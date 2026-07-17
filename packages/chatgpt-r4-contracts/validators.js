@@ -323,6 +323,70 @@ function validatePublicStructuredContent(content) {
   return content;
 }
 
+function validateToolStructuredContent(toolName, content) {
+  validatePublicStructuredContent(content);
+  if (toolName === 'resolve_memory_context') {
+    assertExactKeys(content, [
+      'project_context_ref', 'safe_project_alias', 'expires_at',
+      'visibility_labels', 'context_status'
+    ], 'response_structured_content_shape_invalid');
+    validateProjectContextReference(content.project_context_ref);
+    assertString(content.safe_project_alias, {
+      code: 'response_project_alias_invalid',
+      max: LIMITS.maxProjectAliasCharacters,
+      pattern: /^[A-Za-z0-9][A-Za-z0-9._-]*$/u
+    });
+    parseTime(content.expires_at, 'response_context_expiry_invalid');
+    validateVisibilityLabels(content.visibility_labels, 'response_visibility_labels_invalid');
+    if (content.context_status !== 'resolved') reject('response_context_status_invalid');
+    return content;
+  }
+
+  if (toolName === 'search_memory') {
+    assertExactKeys(content, ['status', 'result_count', 'results'], 'response_structured_content_shape_invalid');
+    assertString(content.status, { code: 'response_result_status_invalid', max: 80 });
+    if (!Number.isInteger(content.result_count) || content.result_count < 0 ||
+        content.result_count > LIMITS.maxResultLimit || !Array.isArray(content.results) ||
+        content.results.length !== content.result_count || content.results.length > LIMITS.maxResultLimit) {
+      reject('response_search_results_invalid');
+    }
+    for (const result of content.results) {
+      assertExactKeys(result, ['result_ref', 'summary', 'relevance'], 'response_search_result_shape_invalid');
+      assertString(result.result_ref, { code: 'response_result_ref_invalid', max: 160 });
+      assertString(result.summary, { code: 'response_result_summary_invalid', max: 4000 });
+      if (typeof result.relevance !== 'number' || !Number.isFinite(result.relevance) ||
+          result.relevance < 0 || result.relevance > 1) {
+        reject('response_result_relevance_invalid');
+      }
+    }
+    return content;
+  }
+
+  const kindByTool = {
+    memory_overview: 'overview',
+    audit_memory: 'audit',
+    prepare_memory_context: 'context'
+  };
+  const expectedKind = kindByTool[toolName];
+  if (!expectedKind) reject('response_tool_name_invalid');
+  assertExactKeys(content, ['status', 'kind', 'item_count'], 'response_structured_content_shape_invalid');
+  assertString(content.status, { code: 'response_result_status_invalid', max: 80 });
+  if (content.kind !== expectedKind) reject('response_result_kind_invalid');
+  if (!Number.isInteger(content.item_count) || content.item_count < 0 ||
+      content.item_count > LIMITS.maxResultLimit) {
+    reject('response_item_count_invalid');
+  }
+  return content;
+}
+
+function validateVisibilityLabels(labels, code) {
+  if (!Array.isArray(labels) || labels.length < 1 ||
+      new Set(labels).size !== labels.length ||
+      labels.some(value => !CONTEXT_VISIBILITIES.includes(value))) {
+    reject(code);
+  }
+}
+
 function validateResponseEnvelope(envelope, {
   now = new Date(),
   resolveResponsePublicKey,
@@ -350,7 +414,7 @@ function validateResponseEnvelope(envelope, {
     maxTtlSeconds: LIMITS.maxEnvelopeTtlSeconds,
     prefix: 'response'
   });
-  validatePublicStructuredContent(envelope.structured_content);
+  validateToolStructuredContent(envelope.tool_name, envelope.structured_content);
   validateCounters(envelope.counters, { requireZero: requireZeroCounters });
   validateReceiptChain(envelope.receipt_chain);
   if (envelope.receipt_chain.edge_request !== envelope.request_digest) {
@@ -399,6 +463,7 @@ module.exports = {
   validateCounters,
   validateReceiptChain,
   validatePublicStructuredContent,
+  validateToolStructuredContent,
   validateResponseEnvelope,
   validateWidgetDto
 };

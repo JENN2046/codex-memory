@@ -23,6 +23,7 @@ const {
   validatePublicStructuredContent,
   validateRequestEnvelope,
   validateResponseEnvelope,
+  validateToolStructuredContent,
   validateToolArguments
 } = require('../../packages/chatgpt-r4-contracts');
 const { generateSigningIdentity, keyResolver, signing, FIXED_NOW, SYNTHETIC_AUDIENCE } = require('./synthetic-harness');
@@ -258,6 +259,49 @@ test('response binds request, counters, receipts, and relay signature', () => {
     resolveResponsePublicKey: keyResolver(relay),
     requireZeroCounters: true
   }), { code: 'response_receipt_request_mismatch' });
+
+  const invalidStructuredContent = createResponseEnvelope({
+    requestId: request.request_id,
+    requestDigest: digestObject(request),
+    toolName: 'memory_overview',
+    status: 'ok',
+    structuredContent: { foo: 'bar' },
+    counters: ZERO_MEMORY_COUNTERS,
+    receiptChain: {
+      edge_request: digestObject(request),
+      relay: sha256('relay'),
+      governance: sha256('governance'),
+      context: sha256('context')
+    },
+    now: clock(),
+    responseId: 'res_response_binding_0000003',
+    signing: signing(relay)
+  });
+  assert.throws(() => validateResponseEnvelope(invalidStructuredContent, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relay),
+    expectedRequest: request,
+    requireZeroCounters: true
+  }), { code: 'response_structured_content_shape_invalid' });
+
+  assert.doesNotThrow(() => validateToolStructuredContent('resolve_memory_context', {
+    project_context_ref: `pctx_${'j'.repeat(32)}`,
+    safe_project_alias: 'project-alpha',
+    expires_at: '2026-07-18T00:05:00.000Z',
+    visibility_labels: ['project', 'workspace'],
+    context_status: 'resolved'
+  }));
+  assert.doesNotThrow(() => validateToolStructuredContent('search_memory', {
+    status: 'ok',
+    result_count: 1,
+    results: [{ result_ref: 'result-1', summary: 'Synthetic summary', relevance: 0.9 }]
+  }));
+  assert.doesNotThrow(() => validateToolStructuredContent('audit_memory', {
+    status: 'empty', kind: 'audit', item_count: 0
+  }));
+  assert.doesNotThrow(() => validateToolStructuredContent('prepare_memory_context', {
+    status: 'empty', kind: 'context', item_count: 0
+  }));
 
   const nonzero = structuredClone(response);
   nonzero.counters.provider_calls = 1;
