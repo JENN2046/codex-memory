@@ -12,6 +12,19 @@ Stage 4A is a short local stability sample; production/release/deploy/cutover/RC
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## Multi-project write-isolation prerequisite
+
+A stable project registry now defines deterministic project-specific private,
+project-shared, and workspace-shared partition requirements. The provisioning
+gate fails closed on missing ownership, profiles, write eligibility, or mapping
+conflicts and exposes no raw partition names. `resolveWrite()` independently
+rejects project-scoped private fallback to a client-only partition.
+
+The current Stage 3B mapping has not been modified and does not yet contain the
+project-specific private targets, so future write activation remains blocked.
+No real partition creation, native write, migration, provider call, service
+operation, release, deploy, or cutover occurred.
+
 ## CM-2133 Diary-partition V1 Stage 4A Stabilization
 
 Restart, deliberate mapping mismatch, retained-binding rollback, and
