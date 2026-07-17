@@ -22,8 +22,17 @@ VCPToolBox 仍然是 native memory behavior 的 owner。本仓库默认不修改
 - [Codex Memory Final Goal](docs/CODEX_MEMORY_FINAL_GOAL.md)
 - [Capability Layer Model](docs/CAPABILITY_LAYER_MODEL.md)
 - [Non-Claims](docs/NON_CLAIMS.md)
+- [ChatGPT Web R4 架构冻结](docs/CHATGPT_WEB_R4_ARCHITECTURE_FREEZE.md)
+- [ChatGPT Web R4 威胁模型](docs/CHATGPT_WEB_R4_THREAT_MODEL.md)
+- [ChatGPT Web R4 实施任务书](docs/CHATGPT_WEB_R4_IMPLEMENTATION_TASKBOOK.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
+
+R4 将目标结构冻结为稳定 HTTPS ChatGPT Edge、本地主动出站 Recall
+Relay、UDS 治理内核和显式多项目上下文。旧 R3/M5 Secure MCP Tunnel
+路线不再是核心路径。该冻结不表示 Edge/Relay 已实现，不改变当前五工具
+默认面，也不执行真实 memory、provider、service、OAuth、deploy、release
+或 cutover 动作。
 
 ## 当前受治理候选路径
 

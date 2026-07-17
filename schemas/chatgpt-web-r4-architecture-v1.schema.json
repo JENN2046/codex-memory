@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codex-memory.local/schemas/chatgpt-web-r4-architecture-v1.schema.json",
+  "title": "codex-memory ChatGPT Web R4 architecture freeze",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "architectureReference",
+    "decisionDate",
+    "decisionTimezone",
+    "decisionAuthority",
+    "freezeStatus",
+    "primaryArchetype",
+    "objective",
+    "canonicalRoute",
+    "trustZones",
+    "transport",
+    "remoteState",
+    "repositoryLayout",
+    "scopeAuthority",
+    "toolProfile",
+    "widget",
+    "authorization",
+    "envelope",
+    "failurePolicy",
+    "implementationStages",
+    "supersession",
+    "nonClaims"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "architectureReference": { "const": "codex-memory-chatgpt-web-r4-v1" },
+    "decisionDate": { "type": "string", "format": "date" },
+    "decisionTimezone": { "const": "Asia/Shanghai" },
+    "decisionAuthority": { "const": "jenn_explicit_r4_freeze" },
+    "freezeStatus": { "const": "frozen_for_implementation" },
+    "primaryArchetype": { "const": "interactive_decoupled" },
+    "objective": { "type": "string", "minLength": 40 },
+    "canonicalRoute": {
+      "const": [
+        "chatgpt_app",
+        "stable_https_chatgpt_edge",
+        "outbound_local_recall_relay",
+        "local_uds",
+        "codex_memory_governance_kernel",
+        "vcp_selected_diary_search"
+      ]
+    },
+    "trustZones": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "role", "durableMemoryAuthority", "diaryAclAuthority"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "role": { "type": "string", "minLength": 1 },
+          "durableMemoryAuthority": { "type": "boolean" },
+          "diaryAclAuthority": { "type": "boolean" }
+        }
+      }
+    },
+    "transport": { "type": "object" },
+    "remoteState": { "type": "object" },
+    "repositoryLayout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sharedContractsRoot",
+        "publicEdgeRoot",
+        "localRelayRoot",
+        "widgetRoot",
+        "governanceAdapterRoot",
+        "testRoot",
+        "importFencesRequired",
+        "publicEdgeForbiddenImports",
+        "localRelayForbiddenCapabilities"
+      ],
+      "properties": {
+        "sharedContractsRoot": { "const": "packages/chatgpt-r4-contracts" },
+        "publicEdgeRoot": { "const": "apps/chatgpt-edge" },
+        "localRelayRoot": { "const": "apps/local-recall-relay" },
+        "widgetRoot": { "const": "apps/chatgpt-memory-scope-widget" },
+        "governanceAdapterRoot": { "const": "src/adapters/chatgpt-r4" },
+        "testRoot": { "const": "tests/chatgpt-r4" },
+        "importFencesRequired": { "const": true },
+        "publicEdgeForbiddenImports": { "type": "array", "minItems": 6, "uniqueItems": true },
+        "localRelayForbiddenCapabilities": { "type": "array", "minItems": 4, "uniqueItems": true }
+      }
+    },
+    "scopeAuthority": { "type": "object" },
+    "toolProfile": { "type": "object" },
+    "widget": { "type": "object" },
+    "authorization": { "type": "object" },
+    "envelope": { "type": "object" },
+    "failurePolicy": { "type": "object" },
+    "implementationStages": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "realMemoryAllowed", "externalRuntimeAllowed"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^R4-[A-G]$" },
+          "name": { "type": "string", "minLength": 1 },
+          "realMemoryAllowed": { "type": "boolean" },
+          "externalRuntimeAllowed": { "type": "boolean" }
+        }
+      }
+    },
+    "supersession": { "type": "object" },
+    "nonClaims": { "type": "object" }
+  }
+}

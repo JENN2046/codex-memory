@@ -4,15 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2134 diary-partition v1 Stage 4B project provisioning and closeout`.
-Current validation: `CMV-2219`.
-Current fact: three projects now resolve through a private 12-entry mapping backed by eight new clean partitions; all 13 legacy partitions remain excluded and unread.
-Thirty bounded provider calls passed the required Codex/Claude and cross-project matrix with zero unscoped search and zero live-proof primary writes.
-Public writes, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+Current task: `CM-2135 ChatGPT Web R4 architecture freeze`.
+Current validation: `CMV-2220`.
+Current fact: R4 freezes a stable HTTPS ChatGPT Edge, outbound Local Recall Relay, local UDS governance kernel, and explicit project context as the canonical route.
+Secure MCP Tunnel is non-canonical; this batch performed no runtime/config/provider/memory action and no public tool expansion.
+Implementation, OAuth activation, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2135 freezes `codex-memory-chatgpt-web-r4-v1`. The canonical flow is stable
+HTTPS ChatGPT Edge -> authenticated outbound Local Recall Relay -> UDS -> local
+codex-memory Governance Kernel -> selected-diary VCP search. Diary ACL remains
+local; a short-lived `project_context_ref` is mandatory and widget/tool inputs
+cannot grant authority. Secure MCP Tunnel is optional/non-canonical, and the R3
+branch stays Draft/paused. Next route is R4-B contract and synthetic-harness
+implementation only; external OAuth/runtime and real memory remain separate.
 
 CM-2134 provisioned three projects with eight new clean partitions and a
 private 12-entry startup mapping. Eight authorized bootstrap records are
