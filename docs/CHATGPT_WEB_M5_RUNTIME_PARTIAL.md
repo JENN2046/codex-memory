@@ -2,7 +2,7 @@
 
 Observed: 2026-07-17 (Asia/Shanghai)
 
-Result: `PARTIAL` / `BLOCKED_AT_TUNNEL_CONTROL_PLANE`
+Result: `PARTIAL` / `BLOCKED_AT_TUNNEL_DOCTOR_AUTH_CLASSIFICATION`
 
 This receipt records only the low-disclosure M5 evidence completed in Jenn's
 dedicated `codex/chatgpt-r3-m2-uds` worktree. It is not ChatGPT reachability,
@@ -67,24 +67,79 @@ operational_audit_write_count: 0
 source_runtime: none
 ```
 
+## Tunnel identity and explicit HTTP fallback
+
+Jenn created a dedicated Tunnel and a restricted runtime key outside Git. A
+read-only control-plane lookup matched the expected Tunnel name and returned
+one organization attachment and one workspace attachment. Exact identifiers,
+key material, and private profile values remain outside this receipt.
+
+The verified official `tunnel-client` `0.0.9` profile schema rejects the R3
+freeze-candidate `unix_socket` field. Under Jenn's explicit M5 UDS/HTTP runtime
+authorization, a separate default-off TCP fallback was therefore added and
+tested:
+
+```yaml
+bind: 127.0.0.1_only
+public_listener: false
+profile: chatgpt_web_transport_probe_v0_only
+bridge_auth: separate_file_bound_header
+transport_auth: separate_file_bound_header
+auth_material_distinct: true
+origin_absent_or_allowlisted_only: true
+forwarded_headers: rejected
+uds_default_changed: false
+```
+
+The real listener bound only to loopback. The private Tunnel profile loaded,
+the local target was reachable, and no poller was started.
+
 ## Hard gate reached
 
-The current WSL process environment and Windows User environment expose no
-`CONTROL_PLANE_TUNNEL_ID`, `OPENAI_ADMIN_KEY`, or runtime-key environment
-binding. The Tunnel client's local runtime-alias list is empty. A protected
-runtime-key file exists, but a runtime key cannot create or list Tunnel CRUD
-metadata and no target Tunnel ID is available for a safe read-only lookup.
+`tunnel-client doctor` completed 12 checks as `PASS` and one optional plugin
+check as `SKIP`, but classified the local bridge-authenticated target as an
+OAuth-capable server because its unauthenticated reachability probe received
+HTTP 401. It then failed `oauth_metadata` when the intentionally non-OAuth v0
+profile returned HTTP 404.
+
+This profile is frozen as private, single-operator, tunnel-bound, read/write
+disabled, and not end-user authenticated. The R3 identity contract makes OAuth
+an upgrade gate for multi-user, shared/published, private-visibility, mutation,
+or user-specific authorization cases. Publishing fabricated OAuth metadata or
+weakening bridge/transport authentication merely to satisfy `doctor` would
+violate that contract.
 
 Consequently, the following were not performed:
 
 - no Tunnel poller start;
-- no Tunnel creation or association;
-- no ChatGPT App creation/update;
+- no ChatGPT App creation/update or scan;
 - no private/single-operator claim;
 - no control-plane/App lineage claim;
 - no ChatGPT E2E probe;
 - no memory recall, provider call, fallback, or memory write.
 
-Advancement requires a separately established codex-memory Tunnel ID plus a
-runtime key authorized for that Tunnel, or a securely bound admin authority to
-create it. Secret values must remain outside Git and command output.
+Advancement requires an official Tunnel client mode that treats static
+file-bound local transport authentication as distinct from end-user OAuth, or
+an approved identity-contract change. Secret values must remain outside Git
+and command output.
+
+## Closeout validation
+
+```yaml
+targeted_chatgpt_transport_tests: 20_pass_0_fail
+npm_test: pass
+npm_test_all: pass
+gate_mainline_strict: pass
+dedicated_loopback_listener_after_closeout: absent
+dedicated_tunnel_poller_after_closeout: absent
+memory_read_count: 0
+memory_write_count: 0
+native_invocation_count: 0
+provider_call_count: 0
+local_fallback_count: 0
+durable_mutation_count: 0
+chatgpt_e2e_claimed: false
+production_ready_claimed: false
+release_ready_claimed: false
+cutover_ready_claimed: false
+```

@@ -877,6 +877,38 @@ function createConfig(overrides = {}) {
       process.env.CODEX_MEMORY_CHATGPT_WEB_UDS_PROFILES,
       []
     ),
+    tcpLoopbackFallbackEnabled: _resolveBool(
+      pickFirstNonEmpty(
+        overrides.chatgptWebTcpFallbackEnabled,
+        chatgptWebUdsOverrides.tcpLoopbackFallback,
+        chatgptWebUdsOverrides.tcp_loopback_fallback
+      ),
+      'CODEX_MEMORY_CHATGPT_WEB_TCP_FALLBACK_ENABLED',
+      false
+    ),
+    tcpLoopbackHost: pickFirstNonEmpty(
+      overrides.chatgptWebTcpFallbackHost,
+      chatgptWebUdsOverrides.tcpLoopbackHost,
+      chatgptWebUdsOverrides.tcp_loopback_host,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_TCP_FALLBACK_HOST,
+      '127.0.0.1'
+    ),
+    tcpLoopbackPort: parsePositiveInteger(
+      pickFirstNonEmpty(
+        overrides.chatgptWebTcpFallbackPort,
+        chatgptWebUdsOverrides.tcpLoopbackPort,
+        chatgptWebUdsOverrides.tcp_loopback_port,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_TCP_FALLBACK_PORT,
+        '17605'
+      ),
+      17605
+    ),
+    transportAuthSecretFile: pickFirstNonEmpty(
+      overrides.chatgptWebTransportAuthSecretFile,
+      chatgptWebUdsOverrides.transportAuthSecretFile,
+      chatgptWebUdsOverrides.transport_auth_secret_file,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_TRANSPORT_AUTH_FILE
+    ),
     fallbackProfileId: chatgptWebProfile.profileId
   });
   const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);

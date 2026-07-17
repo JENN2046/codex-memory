@@ -61,6 +61,14 @@ async function main() {
         bridgeAuthSecretFile: chatgptWebUdsPrivateConfig.bridgeAuthSecretFile,
         allowedOrigins: chatgptWebUdsPrivateConfig.allowedOrigins,
         enabledProfileIds: app.config.chatgptWebUds.enabledProfileIds,
+        tcpLoopbackFallback: chatgptWebUdsPrivateConfig.tcpLoopbackFallback,
+        transportAuthSecretFile: chatgptWebUdsPrivateConfig.transportAuthSecretFile,
+        host: chatgptWebUdsPrivateConfig.tcpLoopbackFallback
+          ? chatgptWebUdsPrivateConfig.tcpLoopbackHost
+          : undefined,
+        port: chatgptWebUdsPrivateConfig.tcpLoopbackFallback
+          ? chatgptWebUdsPrivateConfig.tcpLoopbackPort
+          : undefined,
         runtimeFreshness
       })
     : createStreamableHttpServer({
@@ -77,7 +85,7 @@ async function main() {
     logger.info(httpServer.authWarning);
   }
   if (chatgptWebUdsEnabled) {
-    logger.info(`vcp_codex_memory ChatGPT web UDS MCP listening on ${address.logicalEndpoints.join(', ')}`);
+    logger.info(`vcp_codex_memory ChatGPT web private MCP listening via ${address.transport} on ${address.logicalEndpoints.join(', ')}`);
   } else {
     logger.info(`vcp_codex_memory HTTP MCP listening on ${address.url}`);
   }

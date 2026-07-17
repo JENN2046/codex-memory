@@ -27,6 +27,8 @@ const {
 const SESSION_HEADER = 'Mcp-Session-Id';
 const PROTOCOL_HEADER = 'MCP-Protocol-Version';
 const BRIDGE_AUTH_HEADER = 'X-Codex-Memory-Bridge-Auth';
+const TRANSPORT_AUTH_HEADER = 'X-Codex-Memory-Transport-Auth';
+const CHATGPT_WEB_TCP_FALLBACK_TRANSPORT = 'tcp_loopback_streamable_http';
 const HTTP_SESSION_LIMIT_ERROR = 'HTTP_SESSION_LIMIT_EXCEEDED';
 const HTTP_SESSION_STREAM_LIMIT_ERROR = 'HTTP_SESSION_STREAM_LIMIT_EXCEEDED';
 const PUBLIC_REQUEST_BLOCKED = 'PUBLIC_REQUEST_BLOCKED';
@@ -470,6 +472,14 @@ function isChatGptWebBridgeAuthorized(req, bridgeAuthSecret) {
   return constantTimeStringEqual(bridgeAuthValue, bridgeAuthSecret);
 }
 
+function isChatGptWebTransportAuthorized(req, transportAuthSecret) {
+  const transportAuthValue = getSingleStrictHeaderValue(req, TRANSPORT_AUTH_HEADER);
+  if (!transportAuthValue || !transportAuthSecret || hasForwardedHeaders(req)) {
+    return false;
+  }
+  return constantTimeStringEqual(transportAuthValue, transportAuthSecret);
+}
+
 async function loadChatGptWebBridgeAuthSecret(secretFile) {
   if (typeof secretFile !== 'string' || !path.isAbsolute(secretFile)) {
     throw new Error('ChatGPT web bridge auth file is required.');
@@ -550,6 +560,16 @@ function listenOnUnixSocket(server, socketPath) {
   });
 }
 
+function listenOnTcpLoopback(server, host, port) {
+  return new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(port, host, () => {
+      server.off('error', reject);
+      resolve();
+    });
+  });
+}
+
 function closeServer(server) {
   return new Promise((resolve, reject) => {
     if (!server.listening) {
@@ -594,27 +614,42 @@ function createChatGptWebUdsHttpServer({
   sessionHardeningEnv = process.env,
   sessionClock = () => Date.now(),
   platform = process.platform,
+  tcpLoopbackFallback = false,
+  transportAuthSecretFile,
   host,
   port
 } = {}) {
   if (platform !== 'linux') {
     throw new Error('ChatGPT web UDS transport is supported only on Linux/WSL.');
   }
-  if (host !== undefined || port !== undefined) {
+  const useTcpLoopbackFallback = tcpLoopbackFallback === true;
+  if (!useTcpLoopbackFallback && (host !== undefined || port !== undefined || transportAuthSecretFile !== undefined)) {
     throw new Error('ChatGPT web UDS transport does not permit a TCP fallback.');
+  }
+  if (useTcpLoopbackFallback && host !== '127.0.0.1') {
+    throw new Error('ChatGPT web TCP fallback must bind exactly to 127.0.0.1.');
+  }
+  if (useTcpLoopbackFallback && (!Number.isInteger(port) || port < 0 || port > 65535)) {
+    throw new Error('ChatGPT web TCP fallback port is invalid.');
   }
   if (!app || typeof app !== 'object' || !app.config) {
     throw new Error('ChatGPT web UDS requires an application configuration.');
   }
 
-  const { socketPath, socketDirectory: normalizedSocketDirectory } =
-    validateChatGptWebUdsSocketPath(socketDirectory, socketName);
+  const udsTarget = useTcpLoopbackFallback
+    ? { socketPath: null, socketDirectory: null }
+    : validateChatGptWebUdsSocketPath(socketDirectory, socketName);
+  const { socketPath, socketDirectory: normalizedSocketDirectory } = udsTarget;
+  const activeTransport = useTcpLoopbackFallback
+    ? CHATGPT_WEB_TCP_FALLBACK_TRANSPORT
+    : CHATGPT_WEB_UDS_TRANSPORT;
   const endpoints = buildChatGptWebUdsEndpoints(app, enabledProfileIds);
   const mcpServer = new CodexMemoryMcpServer({ app });
   const sessions = new Map();
   const sessionStreams = new Map();
   const sessionHardening = createSessionHardeningConfig(sessionHardeningEnv);
   let bridgeAuthSecret = null;
+  let transportAuthSecret = null;
 
   function now() {
     return sessionClock();
@@ -681,7 +716,7 @@ function createChatGptWebUdsHttpServer({
   function requestContextFor(endpoint, sessionId) {
     return {
       channelIdentity: 'chatgpt_web',
-      chatgptWebTransport: CHATGPT_WEB_UDS_TRANSPORT,
+      chatgptWebTransport: activeTransport,
       chatgptWebEndpointProfileId: endpoint.profileId,
       sessionId
     };
@@ -690,6 +725,9 @@ function createChatGptWebUdsHttpServer({
   function validateRequestPolicies(req, endpoint) {
     if (!isChatGptWebBridgeAuthorized(req, bridgeAuthSecret)) {
       return { statusCode: 401, code: 'TRANSPORT_BRIDGE_AUTH_REJECTED' };
+    }
+    if (useTcpLoopbackFallback && !isChatGptWebTransportAuthorized(req, transportAuthSecret)) {
+      return { statusCode: 401, code: 'TRANSPORT_AUTH_REJECTED' };
     }
     if (!isChatGptWebOriginAllowed(req, allowedOrigins)) {
       return { statusCode: 403, code: 'TRANSPORT_ORIGIN_REJECTED' };
@@ -852,11 +890,31 @@ function createChatGptWebUdsHttpServer({
     server,
     socketPath,
     logicalEndpoints: Object.freeze([...endpoints.keys()].sort()),
-    transport: CHATGPT_WEB_UDS_TRANSPORT,
+    transport: activeTransport,
     sessionHardening,
     cleanupExpiredSessions,
     async listen() {
       bridgeAuthSecret = await loadChatGptWebBridgeAuthSecret(bridgeAuthSecretFile);
+      if (useTcpLoopbackFallback) {
+        transportAuthSecret = await loadChatGptWebBridgeAuthSecret(transportAuthSecretFile);
+        if (constantTimeStringEqual(bridgeAuthSecret, transportAuthSecret)) {
+          throw new Error('ChatGPT web TCP fallback transport auth must be distinct from bridge auth.');
+        }
+        await listenOnTcpLoopback(server, host, port);
+        const address = server.address();
+        const boundPort = typeof address === 'object' && address ? address.port : port;
+        return {
+          transport: activeTransport,
+          host,
+          port: boundPort,
+          logicalEndpoints: [...endpoints.keys()].sort(),
+          endpointUrls: [...endpoints.keys()].sort().map(endpoint => `http://${host}:${boundPort}${endpoint}`),
+          publicListener: false,
+          tcpLoopbackFallback: true,
+          transportAuthentication: 'separate_file_bound_header',
+          runtimeFreshness: buildRuntimeFreshness(runtimeFreshness)
+        };
+      }
       await ensureChatGptWebUdsSocketDirectory(normalizedSocketDirectory);
       await assertChatGptWebUdsSocketAbsent(socketPath);
       await listenOnUnixSocket(server, socketPath);
@@ -1253,8 +1311,10 @@ function createStreamableHttpServer({
 module.exports = {
   BRIDGE_AUTH_HEADER,
   CHATGPT_WEB_UDS_TRANSPORT,
+  CHATGPT_WEB_TCP_FALLBACK_TRANSPORT,
   PROTOCOL_HEADER,
   SESSION_HEADER,
+  TRANSPORT_AUTH_HEADER,
   PUBLIC_REQUEST_BLOCKED,
   assertChatGptWebUdsSocketAbsent,
   createStreamableHttpServer,
@@ -1263,6 +1323,7 @@ module.exports = {
   ensureChatGptWebUdsSocketDirectory,
   getRawHeaderValues,
   isChatGptWebBridgeAuthorized,
+  isChatGptWebTransportAuthorized,
   isChatGptWebOriginAllowed,
   loadChatGptWebBridgeAuthSecret,
   validateNoTokenJsonRpcRequest,

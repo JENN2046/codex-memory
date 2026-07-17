@@ -64,22 +64,36 @@ function normalizeChatGptWebUdsConfig({
   bridgeAuthSecretFile,
   allowedOrigins,
   enabledProfileIds,
+  tcpLoopbackFallbackEnabled = false,
+  tcpLoopbackHost = '127.0.0.1',
+  tcpLoopbackPort = 17605,
+  transportAuthSecretFile,
   fallbackProfileId = CHATGPT_WEB_PROFILE_IDS.OFF
 } = {}) {
   const resolvedSocketDirectory = resolveAbsolutePath(basePath, socketDirectory);
   const resolvedBridgeAuthSecretFile = resolveAbsolutePath(basePath, bridgeAuthSecretFile);
+  const resolvedTransportAuthSecretFile = resolveAbsolutePath(basePath, transportAuthSecretFile);
   const profiles = normalizeEnabledProfileIds(enabledProfileIds, fallbackProfileId);
   const active = enabled === true;
+  const tcpFallbackActive = active && tcpLoopbackFallbackEnabled === true;
+  const normalizedTcpPort = Number(tcpLoopbackPort);
 
   return {
     publicConfig: Object.freeze({
       enabled: active,
-      transport: 'unix_domain_socket_streamable_http',
+      transport: tcpFallbackActive
+        ? 'tcp_loopback_streamable_http'
+        : 'unix_domain_socket_streamable_http',
       publicListener: false,
-      tcpLoopbackFallback: false,
+      tcpLoopbackFallback: tcpFallbackActive,
       authorizationHeaderAccepted: false,
-      socketConfigured: resolvedSocketDirectory !== null,
+      socketConfigured: !tcpFallbackActive && resolvedSocketDirectory !== null,
       bridgeAuthSecretFileConfigured: resolvedBridgeAuthSecretFile !== null,
+      transportAuthSecretFileConfigured: tcpFallbackActive && resolvedTransportAuthSecretFile !== null,
+      tcpLoopbackHost: tcpFallbackActive ? normalizeString(tcpLoopbackHost) : null,
+      tcpLoopbackPort: tcpFallbackActive && Number.isInteger(normalizedTcpPort)
+        ? normalizedTcpPort
+        : null,
       socketName: normalizeSocketName(socketName),
       enabledProfileIds: Object.freeze(profiles),
       allowedOriginCount: normalizeOrigins(allowedOrigins).length
@@ -88,6 +102,10 @@ function normalizeChatGptWebUdsConfig({
       socketDirectory: resolvedSocketDirectory,
       socketName: normalizeSocketName(socketName),
       bridgeAuthSecretFile: resolvedBridgeAuthSecretFile,
+      transportAuthSecretFile: resolvedTransportAuthSecretFile,
+      tcpLoopbackFallback: tcpFallbackActive,
+      tcpLoopbackHost: normalizeString(tcpLoopbackHost),
+      tcpLoopbackPort: normalizedTcpPort,
       allowedOrigins: Object.freeze(normalizeOrigins(allowedOrigins))
     })
   };

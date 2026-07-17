@@ -57,7 +57,11 @@ M5 is now partial; M6, M7, and M8 remain `runtime_gate` or `not_started`:
 
 - Tunnel client version/SHA/module identity and local checksum-manifest match are recorded;
 - isolated UDS v0/v1 HTTP integration passed and the v0-only runtime probe gate exists;
-- no Secure MCP Tunnel or ChatGPT App;
+- a dedicated Tunnel identity and restricted runtime-key reference were verified without disclosing either;
+- the official `tunnel-client` `0.0.9` schema does not support the candidate `unix_socket` field;
+- an explicitly authorized, default-off, loopback-only HTTP fallback passed dual file-bound auth and Origin conformance;
+- Tunnel `doctor` is blocked at OAuth classification because its unauthenticated local probe sees the required bridge-auth 401, while the private single-operator v0 profile intentionally exposes no OAuth metadata;
+- no Tunnel poller or ChatGPT App was started;
 - one local UDS nonce probe passed with zero memory/native/provider/fallback/mutation counters;
 - no ChatGPT E2E nonce proof;
 - no real or synthetic VCP canary through ChatGPT;
@@ -68,7 +72,8 @@ M5 is now partial; M6, M7, and M8 remain `runtime_gate` or `not_started`:
 
 ```yaml
 runtime_bound: v0_local_probe_only
-tunnel_created: false
+tunnel_identity_verified: true
+tunnel_poller_started: false
 chatgpt_app_connected: false
 real_memory_read: false
 provider_call_performed: false

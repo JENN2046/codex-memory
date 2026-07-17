@@ -130,3 +130,32 @@ test('ChatGPT web UDS configuration fails closed for an explicitly unsafe socket
   assert.equal(normalized.publicConfig.socketName, null);
   assert.equal(normalized.privateConfig.socketName, null);
 });
+
+test('ChatGPT web TCP fallback stays explicit and keeps transport auth references private', () => {
+  const normalized = normalizeChatGptWebUdsConfig({
+    basePath: process.cwd(),
+    enabled: true,
+    bridgeAuthSecretFile: '.synthetic-bridge-auth',
+    transportAuthSecretFile: '.synthetic-transport-auth',
+    enabledProfileIds: [CHATGPT_WEB_PROFILE_IDS.TRANSPORT_PROBE_V0],
+    tcpLoopbackFallbackEnabled: true,
+    tcpLoopbackHost: '127.0.0.1',
+    tcpLoopbackPort: 17605
+  });
+  const config = attachChatGptWebUdsPrivateConfig({
+    chatgptWebUds: normalized.publicConfig
+  }, normalized.privateConfig);
+  const serialized = JSON.stringify(config);
+  const privateConfig = getChatGptWebUdsPrivateConfig(config);
+
+  assert.equal(config.chatgptWebUds.transport, 'tcp_loopback_streamable_http');
+  assert.equal(config.chatgptWebUds.tcpLoopbackFallback, true);
+  assert.equal(config.chatgptWebUds.publicListener, false);
+  assert.equal(config.chatgptWebUds.socketConfigured, false);
+  assert.equal(config.chatgptWebUds.transportAuthSecretFileConfigured, true);
+  assert.equal(serialized.includes('synthetic-bridge-auth'), false);
+  assert.equal(serialized.includes('synthetic-transport-auth'), false);
+  assert.match(privateConfig.transportAuthSecretFile, /synthetic-transport-auth/);
+  assert.equal(privateConfig.tcpLoopbackHost, '127.0.0.1');
+  assert.equal(privateConfig.tcpLoopbackPort, 17605);
+});

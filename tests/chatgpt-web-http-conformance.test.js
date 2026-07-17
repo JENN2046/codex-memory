@@ -9,8 +9,10 @@ const path = require('node:path');
 
 const {
   BRIDGE_AUTH_HEADER,
+  CHATGPT_WEB_TCP_FALLBACK_TRANSPORT,
   PROTOCOL_HEADER,
   SESSION_HEADER,
+  TRANSPORT_AUTH_HEADER,
   createChatGptWebUdsHttpServer,
   ensureChatGptWebUdsSocketDirectory,
   loadChatGptWebBridgeAuthSecret
@@ -25,6 +27,7 @@ const {
 
 const LINUX_ONLY = process.platform !== 'linux';
 const BRIDGE_SECRET = 'synthetic-m2-bridge-secret-value';
+const TRANSPORT_SECRET = 'synthetic-m5-transport-secret-value';
 const JSON_AND_SSE_ACCEPT = 'application/json, text/event-stream';
 const ALL_PROFILE_IDS = Object.freeze([
   CHATGPT_WEB_PROFILE_IDS.TRANSPORT_PROBE_V0,
@@ -109,6 +112,38 @@ function udsRequest(socketPath, requestPath, {
   });
 }
 
+function tcpRequest(port, requestPath, {
+  method = 'POST',
+  headers = {},
+  body
+} = {}) {
+  return new Promise((resolve, reject) => {
+    const request = http.request({
+      host: '127.0.0.1',
+      port,
+      path: requestPath,
+      method,
+      headers
+    }, response => {
+      const chunks = [];
+      response.on('data', chunk => chunks.push(chunk));
+      response.on('end', () => {
+        const text = Buffer.concat(chunks).toString('utf8');
+        let json = null;
+        try {
+          json = text ? JSON.parse(text) : null;
+        } catch {
+          // Streaming responses are handled by a dedicated helper.
+        }
+        resolve({ status: response.statusCode, headers: response.headers, text, json });
+      });
+    });
+    request.once('error', reject);
+    if (body !== undefined) request.write(body);
+    request.end();
+  });
+}
+
 function openUdsSse(socketPath, requestPath, headers) {
   return new Promise((resolve, reject) => {
     const request = http.request({
@@ -134,6 +169,25 @@ function bridgeHeaders(extra = {}) {
     [BRIDGE_AUTH_HEADER]: BRIDGE_SECRET,
     ...extra
   };
+}
+
+function tcpFallbackHeaders(extra = {}) {
+  return bridgeHeaders({
+    [TRANSPORT_AUTH_HEADER]: TRANSPORT_SECRET,
+    ...extra
+  });
+}
+
+function tcpFallbackMcpHeaders(sessionId, extra = {}) {
+  return tcpFallbackHeaders({
+    Accept: JSON_AND_SSE_ACCEPT,
+    'Content-Type': 'application/json',
+    ...(sessionId ? {
+      [SESSION_HEADER]: sessionId,
+      [PROTOCOL_HEADER]: '2025-06-18'
+    } : {}),
+    ...extra
+  });
 }
 
 function mcpHeaders(sessionId, extra = {}) {
@@ -177,6 +231,35 @@ async function withChatGptWebUdsServer(handler) {
     });
   } finally {
     await udsServer.close();
+    await fs.rm(tempRoot, { recursive: true, force: true });
+  }
+}
+
+async function withChatGptWebTcpFallbackServer(handler) {
+  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-m5-tcp-'));
+  const bridgeSecretFile = path.join(tempRoot, 'bridge-auth');
+  const transportSecretFile = path.join(tempRoot, 'transport-auth');
+  await fs.writeFile(bridgeSecretFile, BRIDGE_SECRET, { mode: 0o600 });
+  await fs.writeFile(transportSecretFile, TRANSPORT_SECRET, { mode: 0o600 });
+  await fs.chmod(bridgeSecretFile, 0o600);
+  await fs.chmod(transportSecretFile, 0o600);
+  const { app, calls } = createSyntheticApp();
+  const server = createChatGptWebUdsHttpServer({
+    app,
+    bridgeAuthSecretFile: bridgeSecretFile,
+    transportAuthSecretFile: transportSecretFile,
+    enabledProfileIds: [CHATGPT_WEB_PROFILE_IDS.TRANSPORT_PROBE_V0],
+    allowedOrigins: [],
+    tcpLoopbackFallback: true,
+    host: '127.0.0.1',
+    port: 0
+  });
+  const address = await server.listen();
+
+  try {
+    await handler({ calls, server, address, tempRoot });
+  } finally {
+    await server.close();
     await fs.rm(tempRoot, { recursive: true, force: true });
   }
 }
@@ -393,6 +476,74 @@ test('M2 ChatGPT UDS conformance uses only a synthetic app and no TCP fallback',
     assert.equal(deleteSession.status, 204);
     assert.equal(calls.length, 0);
   });
+});
+
+test('M5 explicit TCP fallback is loopback-only and requires distinct transport plus bridge auth', { skip: LINUX_ONLY }, async () => {
+  await withChatGptWebTcpFallbackServer(async ({ calls, server, address }) => {
+    assert.equal(server.transport, CHATGPT_WEB_TCP_FALLBACK_TRANSPORT);
+    assert.equal(address.transport, CHATGPT_WEB_TCP_FALLBACK_TRANSPORT);
+    assert.equal(address.host, '127.0.0.1');
+    assert.equal(address.publicListener, false);
+    assert.equal(address.tcpLoopbackFallback, true);
+    assert.equal(address.transportAuthentication, 'separate_file_bound_header');
+
+    const endpoint = '/mcp/codex-memory/chatgpt/v0';
+    const missingTransportAuth = await tcpRequest(address.port, endpoint, {
+      headers: mcpHeaders(),
+      body: jsonRpc(1, 'initialize', { protocolVersion: '2025-06-18', capabilities: {} })
+    });
+    assert.equal(missingTransportAuth.status, 401);
+    assert.equal(missingTransportAuth.json.code, 'TRANSPORT_AUTH_REJECTED');
+
+    const rejectedOrigin = await tcpRequest(address.port, endpoint, {
+      headers: tcpFallbackMcpHeaders(undefined, { Origin: 'https://unapproved.invalid' }),
+      body: jsonRpc(2, 'initialize', { protocolVersion: '2025-06-18', capabilities: {} })
+    });
+    assert.equal(rejectedOrigin.status, 403);
+    assert.equal(rejectedOrigin.json.code, 'TRANSPORT_ORIGIN_REJECTED');
+
+    const initialized = await tcpRequest(address.port, endpoint, {
+      headers: tcpFallbackMcpHeaders(),
+      body: jsonRpc(3, 'initialize', { protocolVersion: '2025-06-18', capabilities: {} })
+    });
+    assert.equal(initialized.status, 200);
+    assert.equal(typeof initialized.headers[SESSION_HEADER.toLowerCase()], 'string');
+    assert.deepEqual(calls, []);
+  });
+});
+
+test('M5 TCP fallback rejects non-loopback and shared auth material', { skip: LINUX_ONLY }, async () => {
+  const tempRoot = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-m5-tcp-negative-'));
+  const secretFile = path.join(tempRoot, 'auth');
+  await fs.writeFile(secretFile, BRIDGE_SECRET, { mode: 0o600 });
+  await fs.chmod(secretFile, 0o600);
+  const { app } = createSyntheticApp();
+
+  try {
+    assert.throws(() => createChatGptWebUdsHttpServer({
+      app,
+      bridgeAuthSecretFile: secretFile,
+      transportAuthSecretFile: secretFile,
+      enabledProfileIds: [CHATGPT_WEB_PROFILE_IDS.TRANSPORT_PROBE_V0],
+      tcpLoopbackFallback: true,
+      host: '0.0.0.0',
+      port: 0
+    }), /must bind exactly to 127\.0\.0\.1/);
+
+    const server = createChatGptWebUdsHttpServer({
+      app,
+      bridgeAuthSecretFile: secretFile,
+      transportAuthSecretFile: secretFile,
+      enabledProfileIds: [CHATGPT_WEB_PROFILE_IDS.TRANSPORT_PROBE_V0],
+      tcpLoopbackFallback: true,
+      host: '127.0.0.1',
+      port: 0
+    });
+    await assert.rejects(server.listen(), /must be distinct from bridge auth/);
+    await server.close();
+  } finally {
+    await fs.rm(tempRoot, { recursive: true, force: true });
+  }
 });
 
 test('M2 ChatGPT UDS refuses a TCP-shaped listener configuration', { skip: LINUX_ONLY }, () => {
