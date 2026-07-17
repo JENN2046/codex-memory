@@ -8,10 +8,10 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | ChatGPT Web R4 architecture frozen; Edge/Relay implementation, runtime activation, and readiness remain false |
-| Current task | `CM-2135 ChatGPT Web R4 architecture freeze` |
-| Current validation | `CMV-2220` |
-| Current route | Deliver the R4 freeze through normal PR/CI/review, then begin contracts-only R4-B |
+| Status | ChatGPT Web R4-B contracts and zero-memory synthetic harness implemented; services/runtime/readiness remain false |
+| Current task | `CM-2136 ChatGPT Web R4-B contracts and synthetic harness` |
+| Current validation | `CMV-2221` |
+| Current route | Deliver R4-B through normal PR/CI/review, then begin loopback-only synthetic R4-C |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -32,6 +32,23 @@ no runtime/config, started no service, called no provider or memory path, and
 expanded no public tool surface. Edge/Relay implementation, OAuth activation,
 automatic ChatGPT tool-use proof, production, release, deploy, cutover, and
 readiness remain false. See `docs/CHATGPT_WEB_R4_ARCHITECTURE_FREEZE.md`.
+
+## ChatGPT Web R4-B Contracts And Synthetic Harness
+
+R4-B implements dependency-free signed principal/context/envelope contracts,
+TTL/replay/size/counter/disclosure validation, import fences, a non-default
+read-only six-tool candidate profile, a bounded MCP Apps Widget DTO/bridge, and
+injected Edge/Relay/local-governance modules. The opaque project context is
+issued and resolved locally; public authority fields are rejected.
+
+The in-memory two-request synthetic flow passed with all provider, native,
+fallback, primary/derived write, other durable mutation, and unrestricted
+search counters at zero. Duplicate request, context reuse, signature/scope
+forgery, private visibility, import-boundary, body-log, listener, runtime-config,
+and durable-state mutations fail closed. The candidate is not imported by the
+active runtime. No service, OAuth, external runtime, provider, VCP, real memory,
+public tool expansion, production, release, deploy, cutover, or readiness action
+occurred. See `docs/CHATGPT_WEB_R4B_CONTRACTS_SYNTHETIC.md`.
 
 ## Diary-partition V1 Stage 4B Closeout
 

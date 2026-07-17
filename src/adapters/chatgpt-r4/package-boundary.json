@@ -1,0 +1,11 @@
+{
+  "component": "local_governance_adapter_candidate",
+  "stage": "R4-B",
+  "activated": false,
+  "directCoreImportAllowed": false,
+  "injectedGovernanceOnly": true,
+  "diaryAclAuthorityDelegatedOutsideLocalKernel": false,
+  "allowedProjectImports": [
+    "packages/chatgpt-r4-contracts"
+  ]
+}

@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Current stage: `R4-A architecture_freeze`
+Current stage: `R4-B contracts_and_synthetic_harness`
 
 Old R3/M5 Tunnel route: `draft_paused_no_merge`
 
@@ -18,6 +18,8 @@ branch is not merged or rebased into R4. Reusable controls are ported only after
 review against the frozen manifest.
 
 ## R4-A — Architecture Freeze
+
+Status: `COMPLETE`
 
 Deliverables:
 
@@ -46,6 +48,8 @@ freezes a target; it proves no runtime capability.
 
 ## R4-B — Contracts And Synthetic Harness
 
+Status: `IMPLEMENTED_LOCAL_CANDIDATE_PENDING_PR_DELIVERY`
+
 Implement without external runtime:
 
 - create the frozen package roots under `apps/`, `packages/`,
@@ -63,6 +67,8 @@ Implement without external runtime:
 Required gates include negative mutations for every authority-bearing field.
 No service, OAuth configuration, public tool activation, provider, or real
 memory is authorized by R4-B.
+
+Implementation evidence: `docs/CHATGPT_WEB_R4B_CONTRACTS_SYNTHETIC.md`.
 
 ## R4-C — Local Edge/Relay Integration
 

@@ -25,6 +25,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R4 Architecture Freeze](docs/CHATGPT_WEB_R4_ARCHITECTURE_FREEZE.md)
 - [ChatGPT Web R4 Threat Model](docs/CHATGPT_WEB_R4_THREAT_MODEL.md)
 - [ChatGPT Web R4 Implementation Taskbook](docs/CHATGPT_WEB_R4_IMPLEMENTATION_TASKBOOK.md)
+- [ChatGPT Web R4-B Contracts And Synthetic Harness](docs/CHATGPT_WEB_R4B_CONTRACTS_SYNTHETIC.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 

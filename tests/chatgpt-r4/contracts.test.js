@@ -1,0 +1,300 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
+const test = require('node:test');
+
+const {
+  InMemoryReplayGuard,
+  PRINCIPAL_ASSERTION_SCHEMA,
+  PROJECT_CONTEXT_CLAIM_SCHEMA,
+  REQUEST_ENVELOPE_SCHEMA,
+  RESPONSE_ENVELOPE_SCHEMA,
+  WIDGET_DTO_SCHEMA,
+  ZERO_MEMORY_COUNTERS,
+  canonicalJson,
+  createPrincipalAssertion,
+  createProjectContextClaim,
+  createRequestEnvelope,
+  createResponseEnvelope,
+  digestObject,
+  sha256,
+  validateProjectContextClaim,
+  validateRequestEnvelope,
+  validateResponseEnvelope,
+  validateToolArguments
+} = require('../../packages/chatgpt-r4-contracts');
+const { generateSigningIdentity, keyResolver, signing, FIXED_NOW, SYNTHETIC_AUDIENCE } = require('./synthetic-harness');
+
+function fixture() {
+  const principal = generateSigningIdentity('principal-test-key');
+  const edge = generateSigningIdentity('edge-test-key');
+  const context = generateSigningIdentity('context-test-key');
+  const relay = generateSigningIdentity('relay-test-key');
+  const clock = () => new Date(FIXED_NOW.getTime());
+  const principalAssertion = createPrincipalAssertion({
+    issuer: 'https://idp.synthetic.invalid',
+    audience: SYNTHETIC_AUDIENCE,
+    subjectFingerprint: sha256('principal'),
+    now: clock(),
+    nonce: 'principal_nonce_contract_01',
+    signing: signing(principal)
+  });
+  return { principal, edge, context, relay, clock, principalAssertion };
+}
+
+test('R4-B exports frozen principal, context, request, response, and widget schemas', () => {
+  for (const schema of [
+    PRINCIPAL_ASSERTION_SCHEMA,
+    PROJECT_CONTEXT_CLAIM_SCHEMA,
+    REQUEST_ENVELOPE_SCHEMA,
+    RESPONSE_ENVELOPE_SCHEMA,
+    WIDGET_DTO_SCHEMA
+  ]) {
+    assert.equal(Object.isFrozen(schema), true);
+    assert.equal(schema.additionalProperties, false);
+  }
+  assert.equal(PRINCIPAL_ASSERTION_SCHEMA.properties.oauth_version.const, '2.1');
+  assert.equal(PROJECT_CONTEXT_CLAIM_SCHEMA.properties.client_id.const, 'ChatGPT');
+});
+
+test('canonical JSON and digests are stable across key order', () => {
+  const left = { b: [2, { z: true, a: null }], a: 1 };
+  const right = { a: 1, b: [2, { a: null, z: true }] };
+  assert.equal(canonicalJson(left), canonicalJson(right));
+  assert.equal(digestObject(left), digestObject(right));
+  assert.throws(() => canonicalJson({ value: Number.NaN }), { code: 'non_finite_number' });
+});
+
+test('signed principal and request validate with exact audience and one-time replay guard', () => {
+  const { principal, edge, clock, principalAssertion } = fixture();
+  const replayGuard = new InMemoryReplayGuard({ clock });
+  const request = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'a'.repeat(32)}` },
+    now: clock(),
+    requestId: 'req_contract_validation_0001',
+    nonce: 'request_nonce_contract_0001',
+    signing: signing(edge)
+  });
+  const result = validateRequestEnvelope(request, {
+    now: clock(),
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: keyResolver(principal),
+    resolveRequestPublicKey: keyResolver(edge),
+    replayGuard
+  });
+  assert.equal(result.requestDigest, digestObject(request));
+  assert.throws(() => validateRequestEnvelope(request, {
+    now: clock(),
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: keyResolver(principal),
+    resolveRequestPublicKey: keyResolver(edge),
+    replayGuard
+  }), { code: 'replay_detected' });
+});
+
+test('principal audience, expiry, and signature drift fail closed', () => {
+  const { principal, edge, principalAssertion } = fixture();
+  const request = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'b'.repeat(32)}` },
+    now: FIXED_NOW,
+    requestId: 'req_contract_negative_000001',
+    nonce: 'request_nonce_negative_0001',
+    signing: signing(edge)
+  });
+  const options = {
+    resolvePrincipalPublicKey: keyResolver(principal),
+    resolveRequestPublicKey: keyResolver(edge),
+    consumeReplay: false
+  };
+  assert.throws(() => validateRequestEnvelope(request, {
+    ...options,
+    now: FIXED_NOW,
+    expectedAudience: 'https://wrong.synthetic.invalid/mcp'
+  }), { code: 'principal_audience_mismatch' });
+  assert.throws(() => validateRequestEnvelope(request, {
+    ...options,
+    now: new Date(FIXED_NOW.getTime() + 600_000),
+    expectedAudience: SYNTHETIC_AUDIENCE
+  }), { code: 'request_expired' });
+  const tampered = structuredClone(request);
+  tampered.tool_request.arguments.project_context_ref = `pctx_${'c'.repeat(32)}`;
+  assert.throws(() => validateRequestEnvelope(tampered, {
+    ...options,
+    now: FIXED_NOW,
+    expectedAudience: SYNTHETIC_AUDIENCE
+  }), { code: 'signature_verification_failed' });
+});
+
+test('project context is opaque, signed, principal-bound, and excludes private visibility', () => {
+  const { context, clock, principalAssertion } = fixture();
+  const claim = createProjectContextClaim({
+    projectContextRef: `pctx_${'d'.repeat(32)}`,
+    principalFingerprint: principalAssertion.subject_fingerprint,
+    projectId: 'internal-project',
+    workspaceId: 'internal-workspace',
+    visibilityAllowlist: ['project', 'workspace', 'task_start_context'],
+    registryReference: 'registry-v1',
+    mappingReference: 'mapping-v1',
+    mappingDigest: sha256('mapping'),
+    now: clock(),
+    nonce: 'context_nonce_contract_0001',
+    signing: signing(context)
+  });
+  assert.equal(validateProjectContextClaim(claim, {
+    now: clock(),
+    resolvePublicKey: keyResolver(context),
+    expectedPrincipalFingerprint: principalAssertion.subject_fingerprint
+  }), claim);
+  assert.throws(() => validateProjectContextClaim(claim, {
+    now: clock(),
+    resolvePublicKey: keyResolver(context),
+    expectedPrincipalFingerprint: sha256('other')
+  }), { code: 'project_context_principal_mismatch' });
+
+  const privateClaim = createProjectContextClaim({
+    projectContextRef: `pctx_${'e'.repeat(32)}`,
+    principalFingerprint: principalAssertion.subject_fingerprint,
+    projectId: 'internal-project',
+    workspaceId: 'internal-workspace',
+    visibilityAllowlist: ['private'],
+    registryReference: 'registry-v1',
+    mappingReference: 'mapping-v1',
+    mappingDigest: sha256('mapping'),
+    now: clock(),
+    nonce: 'context_nonce_contract_0002',
+    signing: signing(context)
+  });
+  assert.throws(() => validateProjectContextClaim(privateClaim, {
+    now: clock(),
+    resolvePublicKey: keyResolver(context)
+  }), { code: 'project_context_visibility_invalid' });
+});
+
+test('public tool arguments cannot forge scope, mapping, diary, or ownership fields', () => {
+  for (const forged of [
+    { client_id: 'Codex' },
+    { project_id: 'other-project' },
+    { mapping_digest: sha256('forged') },
+    { nested: { diaryName: 'forbidden' } },
+    { trusted_scope: { visibility: 'private' } }
+  ]) {
+    assert.throws(() => validateToolArguments('search_memory', {
+      project_context_ref: `pctx_${'f'.repeat(32)}`,
+      query: 'safe synthetic query',
+      ...forged
+    }), { code: 'tool_authority_argument_forbidden' });
+  }
+  assert.throws(() => validateToolArguments('search_memory', {
+    project_context_ref: `pctx_${'g'.repeat(32)}`,
+    query: 'x'.repeat(2001)
+  }), { code: 'search_query_invalid' });
+});
+
+test('response binds request, counters, receipts, and relay signature', () => {
+  const { principal, edge, relay, clock, principalAssertion } = fixture();
+  const request = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'h'.repeat(32)}` },
+    now: clock(),
+    requestId: 'req_response_binding_0000001',
+    nonce: 'request_nonce_response_0001',
+    signing: signing(edge)
+  });
+  const response = createResponseEnvelope({
+    requestId: request.request_id,
+    requestDigest: digestObject(request),
+    toolName: 'memory_overview',
+    status: 'ok',
+    structuredContent: { status: 'empty', kind: 'overview', item_count: 0 },
+    counters: ZERO_MEMORY_COUNTERS,
+    receiptChain: {
+      edge_request: digestObject(request),
+      relay: sha256('relay'),
+      governance: sha256('governance'),
+      context: sha256('context')
+    },
+    now: clock(),
+    responseId: 'res_response_binding_0000001',
+    signing: signing(relay)
+  });
+  assert.equal(validateResponseEnvelope(response, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relay),
+    expectedRequest: request,
+    requireZeroCounters: true
+  }), response);
+
+  const nonzero = structuredClone(response);
+  nonzero.counters.provider_calls = 1;
+  assert.throws(() => validateResponseEnvelope(nonzero, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relay),
+    expectedRequest: request,
+    requireZeroCounters: true
+  }), { code: 'zero_memory_counter_nonzero' });
+
+  const wrongRequest = structuredClone(request);
+  wrongRequest.request_id = 'req_response_binding_9999999';
+  assert.throws(() => validateResponseEnvelope(response, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relay),
+    expectedRequest: wrongRequest,
+    requireZeroCounters: true
+  }), { code: 'response_request_id_mismatch' });
+  assert.ok(principal.publicKey.asymmetricKeyType === 'ed25519');
+  assert.ok(crypto.createHash('sha256'));
+});
+
+test('request and response byte ceilings reject oversized signed payloads before invocation', () => {
+  const { principal, edge, relay, clock, principalAssertion } = fixture();
+  const oversizedRequest = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: `pctx_${'i'.repeat(32)}`,
+      query: 'x'.repeat(40_000)
+    },
+    now: clock(),
+    requestId: 'req_oversized_contract_000001',
+    nonce: 'request_nonce_oversized_0001',
+    signing: signing(edge)
+  });
+  assert.throws(() => validateRequestEnvelope(oversizedRequest, {
+    now: clock(),
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: keyResolver(principal),
+    resolveRequestPublicKey: keyResolver(edge),
+    consumeReplay: false
+  }), { code: 'request_envelope_too_large' });
+
+  const requestDigest = digestObject(oversizedRequest);
+  const oversizedResponse = createResponseEnvelope({
+    requestId: oversizedRequest.request_id,
+    requestDigest,
+    toolName: 'search_memory',
+    status: 'ok',
+    structuredContent: { status: 'ok', summary: 'x'.repeat(70_000) },
+    counters: ZERO_MEMORY_COUNTERS,
+    receiptChain: {
+      edge_request: requestDigest,
+      relay: sha256('relay'),
+      governance: sha256('governance'),
+      context: sha256('context')
+    },
+    now: clock(),
+    responseId: 'res_oversized_contract_000001',
+    signing: signing(relay)
+  });
+  assert.throws(() => validateResponseEnvelope(oversizedResponse, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relay),
+    expectedRequest: oversizedRequest,
+    requireZeroCounters: true
+  }), { code: 'response_envelope_too_large' });
+});

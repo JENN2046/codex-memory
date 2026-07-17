@@ -25,6 +25,7 @@ VCPToolBox 仍然是 native memory behavior 的 owner。本仓库默认不修改
 - [ChatGPT Web R4 架构冻结](docs/CHATGPT_WEB_R4_ARCHITECTURE_FREEZE.md)
 - [ChatGPT Web R4 威胁模型](docs/CHATGPT_WEB_R4_THREAT_MODEL.md)
 - [ChatGPT Web R4 实施任务书](docs/CHATGPT_WEB_R4_IMPLEMENTATION_TASKBOOK.md)
+- [ChatGPT Web R4-B 契约与合成验证](docs/CHATGPT_WEB_R4B_CONTRACTS_SYNTHETIC.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
@@ -33,6 +34,11 @@ Relay、UDS 治理内核和显式多项目上下文。旧 R3/M5 Secure MCP Tunne
 路线不再是核心路径。该冻结不表示 Edge/Relay 已实现，不改变当前五工具
 默认面，也不执行真实 memory、provider、service、OAuth、deploy、release
 或 cutover 动作。
+
+R4-B 已实现不激活的共享契约、candidate tool descriptors、Widget DTO、
+Edge/Relay/Governance 注入边界和零记忆 synthetic harness。它不包含服务
+listener、OAuth 配置、公共工具注册、provider/VCP 调用或真实 memory read；
+下一阶段是临时 loopback/UDS 的 R4-C 合成集成。
 
 ## 当前受治理候选路径
 

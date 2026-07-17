@@ -1,0 +1,94 @@
+'use strict';
+
+const {
+  createResponseEnvelope,
+  digestObject,
+  validateCounters,
+  validatePublicStructuredContent,
+  validateRequestEnvelope,
+  validateReceiptChain,
+  reject
+} = require('../../packages/chatgpt-r4-contracts');
+
+function createRelayProcessor({
+  expectedAudience,
+  resolveRequestPublicKey,
+  resolvePrincipalPublicKey,
+  requestReplayGuard,
+  forwardToUds,
+  responseSigning,
+  clock = () => new Date()
+}) {
+  if (typeof forwardToUds !== 'function') reject('relay_forwarder_missing');
+
+  return Object.freeze({
+    async handle(request) {
+      const now = clock();
+      const validation = validateRequestEnvelope(request, {
+        now,
+        resolveRequestPublicKey,
+        resolvePrincipalPublicKey,
+        expectedAudience,
+        replayGuard: requestReplayGuard,
+        consumeReplay: true
+      });
+      const relayReceipt = Object.freeze({
+        schema_version: 1,
+        kind: 'chatgpt_r4_relay_receipt',
+        request_digest: validation.requestDigest,
+        signature_valid: true,
+        replay_guard_passed: true,
+        forwarded_over: 'injected_uds_boundary',
+        scope_authorized_by_relay: false,
+        durable_state_written: false
+      });
+      const invocation = await forwardToUds({ request, relayReceipt });
+      validateInvocation(invocation);
+      const receiptChain = {
+        edge_request: validation.requestDigest,
+        relay: digestObject(relayReceipt),
+        governance: invocation.receipt_digests.governance,
+        context: invocation.receipt_digests.context
+      };
+      validateReceiptChain(receiptChain);
+
+      return createResponseEnvelope({
+        requestId: request.request_id,
+        requestDigest: validation.requestDigest,
+        toolName: request.tool_request.name,
+        status: invocation.status,
+        structuredContent: invocation.structured_content,
+        counters: invocation.counters,
+        receiptChain,
+        now,
+        signing: responseSigning
+      });
+    }
+  });
+}
+
+function validateInvocation(invocation) {
+  if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
+    reject('relay_invocation_invalid');
+  }
+  const keys = Object.keys(invocation).sort();
+  if (keys.join(',') !== ['counters', 'receipt_digests', 'status', 'structured_content'].sort().join(',')) {
+    reject('relay_invocation_shape_invalid');
+  }
+  if (!['ok', 'denied', 'unavailable'].includes(invocation.status)) reject('relay_invocation_status_invalid');
+  validatePublicStructuredContent(invocation.structured_content);
+  validateCounters(invocation.counters);
+  if (!invocation.receipt_digests ||
+      typeof invocation.receipt_digests !== 'object' ||
+      Array.isArray(invocation.receipt_digests) ||
+      Object.keys(invocation.receipt_digests).sort().join(',') !== 'context,governance' ||
+      !/^sha256:[a-f0-9]{64}$/u.test(invocation.receipt_digests.governance || '') ||
+      !/^sha256:[a-f0-9]{64}$/u.test(invocation.receipt_digests.context || '')) {
+    reject('relay_invocation_receipt_invalid');
+  }
+}
+
+module.exports = {
+  createRelayProcessor,
+  validateInvocation
+};

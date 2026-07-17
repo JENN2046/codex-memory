@@ -4,15 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2135 ChatGPT Web R4 architecture freeze`.
-Current validation: `CMV-2220`.
-Current fact: R4 freezes a stable HTTPS ChatGPT Edge, outbound Local Recall Relay, local UDS governance kernel, and explicit project context as the canonical route.
-Secure MCP Tunnel is non-canonical; this batch performed no runtime/config/provider/memory action and no public tool expansion.
-Implementation, OAuth activation, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+Current task: `CM-2136 ChatGPT Web R4-B contracts and synthetic harness`.
+Current validation: `CMV-2221`.
+Current fact: R4-B implements import-fenced signed contracts, a non-default read-only candidate profile, Widget DTO/bridge, and a zero-memory synthetic Edge/Relay/UDS/governance flow.
+All provider/native/fallback/write/durable counters are zero; no service, OAuth, external runtime, real memory, or public tool expansion occurred.
+Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2136 implements the R4-B contracts-only candidate. Signed principal,
+opaque project context, request/response, replay/TTL/size/counter/disclosure,
+candidate tools, Widget bridge, Relay, and local governance injection are
+covered by import fences and 19 focused tests. The in-memory synthetic flow
+performs context resolution plus an empty overview with every provider/native/
+fallback/write/durable/global-search counter at zero. The candidate is not
+default or active. Next route after PR delivery is R4-C loopback/temporary-UDS
+synthetic integration; external OAuth/runtime and real memory remain separate.
 
 CM-2135 freezes `codex-memory-chatgpt-web-r4-v1`. The canonical flow is stable
 HTTPS ChatGPT Edge -> authenticated outbound Local Recall Relay -> UDS -> local
