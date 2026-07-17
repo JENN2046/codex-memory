@@ -32,6 +32,15 @@
     "diaryPartitionV1Stage3bTaskStartNativeRecallPassed": true,
     "diaryPartitionV1Stage3bUnscopedNativeSearchCount": 0,
     "diaryPartitionV1Stage3bVerdict": "V1_COMPLETE",
+    "diaryPartitionV1Stage4aAcceleratedSoakRuns": 3,
+    "diaryPartitionV1Stage4aLivePrimaryMemoryWrites": 0,
+    "diaryPartitionV1Stage4aLiveReadCalls": 30,
+    "diaryPartitionV1Stage4aLongDurationSoakClaimed": false,
+    "diaryPartitionV1Stage4aMappingMismatchFailClosed": true,
+    "diaryPartitionV1Stage4aMismatchProviderCalls": 0,
+    "diaryPartitionV1Stage4aRollbackRestorePassed": true,
+    "diaryPartitionV1Stage4aTaskStartRecoveryNonEmpty": true,
+    "diaryPartitionV1Stage4aUnscopedNativeSearchCount": 0,
     "cm2115CanonicalSnapshotPrepared": true,
     "cm2115FullPlanApplicationApplied": false,
     "cm2115FullPlanApplicationAuthorized": false,
@@ -648,12 +657,17 @@
     "notReleaseReady": true,
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "diary_partition_v1_stage3b_live_proof_complete_production_release_cutover_readiness_false"
+    "scope": "diary_partition_v1_stage4a_local_stabilization_complete_production_release_cutover_readiness_false"
   },
-  "taskId": "CM-2132",
+  "taskId": "CM-2133",
   "updatedAt": "2026-07-17",
-  "validationId": "CMV-2217",
+  "validationId": "CMV-2218",
   "validationSummary": [
+    {
+      "id": "CMV-2218",
+      "scope": "CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill",
+      "status": "COMPLETED_LOCAL_STABILIZATION_RECOVERY_AND_ACCELERATED_SOAK_PASS_READINESS_FALSE"
+    },
     {
       "id": "CMV-2217",
       "scope": "CM-2132 diary-partition v1 Stage 3B activation, live proof, and closeout",

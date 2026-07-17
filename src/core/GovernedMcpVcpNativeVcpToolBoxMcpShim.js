@@ -78,6 +78,30 @@ function jsonRpcError(id, code, message, data = undefined) {
   };
 }
 
+const NATIVE_RUNTIME_FAILURE_REASON_CODES = Object.freeze(new Set([
+  'native_runtime_initialization_failed',
+  'native_provider_embedding_failed',
+  'native_diary_search_failed',
+  'native_result_scope_postcheck_failed'
+]));
+
+function nativeRuntimeStageError(reasonCode, internalMessage = 'native_runtime_stage_failed') {
+  const safeInternalMessage = /^native_result_[a-z0-9_]+$/.test(internalMessage)
+    ? internalMessage
+    : 'native_runtime_stage_failed';
+  const error = new Error(safeInternalMessage);
+  error.reasonCode = NATIVE_RUNTIME_FAILURE_REASON_CODES.has(reasonCode)
+    ? reasonCode
+    : 'native_runtime_call_failed';
+  return error;
+}
+
+function nativeRuntimeFailureReasonCode(error) {
+  return NATIVE_RUNTIME_FAILURE_REASON_CODES.has(error?.reasonCode)
+    ? error.reasonCode
+    : 'native_runtime_call_failed';
+}
+
 function nativeRuntimeReceipt(overrides = {}) {
   return {
     nativeRuntimeCalled: overrides.nativeRuntimeCalled === true,
@@ -682,32 +706,51 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     ) {
       throw new Error('native_diary_authorization_required');
     }
-    await ensureReady();
+    try {
+      await ensureReady();
+    } catch {
+      throw nativeRuntimeStageError('native_runtime_initialization_failed');
+    }
     const query = boundedString(args.query, 1000) || fallbackQuery;
     const limit = normalizeLimit(args.limit ?? args.max_results, 1);
-    const embeddings = await embeddingUtils.getEmbeddingsBatch(
-      [query],
-      runtimeInjected
-        ? {}
-        : {
-            apiUrl: process.env.API_URL,
-            apiKey: process.env.API_Key,
-            model: process.env.WhitelistEmbeddingModel
-          }
-    );
+    let embeddings;
+    try {
+      embeddings = await embeddingUtils.getEmbeddingsBatch(
+        [query],
+        runtimeInjected
+          ? {}
+          : {
+              apiUrl: process.env.API_URL,
+              apiKey: process.env.API_Key,
+              model: process.env.WhitelistEmbeddingModel
+            }
+      );
+    } catch {
+      throw nativeRuntimeStageError('native_provider_embedding_failed');
+    }
     const vector = embeddings && embeddings[0];
     if (!vector) {
-      throw new Error('native_query_vector_unavailable');
+      throw nativeRuntimeStageError('native_provider_embedding_failed');
     }
-    const results = await knowledgeBaseManager.search(
-      authorization.allowedDiaryNames,
-      vector,
-      limit,
-      0,
-      []
-    );
+    let results;
+    try {
+      results = await knowledgeBaseManager.search(
+        authorization.allowedDiaryNames,
+        vector,
+        limit,
+        0,
+        []
+      );
+    } catch {
+      throw nativeRuntimeStageError('native_diary_search_failed');
+    }
     const postcheck = postCheckNativeDiaryResults(results, authorization.allowedDiaryNames);
-    if (!postcheck.accepted) throw new Error(postcheck.reasonCode);
+    if (!postcheck.accepted) {
+      throw nativeRuntimeStageError(
+        'native_result_scope_postcheck_failed',
+        postcheck.reasonCode
+      );
+    }
     return {
       results: projectReadResults(results),
       rawResultCount: Array.isArray(results) ? results.length : 0,
@@ -1030,9 +1073,9 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
         return jsonRpcResult(body.id, structuredContent, runtimeReceipt);
       }
       return jsonRpcError(body.id, -32602, 'Unsupported native tool');
-    } catch {
+    } catch (error) {
       return jsonRpcError(body.id, -32000, 'Native runtime call failed', {
-        reasonCode: 'native_runtime_call_failed',
+        reasonCode: nativeRuntimeFailureReasonCode(error),
         lowDisclosure: true,
         rawErrorDisclosed: false
       });

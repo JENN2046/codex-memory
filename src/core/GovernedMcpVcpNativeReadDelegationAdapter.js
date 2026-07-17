@@ -105,11 +105,41 @@ const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'diary_scope_mapping_binding_mismatch',
   'diary_scope_mapping_missing',
   'native_mutation_tool_unavailable',
+  'native_provider_embedding_failed',
+  'native_runtime_initialization_failed',
   'native_runtime_call_failed',
+  'native_diary_search_failed',
+  'native_result_scope_postcheck_failed',
   'native_tool_public_binding_mismatch',
   'native_write_disabled',
   'unsupported_native_tool'
 ]);
+const ALLOWED_FAILURE_CATEGORIES = Object.freeze([
+  'timeout',
+  'transport_unavailable',
+  'http_client_error',
+  'http_server_error',
+  'invalid_response',
+  'response_id_mismatch',
+  'governance_rejected',
+  'scope_authorization_rejected',
+  'scope_binding_rejected',
+  'provider_embedding_failed',
+  'native_runtime_initialization_failed',
+  'native_scoped_search_failed',
+  'result_scope_postcheck_failed',
+  'native_runtime_failed'
+]);
+const LOCAL_FALLBACK_FORBIDDEN_NATIVE_REASON_CODES = Object.freeze(new Set([
+  'invalid_governance_metadata',
+  'diary_scope_authorization_rejected',
+  'diary_scope_mapping_binding_mismatch',
+  'diary_scope_mapping_missing',
+  'native_tool_public_binding_mismatch',
+  'native_write_disabled',
+  'unsupported_native_tool',
+  'native_result_scope_postcheck_failed'
+]));
 const SCOPE_IDENTIFIER_FIELDS = Object.freeze([
   'project_id',
   'workspace_id',
@@ -236,6 +266,19 @@ function statusClassFromError(error) {
   if (Number.isInteger(status) && status >= 400 && status < 500) return 'client_error';
   if (Number.isInteger(status) && status >= 500 && status < 600) return 'server_error';
   return 'transport_error';
+}
+
+function localFallbackEligibleFromError(error) {
+  const receipt = isPlainObject(error?.lowDisclosureReceipt)
+    ? error.lowDisclosureReceipt
+    : null;
+  const reasonCode = safeEnum(
+    receipt?.jsonRpcErrorReasonCode,
+    ALLOWED_JSON_RPC_ERROR_REASON_CODES
+  );
+  if (reasonCode && LOCAL_FALLBACK_FORBIDDEN_NATIVE_REASON_CODES.has(reasonCode)) return false;
+  if (receipt?.failureCategory === 'result_scope_postcheck_failed') return false;
+  return true;
 }
 
 function lowDisclosureProjection({ toolName = null, gateResult = {} } = {}) {
@@ -528,6 +571,9 @@ function lowDisclosureNativeInvocationReceipt(value, expected = {}) {
     jsonRpcErrorPresent: invocationBindingMatched && value.jsonRpcErrorPresent === true,
     jsonRpcErrorReasonCode: invocationBindingMatched
       ? safeEnum(value.jsonRpcErrorReasonCode, ALLOWED_JSON_RPC_ERROR_REASON_CODES)
+      : null,
+    failureCategory: invocationBindingMatched
+      ? safeEnum(value.failureCategory, ALLOWED_FAILURE_CATEGORIES)
       : null,
     responseShapeCategory: invocationBindingMatched
       ? safeEnum(value.responseShapeCategory, ALLOWED_RESPONSE_SHAPE_CATEGORIES)
@@ -1223,6 +1269,7 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
     nativeInvocationReceipt = nativeCall.nativeInvocationReceipt;
   } catch (error) {
     const statusClass = statusClassFromError(error);
+    const localMemoryFallbackEligible = localFallbackEligibleFromError(error);
     return {
       ...rejected(`native_read_delegation_${statusClass}`, input),
       receipt: buildReceipt({
@@ -1236,7 +1283,7 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
       runtimeCalled: true,
       vcpToolBoxCalled: true,
       mcpToolCalled: true,
-      localMemoryFallbackEligible: true
+      localMemoryFallbackEligible
     };
   }
 

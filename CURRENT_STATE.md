@@ -8,13 +8,29 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Diary-partition v1 Stage 3B live isolation proof complete; production/release/cutover readiness remains false |
-| Current task | `CM-2132 diary-partition v1 Stage 3B activation, live proof, and closeout` |
-| Current validation | `CMV-2217` |
-| Current route | Deliver the low-disclosure closeout through normal PR/CI/review and regular merge |
+| Status | Diary-partition v1 Stage 4A local stabilization and recovery drill complete; production/release/cutover readiness remains false |
+| Current task | `CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill` |
+| Current validation | `CMV-2218` |
+| Current route | Deliver the low-disclosure Stage 4A repair and evidence through normal PR/CI/review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## Diary-partition V1 Stage 4A Stabilization
+
+Stage 4A restarted the loopback shim and bridge from the retained private
+startup binding, fixed the native HTTP MCP deadline at 60 seconds, and proved a
+deliberate mapping mismatch rejects task-start recall before provider use. The
+retained binding then restored non-empty recall. Three accelerated full runs
+covered 30 governed Codex/Claude live reads with isolation, project/workspace/
+shared behavior, receipt binding, zero unscoped search, zero live primary
+memory writes, and no raw disclosure.
+
+The drill exposed and repaired a fallback bug: mapping/scope/post-check failures
+are now never eligible for local fallback. Native transport/provider failure
+receipts carry only bounded categories. This is a short local stability sample,
+not a 24–72 hour soak, production, release, deploy, cutover, or readiness claim.
+See `docs/DIARY_SCOPE_STAGE4A_STABILIZATION.md`.
 
 ## Diary-partition V1 Stage 3B Closeout
 

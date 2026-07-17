@@ -4,13 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2132 diary-partition v1 Stage 3B activation, live proof, and closeout`.
-Current validation: `CMV-2217`.
-Current fact: four clean governed partitions and four authorized bootstrap memories were indexed in an isolated store; all 13 legacy partitions remained excluded and unread.
-Provider-bound Codex/Claude private, project, workspace, shared-union, and task-start reads passed non-empty relevance, isolation, mapping binding, source post-check, and zero-unscoped-search checks.
-Stage 3B is `V1_COMPLETE`; bootstrap primary writes were exactly four and live-proof primary writes were zero. Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+Current task: `CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill`.
+Current validation: `CMV-2218`.
+Current fact: restart, deliberate mapping-mismatch rejection, retained-binding rollback, and non-empty task-start recovery passed without touching governed or legacy partition contents.
+Three accelerated full runs passed 30 Codex/Claude governed reads with isolation, shared behavior, zero unscoped search, zero live primary writes, and no raw disclosure.
+Stage 4A is a short local stability sample; production/release/deploy/cutover/RC/complete-V8/readiness and 24–72 hour soak claims remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2133 Diary-partition V1 Stage 4A Stabilization
+
+Restart, deliberate mapping mismatch, retained-binding rollback, and
+post-restore task-start recall passed. The mismatch made zero provider calls
+and no longer entered local fallback. Three accelerated full runs then passed
+30 governed Codex/Claude reads with zero unscoped search, zero primary-memory
+writes, and no raw disclosure. Native failures now use bounded categories.
+
+Private mapping/config/artifacts remain outside Git. This is not a long-duration
+soak or any production, release, deploy, cutover, or readiness claim.
 
 ## CM-2132 Diary-partition V1 Stage 3B Closeout
 

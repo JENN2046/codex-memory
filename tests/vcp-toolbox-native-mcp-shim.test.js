@@ -111,9 +111,54 @@ test('native read rejects a manager configured for an unscoped startup scan befo
         mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
       }
     }),
-    /native_unscoped_initialization_forbidden/
+    error => error.reasonCode === 'native_runtime_initialization_failed'
   );
   assert.deepEqual(calls, []);
+});
+
+test('native read classifies provider, scoped search, and postcheck failures without raw errors', async () => {
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  const providerFailure = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseManager: { async initialize() {}, async search() { return []; } },
+    embeddingUtils: { async getEmbeddingsBatch() { throw new Error('RAW_PROVIDER_ERROR'); } }
+  });
+  await assert.rejects(
+    providerFailure.search({ query: 'governed read' }, { authorization }),
+    error => error.reasonCode === 'native_provider_embedding_failed' &&
+      !String(error.message).includes('RAW_PROVIDER_ERROR')
+  );
+
+  const searchFailure = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseManager: {
+      async initialize() {},
+      async search() { throw new Error('RAW_SEARCH_ERROR'); }
+    },
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  await assert.rejects(
+    searchFailure.search({ query: 'governed read' }, { authorization }),
+    error => error.reasonCode === 'native_diary_search_failed' &&
+      !String(error.message).includes('RAW_SEARCH_ERROR')
+  );
+
+  const postcheckFailure = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseManager: {
+      async initialize() {},
+      async search() { return [{ fullPath: 'OTHER_DIARY/private.md', score: 0.9 }]; }
+    },
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  await assert.rejects(
+    postcheckFailure.search({ query: 'governed read' }, { authorization }),
+    error => error.reasonCode === 'native_result_scope_postcheck_failed'
+  );
 });
 
 function readBody(req) {
