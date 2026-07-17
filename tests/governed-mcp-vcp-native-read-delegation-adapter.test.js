@@ -1202,40 +1202,47 @@ test('native read error statusClass is whitelisted before reasonCode projection'
   assert.equal(serialized.includes('PRIVATE_NATIVE_ERROR_MESSAGE_SHOULD_NOT_ECHO'), false);
 });
 
-test('scope binding mismatch is never eligible for local fallback', async () => {
-  const result = await executeGovernedMcpVcpNativeReadDelegation({
-    toolName: 'search_memory',
-    args: { query: 'needle' },
-    gateResult: gateResult('search_memory'),
-    callMcpTool: receiptAwareCallMcpTool(async () => {
-      const error = new Error('PRIVATE_MAPPING_DETAIL_SHOULD_NOT_ECHO');
-      error.statusClass = 'client_error';
-      error.lowDisclosureReceipt = {
-        targetReferenceName: 'operator-vcp-toolbox-service-ref',
-        targetKind: 'mcp_server',
-        transportCategory: 'local_http_transport',
-        mcpMethod: 'tools/call',
-        toolName: 'search_memory',
-        requestIdCategory: 'generated_bridge_request_id',
-        jsonRpcResponseIdMatched: true,
-        governanceMetadataPath: 'params._meta.codexMemoryGovernance',
-        governanceMetadataSent: true,
-        statusClass: 'client_error',
-        httpStatusClass: 'success',
-        jsonRpcErrorPresent: true,
-        jsonRpcErrorReasonCode: 'diary_scope_mapping_binding_mismatch',
-        failureCategory: 'scope_binding_rejected'
-      };
-      throw error;
-    })
-  });
-  const serialized = JSON.stringify(result);
+test('governance failure categories are never eligible for local fallback without reason codes', async () => {
+  for (const failureCategory of [
+    'governance_rejected',
+    'scope_authorization_rejected',
+    'scope_binding_rejected',
+    'result_scope_postcheck_failed'
+  ]) {
+    const result = await executeGovernedMcpVcpNativeReadDelegation({
+      toolName: 'search_memory',
+      args: { query: 'needle' },
+      gateResult: gateResult('search_memory'),
+      callMcpTool: receiptAwareCallMcpTool(async () => {
+        const error = new Error('PRIVATE_MAPPING_DETAIL_SHOULD_NOT_ECHO');
+        error.statusClass = 'client_error';
+        error.lowDisclosureReceipt = {
+          targetReferenceName: 'operator-vcp-toolbox-service-ref',
+          targetKind: 'mcp_server',
+          transportCategory: 'local_http_transport',
+          mcpMethod: 'tools/call',
+          toolName: 'search_memory',
+          requestIdCategory: 'generated_bridge_request_id',
+          jsonRpcResponseIdMatched: true,
+          governanceMetadataPath: 'params._meta.codexMemoryGovernance',
+          governanceMetadataSent: true,
+          statusClass: 'client_error',
+          httpStatusClass: 'success',
+          jsonRpcErrorPresent: false,
+          failureCategory
+        };
+        throw error;
+      })
+    });
+    const serialized = JSON.stringify(result);
 
-  assert.equal(result.accepted, false);
-  assert.equal(result.reasonCode, 'native_read_delegation_client_error');
-  assert.equal(result.localMemoryFallbackEligible, false);
-  assert.equal(result.receipt.nativeInvocationReceipt.failureCategory, 'scope_binding_rejected');
-  assert.equal(serialized.includes('PRIVATE_MAPPING_DETAIL_SHOULD_NOT_ECHO'), false);
+    assert.equal(result.accepted, false);
+    assert.equal(result.reasonCode, 'native_read_delegation_client_error');
+    assert.equal(result.localMemoryFallbackEligible, false);
+    assert.equal(result.receipt.nativeInvocationReceipt.jsonRpcErrorReasonCode, null);
+    assert.equal(result.receipt.nativeInvocationReceipt.failureCategory, failureCategory);
+    assert.equal(serialized.includes('PRIVATE_MAPPING_DETAIL_SHOULD_NOT_ECHO'), false);
+  }
 });
 
 test('native read failure receipt tool and target must match actual delegation', async () => {

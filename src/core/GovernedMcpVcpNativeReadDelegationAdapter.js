@@ -140,6 +140,12 @@ const LOCAL_FALLBACK_FORBIDDEN_NATIVE_REASON_CODES = Object.freeze(new Set([
   'unsupported_native_tool',
   'native_result_scope_postcheck_failed'
 ]));
+const LOCAL_FALLBACK_FORBIDDEN_FAILURE_CATEGORIES = Object.freeze(new Set([
+  'governance_rejected',
+  'scope_authorization_rejected',
+  'scope_binding_rejected',
+  'result_scope_postcheck_failed'
+]));
 const SCOPE_IDENTIFIER_FIELDS = Object.freeze([
   'project_id',
   'workspace_id',
@@ -277,7 +283,8 @@ function localFallbackEligibleFromError(error) {
     ALLOWED_JSON_RPC_ERROR_REASON_CODES
   );
   if (reasonCode && LOCAL_FALLBACK_FORBIDDEN_NATIVE_REASON_CODES.has(reasonCode)) return false;
-  if (receipt?.failureCategory === 'result_scope_postcheck_failed') return false;
+  const failureCategory = safeEnum(receipt?.failureCategory, ALLOWED_FAILURE_CATEGORIES);
+  if (failureCategory && LOCAL_FALLBACK_FORBIDDEN_FAILURE_CATEGORIES.has(failureCategory)) return false;
   return true;
 }
 
