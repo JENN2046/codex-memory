@@ -6,6 +6,9 @@ Reference: `codex-memory-chatgpt-web-r4-v1`
 
 Decision date: `2026-07-18`
 
+Decision timezone: `Asia/Shanghai` (the workspace's canonical local date; the
+corresponding GitHub event timestamps may still be `2026-07-17` in UTC)
+
 Authority: Jenn's explicit instruction to freeze R4 instead of continuing the old M5 Tunnel route
 
 This document freezes the target architecture. It does not implement, activate,

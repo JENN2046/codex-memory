@@ -11,8 +11,8 @@ const SCHEMA_PATH = path.join(ROOT, 'schemas', 'chatgpt-web-r4-architecture-v1.s
 const DECISION_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4_ARCHITECTURE_FREEZE.md');
 const THREAT_MODEL_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4_THREAT_MODEL.md');
 const TASKBOOK_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4_IMPLEMENTATION_TASKBOOK.md');
-const EXPECTED_CANONICAL_MANIFEST_SHA256 = '97008bbac3b5ea80c5adb9b2addd48d709d1ea996460ab49fb6ff0c95e34934d';
-const EXPECTED_CANONICAL_SCHEMA_SHA256 = 'a173b47069c757032a81153bd47428da5bd827e78bc6414d218282b25ef24413';
+const EXPECTED_CANONICAL_MANIFEST_SHA256 = '61fc15b39db4cc581f27d6bbb2bd549378ad4e34d179db70d25555e6747690ca';
+const EXPECTED_CANONICAL_SCHEMA_SHA256 = '9eacf0f8a64081626534da38e3d1205495ae6a68a828707d694bf02b035fedc4';
 
 function invariant(condition, message) {
   if (!condition) throw new Error(message);
@@ -138,6 +138,7 @@ function validateArchitecture(manifest, schema = loadSchema()) {
   validateJsonSchema(manifest, schema);
   invariant(manifest.schemaVersion === 1, 'schemaVersion must be 1');
   invariant(manifest.architectureReference === 'codex-memory-chatgpt-web-r4-v1', 'architecture reference mismatch');
+  invariant(manifest.decisionTimezone === 'Asia/Shanghai', 'decision timezone mismatch');
   invariant(manifest.decisionAuthority === 'jenn_explicit_r4_freeze', 'decision authority mismatch');
   invariant(manifest.freezeStatus === 'frozen_for_implementation', 'architecture is not frozen');
   invariant(manifest.primaryArchetype === 'interactive_decoupled', 'wrong primary archetype');
@@ -284,6 +285,7 @@ function validateDocMarkers(root = ROOT) {
     'project_context_ref',
     'Secure MCP Tunnel',
     'interactive-decoupled',
+    'Decision timezone: `Asia/Shanghai`',
     'automatic-first-task-call-guaranteed: false',
     'production-ready: false'
   ];

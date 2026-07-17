@@ -65,6 +65,7 @@
     "chatgptWebR4ArchitectureFreezeCompleted": true,
     "chatgptWebR4CanonicalManifestDigestBound": true,
     "chatgptWebR4CanonicalTunnelRoute": false,
+    "chatgptWebR4DecisionTimezone": "Asia/Shanghai",
     "chatgptWebR4PrimaryArchetype": "interactive_decoupled",
     "chatgptWebR4PublicToolSurfaceExpanded": false,
     "chatgptWebR4RealMemoryReadPerformed": false,

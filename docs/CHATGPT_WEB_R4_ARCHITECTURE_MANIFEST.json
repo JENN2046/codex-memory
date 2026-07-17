@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "architectureReference": "codex-memory-chatgpt-web-r4-v1",
   "decisionDate": "2026-07-18",
+  "decisionTimezone": "Asia/Shanghai",
   "decisionAuthority": "jenn_explicit_r4_freeze",
   "freezeStatus": "frozen_for_implementation",
   "primaryArchetype": "interactive_decoupled",

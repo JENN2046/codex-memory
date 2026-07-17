@@ -76,6 +76,18 @@ test('R4 rejects Tunnel as the canonical route', () => {
   assert.throws(() => validateArchitecture(manifest), /must not be canonical/);
 });
 
+test('R4 binds the freeze date to the workspace Asia/Shanghai calendar', () => {
+  const manifest = clone(loadManifest());
+  assert.equal(manifest.decisionDate, '2026-07-18');
+  assert.equal(manifest.decisionTimezone, 'Asia/Shanghai');
+
+  manifest.decisionTimezone = 'UTC';
+  assert.throws(
+    () => validateArchitecture(manifest),
+    /schema validation failed.*decisionTimezone.*const mismatch/
+  );
+});
+
 test('R4 loads the frozen JSON Schema and rejects route or top-level shape drift', () => {
   const schema = loadSchema();
   validateFrozenSchema(schema);
