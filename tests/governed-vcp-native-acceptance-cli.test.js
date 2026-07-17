@@ -36,6 +36,13 @@ const EXPECTED_NATIVE_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'native_write_disabled',
   'unsupported_native_tool'
 ]);
+const EXPECTED_NATIVE_RUNTIME_PRECONDITION_REASON_CODES = Object.freeze([
+  'native_provider_embedding_failed',
+  'native_runtime_initialization_failed',
+  'native_runtime_call_failed',
+  'native_diary_search_failed',
+  'native_result_scope_postcheck_failed'
+]);
 
 const cliPath = path.join('src', 'cli', 'governed-vcp-native-acceptance.js');
 const workspaceRoot = path.resolve(__dirname, '..');
@@ -71,6 +78,35 @@ test('acceptance evidence preserves every bounded native JSON-RPC reason and fil
   assert.equal(evidence.nativeRuntimeCallFailed, true);
   assert.equal(evidence.rawErrorDisclosed, false);
   assert.equal(JSON.stringify(evidence).includes('PRIVATE_REASON_SHOULD_NOT_BE_ACCEPTED'), false);
+});
+
+test('acceptance evidence classifies every runtime-stage failure as a precondition follow-up', () => {
+  for (const jsonRpcErrorReasonCode of EXPECTED_NATIVE_RUNTIME_PRECONDITION_REASON_CODES) {
+    const evidence = buildNativeRuntimePreconditionEvidence([{
+      access: {
+        runtimeCalled: true,
+        vcpToolBoxCalled: true,
+        mcpToolCalled: true
+      },
+      receipt: {
+        nativeInvocation: {
+          jsonRpcErrorPresent: true,
+          jsonRpcErrorReasonCode,
+          statusClass: 'server_error',
+          jsonRpcResponseIdMatched: true
+        },
+        rollbackDisposition: 'no_runtime_write_to_rollback'
+      }
+    }]);
+
+    assert.equal(evidence.nativeRuntimeCallFailed, true, jsonRpcErrorReasonCode);
+    assert.equal(evidence.operatorActionCategory, 'native_runtime_precondition_check_required');
+    assert.equal(
+      evidence.operatorFollowupPacket.actionCategory,
+      'native_runtime_precondition_check_required'
+    );
+    assert.deepEqual(evidence.reasonCodes, [jsonRpcErrorReasonCode]);
+  }
 });
 
 test('acceptance CLI binds Claude identity without changing the public MCP surface', () => {

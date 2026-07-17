@@ -67,6 +67,13 @@ const ALLOWED_NATIVE_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'native_write_disabled',
   'unsupported_native_tool'
 ]);
+const NATIVE_RUNTIME_PRECONDITION_REASON_CODES = Object.freeze([
+  'native_provider_embedding_failed',
+  'native_runtime_initialization_failed',
+  'native_runtime_call_failed',
+  'native_diary_search_failed',
+  'native_result_scope_postcheck_failed'
+]);
 
 function governedNativeClientOrDefault(value, fallback = 'Codex') {
   const provided = typeof value === 'string' ? value.trim() : '';
@@ -1256,7 +1263,9 @@ function buildNativeRuntimePreconditionEvidence(selectedOperations = []) {
   const nativeJsonRpcErrorObserved = selectedOperations.some(operation =>
     operation.receipt?.nativeInvocation?.jsonRpcErrorPresent === true
   );
-  const nativeRuntimeCallFailed = reasonCodes.includes('native_runtime_call_failed');
+  const nativeRuntimeCallFailed = reasonCodes.some(reasonCode =>
+    NATIVE_RUNTIME_PRECONDITION_REASON_CODES.includes(reasonCode)
+  );
   const allNativeInvocationsSucceeded = selectedOperations.length > 0 &&
     selectedOperations.every(operation =>
       operation.receipt?.nativeInvocation?.statusClass === 'success' &&
