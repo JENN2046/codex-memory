@@ -21,6 +21,9 @@ const {
   attachGovernedMcpVcpNativeHttpMcpTargetPrivateConfig,
   normalizeGovernedMcpVcpNativeHttpMcpTargetConfig
 } = require('../core/GovernedMcpVcpNativeHttpMcpTargetConfig');
+const {
+  buildChatGptWebProfileConfig
+} = require('../core/ChatGptWebProfile');
 
 function toBoolean(value, fallback = false) {
   if (typeof value === 'boolean') return value;
@@ -752,6 +755,65 @@ function createConfig(overrides = {}) {
       ''
     )
   );
+  const chatgptWebProfileOverrides = getNestedPlainObject(overrides, 'chatgptWebProfile');
+  const chatgptWebServerFixedScopeOverrides = getNestedPlainObject(
+    overrides,
+    'chatgptWebServerFixedScope'
+  );
+  const chatgptWebProfileScopeOverrides = getNestedPlainObject(
+    chatgptWebProfileOverrides,
+    'serverFixedScope'
+  );
+  const chatgptWebProfile = buildChatGptWebProfileConfig({
+    profileId: pickFirstNonEmpty(
+      overrides.chatgptWebProfileId,
+      chatgptWebProfileOverrides.profileId,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_PROFILE,
+      'off'
+    ),
+    enabled: _resolveBool(
+      pickFirstNonEmpty(
+        overrides.chatgptWebProfileEnabled,
+        chatgptWebProfileOverrides.enabled
+      ),
+      'CODEX_MEMORY_CHATGPT_WEB_PROFILE_ENABLED',
+      false
+    ),
+    serverFixedScope: {
+      projectId: pickFirstNonEmpty(
+        overrides.chatgptWebProjectId,
+        chatgptWebServerFixedScopeOverrides.projectId,
+        chatgptWebServerFixedScopeOverrides.project_id,
+        chatgptWebProfileScopeOverrides.projectId,
+        chatgptWebProfileScopeOverrides.project_id,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_PROJECT_ID
+      ),
+      workspaceId: pickFirstNonEmpty(
+        overrides.chatgptWebWorkspaceId,
+        chatgptWebServerFixedScopeOverrides.workspaceId,
+        chatgptWebServerFixedScopeOverrides.workspace_id,
+        chatgptWebProfileScopeOverrides.workspaceId,
+        chatgptWebProfileScopeOverrides.workspace_id,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_WORKSPACE_ID
+      ),
+      scopeId: pickFirstNonEmpty(
+        overrides.chatgptWebScopeId,
+        chatgptWebServerFixedScopeOverrides.scopeId,
+        chatgptWebServerFixedScopeOverrides.scope_id,
+        chatgptWebProfileScopeOverrides.scopeId,
+        chatgptWebProfileScopeOverrides.scope_id,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_SCOPE_ID
+      ),
+      visibility: pickFirstNonEmpty(
+        overrides.chatgptWebVisibility,
+        chatgptWebServerFixedScopeOverrides.visibility,
+        chatgptWebServerFixedScopeOverrides.visibility_policy,
+        chatgptWebProfileScopeOverrides.visibility,
+        chatgptWebProfileScopeOverrides.visibility_policy,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_VISIBILITY
+      )
+    }
+  });
   const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);
   const vectorIndexPath = resolveAbsolutePath(
     basePath,
@@ -815,6 +877,7 @@ function createConfig(overrides = {}) {
     mcpPublicToolNames: isHardened ? [] : requestedMcpPublicToolNames,
     exposeControlledMutationMcpTools: isHardened ? false : exposeControlledMutationMcpTools,
     exposeWriteMcpTools: isHardened ? false : exposeWriteMcpTools,
+    chatgptWebProfile,
     embedDimensions: inferredEmbedDimensions,
     embeddingFingerprint,
     embeddingProfileVersion,
