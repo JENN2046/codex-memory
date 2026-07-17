@@ -54,8 +54,15 @@ const WRITE_TOOL_EXACT_APPROVAL_ACTIONS = Object.freeze({
 });
 const ALLOWED_NATIVE_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'invalid_governance_metadata',
+  'diary_scope_authorization_rejected',
+  'diary_scope_mapping_binding_mismatch',
+  'diary_scope_mapping_missing',
   'native_mutation_tool_unavailable',
+  'native_provider_embedding_failed',
+  'native_runtime_initialization_failed',
   'native_runtime_call_failed',
+  'native_diary_search_failed',
+  'native_result_scope_postcheck_failed',
   'native_tool_public_binding_mismatch',
   'native_write_disabled',
   'unsupported_native_tool'
@@ -1986,6 +1993,7 @@ if (require.main === module) {
 module.exports = {
   buildConfigOverrides,
   buildEvidenceArtifact,
+  buildNativeRuntimePreconditionEvidence,
   buildReadContext,
   buildWriteContext,
   collectConfigAcceptanceBlockers,

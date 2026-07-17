@@ -10,6 +10,7 @@ const test = require('node:test');
 
 const {
   buildConfigOverrides,
+  buildNativeRuntimePreconditionEvidence,
   buildReadContext,
   buildWriteContext,
   collectOperationAcceptanceBlockers,
@@ -20,8 +21,57 @@ const {
   validateGovernedVcpNativeAcceptanceEvidenceArtifact
 } = require('../src/cli/governed-vcp-native-acceptance');
 
+const EXPECTED_NATIVE_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
+  'invalid_governance_metadata',
+  'diary_scope_authorization_rejected',
+  'diary_scope_mapping_binding_mismatch',
+  'diary_scope_mapping_missing',
+  'native_mutation_tool_unavailable',
+  'native_provider_embedding_failed',
+  'native_runtime_initialization_failed',
+  'native_runtime_call_failed',
+  'native_diary_search_failed',
+  'native_result_scope_postcheck_failed',
+  'native_tool_public_binding_mismatch',
+  'native_write_disabled',
+  'unsupported_native_tool'
+]);
+
 const cliPath = path.join('src', 'cli', 'governed-vcp-native-acceptance.js');
 const workspaceRoot = path.resolve(__dirname, '..');
+
+test('acceptance evidence preserves every bounded native JSON-RPC reason and filters unsafe values', () => {
+  const selectedOperations = [
+    ...EXPECTED_NATIVE_JSON_RPC_ERROR_REASON_CODES,
+    'https://PRIVATE_REASON_SHOULD_NOT_BE_ACCEPTED'
+  ].map(jsonRpcErrorReasonCode => ({
+    access: {
+      runtimeCalled: true,
+      vcpToolBoxCalled: true,
+      mcpToolCalled: true
+    },
+    receipt: {
+      nativeInvocation: {
+        jsonRpcErrorPresent: true,
+        jsonRpcErrorReasonCode,
+        statusClass: 'server_error',
+        jsonRpcResponseIdMatched: true
+      },
+      rollbackDisposition: 'no_runtime_write_to_rollback'
+    }
+  }));
+
+  const evidence = buildNativeRuntimePreconditionEvidence(selectedOperations);
+
+  assert.deepEqual(evidence.reasonCodes, [...EXPECTED_NATIVE_JSON_RPC_ERROR_REASON_CODES].sort());
+  assert.deepEqual(
+    evidence.operatorFollowupPacket.reasonCodes,
+    [...EXPECTED_NATIVE_JSON_RPC_ERROR_REASON_CODES].sort()
+  );
+  assert.equal(evidence.nativeRuntimeCallFailed, true);
+  assert.equal(evidence.rawErrorDisclosed, false);
+  assert.equal(JSON.stringify(evidence).includes('PRIVATE_REASON_SHOULD_NOT_BE_ACCEPTED'), false);
+});
 
 test('acceptance CLI binds Claude identity without changing the public MCP surface', () => {
   const options = parseArgs([
