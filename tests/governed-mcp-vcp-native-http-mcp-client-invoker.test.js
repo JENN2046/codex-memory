@@ -571,7 +571,8 @@ test('HTTP MCP tool caller rejects invalid governed metadata before native reque
         assert.equal(error.statusClass, 'client_error');
         assert.deepEqual(error.invalidFields, ['governanceMeta']);
         assert.equal(error.lowDisclosureReceipt.governanceMetadataSent, false);
-        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, 'invalid_governance_metadata');
+        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorPresent, false);
+        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, null);
         assert.equal(error.lowDisclosureReceipt.failureCategory, 'governance_rejected');
         assert.equal(error.lowDisclosureReceipt.governanceMetadataRawValueDisclosed, false);
         return true;
@@ -609,7 +610,8 @@ test('HTTP MCP tool caller requires governed metadata before native request', as
         assert.equal(error.statusClass, 'client_error');
         assert.deepEqual(error.invalidFields, ['governanceMeta']);
         assert.equal(error.lowDisclosureReceipt.governanceMetadataSent, false);
-        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, 'invalid_governance_metadata');
+        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorPresent, false);
+        assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, null);
         assert.equal(error.lowDisclosureReceipt.failureCategory, 'governance_rejected');
         assert.equal(error.lowDisclosureReceipt.governanceMetadataRawValueDisclosed, false);
         return true;
