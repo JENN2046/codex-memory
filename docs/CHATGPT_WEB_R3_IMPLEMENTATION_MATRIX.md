@@ -53,11 +53,12 @@ runtime tasks and gates are completed.
 
 ## M5–M8 — runtime, canary, operations, stable use
 
-All M5, M6, M7, and M8 tasks remain `runtime_gate` or `not_started`:
+M5 is now partial; M6, M7, and M8 remain `runtime_gate` or `not_started`:
 
-- no Tunnel client or supply-chain receipt;
+- Tunnel client version/SHA/module identity and local checksum-manifest match are recorded;
+- isolated UDS v0/v1 HTTP integration passed and the v0-only runtime probe gate exists;
 - no Secure MCP Tunnel or ChatGPT App;
-- no local activated UDS service proof;
+- one local UDS nonce probe passed with zero memory/native/provider/fallback/mutation counters;
 - no ChatGPT E2E nonce proof;
 - no real or synthetic VCP canary through ChatGPT;
 - no 404, key rotation, blue-green, upgrade, or rollback drill;
@@ -66,7 +67,7 @@ All M5, M6, M7, and M8 tasks remain `runtime_gate` or `not_started`:
 ## Non-claims
 
 ```yaml
-runtime_bound: false
+runtime_bound: v0_local_probe_only
 tunnel_created: false
 chatgpt_app_connected: false
 real_memory_read: false

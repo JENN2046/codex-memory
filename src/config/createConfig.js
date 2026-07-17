@@ -791,6 +791,14 @@ function createConfig(overrides = {}) {
       'CODEX_MEMORY_CHATGPT_WEB_COMPOSITE_READ_GATE_PASSED',
       false
     ),
+    runtimeProbeBindingPassed: _resolveBool(
+      pickFirstNonEmpty(
+        overrides.chatgptWebRuntimeProbeBindingPassed,
+        chatgptWebProfileOverrides.runtimeProbeBindingPassed
+      ),
+      'CODEX_MEMORY_CHATGPT_WEB_RUNTIME_PROBE_BINDING_PASSED',
+      false
+    ),
     serverFixedScope: {
       projectId: pickFirstNonEmpty(
         overrides.chatgptWebProjectId,

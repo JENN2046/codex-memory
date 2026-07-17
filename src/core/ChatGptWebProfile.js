@@ -118,7 +118,8 @@ function buildChatGptWebProfileConfig({
   profileId = CHATGPT_WEB_PROFILE_IDS.OFF,
   enabled = false,
   serverFixedScope = {},
-  compositeReadGatePassed = false
+  compositeReadGatePassed = false,
+  runtimeProbeBindingPassed = false
 } = {}) {
   const requestedProfileId = normalizeString(profileId).toLowerCase();
   const normalizedProfileId = normalizeChatGptWebProfileId(profileId);
@@ -129,6 +130,8 @@ function buildChatGptWebProfileConfig({
   const profileConfigured = definition !== null;
   const active = activationRequested && profileConfigured && scopeConfigured;
   const compositeReady = compositeReadGatePassed === true;
+  const runtimeProbeReady = runtimeProbeBindingPassed === true &&
+    normalizedProfileId === CHATGPT_WEB_PROFILE_IDS.TRANSPORT_PROBE_V0;
   const pendingCompositeToolNames = definition?.prepareMemoryContextCompositeGateRequired === true &&
     !compositeReady
     ? ['prepare_memory_context']
@@ -165,8 +168,8 @@ function buildChatGptWebProfileConfig({
     localFallbackAllowed: false,
     durableWriteAllowed: false,
     approvedAliasSupported: false,
-    runtimeInvocationAllowed: false,
-    runtimeInvocationStatus: 'not_bound',
+    runtimeInvocationAllowed: active && runtimeProbeReady,
+    runtimeInvocationStatus: active && runtimeProbeReady ? 'probe_v0_bound' : 'not_bound',
     providerApiCallsAllowed: false,
     externalNetworkCallsAllowed: false
   });
@@ -190,7 +193,8 @@ function buildChatGptWebEndpointProfileConfig(config = {}, profileId) {
     profileId: normalizedProfileId,
     enabled: activationRequested && endpointEnabled,
     serverFixedScope: configuredProfile.serverFixedScope,
-    compositeReadGatePassed: configuredProfile.compositeReadGatePassed === true
+    compositeReadGatePassed: configuredProfile.compositeReadGatePassed === true,
+    runtimeProbeBindingPassed: configuredProfile.runtimeInvocationStatus === 'probe_v0_bound'
   });
 }
 
@@ -226,7 +230,8 @@ function getChatGptWebProfileForRequest(config = {}, requestContext = {}) {
         profileId: configuredProfile.profileId,
         enabled: configuredProfile.activationRequested === true || configuredProfile.enabled === true,
         serverFixedScope: configuredProfile.serverFixedScope,
-        compositeReadGatePassed: configuredProfile.compositeReadGatePassed === true
+        compositeReadGatePassed: configuredProfile.compositeReadGatePassed === true,
+        runtimeProbeBindingPassed: configuredProfile.runtimeInvocationStatus === 'probe_v0_bound'
       });
   const accepted = profile.enabled === true &&
     profile.channelIdentity === CHATGPT_WEB_CHANNEL_ID &&

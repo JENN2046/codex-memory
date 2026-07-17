@@ -310,6 +310,43 @@ test('ChatGPT web v0 probe remains blocked by the M1 runtime gate', async () => 
   assert.equal(calls.length, 0);
 });
 
+test('ChatGPT web runtime binding opens only the v0 zero-touch probe', async () => {
+  const v0Config = createChatGptWebConfig('chatgpt_web_transport_probe_v0', {
+    chatgptWebRuntimeProbeBindingPassed: true
+  });
+  const { app: v0App, calls: v0Calls } = createFakeApp(v0Config, {
+    status: 'success',
+    probe: {
+      localMemoryReadPerformed: false,
+      nativeMemoryCallPerformed: false,
+      durableMemoryMutationCount: 0
+    }
+  });
+  const v0Server = new CodexMemoryMcpServer({ app: v0App });
+  const v0Result = await v0Server.handleJsonRpc({
+    jsonrpc: '2.0', id: 22, method: 'tools/call', params: {
+      name: 'memory_overview',
+      arguments: { probe_nonce: 'synthetic-m5-probe-nonce-0001' }
+    }
+  }, CHATGPT_WEB_CONTEXT);
+  assert.equal(v0Result.response.error.data.code, 'tool_output_schema_mismatch');
+  assert.equal(v0Calls.length, 1);
+  assert.equal(v0Config.chatgptWebProfile.runtimeInvocationStatus, 'probe_v0_bound');
+
+  const v1Config = createChatGptWebConfig('chatgpt_web_read_only_v1', {
+    chatgptWebRuntimeProbeBindingPassed: true
+  });
+  const { app: v1App, calls: v1Calls } = createFakeApp(v1Config);
+  const v1Server = new CodexMemoryMcpServer({ app: v1App });
+  const v1Result = await v1Server.handleJsonRpc({
+    jsonrpc: '2.0', id: 23, method: 'tools/call', params: {
+      name: 'memory_overview', arguments: {}
+    }
+  }, CHATGPT_WEB_CONTEXT);
+  assert.equal(v1Result.response.error.data.code, 'chatgpt_web_runtime_not_bound');
+  assert.equal(v1Calls.length, 0);
+});
+
 test('ChatGPT web rejects model-supplied identity or scope overrides before the application is called', async () => {
   const config = createChatGptWebConfig('chatgpt_web_read_only_v1');
   const { app, calls } = createFakeApp(config);
