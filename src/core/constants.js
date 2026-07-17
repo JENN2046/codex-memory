@@ -4,6 +4,9 @@ const CHATGPT_WEB_CHANNEL_ID = 'chatgpt_web';
 const CHATGPT_WEB_CLIENT_ID = 'chatgpt_web';
 const CHATGPT_WEB_UDS_TRANSPORT = 'unix_domain_socket_streamable_http';
 const CHATGPT_WEB_MCP_ENDPOINT_BASE = '/mcp/codex-memory/chatgpt';
+const CHATGPT_WEB_PROBE_NONCE_MIN_LENGTH = 16;
+const CHATGPT_WEB_PROBE_NONCE_MAX_LENGTH = 96;
+const CHATGPT_WEB_PROBE_NONCE_TTL_MS = 5 * 60 * 1000;
 const SUPPORTED_PROTOCOL_VERSIONS = new Set(['2025-03-26', '2025-06-18']);
 const DEFAULT_PROTOCOL_VERSION = '2025-06-18';
 
@@ -102,13 +105,18 @@ const TOOL_DEFINITIONS = [
   {
     name: 'memory_overview',
     title: 'Governed Memory Overview',
-    description: 'Operational overview of governed native bridge evidence and bounded local auxiliary state. HTTP no-token calls return only a selected low-disclosure overview projection; bearer-token HTTP calls return a bounded low-disclosure overview projection by default.',
+    description: 'Operational overview of governed native bridge evidence and bounded local auxiliary state. A ChatGPT web v0 probe_nonce invokes a one-time, zero-memory short-circuit probe. HTTP no-token calls return only a selected low-disclosure overview projection; bearer-token HTTP calls return a bounded low-disclosure overview projection by default.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
       properties: {
         auditWindow: { type: 'integer', minimum: 10, maximum: 2000 },
-        limit: { type: 'integer', minimum: 1, maximum: 50 }
+        limit: { type: 'integer', minimum: 1, maximum: 50 },
+        probe_nonce: {
+          type: 'string',
+          minLength: CHATGPT_WEB_PROBE_NONCE_MIN_LENGTH,
+          maxLength: CHATGPT_WEB_PROBE_NONCE_MAX_LENGTH
+        }
       }
     }
   },
@@ -368,6 +376,9 @@ module.exports = {
   CHATGPT_WEB_CHANNEL_ID,
   CHATGPT_WEB_CLIENT_ID,
   CHATGPT_WEB_MCP_ENDPOINT_BASE,
+  CHATGPT_WEB_PROBE_NONCE_MAX_LENGTH,
+  CHATGPT_WEB_PROBE_NONCE_MIN_LENGTH,
+  CHATGPT_WEB_PROBE_NONCE_TTL_MS,
   CHATGPT_WEB_UDS_TRANSPORT,
   CHAT_INDEX_FILE_NAME,
   DEFAULT_PROTOCOL_VERSION,

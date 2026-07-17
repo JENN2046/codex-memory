@@ -263,6 +263,28 @@ test('ChatGPT web builds a server-fixed context, strips it from output, and bloc
   assert.equal(calls.length, 0);
 });
 
+test('ChatGPT web v0 probe remains blocked by the M1 runtime gate', async () => {
+  const config = createChatGptWebConfig('chatgpt_web_transport_probe_v0');
+  const { app, calls } = createFakeApp(config);
+  const server = new CodexMemoryMcpServer({ app });
+
+  const runtimeResult = await server.handleJsonRpc({
+    jsonrpc: '2.0',
+    id: 21,
+    method: 'tools/call',
+    params: {
+      name: 'memory_overview',
+      arguments: {
+        probe_nonce: 'synthetic-m3-probe-nonce-0006'
+      }
+    }
+  }, CHATGPT_WEB_CONTEXT);
+
+  assert.equal(runtimeResult.response.error.code, -32001);
+  assert.equal(runtimeResult.response.error.data.code, 'chatgpt_web_runtime_not_bound');
+  assert.equal(calls.length, 0);
+});
+
 test('ChatGPT web rejects model-supplied identity or scope overrides before the application is called', async () => {
   const config = createChatGptWebConfig('chatgpt_web_read_only_v1');
   const { app, calls } = createFakeApp(config);

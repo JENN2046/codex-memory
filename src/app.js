@@ -2807,6 +2807,17 @@ function createCodexMemoryApplication(overrides = {}) {
       let governedNativeReadFallbackContext = null;
       let governedNativeReadFallbackAuditReceipt = null;
       let governedNativeReadFallbackArgs = null;
+      if (
+        toolName === 'memory_overview' &&
+        args !== null &&
+        typeof args === 'object' &&
+        Object.prototype.hasOwnProperty.call(args, 'probe_nonce')
+      ) {
+        return overviewService.getChatGptWebTransportProbe({
+          probeNonce: args.probe_nonce,
+          requestContext: effectiveRequestContext
+        });
+      }
       if (toolName === 'memory_overview' && requestContext.noTokenReadOnly === true) {
         return overviewService.getNoTokenSelectedOverview({
           auditWindow: args?.auditWindow
