@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "architectureReference": "codex-memory-chatgpt-web-r4-v1",
+  "decisionDate": "2026-07-18",
+  "decisionAuthority": "jenn_explicit_r4_freeze",
+  "freezeStatus": "frozen_for_implementation",
+  "primaryArchetype": "interactive_decoupled",
+  "objective": "Expose governed project-aware read-only memory to a private single-operator ChatGPT App without moving memory intelligence or durable memory into the public edge.",
+  "canonicalRoute": [
+    "chatgpt_app",
+    "stable_https_chatgpt_edge",
+    "outbound_local_recall_relay",
+    "local_uds",
+    "codex_memory_governance_kernel",
+    "vcp_selected_diary_search"
+  ],
+  "trustZones": [
+    {
+      "id": "chatgpt",
+      "role": "conversation_and_widget_host",
+      "durableMemoryAuthority": false,
+      "diaryAclAuthority": false
+    },
+    {
+      "id": "public_edge",
+      "role": "oauth_mcp_and_transient_relay_edge",
+      "durableMemoryAuthority": false,
+      "diaryAclAuthority": false
+    },
+    {
+      "id": "local_relay",
+      "role": "outbound_authenticated_transport_and_envelope_verifier",
+      "durableMemoryAuthority": false,
+      "diaryAclAuthority": false
+    },
+    {
+      "id": "local_governance_kernel",
+      "role": "trusted_scope_registry_mapping_and_governed_read_authority",
+      "durableMemoryAuthority": false,
+      "diaryAclAuthority": true
+    },
+    {
+      "id": "vcp_runtime",
+      "role": "selected_diary_index_and_vector_search_runtime",
+      "durableMemoryAuthority": true,
+      "diaryAclAuthority": false
+    }
+  ],
+  "transport": {
+    "chatgptIngress": "stable_https_mcp",
+    "edgeToLocal": "local_outbound_authenticated_claim_channel",
+    "localHop": "uds",
+    "secureMcpTunnelRole": "optional_development_compatibility_adapter",
+    "secureMcpTunnelCanonical": false,
+    "inboundLocalPortRequired": false
+  },
+  "remoteState": {
+    "durableMemoryStored": false,
+    "rawMemoryStored": false,
+    "mappingStored": false,
+    "diaryNamesStored": false,
+    "inFlightOnly": true,
+    "boundedTtlRequired": true,
+    "requestOrResponseBodyLoggingAllowed": false,
+    "restartBehavior": "fail_closed_and_expire_inflight"
+  },
+  "repositoryLayout": {
+    "sharedContractsRoot": "packages/chatgpt-r4-contracts",
+    "publicEdgeRoot": "apps/chatgpt-edge",
+    "localRelayRoot": "apps/local-recall-relay",
+    "widgetRoot": "apps/chatgpt-memory-scope-widget",
+    "governanceAdapterRoot": "src/adapters/chatgpt-r4",
+    "testRoot": "tests/chatgpt-r4",
+    "importFencesRequired": true,
+    "publicEdgeForbiddenImports": [
+      "src/config",
+      "src/storage",
+      "src/recall",
+      "src/adapters/vcp-active-memory",
+      "src/adapters/vcp-light-memory",
+      "src/adapters/vcp-passive-memory"
+    ],
+    "localRelayForbiddenCapabilities": [
+      "diary_mapping_load",
+      "provider_invocation",
+      "memory_storage",
+      "scope_authorization"
+    ]
+  },
+  "scopeAuthority": {
+    "resolver": "local_project_context_resolver",
+    "contextReferenceRequiredBeforeRecall": true,
+    "contextReferenceShortLived": true,
+    "contextReferenceBoundFields": [
+      "principal_fingerprint",
+      "client_id",
+      "project_id",
+      "workspace_id",
+      "visibility_allowlist",
+      "registry_reference",
+      "mapping_reference",
+      "mapping_digest",
+      "issued_at",
+      "expires_at",
+      "nonce"
+    ],
+    "widgetStateAffectsAcl": false,
+    "toolArgumentsAffectDiaryAcl": false,
+    "rawDiaryIdentifiersExposed": false,
+    "ambiguousProjectPolicy": "deny_recall_and_request_explicit_selection",
+    "chatgptPrivatePartitionAccess": false,
+    "legacyPartitionAccess": false
+  },
+  "toolProfile": {
+    "dataTools": [
+      "resolve_memory_context",
+      "memory_overview",
+      "search_memory",
+      "audit_memory",
+      "prepare_memory_context"
+    ],
+    "renderTools": [
+      "render_memory_scope"
+    ],
+    "writeTools": [],
+    "proposalTools": [],
+    "defaultMutationAllowed": false,
+    "publicExpansionImplemented": false,
+    "standardSearchFetchCompatibility": "deferred_separate_profile"
+  },
+  "widget": {
+    "purpose": "minimal_memory_scope_selection_and_receipt_status",
+    "businessDataApi": false,
+    "authorizationAuthority": false,
+    "rawMemoryDisplayAllowed": false,
+    "modelContextUpdatesAreAuthorizationInput": false
+  },
+  "authorization": {
+    "oauthRequiredBeforeRealMemory": true,
+    "oauthVersion": "2.1",
+    "pkceMethod": "S256",
+    "exactResourceAudienceRequired": true,
+    "principalMappingRequired": true,
+    "identityProvider": "provider_neutral_established_idp",
+    "anonymousMemoryAccess": false
+  },
+  "envelope": {
+    "requestAndResponseBindingRequired": true,
+    "signatureRequired": true,
+    "nonceRequired": true,
+    "expiryRequired": true,
+    "replayRejected": true,
+    "mappingBindingRequired": true,
+    "receiptChainRequired": true,
+    "rawDiaryNamesInPublicReceipt": false
+  },
+  "failurePolicy": {
+    "defaultPolicy": "deny",
+    "localRelayUnavailable": "bounded_unavailable_without_fallback",
+    "scopeMissingOrExpired": "no_memory_read",
+    "mappingMismatch": "reject_before_provider",
+    "envelopeInvalidOrReplayed": "reject_before_local_invocation",
+    "resultPostcheckFailure": "fail_entire_call",
+    "remoteContinuitySnapshotFallback": false
+  },
+  "implementationStages": [
+    {
+      "id": "R4-A",
+      "name": "architecture_freeze",
+      "realMemoryAllowed": false,
+      "externalRuntimeAllowed": false
+    },
+    {
+      "id": "R4-B",
+      "name": "contracts_and_synthetic_harness",
+      "realMemoryAllowed": false,
+      "externalRuntimeAllowed": false
+    },
+    {
+      "id": "R4-C",
+      "name": "local_edge_relay_integration",
+      "realMemoryAllowed": false,
+      "externalRuntimeAllowed": false
+    },
+    {
+      "id": "R4-D",
+      "name": "oauth_and_external_edge_activation",
+      "realMemoryAllowed": false,
+      "externalRuntimeAllowed": true
+    },
+    {
+      "id": "R4-E",
+      "name": "zero_memory_chatgpt_e2e",
+      "realMemoryAllowed": false,
+      "externalRuntimeAllowed": true
+    },
+    {
+      "id": "R4-F",
+      "name": "bounded_governed_live_read",
+      "realMemoryAllowed": true,
+      "externalRuntimeAllowed": true
+    },
+    {
+      "id": "R4-G",
+      "name": "observation_and_closeout",
+      "realMemoryAllowed": false,
+      "externalRuntimeAllowed": true
+    }
+  ],
+  "supersession": {
+    "r3M5TunnelAsCanonicalRoute": true,
+    "r3SecurityControlsPreserved": true,
+    "r3UdsBoundaryPreserved": true,
+    "r3ZeroMemoryProbePreserved": true,
+    "r3BranchStatus": "draft_paused_no_merge"
+  },
+  "nonClaims": {
+    "edgeImplemented": false,
+    "relayImplemented": false,
+    "oauthConfigured": false,
+    "chatgptAppCreated": false,
+    "automaticFirstTaskCallGuaranteed": false,
+    "realMemoryReadPerformed": false,
+    "providerCallPerformed": false,
+    "runtimeConfigChanged": false,
+    "serviceStartedOrRestarted": false,
+    "publicToolSurfaceExpanded": false,
+    "productionReady": false,
+    "releaseReady": false,
+    "deployReady": false,
+    "cutoverReady": false
+  }
+}

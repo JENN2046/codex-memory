@@ -8,13 +8,30 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Diary-partition v1 Stage 4B multi-project provisioning and live isolation proof complete; public writes and readiness remain false |
-| Current task | `CM-2134 diary-partition v1 Stage 4B project provisioning and closeout` |
-| Current validation | `CMV-2219` |
-| Current route | Deliver the low-disclosure Stage 4B closeout through normal PR/CI/review |
+| Status | ChatGPT Web R4 architecture frozen; Edge/Relay implementation, runtime activation, and readiness remain false |
+| Current task | `CM-2135 ChatGPT Web R4 architecture freeze` |
+| Current validation | `CMV-2220` |
+| Current route | Deliver the R4 freeze through normal PR/CI/review, then begin contracts-only R4-B |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R4 Architecture Freeze
+
+R4 freezes the canonical target as a stable HTTPS ChatGPT Edge, authenticated
+outbound Local Recall Relay, local UDS, codex-memory Governance Kernel, and
+VCPToolBox selected-diary search. The public edge remains transient and cannot
+own mapping, diary ACL, provider execution, indexes, or durable memory. A
+locally issued short-lived `project_context_ref` must precede any recall;
+widget state and public tool arguments cannot grant scope.
+
+Secure MCP Tunnel is now optional/non-canonical, and the old R3 branch remains
+Draft/paused. The frozen package contains the decision, machine manifest/schema,
+threat model, staged taskbook, validator, and negative tests. This batch changed
+no runtime/config, started no service, called no provider or memory path, and
+expanded no public tool surface. Edge/Relay implementation, OAuth activation,
+automatic ChatGPT tool-use proof, production, release, deploy, cutover, and
+readiness remain false. See `docs/CHATGPT_WEB_R4_ARCHITECTURE_FREEZE.md`.
 
 ## Diary-partition V1 Stage 4B Closeout
 

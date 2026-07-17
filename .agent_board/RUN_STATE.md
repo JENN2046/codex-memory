@@ -4,21 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2134 diary-partition v1 Stage 4B project provisioning and closeout`.
-Current validation: `CMV-2219`.
-Current fact: three projects now resolve through a private 12-entry mapping backed by eight new clean partitions; all 13 legacy partitions remain excluded and unread.
-Thirty bounded provider calls passed the required Codex/Claude and cross-project matrix with zero unscoped search and zero live-proof primary writes.
-Public writes, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+Current task: `CM-2135 ChatGPT Web R4 architecture freeze`.
+Current validation: `CMV-2220`.
+Current fact: R4 freezes a stable HTTPS ChatGPT Edge, outbound Local Recall Relay, local UDS governance kernel, and explicit project context as the canonical route.
+Secure MCP Tunnel is non-canonical; this batch performed no runtime/config/provider/memory action and no public tool expansion.
+Implementation, OAuth activation, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Provisioning: three projects, eight new clean partitions, eight authorized bootstrap writes, and 12 private mapping entries.
-- Index/binding: all 12 mapped targets indexed; legacy indexed targets zero; shim/bridge binding matched; rollback config retained.
-- Live proof: 30 provider-bound reads passed required Codex/Claude and cross-project cases; two empty task-start attempts are retained before final pass.
-- Durable mutation: bootstrap primary writes 8; live-proof primary writes 0; public write surface remains off.
-- Status sync: performed locally in CM-2134; PR CI/review and merge remain delivery gates.
+- Architecture: R4 target is frozen as stable HTTPS Edge -> outbound Relay -> UDS -> local governance -> selected-diary VCP search.
+- Project scope: a locally issued short-lived `project_context_ref` must precede recall; widget/tool arguments do not grant ACL.
+- Tunnel: optional development/compatibility adapter only; the R3 branch remains Draft/paused.
+- Side effects: runtime/config/provider/memory/service actions zero; public tool surface unchanged.
+- Status sync: performed locally in CM-2135; PR CI/review and merge remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 

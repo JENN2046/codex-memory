@@ -4,13 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2134 diary-partition v1 Stage 4B project provisioning and closeout`.
-Current validation: `CMV-2219`.
-Current fact: three projects now resolve through a private 12-entry mapping backed by eight new clean partitions; all 13 legacy partitions remain excluded and unread.
-Thirty bounded provider calls passed the required Codex/Claude and cross-project matrix with zero unscoped search and zero live-proof primary writes.
-Public writes, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+Current task: `CM-2135 ChatGPT Web R4 architecture freeze`.
+Current validation: `CMV-2220`.
+Current fact: R4 freezes a stable HTTPS ChatGPT Edge, outbound Local Recall Relay, local UDS governance kernel, and explicit project context as the canonical route.
+Secure MCP Tunnel is non-canonical; this batch performed no runtime/config/provider/memory action and no public tool expansion.
+Implementation, OAuth activation, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2135 ChatGPT Web R4 Architecture Freeze
+
+R4 replaces the old M5 Tunnel-centered target with a stable HTTPS ChatGPT Edge,
+an authenticated outbound Local Recall Relay, local UDS, and the existing
+codex-memory Governance Kernel. A short-lived locally issued
+`project_context_ref` is required before recall; widget state and public tool
+arguments cannot decide diary ACL. VCPToolBox remains the only durable native
+memory authority.
+
+The frozen package includes a human decision, machine manifest/schema, threat
+model, staged taskbook, fail-closed validator, and negative tests. The R3 branch
+remains Draft/paused. No Edge/Relay implementation, OAuth/runtime activation,
+service action, provider or memory call, public tool expansion, deploy, release,
+cutover, or readiness claim occurred.
 
 ## CM-2134 Diary-partition V1 Stage 4B Closeout
 
