@@ -74,20 +74,22 @@ with that exact project ID; it cannot fall back to the client-only private
 partition. Read behavior remains unchanged and may still use the client-only
 partition as general task-start context.
 
-## Current state
+## Stage 4B state
 
-The Stage 3B four-partition mapping proves one project read boundary, but it
-does not contain project-specific private partitions. Therefore the new
-multi-project provisioning gate intentionally remains blocked for write
-activation. A later separately authorized activation must stage the private
-registry and mapping, create the missing clean partitions, validate exact
-binding, and run cross-project negative live proof before enabling writes.
+Stage 4B provisioned three registered projects and completed the cross-client
+and cross-project read proof. The private startup mapping now has 12 entries,
+including exact project-private/project-shared/workspace-shared ownership. The
+two retained client-only private entries are explicitly not write-eligible.
+Provisioning completion does not activate any write surface: public/native
+writes remain off pending a separate authorization and write-specific proof.
 
 ```yaml
-real_partitions_created_by_this_change: 0
-real_mapping_modified: false
+registered_projects: 3
+real_clean_partitions_created_in_stage4b: 8
+private_mapping_entries: 12
+cross_project_read_proof: pass
 public_native_write_surface_enabled: false
-native_memory_write_performed: false
+live_proof_primary_memory_writes: 0
 production_ready_claimed: false
 release_ready_claimed: false
 cutover_ready_claimed: false

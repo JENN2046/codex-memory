@@ -4,11 +4,11 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill`.
-Current validation: `CMV-2218`.
-Current fact: restart, deliberate mapping-mismatch rejection, retained-binding rollback, and non-empty task-start recovery passed without touching governed or legacy partition contents.
-Three accelerated full runs passed 30 Codex/Claude governed reads with isolation, shared behavior, zero unscoped search, zero live primary writes, and no raw disclosure.
-Stage 4A is a short local stability sample; production/release/deploy/cutover/RC/complete-V8/readiness and 24–72 hour soak claims remain false.
+Current task: `CM-2134 diary-partition v1 Stage 4B project provisioning and closeout`.
+Current validation: `CMV-2219`.
+Current fact: three projects now resolve through a private 12-entry mapping backed by eight new clean partitions; all 13 legacy partitions remain excluded and unread.
+Thirty bounded provider calls passed the required Codex/Claude and cross-project matrix with zero unscoped search and zero live-proof primary writes.
+Public writes, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
@@ -46,6 +46,7 @@ P10-observability-admin
 
 | ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|
+| CM-2134 | 2134 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance / P9-codex-claude-client-scope | Authorized eight-record bootstrap, local service activation, and at most 30 provider calls; no production action | private runtime registry/mapping/artifact outside Git; low-disclosure Stage 4B status surfaces | Provision three projects and prove Codex/Claude cross-project read isolation while public writes remain closed | name/Unicode preflight; 12-target indexing; exact binding; health/five-tool contract; strict mainline; 30-call live matrix; docs/current-facts/diff | previous private mapping/binding retained; legacy excluded; live primary writes zero; public writes off | normal PR CI/review; no production/release/deploy/cutover/readiness claim | COMPLETED_STAGE4B_MULTI_PROJECT_LIVE_ISOLATION_PASS_PUBLIC_WRITE_AND_READINESS_FALSE |
 | CM-2133 | 2133 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance / P9-codex-claude-client-scope | Authorized local restart, mismatch drill, provider-bound reads, and retained-config rollback; no production action | governed native failure classification and fallback policy; Stage 4A low-disclosure evidence/status surfaces | Stabilize diary-partition v1 with fail-closed mismatch recovery and accelerated governed-read sampling | deliberate mapping mismatch before provider; retained-binding restore; non-empty task-start recovery; three complete live-proof runs; targeted/default/strict/docs/CI gates | prior private mapping/config retained; mismatch provider calls zero; recovery non-empty; live primary writes zero | normal PR CI/review; no production/release/deploy/cutover/readiness or 24–72 hour soak claim | COMPLETED_LOCAL_STABILIZATION_RECOVERY_AND_ACCELERATED_SOAK_PASS_READINESS_FALSE |
 | CM-2132 | 2132 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance / P9-codex-claude-client-scope | Authorized local bootstrap, provider-bound proof, and bounded runtime/config activation; no production action | diary-scope runtime/config fixes; low-disclosure closeout and active status surfaces | Complete clean-partition diary v1 activation and live Codex/Claude isolation proof | exact VCP conformance; four-partition indexing; MCP/HTTP contract; ten live reads; targeted/default/hardening/strict/docs/CI gates | private rollback mapping/config retained; public write disabled; legacy set untouched; live proof writes zero | normal PR CI/review and regular merge authorized; production/release/cutover remain forbidden | COMPLETED_V1_LIVE_ISOLATION_PROOF_PASS_PRODUCTION_RELEASE_CUTOVER_READINESS_FALSE |
 | CM-2131 | 2131 | done | P0-mainline-health / P6-docs-drift / P8-memory-governance | Narrow status contract and tracked governance-state sync; no runtime/provider action | nine status/governance surfaces; current-facts validator and existing tests | Bind PR #21 merge observation and fresh native-context proof PASS without converting an empty result into recall/relevance or readiness proof | exact merge/head tree equality; main CI; frozen manifest; current-facts v4; native-context contracts; docs/ledger/diff gates | preserve live-head separation; no new provider/runtime/memory action; no new CM-21xx one-shot script | PR CI/review required; merge requires separate exact authorization | COMPLETED_MAIN_BASELINE_REVALIDATED_NATIVE_CONTEXT_PROOF_PASS_RESULT_EMPTY_STATUS_SYNCED_READINESS_FALSE |
