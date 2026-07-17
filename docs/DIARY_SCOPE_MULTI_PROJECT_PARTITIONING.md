@@ -57,7 +57,9 @@ Before any future write activation, every registered project must have:
   names, and no ownership conflict.
 
 The gate returns only counts and missing categories. It does not return raw
-partition names. Missing or conflicting prerequisites result in:
+partition names. Any extra write-eligible client-only, unregistered-project, or
+ownership-drifted entry rejects the complete activation allowlist. Missing,
+extra, or conflicting prerequisites result in:
 
 ```yaml
 write_activation_allowed: false

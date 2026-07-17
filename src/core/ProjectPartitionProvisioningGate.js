@@ -117,8 +117,8 @@ function hasProfiles(entry) {
     entry.readProfiles.includes('task_start_context');
 }
 
-function exactEntries(entries, expected) {
-  return entries.filter(entry =>
+function isExactEntry(entry, expected) {
+  return (
     entry.diaryName === expected.diaryName &&
     entry.classification === expected.classification &&
     entry.clientId === expected.clientId &&
@@ -127,6 +127,10 @@ function exactEntries(entries, expected) {
     entry.writeEligible === true &&
     hasProfiles(entry)
   );
+}
+
+function exactEntries(entries, expected) {
+  return entries.filter(entry => isExactEntry(entry, expected));
 }
 
 function evaluateProjectPartitionProvisioning({ mapping, registry } = {}) {
@@ -139,37 +143,67 @@ function evaluateProjectPartitionProvisioning({ mapping, registry } = {}) {
 
   const entries = mappingValidation.mapping.entries;
   const requiredPartitions = new Set();
+  const requiredTargets = new Map();
   const missingCategories = new Set();
   for (const project of registryValidation.registry.projects) {
     const names = expectedPartitionNames(project);
     for (const clientId of project.clients) {
       requiredPartitions.add(names.privateByClient[clientId]);
-      if (exactEntries(entries, {
+      const expected = {
         diaryName: names.privateByClient[clientId],
         classification: 'client_private',
         clientId,
         projectId: project.projectId,
         workspaceId: project.workspaceId
-      }).length !== 1) missingCategories.add('project_client_private');
+      };
+      requiredTargets.set(expected.diaryName, expected);
+      if (exactEntries(entries, expected).length !== 1) {
+        missingCategories.add('project_client_private');
+      }
     }
 
     requiredPartitions.add(names.projectShared);
-    if (exactEntries(entries, {
+    const expectedProjectShared = {
       diaryName: names.projectShared,
       classification: 'project_shared',
       clientId: null,
       projectId: project.projectId,
       workspaceId: project.workspaceId
-    }).length !== 1) missingCategories.add('project_shared');
+    };
+    requiredTargets.set(expectedProjectShared.diaryName, expectedProjectShared);
+    if (exactEntries(entries, expectedProjectShared).length !== 1) {
+      missingCategories.add('project_shared');
+    }
 
     requiredPartitions.add(names.workspaceShared);
-    if (exactEntries(entries, {
+    const expectedWorkspaceShared = {
       diaryName: names.workspaceShared,
       classification: 'workspace_shared',
       clientId: null,
       projectId: null,
       workspaceId: project.workspaceId
-    }).length !== 1) missingCategories.add('workspace_shared');
+    };
+    requiredTargets.set(expectedWorkspaceShared.diaryName, expectedWorkspaceShared);
+    if (exactEntries(entries, expectedWorkspaceShared).length !== 1) {
+      missingCategories.add('workspace_shared');
+    }
+  }
+
+  const unexpectedWriteEligibleCount = entries.filter(entry => {
+    if (entry.writeEligible !== true) return false;
+    const expected = requiredTargets.get(entry.diaryName);
+    return !expected || !isExactEntry(entry, expected);
+  }).length;
+  if (unexpectedWriteEligibleCount > 0) {
+    return {
+      accepted: false,
+      reasonCode: 'project_partition_write_allowlist_invalid',
+      projectCount: registryValidation.registry.projects.length,
+      requiredPartitionCount: requiredPartitions.size,
+      unexpectedWriteEligibleCount,
+      rawPartitionNamesReturned: false,
+      writeActivationAllowed: false
+    };
   }
 
   if (missingCategories.size > 0) {

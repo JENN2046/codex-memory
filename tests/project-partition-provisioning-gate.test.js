@@ -144,6 +144,40 @@ test('provisioning gate fails closed when project-private partitions are absent'
   assert.equal(JSON.stringify(result).includes('Jenn-'), false);
 });
 
+test('provisioning gate rejects every write-eligible target outside the registry allowlist', () => {
+  const projects = registry().projects;
+  for (const extra of [
+    entry('global-codex-private-v1', 'Jenn-Codex-Private', 'client_private', { clientId: 'Codex' }),
+    entry('unregistered-project-v1', 'Jenn-Project-other-Shared', 'project_shared', {
+      projectId: 'other',
+      workspaceId: 'agents-os'
+    })
+  ]) {
+    const value = completeMapping(projects);
+    value.entries.push(extra);
+    const result = evaluateProjectPartitionProvisioning({ registry: registry(), mapping: value });
+    assert.equal(result.accepted, false);
+    assert.equal(result.reasonCode, 'project_partition_write_allowlist_invalid');
+    assert.equal(result.unexpectedWriteEligibleCount, 1);
+    assert.equal(result.writeActivationAllowed, false);
+    assert.equal(JSON.stringify(result).includes(extra.diaryName), false);
+  }
+});
+
+test('provisioning gate permits excluded non-writable legacy or client-only partitions', () => {
+  const projects = registry().projects;
+  const value = completeMapping(projects);
+  value.entries.push(entry(
+    'global-codex-private-v1',
+    'Jenn-Codex-Private',
+    'client_private',
+    { clientId: 'Codex', writeEligible: false }
+  ));
+  const result = evaluateProjectPartitionProvisioning({ registry: registry(), mapping: value });
+  assert.equal(result.accepted, true);
+  assert.equal(result.writeActivationAllowed, true);
+});
+
 test('provisioning gate rejects ownership profile and write eligibility drift', () => {
   const projects = registry().projects;
   for (const mutate of [
