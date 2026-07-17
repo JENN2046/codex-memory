@@ -4,13 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill`.
-Current validation: `CMV-2218`.
-Current fact: restart, deliberate mapping-mismatch rejection, retained-binding rollback, and non-empty task-start recovery passed without touching governed or legacy partition contents.
-Three accelerated full runs passed 30 Codex/Claude governed reads with isolation, shared behavior, zero unscoped search, zero live primary writes, and no raw disclosure.
-Stage 4A is a short local stability sample; production/release/deploy/cutover/RC/complete-V8/readiness and 24–72 hour soak claims remain false.
+Current task: `CM-2134 diary-partition v1 Stage 4B project provisioning and closeout`.
+Current validation: `CMV-2219`.
+Current fact: three projects now resolve through a private 12-entry mapping backed by eight new clean partitions; all 13 legacy partitions remain excluded and unread.
+Thirty bounded provider calls passed the required Codex/Claude and cross-project matrix with zero unscoped search and zero live-proof primary writes.
+Public writes, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2134 Diary-partition V1 Stage 4B Closeout
+
+The authorized bootstrap created eight clean project partitions and eight
+non-sensitive primary-memory records. A private three-project registry and
+12-entry startup mapping passed schema, ownership, Unicode, provisioning, and
+dual-binding checks. Both client-only private entries are `writeEligible=false`.
+Derived indexing contains all 12 mapped targets and no legacy target.
+
+Health, the exact five-tool MCP surface, and strict mainline gates passed.
+Thirty provider-bound governed reads covered private, project, workspace,
+shared-union, and task-start behavior for Codex and Claude across all three
+projects. Two initial Claude task-start attempts returned empty context and are
+retained in the private counter chain; a unique-nonce retry and all required
+final cases passed. Cross-client/project and legacy isolation passed,
+`unscoped_native_search_count=0`, and live-proof primary writes were zero.
+
+Private mapping/config/artifacts remain outside Git. Public writes, migration,
+production, release, deploy, cutover, and readiness remain false.
 
 ## CM-2133 Diary-partition V1 Stage 4A Stabilization
 

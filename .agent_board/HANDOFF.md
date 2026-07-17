@@ -4,21 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill`.
-Current validation: `CMV-2218`.
-Current fact: restart, deliberate mapping-mismatch rejection, retained-binding rollback, and non-empty task-start recovery passed without touching governed or legacy partition contents.
-Three accelerated full runs passed 30 Codex/Claude governed reads with isolation, shared behavior, zero unscoped search, zero live primary writes, and no raw disclosure.
-Stage 4A is a short local stability sample; production/release/deploy/cutover/RC/complete-V8/readiness and 24–72 hour soak claims remain false.
+Current task: `CM-2134 diary-partition v1 Stage 4B project provisioning and closeout`.
+Current validation: `CMV-2219`.
+Current fact: three projects now resolve through a private 12-entry mapping backed by eight new clean partitions; all 13 legacy partitions remain excluded and unread.
+Thirty bounded provider calls passed the required Codex/Claude and cross-project matrix with zero unscoped search and zero live-proof primary writes.
+Public writes, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2133 repaired mismatch fallback and added low-disclosure native failure
-categories. Restart, mismatch rejection, rollback restore, non-empty task-start,
-and three accelerated isolation runs passed. Private runtime material remains
-outside Git; local services are healthy with write delegation off. Next route:
-complete CI/review delivery. Long-duration soak and readiness remain separate.
+CM-2134 provisioned three projects with eight new clean partitions and a
+private 12-entry startup mapping. Eight authorized bootstrap records are
+indexed; all 13 legacy partitions remain excluded and unread. Health, five-tool
+MCP contract, strict mainline, and the 30-call cross-client/project matrix
+passed. Two empty Claude task-start attempts remain truthfully counted before
+the final nonce-based pass. Private runtime material stays outside Git; public
+writes remain off. Next route: complete PR CI/review delivery without inferring
+production, release, deploy, cutover, or readiness.
 
 Observed `main` merge `49f4ad14…` / tree `930d182c…` exactly matches PR #21 head tree and passed exact-head main CI. The historical frozen evidence manifest remains accepted at `d78ad8f7…`; current-facts drift and the key governed native-context contracts also pass without a new provider call.
 

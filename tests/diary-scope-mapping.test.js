@@ -295,6 +295,51 @@ test('pure write resolver returns exactly one read-allowlisted eligible target',
   }
 });
 
+test('private write with project context never falls back to client-only private', () => {
+  const clientOnly = mapping([entry()]);
+  const rejected = resolveWrite({
+    mapping: clientOnly,
+    trustedScope: {
+      clientId: 'Codex',
+      projectId: 'project-alpha',
+      workspaceId: 'workspace-alpha'
+    },
+    deltaType: 'private'
+  });
+  assert.equal(rejected.accepted, false);
+  assert.equal(rejected.reasonCode, 'scoped_private_write_target_required');
+
+  const projectWithoutWorkspaceTarget = mapping([
+    entry(),
+    entry({
+      partitionReference: 'codex-private-project-v1',
+      diaryName: 'DIARY_CODEX_PROJECT_PRIVATE',
+      projectId: 'project-alpha'
+    })
+  ]);
+  assert.equal(resolveWrite({
+    mapping: projectWithoutWorkspaceTarget,
+    trustedScope: {
+      clientId: 'Codex',
+      projectId: 'project-alpha',
+      workspaceId: 'workspace-alpha'
+    },
+    deltaType: 'private'
+  }).reasonCode, 'scoped_private_write_target_required');
+
+  const accepted = resolveWrite({
+    mapping: fullMapping(),
+    trustedScope: {
+      clientId: 'Codex',
+      projectId: 'project-alpha',
+      workspaceId: 'workspace-alpha'
+    },
+    deltaType: 'private'
+  });
+  assert.equal(accepted.accepted, true);
+  assert.deepEqual(accepted.allowedDiaryNames, ['DIARY_CODEX_PROJECT_WORKSPACE_PRIVATE']);
+});
+
 test('write resolver rejects compatibility ambiguous ineligible missing and multi-target targets', () => {
   const noEligible = fullMapping();
   noEligible.entries.find(item => item.classification === 'project_shared').writeEligible = false;
