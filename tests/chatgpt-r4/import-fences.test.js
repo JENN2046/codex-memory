@@ -54,19 +54,25 @@ test('dynamic imports, runtime config, listeners, body logs, and durable writes 
   const file = path.join(ROOTS.edge, 'synthetic-negative.js');
   for (const source of [
     'const target = "node:fs"; require(target);',
-    "require /*comment*/('node:fs');",
     "require?.('node:fs');",
     "module.require('node:fs');",
     "globalThis['require']('node:fs');"
   ]) {
     assert.throws(() => extractImports(source, 'synthetic.js'), /dynamic_import_forbidden/);
   }
+  assert.throws(() => validateComponentSource('edge', {
+    file,
+    source: "require /*comment*/('node:fs');"
+  }), /builtin_import_forbidden/);
   for (const source of [
     'const value = process.env.SECRET_REFERENCE;',
+    'const value = process/*comment*/.env.SECRET_REFERENCE;',
     "eval('require')('node:fs');",
     String.raw`requ\u0069re('node:fs');`,
     'server.listen(8080);',
+    'server.listen/*comment*/(8080);',
     'console.log(request.body);',
+    'console/*comment*/.log/*comment*/(request.body);',
     'writeFile(target, body);'
   ]) {
     assert.throws(() => validateComponentSource('edge', { file, source }));

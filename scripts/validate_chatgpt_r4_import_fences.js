@@ -36,14 +36,37 @@ const COMPONENT_POLICIES = Object.freeze({
   }
 });
 
+const JS_GAP = String.raw`(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\r\n]*(?:\r?\n|$))*`;
+
 const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
-  { pattern: /\bprocess\s*(?:\.|\[)/u, code: 'runtime_process_access' },
-  { pattern: /\b(?:eval|Function)\s*(?:\?\.)?\s*\(/u, code: 'runtime_code_generation' },
+  { pattern: new RegExp(String.raw`\bprocess${JS_GAP}(?:\.|\[)`, 'u'), code: 'runtime_process_access' },
+  {
+    pattern: new RegExp(String.raw`\b(?:eval|Function)${JS_GAP}(?:\?${JS_GAP}\.)?${JS_GAP}\(`, 'u'),
+    code: 'runtime_code_generation'
+  },
   { pattern: /\\u(?:\{[0-9a-fA-F]+\}|[0-9a-fA-F]{4})/u, code: 'escaped_source_identifier' },
-  { pattern: /\b(?:writeFile|appendFile|createWriteStream|mkdir|rm|unlink)\s*\(/u, code: 'durable_file_mutation' },
-  { pattern: /\b(?:createServer|listen)\s*\(/u, code: 'service_listener' },
-  { pattern: /\b(?:fetch|XMLHttpRequest)\s*\(/u, code: 'network_invocation' },
-  { pattern: /\bconsole\.(?:log|info|warn|error|debug)\s*\(/u, code: 'body_log_risk' }
+  {
+    pattern: new RegExp(
+      String.raw`\b(?:writeFile|appendFile|createWriteStream|mkdir|rm|unlink)${JS_GAP}\(`,
+      'u'
+    ),
+    code: 'durable_file_mutation'
+  },
+  {
+    pattern: new RegExp(String.raw`\b(?:createServer|listen)${JS_GAP}\(`, 'u'),
+    code: 'service_listener'
+  },
+  {
+    pattern: new RegExp(String.raw`\b(?:fetch|XMLHttpRequest)${JS_GAP}\(`, 'u'),
+    code: 'network_invocation'
+  },
+  {
+    pattern: new RegExp(
+      String.raw`\bconsole${JS_GAP}\.${JS_GAP}(?:log|info|warn|error|debug)${JS_GAP}\(`,
+      'u'
+    ),
+    code: 'body_log_risk'
+  }
 ]);
 
 function isWithin(file, directory) {
@@ -63,27 +86,35 @@ function walkFiles(directory, suffix = '.js') {
 
 function extractImports(source, relativeFile) {
   const imports = [];
-  const literalRequirePattern = /\brequire\s*\(\s*['"]([^'"]+)['"]\s*\)/gu;
+  const literalRequireSource = String.raw`\brequire${JS_GAP}\(${JS_GAP}['"]([^'"]+)['"]${JS_GAP}\)`;
+  const literalRequirePattern = new RegExp(literalRequireSource, 'gu');
+  const literalDynamicImportSource = String.raw`\bimport${JS_GAP}\(${JS_GAP}['"]([^'"]+)['"]${JS_GAP}\)`;
   const literalPatterns = [
     literalRequirePattern,
     /\bfrom\s+['"]([^'"]+)['"]/gu,
     /\bimport\s+['"]([^'"]+)['"]/gu,
-    /\bimport\(\s*['"]([^'"]+)['"]\s*\)/gu
+    new RegExp(literalDynamicImportSource, 'gu')
   ];
   for (const pattern of literalPatterns) {
     for (const match of source.matchAll(pattern)) imports.push(match[1]);
   }
   const requireReferenceCount = [...source.matchAll(/\brequire\b/gu)].length;
-  const literalRequireCount = [...source.matchAll(
-    /\brequire\s*\(\s*['"][^'"]+['"]\s*\)/gu
-  )].length;
-  const memberRequireUsed = /(?<!\.)\.\s*require\s*\(/u.test(source) ||
-    /\[\s*['"]require['"]\s*\]\s*\(/u.test(source);
+  const literalRequireCount = [...source.matchAll(new RegExp(literalRequireSource, 'gu'))].length;
+  const memberRequireUsed = new RegExp(
+    String.raw`(?<!\.)\.${JS_GAP}require${JS_GAP}\(`,
+    'u'
+  ).test(source) || new RegExp(
+    String.raw`\[${JS_GAP}['"]require['"]${JS_GAP}\]${JS_GAP}\(`,
+    'u'
+  ).test(source);
   if (requireReferenceCount !== literalRequireCount || memberRequireUsed) {
     throw new Error(`dynamic_import_forbidden:${relativeFile}`);
   }
-  const dynamicImportCount = [...source.matchAll(/\bimport\s*\(/gu)].length;
-  const literalDynamicCount = [...source.matchAll(/\bimport\(\s*['"][^'"]+['"]\s*\)/gu)].length;
+  const dynamicImportCount = [...source.matchAll(new RegExp(
+    String.raw`\bimport${JS_GAP}\(`,
+    'gu'
+  ))].length;
+  const literalDynamicCount = [...source.matchAll(new RegExp(literalDynamicImportSource, 'gu'))].length;
   if (dynamicImportCount !== literalDynamicCount) {
     throw new Error(`dynamic_import_forbidden:${relativeFile}`);
   }
