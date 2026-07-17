@@ -52,9 +52,19 @@ test('Relay and widget cannot import governance, mapping, provider, storage, or 
 
 test('dynamic imports, runtime config, listeners, body logs, and durable writes fail static fences', () => {
   const file = path.join(ROOTS.edge, 'synthetic-negative.js');
-  assert.throws(() => extractImports('const target = "node:fs"; require(target);', 'synthetic.js'), /dynamic_import_forbidden/);
+  for (const source of [
+    'const target = "node:fs"; require(target);',
+    "require /*comment*/('node:fs');",
+    "require?.('node:fs');",
+    "module.require('node:fs');",
+    "globalThis['require']('node:fs');"
+  ]) {
+    assert.throws(() => extractImports(source, 'synthetic.js'), /dynamic_import_forbidden/);
+  }
   for (const source of [
     'const value = process.env.SECRET_REFERENCE;',
+    "eval('require')('node:fs');",
+    String.raw`requ\u0069re('node:fs');`,
     'server.listen(8080);',
     'console.log(request.body);',
     'writeFile(target, body);'

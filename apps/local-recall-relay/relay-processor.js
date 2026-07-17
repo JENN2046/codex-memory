@@ -4,9 +4,9 @@ const {
   createResponseEnvelope,
   digestObject,
   validateCounters,
-  validatePublicStructuredContent,
   validateRequestEnvelope,
   validateReceiptChain,
+  validateToolStructuredContent,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
 
@@ -44,7 +44,7 @@ function createRelayProcessor({
       });
       const invocation = await forwardToUds({ request, relayReceipt });
       const responseNow = clock();
-      validateInvocation(invocation);
+      validateInvocation(invocation, request.tool_request.name);
       const receiptChain = {
         edge_request: validation.requestDigest,
         relay: digestObject(relayReceipt),
@@ -68,7 +68,7 @@ function createRelayProcessor({
   });
 }
 
-function validateInvocation(invocation) {
+function validateInvocation(invocation, toolName) {
   if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
     reject('relay_invocation_invalid');
   }
@@ -77,7 +77,7 @@ function validateInvocation(invocation) {
     reject('relay_invocation_shape_invalid');
   }
   if (!['ok', 'denied', 'unavailable'].includes(invocation.status)) reject('relay_invocation_status_invalid');
-  validatePublicStructuredContent(invocation.structured_content);
+  validateToolStructuredContent(toolName, invocation.structured_content);
   validateCounters(invocation.counters);
   if (!invocation.receipt_digests ||
       typeof invocation.receipt_digests !== 'object' ||

@@ -37,7 +37,9 @@ const COMPONENT_POLICIES = Object.freeze({
 });
 
 const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
-  { pattern: /\bprocess\.env\b/u, code: 'runtime_config_access' },
+  { pattern: /\bprocess\s*(?:\.|\[)/u, code: 'runtime_process_access' },
+  { pattern: /\b(?:eval|Function)\s*(?:\?\.)?\s*\(/u, code: 'runtime_code_generation' },
+  { pattern: /\\u(?:\{[0-9a-fA-F]+\}|[0-9a-fA-F]{4})/u, code: 'escaped_source_identifier' },
   { pattern: /\b(?:writeFile|appendFile|createWriteStream|mkdir|rm|unlink)\s*\(/u, code: 'durable_file_mutation' },
   { pattern: /\b(?:createServer|listen)\s*\(/u, code: 'service_listener' },
   { pattern: /\b(?:fetch|XMLHttpRequest)\s*\(/u, code: 'network_invocation' },
@@ -61,8 +63,9 @@ function walkFiles(directory, suffix = '.js') {
 
 function extractImports(source, relativeFile) {
   const imports = [];
+  const literalRequirePattern = /\brequire\s*\(\s*['"]([^'"]+)['"]\s*\)/gu;
   const literalPatterns = [
-    /\brequire\(\s*['"]([^'"]+)['"]\s*\)/gu,
+    literalRequirePattern,
     /\bfrom\s+['"]([^'"]+)['"]/gu,
     /\bimport\s+['"]([^'"]+)['"]/gu,
     /\bimport\(\s*['"]([^'"]+)['"]\s*\)/gu
@@ -70,9 +73,13 @@ function extractImports(source, relativeFile) {
   for (const pattern of literalPatterns) {
     for (const match of source.matchAll(pattern)) imports.push(match[1]);
   }
-  const requireCount = [...source.matchAll(/\brequire\s*\(/gu)].length;
-  const literalRequireCount = [...source.matchAll(/\brequire\(\s*['"][^'"]+['"]\s*\)/gu)].length;
-  if (requireCount !== literalRequireCount) {
+  const requireReferenceCount = [...source.matchAll(/\brequire\b/gu)].length;
+  const literalRequireCount = [...source.matchAll(
+    /\brequire\s*\(\s*['"][^'"]+['"]\s*\)/gu
+  )].length;
+  const memberRequireUsed = /(?<!\.)\.\s*require\s*\(/u.test(source) ||
+    /\[\s*['"]require['"]\s*\]\s*\(/u.test(source);
+  if (requireReferenceCount !== literalRequireCount || memberRequireUsed) {
     throw new Error(`dynamic_import_forbidden:${relativeFile}`);
   }
   const dynamicImportCount = [...source.matchAll(/\bimport\s*\(/gu)].length;

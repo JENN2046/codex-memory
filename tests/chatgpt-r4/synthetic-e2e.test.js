@@ -12,7 +12,7 @@ const {
   validateResponseEnvelope
 } = require('../../packages/chatgpt-r4-contracts');
 const { buildCandidateEdgeRequest } = require('../../apps/chatgpt-edge');
-const { createRelayProcessor } = require('../../apps/local-recall-relay');
+const { createRelayProcessor, validateInvocation } = require('../../apps/local-recall-relay');
 const {
   FIXED_NOW,
   SYNTHETIC_AUDIENCE,
@@ -107,6 +107,15 @@ test('Relay receipt is exact, request-bound, and proves replay checking without 
   assert.throws(() => validateRelayReceipt(legacy, receipt.request_digest), {
     code: 'relay_receipt_shape_invalid'
   });
+  assert.throws(() => validateInvocation({
+    status: 'ok',
+    structured_content: { foo: 'bar' },
+    counters: ZERO_MEMORY_COUNTERS,
+    receipt_digests: {
+      governance: sha256('governance'),
+      context: sha256('context')
+    }
+  }, 'memory_overview'), { code: 'response_structured_content_shape_invalid' });
 });
 
 test('Relay stamps the response after a slow injected UDS invocation completes', async () => {
