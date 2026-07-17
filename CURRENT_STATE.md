@@ -8,13 +8,26 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | Diary-partition v1 Stage 4A local stabilization and recovery drill complete; production/release/cutover readiness remains false |
+| Status | Diary-partition v1 Stage 4A local stabilization complete; multi-project partitioning now blocks unsafe future writes; readiness remains false |
 | Current task | `CM-2133 diary-partition v1 Stage 4A stabilization and recovery drill` |
 | Current validation | `CMV-2218` |
 | Current route | Deliver the low-disclosure Stage 4A repair and evidence through normal PR/CI/review |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## Multi-project write-isolation prerequisite
+
+Future project-scoped private writes may no longer fall back to the global
+client-only private partition. A stable project registry/schema and pure
+provisioning gate require exact client-project-private, project-shared, and
+workspace-shared ownership before write activation. The gate is low-disclosure
+and returns counts/categories rather than partition names.
+
+No real partition or mapping was changed. The current four-partition Stage 3B
+deployment lacks project-specific private targets, so write activation remains
+fail-closed pending a separately authorized provisioning and live isolation
+proof. See `docs/DIARY_SCOPE_MULTI_PROJECT_PARTITIONING.md`.
 
 ## Diary-partition V1 Stage 4A Stabilization
 

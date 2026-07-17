@@ -323,6 +323,12 @@ function resolveWrite({ mapping, trustedScope, deltaType } = {}) {
   if (deltaType === 'private') {
     const privateResult = mostSpecificClientPrivate(validation.mapping.entries, scope, 'exact_visibility');
     if (!privateResult.accepted) return privateResult;
+    if (scope.projectId && privateResult.entry.projectId !== scope.projectId) {
+      return { accepted: false, reasonCode: 'scoped_private_write_target_required' };
+    }
+    if (scope.workspaceId && privateResult.entry.workspaceId !== scope.workspaceId) {
+      return { accepted: false, reasonCode: 'scoped_private_write_target_required' };
+    }
     candidates = [privateResult.entry];
   } else if (deltaType === 'project' || deltaType === 'shared') {
     if (!scope.projectId) return { accepted: false, reasonCode: 'trusted_project_id_required' };

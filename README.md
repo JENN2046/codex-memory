@@ -137,6 +137,14 @@ an explicit operator surface configuration before they are exposed. Native
 writes still require exact operator approval, bounded rollback posture, and a
 separate real-root write proof.
 
+Multi-project writes now have an additional fail-closed prerequisite. A stable
+project registry defines deterministic client-project-private, project-shared,
+and workspace-shared partition names. `resolveWrite()` refuses to fall back to
+client-only private memory when trusted scope contains a project ID, and the
+provisioning gate requires every registered project/client target before future
+write activation. The current real mapping has not been expanded, so write
+activation remains blocked. See [multi-project partitioning](docs/DIARY_SCOPE_MULTI_PROJECT_PARTITIONING.md).
+
 ## Quick Start
 
 Start or inspect the managed WSL-local native bridge:
