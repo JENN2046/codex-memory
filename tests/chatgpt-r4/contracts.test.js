@@ -6,6 +6,7 @@ const test = require('node:test');
 
 const {
   DATA_TOOL_NAMES,
+  HTTPS_URI_PATTERN_SOURCE,
   InMemoryReplayGuard,
   PRINCIPAL_ASSERTION_SCHEMA,
   PROJECT_CONTEXT_CLAIM_SCHEMA,
@@ -68,6 +69,9 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
     assert.equal(schema.additionalProperties, false);
   }
   assert.equal(PRINCIPAL_ASSERTION_SCHEMA.properties.oauth_version.const, '2.1');
+  assert.equal(PRINCIPAL_ASSERTION_SCHEMA.properties.issuer.pattern, HTTPS_URI_PATTERN_SOURCE);
+  assert.equal(PRINCIPAL_ASSERTION_SCHEMA.properties.audience.pattern, HTTPS_URI_PATTERN_SOURCE);
+  assert.deepEqual(PRINCIPAL_ASSERTION_SCHEMA.properties.scopes.contains, { const: 'memory.read' });
   assert.equal(PROJECT_CONTEXT_CLAIM_SCHEMA.properties.client_id.const, 'ChatGPT');
   const requestVariants = REQUEST_ENVELOPE_SCHEMA.properties.tool_request.oneOf;
   assert.deepEqual(requestVariants.map(variant => variant.properties.name.const), DATA_TOOL_NAMES);
@@ -108,7 +112,7 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.equal(WIDGET_DTO_SCHEMA.properties.safe_project_alias.pattern, '^[A-Za-z0-9][A-Za-z0-9._-]*$');
   assert.deepEqual(
     WIDGET_DTO_SCHEMA.allOf[0].oneOf.map(variant => variant.properties.context_status),
-    [{ const: 'resolved' }, { enum: ['missing', 'denied'] }, { const: 'expired' }]
+    [{ const: 'resolved' }, { enum: ['missing', 'denied', 'unavailable'] }, { const: 'expired' }]
   );
 });
 

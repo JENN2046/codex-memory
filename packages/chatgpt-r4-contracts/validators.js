@@ -495,7 +495,9 @@ function validateWidgetDto(dto) {
     max: LIMITS.maxProjectAliasCharacters,
     pattern: /^[A-Za-z0-9][A-Za-z0-9._-]*$/u
   });
-  if (!['resolved', 'missing', 'expired', 'denied'].includes(dto.context_status)) reject('widget_context_status_invalid');
+  if (!['resolved', 'missing', 'expired', 'denied', 'unavailable'].includes(dto.context_status)) {
+    reject('widget_context_status_invalid');
+  }
   if (!['bound', 'not_available', 'invalid'].includes(dto.receipt_status)) reject('widget_receipt_status_invalid');
   if (dto.context_status === 'resolved') {
     parseTime(dto.expires_at, 'widget_expiry_invalid');

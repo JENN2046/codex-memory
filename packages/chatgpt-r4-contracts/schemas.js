@@ -5,6 +5,7 @@ const {
   ARCHITECTURE_REFERENCE,
   CONTEXT_VISIBILITIES,
   DATA_TOOL_NAMES,
+  HTTPS_URI_PATTERN_SOURCE,
   KINDS,
   LIMITS,
   PROJECT_CONTEXT_REF_PATTERN_SOURCE,
@@ -184,10 +185,16 @@ const PRINCIPAL_ASSERTION_SCHEMA = deepFreeze({
     schema_version: { const: SCHEMA_VERSION },
     kind: { const: KINDS.principalAssertion },
     architecture_reference: { const: ARCHITECTURE_REFERENCE },
-    issuer: { type: 'string', format: 'uri' },
-    audience: { type: 'string', format: 'uri' },
+    issuer: { type: 'string', format: 'uri', pattern: HTTPS_URI_PATTERN_SOURCE },
+    audience: { type: 'string', format: 'uri', pattern: HTTPS_URI_PATTERN_SOURCE },
     subject_fingerprint: { type: 'string', pattern: '^sha256:[a-f0-9]{64}$' },
-    scopes: { type: 'array', minItems: 1, uniqueItems: true, items: { type: 'string' } },
+    scopes: {
+      type: 'array',
+      minItems: 1,
+      uniqueItems: true,
+      contains: { const: 'memory.read' },
+      items: { type: 'string', minLength: 1, maxLength: 120 }
+    },
     oauth_version: { const: '2.1' },
     pkce_method: { const: 'S256' },
     issued_at: { type: 'string', format: 'date-time' },
@@ -308,7 +315,7 @@ const WIDGET_DTO_SCHEMA = deepFreeze({
       maxLength: LIMITS.maxProjectAliasCharacters,
       pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$'
     },
-    context_status: { enum: ['resolved', 'missing', 'expired', 'denied'] },
+    context_status: { enum: ['resolved', 'missing', 'expired', 'denied', 'unavailable'] },
     expires_at: { type: ['string', 'null'], format: 'date-time' },
     visibility_labels: {
       type: 'array',
@@ -329,7 +336,7 @@ const WIDGET_DTO_SCHEMA = deepFreeze({
       },
       {
         properties: {
-          context_status: { enum: ['missing', 'denied'] },
+          context_status: { enum: ['missing', 'denied', 'unavailable'] },
           expires_at: { const: null },
           visibility_labels: { maxItems: 0 },
           receipt_status: { enum: ['not_available', 'invalid'] }

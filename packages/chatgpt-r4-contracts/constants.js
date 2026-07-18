@@ -6,6 +6,7 @@ const WIDGET_RESOURCE_URI = 'ui://codex-memory/chatgpt-r4/memory-scope-widget-v1
 const PROJECT_CONTEXT_REF_PATTERN_SOURCE = '^pctx_[A-Za-z0-9_-]{32,96}$';
 const REQUEST_ID_PATTERN_SOURCE = '^req_[A-Za-z0-9_-]{24,96}$';
 const RESULT_REF_PATTERN_SOURCE = '^mref_[A-Za-z0-9_-]{16,120}$';
+const HTTPS_URI_PATTERN_SOURCE = '^https://[^\\s/@]+(?:[/?#]|$)';
 
 const KINDS = Object.freeze({
   principalAssertion: 'chatgpt_r4_principal_assertion',
@@ -102,6 +103,7 @@ module.exports = {
   PROJECT_CONTEXT_REF_PATTERN_SOURCE,
   REQUEST_ID_PATTERN_SOURCE,
   RESULT_REF_PATTERN_SOURCE,
+  HTTPS_URI_PATTERN_SOURCE,
   KINDS,
   DATA_TOOL_NAMES,
   RENDER_TOOL_NAMES,

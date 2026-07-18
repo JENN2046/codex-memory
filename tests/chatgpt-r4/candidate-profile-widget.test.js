@@ -112,6 +112,7 @@ test('widget DTO renders only safe scope status and bridge uses tools/call', () 
   for (const nonResolved of [
     { contextStatus: 'missing', expiresAt: null, receiptStatus: 'not_available' },
     { contextStatus: 'denied', expiresAt: null, receiptStatus: 'invalid' },
+    { contextStatus: 'unavailable', expiresAt: null, receiptStatus: 'not_available' },
     { contextStatus: 'expired', expiresAt: '2026-07-18T00:05:00.000Z', receiptStatus: 'invalid' }
   ]) {
     assert.doesNotThrow(() => createMemoryScopeDto({
