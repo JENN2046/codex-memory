@@ -7,6 +7,7 @@ const {
   validateRequestEnvelope,
   validateReceiptChain,
   validateToolStructuredContent,
+  deepFreeze,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
 
@@ -32,6 +33,9 @@ function createRelayProcessor({
         replayGuard: requestReplayGuard,
         consumeReplay: true
       });
+      const requestId = request.request_id;
+      const toolName = request.tool_request.name;
+      const forwardedRequest = deepFreeze(structuredClone(request));
       const relayReceipt = Object.freeze({
         schema_version: 1,
         kind: 'chatgpt_r4_relay_receipt',
@@ -42,9 +46,9 @@ function createRelayProcessor({
         scope_authorized_by_relay: false,
         durable_state_written: false
       });
-      const invocation = await forwardToUds({ request, relayReceipt });
+      const invocation = await forwardToUds({ request: forwardedRequest, relayReceipt });
       const responseNow = clock();
-      validateInvocation(invocation, request.tool_request.name);
+      validateInvocation(invocation, toolName);
       const receiptChain = {
         edge_request: validation.requestDigest,
         relay: digestObject(relayReceipt),
@@ -54,9 +58,9 @@ function createRelayProcessor({
       validateReceiptChain(receiptChain);
 
       return createResponseEnvelope({
-        requestId: request.request_id,
+        requestId,
         requestDigest: validation.requestDigest,
-        toolName: request.tool_request.name,
+        toolName,
         status: invocation.status,
         structuredContent: invocation.structured_content,
         counters: invocation.counters,
@@ -77,7 +81,9 @@ function validateInvocation(invocation, toolName) {
     reject('relay_invocation_shape_invalid');
   }
   if (!['ok', 'denied', 'unavailable'].includes(invocation.status)) reject('relay_invocation_status_invalid');
-  validateToolStructuredContent(toolName, invocation.structured_content);
+  validateToolStructuredContent(toolName, invocation.structured_content, {
+    status: invocation.status
+  });
   validateCounters(invocation.counters);
   if (!invocation.receipt_digests ||
       typeof invocation.receipt_digests !== 'object' ||

@@ -3,7 +3,12 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
-const { DATA_TOOL_NAMES, RENDER_TOOL_NAMES, WIDGET_RESOURCE_URI } = require('../../packages/chatgpt-r4-contracts');
+const {
+  DATA_TOOL_NAMES,
+  PROJECT_CONTEXT_REF_PATTERN_SOURCE,
+  RENDER_TOOL_NAMES,
+  WIDGET_RESOURCE_URI
+} = require('../../packages/chatgpt-r4-contracts');
 const { candidateToolProfile } = require('../../apps/chatgpt-edge');
 const {
   buildResolveContextCall,
@@ -36,6 +41,18 @@ test('R4-B candidate profile is non-default, non-activated, read-only, and has n
       assert.equal(descriptor._meta.ui, undefined);
     }
   }
+  for (const name of ['memory_overview', 'search_memory', 'audit_memory', 'prepare_memory_context']) {
+    assert.equal(
+      candidateToolProfile.toolDescriptors[name].inputSchema.properties.project_context_ref.pattern,
+      PROJECT_CONTEXT_REF_PATTERN_SOURCE
+    );
+  }
+  assert.deepEqual(
+    candidateToolProfile.toolDescriptors.resolve_memory_context.outputSchema.oneOf.map(
+      variant => variant.properties.context_status.const
+    ),
+    ['resolved', 'denied', 'unavailable']
+  );
 });
 
 test('widget resource uses MCP Apps MIME, empty CSP domains, and no authorization authority', () => {

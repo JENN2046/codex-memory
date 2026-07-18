@@ -9,6 +9,7 @@ const {
   InMemoryReplayGuard,
   PRINCIPAL_ASSERTION_SCHEMA,
   PROJECT_CONTEXT_CLAIM_SCHEMA,
+  PROJECT_CONTEXT_REF_PATTERN_SOURCE,
   REQUEST_ENVELOPE_SCHEMA,
   RESPONSE_ENVELOPE_SCHEMA,
   RESULT_REF_PATTERN_SOURCE,
@@ -66,11 +67,18 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.equal(requestVariants.every(variant => variant.properties.arguments.additionalProperties === false), true);
   const searchRequest = requestVariants.find(variant => variant.properties.name.const === 'search_memory');
   assert.deepEqual(searchRequest.properties.arguments.required, ['project_context_ref', 'query']);
+  assert.equal(
+    searchRequest.properties.arguments.properties.project_context_ref.pattern,
+    PROJECT_CONTEXT_REF_PATTERN_SOURCE
+  );
   assert.equal(searchRequest.properties.arguments.properties.limit.maximum, 8);
   assert.equal(requestVariants.some(variant => variant.properties.name.const === 'record_memory'), false);
   assert.deepEqual(RESPONSE_ENVELOPE_SCHEMA.properties.tool_name.enum, DATA_TOOL_NAMES);
   const responseVariants = RESPONSE_ENVELOPE_SCHEMA.allOf[0].oneOf;
-  assert.deepEqual(responseVariants.map(variant => variant.properties.tool_name.const), DATA_TOOL_NAMES);
+  assert.deepEqual(
+    [...new Set(responseVariants.map(variant => variant.properties.tool_name.const))],
+    DATA_TOOL_NAMES
+  );
   const overviewResponse = responseVariants.find(variant =>
     variant.properties.tool_name.const === 'memory_overview');
   const searchResponse = responseVariants.find(variant =>
@@ -78,6 +86,11 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.deepEqual(overviewResponse.properties.structured_content.required, ['status', 'kind', 'item_count']);
   assert.equal(overviewResponse.properties.structured_content.properties.kind.const, 'overview');
   assert.equal(overviewResponse.properties.structured_content.additionalProperties, false);
+  const contextResponses = responseVariants.filter(variant =>
+    variant.properties.tool_name.const === 'resolve_memory_context');
+  assert.deepEqual(contextResponses.map(variant => variant.properties.status.const), [
+    'ok', 'denied', 'unavailable'
+  ]);
   assert.equal(
     searchResponse.properties.structured_content.properties.results.items.properties.result_ref.pattern,
     RESULT_REF_PATTERN_SOURCE
@@ -368,6 +381,53 @@ test('response binds request, counters, receipts, and relay signature', () => {
     expires_at: '2026-07-18T00:05:00.000Z',
     visibility_labels: ['project', 'workspace'],
     context_status: 'resolved'
+  }));
+  assert.doesNotThrow(() => validateToolStructuredContent(
+    'resolve_memory_context',
+    { context_status: 'denied' },
+    { status: 'denied' }
+  ));
+  assert.doesNotThrow(() => validateToolStructuredContent(
+    'resolve_memory_context',
+    { context_status: 'unavailable' },
+    { status: 'unavailable' }
+  ));
+  assert.throws(() => validateToolStructuredContent(
+    'resolve_memory_context',
+    { context_status: 'resolved' },
+    { status: 'denied' }
+  ), { code: 'response_context_status_invalid' });
+  const deniedContextRequest = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'resolve_memory_context',
+    toolArguments: { project_alias: 'unregistered-project' },
+    now: clock(),
+    requestId: 'req_denied_context_response_0001',
+    nonce: 'request_nonce_denied_context_01',
+    signing: signing(edge)
+  });
+  const deniedContextResponse = createResponseEnvelope({
+    requestId: deniedContextRequest.request_id,
+    requestDigest: digestObject(deniedContextRequest),
+    toolName: 'resolve_memory_context',
+    status: 'denied',
+    structuredContent: { context_status: 'denied' },
+    counters: ZERO_MEMORY_COUNTERS,
+    receiptChain: {
+      edge_request: digestObject(deniedContextRequest),
+      relay: sha256('denied-relay'),
+      governance: sha256('denied-governance'),
+      context: sha256('denied-context')
+    },
+    now: clock(),
+    responseId: 'res_denied_context_response_0001',
+    signing: signing(relay)
+  });
+  assert.doesNotThrow(() => validateResponseEnvelope(deniedContextResponse, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relay),
+    expectedRequest: deniedContextRequest,
+    requireZeroCounters: true
   }));
   assert.doesNotThrow(() => validateToolStructuredContent('search_memory', {
     status: 'ok',

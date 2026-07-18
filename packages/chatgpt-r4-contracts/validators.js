@@ -8,6 +8,7 @@ const {
   CONTEXT_VISIBILITIES,
   ZERO_MEMORY_COUNTER_KEYS,
   LIMITS,
+  PROJECT_CONTEXT_REF_PATTERN_SOURCE,
   RESULT_REF_PATTERN_SOURCE,
   FORBIDDEN_AUTHORITY_KEYS,
   FORBIDDEN_PUBLIC_DISCLOSURE_KEYS
@@ -17,7 +18,7 @@ const { verifySignedObject } = require('./signatures');
 const { reject } = require('./errors');
 
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
-const CONTEXT_REF_PATTERN = /^pctx_[A-Za-z0-9_-]{32,96}$/u;
+const CONTEXT_REF_PATTERN = new RegExp(PROJECT_CONTEXT_REF_PATTERN_SOURCE, 'u');
 const REQUEST_ID_PATTERN = /^req_[A-Za-z0-9_-]{24,96}$/u;
 const RESPONSE_ID_PATTERN = /^res_[A-Za-z0-9_-]{24,96}$/u;
 const RESULT_REF_PATTERN = new RegExp(RESULT_REF_PATTERN_SOURCE, 'u');
@@ -353,9 +354,15 @@ function validatePublicStructuredContent(content) {
   return content;
 }
 
-function validateToolStructuredContent(toolName, content) {
+function validateToolStructuredContent(toolName, content, { status = 'ok' } = {}) {
   validatePublicStructuredContent(content);
   if (toolName === 'resolve_memory_context') {
+    if (status === 'denied' || status === 'unavailable') {
+      assertExactKeys(content, ['context_status'], 'response_structured_content_shape_invalid');
+      if (content.context_status !== status) reject('response_context_status_invalid');
+      return content;
+    }
+    if (status !== 'ok') reject('response_status_invalid');
     assertExactKeys(content, [
       'project_context_ref', 'safe_project_alias', 'expires_at',
       'visibility_labels', 'context_status'
@@ -448,7 +455,9 @@ function validateResponseEnvelope(envelope, {
     maxTtlSeconds: LIMITS.maxEnvelopeTtlSeconds,
     prefix: 'response'
   });
-  validateToolStructuredContent(envelope.tool_name, envelope.structured_content);
+  validateToolStructuredContent(envelope.tool_name, envelope.structured_content, {
+    status: envelope.status
+  });
   validateCounters(envelope.counters, { requireZero: requireZeroCounters });
   validateReceiptChain(envelope.receipt_chain);
   if (envelope.receipt_chain.edge_request !== envelope.request_digest) {

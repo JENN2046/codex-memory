@@ -7,6 +7,7 @@ const {
   DATA_TOOL_NAMES,
   KINDS,
   LIMITS,
+  PROJECT_CONTEXT_REF_PATTERN_SOURCE,
   RESULT_REF_PATTERN_SOURCE,
   SCHEMA_VERSION,
   ZERO_MEMORY_COUNTER_KEYS
@@ -14,7 +15,7 @@ const {
 
 const projectContextReference = {
   type: 'string',
-  pattern: '^pctx_[A-Za-z0-9_-]{32,96}$'
+  pattern: PROJECT_CONTEXT_REF_PATTERN_SOURCE
 };
 
 function exactArguments({ required, properties }) {
@@ -79,12 +80,13 @@ const toolRequestVariants = [
   }))
 ];
 
-function toolResponse(name, structuredContentSchema) {
+function toolResponse(name, structuredContentSchema, status = null) {
   return {
     type: 'object',
-    required: ['tool_name', 'structured_content'],
+    required: ['tool_name', 'structured_content', ...(status ? ['status'] : [])],
     properties: {
       tool_name: { const: name },
+      ...(status ? { status: { const: status } } : {}),
       structured_content: structuredContentSchema
     }
   };
@@ -124,7 +126,15 @@ const toolResponseVariants = [
       },
       context_status: { const: 'resolved' }
     }
-  })),
+  }), 'ok'),
+  toolResponse('resolve_memory_context', exactArguments({
+    required: ['context_status'],
+    properties: { context_status: { const: 'denied' } }
+  }), 'denied'),
+  toolResponse('resolve_memory_context', exactArguments({
+    required: ['context_status'],
+    properties: { context_status: { const: 'unavailable' } }
+  }), 'unavailable'),
   toolResponse('memory_overview', boundedStatusContent('overview')),
   toolResponse('search_memory', exactArguments({
     required: ['status', 'result_count', 'results'],

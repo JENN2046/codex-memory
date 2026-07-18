@@ -4,6 +4,7 @@ const {
   DATA_TOOL_NAMES,
   RENDER_TOOL_NAMES,
   CONTEXT_VISIBILITIES,
+  PROJECT_CONTEXT_REF_PATTERN_SOURCE,
   RESULT_REF_PATTERN_SOURCE,
   WIDGET_RESOURCE_URI,
   WIDGET_DTO_SCHEMA,
@@ -57,18 +58,7 @@ const toolDescriptors = deepFreeze({
         requested_visibility: { enum: CONTEXT_VISIBILITIES }
       }
     },
-    outputSchema: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['project_context_ref', 'safe_project_alias', 'expires_at', 'visibility_labels', 'context_status'],
-      properties: {
-        project_context_ref: { type: 'string' },
-        safe_project_alias: { type: 'string', pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' },
-        expires_at: { type: 'string' },
-        visibility_labels: { type: 'array', items: { type: 'string' } },
-        context_status: { const: 'resolved' }
-      }
-    }
+    outputSchema: contextResolutionOutputSchema()
   }),
   memory_overview: descriptor({
     title: 'View memory overview',
@@ -84,7 +74,7 @@ const toolDescriptors = deepFreeze({
       additionalProperties: false,
       required: ['project_context_ref', 'query'],
       properties: {
-        project_context_ref: { type: 'string' },
+        project_context_ref: contextReferenceSchema(),
         query: { type: 'string', minLength: 1, maxLength: 2000 },
         limit: { type: 'integer', minimum: 1, maximum: 8 }
       }
@@ -121,7 +111,7 @@ const toolDescriptors = deepFreeze({
       additionalProperties: false,
       required: ['project_context_ref'],
       properties: {
-        project_context_ref: { type: 'string' },
+        project_context_ref: contextReferenceSchema(),
         event_limit: { type: 'integer', minimum: 1, maximum: 8 }
       }
     },
@@ -135,7 +125,7 @@ const toolDescriptors = deepFreeze({
       additionalProperties: false,
       required: ['project_context_ref'],
       properties: {
-        project_context_ref: { type: 'string' },
+        project_context_ref: contextReferenceSchema(),
         task_summary: { type: 'string', minLength: 1, maxLength: 2000 }
       }
     },
@@ -166,7 +156,41 @@ function contextInputSchema() {
     type: 'object',
     additionalProperties: false,
     required: ['project_context_ref'],
-    properties: { project_context_ref: { type: 'string' } }
+    properties: { project_context_ref: contextReferenceSchema() }
+  };
+}
+
+function contextReferenceSchema() {
+  return { type: 'string', pattern: PROJECT_CONTEXT_REF_PATTERN_SOURCE };
+}
+
+function contextResolutionOutputSchema() {
+  return {
+    oneOf: [
+      {
+        type: 'object',
+        additionalProperties: false,
+        required: ['project_context_ref', 'safe_project_alias', 'expires_at', 'visibility_labels', 'context_status'],
+        properties: {
+          project_context_ref: contextReferenceSchema(),
+          safe_project_alias: { type: 'string', pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' },
+          expires_at: { type: 'string' },
+          visibility_labels: { type: 'array', items: { type: 'string' } },
+          context_status: { const: 'resolved' }
+        }
+      },
+      denialContextSchema('denied'),
+      denialContextSchema('unavailable')
+    ]
+  };
+}
+
+function denialContextSchema(status) {
+  return {
+    type: 'object',
+    additionalProperties: false,
+    required: ['context_status'],
+    properties: { context_status: { const: status } }
   };
 }
 

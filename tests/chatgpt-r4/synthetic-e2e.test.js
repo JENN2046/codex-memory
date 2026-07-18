@@ -148,7 +148,12 @@ test('Relay stamps the response after a slow injected UDS invocation completes',
     requestReplayGuard: new InMemoryReplayGuard({ clock }),
     responseSigning: signing(relayIdentity),
     clock,
-    async forwardToUds({ relayReceipt }) {
+    async forwardToUds({ request: forwardedRequest, relayReceipt }) {
+      assert.equal(Object.isFrozen(forwardedRequest), true);
+      assert.equal(Object.isFrozen(forwardedRequest.tool_request), true);
+      assert.throws(() => {
+        forwardedRequest.request_id = 'req_mutated_request_000000001';
+      }, TypeError);
       nowMs += 40_000;
       return {
         status: 'ok',
