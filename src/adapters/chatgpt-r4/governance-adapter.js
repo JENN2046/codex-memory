@@ -140,6 +140,25 @@ async function handleResolve({
     requestedVisibility: args.requested_visibility || 'task_start_context',
     now
   });
+  if (issued && typeof issued === 'object' && !Array.isArray(issued) &&
+      ['denied', 'unavailable'].includes(issued.status)) {
+    if (Object.keys(issued).length !== 1) reject('context_issue_denial_shape_invalid');
+    return buildResolveResult({
+      request,
+      relayReceipt,
+      status: issued.status,
+      structuredContent: { context_status: issued.status },
+      contextReceipt: {
+        schema_version: 1,
+        kind: 'chatgpt_r4_context_receipt',
+        context_status: issued.status,
+        context_issued: false,
+        principal_bound: true,
+        private_partition_access: false,
+        legacy_partition_access: false
+      }
+    });
+  }
   if (!issued || typeof issued !== 'object' || Array.isArray(issued) ||
       typeof issued.safe_project_alias !== 'string') {
     reject('context_issue_result_invalid');
@@ -178,6 +197,17 @@ async function handleResolve({
     private_partition_access: false,
     legacy_partition_access: false
   };
+  return buildResolveResult({
+    request,
+    relayReceipt,
+    status: 'ok',
+    structuredContent,
+    contextReceipt
+  });
+}
+
+function buildResolveResult({ request, relayReceipt, status, structuredContent, contextReceipt }) {
+  validatePublicStructuredContent(structuredContent);
   const governanceReceipt = {
     schema_version: 1,
     kind: 'chatgpt_r4_governance_receipt',
@@ -185,13 +215,13 @@ async function handleResolve({
     relay_receipt_digest: digestObject(relayReceipt),
     context_receipt_digest: digestObject(contextReceipt),
     tool_name: 'resolve_memory_context',
-    authorization_resolved_locally: true,
+    authorization_resolved_locally: status !== 'unavailable',
     tool_arguments_used_as_diary_acl: false,
     result_scope_postcheck_passed: true,
     counters_digest: digestObject(ZERO_MEMORY_COUNTERS)
   };
   return {
-    status: 'ok',
+    status,
     structured_content: structuredContent,
     counters: { ...ZERO_MEMORY_COUNTERS },
     receipt_digests: {
@@ -244,7 +274,7 @@ function validateGovernanceInvocation(invocation) {
   if (!['ok', 'denied', 'unavailable'].includes(invocation.status)) reject('governance_status_invalid');
   if (invocation.result_scope_postcheck_passed !== true) reject('governance_result_postcheck_failed');
   validatePublicStructuredContent(invocation.structured_content);
-  validateCounters(invocation.counters);
+  validateCounters(invocation.counters, { requireZero: true });
 }
 
 module.exports = {

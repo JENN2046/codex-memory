@@ -87,6 +87,35 @@ test('forged public authority fields fail before Relay forwarding', async () => 
   assert.equal(result.artifact.request_count, 2);
 });
 
+test('context resolution returns signed low-disclosure denials without a context ref', async () => {
+  const result = await runZeroMemorySyntheticE2E();
+  for (const [projectAlias, expectedStatus, suffix] of [
+    ['denied-project', 'denied', 'denied'],
+    ['unavailable-project', 'unavailable', 'unavailable']
+  ]) {
+    const request = buildCandidateEdgeRequest({
+      principalAssertion: result.internal.principalAssertion,
+      toolName: 'resolve_memory_context',
+      toolArguments: { project_alias: projectAlias },
+      now: result.internal.clock(),
+      requestId: `req_context_${suffix}_0000000001`,
+      nonce: `request_nonce_${suffix}_00000001`,
+      signing: signing(result.internal.identities.edgeIdentity)
+    });
+    const response = await result.internal.relay.handle(request);
+    assert.equal(response.status, expectedStatus);
+    assert.deepEqual(response.structured_content, { context_status: expectedStatus });
+    assert.equal(Object.hasOwn(response.structured_content, 'project_context_ref'), false);
+    assert.deepEqual(response.counters, ZERO_MEMORY_COUNTERS);
+    assert.doesNotThrow(() => validateResponseEnvelope(response, {
+      now: result.internal.clock(),
+      resolveResponsePublicKey: keyResolver(result.internal.identities.relayIdentity),
+      expectedRequest: request,
+      requireZeroCounters: true
+    }));
+  }
+});
+
 test('Relay receipt is exact, request-bound, and proves replay checking without claiming a rejection', () => {
   const receipt = {
     schema_version: 1,
@@ -116,6 +145,15 @@ test('Relay receipt is exact, request-bound, and proves replay checking without 
       context: sha256('context')
     }
   }, 'memory_overview'), { code: 'response_structured_content_shape_invalid' });
+  assert.throws(() => validateInvocation({
+    status: 'ok',
+    structured_content: { status: 'empty', kind: 'overview', item_count: 0 },
+    counters: { ...ZERO_MEMORY_COUNTERS, provider_calls: 1 },
+    receipt_digests: {
+      governance: sha256('governance'),
+      context: sha256('context')
+    }
+  }, 'memory_overview'), { code: 'zero_memory_counter_nonzero' });
 });
 
 test('Relay stamps the response after a slow injected UDS invocation completes', async () => {

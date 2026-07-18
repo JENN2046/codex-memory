@@ -84,7 +84,7 @@ function validateInvocation(invocation, toolName) {
   validateToolStructuredContent(toolName, invocation.structured_content, {
     status: invocation.status
   });
-  validateCounters(invocation.counters);
+  validateCounters(invocation.counters, { requireZero: true });
   if (!invocation.receipt_digests ||
       typeof invocation.receipt_digests !== 'object' ||
       Array.isArray(invocation.receipt_digests) ||

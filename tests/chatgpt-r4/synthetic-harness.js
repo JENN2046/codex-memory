@@ -86,6 +86,8 @@ async function runZeroMemorySyntheticE2E() {
     clock,
     async issueProjectContext({ principalFingerprint, safeProjectAlias, requestedVisibility, now }) {
       observations.context_resolutions += 1;
+      if (safeProjectAlias === 'denied-project') return { status: 'denied' };
+      if (safeProjectAlias === 'unavailable-project') return { status: 'unavailable' };
       if (safeProjectAlias !== 'project-alpha') throw new Error('synthetic_project_not_registered');
       const projectContextRef = createOpaqueId('pctx_');
       const claim = createProjectContextClaim({
