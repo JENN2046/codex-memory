@@ -20,9 +20,10 @@ lease, ack, cancellation, and response state are bounded and in-memory.
 Exact-file fences restrict Node I/O to the three transport modules and reject
 any listener host/port mutation or active-runtime import.
 
-The focused 33-test R4 matrix proves claim/ack, request expiry, lease expiry and
+The focused 34-test R4 matrix proves claim/ack, request expiry, lease expiry and
 reconnect/reclaim, replay rejection, in-flight cancellation before governance,
-signed response correlation, normalized-root handling, split-UTF-8 preservation,
+asynchronous completion state recheck, signed response correlation,
+normalized-root handling, split-UTF-8 preservation,
 non-loopback rejection, body-log absence, and
 zero provider/native/fallback/write/durable/global-search counters. No active
 config/service, external OAuth/runtime, provider, VCP, real memory, public tool

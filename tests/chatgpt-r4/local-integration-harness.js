@@ -40,6 +40,7 @@ async function createLocalIntegrationHarness({
   claimLeaseMs = 5_000,
   terminalRetentionMs = 5_000,
   governanceDelayMs = 0,
+  responseVerificationDelayMs = 0,
   cancelPollMs = 5
 } = {}) {
   let nowMs = R4C_FIXED_NOW.getTime();
@@ -186,7 +187,8 @@ async function createLocalIntegrationHarness({
         consumeReplay: false
       });
     },
-    verifyResponse(response, request) {
+    async verifyResponse(response, request) {
+      if (responseVerificationDelayMs > 0) await delay(responseVerificationDelayMs);
       return validateResponseEnvelope(response, {
         now: clock(),
         resolveResponsePublicKey: resolveRelayKey,

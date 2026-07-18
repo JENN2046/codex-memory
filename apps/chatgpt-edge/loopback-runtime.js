@@ -183,12 +183,15 @@ function createLoopbackEdgeRuntime({
     const activeClaim = requireLiveClaim(record, claimToken);
     if (!activeClaim.acked) reject('edge_claim_not_acknowledged');
     await verifyResponse(response, record.request);
-    record.response = structuredClone(response);
-    record.status = 'completed';
-    record.claim = null;
-    record.purge_after_ms = nowMs() + terminalRetentionMs;
-    emit('request_completed', record);
-    return { request_id: requestId, status: record.status };
+    const currentRecord = requireRecord(requestId);
+    const currentClaim = requireLiveClaim(currentRecord, claimToken);
+    if (!currentClaim.acked) reject('edge_claim_not_acknowledged');
+    currentRecord.response = structuredClone(response);
+    currentRecord.status = 'completed';
+    currentRecord.claim = null;
+    currentRecord.purge_after_ms = nowMs() + terminalRetentionMs;
+    emit('request_completed', currentRecord);
+    return { request_id: requestId, status: currentRecord.status };
   }
 
   function cancel(requestId) {

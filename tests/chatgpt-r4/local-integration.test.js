@@ -147,6 +147,27 @@ test('R4-C cancellation aborts an in-flight UDS request before governance invoca
   assert.equal(harness.observations.governance_invocations, 0);
 });
 
+test('R4-C completion cannot overwrite cancellation during asynchronous response verification', async t => {
+  const harness = await createLocalIntegrationHarness({
+    responseVerificationDelayMs: 100,
+    cancelPollMs: 2
+  });
+  t.after(() => harness.close());
+  const request = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  });
+  await harness.edgeClient.submit(request);
+  const processing = harness.relayRuntime.processNext();
+  await waitFor(() => harness.relayEvents.some(event => event.event === 'uds_forward_completed'));
+  await harness.edgeClient.cancel(request.request_id);
+  const result = await processing;
+  assert.equal(result.status, 'cancelled');
+  assert.equal((await harness.edgeClient.result(request.request_id)).status, 'cancelled');
+  assert.equal(harness.observations.uds_connections, 1);
+  assert.equal(harness.observations.context_resolutions, 1);
+  assert.equal(harness.observations.governance_invocations, 0);
+});
+
 test('R4-C rejects completion before ack and a signed response with the wrong request correlation', async t => {
   const harness = await createLocalIntegrationHarness();
   t.after(() => harness.close());
