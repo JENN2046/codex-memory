@@ -19,6 +19,7 @@ const {
   SYNTHETIC_AUDIENCE,
   generateSigningIdentity,
   keyResolver,
+  principalKeyResolver,
   runZeroMemorySyntheticE2E,
   signing
 } = require('./synthetic-harness');
@@ -184,7 +185,7 @@ test('Relay stamps the response after a slow injected UDS invocation completes',
     expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
     resolveRequestPublicKey: keyResolver(edge),
-    resolvePrincipalPublicKey: keyResolver(principal),
+    resolvePrincipalPublicKey: principalKeyResolver(SYNTHETIC_ISSUER, principal),
     requestReplayGuard: new InMemoryReplayGuard({ clock }),
     responseSigning: signing(relayIdentity),
     clock,

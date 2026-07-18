@@ -34,6 +34,7 @@ const {
 const {
   generateSigningIdentity,
   keyResolver,
+  principalKeyResolver,
   signing,
   FIXED_NOW,
   SYNTHETIC_ISSUER,
@@ -153,7 +154,7 @@ test('signed principal and request validate with exact audience and one-time rep
     now: clock(),
     expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
-    resolvePrincipalPublicKey: keyResolver(principal),
+    resolvePrincipalPublicKey: principalKeyResolver(SYNTHETIC_ISSUER, principal),
     resolveRequestPublicKey: keyResolver(edge),
     replayGuard
   });
@@ -173,7 +174,7 @@ test('signed principal and request validate with exact audience and one-time rep
     now: clock(),
     expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
-    resolvePrincipalPublicKey: keyResolver(principal),
+    resolvePrincipalPublicKey: principalKeyResolver(SYNTHETIC_ISSUER, principal),
     resolveRequestPublicKey: keyResolver(edge),
     replayGuard
   }), { code: 'replay_detected' });
@@ -192,7 +193,7 @@ test('signed principal and request validate with exact audience and one-time rep
     now: clock(),
     expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
-    resolvePrincipalPublicKey: keyResolver(principal),
+    resolvePrincipalPublicKey: principalKeyResolver(SYNTHETIC_ISSUER, principal),
     resolveRequestPublicKey: keyResolver(edge),
     replayGuard
   }), { code: 'replay_detected' });
@@ -202,11 +203,78 @@ test('signed principal and request validate with exact audience and one-time rep
     now: clock(),
     expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
-    resolvePrincipalPublicKey: keyResolver(principal),
+    resolvePrincipalPublicKey: principalKeyResolver(SYNTHETIC_ISSUER, principal),
     resolveRequestPublicKey: keyResolver(edge),
     replayGuard
   }), { code: 'replay_detected' });
   assert.equal(replayGuard.size, 2);
+});
+
+test('principal key resolution is issuer-scoped and rejects a colliding key id', () => {
+  const { principal, edge, clock, principalAssertion } = fixture();
+  const request = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'v'.repeat(32)}` },
+    now: clock(),
+    requestId: 'req_issuer_key_binding_000001',
+    nonce: 'request_nonce_issuer_binding_01',
+    signing: signing(edge)
+  });
+  const issuerResolver = principalKeyResolver(SYNTHETIC_ISSUER, principal);
+  let observedKeyReference;
+  validateRequestEnvelope(request, {
+    now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey(keyReference) {
+      observedKeyReference = keyReference;
+      return issuerResolver(keyReference);
+    },
+    resolveRequestPublicKey: keyResolver(edge),
+    consumeReplay: false
+  });
+  assert.deepEqual(observedKeyReference, {
+    issuer: SYNTHETIC_ISSUER,
+    key_id: principal.keyId
+  });
+  assert.equal(Object.isFrozen(observedKeyReference), true);
+
+  assert.throws(() => validateRequestEnvelope(request, {
+    now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: keyResolver(principal),
+    resolveRequestPublicKey: keyResolver(edge),
+    consumeReplay: false
+  }), { code: 'signature_public_key_missing' });
+
+  const collidingPrincipal = generateSigningIdentity(principal.keyId);
+  const collidingAssertion = createPrincipalAssertion({
+    issuer: SYNTHETIC_ISSUER,
+    audience: SYNTHETIC_AUDIENCE,
+    subjectFingerprint: sha256('colliding-principal'),
+    now: clock(),
+    nonce: 'principal_nonce_collision_01',
+    signing: signing(collidingPrincipal)
+  });
+  const collidingRequest = createRequestEnvelope({
+    principalAssertion: collidingAssertion,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'w'.repeat(32)}` },
+    now: clock(),
+    requestId: 'req_issuer_key_collision_0001',
+    nonce: 'request_nonce_key_collision_01',
+    signing: signing(edge)
+  });
+  assert.throws(() => validateRequestEnvelope(collidingRequest, {
+    now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: issuerResolver,
+    resolveRequestPublicKey: keyResolver(edge),
+    consumeReplay: false
+  }), { code: 'signature_verification_failed' });
 });
 
 test('principal audience, expiry, and signature drift fail closed', () => {
@@ -221,7 +289,7 @@ test('principal audience, expiry, and signature drift fail closed', () => {
     signing: signing(edge)
   });
   const options = {
-    resolvePrincipalPublicKey: keyResolver(principal),
+    resolvePrincipalPublicKey: principalKeyResolver(SYNTHETIC_ISSUER, principal),
     resolveRequestPublicKey: keyResolver(edge),
     consumeReplay: false
   };
@@ -572,7 +640,7 @@ test('request and response byte ceilings reject oversized signed payloads before
     now: clock(),
     expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
-    resolvePrincipalPublicKey: keyResolver(principal),
+    resolvePrincipalPublicKey: principalKeyResolver(SYNTHETIC_ISSUER, principal),
     resolveRequestPublicKey: keyResolver(edge),
     consumeReplay: false
   }), { code: 'request_envelope_too_large' });

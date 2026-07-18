@@ -32,6 +32,14 @@ function keyResolver(...identities) {
   return keyId => keys.get(keyId) || null;
 }
 
+function principalKeyResolver(issuer, ...identities) {
+  const keys = new Map(identities.map(identity => [identity.keyId, identity.publicKey]));
+  return keyReference => {
+    if (keyReference?.issuer !== issuer) return null;
+    return keys.get(keyReference.key_id) || null;
+  };
+}
+
 function signing(identity) {
   return { keyId: identity.keyId, privateKey: identity.privateKey };
 }
@@ -54,7 +62,7 @@ async function runZeroMemorySyntheticE2E() {
   const edgeIdentity = generateSigningIdentity('synthetic-edge-v1');
   const contextIdentity = generateSigningIdentity('synthetic-context-v1');
   const relayIdentity = generateSigningIdentity('synthetic-relay-v1');
-  const resolvePrincipalKey = keyResolver(principalIdentity);
+  const resolvePrincipalKey = principalKeyResolver(SYNTHETIC_ISSUER, principalIdentity);
   const resolveEdgeKey = keyResolver(edgeIdentity);
   const resolveContextKey = keyResolver(contextIdentity);
   const resolveRelayKey = keyResolver(relayIdentity);
@@ -243,6 +251,7 @@ module.exports = {
   SYNTHETIC_AUDIENCE,
   generateSigningIdentity,
   keyResolver,
+  principalKeyResolver,
   signing,
   createCounterRecorder,
   runZeroMemorySyntheticE2E

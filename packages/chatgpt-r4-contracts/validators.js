@@ -171,7 +171,13 @@ function validatePrincipalAssertion(assertion, {
     prefix: 'principal'
   });
   validateSignatureShape(assertion.signature);
-  verifySignedObject(assertion, { resolvePublicKey });
+  if (typeof resolvePublicKey !== 'function') reject('signature_key_resolver_missing');
+  verifySignedObject(assertion, {
+    resolvePublicKey: keyId => resolvePublicKey(Object.freeze({
+      issuer: expectedIssuer,
+      key_id: keyId
+    }))
+  });
   return assertion;
 }
 
