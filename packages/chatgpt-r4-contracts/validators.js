@@ -311,8 +311,11 @@ function validateRequestEnvelope(envelope, {
   validateSignatureShape(envelope.signature);
   verifySignedObject(envelope, { resolvePublicKey: resolveRequestPublicKey });
   if (consumeReplay) {
-    if (!replayGuard || typeof replayGuard.consume !== 'function') reject('request_replay_guard_missing');
-    replayGuard.consume({ namespace: 'edge_request', key: envelope.nonce, expiresAt: envelope.expires_at });
+    if (!replayGuard || typeof replayGuard.consumeMany !== 'function') reject('request_replay_guard_missing');
+    replayGuard.consumeMany([
+      { namespace: 'edge_request_id', key: envelope.request_id, expiresAt: envelope.expires_at },
+      { namespace: 'edge_request_nonce', key: envelope.nonce, expiresAt: envelope.expires_at }
+    ]);
   }
   return {
     envelope,

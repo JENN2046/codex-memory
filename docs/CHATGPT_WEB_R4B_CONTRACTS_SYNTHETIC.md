@@ -75,10 +75,12 @@ prepare_memory_context
 render_memory_scope
 ```
 
-Every descriptor is read-only, non-destructive, closed-world, and idempotent.
-Only the render tool links the versioned widget resource. The candidate profile
-is not imported by the active runtime and does not alter the existing default
-MCP tool list.
+Every descriptor is read-only, non-destructive, and closed-world. The five data
+tools are intentionally non-idempotent because requests and opaque project
+contexts are one-shot replay-guarded contracts. Only the render tool is marked
+idempotent and links the versioned widget resource. The candidate profile is not
+imported by the active runtime and does not alter the existing default MCP tool
+list.
 
 ## Synthetic Proof
 

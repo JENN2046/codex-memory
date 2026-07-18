@@ -17,18 +17,31 @@ class InMemoryReplayGuard {
   }
 
   consume({ namespace, key, expiresAt }) {
-    if (typeof namespace !== 'string' || !namespace) reject('replay_namespace_invalid');
-    if (typeof key !== 'string' || !key) reject('replay_key_invalid');
-    const expiresMs = new Date(expiresAt).getTime();
-    if (!Number.isFinite(expiresMs)) reject('replay_expiry_invalid');
+    return this.consumeMany([{ namespace, key, expiresAt }]);
+  }
+
+  consumeMany(entries) {
+    if (!Array.isArray(entries) || entries.length < 1) reject('replay_batch_invalid');
+    const pending = entries.map(entry => {
+      if (!entry || typeof entry !== 'object' || Array.isArray(entry)) reject('replay_batch_invalid');
+      const { namespace, key, expiresAt } = entry;
+      if (typeof namespace !== 'string' || !namespace) reject('replay_namespace_invalid');
+      if (typeof key !== 'string' || !key) reject('replay_key_invalid');
+      const expiresMs = new Date(expiresAt).getTime();
+      if (!Number.isFinite(expiresMs)) reject('replay_expiry_invalid');
+      return { composite: `${namespace}:${key}`, expiresMs };
+    });
 
     const nowMs = this.clock().getTime();
     this.prune(nowMs);
-    const composite = `${namespace}:${key}`;
-    if (this.entries.has(composite)) reject('replay_detected');
-    if (this.entries.size >= this.maxEntries) reject('replay_guard_capacity_exceeded');
-    if (expiresMs <= nowMs) reject('replay_expiry_elapsed');
-    this.entries.set(composite, expiresMs);
+    const composites = new Set();
+    for (const entry of pending) {
+      if (composites.has(entry.composite) || this.entries.has(entry.composite)) reject('replay_detected');
+      if (entry.expiresMs <= nowMs) reject('replay_expiry_elapsed');
+      composites.add(entry.composite);
+    }
+    if (this.entries.size + pending.length > this.maxEntries) reject('replay_guard_capacity_exceeded');
+    for (const entry of pending) this.entries.set(entry.composite, entry.expiresMs);
     return true;
   }
 

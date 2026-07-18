@@ -99,6 +99,44 @@ test('signed principal and request validate with exact audience and one-time rep
     replayGuard
   });
   assert.equal(result.requestDigest, digestObject(request));
+  assert.equal(replayGuard.size, 2);
+
+  const reusedRequestId = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'audit_memory',
+    toolArguments: { project_context_ref: `pctx_${'a'.repeat(32)}` },
+    now: clock(),
+    requestId: request.request_id,
+    nonce: 'request_nonce_contract_0002',
+    signing: signing(edge)
+  });
+  assert.throws(() => validateRequestEnvelope(reusedRequestId, {
+    now: clock(),
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: keyResolver(principal),
+    resolveRequestPublicKey: keyResolver(edge),
+    replayGuard
+  }), { code: 'replay_detected' });
+  assert.equal(replayGuard.size, 2);
+
+  const reusedNonce = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'audit_memory',
+    toolArguments: { project_context_ref: `pctx_${'a'.repeat(32)}` },
+    now: clock(),
+    requestId: 'req_contract_validation_0002',
+    nonce: request.nonce,
+    signing: signing(edge)
+  });
+  assert.throws(() => validateRequestEnvelope(reusedNonce, {
+    now: clock(),
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: keyResolver(principal),
+    resolveRequestPublicKey: keyResolver(edge),
+    replayGuard
+  }), { code: 'replay_detected' });
+  assert.equal(replayGuard.size, 2);
+
   assert.throws(() => validateRequestEnvelope(request, {
     now: clock(),
     expectedAudience: SYNTHETIC_AUDIENCE,
@@ -106,6 +144,7 @@ test('signed principal and request validate with exact audience and one-time rep
     resolveRequestPublicKey: keyResolver(edge),
     replayGuard
   }), { code: 'replay_detected' });
+  assert.equal(replayGuard.size, 2);
 });
 
 test('principal audience, expiry, and signature drift fail closed', () => {
