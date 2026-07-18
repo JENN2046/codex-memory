@@ -65,6 +65,20 @@ test('R4-B import fences accept the candidate packages without activating them',
     readFileSync: file => sources.get(file),
     fileExists: file => sources.has(file)
   }), /dynamic_import_forbidden:src\/core\/runtime\.js/);
+  for (const source of [
+    "module['require']('../../../apps/chatgpt-edge');",
+    "require['call'](null, '../../../apps/chatgpt-edge');",
+    "require?.['call'](null, '../../../apps/chatgpt-edge');",
+    "const load = require; load('../../../apps/chatgpt-edge');"
+  ]) {
+    sources.set(path.join(runtimeRoot, 'core', 'runtime.js'), source);
+    assert.throws(() => validateNotActivated({
+      runtimeRoot,
+      entrypoints: [path.join(runtimeRoot, 'index.js')],
+      readFileSync: file => sources.get(file),
+      fileExists: file => sources.has(file)
+    }), /dynamic_import_forbidden:src\/core\/runtime\.js/);
+  }
 });
 
 test('public Edge cannot import local config, storage, recall, or arbitrary packages', () => {

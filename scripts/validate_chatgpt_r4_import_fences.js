@@ -147,24 +147,33 @@ function extractStaticRuntimeImports(source) {
   return [...new Set(imports)].sort();
 }
 
-function maskCommentsAndStringContents(source) {
+function maskCommentsAndStringContents(source, { preserveBracketStringContents = false } = {}) {
   const output = source.split('');
 
   function maskCharacter(index) {
     if (output[index] !== '\n' && output[index] !== '\r') output[index] = ' ';
   }
 
+  function previousCodeCharacter(index) {
+    while (index >= 0 && /\s/u.test(output[index])) index -= 1;
+    return output[index];
+  }
+
   function maskQuoted(index, quote) {
+    const preserveContents = preserveBracketStringContents &&
+      previousCodeCharacter(index - 1) === '[';
     index += 1;
     while (index < output.length) {
       if (output[index] === '\\') {
-        maskCharacter(index);
-        if (index + 1 < output.length) maskCharacter(index + 1);
+        if (!preserveContents) {
+          maskCharacter(index);
+          if (index + 1 < output.length) maskCharacter(index + 1);
+        }
         index += 2;
         continue;
       }
       if (output[index] === quote) return index + 1;
-      maskCharacter(index);
+      if (!preserveContents) maskCharacter(index);
       index += 1;
     }
     return index;
@@ -254,12 +263,17 @@ function maskCommentsAndStringContents(source) {
 
 function assertNoDynamicRuntimeImports(source, relativeFile) {
   const masked = maskCommentsAndStringContents(source);
-  const requireCalls = [...masked.matchAll(/\brequire\s*(?:\?\s*\.\s*)?\(/gu)].length;
+  const bracketMasked = maskCommentsAndStringContents(source, {
+    preserveBracketStringContents: true
+  });
+  const requireReferenceCount = [...masked.matchAll(/\brequire\b/gu)].length;
   const literalRequireCalls = [...masked.matchAll(/\brequire\s*\(\s*['"]\s*['"]\s*\)/gu)].length;
-  const memberRequireUsed = /\.\s*require\s*\(/u.test(masked);
+  const memberRequireUsed = /\.\s*require\s*(?:\?\s*\.\s*)?\(/u.test(masked) ||
+    /\[\s*['"]require['"]\s*\]\s*(?:\?\s*\.\s*)?\(/u.test(bracketMasked);
   const importCalls = [...masked.matchAll(/\bimport\s*\(/gu)].length;
   const literalImportCalls = [...masked.matchAll(/\bimport\s*\(\s*['"]\s*['"]\s*\)/gu)].length;
-  if (requireCalls !== literalRequireCalls || memberRequireUsed || importCalls !== literalImportCalls) {
+  if (requireReferenceCount !== literalRequireCalls || memberRequireUsed ||
+      importCalls !== literalImportCalls) {
     throw new Error(`dynamic_import_forbidden:${relativeFile}`);
   }
 }
