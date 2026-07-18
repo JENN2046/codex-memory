@@ -128,6 +128,10 @@ test('dynamic imports, runtime config, listeners, body logs, and durable writes 
     'const value = process/*comment*/.env.SECRET_REFERENCE;',
     'const value = process?.env.SECRET_REFERENCE;',
     "const value = process?.['env'].SECRET_REFERENCE;",
+    "const value = globalThis['process'].env.SECRET_REFERENCE;",
+    "const network = globalThis['fetch']; network('https://example.invalid');",
+    "globalThis['XMLHttpRequest']();",
+    "const network = fetch; network('https://example.invalid');",
     "eval('require')('node:fs');",
     String.raw`requ\u0069re('node:fs');`,
     'server.listen(8080);',
@@ -137,5 +141,12 @@ test('dynamic imports, runtime config, listeners, body logs, and durable writes 
     'writeFile(target, body);'
   ]) {
     assert.throws(() => validateComponentSource('edge', { file, source }));
+  }
+  for (const source of [
+    "'globalThis[\\'fetch\\']';",
+    '// process.env.SECRET_REFERENCE',
+    'const message = "console.log(request.body)";'
+  ]) {
+    assert.doesNotThrow(() => validateComponentSource('edge', { file, source }));
   }
 });

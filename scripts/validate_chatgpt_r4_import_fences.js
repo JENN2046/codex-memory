@@ -40,37 +40,17 @@ const JS_GAP = String.raw`(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\r\n]*(?:\r?\n|$))*`;
 const CANDIDATE_RUNTIME_PATTERN = /(?:^|\/)(?:chatgpt-r4(?:-contracts)?|chatgpt-edge|local-recall-relay|(?:chatgpt-)?memory-scope-widget)(?:\/|$)/u;
 
 const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
-  {
-    pattern: new RegExp(String.raw`\bprocess${JS_GAP}(?:\?${JS_GAP}\.|\.|\[)`, 'u'),
-    code: 'runtime_process_access'
-  },
-  {
-    pattern: new RegExp(String.raw`\b(?:eval|Function)${JS_GAP}(?:\?${JS_GAP}\.)?${JS_GAP}\(`, 'u'),
-    code: 'runtime_code_generation'
-  },
+  { pattern: /\bprocess\b/u, code: 'runtime_process_access' },
+  { pattern: /\b(?:globalThis|global|window|self)\b/u, code: 'runtime_global_access' },
+  { pattern: /\b(?:eval|Function)\b/u, code: 'runtime_code_generation' },
   { pattern: /\\u(?:\{[0-9a-fA-F]+\}|[0-9a-fA-F]{4})/u, code: 'escaped_source_identifier' },
   {
-    pattern: new RegExp(
-      String.raw`\b(?:writeFile|appendFile|createWriteStream|mkdir|rm|unlink)${JS_GAP}\(`,
-      'u'
-    ),
+    pattern: /\b(?:writeFile|appendFile|createWriteStream|mkdir|rm|unlink)\b/u,
     code: 'durable_file_mutation'
   },
-  {
-    pattern: new RegExp(String.raw`\b(?:createServer|listen)${JS_GAP}\(`, 'u'),
-    code: 'service_listener'
-  },
-  {
-    pattern: new RegExp(String.raw`\b(?:fetch|XMLHttpRequest)${JS_GAP}\(`, 'u'),
-    code: 'network_invocation'
-  },
-  {
-    pattern: new RegExp(
-      String.raw`\bconsole${JS_GAP}\.${JS_GAP}(?:log|info|warn|error|debug)${JS_GAP}\(`,
-      'u'
-    ),
-    code: 'body_log_risk'
-  }
+  { pattern: /\b(?:createServer|listen)\b/u, code: 'service_listener' },
+  { pattern: /\b(?:fetch|XMLHttpRequest)\b/u, code: 'network_invocation' },
+  { pattern: /\bconsole\b/u, code: 'body_log_risk' }
 ]);
 
 function isWithin(file, directory) {
@@ -312,8 +292,9 @@ function validateComponentSource(component, { file, source }) {
   const policy = COMPONENT_POLICIES[component];
   if (!policy) throw new Error(`component_policy_missing:${component}`);
   const relativeFile = path.relative(ROOT, file).split(path.sep).join('/');
+  const maskedSource = maskCommentsAndStringContents(source);
   for (const rule of FORBIDDEN_RUNTIME_PATTERNS) {
-    if (rule.pattern.test(source)) throw new Error(`${rule.code}:${relativeFile}`);
+    if (rule.pattern.test(maskedSource)) throw new Error(`${rule.code}:${relativeFile}`);
   }
   const imports = [];
   for (const specifier of extractImports(source, relativeFile)) {
