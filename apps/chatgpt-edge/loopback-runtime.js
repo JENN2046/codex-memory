@@ -48,14 +48,19 @@ function createLoopbackEdgeRuntime({
 
   function emit(event, record, extra = {}) {
     if (!eventSink) return;
-    eventSink(Object.freeze({
-      component: 'loopback_edge',
-      event,
-      request_id: record?.request.request_id || null,
-      status: record?.status || null,
-      attempt: record?.attempt || 0,
-      ...extra
-    }));
+    try {
+      const pending = eventSink(Object.freeze({
+        component: 'loopback_edge',
+        event,
+        request_id: record?.request.request_id || null,
+        status: record?.status || null,
+        attempt: record?.attempt || 0,
+        ...extra
+      }));
+      if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+    } catch {
+      // Observability is best-effort and cannot alter queue state transitions.
+    }
   }
 
   function nowMs() {

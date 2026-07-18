@@ -44,7 +44,9 @@ async function createLocalIntegrationHarness({
   edgeTimeoutMs = 5_000,
   maxInFlight = 64,
   maxRecords = 256,
-  cancelPollMs = 5
+  cancelPollMs = 5,
+  edgeEventSink,
+  relayEventSink
 } = {}) {
   let nowMs = R4C_FIXED_NOW.getTime();
   const clock = () => new Date(nowMs);
@@ -181,7 +183,7 @@ async function createLocalIntegrationHarness({
     maxInFlight,
     maxRecords,
     clock,
-    eventSink: event => edgeEvents.push(event),
+    eventSink: edgeEventSink === undefined ? event => edgeEvents.push(event) : edgeEventSink,
     verifyRequest(request) {
       return validateRequestEnvelope(request, {
         now: clock(),
@@ -217,7 +219,7 @@ async function createLocalIntegrationHarness({
     edgeTimeoutMs,
     cancelPollMs,
     udsTimeoutMs: 2_000,
-    eventSink: event => relayEvents.push(event)
+    eventSink: relayEventSink === undefined ? event => relayEvents.push(event) : relayEventSink
   });
 
   let requestSequence = 0;

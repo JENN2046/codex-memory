@@ -96,6 +96,35 @@ test('R4-C first stale lookup and snapshot purge untouched records past retentio
   });
 });
 
+test('R4-C event-sink failures cannot corrupt Edge or Relay state transitions', async t => {
+  let edgeSinkCalls = 0;
+  let relaySinkCalls = 0;
+  const harness = await createLocalIntegrationHarness({
+    edgeEventSink() {
+      edgeSinkCalls += 1;
+      if (edgeSinkCalls % 2 === 0) return Promise.reject(new Error('synthetic_async_edge_sink_failure'));
+      throw new Error('synthetic_sync_edge_sink_failure');
+    },
+    relayEventSink() {
+      relaySinkCalls += 1;
+      if (relaySinkCalls % 2 === 0) return Promise.reject(new Error('synthetic_async_relay_sink_failure'));
+      throw new Error('synthetic_sync_relay_sink_failure');
+    }
+  });
+  t.after(() => harness.close());
+  const request = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  });
+  assert.deepEqual(await harness.edgeClient.submit(request), {
+    request_id: request.request_id,
+    status: 'queued'
+  });
+  assert.equal((await harness.relayRuntime.processNext()).status, 'completed');
+  assert.equal((await harness.edgeClient.result(request.request_id)).status, 'completed');
+  assert.equal(edgeSinkCalls, 4);
+  assert.equal(relaySinkCalls, 5);
+});
+
 test('R4-C submit refreshes and prunes untouched expired records before capacity enforcement', async t => {
   const harness = await createLocalIntegrationHarness({
     maxInFlight: 1,

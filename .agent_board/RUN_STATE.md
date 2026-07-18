@@ -17,7 +17,7 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 - Architecture: R4-C candidate adds actual loopback Edge -> outbound Relay -> temporary UDS -> strict synthetic governance without activating external or active runtime.
 - Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
 - Candidate: exact `127.0.0.1:0`, non-default and non-activated; active runtime imports remain unchanged.
-- Synthetic proof: actual loopback HTTP and temporary UDS, 38 focused tests including first-lookup stale-record purge, expired-record capacity reclamation, asynchronous completion-state, Edge-timeout alignment, normalized-root, split-UTF-8, open-peer frame, and listener-alias regressions, all provider/native/fallback/write/durable/global-search counters zero.
+- Synthetic proof: actual loopback HTTP and temporary UDS, 39 focused tests including first-lookup stale-record purge, event-sink failure isolation, expired-record capacity reclamation, asynchronous completion-state, Edge-timeout alignment, normalized-root, split-UTF-8, open-peer frame, and listener-alias regressions, all provider/native/fallback/write/durable/global-search counters zero.
 - Status sync: performed locally in CM-2137; PR CI/review and merge remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.

@@ -34,12 +34,17 @@ function createLoopbackRelayRuntime({
 
   function emit(event, requestId, extra = {}) {
     if (!eventSink) return;
-    eventSink(Object.freeze({
-      component: 'loopback_relay',
-      event,
-      request_id: requestId || null,
-      ...extra
-    }));
+    try {
+      const pending = eventSink(Object.freeze({
+        component: 'loopback_relay',
+        event,
+        request_id: requestId || null,
+        ...extra
+      }));
+      if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+    } catch {
+      // Observability is best-effort and cannot alter relay processing.
+    }
   }
 
   return Object.freeze({

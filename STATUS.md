@@ -20,8 +20,8 @@ lease, ack, cancellation, and response state are bounded and in-memory.
 Exact-file fences restrict Node I/O to the three transport modules and reject
 any listener host/port mutation or active-runtime import.
 
-The focused 38-test R4 matrix proves claim/ack, request expiry, first-lookup
-stale-record purge, expired-record capacity reclamation, lease expiry and
+The focused 39-test R4 matrix proves claim/ack, request expiry, first-lookup
+stale-record purge, event-sink failure isolation, expired-record capacity reclamation, lease expiry and
 reconnect/reclaim, replay rejection, in-flight cancellation before governance,
 asynchronous completion state recheck, Relay/Edge completion-timeout alignment,
 signed response correlation,
