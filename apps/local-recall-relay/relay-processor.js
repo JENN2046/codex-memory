@@ -12,6 +12,7 @@ const {
 } = require('../../packages/chatgpt-r4-contracts');
 
 function createRelayProcessor({
+  expectedIssuer,
   expectedAudience,
   resolveRequestPublicKey,
   resolvePrincipalPublicKey,
@@ -29,6 +30,7 @@ function createRelayProcessor({
         now,
         resolveRequestPublicKey,
         resolvePrincipalPublicKey,
+        expectedIssuer,
         expectedAudience,
         replayGuard: requestReplayGuard,
         consumeReplay: true

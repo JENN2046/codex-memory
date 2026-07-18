@@ -11,6 +11,7 @@ const {
 } = require('../../../packages/chatgpt-r4-contracts');
 
 function createGovernanceAdapter({
+  expectedIssuer,
   expectedAudience,
   resolveRequestPublicKey,
   resolvePrincipalPublicKey,
@@ -32,6 +33,7 @@ function createGovernanceAdapter({
         now,
         resolveRequestPublicKey,
         resolvePrincipalPublicKey,
+        expectedIssuer,
         expectedAudience,
         consumeReplay: false
       });

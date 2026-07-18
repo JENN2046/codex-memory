@@ -29,7 +29,11 @@ const FORBIDDEN_PUBLIC_VALUE_PATTERNS = Object.freeze([
   /\bgh(?:p|o|u|s|r)_[A-Za-z0-9]{20,}\b/u,
   /\bgithub_pat_[A-Za-z0-9_]{20,}\b/u,
   /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/u,
-  /-----BEGIN (?:EC |OPENSSH |RSA )?PRIVATE KEY-----/u
+  /-----BEGIN (?:EC |OPENSSH |RSA )?PRIVATE KEY-----/u,
+  /(?<![A-Za-z0-9.:/])\/(?!\/)(?:[^/\s"'<>]+\/)+[^/\s"'<>]+/u,
+  /\b[A-Za-z]:[\\/](?:[^\\/\s"'<>]+[\\/])*[^\\/\s"'<>]*/u,
+  /\\{2}[^\\\s"'<>]+\\[^\\\s"'<>]+/u,
+  /(?:^|[\\/\s("'(])\.\.(?:[\\/]|$)/u
 ]);
 
 function assertPlainObject(value, code) {
@@ -125,6 +129,7 @@ function assertNoForbiddenStringValues(value, code, depth = 0) {
 function validatePrincipalAssertion(assertion, {
   now = new Date(),
   resolvePublicKey,
+  expectedIssuer,
   expectedAudience,
   requiredScopes = ['memory.read']
 } = {}) {
@@ -138,7 +143,9 @@ function validatePrincipalAssertion(assertion, {
   if (assertion.architecture_reference !== ARCHITECTURE_REFERENCE) reject('principal_architecture_invalid');
   assertHttpsUri(assertion.issuer, 'principal_issuer_invalid');
   assertHttpsUri(assertion.audience, 'principal_audience_invalid');
+  assertHttpsUri(expectedIssuer, 'principal_expected_issuer_invalid');
   assertHttpsUri(expectedAudience, 'principal_expected_audience_invalid');
+  if (assertion.issuer !== expectedIssuer) reject('principal_issuer_mismatch');
   if (assertion.audience !== expectedAudience) reject('principal_audience_mismatch');
   assertString(assertion.subject_fingerprint, {
     code: 'principal_fingerprint_invalid',
@@ -284,6 +291,7 @@ function validateRequestEnvelope(envelope, {
   now = new Date(),
   resolveRequestPublicKey,
   resolvePrincipalPublicKey,
+  expectedIssuer,
   expectedAudience,
   replayGuard,
   consumeReplay = true
@@ -309,6 +317,7 @@ function validateRequestEnvelope(envelope, {
   validatePrincipalAssertion(envelope.principal_assertion, {
     now,
     resolvePublicKey: resolvePrincipalPublicKey,
+    expectedIssuer,
     expectedAudience
   });
   validateToolRequest(envelope.tool_request);

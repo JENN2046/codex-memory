@@ -19,6 +19,7 @@ const { createMemoryScopeDto, parseToolResultNotification, widgetResource } = re
 const { createGovernanceAdapter } = require('../../src/adapters/chatgpt-r4');
 
 const FIXED_NOW = new Date('2026-07-18T00:00:00.000Z');
+const SYNTHETIC_ISSUER = 'https://idp.synthetic.invalid';
 const SYNTHETIC_AUDIENCE = 'https://edge.synthetic.invalid/mcp';
 
 function generateSigningIdentity(keyId) {
@@ -69,7 +70,7 @@ async function runZeroMemorySyntheticE2E() {
   };
 
   const principalAssertion = createPrincipalAssertion({
-    issuer: 'https://idp.synthetic.invalid',
+    issuer: SYNTHETIC_ISSUER,
     audience: SYNTHETIC_AUDIENCE,
     subjectFingerprint: sha256('synthetic-single-operator'),
     now: clock(),
@@ -78,6 +79,7 @@ async function runZeroMemorySyntheticE2E() {
   });
 
   const governanceAdapter = createGovernanceAdapter({
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
     resolveRequestPublicKey: resolveEdgeKey,
     resolvePrincipalPublicKey: resolvePrincipalKey,
@@ -125,6 +127,7 @@ async function runZeroMemorySyntheticE2E() {
   });
 
   const relay = createRelayProcessor({
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
     resolveRequestPublicKey: resolveEdgeKey,
     resolvePrincipalPublicKey: resolvePrincipalKey,
@@ -236,6 +239,7 @@ async function runZeroMemorySyntheticE2E() {
 
 module.exports = {
   FIXED_NOW,
+  SYNTHETIC_ISSUER,
   SYNTHETIC_AUDIENCE,
   generateSigningIdentity,
   keyResolver,

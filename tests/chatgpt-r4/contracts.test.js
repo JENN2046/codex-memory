@@ -29,7 +29,14 @@ const {
   validateToolStructuredContent,
   validateToolArguments
 } = require('../../packages/chatgpt-r4-contracts');
-const { generateSigningIdentity, keyResolver, signing, FIXED_NOW, SYNTHETIC_AUDIENCE } = require('./synthetic-harness');
+const {
+  generateSigningIdentity,
+  keyResolver,
+  signing,
+  FIXED_NOW,
+  SYNTHETIC_ISSUER,
+  SYNTHETIC_AUDIENCE
+} = require('./synthetic-harness');
 
 function fixture() {
   const principal = generateSigningIdentity('principal-test-key');
@@ -38,7 +45,7 @@ function fixture() {
   const relay = generateSigningIdentity('relay-test-key');
   const clock = () => new Date(FIXED_NOW.getTime());
   const principalAssertion = createPrincipalAssertion({
-    issuer: 'https://idp.synthetic.invalid',
+    issuer: SYNTHETIC_ISSUER,
     audience: SYNTHETIC_AUDIENCE,
     subjectFingerprint: sha256('principal'),
     now: clock(),
@@ -120,6 +127,7 @@ test('signed principal and request validate with exact audience and one-time rep
   });
   const result = validateRequestEnvelope(request, {
     now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
     resolvePrincipalPublicKey: keyResolver(principal),
     resolveRequestPublicKey: keyResolver(edge),
@@ -139,6 +147,7 @@ test('signed principal and request validate with exact audience and one-time rep
   });
   assert.throws(() => validateRequestEnvelope(reusedRequestId, {
     now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
     resolvePrincipalPublicKey: keyResolver(principal),
     resolveRequestPublicKey: keyResolver(edge),
@@ -157,6 +166,7 @@ test('signed principal and request validate with exact audience and one-time rep
   });
   assert.throws(() => validateRequestEnvelope(reusedNonce, {
     now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
     resolvePrincipalPublicKey: keyResolver(principal),
     resolveRequestPublicKey: keyResolver(edge),
@@ -166,6 +176,7 @@ test('signed principal and request validate with exact audience and one-time rep
 
   assert.throws(() => validateRequestEnvelope(request, {
     now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
     resolvePrincipalPublicKey: keyResolver(principal),
     resolveRequestPublicKey: keyResolver(edge),
@@ -192,16 +203,30 @@ test('principal audience, expiry, and signature drift fail closed', () => {
   };
   assert.throws(() => validateRequestEnvelope(request, {
     ...options,
-    now: FIXED_NOW
+    now: FIXED_NOW,
+    expectedIssuer: SYNTHETIC_ISSUER
   }), { code: 'principal_expected_audience_invalid' });
   assert.throws(() => validateRequestEnvelope(request, {
     ...options,
     now: FIXED_NOW,
+    expectedAudience: SYNTHETIC_AUDIENCE
+  }), { code: 'principal_expected_issuer_invalid' });
+  assert.throws(() => validateRequestEnvelope(request, {
+    ...options,
+    now: FIXED_NOW,
+    expectedIssuer: 'https://wrong-issuer.synthetic.invalid',
+    expectedAudience: SYNTHETIC_AUDIENCE
+  }), { code: 'principal_issuer_mismatch' });
+  assert.throws(() => validateRequestEnvelope(request, {
+    ...options,
+    now: FIXED_NOW,
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: 'https://wrong.synthetic.invalid/mcp'
   }), { code: 'principal_audience_mismatch' });
   assert.throws(() => validateRequestEnvelope(request, {
     ...options,
     now: new Date(FIXED_NOW.getTime() + 600_000),
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE
   }), { code: 'request_expired' });
   const tampered = structuredClone(request);
@@ -209,6 +234,7 @@ test('principal audience, expiry, and signature drift fail closed', () => {
   assert.throws(() => validateRequestEnvelope(tampered, {
     ...options,
     now: FIXED_NOW,
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE
   }), { code: 'signature_verification_failed' });
 });
@@ -290,6 +316,20 @@ test('public tool arguments cannot forge scope, mapping, diary, or ownership fie
       code: 'public_disclosure_forbidden'
     });
   }
+  for (const pathLikeValue of [
+    '/home/jenn/data/private.sqlite',
+    'file=/home/jenn/data/private.sqlite',
+    'C:\\Users\\Jenn\\private.sqlite',
+    '../data/private.sqlite',
+    '\\\\server\\private\\memory.db'
+  ]) {
+    assert.throws(() => validatePublicStructuredContent({ summary: pathLikeValue }), {
+      code: 'public_disclosure_forbidden'
+    });
+  }
+  assert.doesNotThrow(() => validatePublicStructuredContent({
+    summary: 'See https://example.invalid/docs/memory for public guidance.'
+  }));
   assert.doesNotThrow(() => validatePublicStructuredContent({ summary: 'No secret values are included.' }));
 });
 
@@ -439,7 +479,7 @@ test('response binds request, counters, receipts, and relay signature', () => {
       status: 'ok',
       result_count: 1,
       results: [{ result_ref: resultRef, summary: 'Synthetic summary', relevance: 0.9 }]
-    }), { code: 'response_result_ref_invalid' });
+    }), { code: 'public_disclosure_forbidden' });
   }
   assert.doesNotThrow(() => validateToolStructuredContent('audit_memory', {
     status: 'empty', kind: 'audit', item_count: 0
@@ -485,6 +525,7 @@ test('request and response byte ceilings reject oversized signed payloads before
   });
   assert.throws(() => validateRequestEnvelope(oversizedRequest, {
     now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
     resolvePrincipalPublicKey: keyResolver(principal),
     resolveRequestPublicKey: keyResolver(edge),

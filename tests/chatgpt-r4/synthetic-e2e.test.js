@@ -15,6 +15,7 @@ const { buildCandidateEdgeRequest } = require('../../apps/chatgpt-edge');
 const { createRelayProcessor, validateInvocation } = require('../../apps/local-recall-relay');
 const {
   FIXED_NOW,
+  SYNTHETIC_ISSUER,
   SYNTHETIC_AUDIENCE,
   generateSigningIdentity,
   keyResolver,
@@ -163,7 +164,7 @@ test('Relay stamps the response after a slow injected UDS invocation completes',
   let nowMs = FIXED_NOW.getTime();
   const clock = () => new Date(nowMs);
   const principalAssertion = createPrincipalAssertion({
-    issuer: 'https://idp.synthetic.invalid',
+    issuer: SYNTHETIC_ISSUER,
     audience: SYNTHETIC_AUDIENCE,
     subjectFingerprint: sha256('slow-principal'),
     now: clock(),
@@ -180,6 +181,7 @@ test('Relay stamps the response after a slow injected UDS invocation completes',
     signing: signing(edge)
   });
   const processor = createRelayProcessor({
+    expectedIssuer: SYNTHETIC_ISSUER,
     expectedAudience: SYNTHETIC_AUDIENCE,
     resolveRequestPublicKey: keyResolver(edge),
     resolvePrincipalPublicKey: keyResolver(principal),
