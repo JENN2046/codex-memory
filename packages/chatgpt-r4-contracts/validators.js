@@ -31,6 +31,7 @@ const FORBIDDEN_PUBLIC_VALUE_PATTERNS = Object.freeze([
   /\bgithub_pat_[A-Za-z0-9_]{20,}\b/u,
   /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/u,
   /-----BEGIN (?:EC |OPENSSH |RSA )?PRIVATE KEY-----/u,
+  /\b(?:file|sqlite|vscode(?:-insiders)?):\/{1,3}[^\s"'<>]+/iu,
   /(?<![A-Za-z0-9.:/])\/(?!\/)(?:[^/\s"'<>]+\/)+[^/\s"'<>]+/u,
   /\b[A-Za-z]:[\\/](?:[^\\/\s"'<>]+[\\/])*[^\\/\s"'<>]*/u,
   /\\{2}[^\\\s"'<>]+\\[^\\\s"'<>]+/u,

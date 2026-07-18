@@ -123,6 +123,16 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
     searchResponse.properties.structured_content.properties.results.items.properties.result_ref.pattern,
     RESULT_REF_PATTERN_SOURCE
   );
+  const searchCountVariants = searchResponse.properties.structured_content.allOf[0].oneOf;
+  assert.deepEqual(
+    searchCountVariants.map(variant => variant.properties.result_count.const),
+    Array.from({ length: 9 }, (_, count) => count)
+  );
+  for (const variant of searchCountVariants) {
+    const count = variant.properties.result_count.const;
+    assert.equal(variant.properties.results.minItems, count);
+    assert.equal(variant.properties.results.maxItems, count);
+  }
   assert.equal(WIDGET_DTO_SCHEMA.properties.safe_project_alias.pattern, '^[A-Za-z0-9][A-Za-z0-9._-]*$');
   assert.deepEqual(
     WIDGET_DTO_SCHEMA.allOf[0].oneOf.map(variant => variant.properties.context_status),
@@ -413,7 +423,11 @@ test('public tool arguments cannot forge scope, mapping, diary, or ownership fie
     'file=/home/jenn/data/private.sqlite',
     'C:\\Users\\Jenn\\private.sqlite',
     '../data/private.sqlite',
-    '\\\\server\\private\\memory.db'
+    '\\\\server\\private\\memory.db',
+    'file:///home/jenn/data/private.sqlite',
+    'sqlite:///home/jenn/data/private.sqlite',
+    'vscode://file/C:/Users/Jenn/private.sqlite',
+    'vscode-insiders://file/home/jenn/private.sqlite'
   ]) {
     assert.throws(() => validatePublicStructuredContent({ summary: pathLikeValue }), {
       code: 'public_disclosure_forbidden'

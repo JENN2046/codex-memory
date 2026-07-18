@@ -110,7 +110,7 @@ function boundedStatusContent(kind, nonOkStatus = null) {
 }
 
 function searchStatusContent(nonOkStatus = null) {
-  return exactArguments({
+  const schema = exactArguments({
     required: ['status', 'result_count', 'results'],
     properties: {
       status: nonOkStatus
@@ -135,6 +135,18 @@ function searchStatusContent(nonOkStatus = null) {
           }
     }
   });
+  if (!nonOkStatus) {
+    schema.allOf = [{
+      oneOf: Array.from({ length: LIMITS.maxResultLimit + 1 }, (_, count) => ({
+        required: ['result_count', 'results'],
+        properties: {
+          result_count: { const: count },
+          results: { minItems: count, maxItems: count }
+        }
+      }))
+    }];
+  }
+  return schema;
 }
 
 const toolResponseVariants = [
