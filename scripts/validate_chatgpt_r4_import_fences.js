@@ -54,6 +54,11 @@ const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
     pattern: /\b(?:writeFile|appendFile|createWriteStream|mkdir|rm|unlink)\b/u,
     code: 'durable_file_mutation'
   },
+  {
+    pattern: /\b(?:localStorage|sessionStorage|indexedDB|caches|CacheStorage|cookieStore)\b|\bdocument\s*\.\s*cookie\b/u,
+    bracketPattern: /\bdocument\s*\[\s*['"]cookie['"]\s*\]/u,
+    code: 'durable_browser_storage'
+  },
   { pattern: /\b(?:createServer|listen)\b/u, code: 'service_listener' },
   {
     pattern: /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|WebTransport|RTCPeerConnection|navigator|sendBeacon|importScripts)\b/u,
@@ -340,7 +345,9 @@ function validateComponentSource(component, { file, source }) {
     preserveBracketStringContents: true
   });
   for (const rule of FORBIDDEN_RUNTIME_PATTERNS) {
-    if (rule.pattern.test(maskedSource)) throw new Error(`${rule.code}:${relativeFile}`);
+    if (rule.pattern.test(maskedSource) || rule.bracketPattern?.test(bracketMaskedSource)) {
+      throw new Error(`${rule.code}:${relativeFile}`);
+    }
   }
   if (/\.\s*constructor\b/u.test(maskedSource) ||
       /\[\s*['"]constructor['"]\s*\]/u.test(bracketMaskedSource)) {

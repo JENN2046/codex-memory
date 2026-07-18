@@ -10,6 +10,7 @@ const {
   PRINCIPAL_ASSERTION_SCHEMA,
   PROJECT_CONTEXT_CLAIM_SCHEMA,
   PROJECT_CONTEXT_REF_PATTERN_SOURCE,
+  REQUEST_ID_PATTERN_SOURCE,
   REQUEST_ENVELOPE_SCHEMA,
   RESPONSE_ENVELOPE_SCHEMA,
   RESULT_REF_PATTERN_SOURCE,
@@ -81,6 +82,8 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.equal(searchRequest.properties.arguments.properties.limit.maximum, 8);
   assert.equal(requestVariants.some(variant => variant.properties.name.const === 'record_memory'), false);
   assert.deepEqual(RESPONSE_ENVELOPE_SCHEMA.properties.tool_name.enum, DATA_TOOL_NAMES);
+  assert.equal(REQUEST_ENVELOPE_SCHEMA.properties.request_id.pattern, REQUEST_ID_PATTERN_SOURCE);
+  assert.equal(RESPONSE_ENVELOPE_SCHEMA.properties.request_id.pattern, REQUEST_ID_PATTERN_SOURCE);
   const responseVariants = RESPONSE_ENVELOPE_SCHEMA.allOf[0].oneOf;
   assert.deepEqual(
     [...new Set(responseVariants.map(variant => variant.properties.tool_name.const))],

@@ -148,14 +148,22 @@ test('dynamic imports, runtime config, listeners, body logs, and durable writes 
     'server.listen/*comment*/(8080);',
     'console.log(request.body);',
     'console/*comment*/.log/*comment*/(request.body);',
-    'writeFile(target, body);'
+    'writeFile(target, body);',
+    "localStorage.setItem('request', body);",
+    "sessionStorage.setItem('response', body);",
+    "indexedDB.open('memory');",
+    "caches.open('memory');",
+    "cookieStore.set('request', body);",
+    "document.cookie = 'request=stored';",
+    "document['cookie'] = 'request=stored';"
   ]) {
     assert.throws(() => validateComponentSource('edge', { file, source }));
   }
   for (const source of [
     "'globalThis[\\'fetch\\']';",
     '// process.env.SECRET_REFERENCE',
-    'const message = "console.log(request.body)";'
+    'const message = "console.log(request.body)";',
+    'const message = "localStorage.setItem(request, body)";'
   ]) {
     assert.doesNotThrow(() => validateComponentSource('edge', { file, source }));
   }
