@@ -68,6 +68,13 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.equal(searchRequest.properties.arguments.properties.limit.maximum, 8);
   assert.equal(requestVariants.some(variant => variant.properties.name.const === 'record_memory'), false);
   assert.deepEqual(RESPONSE_ENVELOPE_SCHEMA.properties.tool_name.enum, DATA_TOOL_NAMES);
+  const responseVariants = RESPONSE_ENVELOPE_SCHEMA.allOf[0].oneOf;
+  assert.deepEqual(responseVariants.map(variant => variant.properties.tool_name.const), DATA_TOOL_NAMES);
+  const overviewResponse = responseVariants.find(variant =>
+    variant.properties.tool_name.const === 'memory_overview');
+  assert.deepEqual(overviewResponse.properties.structured_content.required, ['status', 'kind', 'item_count']);
+  assert.equal(overviewResponse.properties.structured_content.properties.kind.const, 'overview');
+  assert.equal(overviewResponse.properties.structured_content.additionalProperties, false);
   assert.equal(WIDGET_DTO_SCHEMA.properties.safe_project_alias.pattern, '^[A-Za-z0-9][A-Za-z0-9._-]*$');
 });
 

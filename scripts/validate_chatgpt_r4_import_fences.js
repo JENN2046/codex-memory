@@ -145,54 +145,107 @@ function extractStaticRuntimeImports(source) {
 }
 
 function maskCommentsAndStringContents(source) {
-  const output = [...source];
-  for (let index = 0; index < output.length; index += 1) {
-    const current = output[index];
-    const next = output[index + 1];
-    if (current === '/' && next === '/') {
-      output[index] = ' ';
-      output[index + 1] = ' ';
-      index += 2;
-      while (index < output.length && output[index] !== '\n' && output[index] !== '\r') {
-        output[index] = ' ';
-        index += 1;
-      }
-      index -= 1;
-      continue;
-    }
-    if (current === '/' && next === '*') {
-      output[index] = ' ';
-      output[index + 1] = ' ';
-      index += 2;
-      while (index < output.length) {
-        if (output[index] === '*' && output[index + 1] === '/') {
-          output[index] = ' ';
-          output[index + 1] = ' ';
-          index += 1;
-          break;
-        }
-        if (output[index] !== '\n' && output[index] !== '\r') output[index] = ' ';
-        index += 1;
-      }
-      continue;
-    }
-    if (current !== "'" && current !== '"' && current !== '`') continue;
-    const quote = current;
+  const output = source.split('');
+
+  function maskCharacter(index) {
+    if (output[index] !== '\n' && output[index] !== '\r') output[index] = ' ';
+  }
+
+  function maskQuoted(index, quote) {
     index += 1;
     while (index < output.length) {
       if (output[index] === '\\') {
-        output[index] = ' ';
-        if (index + 1 < output.length && output[index + 1] !== '\n' && output[index + 1] !== '\r') {
-          output[index + 1] = ' ';
-        }
+        maskCharacter(index);
+        if (index + 1 < output.length) maskCharacter(index + 1);
         index += 2;
         continue;
       }
-      if (output[index] === quote) break;
-      if (output[index] !== '\n' && output[index] !== '\r') output[index] = ' ';
+      if (output[index] === quote) return index + 1;
+      maskCharacter(index);
       index += 1;
     }
+    return index;
   }
+
+  function maskLineComment(index) {
+    output[index] = ' ';
+    output[index + 1] = ' ';
+    index += 2;
+    while (index < output.length && output[index] !== '\n' && output[index] !== '\r') {
+      output[index] = ' ';
+      index += 1;
+    }
+    return index;
+  }
+
+  function maskBlockComment(index) {
+    output[index] = ' ';
+    output[index + 1] = ' ';
+    index += 2;
+    while (index < output.length) {
+      if (output[index] === '*' && output[index + 1] === '/') {
+        output[index] = ' ';
+        output[index + 1] = ' ';
+        return index + 2;
+      }
+      maskCharacter(index);
+      index += 1;
+    }
+    return index;
+  }
+
+  function maskTemplate(index) {
+    index += 1;
+    while (index < output.length) {
+      if (output[index] === '\\') {
+        maskCharacter(index);
+        if (index + 1 < output.length) maskCharacter(index + 1);
+        index += 2;
+        continue;
+      }
+      if (output[index] === '`') return index + 1;
+      if (output[index] === '$' && output[index + 1] === '{') {
+        index = scanCode(index + 2, true);
+        continue;
+      }
+      maskCharacter(index);
+      index += 1;
+    }
+    return index;
+  }
+
+  function scanCode(index, stopAtTemplateBrace = false) {
+    let braceDepth = stopAtTemplateBrace ? 1 : 0;
+    while (index < output.length) {
+      const current = output[index];
+      const next = output[index + 1];
+      if (current === '/' && next === '/') {
+        index = maskLineComment(index);
+        continue;
+      }
+      if (current === '/' && next === '*') {
+        index = maskBlockComment(index);
+        continue;
+      }
+      if (current === "'" || current === '"') {
+        index = maskQuoted(index, current);
+        continue;
+      }
+      if (current === '`') {
+        index = maskTemplate(index);
+        continue;
+      }
+      if (stopAtTemplateBrace && current === '{') braceDepth += 1;
+      if (stopAtTemplateBrace && current === '}') {
+        braceDepth -= 1;
+        if (braceDepth === 0) return index + 1;
+      }
+      index += 1;
+    }
+    return index;
+  }
+
+  scanCode(0);
   return output.join('');
 }
 

@@ -78,6 +78,76 @@ const toolRequestVariants = [
   }))
 ];
 
+function toolResponse(name, structuredContentSchema) {
+  return {
+    type: 'object',
+    required: ['tool_name', 'structured_content'],
+    properties: {
+      tool_name: { const: name },
+      structured_content: structuredContentSchema
+    }
+  };
+}
+
+function boundedStatusContent(kind) {
+  return exactArguments({
+    required: ['status', 'kind', 'item_count'],
+    properties: {
+      status: { type: 'string', minLength: 1, maxLength: 80 },
+      kind: { const: kind },
+      item_count: { type: 'integer', minimum: 0, maximum: LIMITS.maxResultLimit }
+    }
+  });
+}
+
+const toolResponseVariants = [
+  toolResponse('resolve_memory_context', exactArguments({
+    required: [
+      'project_context_ref', 'safe_project_alias', 'expires_at',
+      'visibility_labels', 'context_status'
+    ],
+    properties: {
+      project_context_ref: projectContextReference,
+      safe_project_alias: {
+        type: 'string',
+        minLength: 1,
+        maxLength: LIMITS.maxProjectAliasCharacters,
+        pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$'
+      },
+      expires_at: { type: 'string', format: 'date-time' },
+      visibility_labels: {
+        type: 'array',
+        minItems: 1,
+        uniqueItems: true,
+        items: { enum: CONTEXT_VISIBILITIES }
+      },
+      context_status: { const: 'resolved' }
+    }
+  })),
+  toolResponse('memory_overview', boundedStatusContent('overview')),
+  toolResponse('search_memory', exactArguments({
+    required: ['status', 'result_count', 'results'],
+    properties: {
+      status: { type: 'string', minLength: 1, maxLength: 80 },
+      result_count: { type: 'integer', minimum: 0, maximum: LIMITS.maxResultLimit },
+      results: {
+        type: 'array',
+        maxItems: LIMITS.maxResultLimit,
+        items: exactArguments({
+          required: ['result_ref', 'summary', 'relevance'],
+          properties: {
+            result_ref: { type: 'string', minLength: 1, maxLength: 160 },
+            summary: { type: 'string', minLength: 1, maxLength: 4000 },
+            relevance: { type: 'number', minimum: 0, maximum: 1 }
+          }
+        })
+      }
+    }
+  })),
+  toolResponse('audit_memory', boundedStatusContent('audit')),
+  toolResponse('prepare_memory_context', boundedStatusContent('context'))
+];
+
 const signature = {
   type: 'object',
   additionalProperties: false,
@@ -182,6 +252,7 @@ const RESPONSE_ENVELOPE_SCHEMA = deepFreeze({
     'request_id', 'request_digest', 'tool_name', 'status', 'issued_at',
     'expires_at', 'structured_content', 'counters', 'receipt_chain', 'signature'
   ],
+  allOf: [{ oneOf: toolResponseVariants }],
   properties: {
     schema_version: { const: SCHEMA_VERSION },
     kind: { const: KINDS.responseEnvelope },
