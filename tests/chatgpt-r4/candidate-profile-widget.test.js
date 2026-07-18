@@ -76,6 +76,10 @@ test('widget DTO renders only safe scope status and bridge uses tools/call', () 
     params: { structuredContent: { scope: dto } }
   });
   assert.deepEqual(parsed, dto);
+  assert.equal(Object.isFrozen(dto), true);
+  assert.equal(Object.isFrozen(dto.visibility_labels), true);
+  assert.throws(() => dto.visibility_labels.push('private'), TypeError);
+  assert.deepEqual(dto.visibility_labels, ['project', 'workspace']);
   assert.deepEqual(buildResolveContextCall({
     id: 1,
     projectAlias: 'project-alpha',

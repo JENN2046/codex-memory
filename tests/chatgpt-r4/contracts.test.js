@@ -105,6 +105,19 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.deepEqual(contextResponses.map(variant => variant.properties.status.const), [
     'ok', 'denied', 'unavailable'
   ]);
+  for (const toolName of ['memory_overview', 'search_memory', 'audit_memory', 'prepare_memory_context']) {
+    assert.deepEqual(
+      responseVariants
+        .filter(variant => variant.properties.tool_name.const === toolName)
+        .map(variant => variant.properties.status.const),
+      ['ok', 'denied', 'unavailable']
+    );
+  }
+  const deniedSearchResponse = responseVariants.find(variant =>
+    variant.properties.tool_name.const === 'search_memory' &&
+    variant.properties.status.const === 'denied');
+  assert.equal(deniedSearchResponse.properties.structured_content.properties.result_count.const, 0);
+  assert.equal(deniedSearchResponse.properties.structured_content.properties.results.maxItems, 0);
   assert.equal(
     searchResponse.properties.structured_content.properties.results.items.properties.result_ref.pattern,
     RESULT_REF_PATTERN_SOURCE
@@ -485,6 +498,21 @@ test('response binds request, counters, receipts, and relay signature', () => {
     result_count: 1,
     results: [{ result_ref: `mref_${'r'.repeat(24)}`, summary: 'Synthetic summary', relevance: 0.9 }]
   }));
+  for (const status of ['denied', 'unavailable']) {
+    assert.doesNotThrow(() => validateToolStructuredContent('search_memory', {
+      status,
+      result_count: 0,
+      results: []
+    }, { status }));
+    assert.throws(() => validateToolStructuredContent('search_memory', {
+      status,
+      result_count: 1,
+      results: [{ result_ref: `mref_${'r'.repeat(24)}`, summary: 'Stale summary', relevance: 0.9 }]
+    }, { status }), { code: 'response_search_results_invalid' });
+  }
+  assert.throws(() => validateToolStructuredContent('search_memory', {
+    status: 'denied', result_count: 0, results: []
+  }, { status: 'unavailable' }), { code: 'response_result_status_mismatch' });
   for (const resultRef of ['/home/jenn/private.sqlite', '..\\private.sqlite', '../private.sqlite']) {
     assert.throws(() => validateToolStructuredContent('search_memory', {
       status: 'ok',
@@ -498,6 +526,12 @@ test('response binds request, counters, receipts, and relay signature', () => {
   assert.doesNotThrow(() => validateToolStructuredContent('prepare_memory_context', {
     status: 'empty', kind: 'context', item_count: 0
   }));
+  assert.doesNotThrow(() => validateToolStructuredContent('memory_overview', {
+    status: 'denied', kind: 'overview', item_count: 0
+  }, { status: 'denied' }));
+  assert.throws(() => validateToolStructuredContent('memory_overview', {
+    status: 'denied', kind: 'overview', item_count: 1
+  }, { status: 'denied' }), { code: 'response_item_count_invalid' });
 
   const nonzero = structuredClone(response);
   nonzero.counters.provider_calls = 1;

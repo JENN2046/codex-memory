@@ -14,7 +14,7 @@ function createMemoryScopeDto({
     safe_project_alias: safeProjectAlias,
     context_status: contextStatus,
     expires_at: expiresAt,
-    visibility_labels: [...visibilityLabels],
+    visibility_labels: Object.freeze([...visibilityLabels]),
     receipt_status: receiptStatus
   };
   validateWidgetDto(dto);

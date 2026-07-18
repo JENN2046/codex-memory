@@ -397,6 +397,14 @@ function validateToolStructuredContent(toolName, content, { status = 'ok' } = {}
         content.results.length !== content.result_count || content.results.length > LIMITS.maxResultLimit) {
       reject('response_search_results_invalid');
     }
+    if (status !== 'ok') {
+      if (!['denied', 'unavailable'].includes(status)) reject('response_status_invalid');
+      if (content.status !== status) reject('response_result_status_mismatch');
+      if (content.result_count !== 0 || content.results.length !== 0) {
+        reject('response_search_results_invalid');
+      }
+      return content;
+    }
     for (const result of content.results) {
       assertExactKeys(result, ['result_ref', 'summary', 'relevance'], 'response_search_result_shape_invalid');
       assertString(result.result_ref, {
@@ -426,6 +434,11 @@ function validateToolStructuredContent(toolName, content, { status = 'ok' } = {}
   if (!Number.isInteger(content.item_count) || content.item_count < 0 ||
       content.item_count > LIMITS.maxResultLimit) {
     reject('response_item_count_invalid');
+  }
+  if (status !== 'ok') {
+    if (!['denied', 'unavailable'].includes(status)) reject('response_status_invalid');
+    if (content.status !== status) reject('response_result_status_mismatch');
+    if (content.item_count !== 0) reject('response_item_count_invalid');
   }
   return content;
 }

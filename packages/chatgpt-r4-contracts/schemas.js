@@ -94,13 +94,45 @@ function toolResponse(name, structuredContentSchema, status = null) {
   };
 }
 
-function boundedStatusContent(kind) {
+function boundedStatusContent(kind, nonOkStatus = null) {
   return exactArguments({
     required: ['status', 'kind', 'item_count'],
     properties: {
-      status: { type: 'string', minLength: 1, maxLength: 80 },
+      status: nonOkStatus
+        ? { const: nonOkStatus }
+        : { type: 'string', minLength: 1, maxLength: 80 },
       kind: { const: kind },
-      item_count: { type: 'integer', minimum: 0, maximum: LIMITS.maxResultLimit }
+      item_count: nonOkStatus
+        ? { const: 0 }
+        : { type: 'integer', minimum: 0, maximum: LIMITS.maxResultLimit }
+    }
+  });
+}
+
+function searchStatusContent(nonOkStatus = null) {
+  return exactArguments({
+    required: ['status', 'result_count', 'results'],
+    properties: {
+      status: nonOkStatus
+        ? { const: nonOkStatus }
+        : { type: 'string', minLength: 1, maxLength: 80 },
+      result_count: nonOkStatus
+        ? { const: 0 }
+        : { type: 'integer', minimum: 0, maximum: LIMITS.maxResultLimit },
+      results: nonOkStatus
+        ? { type: 'array', maxItems: 0 }
+        : {
+            type: 'array',
+            maxItems: LIMITS.maxResultLimit,
+            items: exactArguments({
+              required: ['result_ref', 'summary', 'relevance'],
+              properties: {
+                result_ref: { type: 'string', pattern: RESULT_REF_PATTERN_SOURCE },
+                summary: { type: 'string', minLength: 1, maxLength: 4000 },
+                relevance: { type: 'number', minimum: 0, maximum: 1 }
+              }
+            })
+          }
     }
   });
 }
@@ -137,28 +169,18 @@ const toolResponseVariants = [
     required: ['context_status'],
     properties: { context_status: { const: 'unavailable' } }
   }), 'unavailable'),
-  toolResponse('memory_overview', boundedStatusContent('overview')),
-  toolResponse('search_memory', exactArguments({
-    required: ['status', 'result_count', 'results'],
-    properties: {
-      status: { type: 'string', minLength: 1, maxLength: 80 },
-      result_count: { type: 'integer', minimum: 0, maximum: LIMITS.maxResultLimit },
-      results: {
-        type: 'array',
-        maxItems: LIMITS.maxResultLimit,
-        items: exactArguments({
-          required: ['result_ref', 'summary', 'relevance'],
-          properties: {
-            result_ref: { type: 'string', pattern: RESULT_REF_PATTERN_SOURCE },
-            summary: { type: 'string', minLength: 1, maxLength: 4000 },
-            relevance: { type: 'number', minimum: 0, maximum: 1 }
-          }
-        })
-      }
-    }
-  })),
-  toolResponse('audit_memory', boundedStatusContent('audit')),
-  toolResponse('prepare_memory_context', boundedStatusContent('context'))
+  toolResponse('memory_overview', boundedStatusContent('overview'), 'ok'),
+  toolResponse('memory_overview', boundedStatusContent('overview', 'denied'), 'denied'),
+  toolResponse('memory_overview', boundedStatusContent('overview', 'unavailable'), 'unavailable'),
+  toolResponse('search_memory', searchStatusContent(), 'ok'),
+  toolResponse('search_memory', searchStatusContent('denied'), 'denied'),
+  toolResponse('search_memory', searchStatusContent('unavailable'), 'unavailable'),
+  toolResponse('audit_memory', boundedStatusContent('audit'), 'ok'),
+  toolResponse('audit_memory', boundedStatusContent('audit', 'denied'), 'denied'),
+  toolResponse('audit_memory', boundedStatusContent('audit', 'unavailable'), 'unavailable'),
+  toolResponse('prepare_memory_context', boundedStatusContent('context'), 'ok'),
+  toolResponse('prepare_memory_context', boundedStatusContent('context', 'denied'), 'denied'),
+  toolResponse('prepare_memory_context', boundedStatusContent('context', 'unavailable'), 'unavailable')
 ];
 
 const signature = {
