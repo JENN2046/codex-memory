@@ -4,21 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2135 ChatGPT Web R4 architecture freeze`.
-Current validation: `CMV-2220`.
-Current fact: R4 freezes a stable HTTPS ChatGPT Edge, outbound Local Recall Relay, local UDS governance kernel, and explicit project context as the canonical route.
-Secure MCP Tunnel is non-canonical; this batch performed no runtime/config/provider/memory action and no public tool expansion.
-Implementation, OAuth activation, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+Current task: `CM-2136 ChatGPT Web R4-B contracts and synthetic harness`.
+Current validation: `CMV-2221`.
+Current fact: R4-B implements import-fenced signed contracts, a non-default read-only candidate profile, Widget DTO/bridge, and a zero-memory synthetic Edge/Relay/UDS/governance flow.
+All provider/native/fallback/write/durable counters are zero; no service, OAuth, external runtime, real memory, or public tool expansion occurred.
+Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R4 target is frozen as stable HTTPS Edge -> outbound Relay -> UDS -> local governance -> selected-diary VCP search.
-- Project scope: a locally issued short-lived `project_context_ref` must precede recall; widget/tool arguments do not grant ACL.
-- Tunnel: optional development/compatibility adapter only; the R3 branch remains Draft/paused.
-- Side effects: runtime/config/provider/memory/service actions zero; public tool surface unchanged.
-- Status sync: performed locally in CM-2135; PR CI/review and merge remain delivery gates.
+- Architecture: R4-B contract candidate follows stable HTTPS Edge -> outbound Relay -> UDS -> local governance, without activating any hop.
+- Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
+- Candidate: non-default and non-activated; active runtime imports remain unchanged.
+- Synthetic proof: two requests, 20 focused tests, all provider/native/fallback/write/durable/global-search counters zero.
+- Status sync: performed locally in CM-2136; PR CI/review and merge remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 

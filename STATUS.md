@@ -4,13 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2135 ChatGPT Web R4 architecture freeze`.
-Current validation: `CMV-2220`.
-Current fact: R4 freezes a stable HTTPS ChatGPT Edge, outbound Local Recall Relay, local UDS governance kernel, and explicit project context as the canonical route.
-Secure MCP Tunnel is non-canonical; this batch performed no runtime/config/provider/memory action and no public tool expansion.
-Implementation, OAuth activation, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+Current task: `CM-2136 ChatGPT Web R4-B contracts and synthetic harness`.
+Current validation: `CMV-2221`.
+Current fact: R4-B implements import-fenced signed contracts, a non-default read-only candidate profile, Widget DTO/bridge, and a zero-memory synthetic Edge/Relay/UDS/governance flow.
+All provider/native/fallback/write/durable counters are zero; no service, OAuth, external runtime, real memory, or public tool expansion occurred.
+Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2136 ChatGPT Web R4-B Contracts And Synthetic Harness
+
+R4-B adds dependency-free principal, opaque project-context, signed request and
+response, replay/TTL/size/counter/disclosure, receipt-chain, candidate tool,
+Widget DTO/bridge, and import-fence contracts. The non-default candidate is not
+imported by the active runtime. The two-request in-memory synthetic flow passes
+with every memory/provider/native/fallback/durable counter at zero and rejects
+forged authority, invalid signatures, duplicate requests, reused context, and
+forbidden imports. External runtime, service, OAuth, public tools, provider,
+VCP, real memory, production, release, deploy, cutover, and readiness remain
+false.
 
 ## CM-2135 ChatGPT Web R4 Architecture Freeze
 

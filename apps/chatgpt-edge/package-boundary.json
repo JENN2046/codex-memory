@@ -1,0 +1,17 @@
+{
+  "component": "public_edge_candidate",
+  "stage": "R4-B",
+  "activated": false,
+  "defaultProfile": false,
+  "allowedProjectImports": [
+    "packages/chatgpt-r4-contracts"
+  ],
+  "forbiddenCapabilities": [
+    "diary_acl_authorization",
+    "diary_mapping_load",
+    "durable_memory",
+    "provider_invocation",
+    "vcp_runtime",
+    "request_or_response_body_logging"
+  ]
+}

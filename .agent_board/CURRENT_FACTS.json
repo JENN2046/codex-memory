@@ -71,6 +71,22 @@
     "chatgptWebR4RealMemoryReadPerformed": false,
     "chatgptWebR4RuntimeMutationPerformed": false,
     "chatgptWebR4SchemaValidationPassed": true,
+    "chatgptWebR4bCandidateProfileActivated": false,
+    "chatgptWebR4bCandidateProfileDefault": false,
+    "chatgptWebR4bContractTestsPassed": true,
+    "chatgptWebR4bContractTestCount": 20,
+    "chatgptWebR4bDerivedIndexWrites": 0,
+    "chatgptWebR4bDurableRemoteMutations": 0,
+    "chatgptWebR4bExternalRuntimeUsed": false,
+    "chatgptWebR4bImportFencesPassed": true,
+    "chatgptWebR4bLocalFallbacks": 0,
+    "chatgptWebR4bNativeInvocations": 0,
+    "chatgptWebR4bPrimaryMemoryWrites": 0,
+    "chatgptWebR4bProviderCalls": 0,
+    "chatgptWebR4bPublicToolSurfaceExpanded": false,
+    "chatgptWebR4bRealMemoryReads": 0,
+    "chatgptWebR4bSyntheticE2ePassed": true,
+    "chatgptWebR4bUnrestrictedNativeSearches": 0,
     "cm2115CanonicalSnapshotPrepared": true,
     "cm2115FullPlanApplicationApplied": false,
     "cm2115FullPlanApplicationAuthorized": false,
@@ -691,12 +707,17 @@
     "notReleaseReady": true,
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "chatgpt_web_r4_architecture_frozen_implementation_runtime_and_readiness_false"
+    "scope": "chatgpt_web_r4b_contracts_synthetic_complete_services_runtime_and_readiness_false"
   },
-  "taskId": "CM-2135",
+  "taskId": "CM-2136",
   "updatedAt": "2026-07-18",
-  "validationId": "CMV-2220",
+  "validationId": "CMV-2221",
   "validationSummary": [
+    {
+      "id": "CMV-2221",
+      "scope": "CM-2136 ChatGPT Web R4-B contracts and synthetic harness",
+      "status": "COMPLETED_R4B_CONTRACTS_AND_ZERO_MEMORY_SYNTHETIC_PASS_EXTERNAL_RUNTIME_FALSE"
+    },
     {
       "id": "CMV-2220",
       "scope": "CM-2135 ChatGPT Web R4 architecture freeze",

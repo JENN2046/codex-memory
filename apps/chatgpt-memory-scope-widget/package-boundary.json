@@ -1,0 +1,11 @@
+{
+  "component": "memory_scope_widget_candidate",
+  "stage": "R4-B",
+  "activated": false,
+  "businessDataApi": false,
+  "authorizationAuthority": false,
+  "rawMemoryDisplayAllowed": false,
+  "allowedProjectImports": [
+    "packages/chatgpt-r4-contracts"
+  ]
+}

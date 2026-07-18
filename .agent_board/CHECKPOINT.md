@@ -4,13 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2135 ChatGPT Web R4 architecture freeze`.
-Current validation: `CMV-2220`.
-Current fact: R4 freezes a stable HTTPS ChatGPT Edge, outbound Local Recall Relay, local UDS governance kernel, and explicit project context as the canonical route.
-Secure MCP Tunnel is non-canonical; this batch performed no runtime/config/provider/memory action and no public tool expansion.
-Implementation, OAuth activation, production/release/deploy/cutover/RC/complete-V8/readiness remain false.
+Current task: `CM-2136 ChatGPT Web R4-B contracts and synthetic harness`.
+Current validation: `CMV-2221`.
+Current fact: R4-B implements import-fenced signed contracts, a non-default read-only candidate profile, Widget DTO/bridge, and a zero-memory synthetic Edge/Relay/UDS/governance flow.
+All provider/native/fallback/write/durable counters are zero; no service, OAuth, external runtime, real memory, or public tool expansion occurred.
+Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2136 ChatGPT Web R4-B Contracts And Synthetic Harness
+
+Status: `R4B_CONTRACTS_AND_ZERO_MEMORY_SYNTHETIC_PASS_EXTERNAL_RUNTIME_FALSE`
+
+- Signed principal, opaque project context, request/response, replay/TTL/size/counter/disclosure, and receipt-chain contracts are implemented without dependencies.
+- Edge, Relay, Widget, contracts, and governance-adapter import fences pass; the candidate is not imported by active runtime entrypoints.
+- Eighteen focused tests cover the positive flow plus signature, expiry, replay, byte ceiling, scope-forgery, private visibility, counter, receipt, import, listener, logging, and durable-state negatives.
+- Provider/native/fallback/primary-write/derived-write/other-durable/global-search counters are all zero.
+- Service/OAuth/external runtime/VCP/real-memory/public-tool/production/release/deploy/cutover/readiness remain false.
+
+Validation: `CMV-2221`.
 
 ## CM-2135 ChatGPT Web R4 Architecture Freeze
 

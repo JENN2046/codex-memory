@@ -1,0 +1,17 @@
+{
+  "component": "local_recall_relay_candidate",
+  "stage": "R4-B",
+  "activated": false,
+  "serviceListenerImplemented": false,
+  "allowedProjectImports": [
+    "packages/chatgpt-r4-contracts"
+  ],
+  "forbiddenCapabilities": [
+    "diary_mapping_load",
+    "provider_invocation",
+    "memory_storage",
+    "scope_authorization",
+    "global_native_search",
+    "durable_request_or_response_logging"
+  ]
+}
