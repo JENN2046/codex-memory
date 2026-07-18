@@ -50,13 +50,17 @@ function createLoopbackRelayRuntime({
       emit('claim_acknowledged', claim.request_id, { attempt: claim.attempt });
 
       const cancellation = new AbortController();
+      let interruptionStatus = null;
       let monitorStopped = false;
       const monitor = monitorCancellation({
         edge,
         claim,
         cancellation,
         pollMs: cancelPollMs,
-        isStopped: () => monitorStopped
+        isStopped: () => monitorStopped,
+        onInterrupted(status) {
+          interruptionStatus = status;
+        }
       });
       const processor = createRelayProcessor({
         expectedIssuer,
@@ -86,10 +90,15 @@ function createLoopbackRelayRuntime({
         });
       } catch (error) {
         if (error?.code === 'relay_cancelled' || error?.code === 'edge_request_cancelled' ||
+            error?.code === 'edge_request_expired' ||
             cancellation.signal.aborted) {
-          emit('request_cancelled', claim.request_id, { attempt: claim.attempt });
+          const status = interruptionStatus ||
+            (error?.code === 'edge_request_expired' ? 'expired' : 'cancelled');
+          emit(status === 'expired' ? 'request_expired' : 'request_cancelled', claim.request_id, {
+            attempt: claim.attempt
+          });
           return Object.freeze({
-            status: 'cancelled',
+            status,
             request_id: claim.request_id,
             attempt: claim.attempt
           });
@@ -111,16 +120,20 @@ function safeErrorCode(value) {
     : 'relay_failure';
 }
 
-async function monitorCancellation({ edge, claim, cancellation, pollMs, isStopped }) {
+async function monitorCancellation({ edge, claim, cancellation, pollMs, isStopped, onInterrupted }) {
   while (!isStopped() && !cancellation.signal.aborted) {
     await delay(pollMs);
     if (isStopped() || cancellation.signal.aborted) return;
     try {
       const current = await edge.state(claim);
-      if (current.status === 'cancelled') cancellation.abort();
-      if (current.status === 'expired') cancellation.abort();
+      if (current.status === 'cancelled' || current.status === 'expired') {
+        onInterrupted(current.status);
+        cancellation.abort();
+      }
     } catch (error) {
-      if (error?.code === 'edge_request_cancelled' || error?.code === 'edge_request_expired') {
+      if (error?.code === 'edge_request_cancelled' || error?.code === 'edge_request_expired' ||
+          error?.code === 'edge_request_not_found') {
+        onInterrupted(error?.code === 'edge_request_cancelled' ? 'cancelled' : 'expired');
         cancellation.abort();
       }
     }

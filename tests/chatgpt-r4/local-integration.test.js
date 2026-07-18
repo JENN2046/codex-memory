@@ -84,6 +84,28 @@ test('R4-C reconnect reclaims an unacknowledged request only after the claim lea
   });
 });
 
+test('R4-C never requeues an acknowledged in-flight request after its claim lease expires', async t => {
+  const harness = await createLocalIntegrationHarness({
+    claimLeaseMs: 50,
+    governanceDelayMs: 150,
+    cancelPollMs: 2
+  });
+  t.after(() => harness.close());
+  const request = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  });
+  await harness.edgeClient.submit(request);
+  const processing = harness.relayRuntime.processNext();
+  await waitFor(() => harness.relayEvents.some(event => event.event === 'uds_forward_started'));
+  harness.advance(51);
+  const result = await processing;
+  assert.equal(result.status, 'expired');
+  assert.equal(await harness.edgeClient.claim('second-relay'), null);
+  assert.equal((await harness.edgeClient.result(request.request_id)).status, 'expired');
+  assert.equal(harness.observations.uds_connections, 1);
+  assert.equal(harness.observations.governance_invocations, 0);
+});
+
 test('R4-C rejects duplicate submission and duplicate claim acknowledgement as replay', async t => {
   const harness = await createLocalIntegrationHarness();
   t.after(() => harness.close());
@@ -96,6 +118,8 @@ test('R4-C rejects duplicate submission and duplicate claim acknowledgement as r
   await harness.edgeClient.acknowledge(claim);
   await assert.rejects(() => harness.edgeClient.acknowledge(claim), { code: 'edge_claim_ack_replay' });
   await harness.edgeClient.cancel(request.request_id);
+  harness.advance(5_001);
+  await assert.rejects(() => harness.edgeClient.submit(request), { code: 'replay_detected' });
   assert.equal(harness.observations.uds_connections, 0);
 });
 

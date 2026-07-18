@@ -47,8 +47,8 @@ static gate.
 
 ## Integration Proof
 
-The focused R4 matrix passes 30 tests: 23 retained R4-B contract/synthetic
-checks and 7 R4-C runtime integration checks. R4-C proves:
+The focused R4 matrix passes 31 tests: 23 retained R4-B contract/synthetic
+checks and 8 R4-C runtime integration checks. R4-C proves:
 
 ```yaml
 actual_loopback_http: pass
@@ -91,8 +91,8 @@ raw_disclosure: false
 Validation on the final local diff:
 
 ```text
-focused R4-B/R4-C matrix: 30/30 pass
-npm test -- --summary:     5756 pass, 0 fail, 8 skip
+focused R4-B/R4-C matrix: 31/31 pass
+npm test -- --summary:     5757 pass, 0 fail, 8 skip
 npm run test:hardening:    97/97 + 6/6 pass
 architecture validator:    pass
 import-fence validator:    pass

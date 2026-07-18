@@ -3,6 +3,7 @@
 const http = require('node:http');
 
 const {
+  InMemoryReplayGuard,
   LIMITS,
   createOpaqueId,
   reject
@@ -39,6 +40,10 @@ function createLoopbackEdgeRuntime({
   if (eventSink !== undefined && typeof eventSink !== 'function') reject('edge_event_sink_invalid');
 
   const records = new Map();
+  const submissionReplayGuard = new InMemoryReplayGuard({
+    maxEntries: maxRecords * 2,
+    clock
+  });
   let started = false;
 
   function emit(event, record, extra = {}) {
@@ -71,9 +76,11 @@ function createLoopbackEdgeRuntime({
       return;
     }
     if (record.status === 'claimed' && record.claim.expires_ms <= currentMs) {
-      record.status = 'queued';
+      const acknowledged = record.claim.acked;
+      record.status = acknowledged ? 'expired' : 'queued';
       record.claim = null;
-      emit('claim_expired', record);
+      if (acknowledged) record.purge_after_ms = currentMs + terminalRetentionMs;
+      emit(acknowledged ? 'acknowledged_claim_expired' : 'claim_expired', record);
     }
   }
 
@@ -116,6 +123,10 @@ function createLoopbackEdgeRuntime({
       return !TERMINAL_STATES.has(record.status);
     }).length;
     if (activeCount >= maxInFlight) reject('edge_inflight_capacity_exceeded');
+    submissionReplayGuard.consumeMany([
+      { namespace: 'edge_submission_request_id', key: request.request_id, expiresAt: request.expires_at },
+      { namespace: 'edge_submission_nonce', key: request.nonce, expiresAt: request.expires_at }
+    ]);
     const record = {
       request: structuredClone(request),
       response: null,
