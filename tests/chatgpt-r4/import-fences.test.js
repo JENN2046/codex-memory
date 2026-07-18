@@ -8,6 +8,7 @@ const {
   ROOTS,
   extractImports,
   validateComponentSource,
+  validateNotActivated,
   validateImportFences
 } = require('../../scripts/validate_chatgpt_r4_import_fences');
 
@@ -20,6 +21,19 @@ test('R4-B import fences accept the candidate packages without activating them',
   assert.deepEqual(result.components.map(component => component.component), [
     'contracts', 'edge', 'relay', 'widget', 'governance'
   ]);
+
+  const runtimeRoot = path.join('/synthetic-runtime', 'src');
+  const sources = new Map([
+    [path.join(runtimeRoot, 'index.js'), "require('./app')"],
+    [path.join(runtimeRoot, 'app.js'), "require('./core/runtime')"],
+    [path.join(runtimeRoot, 'core', 'runtime.js'), "require('../../../apps/chatgpt-edge')"]
+  ]);
+  assert.throws(() => validateNotActivated({
+    runtimeRoot,
+    entrypoints: [path.join(runtimeRoot, 'index.js')],
+    readFileSync: file => sources.get(file),
+    fileExists: file => sources.has(file)
+  }), /candidate_runtime_activated:src\/core\/runtime\.js/);
 });
 
 test('public Edge cannot import local config, storage, recall, or arbitrary packages', () => {

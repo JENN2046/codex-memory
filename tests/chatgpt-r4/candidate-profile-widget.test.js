@@ -79,4 +79,18 @@ test('widget DTO renders only safe scope status and bridge uses tools/call', () 
     visibilityLabels: ['private'],
     receiptStatus: 'bound'
   }), { code: 'widget_visibility_labels_invalid' });
+  for (const safeProjectAlias of ['project alpha', '<project>', 'project/alpha']) {
+    assert.throws(() => createMemoryScopeDto({
+      safeProjectAlias,
+      contextStatus: 'resolved',
+      expiresAt: '2026-07-18T00:05:00.000Z',
+      visibilityLabels: ['project'],
+      receiptStatus: 'bound'
+    }), { code: 'widget_project_alias_invalid' });
+  }
+  assert.throws(() => parseToolResultNotification({
+    jsonrpc: '2.0',
+    method: 'ui/notifications/tool-result',
+    params: { structuredContent: { scope: { ...dto, safe_project_alias: 'project alpha' } } }
+  }), { code: 'widget_project_alias_invalid' });
 });

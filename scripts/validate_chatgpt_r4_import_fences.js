@@ -37,6 +37,7 @@ const COMPONENT_POLICIES = Object.freeze({
 });
 
 const JS_GAP = String.raw`(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\r\n]*(?:\r?\n|$))*`;
+const CANDIDATE_RUNTIME_PATTERN = /(?:^|\/)(?:chatgpt-r4(?:-contracts)?|chatgpt-edge|local-recall-relay|(?:chatgpt-)?memory-scope-widget)(?:\/|$)/u;
 
 const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
   { pattern: new RegExp(String.raw`\bprocess${JS_GAP}(?:\.|\[)`, 'u'), code: 'runtime_process_access' },
@@ -129,6 +130,39 @@ function resolveImport(file, specifier) {
   return { file: path.resolve(path.dirname(file), specifier) };
 }
 
+function extractStaticRuntimeImports(source) {
+  const imports = [];
+  const patterns = [
+    new RegExp(String.raw`\brequire${JS_GAP}\(${JS_GAP}['"]([^'"]+)['"]${JS_GAP}\)`, 'gu'),
+    /\bfrom\s+['"]([^'"]+)['"]/gu,
+    /\bimport\s+['"]([^'"]+)['"]/gu,
+    new RegExp(String.raw`\bimport${JS_GAP}\(${JS_GAP}['"]([^'"]+)['"]${JS_GAP}\)`, 'gu')
+  ];
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern)) imports.push(match[1]);
+  }
+  return [...new Set(imports)].sort();
+}
+
+function isFile(file) {
+  try {
+    return fs.statSync(file).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function resolveRuntimeModuleFile(file, specifier, { fileExists = isFile } = {}) {
+  if (!specifier.startsWith('.') && !specifier.startsWith('/')) return null;
+  const base = path.resolve(path.dirname(file), specifier);
+  const candidates = [base];
+  if (!/\.(?:cjs|js|mjs)$/u.test(base)) {
+    candidates.push(`${base}.js`, `${base}.cjs`, `${base}.mjs`);
+    candidates.push(path.join(base, 'index.js'), path.join(base, 'index.cjs'), path.join(base, 'index.mjs'));
+  }
+  return candidates.find(candidate => fileExists(candidate)) || null;
+}
+
 function validateComponent(component, root = ROOTS[component]) {
   const files = walkFiles(root);
   const imports = [];
@@ -192,18 +226,30 @@ function validateBoundaryManifests() {
   }
 }
 
-function validateNotActivated() {
-  const activeEntrypoints = [
-    path.join(ROOT, 'src', 'index.js'),
-    path.join(ROOT, 'src', 'http-index.js'),
-    path.join(ROOT, 'src', 'app.js')
-  ].filter(fs.existsSync);
-  for (const file of activeEntrypoints) {
-    const source = fs.readFileSync(file, 'utf8');
-    if (/chatgpt-r4|chatgpt-edge|local-recall-relay|memory-scope-widget/u.test(source)) {
-      throw new Error(`candidate_runtime_activated:${path.relative(ROOT, file)}`);
+function validateNotActivated({
+  runtimeRoot = path.join(ROOT, 'src'),
+  entrypoints = [path.join(runtimeRoot, 'index.js'), path.join(runtimeRoot, 'http-index.js')],
+  readFileSync = file => fs.readFileSync(file, 'utf8'),
+  fileExists = isFile
+} = {}) {
+  const queue = entrypoints.filter(fileExists);
+  const visited = new Set();
+  while (queue.length > 0) {
+    const file = queue.shift();
+    if (visited.has(file)) continue;
+    visited.add(file);
+    const source = readFileSync(file);
+    for (const specifier of extractStaticRuntimeImports(source)) {
+      const resolved = resolveRuntimeModuleFile(file, specifier, { fileExists });
+      if (CANDIDATE_RUNTIME_PATTERN.test(specifier) ||
+          (resolved && CANDIDATE_RUNTIME_PATTERN.test(resolved.split(path.sep).join('/')))) {
+        const relativeFile = path.relative(path.dirname(runtimeRoot), file).split(path.sep).join('/');
+        throw new Error(`candidate_runtime_activated:${relativeFile}:${specifier}`);
+      }
+      if (resolved && isWithin(resolved, runtimeRoot) && !visited.has(resolved)) queue.push(resolved);
     }
   }
+  return { entrypointCount: entrypoints.length, moduleCount: visited.size };
 }
 
 function validateImportFences() {
@@ -237,6 +283,8 @@ module.exports = {
   ROOTS,
   COMPONENT_POLICIES,
   extractImports,
+  extractStaticRuntimeImports,
+  resolveRuntimeModuleFile,
   validateComponentSource,
   validateComponent,
   validateBoundaryManifests,

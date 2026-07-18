@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const test = require('node:test');
 
 const {
+  DATA_TOOL_NAMES,
   InMemoryReplayGuard,
   PRINCIPAL_ASSERTION_SCHEMA,
   PROJECT_CONTEXT_CLAIM_SCHEMA,
@@ -58,6 +59,16 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   }
   assert.equal(PRINCIPAL_ASSERTION_SCHEMA.properties.oauth_version.const, '2.1');
   assert.equal(PROJECT_CONTEXT_CLAIM_SCHEMA.properties.client_id.const, 'ChatGPT');
+  const requestVariants = REQUEST_ENVELOPE_SCHEMA.properties.tool_request.oneOf;
+  assert.deepEqual(requestVariants.map(variant => variant.properties.name.const), DATA_TOOL_NAMES);
+  assert.equal(requestVariants.every(variant => variant.additionalProperties === false), true);
+  assert.equal(requestVariants.every(variant => variant.properties.arguments.additionalProperties === false), true);
+  const searchRequest = requestVariants.find(variant => variant.properties.name.const === 'search_memory');
+  assert.deepEqual(searchRequest.properties.arguments.required, ['project_context_ref', 'query']);
+  assert.equal(searchRequest.properties.arguments.properties.limit.maximum, 8);
+  assert.equal(requestVariants.some(variant => variant.properties.name.const === 'record_memory'), false);
+  assert.deepEqual(RESPONSE_ENVELOPE_SCHEMA.properties.tool_name.enum, DATA_TOOL_NAMES);
+  assert.equal(WIDGET_DTO_SCHEMA.properties.safe_project_alias.pattern, '^[A-Za-z0-9][A-Za-z0-9._-]*$');
 });
 
 test('canonical JSON and digests are stable across key order', () => {

@@ -58,7 +58,7 @@ const toolDescriptors = deepFreeze({
       required: ['project_context_ref', 'safe_project_alias', 'expires_at', 'visibility_labels', 'context_status'],
       properties: {
         project_context_ref: { type: 'string' },
-        safe_project_alias: { type: 'string' },
+        safe_project_alias: { type: 'string', pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' },
         expires_at: { type: 'string' },
         visibility_labels: { type: 'array', items: { type: 'string' } },
         context_status: { const: 'resolved' }

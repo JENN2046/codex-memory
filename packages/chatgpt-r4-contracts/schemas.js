@@ -1,7 +1,82 @@
 'use strict';
 
 const { deepFreeze } = require('./canonical');
-const { ARCHITECTURE_REFERENCE, KINDS, SCHEMA_VERSION, ZERO_MEMORY_COUNTER_KEYS } = require('./constants');
+const {
+  ARCHITECTURE_REFERENCE,
+  CONTEXT_VISIBILITIES,
+  DATA_TOOL_NAMES,
+  KINDS,
+  LIMITS,
+  SCHEMA_VERSION,
+  ZERO_MEMORY_COUNTER_KEYS
+} = require('./constants');
+
+const projectContextReference = {
+  type: 'string',
+  pattern: '^pctx_[A-Za-z0-9_-]{32,96}$'
+};
+
+function exactArguments({ required, properties }) {
+  return {
+    type: 'object',
+    additionalProperties: false,
+    required,
+    properties
+  };
+}
+
+function toolRequest(name, argumentsSchema) {
+  return {
+    type: 'object',
+    additionalProperties: false,
+    required: ['name', 'arguments'],
+    properties: {
+      name: { const: name },
+      arguments: argumentsSchema
+    }
+  };
+}
+
+const toolRequestVariants = [
+  toolRequest('resolve_memory_context', exactArguments({
+    required: ['project_alias'],
+    properties: {
+      project_alias: {
+        type: 'string',
+        minLength: 1,
+        maxLength: LIMITS.maxProjectAliasCharacters,
+        pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$'
+      },
+      requested_visibility: { enum: CONTEXT_VISIBILITIES }
+    }
+  })),
+  toolRequest('memory_overview', exactArguments({
+    required: ['project_context_ref'],
+    properties: { project_context_ref: projectContextReference }
+  })),
+  toolRequest('search_memory', exactArguments({
+    required: ['project_context_ref', 'query'],
+    properties: {
+      project_context_ref: projectContextReference,
+      query: { type: 'string', minLength: 1, maxLength: LIMITS.maxQueryCharacters },
+      limit: { type: 'integer', minimum: 1, maximum: LIMITS.maxResultLimit }
+    }
+  })),
+  toolRequest('audit_memory', exactArguments({
+    required: ['project_context_ref'],
+    properties: {
+      project_context_ref: projectContextReference,
+      event_limit: { type: 'integer', minimum: 1, maximum: LIMITS.maxResultLimit }
+    }
+  })),
+  toolRequest('prepare_memory_context', exactArguments({
+    required: ['project_context_ref'],
+    properties: {
+      project_context_ref: projectContextReference,
+      task_summary: { type: 'string', minLength: 1, maxLength: LIMITS.maxQueryCharacters }
+    }
+  }))
+];
 
 const signature = {
   type: 'object',
@@ -93,12 +168,7 @@ const REQUEST_ENVELOPE_SCHEMA = deepFreeze({
     expires_at: { type: 'string', format: 'date-time' },
     nonce: { type: 'string', minLength: 16, maxLength: 120 },
     principal_assertion: PRINCIPAL_ASSERTION_SCHEMA,
-    tool_request: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['name', 'arguments'],
-      properties: { name: { type: 'string' }, arguments: { type: 'object' } }
-    },
+    tool_request: { oneOf: toolRequestVariants },
     signature
   }
 });
@@ -119,7 +189,7 @@ const RESPONSE_ENVELOPE_SCHEMA = deepFreeze({
     response_id: { type: 'string', pattern: '^res_[A-Za-z0-9_-]{24,96}$' },
     request_id: { type: 'string' },
     request_digest: { type: 'string', pattern: '^sha256:[a-f0-9]{64}$' },
-    tool_name: { type: 'string' },
+    tool_name: { enum: DATA_TOOL_NAMES },
     status: { enum: ['ok', 'denied', 'unavailable'] },
     issued_at: { type: 'string', format: 'date-time' },
     expires_at: { type: 'string', format: 'date-time' },
@@ -149,7 +219,12 @@ const WIDGET_DTO_SCHEMA = deepFreeze({
   required: ['schema_version', 'safe_project_alias', 'context_status', 'expires_at', 'visibility_labels', 'receipt_status'],
   properties: {
     schema_version: { const: SCHEMA_VERSION },
-    safe_project_alias: { type: 'string', minLength: 1, maxLength: 80 },
+    safe_project_alias: {
+      type: 'string',
+      minLength: 1,
+      maxLength: LIMITS.maxProjectAliasCharacters,
+      pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$'
+    },
     context_status: { enum: ['resolved', 'missing', 'expired', 'denied'] },
     expires_at: { type: ['string', 'null'], format: 'date-time' },
     visibility_labels: {

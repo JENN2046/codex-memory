@@ -437,7 +437,11 @@ function validateWidgetDto(dto) {
     'visibility_labels', 'receipt_status'
   ], 'widget_dto_shape_invalid');
   if (dto.schema_version !== SCHEMA_VERSION) reject('widget_dto_schema_version_invalid');
-  assertString(dto.safe_project_alias, { code: 'widget_project_alias_invalid', max: LIMITS.maxProjectAliasCharacters });
+  assertString(dto.safe_project_alias, {
+    code: 'widget_project_alias_invalid',
+    max: LIMITS.maxProjectAliasCharacters,
+    pattern: /^[A-Za-z0-9][A-Za-z0-9._-]*$/u
+  });
   if (!['resolved', 'missing', 'expired', 'denied'].includes(dto.context_status)) reject('widget_context_status_invalid');
   if (dto.expires_at !== null) parseTime(dto.expires_at, 'widget_expiry_invalid');
   if (!Array.isArray(dto.visibility_labels) || new Set(dto.visibility_labels).size !== dto.visibility_labels.length ||
