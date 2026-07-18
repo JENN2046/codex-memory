@@ -41,6 +41,7 @@ async function createLocalIntegrationHarness({
   terminalRetentionMs = 5_000,
   governanceDelayMs = 0,
   responseVerificationDelayMs = 0,
+  edgeTimeoutMs = 5_000,
   cancelPollMs = 5
 } = {}) {
   let nowMs = R4C_FIXED_NOW.getTime();
@@ -209,6 +210,7 @@ async function createLocalIntegrationHarness({
     requestReplayGuard: new InMemoryReplayGuard({ clock }),
     responseSigning: signing(relayIdentity),
     clock,
+    edgeTimeoutMs,
     cancelPollMs,
     udsTimeoutMs: 2_000,
     eventSink: event => relayEvents.push(event)

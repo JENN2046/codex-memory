@@ -168,6 +168,21 @@ test('R4-C completion cannot overwrite cancellation during asynchronous response
   assert.equal(harness.observations.governance_invocations, 0);
 });
 
+test('R4-C Relay waits for asynchronous Edge completion beyond the former one-second ceiling', async t => {
+  const harness = await createLocalIntegrationHarness({
+    responseVerificationDelayMs: 1_100
+  });
+  t.after(() => harness.close());
+  const request = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  });
+  await harness.edgeClient.submit(request);
+  const result = await harness.relayRuntime.processNext();
+  assert.equal(result.status, 'completed');
+  assert.equal((await harness.edgeClient.result(request.request_id)).status, 'completed');
+  assert.equal(harness.observations.context_resolutions, 1);
+});
+
 test('R4-C rejects completion before ack and a signed response with the wrong request correlation', async t => {
   const harness = await createLocalIntegrationHarness();
   t.after(() => harness.close());

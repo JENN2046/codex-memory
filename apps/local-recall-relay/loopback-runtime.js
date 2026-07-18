@@ -20,6 +20,7 @@ function createLoopbackRelayRuntime({
   responseSigning,
   clock = () => new Date(),
   cancelPollMs = 10,
+  edgeTimeoutMs = 5_000,
   udsTimeoutMs = 2_000,
   eventSink
 } = {}) {
@@ -27,7 +28,7 @@ function createLoopbackRelayRuntime({
     reject('relay_cancel_poll_invalid');
   }
   if (eventSink !== undefined && typeof eventSink !== 'function') reject('relay_event_sink_invalid');
-  const edge = createLoopbackEdgeClient(edgeUrl);
+  const edge = createLoopbackEdgeClient(edgeUrl, { timeoutMs: edgeTimeoutMs });
   const udsForwarder = createUdsForwarder({ socketPath, timeoutMs: udsTimeoutMs });
   const replayGuard = requestReplayGuard || new InMemoryReplayGuard({ clock });
 
