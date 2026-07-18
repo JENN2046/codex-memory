@@ -112,6 +112,8 @@ test('dynamic imports, runtime config, listeners, body logs, and durable writes 
   for (const source of [
     'const value = process.env.SECRET_REFERENCE;',
     'const value = process/*comment*/.env.SECRET_REFERENCE;',
+    'const value = process?.env.SECRET_REFERENCE;',
+    "const value = process?.['env'].SECRET_REFERENCE;",
     "eval('require')('node:fs');",
     String.raw`requ\u0069re('node:fs');`,
     'server.listen(8080);',

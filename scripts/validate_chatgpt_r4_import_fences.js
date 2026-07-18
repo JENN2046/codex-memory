@@ -40,7 +40,10 @@ const JS_GAP = String.raw`(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\r\n]*(?:\r?\n|$))*`;
 const CANDIDATE_RUNTIME_PATTERN = /(?:^|\/)(?:chatgpt-r4(?:-contracts)?|chatgpt-edge|local-recall-relay|(?:chatgpt-)?memory-scope-widget)(?:\/|$)/u;
 
 const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
-  { pattern: new RegExp(String.raw`\bprocess${JS_GAP}(?:\.|\[)`, 'u'), code: 'runtime_process_access' },
+  {
+    pattern: new RegExp(String.raw`\bprocess${JS_GAP}(?:\?${JS_GAP}\.|\.|\[)`, 'u'),
+    code: 'runtime_process_access'
+  },
   {
     pattern: new RegExp(String.raw`\b(?:eval|Function)${JS_GAP}(?:\?${JS_GAP}\.)?${JS_GAP}\(`, 'u'),
     code: 'runtime_code_generation'
