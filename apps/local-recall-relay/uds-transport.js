@@ -29,7 +29,7 @@ function createUdsForwarder({
     return new Promise((resolve, rejectForward) => {
       let settled = false;
       let bytes = 0;
-      let text = '';
+      const chunks = [];
       const socket = net.createConnection({ path: socketPath });
       const timer = setTimeout(() => fail('relay_uds_timeout'), timeoutMs);
 
@@ -63,10 +63,11 @@ function createUdsForwarder({
           fail('relay_uds_response_too_large');
           return;
         }
-        text += chunk.toString('utf8');
+        chunks.push(chunk);
       });
       socket.on('end', () => {
         if (settled) return;
+        const text = Buffer.concat(chunks, bytes).toString('utf8');
         const newline = text.indexOf('\n');
         if (newline === -1) {
           fail('relay_uds_response_incomplete');

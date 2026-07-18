@@ -29,7 +29,8 @@ The Edge listener is statically and dynamically bound to `127.0.0.1` with port
 responses exist only in bounded process memory. It has no config, filesystem,
 storage, provider, VCP, mapping, diary, or body-logging import.
 
-The Relay accepts only an exact `http://127.0.0.1:<port>/` Edge URL. It claims
+The Relay accepts only the canonical `http://127.0.0.1:<port>` Edge origin,
+with or without its normalized root-path `/`. It claims
 and acknowledges work over loopback HTTP, forwards the already validated
 signed envelope over an explicitly injected temporary UDS, and returns the
 signed response to the Edge. It owns no scope authorization, mapping, storage,
@@ -47,8 +48,8 @@ static gate.
 
 ## Integration Proof
 
-The focused R4 matrix passes 31 tests: 23 retained R4-B contract/synthetic
-checks and 8 R4-C runtime integration checks. R4-C proves:
+The focused R4 matrix passes 33 tests: 23 retained R4-B contract/synthetic
+checks and 10 R4-C runtime integration checks. R4-C proves:
 
 ```yaml
 actual_loopback_http: pass
@@ -63,6 +64,8 @@ duplicate_ack_rejected: pass
 inflight_cancellation_before_governance_invocation: pass
 response_request_correlation: pass
 non_loopback_edge_rejected_before_network: pass
+normalized_loopback_root_url: pass
+uds_split_multibyte_utf8: pass
 body_log_absence: pass
 candidate_activated: false
 external_runtime_used: false
@@ -91,8 +94,8 @@ raw_disclosure: false
 Validation on the final local diff:
 
 ```text
-focused R4-B/R4-C matrix: 31/31 pass
-npm test -- --summary:     5757 pass, 0 fail, 8 skip
+focused R4-B/R4-C matrix: 33/33 pass
+npm test -- --summary:     5759 pass, 0 fail, 8 skip
 npm run test:hardening:    97/97 + 6/6 pass
 architecture validator:    pass
 import-fence validator:    pass

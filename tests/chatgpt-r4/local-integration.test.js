@@ -1,6 +1,10 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const net = require('node:net');
+const os = require('node:os');
+const path = require('node:path');
 const test = require('node:test');
 
 const {
@@ -9,7 +13,10 @@ const {
   digestObject,
   sha256
 } = require('../../packages/chatgpt-r4-contracts');
-const { createLoopbackEdgeClient } = require('../../apps/local-recall-relay');
+const {
+  createLoopbackEdgeClient,
+  createUdsForwarder
+} = require('../../apps/local-recall-relay');
 const { signing } = require('./synthetic-harness');
 const {
   createLocalIntegrationHarness,
@@ -187,6 +194,36 @@ test('R4-C Relay client rejects non-loopback Edge URLs before any network call',
   ]) {
     assert.throws(() => createLoopbackEdgeClient(value), { code: 'relay_edge_not_loopback' });
   }
+});
+
+test('R4-C Relay client accepts either canonical spelling of the loopback root URL', () => {
+  assert.doesNotThrow(() => createLoopbackEdgeClient('http://127.0.0.1:8080'));
+  assert.doesNotThrow(() => createLoopbackEdgeClient('http://127.0.0.1:8080/'));
+});
+
+test('R4-C UDS forwarding preserves UTF-8 split across socket chunks', async t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4c-utf8-'));
+  const socketPath = path.join(directory, 'governance.sock');
+  const expected = { status: 'ok', structured_content: { summary: '受治理记忆' } };
+  const encoded = Buffer.from(`${JSON.stringify(expected)}\n`, 'utf8');
+  const multibyteStart = encoded.indexOf(Buffer.from('受', 'utf8'));
+  const server = net.createServer(socket => {
+    socket.once('data', () => {
+      socket.write(encoded.subarray(0, multibyteStart + 1));
+      setImmediate(() => socket.end(encoded.subarray(multibyteStart + 1)));
+    });
+  });
+  t.after(async () => {
+    await new Promise(resolve => server.close(resolve));
+    fs.rmSync(directory, { recursive: true, force: true });
+  });
+  await new Promise((resolve, rejectListen) => {
+    server.once('error', rejectListen);
+    server.listen(socketPath, resolve);
+  });
+
+  const forward = createUdsForwarder({ socketPath });
+  assert.deepEqual(await forward({ request: 'synthetic' }), expected);
 });
 
 async function waitFor(predicate, timeoutMs = 1_000) {

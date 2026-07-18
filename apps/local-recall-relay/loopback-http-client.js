@@ -56,7 +56,8 @@ function validateLoopbackUrl(value) {
       parsed.username || parsed.password || parsed.pathname !== '/' || parsed.search || parsed.hash) {
     reject('relay_edge_not_loopback');
   }
-  if (value !== `http://127.0.0.1:${parsed.port}`) reject('relay_edge_not_loopback');
+  const canonical = `http://127.0.0.1:${parsed.port}`;
+  if (value !== canonical && value !== `${canonical}/`) reject('relay_edge_not_loopback');
   return parsed;
 }
 
