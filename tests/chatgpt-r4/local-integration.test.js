@@ -72,6 +72,30 @@ test('R4-C request expiry fails closed before claim or UDS forwarding', async t 
   });
 });
 
+test('R4-C first stale lookup and snapshot purge untouched records past retention', async t => {
+  const harness = await createLocalIntegrationHarness({ terminalRetentionMs: 50 });
+  t.after(() => harness.close());
+  const lookupRecord = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  }, { ttlSeconds: 1 });
+  await harness.edgeClient.submit(lookupRecord);
+  harness.advance(1_051);
+  await assert.rejects(() => harness.edgeClient.result(lookupRecord.request_id), {
+    code: 'edge_request_not_found'
+  });
+
+  const snapshotRecord = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  }, { ttlSeconds: 1 });
+  await harness.edgeClient.submit(snapshotRecord);
+  harness.advance(1_051);
+  assert.deepEqual(harness.edgeRuntime.snapshot(), {
+    in_memory_only: true,
+    request_count: 0,
+    states: { queued: 0, claimed: 0, completed: 0, cancelled: 0, expired: 0 }
+  });
+});
+
 test('R4-C submit refreshes and prunes untouched expired records before capacity enforcement', async t => {
   const harness = await createLocalIntegrationHarness({
     maxInFlight: 1,

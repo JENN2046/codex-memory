@@ -95,11 +95,15 @@ function createLoopbackEdgeRuntime({
     }
   }
 
-  function requireRecord(requestId) {
+  function refreshAndPrune() {
+    for (const record of records.values()) refresh(record);
     pruneTerminals();
+  }
+
+  function requireRecord(requestId) {
+    refreshAndPrune();
     const record = records.get(requestId);
     if (!record) reject('edge_request_not_found');
-    refresh(record);
     return record;
   }
 
@@ -117,8 +121,7 @@ function createLoopbackEdgeRuntime({
 
   async function submit(request) {
     await verifyRequest(request);
-    for (const record of records.values()) refresh(record);
-    pruneTerminals();
+    refreshAndPrune();
     if (records.has(request.request_id)) reject('replay_detected');
     if (records.size >= maxRecords) reject('edge_record_capacity_exceeded');
     const activeCount = [...records.values()].filter(record => {
@@ -147,9 +150,8 @@ function createLoopbackEdgeRuntime({
     if (typeof relayId !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/u.test(relayId)) {
       reject('edge_relay_id_invalid');
     }
-    pruneTerminals();
+    refreshAndPrune();
     for (const record of records.values()) {
-      refresh(record);
       if (record.status !== 'queued') continue;
       const expiresMs = nowMs() + claimLeaseMs;
       record.status = 'claimed';
@@ -317,10 +319,9 @@ function createLoopbackEdgeRuntime({
       started = false;
     },
     snapshot() {
-      pruneTerminals();
+      refreshAndPrune();
       const counts = { queued: 0, claimed: 0, completed: 0, cancelled: 0, expired: 0 };
       for (const record of records.values()) {
-        refresh(record);
         counts[record.status] += 1;
       }
       return Object.freeze({ in_memory_only: true, request_count: records.size, states: counts });
