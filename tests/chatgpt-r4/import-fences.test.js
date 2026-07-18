@@ -6,6 +6,7 @@ const test = require('node:test');
 
 const {
   ROOTS,
+  discoverPackageRuntimeEntrypoints,
   extractImports,
   validateComponentSource,
   validateNotActivated,
@@ -18,6 +19,10 @@ test('R4-B import fences accept the candidate packages without activating them',
   assert.equal(result.candidateActivated, false);
   assert.equal(result.externalRuntimeUsed, false);
   assert.equal(result.durableRemoteStateAllowed, false);
+  const packageEntrypoints = discoverPackageRuntimeEntrypoints();
+  assert.equal(result.activationEntrypointCount, packageEntrypoints.length);
+  assert.equal(packageEntrypoints.some(file => file.endsWith('/src/cli/provider-smoke.js')), true);
+  assert.equal(packageEntrypoints.some(file => file.endsWith('/scripts/verify-frozen-evidence-manifest.js')), true);
   assert.deepEqual(result.components.map(component => component.component), [
     'contracts', 'edge', 'relay', 'widget', 'governance'
   ]);
@@ -132,6 +137,11 @@ test('dynamic imports, runtime config, listeners, body logs, and durable writes 
     "const network = globalThis['fetch']; network('https://example.invalid');",
     "globalThis['XMLHttpRequest']();",
     "const network = fetch; network('https://example.invalid');",
+    "new WebSocket('wss://example.invalid');",
+    "new EventSource('https://example.invalid/events');",
+    "navigator.sendBeacon('https://example.invalid', 'synthetic');",
+    "({}).constructor.constructor('return 1')();",
+    "({})['constructor']['constructor']('return 1')();",
     "eval('require')('node:fs');",
     String.raw`requ\u0069re('node:fs');`,
     'server.listen(8080);',

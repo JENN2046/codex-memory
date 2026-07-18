@@ -4,6 +4,7 @@ const {
   DATA_TOOL_NAMES,
   RENDER_TOOL_NAMES,
   CONTEXT_VISIBILITIES,
+  RESULT_REF_PATTERN_SOURCE,
   WIDGET_RESOURCE_URI,
   WIDGET_DTO_SCHEMA,
   deepFreeze
@@ -103,7 +104,7 @@ const toolDescriptors = deepFreeze({
             additionalProperties: false,
             required: ['result_ref', 'summary', 'relevance'],
             properties: {
-              result_ref: { type: 'string' },
+              result_ref: { type: 'string', pattern: RESULT_REF_PATTERN_SOURCE },
               summary: { type: 'string' },
               relevance: { type: 'number', minimum: 0, maximum: 1 }
             }

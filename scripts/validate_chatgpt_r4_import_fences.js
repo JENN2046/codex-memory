@@ -38,6 +38,12 @@ const COMPONENT_POLICIES = Object.freeze({
 
 const JS_GAP = String.raw`(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\r\n]*(?:\r?\n|$))*`;
 const CANDIDATE_RUNTIME_PATTERN = /(?:^|\/)(?:chatgpt-r4(?:-contracts)?|chatgpt-edge|local-recall-relay|(?:chatgpt-)?memory-scope-widget)(?:\/|$)/u;
+const ACTIVE_RUNTIME_DYNAMIC_REQUIRE_ALLOWLIST = Object.freeze({
+  'src/core/GovernedMcpVcpNativeVcpToolBoxMcpShim.js': Object.freeze({
+    knowledgeBaseManagerPath: 'KnowledgeBaseManager.js',
+    embeddingUtilsPath: 'EmbeddingUtils.js'
+  })
+});
 
 const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
   { pattern: /\bprocess\b/u, code: 'runtime_process_access' },
@@ -49,7 +55,10 @@ const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
     code: 'durable_file_mutation'
   },
   { pattern: /\b(?:createServer|listen)\b/u, code: 'service_listener' },
-  { pattern: /\b(?:fetch|XMLHttpRequest)\b/u, code: 'network_invocation' },
+  {
+    pattern: /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|WebTransport|RTCPeerConnection|navigator|sendBeacon|importScripts)\b/u,
+    code: 'network_invocation'
+  },
   { pattern: /\bconsole\b/u, code: 'body_log_risk' }
 ]);
 
@@ -248,14 +257,48 @@ function assertNoDynamicRuntimeImports(source, relativeFile) {
   });
   const requireReferenceCount = [...masked.matchAll(/\brequire\b/gu)].length;
   const literalRequireCalls = [...masked.matchAll(/\brequire\s*\(\s*['"]\s*['"]\s*\)/gu)].length;
+  const requireMainReferences = [...masked.matchAll(/\brequire\s*\.\s*main\b/gu)].length;
+  const allowedDynamicRequireCalls = countAllowedRuntimeDynamicRequireCalls({
+    source,
+    masked,
+    relativeFile
+  });
   const memberRequireUsed = /\.\s*require\s*(?:\?\s*\.\s*)?\(/u.test(masked) ||
     /\[\s*['"]require['"]\s*\]\s*(?:\?\s*\.\s*)?\(/u.test(bracketMasked);
   const importCalls = [...masked.matchAll(/\bimport\s*\(/gu)].length;
   const literalImportCalls = [...masked.matchAll(/\bimport\s*\(\s*['"]\s*['"]\s*\)/gu)].length;
-  if (requireReferenceCount !== literalRequireCalls || memberRequireUsed ||
+  if (requireReferenceCount !== literalRequireCalls + requireMainReferences + allowedDynamicRequireCalls ||
+      memberRequireUsed ||
       importCalls !== literalImportCalls) {
     throw new Error(`dynamic_import_forbidden:${relativeFile}`);
   }
+}
+
+function countAllowedRuntimeDynamicRequireCalls({ source, masked, relativeFile }) {
+  const bindings = ACTIVE_RUNTIME_DYNAMIC_REQUIRE_ALLOWLIST[relativeFile];
+  if (!bindings) return 0;
+  let allowedCalls = 0;
+  for (const [identifier, fixedFilename] of Object.entries(bindings)) {
+    const escapedIdentifier = identifier.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
+    const escapedFilename = fixedFilename.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
+    const identifierReferences = [...masked.matchAll(new RegExp(
+      String.raw`\b${escapedIdentifier}\b`,
+      'gu'
+    ))].length;
+    const bindingMatches = [...source.matchAll(new RegExp(
+      String.raw`\bconst\s+${escapedIdentifier}\s*=\s*path\.join\([^;]{0,240}['"]${escapedFilename}['"]\s*\);`,
+      'gu'
+    ))].length;
+    const requireCalls = [...masked.matchAll(new RegExp(
+      String.raw`\brequire\s*\(\s*${escapedIdentifier}\s*\)`,
+      'gu'
+    ))].length;
+    if (bindingMatches !== 1 || requireCalls !== 1 || identifierReferences !== 2) {
+      throw new Error(`dynamic_import_forbidden:${relativeFile}`);
+    }
+    allowedCalls += requireCalls;
+  }
+  return allowedCalls;
 }
 
 function isFile(file) {
@@ -293,8 +336,15 @@ function validateComponentSource(component, { file, source }) {
   if (!policy) throw new Error(`component_policy_missing:${component}`);
   const relativeFile = path.relative(ROOT, file).split(path.sep).join('/');
   const maskedSource = maskCommentsAndStringContents(source);
+  const bracketMaskedSource = maskCommentsAndStringContents(source, {
+    preserveBracketStringContents: true
+  });
   for (const rule of FORBIDDEN_RUNTIME_PATTERNS) {
     if (rule.pattern.test(maskedSource)) throw new Error(`${rule.code}:${relativeFile}`);
+  }
+  if (/\.\s*constructor\b/u.test(maskedSource) ||
+      /\[\s*['"]constructor['"]\s*\]/u.test(bracketMaskedSource)) {
+    throw new Error(`runtime_code_generation:${relativeFile}`);
   }
   const imports = [];
   for (const specifier of extractImports(source, relativeFile)) {
@@ -341,13 +391,38 @@ function validateBoundaryManifests() {
   }
 }
 
-function validateNotActivated({
-  runtimeRoot = path.join(ROOT, 'src'),
-  entrypoints = [path.join(runtimeRoot, 'index.js'), path.join(runtimeRoot, 'http-index.js')],
-  readFileSync = file => fs.readFileSync(file, 'utf8'),
+function discoverPackageRuntimeEntrypoints({
+  packageFile = path.join(ROOT, 'package.json'),
   fileExists = isFile
 } = {}) {
-  const queue = entrypoints.filter(fileExists);
+  const manifest = JSON.parse(fs.readFileSync(packageFile, 'utf8'));
+  const relativeEntrypoints = [];
+  if (typeof manifest.main === 'string') relativeEntrypoints.push(manifest.main);
+  if (typeof manifest.bin === 'string') relativeEntrypoints.push(manifest.bin);
+  if (manifest.bin && typeof manifest.bin === 'object') {
+    relativeEntrypoints.push(...Object.values(manifest.bin).filter(value => typeof value === 'string'));
+  }
+  for (const command of Object.values(manifest.scripts || {})) {
+    if (typeof command !== 'string') continue;
+    const pattern = /\bnode(?:\s+--[A-Za-z0-9=._:-]+)*\s+((?:\.\/)?(?:src|scripts)\/[A-Za-z0-9._/-]+\.js)\b/gu;
+    for (const match of command.matchAll(pattern)) relativeEntrypoints.push(match[1]);
+  }
+  const packageRoot = path.dirname(packageFile);
+  return [...new Set(relativeEntrypoints.map(relative => path.resolve(packageRoot, relative)))]
+    .filter(fileExists)
+    .sort();
+}
+
+function validateNotActivated({
+  runtimeRoot = path.join(ROOT, 'src'),
+  entrypoints,
+  readFileSync = file => fs.readFileSync(file, 'utf8'),
+  fileExists = isFile,
+  moduleRoot = path.dirname(runtimeRoot)
+} = {}) {
+  const activeEntrypoints = (entrypoints || discoverPackageRuntimeEntrypoints({ fileExists }))
+    .filter(fileExists);
+  const queue = [...activeEntrypoints];
   const visited = new Set();
   while (queue.length > 0) {
     const file = queue.shift();
@@ -362,21 +437,23 @@ function validateNotActivated({
           (resolved && CANDIDATE_RUNTIME_PATTERN.test(resolved.split(path.sep).join('/')))) {
         throw new Error(`candidate_runtime_activated:${relativeFile}:${specifier}`);
       }
-      if (resolved && isWithin(resolved, runtimeRoot) && !visited.has(resolved)) queue.push(resolved);
+      if (resolved && isWithin(resolved, moduleRoot) && !visited.has(resolved)) queue.push(resolved);
     }
   }
-  return { entrypointCount: entrypoints.length, moduleCount: visited.size };
+  return { entrypointCount: activeEntrypoints.length, moduleCount: visited.size };
 }
 
 function validateImportFences() {
   validateBoundaryManifests();
-  validateNotActivated();
+  const activation = validateNotActivated();
   const components = ['contracts', 'edge', 'relay', 'widget', 'governance'].map(component => validateComponent(component));
   return {
     accepted: true,
     stage: 'R4-B',
     components,
     candidateActivated: false,
+    activationEntrypointCount: activation.entrypointCount,
+    activationModuleCount: activation.moduleCount,
     externalRuntimeUsed: false,
     durableRemoteStateAllowed: false,
     publicToolSurfaceExpanded: false
@@ -403,6 +480,7 @@ module.exports = {
   maskCommentsAndStringContents,
   assertNoDynamicRuntimeImports,
   resolveRuntimeModuleFile,
+  discoverPackageRuntimeEntrypoints,
   validateComponentSource,
   validateComponent,
   validateBoundaryManifests,

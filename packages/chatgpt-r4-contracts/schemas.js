@@ -7,6 +7,7 @@ const {
   DATA_TOOL_NAMES,
   KINDS,
   LIMITS,
+  RESULT_REF_PATTERN_SOURCE,
   SCHEMA_VERSION,
   ZERO_MEMORY_COUNTER_KEYS
 } = require('./constants');
@@ -136,7 +137,7 @@ const toolResponseVariants = [
         items: exactArguments({
           required: ['result_ref', 'summary', 'relevance'],
           properties: {
-            result_ref: { type: 'string', minLength: 1, maxLength: 160 },
+            result_ref: { type: 'string', pattern: RESULT_REF_PATTERN_SOURCE },
             summary: { type: 'string', minLength: 1, maxLength: 4000 },
             relevance: { type: 'number', minimum: 0, maximum: 1 }
           }

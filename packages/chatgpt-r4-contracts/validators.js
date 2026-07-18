@@ -8,6 +8,7 @@ const {
   CONTEXT_VISIBILITIES,
   ZERO_MEMORY_COUNTER_KEYS,
   LIMITS,
+  RESULT_REF_PATTERN_SOURCE,
   FORBIDDEN_AUTHORITY_KEYS,
   FORBIDDEN_PUBLIC_DISCLOSURE_KEYS
 } = require('./constants');
@@ -19,6 +20,7 @@ const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 const CONTEXT_REF_PATTERN = /^pctx_[A-Za-z0-9_-]{32,96}$/u;
 const REQUEST_ID_PATTERN = /^req_[A-Za-z0-9_-]{24,96}$/u;
 const RESPONSE_ID_PATTERN = /^res_[A-Za-z0-9_-]{24,96}$/u;
+const RESULT_REF_PATTERN = new RegExp(RESULT_REF_PATTERN_SOURCE, 'u');
 const FORBIDDEN_PUBLIC_VALUE_PATTERNS = Object.freeze([
   /\bBearer\s+[A-Za-z0-9._~+/-]{16,}\b/iu,
   /\b(?:sk|rk)-(?:proj-)?[A-Za-z0-9_-]{16,}\b/u,
@@ -135,7 +137,8 @@ function validatePrincipalAssertion(assertion, {
   if (assertion.architecture_reference !== ARCHITECTURE_REFERENCE) reject('principal_architecture_invalid');
   assertHttpsUri(assertion.issuer, 'principal_issuer_invalid');
   assertHttpsUri(assertion.audience, 'principal_audience_invalid');
-  if (expectedAudience && assertion.audience !== expectedAudience) reject('principal_audience_mismatch');
+  assertHttpsUri(expectedAudience, 'principal_expected_audience_invalid');
+  if (assertion.audience !== expectedAudience) reject('principal_audience_mismatch');
   assertString(assertion.subject_fingerprint, {
     code: 'principal_fingerprint_invalid',
     max: 71,
@@ -379,7 +382,11 @@ function validateToolStructuredContent(toolName, content) {
     }
     for (const result of content.results) {
       assertExactKeys(result, ['result_ref', 'summary', 'relevance'], 'response_search_result_shape_invalid');
-      assertString(result.result_ref, { code: 'response_result_ref_invalid', max: 160 });
+      assertString(result.result_ref, {
+        code: 'response_result_ref_invalid',
+        max: 125,
+        pattern: RESULT_REF_PATTERN
+      });
       assertString(result.summary, { code: 'response_result_summary_invalid', max: 4000 });
       if (typeof result.relevance !== 'number' || !Number.isFinite(result.relevance) ||
           result.relevance < 0 || result.relevance > 1) {

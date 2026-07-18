@@ -11,6 +11,7 @@ const {
   PROJECT_CONTEXT_CLAIM_SCHEMA,
   REQUEST_ENVELOPE_SCHEMA,
   RESPONSE_ENVELOPE_SCHEMA,
+  RESULT_REF_PATTERN_SOURCE,
   WIDGET_DTO_SCHEMA,
   ZERO_MEMORY_COUNTERS,
   canonicalJson,
@@ -72,9 +73,15 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.deepEqual(responseVariants.map(variant => variant.properties.tool_name.const), DATA_TOOL_NAMES);
   const overviewResponse = responseVariants.find(variant =>
     variant.properties.tool_name.const === 'memory_overview');
+  const searchResponse = responseVariants.find(variant =>
+    variant.properties.tool_name.const === 'search_memory');
   assert.deepEqual(overviewResponse.properties.structured_content.required, ['status', 'kind', 'item_count']);
   assert.equal(overviewResponse.properties.structured_content.properties.kind.const, 'overview');
   assert.equal(overviewResponse.properties.structured_content.additionalProperties, false);
+  assert.equal(
+    searchResponse.properties.structured_content.properties.results.items.properties.result_ref.pattern,
+    RESULT_REF_PATTERN_SOURCE
+  );
   assert.equal(WIDGET_DTO_SCHEMA.properties.safe_project_alias.pattern, '^[A-Za-z0-9][A-Za-z0-9._-]*$');
 });
 
@@ -170,6 +177,10 @@ test('principal audience, expiry, and signature drift fail closed', () => {
     resolveRequestPublicKey: keyResolver(edge),
     consumeReplay: false
   };
+  assert.throws(() => validateRequestEnvelope(request, {
+    ...options,
+    now: FIXED_NOW
+  }), { code: 'principal_expected_audience_invalid' });
   assert.throws(() => validateRequestEnvelope(request, {
     ...options,
     now: FIXED_NOW,
@@ -361,8 +372,15 @@ test('response binds request, counters, receipts, and relay signature', () => {
   assert.doesNotThrow(() => validateToolStructuredContent('search_memory', {
     status: 'ok',
     result_count: 1,
-    results: [{ result_ref: 'result-1', summary: 'Synthetic summary', relevance: 0.9 }]
+    results: [{ result_ref: `mref_${'r'.repeat(24)}`, summary: 'Synthetic summary', relevance: 0.9 }]
   }));
+  for (const resultRef of ['/home/jenn/private.sqlite', '..\\private.sqlite', '../private.sqlite']) {
+    assert.throws(() => validateToolStructuredContent('search_memory', {
+      status: 'ok',
+      result_count: 1,
+      results: [{ result_ref: resultRef, summary: 'Synthetic summary', relevance: 0.9 }]
+    }), { code: 'response_result_ref_invalid' });
+  }
   assert.doesNotThrow(() => validateToolStructuredContent('audit_memory', {
     status: 'empty', kind: 'audit', item_count: 0
   }));
