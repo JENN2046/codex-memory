@@ -103,6 +103,10 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
     RESULT_REF_PATTERN_SOURCE
   );
   assert.equal(WIDGET_DTO_SCHEMA.properties.safe_project_alias.pattern, '^[A-Za-z0-9][A-Za-z0-9._-]*$');
+  assert.deepEqual(
+    WIDGET_DTO_SCHEMA.allOf[0].oneOf.map(variant => variant.properties.context_status),
+    [{ const: 'resolved' }, { enum: ['missing', 'denied'] }, { const: 'expired' }]
+  );
 });
 
 test('canonical JSON and digests are stable across key order', () => {

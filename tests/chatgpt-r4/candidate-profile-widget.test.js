@@ -96,6 +96,53 @@ test('widget DTO renders only safe scope status and bridge uses tools/call', () 
     visibilityLabels: ['private'],
     receiptStatus: 'bound'
   }), { code: 'widget_visibility_labels_invalid' });
+  for (const invalidResolved of [
+    { expiresAt: null, visibilityLabels: ['project'], receiptStatus: 'bound', code: 'widget_expiry_invalid' },
+    { expiresAt: '2026-07-18T00:05:00.000Z', visibilityLabels: [], receiptStatus: 'bound', code: 'widget_visibility_labels_invalid' },
+    { expiresAt: '2026-07-18T00:05:00.000Z', visibilityLabels: ['project'], receiptStatus: 'not_available', code: 'widget_receipt_status_invalid' }
+  ]) {
+    assert.throws(() => createMemoryScopeDto({
+      safeProjectAlias: 'project-alpha',
+      contextStatus: 'resolved',
+      expiresAt: invalidResolved.expiresAt,
+      visibilityLabels: invalidResolved.visibilityLabels,
+      receiptStatus: invalidResolved.receiptStatus
+    }), { code: invalidResolved.code });
+  }
+  for (const nonResolved of [
+    { contextStatus: 'missing', expiresAt: null, receiptStatus: 'not_available' },
+    { contextStatus: 'denied', expiresAt: null, receiptStatus: 'invalid' },
+    { contextStatus: 'expired', expiresAt: '2026-07-18T00:05:00.000Z', receiptStatus: 'invalid' }
+  ]) {
+    assert.doesNotThrow(() => createMemoryScopeDto({
+      safeProjectAlias: 'project-alpha',
+      contextStatus: nonResolved.contextStatus,
+      expiresAt: nonResolved.expiresAt,
+      visibilityLabels: [],
+      receiptStatus: nonResolved.receiptStatus
+    }));
+  }
+  assert.throws(() => createMemoryScopeDto({
+    safeProjectAlias: 'project-alpha',
+    contextStatus: 'denied',
+    expiresAt: null,
+    visibilityLabels: ['project'],
+    receiptStatus: 'invalid'
+  }), { code: 'widget_visibility_labels_invalid' });
+  assert.throws(() => createMemoryScopeDto({
+    safeProjectAlias: 'project-alpha',
+    contextStatus: 'expired',
+    expiresAt: null,
+    visibilityLabels: [],
+    receiptStatus: 'invalid'
+  }), { code: 'widget_expiry_invalid' });
+  assert.throws(() => createMemoryScopeDto({
+    safeProjectAlias: 'project-alpha',
+    contextStatus: 'missing',
+    expiresAt: null,
+    visibilityLabels: [],
+    receiptStatus: 'bound'
+  }), { code: 'widget_receipt_status_invalid' });
   for (const safeProjectAlias of ['project alpha', '<project>', 'project/alpha']) {
     assert.throws(() => createMemoryScopeDto({
       safeProjectAlias,

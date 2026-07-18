@@ -315,7 +315,35 @@ const WIDGET_DTO_SCHEMA = deepFreeze({
       items: { enum: ['project', 'workspace', 'shared', 'task_start_context'] }
     },
     receipt_status: { enum: ['bound', 'not_available', 'invalid'] }
-  }
+  },
+  allOf: [{
+    oneOf: [
+      {
+        properties: {
+          context_status: { const: 'resolved' },
+          expires_at: { type: 'string', format: 'date-time' },
+          visibility_labels: { minItems: 1 },
+          receipt_status: { const: 'bound' }
+        }
+      },
+      {
+        properties: {
+          context_status: { enum: ['missing', 'denied'] },
+          expires_at: { const: null },
+          visibility_labels: { maxItems: 0 },
+          receipt_status: { enum: ['not_available', 'invalid'] }
+        }
+      },
+      {
+        properties: {
+          context_status: { const: 'expired' },
+          expires_at: { type: 'string', format: 'date-time' },
+          visibility_labels: { maxItems: 0 },
+          receipt_status: { enum: ['not_available', 'invalid'] }
+        }
+      }
+    ]
+  }]
 });
 
 module.exports = {

@@ -495,12 +495,22 @@ function validateWidgetDto(dto) {
     pattern: /^[A-Za-z0-9][A-Za-z0-9._-]*$/u
   });
   if (!['resolved', 'missing', 'expired', 'denied'].includes(dto.context_status)) reject('widget_context_status_invalid');
-  if (dto.expires_at !== null) parseTime(dto.expires_at, 'widget_expiry_invalid');
-  if (!Array.isArray(dto.visibility_labels) || new Set(dto.visibility_labels).size !== dto.visibility_labels.length ||
-      dto.visibility_labels.some(value => !CONTEXT_VISIBILITIES.includes(value))) {
-    reject('widget_visibility_labels_invalid');
-  }
   if (!['bound', 'not_available', 'invalid'].includes(dto.receipt_status)) reject('widget_receipt_status_invalid');
+  if (dto.context_status === 'resolved') {
+    parseTime(dto.expires_at, 'widget_expiry_invalid');
+    validateVisibilityLabels(dto.visibility_labels, 'widget_visibility_labels_invalid');
+    if (dto.receipt_status !== 'bound') reject('widget_receipt_status_invalid');
+  } else {
+    if (!Array.isArray(dto.visibility_labels) || dto.visibility_labels.length !== 0) {
+      reject('widget_visibility_labels_invalid');
+    }
+    if (dto.context_status === 'expired') {
+      parseTime(dto.expires_at, 'widget_expiry_invalid');
+    } else if (dto.expires_at !== null) {
+      reject('widget_expiry_invalid');
+    }
+    if (dto.receipt_status === 'bound') reject('widget_receipt_status_invalid');
+  }
   assertNoNormalizedKeys(dto, FORBIDDEN_PUBLIC_DISCLOSURE_KEYS, 'widget_public_disclosure_forbidden');
   assertNoForbiddenStringValues(dto, 'widget_public_disclosure_forbidden');
   return dto;
