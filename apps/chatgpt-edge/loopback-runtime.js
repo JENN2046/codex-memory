@@ -68,18 +68,20 @@ function createLoopbackEdgeRuntime({
   function refresh(record) {
     if (TERMINAL_STATES.has(record.status)) return;
     const currentMs = nowMs();
-    if (Date.parse(record.request.expires_at) <= currentMs) {
+    const requestExpiresMs = Date.parse(record.request.expires_at);
+    if (requestExpiresMs <= currentMs) {
       record.status = 'expired';
       record.claim = null;
-      record.purge_after_ms = currentMs + terminalRetentionMs;
+      record.purge_after_ms = requestExpiresMs + terminalRetentionMs;
       emit('request_expired', record);
       return;
     }
     if (record.status === 'claimed' && record.claim.expires_ms <= currentMs) {
       const acknowledged = record.claim.acked;
+      const claimExpiresMs = record.claim.expires_ms;
       record.status = acknowledged ? 'expired' : 'queued';
       record.claim = null;
-      if (acknowledged) record.purge_after_ms = currentMs + terminalRetentionMs;
+      if (acknowledged) record.purge_after_ms = claimExpiresMs + terminalRetentionMs;
       emit(acknowledged ? 'acknowledged_claim_expired' : 'claim_expired', record);
     }
   }
@@ -115,6 +117,7 @@ function createLoopbackEdgeRuntime({
 
   async function submit(request) {
     await verifyRequest(request);
+    for (const record of records.values()) refresh(record);
     pruneTerminals();
     if (records.has(request.request_id)) reject('replay_detected');
     if (records.size >= maxRecords) reject('edge_record_capacity_exceeded');

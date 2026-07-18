@@ -72,6 +72,34 @@ test('R4-C request expiry fails closed before claim or UDS forwarding', async t 
   });
 });
 
+test('R4-C submit refreshes and prunes untouched expired records before capacity enforcement', async t => {
+  const harness = await createLocalIntegrationHarness({
+    maxInFlight: 1,
+    maxRecords: 1,
+    terminalRetentionMs: 50
+  });
+  t.after(() => harness.close());
+  const expired = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  }, { ttlSeconds: 1 });
+  await harness.edgeClient.submit(expired);
+  harness.advance(1_051);
+  const replacement = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  });
+  assert.deepEqual(await harness.edgeClient.submit(replacement), {
+    request_id: replacement.request_id,
+    status: 'queued'
+  });
+  assert.deepEqual(harness.edgeRuntime.snapshot().states, {
+    queued: 1,
+    claimed: 0,
+    completed: 0,
+    cancelled: 0,
+    expired: 0
+  });
+});
+
 test('R4-C reconnect reclaims an unacknowledged request only after the claim lease expires', async t => {
   const harness = await createLocalIntegrationHarness({ claimLeaseMs: 50 });
   t.after(() => harness.close());

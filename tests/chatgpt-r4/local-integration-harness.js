@@ -42,6 +42,8 @@ async function createLocalIntegrationHarness({
   governanceDelayMs = 0,
   responseVerificationDelayMs = 0,
   edgeTimeoutMs = 5_000,
+  maxInFlight = 64,
+  maxRecords = 256,
   cancelPollMs = 5
 } = {}) {
   let nowMs = R4C_FIXED_NOW.getTime();
@@ -176,6 +178,8 @@ async function createLocalIntegrationHarness({
   const edgeRuntime = createLoopbackEdgeRuntime({
     claimLeaseMs,
     terminalRetentionMs,
+    maxInFlight,
+    maxRecords,
     clock,
     eventSink: event => edgeEvents.push(event),
     verifyRequest(request) {
