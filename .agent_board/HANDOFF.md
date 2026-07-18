@@ -22,7 +22,7 @@ reconnect/reclaim, replay rejection, in-flight cancellation, asynchronous
 completion state recheck, Relay/Edge completion-timeout alignment, response
 correlation, normalized-root handling, split-UTF-8 preservation, open-peer UDS
 frame handling, listener-alias and non-loopback rejection, and body-log absence
-pass across 39 focused
+pass across 41 focused
 R4 tests. All provider/native/fallback/write/durable/global-search counters are
 zero. R4-D is next, but external OAuth/runtime configuration requires Jenn's
 new exact authorization; no active service/config, public endpoint, real

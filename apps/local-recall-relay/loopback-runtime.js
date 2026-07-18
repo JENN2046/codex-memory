@@ -52,7 +52,25 @@ function createLoopbackRelayRuntime({
       const claim = await edge.claim(relayId);
       if (!claim) return Object.freeze({ status: 'idle' });
       emit('claim_received', claim.request_id, { attempt: claim.attempt });
-      await edge.acknowledge(claim);
+      function interrupted(status) {
+        emit(status === 'expired' ? 'request_expired' : 'request_cancelled', claim.request_id, {
+          attempt: claim.attempt
+        });
+        return Object.freeze({
+          status,
+          request_id: claim.request_id,
+          attempt: claim.attempt
+        });
+      }
+      try {
+        await edge.acknowledge(claim);
+      } catch (error) {
+        const status = classifyEdgeInterruption(error);
+        if (status) return interrupted(status);
+        const code = safeErrorCode(error?.code);
+        emit('request_failed', claim.request_id, { attempt: claim.attempt, error_code: code });
+        throw Object.assign(new Error(code), { code });
+      }
       emit('claim_acknowledged', claim.request_id, { attempt: claim.attempt });
 
       const cancellation = new AbortController();
@@ -95,19 +113,11 @@ function createLoopbackRelayRuntime({
           response
         });
       } catch (error) {
-        if (error?.code === 'relay_cancelled' || error?.code === 'edge_request_cancelled' ||
-            error?.code === 'edge_request_expired' ||
-            cancellation.signal.aborted) {
+        const errorStatus = classifyEdgeInterruption(error);
+        if (error?.code === 'relay_cancelled' || errorStatus || cancellation.signal.aborted) {
           const status = interruptionStatus ||
-            (error?.code === 'edge_request_expired' ? 'expired' : 'cancelled');
-          emit(status === 'expired' ? 'request_expired' : 'request_cancelled', claim.request_id, {
-            attempt: claim.attempt
-          });
-          return Object.freeze({
-            status,
-            request_id: claim.request_id,
-            attempt: claim.attempt
-          });
+            errorStatus || 'cancelled';
+          return interrupted(status);
         }
         const code = safeErrorCode(error?.code);
         emit('request_failed', claim.request_id, { attempt: claim.attempt, error_code: code });
@@ -118,6 +128,13 @@ function createLoopbackRelayRuntime({
       }
     }
   });
+}
+
+function classifyEdgeInterruption(error) {
+  if (error?.code === 'edge_request_cancelled') return 'cancelled';
+  if (error?.code === 'edge_request_expired' || error?.code === 'edge_claim_expired' ||
+      error?.code === 'edge_request_not_found') return 'expired';
+  return null;
 }
 
 function safeErrorCode(value) {
@@ -137,9 +154,9 @@ async function monitorCancellation({ edge, claim, cancellation, pollMs, isStoppe
         cancellation.abort();
       }
     } catch (error) {
-      if (error?.code === 'edge_request_cancelled' || error?.code === 'edge_request_expired' ||
-          error?.code === 'edge_request_not_found') {
-        onInterrupted(error?.code === 'edge_request_cancelled' ? 'cancelled' : 'expired');
+      const status = classifyEdgeInterruption(error);
+      if (status) {
+        onInterrupted(status);
         cancellation.abort();
       }
     }
@@ -151,5 +168,6 @@ function delay(milliseconds) {
 }
 
 module.exports = {
+  classifyEdgeInterruption,
   createLoopbackRelayRuntime
 };

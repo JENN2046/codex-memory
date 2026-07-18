@@ -17,6 +17,9 @@ const {
   createLoopbackEdgeClient,
   createUdsForwarder
 } = require('../../apps/local-recall-relay');
+const {
+  classifyEdgeInterruption
+} = require('../../apps/local-recall-relay/loopback-runtime');
 const { signing } = require('./synthetic-harness');
 const {
   createLocalIntegrationHarness,
@@ -123,6 +126,42 @@ test('R4-C event-sink failures cannot corrupt Edge or Relay state transitions', 
   assert.equal((await harness.edgeClient.result(request.request_id)).status, 'completed');
   assert.equal(edgeSinkCalls, 4);
   assert.equal(relaySinkCalls, 5);
+});
+
+test('R4-C cancellation between claim and acknowledgement returns a cancelled result', async t => {
+  let edgeClient;
+  let cancellation;
+  const harness = await createLocalIntegrationHarness({
+    edgeEventSink(event) {
+      if (event.event === 'request_claimed') {
+        cancellation = edgeClient.cancel(event.request_id);
+        return cancellation;
+      }
+      return undefined;
+    }
+  });
+  edgeClient = harness.edgeClient;
+  t.after(() => harness.close());
+  const request = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  });
+  await harness.edgeClient.submit(request);
+  assert.deepEqual(await harness.relayRuntime.processNext(), {
+    status: 'cancelled',
+    request_id: request.request_id,
+    attempt: 1
+  });
+  await cancellation;
+  assert.equal((await harness.edgeClient.result(request.request_id)).status, 'cancelled');
+  assert.equal(harness.observations.uds_connections, 0);
+});
+
+test('R4-C claim-expiry state races classify as expired interruptions', () => {
+  assert.equal(classifyEdgeInterruption({ code: 'edge_claim_expired' }), 'expired');
+  assert.equal(classifyEdgeInterruption({ code: 'edge_request_expired' }), 'expired');
+  assert.equal(classifyEdgeInterruption({ code: 'edge_request_not_found' }), 'expired');
+  assert.equal(classifyEdgeInterruption({ code: 'edge_request_cancelled' }), 'cancelled');
+  assert.equal(classifyEdgeInterruption({ code: 'relay_edge_unavailable' }), null);
 });
 
 test('R4-C submit refreshes and prunes untouched expired records before capacity enforcement', async t => {

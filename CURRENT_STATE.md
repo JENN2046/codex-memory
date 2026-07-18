@@ -42,8 +42,9 @@ claim lease, acknowledgement, cancellation, and response state remain bounded
 and in-memory. Exact-file import fences allow only the loopback HTTP and UDS
 transport builtins; active entrypoints still cannot import the candidate.
 
-The 39-test focused R4 matrix passes claim/ack, request and claim expiry,
-first-lookup stale-record purge, event-sink failure isolation, expired-record
+The 41-test focused R4 matrix passes claim/ack, cancellation-before-ack and
+claim-expiry races, request and claim expiry, first-lookup stale-record purge,
+event-sink failure isolation, expired-record
 capacity reclamation, reconnect/reclaim, duplicate submission
 and ack rejection, in-flight cancellation before governance invocation,
 asynchronous completion state recheck, Relay/Edge timeout alignment, signed
