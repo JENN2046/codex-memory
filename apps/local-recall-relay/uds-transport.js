@@ -50,6 +50,29 @@ function createUdsForwarder({
         fail('relay_cancelled');
       }
 
+      function parseFrame({ endOfStream = false } = {}) {
+        if (settled) return;
+        const frame = Buffer.concat(chunks, bytes);
+        const newline = frame.indexOf(0x0a);
+        if (newline === -1) {
+          if (endOfStream) fail('relay_uds_response_incomplete');
+          return;
+        }
+        if (newline !== frame.length - 1) {
+          fail('relay_uds_response_framing_invalid');
+          return;
+        }
+        try {
+          const parsed = JSON.parse(frame.subarray(0, newline).toString('utf8'));
+          settled = true;
+          cleanup();
+          socket.destroy();
+          resolve(parsed);
+        } catch (error) {
+          fail('relay_uds_response_invalid', error);
+        }
+      }
+
       if (signal?.aborted) {
         fail('relay_cancelled');
         return;
@@ -64,28 +87,9 @@ function createUdsForwarder({
           return;
         }
         chunks.push(chunk);
+        parseFrame();
       });
-      socket.on('end', () => {
-        if (settled) return;
-        const text = Buffer.concat(chunks, bytes).toString('utf8');
-        const newline = text.indexOf('\n');
-        if (newline === -1) {
-          fail('relay_uds_response_incomplete');
-          return;
-        }
-        if (newline !== text.length - 1 || text.indexOf('\n', newline + 1) !== -1) {
-          fail('relay_uds_response_framing_invalid');
-          return;
-        }
-        try {
-          const parsed = JSON.parse(text.slice(0, newline));
-          settled = true;
-          cleanup();
-          resolve(parsed);
-        } catch (error) {
-          fail('relay_uds_response_invalid', error);
-        }
-      });
+      socket.on('end', () => parseFrame({ endOfStream: true }));
       socket.on('error', error => {
         if (!settled) fail('relay_uds_unavailable', error);
       });

@@ -20,8 +20,9 @@ origin and forwards signed envelopes through an explicitly injected temporary
 UDS to a strict synthetic governance double. Claim/ack, expiry, capacity reclamation,
 reconnect/reclaim, replay rejection, in-flight cancellation, asynchronous
 completion state recheck, Relay/Edge completion-timeout alignment, response
-correlation, normalized-root handling, split-UTF-8 preservation, non-loopback
-rejection, and body-log absence pass across 36 focused
+correlation, normalized-root handling, split-UTF-8 preservation, open-peer UDS
+frame handling, listener-alias and non-loopback rejection, and body-log absence
+pass across 37 focused
 R4 tests. All provider/native/fallback/write/durable/global-search counters are
 zero. R4-D is next, but external OAuth/runtime configuration requires Jenn's
 new exact authorization; no active service/config, public endpoint, real

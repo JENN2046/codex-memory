@@ -18,8 +18,8 @@ Status: `R4C_LOOPBACK_EDGE_RELAY_TEMP_UDS_INTEGRATION_PASS_EXTERNAL_RUNTIME_FALS
 
 - Actual Edge listener is exactly `127.0.0.1:0`; queue, leases, ack, cancel, and response state are bounded and in-memory.
 - Relay accepts only exact loopback HTTP and forwards over an explicitly injected temporary UDS; it has no listener or authorization/storage/provider authority.
-- Thirty-six focused R4 tests cover claim/ack, request and lease expiry, expired-record capacity reclamation, reconnect/reclaim, replay, in-flight cancellation, asynchronous completion state recheck, Relay/Edge completion-timeout alignment, response correlation, loopback normalization, split UTF-8 preservation, non-loopback rejection, and body-log absence.
-- Final default validation passed `5762` with `8` documented skips; hardening passed `97/97 + 6/6`.
+- Thirty-seven focused R4 tests cover claim/ack, request and lease expiry, expired-record capacity reclamation, reconnect/reclaim, replay, in-flight cancellation, asynchronous completion state recheck, Relay/Edge completion-timeout alignment, response correlation, loopback normalization, split UTF-8 and open-peer frame handling, listener-alias rejection, non-loopback rejection, and body-log absence.
+- Final default validation passed `5763` with `8` documented skips; hardening passed `97/97 + 6/6`.
 - Provider/native/fallback/primary-write/derived-write/other-durable/global-search counters are all zero.
 - Candidate default/activation, active config/service, OAuth/external runtime, VCP/real memory, public tools, production/release/deploy/cutover/readiness remain false.
 

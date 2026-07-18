@@ -74,7 +74,11 @@ const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
     bracketPattern: /\bdocument\s*\[\s*['"]cookie['"]\s*\]/u,
     code: 'durable_browser_storage'
   },
-  { pattern: /\b(?:createServer|listen)\b/u, code: 'service_listener' },
+  {
+    pattern: /\b(?:createServer|listen)\b/u,
+    bracketPattern: /\[\s*['"](?:createServer|listen)['"]\s*\]/u,
+    code: 'service_listener'
+  },
   {
     pattern: /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|WebTransport|RTCPeerConnection|navigator|sendBeacon|importScripts)\b/u,
     code: 'network_invocation'
@@ -360,18 +364,24 @@ function validateComponentSource(component, { file, source }) {
     preserveBracketStringContents: true
   });
   const runtimeFilePolicy = R4C_RUNTIME_FILE_POLICIES[relativeFile];
-  for (const rule of FORBIDDEN_RUNTIME_PATTERNS) {
-    if (rule.pattern.test(maskedSource) || rule.bracketPattern?.test(bracketMaskedSource)) {
-      if (runtimeFilePolicy?.allowedRuntimeRules.includes(rule.code)) continue;
-      throw new Error(`${rule.code}:${relativeFile}`);
-    }
-  }
+  let listenerCheckedSource = maskedSource;
   if (runtimeFilePolicy?.allowedRuntimeRules.includes('service_listener')) {
     const exactLoopbackListen = /\bserver\s*\.\s*listen\s*\(\s*0\s*,\s*['"]127\.0\.0\.1['"]\s*\)/u;
-    const listenerCalls = [...source.matchAll(/\bserver\s*\.\s*listen\s*\(/gu)].length;
-    const serverCreations = [...source.matchAll(/\bhttp\s*\.\s*createServer\s*\(/gu)].length;
+    const exactServerCreation = /\bhttp\s*\.\s*createServer\s*\(/u;
+    const listenerCalls = [...maskedSource.matchAll(/\bserver\s*\.\s*listen\s*\(/gu)].length;
+    const serverCreations = [...maskedSource.matchAll(/\bhttp\s*\.\s*createServer\s*\(/gu)].length;
     if (!exactLoopbackListen.test(source) || listenerCalls !== 1 || serverCreations !== 1) {
       throw new Error(`loopback_listener_contract_invalid:${relativeFile}`);
+    }
+    const withoutAllowedListeners = source
+      .replace(exactServerCreation, match => ' '.repeat(match.length))
+      .replace(exactLoopbackListen, match => ' '.repeat(match.length));
+    listenerCheckedSource = maskCommentsAndStringContents(withoutAllowedListeners);
+  }
+  for (const rule of FORBIDDEN_RUNTIME_PATTERNS) {
+    const ruleSource = rule.code === 'service_listener' ? listenerCheckedSource : maskedSource;
+    if (rule.pattern.test(ruleSource) || rule.bracketPattern?.test(bracketMaskedSource)) {
+      throw new Error(`${rule.code}:${relativeFile}`);
     }
   }
   if (/\.\s*constructor\b/u.test(maskedSource) ||

@@ -42,12 +42,12 @@ claim lease, acknowledgement, cancellation, and response state remain bounded
 and in-memory. Exact-file import fences allow only the loopback HTTP and UDS
 transport builtins; active entrypoints still cannot import the candidate.
 
-The 36-test focused R4 matrix passes claim/ack, request and claim expiry,
+The 37-test focused R4 matrix passes claim/ack, request and claim expiry,
 expired-record capacity reclamation, reconnect/reclaim, duplicate submission
 and ack rejection, in-flight cancellation before governance invocation,
 asynchronous completion state recheck, Relay/Edge timeout alignment, signed
-response correlation, normalized-root and split-UTF-8 handling, non-loopback
-rejection, and body-log absence. The positive context-resolution
+response correlation, normalized-root, split-UTF-8, and open-peer UDS frame
+handling, listener-alias and non-loopback rejection, and body-log absence. The positive context-resolution
 and empty-overview path keeps provider, native, fallback, primary/derived write,
 other durable mutation, and unrestricted-search counters at zero. No active
 config/service, external runtime, OAuth, provider, VCP, real memory, public tool

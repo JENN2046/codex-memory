@@ -290,6 +290,26 @@ test('R4-C UDS forwarding preserves UTF-8 split across socket chunks', async t =
   assert.deepEqual(await forward({ request: 'synthetic' }), expected);
 });
 
+test('R4-C UDS forwarding resolves a complete frame without waiting for peer EOF', async t => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4c-open-uds-'));
+  const socketPath = path.join(directory, 'governance.sock');
+  const expected = { status: 'ok', structured_content: { status: 'empty' } };
+  const server = net.createServer(socket => {
+    socket.once('data', () => socket.write(`${JSON.stringify(expected)}\n`));
+  });
+  t.after(async () => {
+    await new Promise(resolve => server.close(resolve));
+    fs.rmSync(directory, { recursive: true, force: true });
+  });
+  await new Promise((resolve, rejectListen) => {
+    server.once('error', rejectListen);
+    server.listen(socketPath, resolve);
+  });
+
+  const forward = createUdsForwarder({ socketPath, timeoutMs: 500 });
+  assert.deepEqual(await forward({ request: 'synthetic' }), expected);
+});
+
 async function waitFor(predicate, timeoutMs = 1_000) {
   const started = Date.now();
   while (!predicate()) {

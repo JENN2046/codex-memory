@@ -102,6 +102,20 @@ test('R4-C listener and transport builtin exceptions are exact-file and exact-lo
     source: edgeSource.replace("server.listen(0, '127.0.0.1')", "server.listen(8080, '0.0.0.0')")
   }), /loopback_listener_contract_invalid/);
   assert.throws(() => validateComponentSource('edge', {
+    file: edgeRuntimeFile,
+    source: edgeSource.replace(
+      "server.listen(0, '127.0.0.1')",
+      "const listen = server.listen.bind(server); listen(0, '127.0.0.1'); server.listen(0, '127.0.0.1')"
+    )
+  }), /service_listener/);
+  assert.throws(() => validateComponentSource('edge', {
+    file: edgeRuntimeFile,
+    source: edgeSource.replace(
+      "server.listen(0, '127.0.0.1')",
+      "const listen = server['listen'].bind(server); listen(0, '127.0.0.1'); server.listen(0, '127.0.0.1')"
+    )
+  }), /service_listener/);
+  assert.throws(() => validateComponentSource('edge', {
     file: path.join(ROOTS.edge, 'copied-loopback-runtime.js'),
     source: edgeSource
   }), /service_listener|builtin_import_forbidden/);
