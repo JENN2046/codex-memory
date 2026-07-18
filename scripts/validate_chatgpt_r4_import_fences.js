@@ -144,6 +144,70 @@ function extractStaticRuntimeImports(source) {
   return [...new Set(imports)].sort();
 }
 
+function maskCommentsAndStringContents(source) {
+  const output = [...source];
+  for (let index = 0; index < output.length; index += 1) {
+    const current = output[index];
+    const next = output[index + 1];
+    if (current === '/' && next === '/') {
+      output[index] = ' ';
+      output[index + 1] = ' ';
+      index += 2;
+      while (index < output.length && output[index] !== '\n' && output[index] !== '\r') {
+        output[index] = ' ';
+        index += 1;
+      }
+      index -= 1;
+      continue;
+    }
+    if (current === '/' && next === '*') {
+      output[index] = ' ';
+      output[index + 1] = ' ';
+      index += 2;
+      while (index < output.length) {
+        if (output[index] === '*' && output[index + 1] === '/') {
+          output[index] = ' ';
+          output[index + 1] = ' ';
+          index += 1;
+          break;
+        }
+        if (output[index] !== '\n' && output[index] !== '\r') output[index] = ' ';
+        index += 1;
+      }
+      continue;
+    }
+    if (current !== "'" && current !== '"' && current !== '`') continue;
+    const quote = current;
+    index += 1;
+    while (index < output.length) {
+      if (output[index] === '\\') {
+        output[index] = ' ';
+        if (index + 1 < output.length && output[index + 1] !== '\n' && output[index + 1] !== '\r') {
+          output[index + 1] = ' ';
+        }
+        index += 2;
+        continue;
+      }
+      if (output[index] === quote) break;
+      if (output[index] !== '\n' && output[index] !== '\r') output[index] = ' ';
+      index += 1;
+    }
+  }
+  return output.join('');
+}
+
+function assertNoDynamicRuntimeImports(source, relativeFile) {
+  const masked = maskCommentsAndStringContents(source);
+  const requireCalls = [...masked.matchAll(/\brequire\s*(?:\?\s*\.\s*)?\(/gu)].length;
+  const literalRequireCalls = [...masked.matchAll(/\brequire\s*\(\s*['"]\s*['"]\s*\)/gu)].length;
+  const memberRequireUsed = /\.\s*require\s*\(/u.test(masked);
+  const importCalls = [...masked.matchAll(/\bimport\s*\(/gu)].length;
+  const literalImportCalls = [...masked.matchAll(/\bimport\s*\(\s*['"]\s*['"]\s*\)/gu)].length;
+  if (requireCalls !== literalRequireCalls || memberRequireUsed || importCalls !== literalImportCalls) {
+    throw new Error(`dynamic_import_forbidden:${relativeFile}`);
+  }
+}
+
 function isFile(file) {
   try {
     return fs.statSync(file).isFile();
@@ -239,11 +303,12 @@ function validateNotActivated({
     if (visited.has(file)) continue;
     visited.add(file);
     const source = readFileSync(file);
+    const relativeFile = path.relative(path.dirname(runtimeRoot), file).split(path.sep).join('/');
+    assertNoDynamicRuntimeImports(source, relativeFile);
     for (const specifier of extractStaticRuntimeImports(source)) {
       const resolved = resolveRuntimeModuleFile(file, specifier, { fileExists });
       if (CANDIDATE_RUNTIME_PATTERN.test(specifier) ||
           (resolved && CANDIDATE_RUNTIME_PATTERN.test(resolved.split(path.sep).join('/')))) {
-        const relativeFile = path.relative(path.dirname(runtimeRoot), file).split(path.sep).join('/');
         throw new Error(`candidate_runtime_activated:${relativeFile}:${specifier}`);
       }
       if (resolved && isWithin(resolved, runtimeRoot) && !visited.has(resolved)) queue.push(resolved);
@@ -284,6 +349,8 @@ module.exports = {
   COMPONENT_POLICIES,
   extractImports,
   extractStaticRuntimeImports,
+  maskCommentsAndStringContents,
+  assertNoDynamicRuntimeImports,
   resolveRuntimeModuleFile,
   validateComponentSource,
   validateComponent,

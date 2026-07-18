@@ -26,7 +26,7 @@ test('R4-B candidate profile is non-default, non-activated, read-only, and has n
       readOnlyHint: true,
       destructiveHint: false,
       openWorldHint: false,
-      idempotentHint: true
+      idempotentHint: name === 'render_memory_scope'
     });
     assert.ok(descriptor.outputSchema, `${name} output schema`);
     assert.deepEqual(descriptor._meta.securitySchemes, descriptor.securitySchemes);

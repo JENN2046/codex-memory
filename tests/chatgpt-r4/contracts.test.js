@@ -211,6 +211,16 @@ test('public tool arguments cannot forge scope, mapping, diary, or ownership fie
       code: 'public_disclosure_forbidden'
     });
   }
+  for (const credentialLikeValue of [
+    ['Bearer', 'synthetic_credential_material_1234567890'].join(' '),
+    ['sk', 'syntheticCredentialMaterial1234567890'].join('-'),
+    ['eyJsyntheticHeader', 'syntheticPayload1234', 'syntheticSignature1234'].join('.')
+  ]) {
+    assert.throws(() => validatePublicStructuredContent({ summary: credentialLikeValue }), {
+      code: 'public_disclosure_forbidden'
+    });
+  }
+  assert.doesNotThrow(() => validatePublicStructuredContent({ summary: 'No secret values are included.' }));
 });
 
 test('response binds request, counters, receipts, and relay signature', () => {

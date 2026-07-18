@@ -34,6 +34,27 @@ test('R4-B import fences accept the candidate packages without activating them',
     readFileSync: file => sources.get(file),
     fileExists: file => sources.has(file)
   }), /candidate_runtime_activated:src\/core\/runtime\.js/);
+
+  sources.set(path.join(runtimeRoot, 'core', 'runtime.js'), [
+    "const target = '../../../apps/chatgpt-edge';",
+    'require(target);'
+  ].join('\n'));
+  assert.throws(() => validateNotActivated({
+    runtimeRoot,
+    entrypoints: [path.join(runtimeRoot, 'index.js')],
+    readFileSync: file => sources.get(file),
+    fileExists: file => sources.has(file)
+  }), /dynamic_import_forbidden:src\/core\/runtime\.js/);
+  sources.set(path.join(runtimeRoot, 'core', 'runtime.js'), [
+    "const target = '../../../apps/chatgpt-edge';",
+    'import(target);'
+  ].join('\n'));
+  assert.throws(() => validateNotActivated({
+    runtimeRoot,
+    entrypoints: [path.join(runtimeRoot, 'index.js')],
+    readFileSync: file => sources.get(file),
+    fileExists: file => sources.has(file)
+  }), /dynamic_import_forbidden:src\/core\/runtime\.js/);
 });
 
 test('public Edge cannot import local config, storage, recall, or arbitrary packages', () => {

@@ -19,6 +19,15 @@ const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 const CONTEXT_REF_PATTERN = /^pctx_[A-Za-z0-9_-]{32,96}$/u;
 const REQUEST_ID_PATTERN = /^req_[A-Za-z0-9_-]{24,96}$/u;
 const RESPONSE_ID_PATTERN = /^res_[A-Za-z0-9_-]{24,96}$/u;
+const FORBIDDEN_PUBLIC_VALUE_PATTERNS = Object.freeze([
+  /\bBearer\s+[A-Za-z0-9._~+/-]{16,}\b/iu,
+  /\b(?:sk|rk)-(?:proj-)?[A-Za-z0-9_-]{16,}\b/u,
+  /\bAKIA[0-9A-Z]{16}\b/u,
+  /\bgh(?:p|o|u|s|r)_[A-Za-z0-9]{20,}\b/u,
+  /\bgithub_pat_[A-Za-z0-9_]{20,}\b/u,
+  /\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b/u,
+  /-----BEGIN (?:EC |OPENSSH |RSA )?PRIVATE KEY-----/u
+]);
 
 function assertPlainObject(value, code) {
   if (!isPlainObject(value)) reject(code);
@@ -94,6 +103,20 @@ function assertNoNormalizedKeys(value, forbiddenKeys, code, depth = 0) {
     if (forbiddenKeys.some(forbiddenKey => normalizedKey.includes(forbiddenKey))) reject(code);
     assertNoNormalizedKeys(child, forbiddenKeys, code, depth + 1);
   }
+}
+
+function assertNoForbiddenStringValues(value, code, depth = 0) {
+  if (depth > 16) reject(`${code}_depth_exceeded`);
+  if (typeof value === 'string') {
+    if (FORBIDDEN_PUBLIC_VALUE_PATTERNS.some(pattern => pattern.test(value))) reject(code);
+    return;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) assertNoForbiddenStringValues(item, code, depth + 1);
+    return;
+  }
+  if (!isPlainObject(value)) return;
+  for (const child of Object.values(value)) assertNoForbiddenStringValues(child, code, depth + 1);
 }
 
 function validatePrincipalAssertion(assertion, {
@@ -320,6 +343,7 @@ function validatePublicStructuredContent(content) {
   assertPlainObject(content, 'structured_content_invalid');
   if (utf8ByteLength(content) > LIMITS.maxStructuredContentBytes) reject('structured_content_too_large');
   assertNoNormalizedKeys(content, FORBIDDEN_PUBLIC_DISCLOSURE_KEYS, 'public_disclosure_forbidden');
+  assertNoForbiddenStringValues(content, 'public_disclosure_forbidden');
   return content;
 }
 
@@ -450,14 +474,17 @@ function validateWidgetDto(dto) {
   }
   if (!['bound', 'not_available', 'invalid'].includes(dto.receipt_status)) reject('widget_receipt_status_invalid');
   assertNoNormalizedKeys(dto, FORBIDDEN_PUBLIC_DISCLOSURE_KEYS, 'widget_public_disclosure_forbidden');
+  assertNoForbiddenStringValues(dto, 'widget_public_disclosure_forbidden');
   return dto;
 }
 
 module.exports = {
   DIGEST_PATTERN,
   CONTEXT_REF_PATTERN,
+  FORBIDDEN_PUBLIC_VALUE_PATTERNS,
   assertExactKeys,
   assertNoNormalizedKeys,
+  assertNoForbiddenStringValues,
   validatePrincipalAssertion,
   validateProjectContextReference,
   validateProjectContextClaim,

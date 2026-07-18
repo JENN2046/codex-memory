@@ -14,18 +14,22 @@ const READ_ONLY_ANNOTATIONS = deepFreeze({
   readOnlyHint: true,
   destructiveHint: false,
   openWorldHint: false,
+  idempotentHint: false
+});
+const IDEMPOTENT_READ_ONLY_ANNOTATIONS = deepFreeze({
+  ...READ_ONLY_ANNOTATIONS,
   idempotentHint: true
 });
 const SECURITY_SCHEMES = deepFreeze([{ type: 'oauth2', scopes: ['memory.read'] }]);
 
-function descriptor({ title, description, inputSchema, outputSchema, render = false }) {
+function descriptor({ title, description, inputSchema, outputSchema, render = false, idempotent = false }) {
   const value = {
     title,
     description,
     inputSchema,
     outputSchema,
     securitySchemes: SECURITY_SCHEMES,
-    annotations: READ_ONLY_ANNOTATIONS,
+    annotations: idempotent ? IDEMPOTENT_READ_ONLY_ANNOTATIONS : READ_ONLY_ANNOTATIONS,
     _meta: { securitySchemes: SECURITY_SCHEMES }
   };
   if (render) {
@@ -151,7 +155,8 @@ const toolDescriptors = deepFreeze({
       required: ['scope'],
       properties: { scope: WIDGET_DTO_SCHEMA }
     },
-    render: true
+    render: true,
+    idempotent: true
   })
 });
 
@@ -194,6 +199,7 @@ const candidateToolProfile = deepFreeze({
 module.exports = {
   RESOURCE_URI,
   READ_ONLY_ANNOTATIONS,
+  IDEMPOTENT_READ_ONLY_ANNOTATIONS,
   SECURITY_SCHEMES,
   candidateToolProfile,
   toolDescriptors
