@@ -268,8 +268,8 @@ function assertNoDynamicRuntimeImports(source, relativeFile) {
     masked,
     relativeFile
   });
-  const memberRequireUsed = /\.\s*require\s*(?:\?\s*\.\s*)?\(/u.test(masked) ||
-    /\[\s*['"]require['"]\s*\]\s*(?:\?\s*\.\s*)?\(/u.test(bracketMasked);
+  const memberRequireUsed = /\.\s*require\b/u.test(masked) ||
+    /\[\s*['"]require['"]\s*\]/u.test(bracketMasked);
   const importCalls = [...masked.matchAll(/\bimport\s*\(/gu)].length;
   const literalImportCalls = [...masked.matchAll(/\bimport\s*\(\s*['"]\s*['"]\s*\)/gu)].length;
   if (requireReferenceCount !== literalRequireCalls + requireMainReferences + allowedDynamicRequireCalls ||

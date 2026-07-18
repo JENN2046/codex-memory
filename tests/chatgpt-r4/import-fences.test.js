@@ -72,6 +72,8 @@ test('R4-B import fences accept the candidate packages without activating them',
   }), /dynamic_import_forbidden:src\/core\/runtime\.js/);
   for (const source of [
     "module['require']('../../../apps/chatgpt-edge');",
+    "module['require'].call(module, '../../../apps/chatgpt-edge');",
+    "module['require'].apply(module, ['../../../apps/chatgpt-edge']);",
     "require['call'](null, '../../../apps/chatgpt-edge');",
     "require?.['call'](null, '../../../apps/chatgpt-edge');",
     "const load = require; load('../../../apps/chatgpt-edge');"
