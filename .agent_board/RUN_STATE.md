@@ -4,21 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2136 ChatGPT Web R4-B contracts and synthetic harness`.
-Current validation: `CMV-2221`.
-Current fact: R4-B implements import-fenced signed contracts, a non-default read-only candidate profile, Widget DTO/bridge, and a zero-memory synthetic Edge/Relay/UDS/governance flow.
-All provider/native/fallback/write/durable counters are zero; no service, OAuth, external runtime, real memory, or public tool expansion occurred.
+Current task: `CM-2137 ChatGPT Web R4-C local Edge/Relay integration`.
+Current validation: `CMV-2222`.
+Current fact: R4-C implements a non-activated loopback-only Edge, outbound Relay, temporary UDS, and strict synthetic governance integration.
+Claim/ack/expiry/reconnect/replay/cancel/correlation/body-log gates pass with all provider/native/fallback/write/durable counters at zero; no active service/config, OAuth, external runtime, real memory, or public tool activation occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R4-B contract candidate follows stable HTTPS Edge -> outbound Relay -> UDS -> local governance, without activating any hop.
+- Architecture: R4-C candidate adds actual loopback Edge -> outbound Relay -> temporary UDS -> strict synthetic governance without activating external or active runtime.
 - Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
-- Candidate: non-default and non-activated; active runtime imports remain unchanged.
-- Synthetic proof: two requests, 20 focused tests, all provider/native/fallback/write/durable/global-search counters zero.
-- Status sync: performed locally in CM-2136; PR CI/review and merge remain delivery gates.
+- Candidate: exact `127.0.0.1:0`, non-default and non-activated; active runtime imports remain unchanged.
+- Synthetic proof: actual loopback HTTP and temporary UDS, 30 focused tests, all provider/native/fallback/write/durable/global-search counters zero.
+- Status sync: performed locally in CM-2137; PR CI/review and merge remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 

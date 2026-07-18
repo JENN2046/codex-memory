@@ -4,13 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2136 ChatGPT Web R4-B contracts and synthetic harness`.
-Current validation: `CMV-2221`.
-Current fact: R4-B implements import-fenced signed contracts, a non-default read-only candidate profile, Widget DTO/bridge, and a zero-memory synthetic Edge/Relay/UDS/governance flow.
-All provider/native/fallback/write/durable counters are zero; no service, OAuth, external runtime, real memory, or public tool expansion occurred.
+Current task: `CM-2137 ChatGPT Web R4-C local Edge/Relay integration`.
+Current validation: `CMV-2222`.
+Current fact: R4-C implements a non-activated loopback-only Edge, outbound Relay, temporary UDS, and strict synthetic governance integration.
+Claim/ack/expiry/reconnect/replay/cancel/correlation/body-log gates pass with all provider/native/fallback/write/durable counters at zero; no active service/config, OAuth, external runtime, real memory, or public tool activation occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2137 ChatGPT Web R4-C Local Edge/Relay Integration
+
+Status: `R4C_LOOPBACK_EDGE_RELAY_TEMP_UDS_INTEGRATION_PASS_EXTERNAL_RUNTIME_FALSE`
+
+- Actual Edge listener is exactly `127.0.0.1:0`; queue, leases, ack, cancel, and response state are bounded and in-memory.
+- Relay accepts only exact loopback HTTP and forwards over an explicitly injected temporary UDS; it has no listener or authorization/storage/provider authority.
+- Thirty focused R4 tests cover claim/ack, request and lease expiry, reconnect/reclaim, replay, in-flight cancellation, response correlation, non-loopback rejection, and body-log absence.
+- Final default validation passed `5756` with `8` documented skips; hardening passed `97/97 + 6/6`.
+- Provider/native/fallback/primary-write/derived-write/other-durable/global-search counters are all zero.
+- Candidate default/activation, active config/service, OAuth/external runtime, VCP/real memory, public tools, production/release/deploy/cutover/readiness remain false.
+
+Validation: `CMV-2222`.
 
 ## CM-2136 ChatGPT Web R4-B Contracts And Synthetic Harness
 
@@ -18,7 +31,7 @@ Status: `R4B_CONTRACTS_AND_ZERO_MEMORY_SYNTHETIC_PASS_EXTERNAL_RUNTIME_FALSE`
 
 - Signed principal, opaque project context, request/response, replay/TTL/size/counter/disclosure, and receipt-chain contracts are implemented without dependencies.
 - Edge, Relay, Widget, contracts, and governance-adapter import fences pass; the candidate is not imported by active runtime entrypoints.
-- Eighteen focused tests cover the positive flow plus signature, expiry, replay, byte ceiling, scope-forgery, private visibility, counter, receipt, import, listener, logging, and durable-state negatives.
+- Twenty-three focused tests cover the positive flow plus signature, expiry, replay, byte ceiling, scope-forgery, private visibility, counter, receipt, import, listener, logging, and durable-state negatives.
 - Provider/native/fallback/primary-write/derived-write/other-durable/global-search counters are all zero.
 - Service/OAuth/external runtime/VCP/real-memory/public-tool/production/release/deploy/cutover/readiness remain false.
 

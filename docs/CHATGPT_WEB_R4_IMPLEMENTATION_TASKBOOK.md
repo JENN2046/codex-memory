@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Current stage: `R4-B contracts_and_synthetic_harness`
+Current stage: `R4-C local_edge_relay_integration`
 
 Old R3/M5 Tunnel route: `draft_paused_no_merge`
 
@@ -48,7 +48,7 @@ freezes a target; it proves no runtime capability.
 
 ## R4-B — Contracts And Synthetic Harness
 
-Status: `IMPLEMENTED_LOCAL_CANDIDATE_PENDING_PR_DELIVERY`
+Status: `COMPLETE`
 
 Implement without external runtime:
 
@@ -72,6 +72,8 @@ Implementation evidence: `docs/CHATGPT_WEB_R4B_CONTRACTS_SYNTHETIC.md`.
 
 ## R4-C — Local Edge/Relay Integration
 
+Status: `IMPLEMENTED_LOCAL_REFERENCE_RUNTIME_PENDING_PR_DELIVERY`
+
 Build a loopback-only reference topology:
 
 ```text
@@ -86,6 +88,8 @@ Prove claim/ack/expiry/reconnect, replay rejection, cancellation, response
 correlation, body-log absence, and zero provider/native/write counters. Use only
 temporary roots and synthetic data. Do not read active config, start the active
 memory service, or expose a public endpoint.
+
+Implementation evidence: `docs/CHATGPT_WEB_R4C_LOCAL_INTEGRATION.md`.
 
 ## R4-D — OAuth And External Edge Activation
 

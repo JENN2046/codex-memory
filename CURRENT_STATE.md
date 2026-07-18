@@ -8,10 +8,10 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | ChatGPT Web R4-B contracts and zero-memory synthetic harness implemented; services/runtime/readiness remain false |
-| Current task | `CM-2136 ChatGPT Web R4-B contracts and synthetic harness` |
-| Current validation | `CMV-2221` |
-| Current route | Deliver R4-B through normal PR/CI/review, then begin loopback-only synthetic R4-C |
+| Status | ChatGPT Web R4-C loopback Edge/Relay and temporary-UDS integration implemented; candidate activation/external runtime/readiness remain false |
+| Current task | `CM-2137 ChatGPT Web R4-C local Edge/Relay integration` |
+| Current validation | `CMV-2222` |
+| Current route | Deliver R4-C through normal PR/CI/review; R4-D external OAuth/runtime requires new exact authorization |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -32,6 +32,25 @@ no runtime/config, started no service, called no provider or memory path, and
 expanded no public tool surface. Edge/Relay implementation, OAuth activation,
 automatic ChatGPT tool-use proof, production, release, deploy, cutover, and
 readiness remain false. See `docs/CHATGPT_WEB_R4_ARCHITECTURE_FREEZE.md`.
+
+## ChatGPT Web R4-C Local Edge/Relay Integration
+
+R4-C implements an actual Node HTTP Edge bound only to
+`127.0.0.1:<ephemeral>`, an outbound-only Local Recall Relay, a framed temporary
+UDS transport, and a strict injected synthetic governance double. Edge queue,
+claim lease, acknowledgement, cancellation, and response state remain bounded
+and in-memory. Exact-file import fences allow only the loopback HTTP and UDS
+transport builtins; active entrypoints still cannot import the candidate.
+
+The 30-test focused R4 matrix passes claim/ack, request and claim expiry,
+reconnect/reclaim, duplicate submission and ack rejection, in-flight
+cancellation before governance invocation, signed response correlation,
+non-loopback rejection, and body-log absence. The positive context-resolution
+and empty-overview path keeps provider, native, fallback, primary/derived write,
+other durable mutation, and unrestricted-search counters at zero. No active
+config/service, external runtime, OAuth, provider, VCP, real memory, public tool
+activation, production, release, deploy, cutover, or readiness action occurred.
+See `docs/CHATGPT_WEB_R4C_LOCAL_INTEGRATION.md`.
 
 ## ChatGPT Web R4-B Contracts And Synthetic Harness
 

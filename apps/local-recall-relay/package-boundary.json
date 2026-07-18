@@ -1,8 +1,11 @@
 {
   "component": "local_recall_relay_candidate",
-  "stage": "R4-B",
+  "stage": "R4-C",
   "activated": false,
   "serviceListenerImplemented": false,
+  "loopbackHttpClientImplemented": true,
+  "temporaryUdsClientImplemented": true,
+  "durableStateImplemented": false,
   "allowedProjectImports": [
     "packages/chatgpt-r4-contracts"
   ],

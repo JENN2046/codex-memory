@@ -4,13 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2136 ChatGPT Web R4-B contracts and synthetic harness`.
-Current validation: `CMV-2221`.
-Current fact: R4-B implements import-fenced signed contracts, a non-default read-only candidate profile, Widget DTO/bridge, and a zero-memory synthetic Edge/Relay/UDS/governance flow.
-All provider/native/fallback/write/durable counters are zero; no service, OAuth, external runtime, real memory, or public tool expansion occurred.
+Current task: `CM-2137 ChatGPT Web R4-C local Edge/Relay integration`.
+Current validation: `CMV-2222`.
+Current fact: R4-C implements a non-activated loopback-only Edge, outbound Relay, temporary UDS, and strict synthetic governance integration.
+Claim/ack/expiry/reconnect/replay/cancel/correlation/body-log gates pass with all provider/native/fallback/write/durable counters at zero; no active service/config, OAuth, external runtime, real memory, or public tool activation occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2137 ChatGPT Web R4-C Local Edge/Relay Integration
+
+R4-C adds an actual `127.0.0.1:0` HTTP Edge, an outbound-only loopback Relay,
+and a framed temporary-UDS transport without activating the candidate. Queue,
+lease, ack, cancellation, and response state are bounded and in-memory.
+Exact-file fences restrict Node I/O to the three transport modules and reject
+any listener host/port mutation or active-runtime import.
+
+The focused 30-test R4 matrix proves claim/ack, request expiry, lease expiry and
+reconnect/reclaim, replay rejection, in-flight cancellation before governance,
+signed response correlation, non-loopback rejection, body-log absence, and
+zero provider/native/fallback/write/durable/global-search counters. No active
+config/service, external OAuth/runtime, provider, VCP, real memory, public tool
+activation, production, release, deploy, cutover, or readiness action occurred.
 
 ## CM-2136 ChatGPT Web R4-B Contracts And Synthetic Harness
 

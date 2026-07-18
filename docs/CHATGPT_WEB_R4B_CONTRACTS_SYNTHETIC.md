@@ -8,6 +8,11 @@ Task / validation: `CM-2136` / `CMV-2221`
 
 Date / timezone: `2026-07-18` / `Asia/Shanghai`
 
+This document is the R4-B closeout snapshot. R4-C later adds only the exact
+loopback HTTP and temporary-UDS transport exceptions documented in
+`docs/CHATGPT_WEB_R4C_LOCAL_INTEGRATION.md`; candidate activation and external
+runtime remain false.
+
 R4-B turns the frozen architecture into import-fenced, non-activated contract
 modules and a zero-memory synthetic proof. It does not start or expose an Edge,
 Relay, OAuth flow, MCP endpoint, provider, VCP runtime, or real memory path.

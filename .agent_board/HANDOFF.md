@@ -4,24 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2136 ChatGPT Web R4-B contracts and synthetic harness`.
-Current validation: `CMV-2221`.
-Current fact: R4-B implements import-fenced signed contracts, a non-default read-only candidate profile, Widget DTO/bridge, and a zero-memory synthetic Edge/Relay/UDS/governance flow.
-All provider/native/fallback/write/durable counters are zero; no service, OAuth, external runtime, real memory, or public tool expansion occurred.
+Current task: `CM-2137 ChatGPT Web R4-C local Edge/Relay integration`.
+Current validation: `CMV-2222`.
+Current fact: R4-C implements a non-activated loopback-only Edge, outbound Relay, temporary UDS, and strict synthetic governance integration.
+Claim/ack/expiry/reconnect/replay/cancel/correlation/body-log gates pass with all provider/native/fallback/write/durable counters at zero; no active service/config, OAuth, external runtime, real memory, or public tool activation occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
+CM-2137 implements R4-C as a non-activated local reference runtime. An actual
+Edge binds only to `127.0.0.1:0`; the outbound Relay accepts only that loopback
+origin and forwards signed envelopes through an explicitly injected temporary
+UDS to a strict synthetic governance double. Claim/ack, expiry,
+reconnect/reclaim, replay rejection, in-flight cancellation, response
+correlation, non-loopback rejection, and body-log absence pass across 30 focused
+R4 tests. All provider/native/fallback/write/durable/global-search counters are
+zero. R4-D is next, but external OAuth/runtime configuration requires Jenn's
+new exact authorization; no active service/config, public endpoint, real
+memory, production, release, deploy, cutover, or readiness action is open.
+
 CM-2136 implements the R4-B contracts-only candidate. Signed principal,
 opaque project context, request/response, replay/TTL/size/counter/disclosure,
 candidate tools, Widget bridge, Relay, and local governance injection are
-covered by import fences and 20 focused tests. The in-memory synthetic flow
+covered by import fences and 23 focused tests. The in-memory synthetic flow
 performs context resolution plus an empty overview with every provider/native/
 fallback/write/durable/global-search counter at zero. The candidate is not
-default or active. Next route after PR delivery is R4-C loopback/temporary-UDS
-synthetic integration; external OAuth/runtime and real memory remain separate.
+default or active. Its next route was R4-C loopback/temporary-UDS synthetic
+integration, now implemented by CM-2137; external OAuth/runtime and real memory
+remain separate.
 
 CM-2135 freezes `codex-memory-chatgpt-web-r4-v1`. The canonical flow is stable
 HTTPS ChatGPT Edge -> authenticated outbound Local Recall Relay -> UDS -> local

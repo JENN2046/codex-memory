@@ -13,10 +13,12 @@ const {
   validateImportFences
 } = require('../../scripts/validate_chatgpt_r4_import_fences');
 
-test('R4-B import fences accept the candidate packages without activating them', () => {
+test('R4-C import fences accept only the loopback reference runtime without activating it', () => {
   const result = validateImportFences();
   assert.equal(result.accepted, true);
+  assert.equal(result.stage, 'R4-C');
   assert.equal(result.candidateActivated, false);
+  assert.equal(result.loopbackReferenceRuntimeImplemented, true);
   assert.equal(result.externalRuntimeUsed, false);
   assert.equal(result.durableRemoteStateAllowed, false);
   const packageEntrypoints = discoverPackageRuntimeEntrypoints();
@@ -86,6 +88,27 @@ test('R4-B import fences accept the candidate packages without activating them',
       fileExists: file => sources.has(file)
     }), /dynamic_import_forbidden:src\/core\/runtime\.js/);
   }
+});
+
+test('R4-C listener and transport builtin exceptions are exact-file and exact-loopback only', () => {
+  const edgeRuntimeFile = path.join(ROOTS.edge, 'loopback-runtime.js');
+  const edgeSource = require('node:fs').readFileSync(edgeRuntimeFile, 'utf8');
+  assert.doesNotThrow(() => validateComponentSource('edge', {
+    file: edgeRuntimeFile,
+    source: edgeSource
+  }));
+  assert.throws(() => validateComponentSource('edge', {
+    file: edgeRuntimeFile,
+    source: edgeSource.replace("server.listen(0, '127.0.0.1')", "server.listen(8080, '0.0.0.0')")
+  }), /loopback_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('edge', {
+    file: path.join(ROOTS.edge, 'copied-loopback-runtime.js'),
+    source: edgeSource
+  }), /service_listener|builtin_import_forbidden/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: path.join(ROOTS.relay, 'unexpected-http-client.js'),
+    source: "require('node:http')"
+  }), /builtin_import_forbidden/);
 });
 
 test('public Edge cannot import local config, storage, recall, or arbitrary packages', () => {
