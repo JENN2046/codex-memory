@@ -143,6 +143,9 @@ test('R4-D rejects placeholder, local, path-bearing, or mismatched public author
     [value => { value.endpoints.public_origin = 'https://edge.example.invalid'; value.oauth.resource = value.endpoints.public_origin; }, 'r4d_public_origin_invalid_non_public'],
     [value => { value.endpoints.public_origin = 'https://localhost'; value.oauth.resource = value.endpoints.public_origin; }, 'r4d_public_origin_invalid_non_public'],
     [value => { value.endpoints.public_origin = 'https://127.0.0.1'; value.oauth.resource = value.endpoints.public_origin; }, 'r4d_public_origin_invalid_non_public'],
+    [value => { value.endpoints.public_origin = 'https://bad-.com'; value.oauth.resource = value.endpoints.public_origin; }, 'r4d_public_origin_invalid_non_public'],
+    [value => { value.endpoints.public_origin = 'https://a..com'; value.oauth.resource = value.endpoints.public_origin; }, 'r4d_public_origin_invalid_non_public'],
+    [value => { value.endpoints.public_origin = `https://${'a'.repeat(64)}.com`; value.oauth.resource = value.endpoints.public_origin; }, 'r4d_public_origin_invalid_non_public'],
     [value => { value.endpoints.public_origin = 'https://memory-edge.jenn.dev/base'; }, 'r4d_public_origin_invalid'],
     [value => { value.oauth.resource = 'https://another-edge.jenn.dev'; }, 'r4d_resource_audience_mismatch'],
     [value => { value.endpoints.mcp_path = '/api/mcp'; }, 'r4d_mcp_path_invalid'],
@@ -150,6 +153,7 @@ test('R4-D rejects placeholder, local, path-bearing, or mismatched public author
     [value => { value.endpoints.authorization_server_discovery_url = 'https://other.us.auth0.com/.well-known/openid-configuration'; }, 'r4d_discovery_issuer_mismatch'],
     [value => { value.oauth.issuer = 'https://jenn-dev.us.auth0.com'; }, 'r4d_issuer_not_canonical'],
     [value => { value.oauth.issuer = 'https://auth0/'; }, 'r4d_issuer_invalid_non_public'],
+    [value => { value.oauth.issuer = 'https://bad-.auth0.com/'; }, 'r4d_issuer_invalid_non_public'],
     [value => { value.oauth.issuer = 'https://jenn-dev.us.auth0.com/tenant/'; }, 'r4d_issuer_not_canonical']
   ]) {
     const value = candidate();

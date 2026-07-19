@@ -82,7 +82,13 @@ function parseHttpsUrl(value, code) {
   }
   if (parsed.protocol !== 'https:' || parsed.username || parsed.password || parsed.hash) reject(code);
   const hostname = parsed.hostname.toLowerCase();
+  const dnsLabels = hostname.split('.');
+  const dnsLabelsValid = hostname.length <= 253 && dnsLabels.every(label =>
+    label.length >= 1 &&
+    label.length <= 63 &&
+    /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/u.test(label));
   if (
+    !dnsLabelsValid ||
     hostname === 'localhost' ||
     hostname.endsWith('.localhost') ||
     hostname.endsWith('.invalid') ||
