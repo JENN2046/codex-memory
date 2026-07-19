@@ -9,6 +9,7 @@ const test = require('node:test');
 
 const { sha256 } = require('../../packages/chatgpt-r4-contracts');
 const {
+  assertDistinctEd25519Authorities,
   assertEd25519KeyPair,
   createStrictEd25519PublicKey,
   readSecretReference,
@@ -76,6 +77,24 @@ test('D2A runtime authority accepts only owner-only file references and non-plac
     other.publicKey,
     'edge_runtime_signing_key_pair_mismatch'
   ), { code: 'edge_runtime_signing_key_pair_mismatch' });
+  assert.equal(assertDistinctEd25519Authorities(
+    signing.publicKey,
+    other.publicKey,
+    'edge-key-v1',
+    'relay-key-v1'
+  ), true);
+  assert.throws(() => assertDistinctEd25519Authorities(
+    signing.publicKey,
+    signing.publicKey,
+    'edge-key-v1',
+    'relay-key-v1'
+  ), { code: 'edge_runtime_signing_authority_reused' });
+  assert.throws(() => assertDistinctEd25519Authorities(
+    signing.publicKey,
+    other.publicKey,
+    'shared-key-v1',
+    'shared-key-v1'
+  ), { code: 'edge_runtime_signing_key_id_reused' });
 });
 
 test('D2A Docker build context is narrow and base image is digest-pinned', () => {

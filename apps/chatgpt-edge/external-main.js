@@ -56,6 +56,14 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
     reject('edge_runtime_key_material_invalid');
   }
   assertEd25519KeyPair(edgePrivateKey, edgePublicKey, 'edge_runtime_signing_key_pair_mismatch');
+  const edgeSigningKeyId = getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID');
+  const relaySigningKeyId = getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID');
+  assertDistinctEd25519Authorities(
+    edgePublicKey,
+    relayPublicKey,
+    edgeSigningKeyId,
+    relaySigningKeyId
+  );
 
   return createExternalEdgeRuntime({
     publicOrigin: getEnvironment(environment, 'CODEX_MEMORY_R4_PUBLIC_ORIGIN'),
@@ -68,10 +76,10 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
     ),
     edgeSigning: {
       privateKey: edgePrivateKey,
-      keyId: getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID')
+      keyId: edgeSigningKeyId
     },
     relaySigningPublicKey: relayPublicKey,
-    relaySigningKeyId: getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID'),
+    relaySigningKeyId,
     relayAuthToken: normalizeSingleLineSecret(relayAuthToken),
     bindHost: environment.CODEX_MEMORY_R4_EDGE_BIND_HOST || '0.0.0.0',
     bindPort: parseIntegerEnvironment(environment.CODEX_MEMORY_R4_EDGE_PORT || '8080', 'edge_bind_port_invalid'),
@@ -93,6 +101,18 @@ function assertEd25519KeyPair(privateKey, publicKey, code) {
   const derived = crypto.createPublicKey(privateKey).export({ type: 'spki', format: 'der' });
   const bound = publicKey.export({ type: 'spki', format: 'der' });
   if (!derived.equals(bound)) reject(code);
+  return true;
+}
+
+function assertDistinctEd25519Authorities(edgePublicKey, relayPublicKey, edgeKeyId, relayKeyId) {
+  if (edgePublicKey?.type !== 'public' || edgePublicKey.asymmetricKeyType !== 'ed25519' ||
+      relayPublicKey?.type !== 'public' || relayPublicKey.asymmetricKeyType !== 'ed25519') {
+    reject('edge_runtime_signing_authority_invalid');
+  }
+  const edgeDer = edgePublicKey.export({ type: 'spki', format: 'der' });
+  const relayDer = relayPublicKey.export({ type: 'spki', format: 'der' });
+  if (edgeDer.equals(relayDer)) reject('edge_runtime_signing_authority_reused');
+  if (edgeKeyId === relayKeyId) reject('edge_runtime_signing_key_id_reused');
   return true;
 }
 
@@ -271,6 +291,7 @@ module.exports = {
   DEFAULT_LOCKFILE_PATH,
   DEFAULT_BUILD_SOURCE_FILE,
   assertDigest,
+  assertDistinctEd25519Authorities,
   assertEd25519KeyPair,
   createStrictEd25519PublicKey,
   loadExternalEdgeRuntimeFromEnvironment,
