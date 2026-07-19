@@ -100,6 +100,46 @@ test('D2A runtime authority accepts only owner-only file references and non-plac
 test('D2A Docker build context is narrow and base image is digest-pinned', () => {
   const dockerfile = fs.readFileSync(path.join(__dirname, '../../apps/chatgpt-edge/Dockerfile'), 'utf8');
   const dockerignore = fs.readFileSync(path.join(__dirname, '../../.dockerignore'), 'utf8');
+  const dockerContextAllowlist = dockerignore.split(/\r?\n/u).filter(line => line.startsWith('!'));
+  const expectedDockerContextAllowlist = [
+    '!package.json',
+    '!package-lock.json',
+    '!apps/',
+    '!apps/chatgpt-edge/',
+    '!apps/chatgpt-edge/Dockerfile',
+    '!apps/chatgpt-edge/auth0-token-verifier.js',
+    '!apps/chatgpt-edge/candidate-tool-profile.js',
+    '!apps/chatgpt-edge/external-http-runtime.js',
+    '!apps/chatgpt-edge/external-main.js',
+    '!apps/chatgpt-edge/external-mcp.js',
+    '!apps/chatgpt-edge/index.js',
+    '!apps/chatgpt-edge/loopback-runtime.js',
+    '!apps/chatgpt-edge/package-boundary.json',
+    '!apps/chatgpt-edge/request-envelope.js',
+    '!apps/chatgpt-edge/transient-request-broker.js',
+    '!apps/chatgpt-memory-scope-widget/',
+    '!apps/chatgpt-memory-scope-widget/index.js',
+    '!apps/chatgpt-memory-scope-widget/package-boundary.json',
+    '!apps/chatgpt-memory-scope-widget/src/',
+    '!apps/chatgpt-memory-scope-widget/src/bridge.js',
+    '!apps/chatgpt-memory-scope-widget/src/dto.js',
+    '!apps/chatgpt-memory-scope-widget/src/html.js',
+    '!apps/chatgpt-memory-scope-widget/src/resource.js',
+    '!packages/',
+    '!packages/chatgpt-r4-contracts/',
+    '!packages/chatgpt-r4-contracts/builders.js',
+    '!packages/chatgpt-r4-contracts/canonical.js',
+    '!packages/chatgpt-r4-contracts/constants.js',
+    '!packages/chatgpt-r4-contracts/errors.js',
+    '!packages/chatgpt-r4-contracts/external-runtime-preflight.js',
+    '!packages/chatgpt-r4-contracts/index.js',
+    '!packages/chatgpt-r4-contracts/package.json',
+    '!packages/chatgpt-r4-contracts/replay-guard.js',
+    '!packages/chatgpt-r4-contracts/schemas.js',
+    '!packages/chatgpt-r4-contracts/self-hosted-binding-amendment.js',
+    '!packages/chatgpt-r4-contracts/signatures.js',
+    '!packages/chatgpt-r4-contracts/validators.js'
+  ];
   assert.match(dockerfile, /^FROM node:22\.23\.1-bookworm-slim@sha256:[a-f0-9]{64}$/mu);
   assert.match(dockerfile, /npm ci --omit=dev --ignore-scripts/u);
   assert.match(dockerfile, /> \/app\/\.build-source-commit/u);
@@ -109,9 +149,9 @@ test('D2A Docker build context is narrow and base image is digest-pinned', () =>
   assert.match(dockerfile, /HEALTHCHECK/u);
   assert.match(dockerfile, /ENTRYPOINT \["node", "apps\/chatgpt-edge\/external-main\.js"\]/u);
   assert.match(dockerignore, /^\*\*$/mu);
-  assert.doesNotMatch(dockerignore, /state-private|\.env/u);
-  assert.equal(dockerignore.includes('!apps/chatgpt-edge/**'), true);
-  assert.equal(dockerignore.includes('!packages/chatgpt-r4-contracts/**'), true);
+  assert.deepEqual(dockerContextAllowlist, expectedDockerContextAllowlist);
+  assert.equal(dockerContextAllowlist.every(entry => !entry.includes('*')), true);
+  assert.equal(dockerContextAllowlist.some(entry => /(?:^|\/)(?:\.env|logs?|tmp|scratch)(?:[./]|$)/u.test(entry)), false);
 });
 
 function supplyChainEnvironment() {
