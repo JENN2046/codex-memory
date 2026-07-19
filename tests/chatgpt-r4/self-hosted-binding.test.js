@@ -10,7 +10,9 @@ const {
 } = require('../../packages/chatgpt-r4-contracts');
 const {
   loadJson,
+  PRIVATE_FINGERPRINT_KEYS,
   validateRedactedExample,
+  validatePrivateBindingEnvelope,
   validateSchema,
   EXAMPLE_PATH,
   SCHEMA_PATH
@@ -76,7 +78,9 @@ function candidate() {
       repository: 'JENN2046/codex-memory',
       base_commit_sha: '0123456789abcdef0123456789abcdef01234567',
       commit_sha: '89abcdef0123456789abcdef0123456789abcdef',
-      tree_sha: 'fedcba9876543210fedcba9876543210fedcba98'
+      tree_sha: 'fedcba9876543210fedcba9876543210fedcba98',
+      lockfile_sha256: `sha256:${'0123456789abcdef'.repeat(4)}`,
+      edge_artifact_sha256: `sha256:${'fedcba9876543210'.repeat(4)}`
     },
     activation_boundary: {
       deployed: false,
@@ -167,11 +171,40 @@ test('R4-D D2B rejects reused references, placeholders, IP origins, and source p
   assert.throws(() => validateSelfHostedBindingAmendment(source), {
     code: 'r4d_d2b_commit_invalid'
   });
+
+  const artifact = candidate();
+  artifact.source_identity.edge_artifact_sha256 = `sha256:${'0'.repeat(64)}`;
+  assert.throws(() => validateSelfHostedBindingAmendment(artifact), {
+    code: 'r4d_d2b_edge_artifact_invalid'
+  });
 });
 
 test('R4-D D2B schema is frozen and redacted example remains activation-ineligible', () => {
   assert.doesNotThrow(() => validateSchema(loadJson(SCHEMA_PATH)));
   assert.doesNotThrow(() => validateRedactedExample(loadJson(EXAMPLE_PATH)));
+});
+
+test('R4-D D2B private envelope binds exact-value fingerprints without returning them', () => {
+  const exactValueFingerprints = Object.fromEntries(
+    PRIVATE_FINGERPRINT_KEYS.map((key, index) => [
+      key,
+      `sha256:${(index + 1).toString(16).padStart(2, '0').repeat(32)}`
+    ])
+  );
+  const envelope = {
+    private_binding_reference: 'binding:r4d-d2b:private-test-0001',
+    amendment: candidate(),
+    exact_value_fingerprints: exactValueFingerprints
+  };
+  const resolved = validatePrivateBindingEnvelope(envelope);
+  assert.match(resolved.bindingDigest, /^sha256:[a-f0-9]{64}$/u);
+  assert.equal(resolved.amendmentReceipt.accepted, true);
+  assert.equal(JSON.stringify(resolved.amendmentReceipt).includes('auth0_issuer_sha256'), false);
+
+  delete envelope.exact_value_fingerprints.relay_auth_token_sha256;
+  assert.throws(() => validatePrivateBindingEnvelope(envelope), {
+    message: 'r4d_d2b_private_fingerprint_shape_invalid'
+  });
 });
 
 module.exports = { candidate };

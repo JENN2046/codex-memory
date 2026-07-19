@@ -6,6 +6,8 @@ const path = require('node:path');
 
 const {
   D2B_ENV_REFERENCES,
+  digestObject,
+  isPlainObject,
   resolveSelfHostedBindingAmendment,
   validateSelfHostedBindingAmendment
 } = require('../packages/chatgpt-r4-contracts');
@@ -22,7 +24,22 @@ const EXAMPLE_PATH = path.join(
   'examples',
   'chatgpt-web-r4d-self-hosted-binding-amendment.redacted.example.json'
 );
-const EXPECTED_SCHEMA_SHA256 = '8aaa62da452fcc16c4953adb38d5f298586194e6e49760da2d59525a06355cb3';
+const EXPECTED_SCHEMA_SHA256 = '2c6eb6616b3aeb8239485031598bbfbfb371cba355eb55c9cc244bf90668e9f6';
+const PRIVATE_FINGERPRINT_KEYS = Object.freeze([
+  'auth0_issuer_sha256',
+  'edge_signing_key_id_sha256',
+  'edge_signing_public_key_sha256',
+  'host_project_reference_sha256',
+  'oauth_client_id_sha256',
+  'operator_reference_sha256',
+  'previous_binding_reference_sha256',
+  'previous_host_config_reference_sha256',
+  'public_origin_sha256',
+  'relay_auth_token_sha256',
+  'relay_signing_key_id_sha256',
+  'relay_signing_public_key_sha256',
+  'relay_uds_path_sha256'
+]);
 
 function loadJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -60,19 +77,61 @@ function validatePrivateBinding(file, { expectedCommit, expectedTree, digestFile
   invariant(/^[a-f0-9]{40}$/u.test(expectedTree || ''), 'r4d_d2b_expected_tree_invalid');
   assertOwnerOnlyFile(absolute);
   const input = loadJson(absolute);
-  invariant(input.source_identity?.commit_sha === expectedCommit, 'r4d_d2b_private_commit_mismatch');
-  invariant(input.source_identity?.tree_sha === expectedTree, 'r4d_d2b_private_tree_mismatch');
-  const resolved = resolveSelfHostedBindingAmendment(input);
+  invariant(input.amendment?.source_identity?.commit_sha === expectedCommit, 'r4d_d2b_private_commit_mismatch');
+  invariant(input.amendment?.source_identity?.tree_sha === expectedTree, 'r4d_d2b_private_tree_mismatch');
+  const resolved = validatePrivateBindingEnvelope(input);
   if (digestFile) writeOwnerOnlyDigest(digestFile, resolved.bindingDigest);
   return {
-    ...resolved.receipt,
+    ...resolved.amendmentReceipt,
     private_binding_file_owner_only: true,
     exact_source_identity_match: true,
+    exact_value_fingerprint_count: PRIVATE_FINGERPRINT_KEYS.length,
+    exact_value_fingerprints_bound: true,
     canonical_digest_written_privately: Boolean(digestFile),
     reference_count: Object.keys(D2B_ENV_REFERENCES).length,
     secret_values_read: false,
     exact_values_returned: false
   };
+}
+
+function validatePrivateBindingEnvelope(input) {
+  exactKeys(input, [
+    'amendment', 'exact_value_fingerprints', 'private_binding_reference'
+  ], 'r4d_d2b_private_envelope_shape_invalid');
+  invariant(
+    typeof input.private_binding_reference === 'string' &&
+      /^binding:r4d-d2b:[A-Za-z0-9][A-Za-z0-9._-]{7,119}$/u.test(input.private_binding_reference) &&
+      !/placeholder|example|todo/iu.test(input.private_binding_reference),
+    'r4d_d2b_private_binding_reference_invalid'
+  );
+  exactKeys(
+    input.exact_value_fingerprints,
+    PRIVATE_FINGERPRINT_KEYS,
+    'r4d_d2b_private_fingerprint_shape_invalid'
+  );
+  for (const key of PRIVATE_FINGERPRINT_KEYS) {
+    const value = input.exact_value_fingerprints[key];
+    invariant(
+      typeof value === 'string' && /^sha256:[a-f0-9]{64}$/u.test(value) &&
+        !/^(.)\1+$/u.test(value.slice(7)),
+      'r4d_d2b_private_fingerprint_invalid'
+    );
+  }
+  const amendment = resolveSelfHostedBindingAmendment(input.amendment);
+  return {
+    amendmentReceipt: amendment.receipt,
+    bindingDigest: digestObject(input)
+  };
+}
+
+function exactKeys(value, expected, code) {
+  invariant(isPlainObject(value), code);
+  const actual = Object.keys(value).sort();
+  const wanted = [...expected].sort();
+  invariant(
+    actual.length === wanted.length && actual.every((key, index) => key === wanted[index]),
+    code
+  );
 }
 
 function assertOwnerOnlyFile(file) {
@@ -159,12 +218,14 @@ if (require.main === module) {
 module.exports = {
   EXAMPLE_PATH,
   EXPECTED_SCHEMA_SHA256,
+  PRIVATE_FINGERPRINT_KEYS,
   ROOT,
   SCHEMA_PATH,
   assertOwnerOnlyFile,
   loadJson,
   parseArguments,
   validatePrivateBinding,
+  validatePrivateBindingEnvelope,
   validateRedactedExample,
   validateSchema,
   writeOwnerOnlyDigest

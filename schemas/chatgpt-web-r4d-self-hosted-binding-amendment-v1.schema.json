@@ -117,12 +117,17 @@
     "source_identity": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository", "base_commit_sha", "commit_sha", "tree_sha"],
+      "required": [
+        "repository", "base_commit_sha", "commit_sha", "tree_sha",
+        "lockfile_sha256", "edge_artifact_sha256"
+      ],
       "properties": {
         "repository": { "const": "JENN2046/codex-memory" },
         "base_commit_sha": { "$ref": "#/$defs/sha40" },
         "commit_sha": { "$ref": "#/$defs/sha40" },
-        "tree_sha": { "$ref": "#/$defs/sha40" }
+        "tree_sha": { "$ref": "#/$defs/sha40" },
+        "lockfile_sha256": { "$ref": "#/$defs/sha256" },
+        "edge_artifact_sha256": { "$ref": "#/$defs/sha256" }
       }
     },
     "activation_boundary": {

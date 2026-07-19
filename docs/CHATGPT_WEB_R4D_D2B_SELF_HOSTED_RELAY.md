@@ -83,7 +83,8 @@ private single operator
 The canonical digest covers the entire exact private amendment, including the
 previous binding digest, ownership, origin/resource, issuer/discovery, source
 identity, all four Edge-private/Edge-public/Relay-private/Relay-public signing
-authority references, and rollback references. The public receipt
+authority references, lockfile and built Edge artifact digests, private
+exact-value fingerprints, and rollback references. The public receipt
 does not return exact values or the digest.
 
 The existing Windows current-user private store and all six original D1

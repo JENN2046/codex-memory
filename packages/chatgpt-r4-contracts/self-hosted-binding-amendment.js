@@ -143,12 +143,15 @@ function resolveSelfHostedBindingAmendment(input) {
   ]) literal(input.rollback[field], true, `r4d_d2b_${field}_invalid`);
 
   exactKeys(input.source_identity, [
-    'base_commit_sha', 'commit_sha', 'repository', 'tree_sha'
+    'base_commit_sha', 'commit_sha', 'edge_artifact_sha256', 'lockfile_sha256',
+    'repository', 'tree_sha'
   ], 'r4d_d2b_source_shape_invalid');
   literal(input.source_identity.repository, 'JENN2046/codex-memory', 'r4d_d2b_repository_invalid');
   digest(input.source_identity.base_commit_sha, SHA40_PATTERN, 'r4d_d2b_base_commit_invalid');
   digest(input.source_identity.commit_sha, SHA40_PATTERN, 'r4d_d2b_commit_invalid');
   digest(input.source_identity.tree_sha, SHA40_PATTERN, 'r4d_d2b_tree_invalid');
+  digest(input.source_identity.lockfile_sha256, SHA256_PATTERN, 'r4d_d2b_lockfile_invalid');
+  digest(input.source_identity.edge_artifact_sha256, SHA256_PATTERN, 'r4d_d2b_edge_artifact_invalid');
 
   exactKeys(input.activation_boundary, [
     'chatgpt_app_created', 'deployed', 'external_service_changed', 'memory_read',

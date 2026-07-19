@@ -57,7 +57,9 @@
     "repository": "JENN2046/codex-memory",
     "base_commit_sha": "0123456789abcdef0123456789abcdef01234567",
     "commit_sha": "89abcdef0123456789abcdef0123456789abcdef",
-    "tree_sha": "fedcba9876543210fedcba9876543210fedcba98"
+    "tree_sha": "fedcba9876543210fedcba9876543210fedcba98",
+    "lockfile_sha256": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "edge_artifact_sha256": "sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210"
   },
   "activation_boundary": {
     "deployed": false,
