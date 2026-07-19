@@ -47,9 +47,9 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
   let relayPrivateKey;
   let relayPublicKey;
   try {
-    edgePublicKey = crypto.createPublicKey(edgePublicKeyPem);
+    edgePublicKey = createStrictEd25519PublicKey(edgePublicKeyPem, 'relay_runtime_public_key_material_invalid');
     relayPrivateKey = crypto.createPrivateKey(relayPrivateKeyPem);
-    relayPublicKey = crypto.createPublicKey(relayPublicKeyPem);
+    relayPublicKey = createStrictEd25519PublicKey(relayPublicKeyPem, 'relay_runtime_public_key_material_invalid');
   } catch {
     reject('relay_runtime_key_material_invalid');
   }
@@ -83,6 +83,21 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
     cancelPollMs: integerEnvironment(environment.CODEX_MEMORY_R4_RELAY_CANCEL_POLL_MS || '250', 1, 1000),
     edgeRequest
   });
+}
+
+function createStrictEd25519PublicKey(value, code) {
+  if (typeof value !== 'string' || value.includes('\r') ||
+      !/^-----BEGIN PUBLIC KEY-----\n(?:[A-Za-z0-9+/]{1,64}={0,2}\n)+-----END PUBLIC KEY-----\n?$/u.test(value)) {
+    reject(code);
+  }
+  let key;
+  try {
+    key = crypto.createPublicKey(value);
+  } catch {
+    reject(code);
+  }
+  if (key.type !== 'public' || key.asymmetricKeyType !== 'ed25519') reject(code);
+  return key;
 }
 
 function validateBindingEnvironment(environment) {
@@ -188,6 +203,7 @@ function integerEnvironment(value, minimum, maximum) {
 }
 
 module.exports = {
+  createStrictEd25519PublicKey,
   DEFAULT_RELAY_SECRET_ROOT,
   getEnvironment,
   integerEnvironment,

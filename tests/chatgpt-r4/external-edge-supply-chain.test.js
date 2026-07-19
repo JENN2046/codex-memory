@@ -9,6 +9,7 @@ const test = require('node:test');
 
 const { sha256 } = require('../../packages/chatgpt-r4-contracts');
 const {
+  createStrictEd25519PublicKey,
   readSecretReference,
   validateSupplyChainEnvironment
 } = require('../../apps/chatgpt-edge/external-main');
@@ -53,6 +54,16 @@ test('D2A runtime authority accepts only owner-only file references and non-plac
   assert.throws(() => validateSupplyChainEnvironment(environment, {
     buildSourceCommit: 'abcdef1234567890abcdef1234567890abcdef12'
   }), { code: 'edge_runtime_source_commit_mismatch' });
+
+  const signing = crypto.generateKeyPairSync('ed25519');
+  assert.doesNotThrow(() => createStrictEd25519PublicKey(
+    signing.publicKey.export({ type: 'spki', format: 'pem' }),
+    'edge_runtime_public_key_material_invalid'
+  ));
+  assert.throws(() => createStrictEd25519PublicKey(
+    signing.privateKey.export({ type: 'pkcs8', format: 'pem' }),
+    'edge_runtime_public_key_material_invalid'
+  ), { code: 'edge_runtime_public_key_material_invalid' });
 });
 
 test('D2A Docker build context is narrow and base image is digest-pinned', () => {

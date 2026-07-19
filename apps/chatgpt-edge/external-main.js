@@ -45,7 +45,7 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
   let relayPublicKey;
   try {
     edgePrivateKey = crypto.createPrivateKey(edgePrivateKeyPem);
-    relayPublicKey = crypto.createPublicKey(relayPublicKeyPem);
+    relayPublicKey = createStrictEd25519PublicKey(relayPublicKeyPem, 'edge_runtime_public_key_material_invalid');
   } catch {
     reject('edge_runtime_key_material_invalid');
   }
@@ -78,6 +78,21 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
       'edge_inflight_limit_invalid'
     )
   });
+}
+
+function createStrictEd25519PublicKey(value, code) {
+  if (typeof value !== 'string' || value.includes('\r') ||
+      !/^-----BEGIN PUBLIC KEY-----\n(?:[A-Za-z0-9+/]{1,64}={0,2}\n)+-----END PUBLIC KEY-----\n?$/u.test(value)) {
+    reject(code);
+  }
+  let key;
+  try {
+    key = crypto.createPublicKey(value);
+  } catch {
+    reject(code);
+  }
+  if (key.type !== 'public' || key.asymmetricKeyType !== 'ed25519') reject(code);
+  return key;
 }
 
 function validateSupplyChainEnvironment(environment, {
@@ -240,6 +255,7 @@ module.exports = {
   DEFAULT_LOCKFILE_PATH,
   DEFAULT_BUILD_SOURCE_FILE,
   assertDigest,
+  createStrictEd25519PublicKey,
   loadExternalEdgeRuntimeFromEnvironment,
   normalizeBuildSourceCommit,
   normalizeSingleLineSecret,

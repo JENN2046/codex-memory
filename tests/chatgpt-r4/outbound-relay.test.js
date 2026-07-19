@@ -176,6 +176,17 @@ test('R4-D D2B runtime authority requires owner-only files and distinct Ed25519 
     edgeRequest: createFakeHttpsRequest(() => ({ statusCode: 204, body: null }))
   }));
 
+  fs.writeFileSync(files.edge, edge.privateKey.export({ type: 'pkcs8', format: 'pem' }), { mode: 0o600 });
+  assert.throws(() => loadOutboundRelayRuntimeFromEnvironment(environment, { secretRoot: root }), {
+    code: 'relay_runtime_key_material_invalid'
+  });
+  fs.writeFileSync(files.edge, edge.publicKey.export({ type: 'spki', format: 'pem' }), { mode: 0o600 });
+  fs.writeFileSync(files.relayPublic, relay.privateKey.export({ type: 'pkcs8', format: 'pem' }), { mode: 0o600 });
+  assert.throws(() => loadOutboundRelayRuntimeFromEnvironment(environment, { secretRoot: root }), {
+    code: 'relay_runtime_key_material_invalid'
+  });
+  fs.writeFileSync(files.relayPublic, relay.publicKey.export({ type: 'spki', format: 'pem' }), { mode: 0o600 });
+
   fs.chmodSync(files.token, 0o644);
   assert.throws(() => loadOutboundRelayRuntimeFromEnvironment(environment, { secretRoot: root }), {
     code: 'relay_secret_file_security_invalid'
