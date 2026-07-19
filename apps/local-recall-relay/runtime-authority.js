@@ -66,12 +66,15 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
   const edgeKeyId = keyId(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID');
   const relayKeyId = keyId(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID');
   if (edgeKeyId === relayKeyId) reject('relay_runtime_signing_key_id_reused');
+  const relayId = environment.CODEX_MEMORY_R4_RELAY_ID === undefined
+    ? undefined
+    : keyId(environment, 'CODEX_MEMORY_R4_RELAY_ID');
 
   return createOutboundRelayRuntime({
     edgeOrigin,
     relayAuthToken,
     socketPath: validateSocketPath(getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_UDS_PATH')),
-    relayId: keyId(environment, 'CODEX_MEMORY_R4_RELAY_ID'),
+    relayId,
     expectedIssuer: issuer,
     expectedAudience: edgeOrigin,
     resolveRequestPublicKey: candidate => candidate === edgeKeyId ? edgePublicKey : null,
