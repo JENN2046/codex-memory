@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "architecture_reference": "codex-memory-chatgpt-web-r4-v1",
+  "stage": "R4-D-D2B",
+  "amendment": {
+    "amendment_reference": "binding:r4d-d2b:redacted",
+    "previous_binding_digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "reason": "self_hosted_private_vm_selected"
+  },
+  "ownership": {
+    "deployment_class": "private_development",
+    "hosting_provider": "self_hosted_private_vm",
+    "host_service_mode": "isolated_container_loopback_reverse_proxy",
+    "host_project_reference": "env:CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE",
+    "operator_count": 1,
+    "operator_reference": "env:CODEX_MEMORY_R4_OPERATOR_REFERENCE",
+    "operator_role": "owner"
+  },
+  "oauth": {
+    "identity_provider": "auth0",
+    "client_registration_mode": "predefined_public_client",
+    "issuer": "https://tenant.example.invalid/",
+    "resource": "https://edge.example.invalid",
+    "scopes": ["memory.read"],
+    "pkce_method": "S256",
+    "oauth_client_id": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID"
+  },
+  "endpoints": {
+    "public_origin": "https://edge.example.invalid",
+    "mcp_path": "/mcp",
+    "protected_resource_metadata_path": "/.well-known/oauth-protected-resource",
+    "authorization_server_discovery_url": "https://tenant.example.invalid/.well-known/openid-configuration"
+  },
+  "relay_authority": {
+    "transport_mode": "outbound_https_to_local_uds",
+    "edge_signing_private_key": "env:CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY",
+    "edge_signing_public_key": "env:CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY",
+    "edge_signing_key_id": "env:CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID",
+    "relay_signing_private_key": "env:CODEX_MEMORY_R4_RELAY_SIGNING_PRIVATE_KEY",
+    "relay_signing_public_key": "env:CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY",
+    "relay_signing_key_id": "env:CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID",
+    "relay_auth_token": "env:CODEX_MEMORY_R4_RELAY_AUTH_TOKEN",
+    "relay_uds_path": "env:CODEX_MEMORY_R4_RELAY_UDS_PATH",
+    "inbound_listener_allowed": false,
+    "body_logging_allowed": false,
+    "durable_state_allowed": false
+  },
+  "rollback": {
+    "previous_binding_reference": "env:CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE",
+    "previous_host_config_reference": "env:CODEX_MEMORY_R4_PREVIOUS_HOST_CONFIG_REFERENCE",
+    "relay_stop_ready": true,
+    "container_stop_ready": true,
+    "reverse_proxy_disable_ready": true,
+    "credential_revocation_ready": true
+  },
+  "source_identity": {
+    "repository": "JENN2046/codex-memory",
+    "base_commit_sha": "0123456789abcdef0123456789abcdef01234567",
+    "commit_sha": "89abcdef0123456789abcdef0123456789abcdef",
+    "tree_sha": "fedcba9876543210fedcba9876543210fedcba98",
+    "lockfile_sha256": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "edge_artifact_sha256": "sha256:fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210"
+  },
+  "activation_boundary": {
+    "deployed": false,
+    "service_started": false,
+    "external_service_changed": false,
+    "chatgpt_app_created": false,
+    "oauth_token_exchanges": 0,
+    "provider_calls": 0,
+    "memory_read": false,
+    "memory_write": false
+  }
+}

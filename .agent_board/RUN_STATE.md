@@ -4,22 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2139 ChatGPT Web R4-D D2A external Edge artifact`.
-Current validation: `CMV-2224`.
-Current fact: R4-D D2A implements and locally validates an isolated official-SDK Direct HTTPS Edge artifact without activation.
-Official MCP/OAuth, zero-memory relay, import-fence, secret-reference, source/lockfile binding, and pinned-container checks pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
+Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
+Current validation: `CMV-2226`.
+Current fact: D2C-D4 isolated Direct HTTPS Edge, Auth0 PKCE/operator binding, and authenticated initialize/tools-list canary pass.
+All 65 R4 tests and full hardening pass; six read-only candidate tools were discovered with zero tool/Relay/memory/provider/native/fallback/write/durable calls.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R4-D D2A implements an isolated Direct HTTPS Edge artifact; the deployment host binding remains unamended and inactive.
+- Architecture: R4-D Direct HTTPS self-hosted Edge and exact private binding are active for one private-development operator.
 - Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
-- Candidate: official-SDK external MCP/PRMD/Auth0/Widget/Relay code exists but remains non-default/non-activated.
-- D2A proof: all 57 focused R4 tests pass; pinned non-root Docker artifact builds without container start.
-- Host route: private VM read-only preflight passed with a coexistence gate; D1 Render binding must be amended before self-hosted deployment.
-- Status sync: performed locally in CM-2139; PR CI/review and merge remain delivery gates.
+- Candidate: the external six-tool candidate is discoverable behind OAuth but remains absent from the default local MCP surface.
+- D2C-D4 proof: exact binding, isolated container, TLS/health/PRMD, Auth0 PKCE/operator binding, initialize, and tools/list pass with zero memory/provider/native/write effects.
+- Host route: Jenn-controlled Direct HTTPS is validated; outbound Relay/local UDS and ChatGPT App remain inactive.
+- Status sync: performed locally in CM-2141; stacked PR CI/review remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -49,7 +49,7 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Any readiness, release, deploy, cutover, tag, push, native-memory, provider, or real-memory action requires a new exact boundary. Do not replay the consumed full-plan application authorization.
+Enter R4-E private single-operator ChatGPT App attachment and zero-memory Widget/`memory_overview` E2E. R4-F native-memory/provider/real-memory, readiness, release, and cutover remain closed.
 
 ## Historical Run Notes
 

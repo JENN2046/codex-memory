@@ -9,5 +9,6 @@ module.exports = {
   ...require('./builders'),
   ...require('./validators'),
   ...require('./replay-guard'),
-  ...require('./external-runtime-preflight')
+  ...require('./external-runtime-preflight'),
+  ...require('./self-hosted-binding-amendment')
 };

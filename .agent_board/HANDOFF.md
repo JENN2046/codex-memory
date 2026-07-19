@@ -4,15 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2139 ChatGPT Web R4-D D2A external Edge artifact`.
-Current validation: `CMV-2224`.
-Current fact: R4-D D2A implements and locally validates an isolated official-SDK Direct HTTPS Edge artifact without activation.
-Official MCP/OAuth, zero-memory relay, import-fence, secret-reference, source/lockfile binding, and pinned-container checks pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
+Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
+Current validation: `CMV-2226`.
+Current fact: D2C-D4 isolated Direct HTTPS Edge, Auth0 PKCE/operator binding, and authenticated initialize/tools-list canary pass.
+All 65 R4 tests and full hardening pass; six read-only candidate tools were discovered with zero tool/Relay/memory/provider/native/fallback/write/durable calls.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2141 completes the D2B private binding plus D2C-D4 Direct HTTPS canary. One
+isolated Edge container, dedicated TLS vhost, Auth0 exact resource/client/scope,
+PKCE S256, and operator fingerprint are active in private development. D4 sent
+only initialize/tools-list and found six read-only tools. Relay/local UDS,
+ChatGPT App, Widget E2E, and memory paths were not invoked. The next exact gate
+is R4-E private ChatGPT App zero-memory E2E; R4-F live recall remains closed.
+
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,

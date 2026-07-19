@@ -8,10 +8,10 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | ChatGPT Web R4-D D2A external Edge artifact implemented and locally validated; activation and readiness remain false |
-| Current task | `CM-2139 ChatGPT Web R4-D D2A external Edge artifact` |
-| Current validation | `CMV-2224` |
-| Current route | Deliver D2A through normal PR/CI/review; then amend the Render-specific D1 private binding for isolated self-hosting before any deployment |
+| Status | ChatGPT Web R4-D D2C-D4 Direct HTTPS Edge, Auth0 PKCE, operator binding, and zero-memory MCP discovery canary passed |
+| Current task | `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary` |
+| Current validation | `CMV-2226` |
+| Current route | Enter R4-E private single-operator ChatGPT App attachment and zero-memory Widget/`memory_overview` E2E |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -32,6 +32,35 @@ tests pass and the image builds locally; no container or external service was
 started. The private VM's read-only preflight passed with a coexistence gate,
 but the old D1 binding is still Render-specific and is not deployment authority
 for that VM. See `docs/CHATGPT_WEB_R4D_D2A_EDGE_ARTIFACT.md`.
+
+## ChatGPT Web R4-D D2B Self-Hosted Binding And Outbound Relay
+
+D2B adds a frozen self-hosted private-development amendment plus the real
+outbound HTTPS Relay client. Relay transport is canonical public HTTPS to local
+UDS; the Relay has no inbound listener, mapping/scope/provider/storage
+authority, body logging, or durable state. Owner-only `file:` references,
+distinct Ed25519 Edge/Relay identities, exact issuer/resource binding, replay
+checks, signed zero-counter completions, and URL/key/permission negatives pass.
+
+All 65 R4 tests pass. The exact amendment now binds the Jenn-controlled public
+origin, source/artifact identity, distinct Edge/Relay signing authorities, and
+rollback references in the private owner-only store. See
+`docs/CHATGPT_WEB_R4D_D2B_SELF_HOSTED_RELAY.md`.
+
+## ChatGPT Web R4-D Direct OAuth Runtime Canary
+
+D2C deployed one isolated non-root Edge container behind host-loopback publish,
+a dedicated reverse-proxy vhost, and TLS without changing unrelated
+containers. Public/local health, protected-resource metadata, and anonymous
+MCP rejection passed. D3 bound an Auth0 RS256 resource, predefined Native
+public client, PKCE S256, exact `memory.read`, and one operator fingerprint;
+one authorization-code exchange validated the binding and retained encrypted
+rollback.
+
+D4 authenticated exactly `initialize` and `tools/list`. Six read-only candidate
+tools were discovered; tool, Relay, memory, provider, native, fallback, write,
+and durable-mutation counters remained zero. No ChatGPT App or real recall was
+used. See `docs/CHATGPT_WEB_R4D_DIRECT_OAUTH_RUNTIME_CANARY.md`.
 
 ## ChatGPT Web R4-D External OAuth/Runtime Preflight
 

@@ -45,6 +45,18 @@ const R4C_RUNTIME_FILE_POLICIES = Object.freeze({
     allowedBuiltins: Object.freeze(['node:http']),
     allowedRuntimeRules: Object.freeze([])
   }),
+  'apps/local-recall-relay/outbound-https-client.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:https']),
+    allowedRuntimeRules: Object.freeze([])
+  }),
+  'apps/local-recall-relay/runtime-authority.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:crypto', 'node:fs', 'node:path']),
+    allowedRuntimeRules: Object.freeze(['runtime_process_access'])
+  }),
+  'apps/local-recall-relay/outbound-main.js': Object.freeze({
+    allowedBuiltins: Object.freeze([]),
+    allowedRuntimeRules: Object.freeze(['runtime_process_access'])
+  }),
   'apps/local-recall-relay/uds-transport.js': Object.freeze({
     allowedBuiltins: Object.freeze(['node:net']),
     allowedRuntimeRules: Object.freeze([])
@@ -448,7 +460,7 @@ function readBoundary(component) {
   const value = JSON.parse(fs.readFileSync(file, 'utf8'));
   const expectedStage = component === 'edge'
     ? 'R4-D-D2A'
-    : (component === 'relay' ? 'R4-C' : 'R4-B');
+    : (component === 'relay' ? 'R4-D-D2B' : 'R4-B');
   if (value.stage !== expectedStage || value.activated !== false) {
     throw new Error(`boundary_activation_invalid:${component}`);
   }
@@ -479,6 +491,11 @@ function validateBoundaryManifests() {
   if (relay.loopbackHttpClientImplemented !== true || relay.temporaryUdsClientImplemented !== true ||
       relay.serviceListenerImplemented !== false || relay.durableStateImplemented !== false) {
     throw new Error('relay_loopback_boundary_invalid');
+  }
+  if (relay.outboundHttpsClientImplemented !== true ||
+      relay.ownerOnlySecretReferencesRequired !== true ||
+      relay.edgeRelaySigningAuthoritySeparated !== true) {
+    throw new Error('relay_outbound_boundary_invalid');
   }
   if (widget.authorizationAuthority !== false || widget.rawMemoryDisplayAllowed !== false) {
     throw new Error('widget_boundary_invalid');
@@ -546,11 +563,12 @@ function validateImportFences() {
   const components = ['contracts', 'edge', 'relay', 'widget', 'governance'].map(component => validateComponent(component));
   return {
     accepted: true,
-    stage: 'R4-D-D2A',
+    stage: 'R4-D-D2B',
     components,
     candidateActivated: false,
     loopbackReferenceRuntimeImplemented: true,
     externalRuntimeImplemented: true,
+    outboundRelayImplemented: true,
     externalRuntimeActivated: false,
     activationEntrypointCount: activation.entrypointCount,
     activationModuleCount: activation.moduleCount,

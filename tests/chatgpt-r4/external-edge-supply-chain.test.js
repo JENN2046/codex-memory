@@ -9,6 +9,9 @@ const test = require('node:test');
 
 const { sha256 } = require('../../packages/chatgpt-r4-contracts');
 const {
+  assertDistinctEd25519Authorities,
+  assertEd25519KeyPair,
+  createStrictEd25519PublicKey,
   readSecretReference,
   validateSupplyChainEnvironment
 } = require('../../apps/chatgpt-edge/external-main');
@@ -53,6 +56,45 @@ test('D2A runtime authority accepts only owner-only file references and non-plac
   assert.throws(() => validateSupplyChainEnvironment(environment, {
     buildSourceCommit: 'abcdef1234567890abcdef1234567890abcdef12'
   }), { code: 'edge_runtime_source_commit_mismatch' });
+
+  const signing = crypto.generateKeyPairSync('ed25519');
+  assert.doesNotThrow(() => createStrictEd25519PublicKey(
+    signing.publicKey.export({ type: 'spki', format: 'pem' }),
+    'edge_runtime_public_key_material_invalid'
+  ));
+  assert.throws(() => createStrictEd25519PublicKey(
+    signing.privateKey.export({ type: 'pkcs8', format: 'pem' }),
+    'edge_runtime_public_key_material_invalid'
+  ), { code: 'edge_runtime_public_key_material_invalid' });
+  assert.equal(assertEd25519KeyPair(
+    signing.privateKey,
+    signing.publicKey,
+    'edge_runtime_signing_key_pair_mismatch'
+  ), true);
+  const other = crypto.generateKeyPairSync('ed25519');
+  assert.throws(() => assertEd25519KeyPair(
+    signing.privateKey,
+    other.publicKey,
+    'edge_runtime_signing_key_pair_mismatch'
+  ), { code: 'edge_runtime_signing_key_pair_mismatch' });
+  assert.equal(assertDistinctEd25519Authorities(
+    signing.publicKey,
+    other.publicKey,
+    'edge-key-v1',
+    'relay-key-v1'
+  ), true);
+  assert.throws(() => assertDistinctEd25519Authorities(
+    signing.publicKey,
+    signing.publicKey,
+    'edge-key-v1',
+    'relay-key-v1'
+  ), { code: 'edge_runtime_signing_authority_reused' });
+  assert.throws(() => assertDistinctEd25519Authorities(
+    signing.publicKey,
+    other.publicKey,
+    'shared-key-v1',
+    'shared-key-v1'
+  ), { code: 'edge_runtime_signing_key_id_reused' });
 });
 
 test('D2A Docker build context is narrow and base image is digest-pinned', () => {

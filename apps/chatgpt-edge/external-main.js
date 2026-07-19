@@ -32,6 +32,10 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
     getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY'),
     { secretRoot, readFileSync, statSync, realpathSync }
   );
+  const edgePublicKeyPem = readSecretReference(
+    getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY'),
+    { secretRoot, readFileSync, statSync, realpathSync }
+  );
   const relayPublicKeyPem = readSecretReference(
     getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY'),
     { secretRoot, readFileSync, statSync, realpathSync }
@@ -42,13 +46,24 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
   );
 
   let edgePrivateKey;
+  let edgePublicKey;
   let relayPublicKey;
   try {
     edgePrivateKey = crypto.createPrivateKey(edgePrivateKeyPem);
-    relayPublicKey = crypto.createPublicKey(relayPublicKeyPem);
+    edgePublicKey = createStrictEd25519PublicKey(edgePublicKeyPem, 'edge_runtime_public_key_material_invalid');
+    relayPublicKey = createStrictEd25519PublicKey(relayPublicKeyPem, 'edge_runtime_public_key_material_invalid');
   } catch {
     reject('edge_runtime_key_material_invalid');
   }
+  assertEd25519KeyPair(edgePrivateKey, edgePublicKey, 'edge_runtime_signing_key_pair_mismatch');
+  const edgeSigningKeyId = getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID');
+  const relaySigningKeyId = getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID');
+  assertDistinctEd25519Authorities(
+    edgePublicKey,
+    relayPublicKey,
+    edgeSigningKeyId,
+    relaySigningKeyId
+  );
 
   return createExternalEdgeRuntime({
     publicOrigin: getEnvironment(environment, 'CODEX_MEMORY_R4_PUBLIC_ORIGIN'),
@@ -61,10 +76,10 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
     ),
     edgeSigning: {
       privateKey: edgePrivateKey,
-      keyId: getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID')
+      keyId: edgeSigningKeyId
     },
     relaySigningPublicKey: relayPublicKey,
-    relaySigningKeyId: getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID'),
+    relaySigningKeyId,
     relayAuthToken: normalizeSingleLineSecret(relayAuthToken),
     bindHost: environment.CODEX_MEMORY_R4_EDGE_BIND_HOST || '0.0.0.0',
     bindPort: parseIntegerEnvironment(environment.CODEX_MEMORY_R4_EDGE_PORT || '8080', 'edge_bind_port_invalid'),
@@ -78,6 +93,42 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
       'edge_inflight_limit_invalid'
     )
   });
+}
+
+function assertEd25519KeyPair(privateKey, publicKey, code) {
+  if (privateKey?.type !== 'private' || privateKey.asymmetricKeyType !== 'ed25519' ||
+      publicKey?.type !== 'public' || publicKey.asymmetricKeyType !== 'ed25519') reject(code);
+  const derived = crypto.createPublicKey(privateKey).export({ type: 'spki', format: 'der' });
+  const bound = publicKey.export({ type: 'spki', format: 'der' });
+  if (!derived.equals(bound)) reject(code);
+  return true;
+}
+
+function assertDistinctEd25519Authorities(edgePublicKey, relayPublicKey, edgeKeyId, relayKeyId) {
+  if (edgePublicKey?.type !== 'public' || edgePublicKey.asymmetricKeyType !== 'ed25519' ||
+      relayPublicKey?.type !== 'public' || relayPublicKey.asymmetricKeyType !== 'ed25519') {
+    reject('edge_runtime_signing_authority_invalid');
+  }
+  const edgeDer = edgePublicKey.export({ type: 'spki', format: 'der' });
+  const relayDer = relayPublicKey.export({ type: 'spki', format: 'der' });
+  if (edgeDer.equals(relayDer)) reject('edge_runtime_signing_authority_reused');
+  if (edgeKeyId === relayKeyId) reject('edge_runtime_signing_key_id_reused');
+  return true;
+}
+
+function createStrictEd25519PublicKey(value, code) {
+  if (typeof value !== 'string' || value.includes('\r') ||
+      !/^-----BEGIN PUBLIC KEY-----\n(?:[A-Za-z0-9+/]{1,64}={0,2}\n)+-----END PUBLIC KEY-----\n?$/u.test(value)) {
+    reject(code);
+  }
+  let key;
+  try {
+    key = crypto.createPublicKey(value);
+  } catch {
+    reject(code);
+  }
+  if (key.type !== 'public' || key.asymmetricKeyType !== 'ed25519') reject(code);
+  return key;
 }
 
 function validateSupplyChainEnvironment(environment, {
@@ -240,6 +291,9 @@ module.exports = {
   DEFAULT_LOCKFILE_PATH,
   DEFAULT_BUILD_SOURCE_FILE,
   assertDigest,
+  assertDistinctEd25519Authorities,
+  assertEd25519KeyPair,
+  createStrictEd25519PublicKey,
   loadExternalEdgeRuntimeFromEnvironment,
   normalizeBuildSourceCommit,
   normalizeSingleLineSecret,
