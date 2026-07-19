@@ -10,6 +10,20 @@ const PUBLIC_ORIGIN_PATTERN = /^https:\/\/[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9
 const ENV_REFERENCE_PATTERN = /^env:[A-Z][A-Z0-9_]{2,119}$/u;
 const SHA40_PATTERN = /^[a-f0-9]{40}$/u;
 const SHA256_PATTERN = /^sha256:[a-f0-9]{64}$/u;
+const NON_PUBLIC_DNS_SUFFIXES = deepFreeze([
+  'alt',
+  'arpa',
+  'example',
+  'example.com',
+  'example.net',
+  'example.org',
+  'internal',
+  'invalid',
+  'local',
+  'localhost',
+  'onion',
+  'test'
+]);
 
 const ENV_REFERENCES = deepFreeze({
   operator_reference: 'env:CODEX_MEMORY_R4_OPERATOR_REFERENCE',
@@ -72,6 +86,10 @@ function assertNonPlaceholderDigest(value, pattern, code) {
   if (/^(.)\1+$/u.test(digest)) reject(`${code}_placeholder`);
 }
 
+function hasDnsSuffix(hostname, suffix) {
+  return hostname === suffix || hostname.endsWith(`.${suffix}`);
+}
+
 function parseHttpsUrl(value, code) {
   if (typeof value !== 'string' || value.trim() !== value || value.length > 2048) reject(code);
   let parsed;
@@ -89,11 +107,7 @@ function parseHttpsUrl(value, code) {
     /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/u.test(label));
   if (
     !dnsLabelsValid ||
-    hostname === 'localhost' ||
-    hostname.endsWith('.localhost') ||
-    hostname.endsWith('.invalid') ||
-    hostname.endsWith('.example') ||
-    hostname.endsWith('.test') ||
+    NON_PUBLIC_DNS_SUFFIXES.some(suffix => hasDnsSuffix(hostname, suffix)) ||
     !hostname.includes('.') ||
     /^\d{1,3}(?:\.\d{1,3}){3}$/u.test(hostname) ||
     hostname.startsWith('[')
@@ -361,6 +375,7 @@ function validateExternalOAuthRuntimePreflight(input) {
 module.exports = {
   ENV_REFERENCES,
   ENV_REFERENCE_PATTERN,
+  NON_PUBLIC_DNS_SUFFIXES,
   REQUIRED_ENV_REFERENCES,
   STAGE,
   ZERO_PREFLIGHT_COUNTERS,
