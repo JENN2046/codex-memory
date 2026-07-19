@@ -4,6 +4,7 @@
   "stage": "R4-D-D2B",
   "amendment": {
     "amendment_reference": "binding:r4d-d2b:redacted",
+    "binding_reference": "env:CODEX_MEMORY_R4_BINDING_REFERENCE",
     "previous_binding_digest": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
     "reason": "self_hosted_private_vm_selected"
   },
@@ -23,7 +24,9 @@
     "resource": "https://edge.example.invalid",
     "scopes": ["memory.read"],
     "pkce_method": "S256",
-    "oauth_client_id": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID"
+    "oauth_client_id": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID",
+    "auth0_jwks_uri": "env:CODEX_MEMORY_R4_AUTH0_JWKS_URI",
+    "operator_subject_fingerprint": "env:CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT"
   },
   "endpoints": {
     "public_origin": "https://edge.example.invalid",

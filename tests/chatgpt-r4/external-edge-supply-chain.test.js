@@ -48,6 +48,7 @@ test('D2A runtime authority accepts only owner-only file references and non-plac
     { CODEX_MEMORY_R4_SOURCE_COMMIT: 'abcdef1234567890abcdef1234567890abcdef12' },
     { CODEX_MEMORY_R4_LOCKFILE_SHA256: sha256('wrong-lockfile') },
     { CODEX_MEMORY_R4_EDGE_ARTIFACT_SHA256: 'placeholder' },
+    { CODEX_MEMORY_R4_BINDING_REFERENCE: 'todo' },
     { CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE: 'todo' }
   ]) {
     assert.throws(() => validateSupplyChainEnvironment({ ...environment, ...mutation }, {
@@ -169,6 +170,7 @@ test('D2A CommonJS entrypoint loads when require(esm) is disabled', () => {
 
 function supplyChainEnvironment() {
   return {
+    CODEX_MEMORY_R4_BINDING_REFERENCE: 'binding:r4d-d2b:current-v1',
     CODEX_MEMORY_R4_OPERATOR_REFERENCE: 'operator:jenn-owner',
     CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE: 'host:private-development',
     CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE: 'binding:previous-v1',

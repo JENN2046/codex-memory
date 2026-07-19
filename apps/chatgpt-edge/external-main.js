@@ -137,6 +137,7 @@ function validateSupplyChainEnvironment(environment, {
   readFileSync = fs.readFileSync
 } = {}) {
   const requiredOpaqueReferences = [
+    'CODEX_MEMORY_R4_BINDING_REFERENCE',
     'CODEX_MEMORY_R4_OPERATOR_REFERENCE',
     'CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE',
     'CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE'

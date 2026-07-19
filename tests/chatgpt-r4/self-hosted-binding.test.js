@@ -6,6 +6,7 @@ const test = require('node:test');
 const {
   D2B_ZERO_COUNTERS,
   resolveSelfHostedBindingAmendment,
+  sha256,
   validateSelfHostedBindingAmendment
 } = require('../../packages/chatgpt-r4-contracts');
 const {
@@ -25,6 +26,7 @@ function candidate() {
     stage: 'R4-D-D2B',
     amendment: {
       amendment_reference: 'binding:r4d-d2b:private-001',
+      binding_reference: 'env:CODEX_MEMORY_R4_BINDING_REFERENCE',
       previous_binding_digest: `sha256:${'0123456789abcdef'.repeat(4)}`,
       reason: 'self_hosted_private_vm_selected'
     },
@@ -44,7 +46,9 @@ function candidate() {
       resource: 'https://memory-edge.jenn.dev',
       scopes: ['memory.read'],
       pkce_method: 'S256',
-      oauth_client_id: 'env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID'
+      oauth_client_id: 'env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID',
+      auth0_jwks_uri: 'env:CODEX_MEMORY_R4_AUTH0_JWKS_URI',
+      operator_subject_fingerprint: 'env:CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT'
     },
     endpoints: {
       public_origin: 'https://memory-edge.jenn.dev',
@@ -122,6 +126,9 @@ test('R4-D D2B rejects host, Relay authority, OAuth, rollback, and activation we
     [value => { value.relay_authority.body_logging_allowed = true; }, 'r4d_d2b_relay_body_log_forbidden'],
     [value => { value.relay_authority.durable_state_allowed = true; }, 'r4d_d2b_relay_durable_state_forbidden'],
     [value => { value.oauth.resource = 'https://other.jenn.dev'; }, 'r4d_d2b_resource_origin_mismatch'],
+    [value => { delete value.oauth.auth0_jwks_uri; }, 'r4d_d2b_oauth_shape_invalid'],
+    [value => { delete value.oauth.operator_subject_fingerprint; }, 'r4d_d2b_oauth_shape_invalid'],
+    [value => { delete value.amendment.binding_reference; }, 'r4d_d2b_amendment_shape_invalid'],
     [value => { value.oauth.scopes = ['memory.read', 'memory.write']; }, 'r4d_d2b_scopes_invalid'],
     [value => { value.rollback.relay_stop_ready = false; }, 'r4d_d2b_relay_stop_ready_invalid'],
     [value => { value.activation_boundary.deployed = true; }, 'r4d_d2b_deployed_must_be_false'],
@@ -208,14 +215,16 @@ test('R4-D D2B schema is frozen and redacted example remains activation-ineligib
 });
 
 test('R4-D D2B private envelope binds exact-value fingerprints without returning them', () => {
+  const privateBindingReference = 'binding:r4d-d2b:private-test-0001';
   const exactValueFingerprints = Object.fromEntries(
     PRIVATE_FINGERPRINT_KEYS.map((key, index) => [
       key,
       `sha256:${(index + 1).toString(16).padStart(2, '0').repeat(32)}`
     ])
   );
+  exactValueFingerprints.binding_reference_sha256 = sha256(privateBindingReference);
   const envelope = {
-    private_binding_reference: 'binding:r4d-d2b:private-test-0001',
+    private_binding_reference: privateBindingReference,
     amendment: candidate(),
     exact_value_fingerprints: exactValueFingerprints
   };
@@ -235,6 +244,12 @@ test('R4-D D2B private envelope binds exact-value fingerprints without returning
     reusedKeyId.exact_value_fingerprints.edge_signing_key_id_sha256;
   assert.throws(() => validatePrivateBindingEnvelope(reusedKeyId), {
     message: 'r4d_d2b_private_signing_key_id_reused'
+  });
+
+  const mismatchedBindingReference = structuredClone(envelope);
+  mismatchedBindingReference.private_binding_reference = 'binding:r4d-d2b:private-test-0002';
+  assert.throws(() => validatePrivateBindingEnvelope(mismatchedBindingReference), {
+    message: 'r4d_d2b_private_binding_reference_fingerprint_mismatch'
   });
 
   delete envelope.exact_value_fingerprints.relay_auth_token_sha256;

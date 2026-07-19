@@ -8,6 +8,7 @@ const {
   D2B_ENV_REFERENCES,
   digestObject,
   isPlainObject,
+  sha256,
   resolveSelfHostedBindingAmendment,
   validateSelfHostedBindingAmendment
 } = require('../packages/chatgpt-r4-contracts');
@@ -24,14 +25,17 @@ const EXAMPLE_PATH = path.join(
   'examples',
   'chatgpt-web-r4d-self-hosted-binding-amendment.redacted.example.json'
 );
-const EXPECTED_SCHEMA_SHA256 = 'de3ca6b264f0f9e8094d7b8c5a023f4dcdb07bb6f37a18759ae3a7baabd53d67';
+const EXPECTED_SCHEMA_SHA256 = 'be20ad7859f4139b178a7b1740c7de61dd023541263048bf3623b01a54f3623f';
 const PRIVATE_FINGERPRINT_KEYS = Object.freeze([
   'auth0_issuer_sha256',
+  'auth0_jwks_uri_sha256',
+  'binding_reference_sha256',
   'edge_signing_key_id_sha256',
   'edge_signing_public_key_sha256',
   'host_project_reference_sha256',
   'oauth_client_id_sha256',
   'operator_reference_sha256',
+  'operator_subject_fingerprint_sha256',
   'previous_binding_reference_sha256',
   'previous_host_config_reference_sha256',
   'public_origin_sha256',
@@ -56,6 +60,15 @@ function validateSchema(schema) {
   invariant(schema.properties?.oauth?.properties?.scopes?.minItems === 1 &&
     schema.properties?.oauth?.properties?.scopes?.maxItems === 1,
   'r4d_d2b_schema_scope_cardinality_mismatch');
+  invariant(
+    schema.properties?.amendment?.properties?.binding_reference?.const ===
+      D2B_ENV_REFERENCES.binding_reference &&
+    schema.properties?.oauth?.properties?.auth0_jwks_uri?.const ===
+      D2B_ENV_REFERENCES.auth0_jwks_uri &&
+    schema.properties?.oauth?.properties?.operator_subject_fingerprint?.const ===
+      D2B_ENV_REFERENCES.operator_subject_fingerprint,
+    'r4d_d2b_schema_runtime_binding_mismatch'
+  );
   invariant(rejectsRepeatedPlaceholder(schema.$defs?.sha40?.pattern, '0'.repeat(40)),
     'r4d_d2b_schema_sha40_placeholder_allowed');
   invariant(rejectsRepeatedPlaceholder(schema.$defs?.sha256?.pattern, `sha256:${'0'.repeat(64)}`),
@@ -141,6 +154,11 @@ function validatePrivateBindingEnvelope(input) {
       'r4d_d2b_private_fingerprint_invalid'
     );
   }
+  invariant(
+    input.exact_value_fingerprints.binding_reference_sha256 ===
+      sha256(input.private_binding_reference),
+    'r4d_d2b_private_binding_reference_fingerprint_mismatch'
+  );
   invariant(
     input.exact_value_fingerprints.edge_signing_public_key_sha256 !==
       input.exact_value_fingerprints.relay_signing_public_key_sha256,

@@ -16,9 +16,10 @@
     "amendment": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["amendment_reference", "previous_binding_digest", "reason"],
+      "required": ["amendment_reference", "binding_reference", "previous_binding_digest", "reason"],
       "properties": {
         "amendment_reference": { "type": "string", "minLength": 3, "maxLength": 256 },
+        "binding_reference": { "const": "env:CODEX_MEMORY_R4_BINDING_REFERENCE" },
         "previous_binding_digest": { "$ref": "#/$defs/sha256" },
         "reason": { "const": "self_hosted_private_vm_selected" }
       }
@@ -45,7 +46,8 @@
       "additionalProperties": false,
       "required": [
         "identity_provider", "client_registration_mode", "issuer", "resource",
-        "scopes", "pkce_method", "oauth_client_id"
+        "scopes", "pkce_method", "oauth_client_id", "auth0_jwks_uri",
+        "operator_subject_fingerprint"
       ],
       "properties": {
         "identity_provider": { "const": "auth0" },
@@ -60,7 +62,9 @@
           "items": false
         },
         "pkce_method": { "const": "S256" },
-        "oauth_client_id": { "const": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID" }
+        "oauth_client_id": { "const": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID" },
+        "auth0_jwks_uri": { "const": "env:CODEX_MEMORY_R4_AUTH0_JWKS_URI" },
+        "operator_subject_fingerprint": { "const": "env:CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT" }
       }
     },
     "endpoints": {

@@ -19,9 +19,12 @@ const SHA40_PATTERN = /^[a-f0-9]{40}$/u;
 const SHA256_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 
 const D2B_ENV_REFERENCES = deepFreeze({
+  binding_reference: 'env:CODEX_MEMORY_R4_BINDING_REFERENCE',
   operator_reference: 'env:CODEX_MEMORY_R4_OPERATOR_REFERENCE',
   host_project_reference: 'env:CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE',
+  auth0_jwks_uri: 'env:CODEX_MEMORY_R4_AUTH0_JWKS_URI',
   oauth_client_id: 'env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID',
+  operator_subject_fingerprint: 'env:CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT',
   edge_signing_private_key: 'env:CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY',
   edge_signing_public_key: 'env:CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY',
   edge_signing_key_id: 'env:CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID',
@@ -59,9 +62,10 @@ function resolveSelfHostedBindingAmendment(input) {
   literal(input.stage, D2B_STAGE, 'r4d_d2b_stage_invalid');
 
   exactKeys(input.amendment, [
-    'amendment_reference', 'previous_binding_digest', 'reason'
+    'amendment_reference', 'binding_reference', 'previous_binding_digest', 'reason'
   ], 'r4d_d2b_amendment_shape_invalid');
   reference(input.amendment.amendment_reference, 'r4d_d2b_amendment_reference_invalid');
+  exactEnv(input.amendment.binding_reference, 'binding_reference');
   digest(input.amendment.previous_binding_digest, SHA256_PATTERN, 'r4d_d2b_previous_digest_invalid');
   literal(input.amendment.reason, 'self_hosted_private_vm_selected', 'r4d_d2b_reason_invalid');
 
@@ -82,13 +86,15 @@ function resolveSelfHostedBindingAmendment(input) {
   literal(input.ownership.operator_role, 'owner', 'r4d_d2b_operator_role_invalid');
 
   exactKeys(input.oauth, [
-    'client_registration_mode', 'identity_provider', 'issuer', 'oauth_client_id',
-    'pkce_method', 'resource', 'scopes'
+    'auth0_jwks_uri', 'client_registration_mode', 'identity_provider', 'issuer',
+    'oauth_client_id', 'operator_subject_fingerprint', 'pkce_method', 'resource', 'scopes'
   ], 'r4d_d2b_oauth_shape_invalid');
   literal(input.oauth.identity_provider, 'auth0', 'r4d_d2b_idp_invalid');
   literal(input.oauth.client_registration_mode, 'predefined_public_client', 'r4d_d2b_client_mode_invalid');
   literal(input.oauth.pkce_method, 'S256', 'r4d_d2b_pkce_invalid');
   exactEnv(input.oauth.oauth_client_id, 'oauth_client_id');
+  exactEnv(input.oauth.auth0_jwks_uri, 'auth0_jwks_uri');
+  exactEnv(input.oauth.operator_subject_fingerprint, 'operator_subject_fingerprint');
   const issuer = assertCanonicalIssuer(input.oauth.issuer);
   const publicOrigin = assertCanonicalPublicOrigin(input.oauth.resource);
   if (!Array.isArray(input.oauth.scopes) || input.oauth.scopes.length !== 1 ||
@@ -165,9 +171,12 @@ function resolveSelfHostedBindingAmendment(input) {
   literal(input.activation_boundary.provider_calls, 0, 'r4d_d2b_provider_calls_must_be_zero');
 
   const references = [
+    input.amendment.binding_reference,
     input.ownership.operator_reference,
     input.ownership.host_project_reference,
     input.oauth.oauth_client_id,
+    input.oauth.auth0_jwks_uri,
+    input.oauth.operator_subject_fingerprint,
     ...Object.values(input.relay_authority).filter(value => typeof value === 'string' && ENV_PATTERN.test(value)),
     input.rollback.previous_binding_reference,
     input.rollback.previous_host_config_reference
