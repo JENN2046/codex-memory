@@ -138,6 +138,23 @@ test('R4-D redacted example is schema-shaped but intentionally not activation-re
   });
 });
 
+test('R4-D schema rejects credentialed OAuth and public endpoint URLs', () => {
+  const schema = loadJson(SCHEMA_PATH);
+  const cases = [
+    [schema.properties.oauth.properties.issuer.pattern, 'https://user:pass@tenant.auth0.com/'],
+    [schema.properties.oauth.properties.resource.pattern, 'https://user:pass@edge.jenn.dev'],
+    [schema.properties.endpoints.properties.public_origin.pattern, 'https://user:pass@edge.jenn.dev'],
+    [
+      schema.properties.endpoints.properties.authorization_server_discovery_url.pattern,
+      'https://user:pass@tenant.auth0.com/.well-known/openid-configuration'
+    ]
+  ];
+  for (const [pattern, value] of cases) {
+    assert.equal(new RegExp(pattern, 'u').test(value), false);
+  }
+  assert.doesNotThrow(() => validateSchema(schema));
+});
+
 test('R4-D rejects placeholder, local, path-bearing, or mismatched public authority URLs', () => {
   for (const [mutate, code] of [
     [value => { value.endpoints.public_origin = 'https://edge.example.invalid'; value.oauth.resource = value.endpoints.public_origin; }, 'r4d_public_origin_invalid_non_public'],

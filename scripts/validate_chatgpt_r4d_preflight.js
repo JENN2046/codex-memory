@@ -22,7 +22,7 @@ const EXAMPLE_PATH = path.join(
   'chatgpt-web-r4d-oauth-runtime-preflight.redacted.example.json'
 );
 const DOC_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4D_EXTERNAL_RUNTIME_PREFLIGHT.md');
-const EXPECTED_SCHEMA_SHA256 = '6137b2ba1687a0142ef6802690eafa3e9c2ee99380b1241e2d5bc99da3cf1b0a';
+const EXPECTED_SCHEMA_SHA256 = 'a4e2802cb8f9a3fcbb73a2027f4b3686e1494a9c494a7533f5799603b2d7f429';
 
 const ENV_REFERENCE_NAMES = Object.freeze([
   'CODEX_MEMORY_R4_OPERATOR_REFERENCE',
@@ -51,6 +51,20 @@ function validateSchema(schema) {
   invariant(schema.properties?.runtime?.properties?.transport_mode?.const === 'direct_https', 'r4d direct HTTPS mismatch');
   invariant(schema.properties?.runtime?.properties?.adapter_mode?.const === 'none', 'r4d adapter preflight mismatch');
   invariant(schema.properties?.activation_boundary?.properties?.real_memory_allowed?.const === false, 'r4d real-memory boundary mismatch');
+  const credentialedUrlCases = [
+    ['oauth issuer', schema.properties?.oauth?.properties?.issuer?.pattern, 'https://user:pass@tenant.auth0.com/'],
+    ['oauth resource', schema.properties?.oauth?.properties?.resource?.pattern, 'https://user:pass@edge.jenn.dev'],
+    ['public origin', schema.properties?.endpoints?.properties?.public_origin?.pattern, 'https://user:pass@edge.jenn.dev'],
+    [
+      'authorization server discovery',
+      schema.properties?.endpoints?.properties?.authorization_server_discovery_url?.pattern,
+      'https://user:pass@tenant.auth0.com/.well-known/openid-configuration'
+    ]
+  ];
+  for (const [label, pattern, value] of credentialedUrlCases) {
+    invariant(typeof pattern === 'string', `r4d ${label} schema pattern missing`);
+    invariant(!new RegExp(pattern, 'u').test(value), `r4d ${label} schema permits userinfo`);
+  }
   invariant(canonicalSha256(schema) === EXPECTED_SCHEMA_SHA256, 'r4d schema canonical digest mismatch');
 }
 

@@ -62,8 +62,8 @@
       "properties": {
         "identity_provider": { "const": "auth0" },
         "client_registration_mode": { "const": "predefined_public_client" },
-        "issuer": { "type": "string", "format": "uri", "pattern": "^https://[^/?#]+/$" },
-        "resource": { "type": "string", "format": "uri", "pattern": "^https://[^/?#]+$" },
+        "issuer": { "type": "string", "format": "uri", "pattern": "^https://[^@/?#]+/$" },
+        "resource": { "type": "string", "format": "uri", "pattern": "^https://[^@/?#]+$" },
         "scopes": {
           "type": "array",
           "prefixItems": [{ "const": "memory.read" }],
@@ -89,13 +89,13 @@
         "authorization_server_discovery_url"
       ],
       "properties": {
-        "public_origin": { "type": "string", "format": "uri", "pattern": "^https://[^/?#]+$" },
+        "public_origin": { "type": "string", "format": "uri", "pattern": "^https://[^@/?#]+$" },
         "mcp_path": { "const": "/mcp" },
         "protected_resource_metadata_path": { "const": "/.well-known/oauth-protected-resource" },
         "authorization_server_discovery_url": {
           "type": "string",
           "format": "uri",
-          "pattern": "^https://.+/\\.well-known/openid-configuration$"
+          "pattern": "^https://[^@/?#]+/\\.well-known/openid-configuration$"
         }
       }
     },
