@@ -308,7 +308,13 @@ test('external Edge configuration rejects non-public origins, unsafe bind, and n
     bindHost: '127.0.0.1',
     bindPort: 0
   };
-  assert.doesNotThrow(() => validateExternalEdgeRuntimeConfig(base));
+  const defaults = validateExternalEdgeRuntimeConfig(base);
+  assert.equal(defaults.claimLeaseMs, defaults.responseTimeoutMs);
+  assert.throws(() => validateExternalEdgeRuntimeConfig({
+    ...base,
+    responseTimeoutMs: 10_000,
+    claimLeaseMs: 9_999
+  }), { code: 'edge_claim_lease_too_short' });
   for (const publicOrigin of [
     'https://localhost',
     'https://127.0.0.1',
