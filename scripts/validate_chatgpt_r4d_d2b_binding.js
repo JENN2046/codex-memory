@@ -22,7 +22,7 @@ const EXAMPLE_PATH = path.join(
   'examples',
   'chatgpt-web-r4d-self-hosted-binding-amendment.redacted.example.json'
 );
-const EXPECTED_SCHEMA_SHA256 = '247b3269b0d244f12009f7fbb01757e0ecfc77f16642ff235cbb540127a09fc0';
+const EXPECTED_SCHEMA_SHA256 = '8aaa62da452fcc16c4953adb38d5f298586194e6e49760da2d59525a06355cb3';
 
 function loadJson(file) {
   return JSON.parse(fs.readFileSync(file, 'utf8'));

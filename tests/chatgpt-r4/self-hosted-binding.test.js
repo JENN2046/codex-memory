@@ -52,9 +52,11 @@ function candidate() {
     },
     relay_authority: {
       transport_mode: 'outbound_https_to_local_uds',
+      edge_signing_private_key: 'env:CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY',
       edge_signing_public_key: 'env:CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY',
       edge_signing_key_id: 'env:CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID',
       relay_signing_private_key: 'env:CODEX_MEMORY_R4_RELAY_SIGNING_PRIVATE_KEY',
+      relay_signing_public_key: 'env:CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY',
       relay_signing_key_id: 'env:CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID',
       relay_auth_token: 'env:CODEX_MEMORY_R4_RELAY_AUTH_TOKEN',
       relay_uds_path: 'env:CODEX_MEMORY_R4_RELAY_UDS_PATH',
@@ -133,6 +135,18 @@ test('R4-D D2B rejects reused references, placeholders, IP origins, and source p
   reused.relay_authority.relay_signing_private_key = reused.relay_authority.edge_signing_public_key;
   assert.throws(() => validateSelfHostedBindingAmendment(reused), {
     code: 'r4d_d2b_env_reference_invalid'
+  });
+
+  const incompleteEdge = candidate();
+  delete incompleteEdge.relay_authority.edge_signing_private_key;
+  assert.throws(() => validateSelfHostedBindingAmendment(incompleteEdge), {
+    code: 'r4d_d2b_relay_shape_invalid'
+  });
+
+  const incompleteRelay = candidate();
+  delete incompleteRelay.relay_authority.relay_signing_public_key;
+  assert.throws(() => validateSelfHostedBindingAmendment(incompleteRelay), {
+    code: 'r4d_d2b_relay_shape_invalid'
   });
 
   const placeholder = candidate();
