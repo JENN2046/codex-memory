@@ -15,6 +15,10 @@ const { createTransientRequestBroker } = require('./transient-request-broker');
 
 const PRMD_PATH = '/.well-known/oauth-protected-resource';
 const MCP_PATH = '/mcp';
+const PRMD_PATHS = new Set([
+  PRMD_PATH,
+  `${PRMD_PATH}${MCP_PATH}`
+]);
 const HEALTH_PATH = '/healthz';
 const RELAY_PATHS = new Set([
   '/v1/relay/claim',
@@ -95,12 +99,12 @@ function createExternalEdgeRuntime(options = {}) {
           durable_remote_state: false
         });
       }
-      if (method === 'GET' && pathname === PRMD_PATH) {
+      if (method === 'GET' && PRMD_PATHS.has(pathname)) {
         return sendJson(outgoing, 200, protectedResourceMetadata(config));
       }
       if (pathname === MCP_PATH) {
-        if (method !== 'POST') return sendMethodNotAllowed(outgoing, ['POST']);
         const authInfo = await authenticateMcp(incoming, verifyAccessToken, config);
+        if (method !== 'POST') return sendMethodNotAllowed(outgoing, ['POST']);
         const body = await readJsonBody(incoming, { allowBatch: true });
         return await mcp.handle(incoming, outgoing, body, authInfo);
       }

@@ -131,11 +131,29 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
     bearer_methods_supported: ['header'],
     resource_name: 'codex-memory private project memory'
   });
+  const pathSpecificPrmd = await edgeRequest(
+    address,
+    'GET',
+    '/.well-known/oauth-protected-resource/mcp'
+  );
+  assert.equal(pathSpecificPrmd.statusCode, 200);
+  assert.deepEqual(pathSpecificPrmd.body, prmd.body);
 
   const unauthenticated = await mcpRequest(address, initializeRequest(1), null);
   assert.equal(unauthenticated.statusCode, 401);
   assert.match(unauthenticated.headers['www-authenticate'], /resource_metadata=/u);
   assert.match(unauthenticated.headers['www-authenticate'], /scope="memory\.read"/u);
+
+  const unauthenticatedGet = await edgeRequest(address, 'GET', '/mcp');
+  assert.equal(unauthenticatedGet.statusCode, 401);
+  assert.match(unauthenticatedGet.headers['www-authenticate'], /resource_metadata=/u);
+  assert.match(unauthenticatedGet.headers['www-authenticate'], /scope="memory\.read"/u);
+
+  const authenticatedGet = await edgeRequest(address, 'GET', '/mcp', {
+    authorization: `Bearer ${ACCESS_TOKEN}`
+  });
+  assert.equal(authenticatedGet.statusCode, 405);
+  assert.equal(authenticatedGet.headers.allow, 'POST');
 
   const initialized = await mcpRequest(address, initializeRequest(2), ACCESS_TOKEN);
   assert.equal(initialized.statusCode, 200);
