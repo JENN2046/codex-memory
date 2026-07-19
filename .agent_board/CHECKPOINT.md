@@ -4,13 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2137 ChatGPT Web R4-C local Edge/Relay integration`.
-Current validation: `CMV-2222`.
-Current fact: R4-C implements a non-activated loopback-only Edge, outbound Relay, temporary UDS, and strict synthetic governance integration.
-Claim/ack/expiry/reconnect/replay/cancel/correlation/body-log gates pass with all provider/native/fallback/write/durable counters at zero; no active service/config, OAuth, external runtime, real memory, or public tool activation occurred.
+Current task: `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight`.
+Current validation: `CMV-2223`.
+Current fact: R4-D freezes an Auth0 predefined public client and dedicated single-instance Render Direct HTTPS canary contract without activation.
+Nine focused preflight tests and a presence-only binding check pass; private references are `0/6`, no values were read, and service/config/OAuth/ChatGPT App/memory/provider effects remain zero.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2138 ChatGPT Web R4-D External OAuth/Runtime Preflight
+
+Status: `R4D_PREFLIGHT_CONTRACT_READY_PRIVATE_BINDING_PENDING_ACTIVATION_FALSE`
+
+- Selected route: Auth0 predefined public client, PKCE S256, exact resource/audience, exact `memory.read`, dedicated single-instance Render Direct HTTPS Edge.
+- Contract surfaces: pure validator, JSON Schema with canonical digest, redacted fail-closed example, presence-only environment audit, and negative tests.
+- Nine focused R4-D tests and all 50 focused R4-B/R4-C/R4-D tests pass;
+  default is `5776 pass / 0 fail / 8 skip`, and hardening is `97/97 + 6/6`.
+- Strict offline subgates report contract `113 tests / 112 pass / 0 fail`,
+  default `5784 / 5776 pass / 0 fail / 8 skip`, compare `43/43`, and rollback
+  `43/43`; strict health is `UNAVAILABLE_SERVICE_INACTIVE`. No service was
+  started to turn the overall strict result into a pass.
+- Private environment references are `0/6` without value reads.
+- Tunnel/proxy/CDN, body logs, durable remote state, activation, service, ChatGPT App, memory/provider calls, write tools, and public expansion fail closed.
+- External config/service, Direct HTTPS canary, real memory, production/release/deploy/cutover/readiness remain false.
+
+Validation: `CMV-2223`.
 
 ## CM-2137 ChatGPT Web R4-C Local Edge/Relay Integration
 

@@ -4,15 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2137 ChatGPT Web R4-C local Edge/Relay integration`.
-Current validation: `CMV-2222`.
-Current fact: R4-C implements a non-activated loopback-only Edge, outbound Relay, temporary UDS, and strict synthetic governance integration.
-Claim/ack/expiry/reconnect/replay/cancel/correlation/body-log gates pass with all provider/native/fallback/write/durable counters at zero; no active service/config, OAuth, external runtime, real memory, or public tool activation occurred.
+Current task: `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight`.
+Current validation: `CMV-2223`.
+Current fact: R4-D freezes an Auth0 predefined public client and dedicated single-instance Render Direct HTTPS canary contract without activation.
+Nine focused preflight tests and a presence-only binding check pass; private references are `0/6`, no values were read, and service/config/OAuth/ChatGPT App/memory/provider effects remain zero.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2138 implements the R4-D external OAuth/runtime preflight contract without
+activation. It selects Auth0 predefined public-client PKCE, exact
+resource/audience plus `memory.read`, and a dedicated single-instance Render
+Direct HTTPS Edge before any optional adapter. The pure validator accepts only
+`env:` references, exact rollback/supply-chain binding, no body logs, no durable
+remote state, and zero activation/memory/provider/service effects. Nine focused
+tests pass; the presence-only audit reports `0/6` private references configured
+and reads no values. Next boundary: private exact-value binding and offline
+validation; no service creation, external configuration, token exchange, Direct
+HTTPS canary, ChatGPT App, real memory, deploy/release/cutover, or readiness is
+open from this preflight alone.
 
 CM-2137 implements R4-C as a non-activated local reference runtime. An actual
 Edge binds only to `127.0.0.1:0`; the outbound Relay accepts only that loopback
