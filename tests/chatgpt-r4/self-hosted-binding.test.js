@@ -186,6 +186,24 @@ test('R4-D D2B schema is frozen and redacted example remains activation-ineligib
   assert.equal(schema.properties.oauth.properties.scopes.maxItems, 1);
   assert.equal(new RegExp(schema.$defs.sha40.pattern, 'u').test('0'.repeat(40)), false);
   assert.equal(new RegExp(schema.$defs.sha256.pattern, 'u').test(`sha256:${'f'.repeat(64)}`), false);
+  const publicOrigin = new RegExp(schema.$defs.publicOrigin.pattern, 'u');
+  const publicIssuer = new RegExp(schema.$defs.publicIssuer.pattern, 'u');
+  const publicDiscovery = new RegExp(schema.$defs.publicDiscovery.pattern, 'u');
+  assert.equal(publicOrigin.test('https://memory.jenn.dev'), true);
+  assert.equal(publicOrigin.test('https://memory.jenn.dev:65535'), true);
+  assert.equal(publicIssuer.test('https://tenant.auth0.com/'), true);
+  assert.equal(publicDiscovery.test('https://tenant.auth0.com/.well-known/openid-configuration'), true);
+  for (const value of [
+    'https://127.0.0.1',
+    'https://memory.local',
+    'https://example.invalid',
+    'https://memory.jenn.dev:443',
+    'https://memory.jenn.dev:65536'
+  ]) {
+    assert.equal(publicOrigin.test(value), false);
+    assert.equal(publicIssuer.test(`${value}/`), false);
+    assert.equal(publicDiscovery.test(`${value}/.well-known/openid-configuration`), false);
+  }
   assert.doesNotThrow(() => validateRedactedExample(loadJson(EXAMPLE_PATH)));
 });
 

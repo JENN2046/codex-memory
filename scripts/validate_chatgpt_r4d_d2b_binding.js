@@ -24,7 +24,7 @@ const EXAMPLE_PATH = path.join(
   'examples',
   'chatgpt-web-r4d-self-hosted-binding-amendment.redacted.example.json'
 );
-const EXPECTED_SCHEMA_SHA256 = 'a864b6289443bc1b2162aa24410736b871927835f27580af2c02028e1f4af86e';
+const EXPECTED_SCHEMA_SHA256 = 'de3ca6b264f0f9e8094d7b8c5a023f4dcdb07bb6f37a18759ae3a7baabd53d67';
 const PRIVATE_FINGERPRINT_KEYS = Object.freeze([
   'auth0_issuer_sha256',
   'edge_signing_key_id_sha256',
@@ -60,6 +60,15 @@ function validateSchema(schema) {
     'r4d_d2b_schema_sha40_placeholder_allowed');
   invariant(rejectsRepeatedPlaceholder(schema.$defs?.sha256?.pattern, `sha256:${'0'.repeat(64)}`),
     'r4d_d2b_schema_sha256_placeholder_allowed');
+  invariant(rejectsRepeatedPlaceholder(schema.$defs?.publicOrigin?.pattern, 'https://127.0.0.1') &&
+    rejectsRepeatedPlaceholder(schema.$defs?.publicOrigin?.pattern, 'https://memory.local') &&
+    rejectsRepeatedPlaceholder(schema.$defs?.publicOrigin?.pattern, 'https://example.invalid') &&
+    !rejectsRepeatedPlaceholder(schema.$defs?.publicOrigin?.pattern, 'https://memory.jenn.dev'),
+  'r4d_d2b_schema_public_origin_boundary_mismatch');
+  invariant(rejectsRepeatedPlaceholder(schema.$defs?.publicIssuer?.pattern, 'https://127.0.0.1/') &&
+    rejectsRepeatedPlaceholder(schema.$defs?.publicIssuer?.pattern, 'https://tenant.local/') &&
+    !rejectsRepeatedPlaceholder(schema.$defs?.publicIssuer?.pattern, 'https://tenant.auth0.com/'),
+  'r4d_d2b_schema_public_issuer_boundary_mismatch');
   invariant(schema.properties?.activation_boundary?.properties?.deployed?.const === false, 'r4d_d2b_schema_activation_mismatch');
   invariant(canonicalSha256(schema) === EXPECTED_SCHEMA_SHA256, 'r4d_d2b_schema_digest_mismatch');
 }

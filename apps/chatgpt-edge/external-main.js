@@ -32,6 +32,10 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
     getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY'),
     { secretRoot, readFileSync, statSync, realpathSync }
   );
+  const edgePublicKeyPem = readSecretReference(
+    getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY'),
+    { secretRoot, readFileSync, statSync, realpathSync }
+  );
   const relayPublicKeyPem = readSecretReference(
     getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY'),
     { secretRoot, readFileSync, statSync, realpathSync }
@@ -42,13 +46,16 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
   );
 
   let edgePrivateKey;
+  let edgePublicKey;
   let relayPublicKey;
   try {
     edgePrivateKey = crypto.createPrivateKey(edgePrivateKeyPem);
+    edgePublicKey = createStrictEd25519PublicKey(edgePublicKeyPem, 'edge_runtime_public_key_material_invalid');
     relayPublicKey = createStrictEd25519PublicKey(relayPublicKeyPem, 'edge_runtime_public_key_material_invalid');
   } catch {
     reject('edge_runtime_key_material_invalid');
   }
+  assertEd25519KeyPair(edgePrivateKey, edgePublicKey, 'edge_runtime_signing_key_pair_mismatch');
 
   return createExternalEdgeRuntime({
     publicOrigin: getEnvironment(environment, 'CODEX_MEMORY_R4_PUBLIC_ORIGIN'),
@@ -78,6 +85,15 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
       'edge_inflight_limit_invalid'
     )
   });
+}
+
+function assertEd25519KeyPair(privateKey, publicKey, code) {
+  if (privateKey?.type !== 'private' || privateKey.asymmetricKeyType !== 'ed25519' ||
+      publicKey?.type !== 'public' || publicKey.asymmetricKeyType !== 'ed25519') reject(code);
+  const derived = crypto.createPublicKey(privateKey).export({ type: 'spki', format: 'der' });
+  const bound = publicKey.export({ type: 'spki', format: 'der' });
+  if (!derived.equals(bound)) reject(code);
+  return true;
 }
 
 function createStrictEd25519PublicKey(value, code) {
@@ -255,6 +271,7 @@ module.exports = {
   DEFAULT_LOCKFILE_PATH,
   DEFAULT_BUILD_SOURCE_FILE,
   assertDigest,
+  assertEd25519KeyPair,
   createStrictEd25519PublicKey,
   loadExternalEdgeRuntimeFromEnvironment,
   normalizeBuildSourceCommit,
