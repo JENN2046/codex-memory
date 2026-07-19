@@ -13,12 +13,14 @@ const {
   validateImportFences
 } = require('../../scripts/validate_chatgpt_r4_import_fences');
 
-test('R4-C import fences accept only the loopback reference runtime without activating it', () => {
+test('R4-D D2A import fences accept the isolated external runtime without activating local defaults', () => {
   const result = validateImportFences();
   assert.equal(result.accepted, true);
-  assert.equal(result.stage, 'R4-C');
+  assert.equal(result.stage, 'R4-D-D2A');
   assert.equal(result.candidateActivated, false);
   assert.equal(result.loopbackReferenceRuntimeImplemented, true);
+  assert.equal(result.externalRuntimeImplemented, true);
+  assert.equal(result.externalRuntimeActivated, false);
   assert.equal(result.externalRuntimeUsed, false);
   assert.equal(result.durableRemoteStateAllowed, false);
   const packageEntrypoints = discoverPackageRuntimeEntrypoints();

@@ -4,15 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight`.
-Current validation: `CMV-2223`.
-Current fact: R4-D freezes an Auth0 predefined public client and dedicated single-instance Render Direct HTTPS canary contract without activation.
-Nine focused preflight tests and a presence-only binding check pass; private references are `0/6`, no values were read, and service/config/OAuth/ChatGPT App/memory/provider effects remain zero.
+Current task: `CM-2139 ChatGPT Web R4-D D2A external Edge artifact`.
+Current validation: `CMV-2224`.
+Current fact: R4-D D2A implements and locally validates an isolated official-SDK Direct HTTPS Edge artifact without activation.
+Official MCP/OAuth, zero-memory relay, import-fence, secret-reference, source/lockfile binding, and pinned-container checks pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2139 implements the D2A external Edge artifact without activation. The
+official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,
+authenticated transient Relay broker, exact zero-counter response gate,
+owner-only secret references, lockfile/build-source binding, and pinned
+non-root container pass local tests. The existing private VM is viable only
+behind an isolated container, host-loopback high port, and separate reverse-
+proxy vhost; no remote mutation occurred. Before deployment, amend the
+Render-specific D1 private binding for self-hosting, freeze rollback and Relay
+signing references, then rebuild from an exact committed head and verify the
+image digest. No external service, token exchange, memory/provider call, public
+local-surface change, deploy/release/cutover, or readiness action is open from
+D2A alone.
 
 CM-2138 implements the R4-D external OAuth/runtime preflight contract without
 activation. It selects Auth0 predefined public-client PKCE, exact

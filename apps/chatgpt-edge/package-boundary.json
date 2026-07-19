@@ -1,15 +1,28 @@
 {
   "component": "public_edge_candidate",
-  "stage": "R4-C",
+  "stage": "R4-D-D2A",
   "activated": false,
   "defaultProfile": false,
   "loopbackReferenceListenerImplemented": true,
+  "externalRuntimeImplemented": true,
+  "externalRuntimeActivated": false,
+  "externalBindMode": "container_port_with_host_loopback_publish_required",
+  "externalMcpPath": "/mcp",
+  "protectedResourceMetadataPath": "/.well-known/oauth-protected-resource",
+  "oauthRequired": true,
+  "relayAuthenticationRequired": true,
+  "zeroMemoryCountersRequired": true,
   "bindHost": "127.0.0.1",
   "bindPort": 0,
   "boundedInMemoryState": true,
   "durableStateImplemented": false,
   "allowedProjectImports": [
-    "packages/chatgpt-r4-contracts"
+    "packages/chatgpt-r4-contracts",
+    "apps/chatgpt-memory-scope-widget"
+  ],
+  "allowedExternalPackages": [
+    "@modelcontextprotocol/sdk",
+    "jose"
   ],
   "forbiddenCapabilities": [
     "diary_acl_authorization",

@@ -19,7 +19,7 @@ const COMPONENT_POLICIES = Object.freeze({
     allowedBuiltins: ['node:crypto']
   },
   edge: {
-    allowedRoots: [ROOTS.edge, ROOTS.contracts],
+    allowedRoots: [ROOTS.edge, ROOTS.contracts, ROOTS.widget],
     allowedBuiltins: []
   },
   relay: {
@@ -48,6 +48,30 @@ const R4C_RUNTIME_FILE_POLICIES = Object.freeze({
   'apps/local-recall-relay/uds-transport.js': Object.freeze({
     allowedBuiltins: Object.freeze(['node:net']),
     allowedRuntimeRules: Object.freeze([])
+  }),
+  'apps/chatgpt-edge/auth0-token-verifier.js': Object.freeze({
+    allowedBuiltins: Object.freeze([]),
+    allowedPackages: Object.freeze(['jose']),
+    allowedRuntimeRules: Object.freeze([])
+  }),
+  'apps/chatgpt-edge/external-mcp.js': Object.freeze({
+    allowedBuiltins: Object.freeze([]),
+    allowedPackages: Object.freeze([
+      '@modelcontextprotocol/sdk/server/index.js',
+      '@modelcontextprotocol/sdk/server/streamableHttp.js',
+      '@modelcontextprotocol/sdk/types.js'
+    ]),
+    allowedRuntimeRules: Object.freeze([])
+  }),
+  'apps/chatgpt-edge/external-http-runtime.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:crypto', 'node:http']),
+    allowedPackages: Object.freeze([]),
+    allowedRuntimeRules: Object.freeze(['service_listener'])
+  }),
+  'apps/chatgpt-edge/external-main.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:crypto', 'node:fs', 'node:path']),
+    allowedPackages: Object.freeze([]),
+    allowedRuntimeRules: Object.freeze(['runtime_process_access'])
   })
 });
 
@@ -117,6 +141,7 @@ function extractImports(source, relativeFile) {
   }
   const requireReferenceCount = [...source.matchAll(/\brequire\b/gu)].length;
   const literalRequireCount = [...source.matchAll(new RegExp(literalRequireSource, 'gu'))].length;
+  const requireMainCount = [...source.matchAll(/\brequire\s*\.\s*main\b/gu)].length;
   const memberRequireUsed = new RegExp(
     String.raw`(?<!\.)\.${JS_GAP}require${JS_GAP}\(`,
     'u'
@@ -124,7 +149,7 @@ function extractImports(source, relativeFile) {
     String.raw`\[${JS_GAP}['"]require['"]${JS_GAP}\]${JS_GAP}\(`,
     'u'
   ).test(source);
-  if (requireReferenceCount !== literalRequireCount || memberRequireUsed) {
+  if (requireReferenceCount !== literalRequireCount + requireMainCount || memberRequireUsed) {
     throw new Error(`dynamic_import_forbidden:${relativeFile}`);
   }
   const dynamicImportCount = [...source.matchAll(new RegExp(
@@ -367,18 +392,25 @@ function validateComponentSource(component, { file, source }) {
   let listenerCheckedSource = maskedSource;
   if (runtimeFilePolicy?.allowedRuntimeRules.includes('service_listener')) {
     const exactLoopbackListen = /\bserver\s*\.\s*listen\s*\(\s*0\s*,\s*['"]127\.0\.0\.1['"]\s*\)/u;
+    const exactExternalListen = /\bserver\s*\.\s*listen\s*\(\s*config\.bindPort\s*,\s*config\.bindHost\s*\)/u;
     const exactServerCreation = /\bhttp\s*\.\s*createServer\s*\(/u;
     const listenerCalls = [...maskedSource.matchAll(/\bserver\s*\.\s*listen\s*\(/gu)].length;
     const serverCreations = [...maskedSource.matchAll(/\bhttp\s*\.\s*createServer\s*\(/gu)].length;
-    if (!exactLoopbackListen.test(source) || listenerCalls !== 1 || serverCreations !== 1) {
+    const listenPattern = relativeFile === 'apps/chatgpt-edge/loopback-runtime.js'
+      ? exactLoopbackListen
+      : exactExternalListen;
+    if (!listenPattern.test(source) || listenerCalls !== 1 || serverCreations !== 1) {
       throw new Error(`loopback_listener_contract_invalid:${relativeFile}`);
     }
     const withoutAllowedListeners = source
       .replace(exactServerCreation, match => ' '.repeat(match.length))
-      .replace(exactLoopbackListen, match => ' '.repeat(match.length));
+      .replace(listenPattern, match => ' '.repeat(match.length));
     listenerCheckedSource = maskCommentsAndStringContents(withoutAllowedListeners);
   }
   for (const rule of FORBIDDEN_RUNTIME_PATTERNS) {
+    if (rule.code !== 'service_listener' && runtimeFilePolicy?.allowedRuntimeRules.includes(rule.code)) {
+      continue;
+    }
     const ruleSource = rule.code === 'service_listener' ? listenerCheckedSource : maskedSource;
     if (rule.pattern.test(ruleSource) || rule.bracketPattern?.test(bracketMaskedSource)) {
       throw new Error(`${rule.code}:${relativeFile}`);
@@ -400,7 +432,9 @@ function validateComponentSource(component, { file, source }) {
       throw new Error(`builtin_import_forbidden:${component}:${relativeFile}:${specifier}`);
     }
     if (resolved.package) {
-      throw new Error(`package_import_forbidden:${component}:${relativeFile}:${specifier}`);
+      if (!runtimeFilePolicy?.allowedPackages?.includes(specifier)) {
+        throw new Error(`package_import_forbidden:${component}:${relativeFile}:${specifier}`);
+      }
     }
     if (resolved.file && !policy.allowedRoots.some(allowedRoot => isWithin(resolved.file, allowedRoot))) {
       throw new Error(`project_import_forbidden:${component}:${relativeFile}:${specifier}`);
@@ -412,7 +446,9 @@ function validateComponentSource(component, { file, source }) {
 function readBoundary(component) {
   const file = path.join(ROOTS[component], 'package-boundary.json');
   const value = JSON.parse(fs.readFileSync(file, 'utf8'));
-  const expectedStage = ['edge', 'relay'].includes(component) ? 'R4-C' : 'R4-B';
+  const expectedStage = component === 'edge'
+    ? 'R4-D-D2A'
+    : (component === 'relay' ? 'R4-C' : 'R4-B');
   if (value.stage !== expectedStage || value.activated !== false) {
     throw new Error(`boundary_activation_invalid:${component}`);
   }
@@ -430,6 +466,12 @@ function validateBoundaryManifests() {
   if (edge.loopbackReferenceListenerImplemented !== true || edge.bindHost !== '127.0.0.1' ||
       edge.bindPort !== 0 || edge.boundedInMemoryState !== true || edge.durableStateImplemented !== false) {
     throw new Error('edge_loopback_boundary_invalid');
+  }
+  if (edge.externalRuntimeImplemented !== true || edge.externalRuntimeActivated !== false ||
+      edge.oauthRequired !== true || edge.relayAuthenticationRequired !== true ||
+      edge.zeroMemoryCountersRequired !== true || edge.externalMcpPath !== '/mcp' ||
+      edge.protectedResourceMetadataPath !== '/.well-known/oauth-protected-resource') {
+    throw new Error('edge_external_boundary_invalid');
   }
   for (const capability of ['diary_mapping_load', 'provider_invocation', 'memory_storage', 'scope_authorization']) {
     if (!relay.forbiddenCapabilities.includes(capability)) throw new Error(`relay_capability_not_forbidden:${capability}`);
@@ -504,10 +546,12 @@ function validateImportFences() {
   const components = ['contracts', 'edge', 'relay', 'widget', 'governance'].map(component => validateComponent(component));
   return {
     accepted: true,
-    stage: 'R4-C',
+    stage: 'R4-D-D2A',
     components,
     candidateActivated: false,
     loopbackReferenceRuntimeImplemented: true,
+    externalRuntimeImplemented: true,
+    externalRuntimeActivated: false,
     activationEntrypointCount: activation.entrypointCount,
     activationModuleCount: activation.moduleCount,
     externalRuntimeUsed: false,

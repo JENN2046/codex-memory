@@ -4,21 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight`.
-Current validation: `CMV-2223`.
-Current fact: R4-D freezes an Auth0 predefined public client and dedicated single-instance Render Direct HTTPS canary contract without activation.
-Nine focused preflight tests and a presence-only binding check pass; private references are `0/6`, no values were read, and service/config/OAuth/ChatGPT App/memory/provider effects remain zero.
+Current task: `CM-2139 ChatGPT Web R4-D D2A external Edge artifact`.
+Current validation: `CMV-2224`.
+Current fact: R4-D D2A implements and locally validates an isolated official-SDK Direct HTTPS Edge artifact without activation.
+Official MCP/OAuth, zero-memory relay, import-fence, secret-reference, source/lockfile binding, and pinned-container checks pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R4-D preflight selects Auth0 predefined PKCE and a dedicated single-instance Render Direct HTTPS Edge before any optional adapter.
+- Architecture: R4-D D2A implements an isolated Direct HTTPS Edge artifact; the deployment host binding remains unamended and inactive.
 - Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
-- Candidate: R4-C remains non-default/non-activated; R4-D adds only a pure preflight contract/schema/example/validator.
-- Preflight proof: 9 focused tests pass; required private environment references are presence-checked as `0/6` without reading values.
-- Status sync: performed locally in CM-2138; PR CI/review and merge remain delivery gates.
+- Candidate: official-SDK external MCP/PRMD/Auth0/Widget/Relay code exists but remains non-default/non-activated.
+- D2A proof: all 57 focused R4 tests pass; pinned non-root Docker artifact builds without container start.
+- Host route: private VM read-only preflight passed with a coexistence gate; D1 Render binding must be amended before self-hosted deployment.
+- Status sync: performed locally in CM-2139; PR CI/review and merge remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 

@@ -4,13 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight`.
-Current validation: `CMV-2223`.
-Current fact: R4-D freezes an Auth0 predefined public client and dedicated single-instance Render Direct HTTPS canary contract without activation.
-Nine focused preflight tests and a presence-only binding check pass; private references are `0/6`, no values were read, and service/config/OAuth/ChatGPT App/memory/provider effects remain zero.
+Current task: `CM-2139 ChatGPT Web R4-D D2A external Edge artifact`.
+Current validation: `CMV-2224`.
+Current fact: R4-D D2A implements and locally validates an isolated official-SDK Direct HTTPS Edge artifact without activation.
+Official MCP/OAuth, zero-memory relay, import-fence, secret-reference, source/lockfile binding, and pinned-container checks pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2139 ChatGPT Web R4-D D2A External Edge Artifact
+
+Status: `R4D_D2A_EXTERNAL_EDGE_ARTIFACT_VALIDATED_ACTIVATION_FALSE`
+
+- Official MCP SDK stateless Streamable HTTP exposes the isolated six-tool candidate and immutable scope widget without changing the local default surface.
+- Exact Auth0 RS256 issuer/resource/client/scope/operator verification, PRMD, Relay bearer authentication, Ed25519 request/response binding, bounded in-memory brokerage, and all-zero memory/provider/native/write counters fail closed.
+- Runtime authority accepts owner-only `file:` references and binds actual lockfile bytes plus the image build-source commit; artifact digest remains an external deployment gate.
+- Digest-pinned non-root Docker artifact and whitelist-only context build locally; no container was started.
+- Existing private VM read-only preflight passed with a coexistence gate; D1 remains Render-specific and requires a self-hosted binding amendment before deployment.
+- All 57 focused R4 tests pass. External service/config, token exchange, real memory/provider use, production/release/deploy/cutover/readiness remain false.
+
+Validation: `CMV-2224`.
 
 ## CM-2138 ChatGPT Web R4-D External OAuth/Runtime Preflight
 

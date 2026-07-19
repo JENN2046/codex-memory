@@ -1,0 +1,11 @@
+**
+!package.json
+!package-lock.json
+!apps/
+!apps/chatgpt-edge/
+!apps/chatgpt-edge/**
+!apps/chatgpt-memory-scope-widget/
+!apps/chatgpt-memory-scope-widget/**
+!packages/
+!packages/chatgpt-r4-contracts/
+!packages/chatgpt-r4-contracts/**

@@ -4,13 +4,30 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight`.
-Current validation: `CMV-2223`.
-Current fact: R4-D freezes an Auth0 predefined public client and dedicated single-instance Render Direct HTTPS canary contract without activation.
-Nine focused preflight tests and a presence-only binding check pass; private references are `0/6`, no values were read, and service/config/OAuth/ChatGPT App/memory/provider effects remain zero.
+Current task: `CM-2139 ChatGPT Web R4-D D2A external Edge artifact`.
+Current validation: `CMV-2224`.
+Current fact: R4-D D2A implements and locally validates an isolated official-SDK Direct HTTPS Edge artifact without activation.
+Official MCP/OAuth, zero-memory relay, import-fence, secret-reference, source/lockfile binding, and pinned-container checks pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2139 ChatGPT Web R4-D D2A External Edge Artifact
+
+D2A implements the isolated external Edge as a non-default, non-activated
+artifact. It uses the official MCP SDK, stateless Streamable HTTP, exact Auth0
+RS256 issuer/resource/client/scope/operator binding, protected-resource
+metadata, six read-only candidate tools, and an immutable MCP Apps scope
+resource. The authenticated outbound Relay contract permits only signed,
+zero-memory responses and bounded in-flight state.
+
+The container is non-root, uses a digest-pinned Node base, has a whitelist-only
+build context, and binds actual lockfile bytes plus build-source commit before
+runtime start. The existing private VM passed a low-disclosure read-only
+capacity/coexistence preflight, but no service or server configuration was
+changed. The old D1 private binding remains Render-specific and must be amended
+and revalidated for self-hosting before any deployment. See
+`docs/CHATGPT_WEB_R4D_D2A_EDGE_ARTIFACT.md`.
 
 ## CM-2138 ChatGPT Web R4-D External OAuth/Runtime Preflight
 

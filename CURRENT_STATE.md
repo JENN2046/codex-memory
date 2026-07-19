@@ -8,13 +8,30 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | ChatGPT Web R4-D external OAuth/runtime preflight contract implemented; private binding, activation and readiness remain false |
-| Current task | `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight` |
-| Current validation | `CMV-2223` |
-| Current route | Deliver preflight through normal PR/CI/review; then bind exact private R4-D values offline under a separate execution boundary |
+| Status | ChatGPT Web R4-D D2A external Edge artifact implemented and locally validated; activation and readiness remain false |
+| Current task | `CM-2139 ChatGPT Web R4-D D2A external Edge artifact` |
+| Current validation | `CMV-2224` |
+| Current route | Deliver D2A through normal PR/CI/review; then amend the Render-specific D1 private binding for isolated self-hosting before any deployment |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R4-D D2A External Edge Artifact
+
+D2A adds an isolated, non-default external Edge built on the official MCP SDK.
+It serves stateless Streamable HTTP MCP and PRMD, verifies Auth0 RS256 tokens
+against exact issuer/resource/client/scope/operator bindings, publishes six
+read-only candidate tools plus an immutable scope widget, and accepts only
+authenticated, Ed25519-bound Relay completions with all memory/provider/native/
+write counters equal to zero.
+
+The Docker artifact is non-root and digest-pinned, uses a whitelist-only build
+context, reads secret material only through owner-only files, and verifies the
+actual lockfile bytes and image build-source commit before startup. All 57 R4
+tests pass and the image builds locally; no container or external service was
+started. The private VM's read-only preflight passed with a coexistence gate,
+but the old D1 binding is still Render-specific and is not deployment authority
+for that VM. See `docs/CHATGPT_WEB_R4D_D2A_EDGE_ARTIFACT.md`.
 
 ## ChatGPT Web R4-D External OAuth/Runtime Preflight
 

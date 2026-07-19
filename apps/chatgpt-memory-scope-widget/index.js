@@ -3,5 +3,6 @@
 module.exports = {
   ...require('./src/resource'),
   ...require('./src/dto'),
-  ...require('./src/bridge')
+  ...require('./src/bridge'),
+  ...require('./src/html')
 };
