@@ -99,8 +99,8 @@ function createExternalEdgeRuntime(options = {}) {
         return sendJson(outgoing, 200, protectedResourceMetadata(config));
       }
       if (pathname === MCP_PATH) {
-        if (method !== 'POST') return sendMethodNotAllowed(outgoing, ['POST']);
         const authInfo = await authenticateMcp(incoming, verifyAccessToken, config);
+        if (method !== 'POST') return sendMethodNotAllowed(outgoing, ['POST']);
         const body = await readJsonBody(incoming, { allowBatch: true });
         return await mcp.handle(incoming, outgoing, body, authInfo);
       }
