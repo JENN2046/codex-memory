@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Current stage: `R4-C local_edge_relay_integration`
+Current stage: `R4-D external_oauth_runtime_preflight`
 
 Old R3/M5 Tunnel route: `draft_paused_no_merge`
 
@@ -72,7 +72,7 @@ Implementation evidence: `docs/CHATGPT_WEB_R4B_CONTRACTS_SYNTHETIC.md`.
 
 ## R4-C — Local Edge/Relay Integration
 
-Status: `IMPLEMENTED_LOCAL_REFERENCE_RUNTIME_PENDING_PR_DELIVERY`
+Status: `COMPLETE_MERGED`
 
 Build a loopback-only reference topology:
 
@@ -93,6 +93,8 @@ Implementation evidence: `docs/CHATGPT_WEB_R4C_LOCAL_INTEGRATION.md`.
 
 ## R4-D — OAuth And External Edge Activation
 
+Status: `PREFLIGHT_CONTRACT_IMPLEMENTED_ACTIVATION_NOT_PERFORMED`
+
 This stage crosses external auth/runtime configuration and requires Jenn's
 current exact authorization.
 
@@ -110,6 +112,9 @@ Tunnel/proxy/CDN adapter. If direct succeeds and an adapter fails, investigate
 the adapter; do not mutate local memory governance or weaken OAuth.
 
 No real memory is allowed in R4-D.
+
+Preflight evidence:
+`docs/CHATGPT_WEB_R4D_EXTERNAL_RUNTIME_PREFLIGHT.md`.
 
 ## R4-E — Zero-memory ChatGPT E2E
 

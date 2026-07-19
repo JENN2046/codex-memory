@@ -8,13 +8,32 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | ChatGPT Web R4-C loopback Edge/Relay and temporary-UDS integration implemented; candidate activation/external runtime/readiness remain false |
-| Current task | `CM-2137 ChatGPT Web R4-C local Edge/Relay integration` |
-| Current validation | `CMV-2222` |
-| Current route | Deliver R4-C through normal PR/CI/review; R4-D external OAuth/runtime requires new exact authorization |
+| Status | ChatGPT Web R4-D external OAuth/runtime preflight contract implemented; private binding, activation and readiness remain false |
+| Current task | `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight` |
+| Current validation | `CMV-2223` |
+| Current route | Deliver preflight through normal PR/CI/review; then bind exact private R4-D values offline under a separate execution boundary |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R4-D External OAuth/Runtime Preflight
+
+R4-D selects an Auth0 predefined public client, PKCE S256, exact
+resource/audience and `memory.read`, plus a dedicated single-instance Render
+Direct HTTPS Edge. Direct HTTPS must pass before any Tunnel/proxy/CDN adapter.
+The preflight is a pure contract with a canonical JSON Schema digest, an
+intentionally non-activatable redacted example, a value-free environment
+presence audit, and negative tests.
+
+Nine focused tests pass. The required private environment references are
+currently `0/6`; only presence was checked and no value was read. The contract
+rejects local/placeholder origins, authority mismatches, credential values,
+anonymous access, widened scopes, non-S256 PKCE, Tunnel-first routing, body
+logs, durable remote state, incomplete rollback/supply-chain identity, and any
+positive activation/memory/provider/service claim. No external configuration,
+service, OAuth client, token exchange, ChatGPT App, real memory, public tool,
+production, release, deploy, cutover, or readiness action occurred. See
+`docs/CHATGPT_WEB_R4D_EXTERNAL_RUNTIME_PREFLIGHT.md`.
 
 ## ChatGPT Web R4 Architecture Freeze
 

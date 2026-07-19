@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "architecture_reference": "codex-memory-chatgpt-web-r4-v1",
+  "stage": "R4-D",
+  "ownership": {
+    "deployment_class": "private_development",
+    "hosting_provider": "render",
+    "host_service_mode": "dedicated_single_instance_web_service",
+    "host_project_reference": "env:CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE",
+    "operator_count": 1,
+    "operator_reference": "env:CODEX_MEMORY_R4_OPERATOR_REFERENCE",
+    "operator_role": "owner"
+  },
+  "oauth": {
+    "identity_provider": "auth0",
+    "client_registration_mode": "predefined_public_client",
+    "issuer": "https://tenant.example.invalid/",
+    "resource": "https://edge.example.invalid",
+    "scopes": ["memory.read"],
+    "pkce_method": "S256",
+    "token_endpoint_auth_method": "none",
+    "resource_parameter_on_authorization": true,
+    "resource_parameter_on_token": true,
+    "audience_claim_required": true,
+    "anonymous_access": false
+  },
+  "endpoints": {
+    "public_origin": "https://edge.example.invalid",
+    "mcp_path": "/mcp",
+    "protected_resource_metadata_path": "/.well-known/oauth-protected-resource",
+    "authorization_server_discovery_url": "https://tenant.example.invalid/.well-known/openid-configuration"
+  },
+  "credential_references": {
+    "oauth_client_id": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID",
+    "edge_signing_private_key": "env:CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY",
+    "relay_auth_token": "env:CODEX_MEMORY_R4_RELAY_AUTH_TOKEN"
+  },
+  "runtime": {
+    "transport_mode": "direct_https",
+    "adapter_mode": "none",
+    "direct_https_canary_required": true,
+    "request_or_response_body_logging_allowed": false,
+    "durable_remote_state_allowed": false,
+    "max_in_flight_requests": 16,
+    "request_ttl_seconds": 30,
+    "restart_behavior": "fail_closed_and_expire_inflight"
+  },
+  "rollback": {
+    "previous_binding_reference": "env:CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE",
+    "app_disable_ready": true,
+    "credential_revocation_ready": true,
+    "edge_disable_ready": true,
+    "relay_stop_ready": true
+  },
+  "supply_chain": {
+    "repository": "JENN2046/codex-memory",
+    "commit_sha": "0000000000000000000000000000000000000000",
+    "tree_sha": "0000000000000000000000000000000000000000",
+    "lockfile_sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "edge_artifact_sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "activation_boundary": {
+    "external_runtime_activated": false,
+    "service_started": false,
+    "chatgpt_app_created": false,
+    "direct_https_canary_passed": false,
+    "real_memory_allowed": false,
+    "real_memory_reads": 0,
+    "provider_calls": 0,
+    "write_tools_enabled": false,
+    "public_tool_surface_expanded": false
+  }
+}

@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codex-memory://chatgpt-web-r4d/oauth-runtime-preflight-v1",
+  "title": "ChatGPT Web R4-D OAuth and external runtime preflight",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "architecture_reference",
+    "stage",
+    "ownership",
+    "oauth",
+    "endpoints",
+    "credential_references",
+    "runtime",
+    "rollback",
+    "supply_chain",
+    "activation_boundary"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "architecture_reference": { "const": "codex-memory-chatgpt-web-r4-v1" },
+    "stage": { "const": "R4-D" },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deployment_class",
+        "hosting_provider",
+        "host_service_mode",
+        "host_project_reference",
+        "operator_count",
+        "operator_reference",
+        "operator_role"
+      ],
+      "properties": {
+        "deployment_class": { "const": "private_development" },
+        "hosting_provider": { "const": "render" },
+        "host_service_mode": { "const": "dedicated_single_instance_web_service" },
+        "host_project_reference": { "const": "env:CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE" },
+        "operator_count": { "const": 1 },
+        "operator_reference": { "const": "env:CODEX_MEMORY_R4_OPERATOR_REFERENCE" },
+        "operator_role": { "const": "owner" }
+      }
+    },
+    "oauth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity_provider",
+        "client_registration_mode",
+        "issuer",
+        "resource",
+        "scopes",
+        "pkce_method",
+        "token_endpoint_auth_method",
+        "resource_parameter_on_authorization",
+        "resource_parameter_on_token",
+        "audience_claim_required",
+        "anonymous_access"
+      ],
+      "properties": {
+        "identity_provider": { "const": "auth0" },
+        "client_registration_mode": { "const": "predefined_public_client" },
+        "issuer": { "type": "string", "format": "uri", "pattern": "^https://[^/?#]+/$" },
+        "resource": { "type": "string", "format": "uri", "pattern": "^https://[^/?#]+$" },
+        "scopes": {
+          "type": "array",
+          "prefixItems": [{ "const": "memory.read" }],
+          "items": false,
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "pkce_method": { "const": "S256" },
+        "token_endpoint_auth_method": { "const": "none" },
+        "resource_parameter_on_authorization": { "const": true },
+        "resource_parameter_on_token": { "const": true },
+        "audience_claim_required": { "const": true },
+        "anonymous_access": { "const": false }
+      }
+    },
+    "endpoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "public_origin",
+        "mcp_path",
+        "protected_resource_metadata_path",
+        "authorization_server_discovery_url"
+      ],
+      "properties": {
+        "public_origin": { "type": "string", "format": "uri", "pattern": "^https://[^/?#]+$" },
+        "mcp_path": { "const": "/mcp" },
+        "protected_resource_metadata_path": { "const": "/.well-known/oauth-protected-resource" },
+        "authorization_server_discovery_url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://.+/\\.well-known/openid-configuration$"
+        }
+      }
+    },
+    "credential_references": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["oauth_client_id", "edge_signing_private_key", "relay_auth_token"],
+      "properties": {
+        "oauth_client_id": { "const": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID" },
+        "edge_signing_private_key": { "const": "env:CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY" },
+        "relay_auth_token": { "const": "env:CODEX_MEMORY_R4_RELAY_AUTH_TOKEN" }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transport_mode",
+        "adapter_mode",
+        "direct_https_canary_required",
+        "request_or_response_body_logging_allowed",
+        "durable_remote_state_allowed",
+        "max_in_flight_requests",
+        "request_ttl_seconds",
+        "restart_behavior"
+      ],
+      "properties": {
+        "transport_mode": { "const": "direct_https" },
+        "adapter_mode": { "const": "none" },
+        "direct_https_canary_required": { "const": true },
+        "request_or_response_body_logging_allowed": { "const": false },
+        "durable_remote_state_allowed": { "const": false },
+        "max_in_flight_requests": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "request_ttl_seconds": { "type": "integer", "minimum": 1, "maximum": 30 },
+        "restart_behavior": { "const": "fail_closed_and_expire_inflight" }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "previous_binding_reference",
+        "app_disable_ready",
+        "credential_revocation_ready",
+        "edge_disable_ready",
+        "relay_stop_ready"
+      ],
+      "properties": {
+        "previous_binding_reference": { "const": "env:CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE" },
+        "app_disable_ready": { "const": true },
+        "credential_revocation_ready": { "const": true },
+        "edge_disable_ready": { "const": true },
+        "relay_stop_ready": { "const": true }
+      }
+    },
+    "supply_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "commit_sha", "tree_sha", "lockfile_sha256", "edge_artifact_sha256"],
+      "properties": {
+        "repository": { "const": "JENN2046/codex-memory" },
+        "commit_sha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "tree_sha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "lockfile_sha256": { "$ref": "#/$defs/sha256" },
+        "edge_artifact_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "activation_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "external_runtime_activated",
+        "service_started",
+        "chatgpt_app_created",
+        "direct_https_canary_passed",
+        "real_memory_allowed",
+        "real_memory_reads",
+        "provider_calls",
+        "write_tools_enabled",
+        "public_tool_surface_expanded"
+      ],
+      "properties": {
+        "external_runtime_activated": { "const": false },
+        "service_started": { "const": false },
+        "chatgpt_app_created": { "const": false },
+        "direct_https_canary_passed": { "const": false },
+        "real_memory_allowed": { "const": false },
+        "real_memory_reads": { "const": 0 },
+        "provider_calls": { "const": 0 },
+        "write_tools_enabled": { "const": false },
+        "public_tool_surface_expanded": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

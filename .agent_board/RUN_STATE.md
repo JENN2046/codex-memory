@@ -4,21 +4,21 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2137 ChatGPT Web R4-C local Edge/Relay integration`.
-Current validation: `CMV-2222`.
-Current fact: R4-C implements a non-activated loopback-only Edge, outbound Relay, temporary UDS, and strict synthetic governance integration.
-Claim/ack/expiry/reconnect/replay/cancel/correlation/body-log gates pass with all provider/native/fallback/write/durable counters at zero; no active service/config, OAuth, external runtime, real memory, or public tool activation occurred.
+Current task: `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight`.
+Current validation: `CMV-2223`.
+Current fact: R4-D freezes an Auth0 predefined public client and dedicated single-instance Render Direct HTTPS canary contract without activation.
+Nine focused preflight tests and a presence-only binding check pass; private references are `0/6`, no values were read, and service/config/OAuth/ChatGPT App/memory/provider effects remain zero.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R4-C candidate adds actual loopback Edge -> outbound Relay -> temporary UDS -> strict synthetic governance without activating external or active runtime.
+- Architecture: R4-D preflight selects Auth0 predefined PKCE and a dedicated single-instance Render Direct HTTPS Edge before any optional adapter.
 - Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
-- Candidate: exact `127.0.0.1:0`, non-default and non-activated; active runtime imports remain unchanged.
-- Synthetic proof: actual loopback HTTP and temporary UDS, 41 focused tests including cancellation-before-ack and claim-expiry races, first-lookup stale-record purge, event-sink failure isolation, expired-record capacity reclamation, asynchronous completion-state, Edge-timeout alignment, normalized-root, split-UTF-8, open-peer frame, and listener-alias regressions, all provider/native/fallback/write/durable/global-search counters zero.
-- Status sync: performed locally in CM-2137; PR CI/review and merge remain delivery gates.
+- Candidate: R4-C remains non-default/non-activated; R4-D adds only a pure preflight contract/schema/example/validator.
+- Preflight proof: 9 focused tests pass; required private environment references are presence-checked as `0/6` without reading values.
+- Status sync: performed locally in CM-2138; PR CI/review and merge remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
