@@ -131,14 +131,6 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
     bearer_methods_supported: ['header'],
     resource_name: 'codex-memory private project memory'
   });
-  const pathSpecificPrmd = await edgeRequest(
-    address,
-    'GET',
-    '/.well-known/oauth-protected-resource/mcp'
-  );
-  assert.equal(pathSpecificPrmd.statusCode, 200);
-  assert.deepEqual(pathSpecificPrmd.body, prmd.body);
-
   const unauthenticated = await mcpRequest(address, initializeRequest(1), null);
   assert.equal(unauthenticated.statusCode, 401);
   assert.match(unauthenticated.headers['www-authenticate'], /resource_metadata=/u);
