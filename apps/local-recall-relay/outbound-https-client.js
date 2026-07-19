@@ -17,7 +17,7 @@ function createOutboundEdgeClient(edgeOrigin, {
 } = {}) {
   const baseUrl = assertCanonicalPublicOrigin(edgeOrigin);
   if (typeof authToken !== 'string' || authToken.length < 32 || authToken.length > 2048 ||
-      authToken.trim() !== authToken || /[\r\n]/u.test(authToken)) {
+      !/^[A-Za-z0-9._~+/-]+$/u.test(authToken)) {
     reject('relay_edge_auth_token_invalid');
   }
   if (!Number.isInteger(timeoutMs) || timeoutMs < 10 || timeoutMs > 30_000) {

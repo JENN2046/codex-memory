@@ -133,7 +133,7 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   }
 });
 
-test('R4-D D2B outbound client rejects HTTP, IP, credentials, paths, and short tokens before network', () => {
+test('R4-D D2B outbound client rejects unsafe origins and Edge-incompatible tokens before network', () => {
   for (const origin of [
     'http://memory.jenn.dev',
     'https://127.0.0.1',
@@ -148,6 +148,11 @@ test('R4-D D2B outbound client rejects HTTP, IP, credentials, paths, and short t
   assert.throws(() => createOutboundEdgeClient(ORIGIN, { authToken: 'short' }), {
     code: 'relay_edge_auth_token_invalid'
   });
+  for (const authToken of [`${TOKEN}=`, `${TOKEN} value`, `${TOKEN}\n`]) {
+    assert.throws(() => createOutboundEdgeClient(ORIGIN, { authToken }), {
+      code: 'relay_edge_auth_token_invalid'
+    });
+  }
 });
 
 test('R4-D D2B runtime authority requires owner-only files and distinct Ed25519 authorities', () => {
