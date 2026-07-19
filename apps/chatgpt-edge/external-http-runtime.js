@@ -204,6 +204,13 @@ function validateExternalEdgeRuntimeConfig(options) {
       !/^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/u.test(options.relaySigningKeyId)) {
     reject('edge_relay_signing_key_id_invalid');
   }
+  const edgeSigningPublicKey = crypto.createPublicKey(options.edgeSigning.privateKey);
+  const edgeSigningDer = edgeSigningPublicKey.export({ type: 'spki', format: 'der' });
+  const relaySigningDer = relaySigningPublicKey.export({ type: 'spki', format: 'der' });
+  if (edgeSigningDer.equals(relaySigningDer)) reject('edge_runtime_signing_authority_reused');
+  if (options.edgeSigning.keyId === options.relaySigningKeyId) {
+    reject('edge_runtime_signing_key_id_reused');
+  }
   if (typeof options.relayAuthToken !== 'string' || options.relayAuthToken.length < 32 ||
       options.relayAuthToken.length > 2048) {
     reject('edge_relay_auth_token_invalid');

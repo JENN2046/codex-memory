@@ -69,6 +69,7 @@ function createAuth0TokenVerifier({
       reject('edge_oauth_token_invalid');
     }
     const payload = verified.payload;
+    if (payload.aud !== audience) reject('edge_oauth_audience_mismatch');
     if (typeof payload.sub !== 'string' || payload.sub.length < 1 || payload.sub.length > 255) {
       reject('edge_oauth_subject_invalid');
     }

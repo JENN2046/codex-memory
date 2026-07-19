@@ -63,6 +63,7 @@ test('Auth0 verifier binds RS256 issuer, audience, client, scope, and single ope
   for (const mutation of [
     { subject: 'auth0|other-operator' },
     { audience: 'https://other.codex-memory.dev' },
+    { audience: [PUBLIC_ORIGIN, 'https://other.codex-memory.dev'] },
     { clientId: 'other-client-id' },
     { scope: 'openid' }
   ]) {
@@ -336,6 +337,14 @@ test('external Edge configuration rejects non-public origins, unsafe bind, and n
     ...base,
     relaySigningPublicKey: rsa.publicKey
   }), { code: 'edge_relay_signing_algorithm_invalid' });
+  assert.throws(() => validateExternalEdgeRuntimeConfig({
+    ...base,
+    relaySigningPublicKey: edgeIdentity.publicKey
+  }), { code: 'edge_runtime_signing_authority_reused' });
+  assert.throws(() => validateExternalEdgeRuntimeConfig({
+    ...base,
+    relaySigningKeyId: edgeIdentity.keyId
+  }), { code: 'edge_runtime_signing_key_id_reused' });
 });
 
 async function signAccessToken(privateKey, {
