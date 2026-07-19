@@ -157,11 +157,13 @@ test('R4-D D2B runtime authority requires owner-only files and distinct Ed25519 
   const relay = crypto.generateKeyPairSync('ed25519');
   const files = {
     edge: path.join(root, 'edge-public.pem'),
-    relay: path.join(root, 'relay-private.pem'),
+    relayPrivate: path.join(root, 'relay-private.pem'),
+    relayPublic: path.join(root, 'relay-public.pem'),
     token: path.join(root, 'relay-token')
   };
   fs.writeFileSync(files.edge, edge.publicKey.export({ type: 'spki', format: 'pem' }), { mode: 0o600 });
-  fs.writeFileSync(files.relay, relay.privateKey.export({ type: 'pkcs8', format: 'pem' }), { mode: 0o600 });
+  fs.writeFileSync(files.relayPrivate, relay.privateKey.export({ type: 'pkcs8', format: 'pem' }), { mode: 0o600 });
+  fs.writeFileSync(files.relayPublic, relay.publicKey.export({ type: 'spki', format: 'pem' }), { mode: 0o600 });
   fs.writeFileSync(files.token, `${TOKEN}\n`, { mode: 0o600 });
   const environment = runtimeEnvironment(files);
   assert.doesNotThrow(() => loadOutboundRelayRuntimeFromEnvironment(environment, {
@@ -174,9 +176,20 @@ test('R4-D D2B runtime authority requires owner-only files and distinct Ed25519 
     code: 'relay_secret_file_security_invalid'
   });
   fs.chmodSync(files.token, 0o600);
-  fs.writeFileSync(files.relay, edge.privateKey.export({ type: 'pkcs8', format: 'pem' }), { mode: 0o600 });
+  const mismatchedRelay = crypto.generateKeyPairSync('ed25519');
+  fs.writeFileSync(files.relayPublic, mismatchedRelay.publicKey.export({ type: 'spki', format: 'pem' }), { mode: 0o600 });
+  assert.throws(() => loadOutboundRelayRuntimeFromEnvironment(environment, { secretRoot: root }), {
+    code: 'relay_runtime_signing_key_pair_mismatch'
+  });
+  fs.writeFileSync(files.relayPrivate, edge.privateKey.export({ type: 'pkcs8', format: 'pem' }), { mode: 0o600 });
+  fs.writeFileSync(files.relayPublic, edge.publicKey.export({ type: 'spki', format: 'pem' }), { mode: 0o600 });
   assert.throws(() => loadOutboundRelayRuntimeFromEnvironment(environment, { secretRoot: root }), {
     code: 'relay_runtime_signing_authority_reused'
+  });
+  const missingHostRollback = runtimeEnvironment(files);
+  delete missingHostRollback.CODEX_MEMORY_R4_PREVIOUS_HOST_CONFIG_REFERENCE;
+  assert.throws(() => loadOutboundRelayRuntimeFromEnvironment(missingHostRollback, { secretRoot: root }), {
+    code: 'relay_runtime_environment_missing'
   });
   fs.rmSync(root, { recursive: true, force: true });
 });
@@ -187,12 +200,14 @@ function runtimeEnvironment(files) {
     CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE: 'host:self-managed:private-vm',
     CODEX_MEMORY_R4_BINDING_REFERENCE: 'binding:r4d-d2b:private',
     CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE: 'rollback:r4d-d1:private',
+    CODEX_MEMORY_R4_PREVIOUS_HOST_CONFIG_REFERENCE: 'rollback:r4d-d2a:host-config',
     CODEX_MEMORY_R4_BINDING_DIGEST: `sha256:${'0123456789abcdef'.repeat(4)}`,
     CODEX_MEMORY_R4_PUBLIC_ORIGIN: ORIGIN,
     CODEX_MEMORY_R4_AUTH0_ISSUER: ISSUER,
     CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY: `file:${files.edge}`,
     CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID: 'edge-r4d-d2b-test',
-    CODEX_MEMORY_R4_RELAY_SIGNING_PRIVATE_KEY: `file:${files.relay}`,
+    CODEX_MEMORY_R4_RELAY_SIGNING_PRIVATE_KEY: `file:${files.relayPrivate}`,
+    CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY: `file:${files.relayPublic}`,
     CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID: 'relay-r4d-d2b-test',
     CODEX_MEMORY_R4_RELAY_AUTH_TOKEN: `file:${files.token}`,
     CODEX_MEMORY_R4_RELAY_UDS_PATH: '/run/user/1000/codex-memory/governance.sock',

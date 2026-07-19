@@ -1,6 +1,6 @@
 # ChatGPT Web R4-D D2B Self-Hosted Binding And Outbound Relay
 
-Status: `SOURCE_VALIDATED_PRIVATE_EXACT_BINDING_BLOCKED_PUBLIC_ORIGIN_MISSING`
+Status: `PRIVATE_EXACT_BINDING_AND_DIRECT_RUNTIME_CANARY_PASS`
 
 Task: `CM-2140`
 
@@ -12,10 +12,9 @@ Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
 D2B replaces the Render-only host assumption with an explicit self-hosted
 private-development amendment and implements the local outbound Relay client.
-The tracked contract is ready; exact private activation is not complete because
-no canonical public HTTPS origin reference is currently bound. The validator
-rejects placeholders, IP origins, and non-public names, so deployment does not
-fall back to a bare server address or an unowned wildcard-DNS service.
+The exact private amendment is now frozen against a Jenn-controlled canonical
+public HTTPS origin. Its Direct HTTPS Edge, Auth0 PKCE binding, and zero-memory
+MCP discovery canary passed. Exact values and digests remain private.
 
 ```yaml
 self_hosted_amendment_contract: pass
@@ -25,12 +24,12 @@ relay_inbound_listener: false
 edge_relay_signing_authority_separated: pass
 owner_only_secret_references: pass
 private_d1_prerequisites_present: true
-canonical_public_origin_reference_present: false
-private_exact_binding_complete: false
-external_service_changed: false
-service_started: false
-deployed: false
-oauth_token_exchanges: 0
+canonical_public_origin_reference_present: true
+private_exact_binding_complete: true
+external_service_changed: true
+service_started: true
+deployed: true
+oauth_token_exchanges: 1
 provider_calls: 0
 memory_reads: 0
 memory_writes: 0
@@ -89,14 +88,14 @@ does not return exact values or the digest.
 
 The existing Windows current-user private store and all six original D1
 references were found present through a value-free audit. The D2B-specific
-public-origin, Edge-public-key, Relay-private-key, UDS, and previous-host-config
-references are not yet bound. No credential value or private-store content was
-read or printed.
+public-origin, signing-authority, UDS, artifact, and rollback references were
+then bound in the owner-only private store. No credential or exact private
+binding value was printed or committed.
 
 ## Validation
 
 ```yaml
-all_r4_tests: 64/64
+all_r4_tests: 65/65
 d2b_tests: 7/7
 canonical_ci_selected_external_tests: 13/13
 default_tests: 5798
@@ -123,12 +122,13 @@ Official contract references:
 
 ## Next Gate
 
-Jenn must select a stable DNS name she controls for the private Edge and bind it
-to the server before the exact D2B private amendment can be frozen. D2C may then
-build and pin the exact committed image, stage isolated container and reverse-
-proxy configuration, validate rollback/coexistence, and perform the authorized
-health contract. D3 OAuth discovery/resource/token canary follows only after
-D2C passes.
+The stable Jenn-controlled DNS origin, exact private amendment, isolated Edge,
+TLS vhost, Auth0 resource/client binding, operator fingerprint, and D4
+initialize/tools-list canary now pass. See
+`docs/CHATGPT_WEB_R4D_DIRECT_OAUTH_RUNTIME_CANARY.md` for the low-disclosure
+runtime receipt.
 
-No real memory is allowed in D2B, D2C, D3, or D4. Production, release, cutover,
-deploy-ready, and readiness claims remain false.
+R4-E may bind a private single-operator ChatGPT App and run the zero-memory
+Widget/`memory_overview` probe. No real memory is allowed before separately
+authorized R4-F. Production, release, cutover, deploy-ready, and readiness
+claims remain false.

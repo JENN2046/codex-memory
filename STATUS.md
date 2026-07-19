@@ -4,13 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2140 ChatGPT Web R4-D D2B self-hosted binding and outbound Relay`.
-Current validation: `CMV-2225`.
-Current fact: D2B source, schema, amendment contract, and outbound HTTPS-to-UDS Relay pass; the exact private binding remains blocked on a missing canonical public origin.
-All 64 R4 tests pass; D1 private prerequisites are present by value-free audit, while no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
+Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
+Current validation: `CMV-2226`.
+Current fact: D2C-D4 Direct HTTPS deployment, Auth0 PKCE/operator binding, and authenticated MCP initialize/tools-list canary pass.
+All 65 R4 tests pass; six read-only candidate tools were discovered with zero tool, Relay, memory, provider, native, fallback, write, or durable-mutation calls.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2141 ChatGPT Web R4-D Direct OAuth Runtime Canary
+
+The private exact binding, isolated non-root Edge container, host-loopback
+publish, dedicated Nginx/TLS vhost, public/local health, protected-resource
+metadata, Auth0 RS256 resource, predefined Native public client, PKCE S256,
+exact `memory.read`, and single-operator fingerprint passed. Rollback material
+remains encrypted and owner-only; exact private values and digests remain out
+of Git.
+
+The authenticated D4 canary sent only `initialize` and `tools/list`. It found
+exactly six read-only candidate tools and made no tool or Relay call. Memory,
+provider, native, fallback, write, and durable-mutation counters stayed zero.
+No ChatGPT App, Widget E2E, or real memory recall was performed. See
+`docs/CHATGPT_WEB_R4D_DIRECT_OAUTH_RUNTIME_CANARY.md`.
 
 ## CM-2140 ChatGPT Web R4-D D2B Self-Hosted Binding And Outbound Relay
 
@@ -20,9 +35,9 @@ has no listener and forwards signed requests only to the configured local UDS.
 It rejects non-public/HTTP/IP/path origins, insecure or out-of-root secret
 files, key reuse, signature/replay drift, body disclosure, and nonzero counters.
 
-The six original D1 references and protected private store are present. The
-canonical public origin and new D2B authority references are not bound, so the
-exact private amendment, deployment, and OAuth canary remain unperformed. See
+The six original D1 references and D2B authority references are now bound in
+the protected private store. The exact amendment, deployment, and direct OAuth
+discovery canary passed. See
 `docs/CHATGPT_WEB_R4D_D2B_SELF_HOSTED_RELAY.md`.
 
 ## CM-2139 ChatGPT Web R4-D D2A External Edge Artifact

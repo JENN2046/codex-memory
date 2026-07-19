@@ -34,6 +34,10 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
     getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_PRIVATE_KEY'),
     { secretRoot, readFileSync, statSync, realpathSync }
   );
+  const relayPublicKeyPem = readSecretReference(
+    getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY'),
+    { secretRoot, readFileSync, statSync, realpathSync }
+  );
   const relayAuthToken = normalizeSingleLineSecret(readSecretReference(
     getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_AUTH_TOKEN'),
     { secretRoot, readFileSync, statSync, realpathSync }
@@ -41,16 +45,21 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
 
   let edgePublicKey;
   let relayPrivateKey;
+  let relayPublicKey;
   try {
     edgePublicKey = crypto.createPublicKey(edgePublicKeyPem);
     relayPrivateKey = crypto.createPrivateKey(relayPrivateKeyPem);
+    relayPublicKey = crypto.createPublicKey(relayPublicKeyPem);
   } catch {
     reject('relay_runtime_key_material_invalid');
   }
-  if (edgePublicKey.asymmetricKeyType !== 'ed25519' || relayPrivateKey.asymmetricKeyType !== 'ed25519') {
+  if (edgePublicKey.asymmetricKeyType !== 'ed25519' || relayPrivateKey.asymmetricKeyType !== 'ed25519' ||
+      relayPublicKey.asymmetricKeyType !== 'ed25519') {
     reject('relay_runtime_signing_algorithm_invalid');
   }
   const relayPublicDer = crypto.createPublicKey(relayPrivateKey).export({ type: 'spki', format: 'der' });
+  const boundRelayPublicDer = relayPublicKey.export({ type: 'spki', format: 'der' });
+  if (!relayPublicDer.equals(boundRelayPublicDer)) reject('relay_runtime_signing_key_pair_mismatch');
   const edgePublicDer = edgePublicKey.export({ type: 'spki', format: 'der' });
   if (relayPublicDer.equals(edgePublicDer)) reject('relay_runtime_signing_authority_reused');
 
@@ -81,7 +90,8 @@ function validateBindingEnvironment(environment) {
     'CODEX_MEMORY_R4_OPERATOR_REFERENCE',
     'CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE',
     'CODEX_MEMORY_R4_BINDING_REFERENCE',
-    'CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE'
+    'CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE',
+    'CODEX_MEMORY_R4_PREVIOUS_HOST_CONFIG_REFERENCE'
   ]) {
     const value = getEnvironment(environment, name);
     if (!/^[A-Za-z0-9][A-Za-z0-9._:/-]{2,255}$/u.test(value) || /placeholder|example|todo/iu.test(value)) {

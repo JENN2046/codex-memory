@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Current stage: `R4-D D2B self_hosted_binding_and_outbound_relay`
+Current stage: `R4-E private_chatgpt_app_zero_memory_e2e`
 
 Old R3/M5 Tunnel route: `draft_paused_no_merge`
 
@@ -93,7 +93,7 @@ Implementation evidence: `docs/CHATGPT_WEB_R4C_LOCAL_INTEGRATION.md`.
 
 ## R4-D — OAuth And External Edge Activation
 
-Status: `D2B_SOURCE_VALIDATED_PRIVATE_EXACT_BINDING_BLOCKED_PUBLIC_ORIGIN_MISSING`
+Status: `D2C_D3_D4_DIRECT_CANARY_PASS_ZERO_MEMORY`
 
 This stage crosses external auth/runtime configuration and requires Jenn's
 current exact authorization.
@@ -139,12 +139,14 @@ for the preflighted private VM. D2B must amend and revalidate host ownership,
 public origin, rollback references, and Relay signing authority before D2C.
 
 D2B now implements the self-hosted amendment contract and outbound HTTPS Relay
-client. The Relay has no inbound listener, preserves the local UDS/governance
-authority boundary, uses distinct Ed25519 Edge/Relay identities, and accepts
-secret material only from owner-only files. All 64 R4 tests pass. The exact
-private amendment remains fail-closed because a canonical public HTTPS DNS
-origin is not yet bound; no bare IP or third-party wildcard-DNS fallback is
-accepted. Evidence: `docs/CHATGPT_WEB_R4D_D2B_SELF_HOSTED_RELAY.md`.
+client. The exact private amendment is frozen against a Jenn-controlled DNS
+origin. D2C deployed one isolated non-root Edge behind loopback/Nginx/TLS; D3
+bound the Auth0 resource, predefined public client, PKCE S256, exact scope, and
+single operator; D4 authenticated only `initialize` and `tools/list`. Six
+read-only candidate tools were discovered with zero tool, Relay, memory,
+provider, native, fallback, or durable-mutation calls. Evidence:
+`docs/CHATGPT_WEB_R4D_D2B_SELF_HOSTED_RELAY.md` and
+`docs/CHATGPT_WEB_R4D_DIRECT_OAUTH_RUNTIME_CANARY.md`.
 
 ## R4-E — Zero-memory ChatGPT E2E
 

@@ -180,7 +180,12 @@ test('R4-D D2B rejects reused references, placeholders, IP origins, and source p
 });
 
 test('R4-D D2B schema is frozen and redacted example remains activation-ineligible', () => {
-  assert.doesNotThrow(() => validateSchema(loadJson(SCHEMA_PATH)));
+  const schema = loadJson(SCHEMA_PATH);
+  assert.doesNotThrow(() => validateSchema(schema));
+  assert.equal(schema.properties.oauth.properties.scopes.minItems, 1);
+  assert.equal(schema.properties.oauth.properties.scopes.maxItems, 1);
+  assert.equal(new RegExp(schema.$defs.sha40.pattern, 'u').test('0'.repeat(40)), false);
+  assert.equal(new RegExp(schema.$defs.sha256.pattern, 'u').test(`sha256:${'f'.repeat(64)}`), false);
   assert.doesNotThrow(() => validateRedactedExample(loadJson(EXAMPLE_PATH)));
 });
 

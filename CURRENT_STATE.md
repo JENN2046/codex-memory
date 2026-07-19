@@ -8,10 +8,10 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | ChatGPT Web R4-D D2B self-hosted contract and outbound Relay implemented; exact private binding is blocked on a missing canonical public origin |
-| Current task | `CM-2140 ChatGPT Web R4-D D2B self-hosted binding and outbound Relay` |
-| Current validation | `CMV-2225` |
-| Current route | Bind one stable Jenn-controlled public DNS origin, freeze the private D2B amendment, then enter D2C exact-head deploy/health before D3 OAuth canary |
+| Status | ChatGPT Web R4-D D2C-D4 Direct HTTPS Edge, Auth0 PKCE, operator binding, and zero-memory MCP discovery canary passed |
+| Current task | `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary` |
+| Current validation | `CMV-2226` |
+| Current route | Enter R4-E private single-operator ChatGPT App attachment and zero-memory Widget/`memory_overview` E2E |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -42,11 +42,25 @@ authority, body logging, or durable state. Owner-only `file:` references,
 distinct Ed25519 Edge/Relay identities, exact issuer/resource binding, replay
 checks, signed zero-counter completions, and URL/key/permission negatives pass.
 
-All 64 R4 tests pass. A value-free Windows audit found the original D1 private
-store, protected ACL, low-disclosure receipt, and six D1 references present.
-The canonical public origin and D2B-specific authority references are absent,
-so the private exact amendment is not frozen and deployment did not begin. See
+All 65 R4 tests pass. The exact amendment now binds the Jenn-controlled public
+origin, source/artifact identity, distinct Edge/Relay signing authorities, and
+rollback references in the private owner-only store. See
 `docs/CHATGPT_WEB_R4D_D2B_SELF_HOSTED_RELAY.md`.
+
+## ChatGPT Web R4-D Direct OAuth Runtime Canary
+
+D2C deployed one isolated non-root Edge container behind host-loopback publish,
+a dedicated reverse-proxy vhost, and TLS without changing unrelated
+containers. Public/local health, protected-resource metadata, and anonymous
+MCP rejection passed. D3 bound an Auth0 RS256 resource, predefined Native
+public client, PKCE S256, exact `memory.read`, and one operator fingerprint;
+one authorization-code exchange validated the binding and retained encrypted
+rollback.
+
+D4 authenticated exactly `initialize` and `tools/list`. Six read-only candidate
+tools were discovered; tool, Relay, memory, provider, native, fallback, write,
+and durable-mutation counters remained zero. No ChatGPT App or real recall was
+used. See `docs/CHATGPT_WEB_R4D_DIRECT_OAUTH_RUNTIME_CANARY.md`.
 
 ## ChatGPT Web R4-D External OAuth/Runtime Preflight
 

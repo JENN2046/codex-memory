@@ -52,7 +52,13 @@
         "client_registration_mode": { "const": "predefined_public_client" },
         "issuer": { "type": "string", "pattern": "^https://[^@/?#]+/$" },
         "resource": { "type": "string", "pattern": "^https://[^@/?#]+$" },
-        "scopes": { "type": "array", "prefixItems": [{ "const": "memory.read" }], "items": false },
+        "scopes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "prefixItems": [{ "const": "memory.read" }],
+          "items": false
+        },
         "pkce_method": { "const": "S256" },
         "oauth_client_id": { "const": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID" }
       }
@@ -150,7 +156,7 @@
     }
   },
   "$defs": {
-    "sha40": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
-    "sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+    "sha40": { "type": "string", "pattern": "^(?!([a-f0-9])\\1{39}$)[a-f0-9]{40}$" },
+    "sha256": { "type": "string", "pattern": "^sha256:(?!([a-f0-9])\\1{63}$)[a-f0-9]{64}$" }
   }
 }

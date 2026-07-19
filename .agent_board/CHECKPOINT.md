@@ -4,13 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2140 ChatGPT Web R4-D D2B self-hosted binding and outbound Relay`.
-Current validation: `CMV-2225`.
-Current fact: D2B source and outbound HTTPS-to-UDS Relay pass; exact private binding is blocked on a missing canonical public origin.
-All 64 R4 tests, 13 canonical external tests, 5790 default tests, and both hardening suites pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
+Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
+Current validation: `CMV-2226`.
+Current fact: D2C-D4 isolated Direct HTTPS Edge, Auth0 PKCE/operator binding, and authenticated initialize/tools-list canary pass.
+All 65 R4 tests and full hardening pass; six read-only candidate tools were discovered with zero tool/Relay/memory/provider/native/fallback/write/durable calls.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2141 ChatGPT Web R4-D Direct OAuth Runtime Canary
+
+Status: `R4D_D2C_D3_D4_DIRECT_CANARY_PASS_ZERO_MEMORY`
+
+- Owner-only exact binding, source/artifact identity, and rollback passed.
+- One isolated non-root Edge serves host-loopback through a dedicated TLS vhost; unrelated container mutations are zero.
+- Auth0 RS256, exact resource, predefined public client, PKCE S256, `memory.read`, and one operator fingerprint passed.
+- D4 made two authenticated requests and discovered six read-only tools.
+- Tool, Relay, memory, provider, native, fallback, write, and durable counters are zero.
+- R4-E ChatGPT App/Widget E2E and R4-F governed live read remain unperformed.
+
+Validation: `CMV-2226`.
 
 ## CM-2140 ChatGPT Web R4-D D2B Self-Hosted Binding And Outbound Relay
 

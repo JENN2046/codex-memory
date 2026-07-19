@@ -24,7 +24,7 @@ const EXAMPLE_PATH = path.join(
   'examples',
   'chatgpt-web-r4d-self-hosted-binding-amendment.redacted.example.json'
 );
-const EXPECTED_SCHEMA_SHA256 = '2c6eb6616b3aeb8239485031598bbfbfb371cba355eb55c9cc244bf90668e9f6';
+const EXPECTED_SCHEMA_SHA256 = 'a864b6289443bc1b2162aa24410736b871927835f27580af2c02028e1f4af86e';
 const PRIVATE_FINGERPRINT_KEYS = Object.freeze([
   'auth0_issuer_sha256',
   'edge_signing_key_id_sha256',
@@ -53,8 +53,23 @@ function validateSchema(schema) {
   invariant(schema.properties?.ownership?.properties?.hosting_provider?.const === 'self_hosted_private_vm', 'r4d_d2b_schema_host_mismatch');
   invariant(schema.properties?.relay_authority?.properties?.transport_mode?.const === 'outbound_https_to_local_uds', 'r4d_d2b_schema_relay_mismatch');
   invariant(schema.properties?.relay_authority?.properties?.inbound_listener_allowed?.const === false, 'r4d_d2b_schema_listener_mismatch');
+  invariant(schema.properties?.oauth?.properties?.scopes?.minItems === 1 &&
+    schema.properties?.oauth?.properties?.scopes?.maxItems === 1,
+  'r4d_d2b_schema_scope_cardinality_mismatch');
+  invariant(rejectsRepeatedPlaceholder(schema.$defs?.sha40?.pattern, '0'.repeat(40)),
+    'r4d_d2b_schema_sha40_placeholder_allowed');
+  invariant(rejectsRepeatedPlaceholder(schema.$defs?.sha256?.pattern, `sha256:${'0'.repeat(64)}`),
+    'r4d_d2b_schema_sha256_placeholder_allowed');
   invariant(schema.properties?.activation_boundary?.properties?.deployed?.const === false, 'r4d_d2b_schema_activation_mismatch');
   invariant(canonicalSha256(schema) === EXPECTED_SCHEMA_SHA256, 'r4d_d2b_schema_digest_mismatch');
+}
+
+function rejectsRepeatedPlaceholder(pattern, value) {
+  try {
+    return typeof pattern === 'string' && !new RegExp(pattern, 'u').test(value);
+  } catch {
+    return false;
+  }
 }
 
 function validateRedactedExample(example) {
