@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const { execFileSync } = require('node:child_process');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -152,6 +153,18 @@ test('D2A Docker build context is narrow and base image is digest-pinned', () =>
   assert.deepEqual(dockerContextAllowlist, expectedDockerContextAllowlist);
   assert.equal(dockerContextAllowlist.every(entry => !entry.includes('*')), true);
   assert.equal(dockerContextAllowlist.some(entry => /(?:^|\/)(?:\.env|logs?|tmp|scratch)(?:[./]|$)/u.test(entry)), false);
+});
+
+test('D2A CommonJS entrypoint loads when require(esm) is disabled', () => {
+  assert.doesNotThrow(() => execFileSync(process.execPath, [
+    '--no-experimental-require-module',
+    '-e',
+    "require('./apps/chatgpt-edge/auth0-token-verifier')"
+  ], {
+    cwd: path.join(__dirname, '../..'),
+    encoding: 'utf8',
+    stdio: 'pipe'
+  }));
 });
 
 function supplyChainEnvironment() {

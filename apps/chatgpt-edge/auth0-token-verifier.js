@@ -1,10 +1,15 @@
 'use strict';
 
-const { createRemoteJWKSet, jwtVerify } = require('jose');
-
 const { sha256, reject } = require('../../packages/chatgpt-r4-contracts');
 
 const SUBJECT_FINGERPRINT_PATTERN = /^sha256:[a-f0-9]{64}$/u;
+
+let joseModulePromise;
+
+function loadJose() {
+  if (!joseModulePromise) joseModulePromise = import('jose');
+  return joseModulePromise;
+}
 
 function createAuth0TokenVerifier({
   issuer,
@@ -37,11 +42,13 @@ function createAuth0TokenVerifier({
   if (!Number.isInteger(clockToleranceSeconds) || clockToleranceSeconds < 0 || clockToleranceSeconds > 30) {
     reject('edge_oauth_clock_tolerance_invalid');
   }
-  const keySet = jwks || createRemoteJWKSet(jwksUrl, {
-    timeoutDuration: 5_000,
-    cooldownDuration: 30_000,
-    cacheMaxAge: 10 * 60_000
-  });
+  const keySetPromise = jwks
+    ? Promise.resolve(jwks)
+    : loadJose().then(({ createRemoteJWKSet }) => createRemoteJWKSet(jwksUrl, {
+      timeoutDuration: 5_000,
+      cooldownDuration: 30_000,
+      cacheMaxAge: 10 * 60_000
+    }));
 
   return async function verifyAccessToken(token) {
     if (typeof token !== 'string' || token.length < 32 || token.length > 16_384 ||
@@ -50,6 +57,7 @@ function createAuth0TokenVerifier({
     }
     let verified;
     try {
+      const [{ jwtVerify }, keySet] = await Promise.all([loadJose(), keySetPromise]);
       verified = await jwtVerify(token, keySet, {
         issuer,
         audience,
