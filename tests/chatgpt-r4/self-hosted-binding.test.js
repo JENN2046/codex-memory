@@ -224,6 +224,19 @@ test('R4-D D2B private envelope binds exact-value fingerprints without returning
   assert.equal(resolved.amendmentReceipt.accepted, true);
   assert.equal(JSON.stringify(resolved.amendmentReceipt).includes('auth0_issuer_sha256'), false);
 
+  const reusedPublicKey = structuredClone(envelope);
+  reusedPublicKey.exact_value_fingerprints.relay_signing_public_key_sha256 =
+    reusedPublicKey.exact_value_fingerprints.edge_signing_public_key_sha256;
+  assert.throws(() => validatePrivateBindingEnvelope(reusedPublicKey), {
+    message: 'r4d_d2b_private_signing_public_key_reused'
+  });
+  const reusedKeyId = structuredClone(envelope);
+  reusedKeyId.exact_value_fingerprints.relay_signing_key_id_sha256 =
+    reusedKeyId.exact_value_fingerprints.edge_signing_key_id_sha256;
+  assert.throws(() => validatePrivateBindingEnvelope(reusedKeyId), {
+    message: 'r4d_d2b_private_signing_key_id_reused'
+  });
+
   delete envelope.exact_value_fingerprints.relay_auth_token_sha256;
   assert.throws(() => validatePrivateBindingEnvelope(envelope), {
     message: 'r4d_d2b_private_fingerprint_shape_invalid'

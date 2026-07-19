@@ -141,6 +141,16 @@ function validatePrivateBindingEnvelope(input) {
       'r4d_d2b_private_fingerprint_invalid'
     );
   }
+  invariant(
+    input.exact_value_fingerprints.edge_signing_public_key_sha256 !==
+      input.exact_value_fingerprints.relay_signing_public_key_sha256,
+    'r4d_d2b_private_signing_public_key_reused'
+  );
+  invariant(
+    input.exact_value_fingerprints.edge_signing_key_id_sha256 !==
+      input.exact_value_fingerprints.relay_signing_key_id_sha256,
+    'r4d_d2b_private_signing_key_id_reused'
+  );
   const amendment = resolveSelfHostedBindingAmendment(input.amendment);
   return {
     amendmentReceipt: amendment.receipt,
