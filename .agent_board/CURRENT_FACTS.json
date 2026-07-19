@@ -707,12 +707,17 @@
     "notReleaseReady": true,
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "chatgpt_web_r4b_contracts_synthetic_complete_services_runtime_and_readiness_false"
+    "scope": "chatgpt_web_r4c_loopback_edge_relay_temp_uds_complete_external_runtime_and_readiness_false"
   },
-  "taskId": "CM-2136",
-  "updatedAt": "2026-07-18",
-  "validationId": "CMV-2221",
+  "taskId": "CM-2137",
+  "updatedAt": "2026-07-19",
+  "validationId": "CMV-2222",
   "validationSummary": [
+    {
+      "id": "CMV-2222",
+      "scope": "CM-2137 ChatGPT Web R4-C local Edge/Relay integration",
+      "status": "COMPLETED_R4C_LOOPBACK_EDGE_RELAY_TEMP_UDS_INTEGRATION_PASS_EXTERNAL_RUNTIME_FALSE"
+    },
     {
       "id": "CMV-2221",
       "scope": "CM-2136 ChatGPT Web R4-B contracts and synthetic harness",

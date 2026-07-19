@@ -1,8 +1,13 @@
 {
   "component": "public_edge_candidate",
-  "stage": "R4-B",
+  "stage": "R4-C",
   "activated": false,
   "defaultProfile": false,
+  "loopbackReferenceListenerImplemented": true,
+  "bindHost": "127.0.0.1",
+  "bindPort": 0,
+  "boundedInMemoryState": true,
+  "durableStateImplemented": false,
   "allowedProjectImports": [
     "packages/chatgpt-r4-contracts"
   ],

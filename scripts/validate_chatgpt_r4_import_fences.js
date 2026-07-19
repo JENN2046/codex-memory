@@ -36,6 +36,21 @@ const COMPONENT_POLICIES = Object.freeze({
   }
 });
 
+const R4C_RUNTIME_FILE_POLICIES = Object.freeze({
+  'apps/chatgpt-edge/loopback-runtime.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:http']),
+    allowedRuntimeRules: Object.freeze(['service_listener'])
+  }),
+  'apps/local-recall-relay/loopback-http-client.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:http']),
+    allowedRuntimeRules: Object.freeze([])
+  }),
+  'apps/local-recall-relay/uds-transport.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:net']),
+    allowedRuntimeRules: Object.freeze([])
+  })
+});
+
 const JS_GAP = String.raw`(?:\s|\/\*[\s\S]*?\*\/|\/\/[^\r\n]*(?:\r?\n|$))*`;
 const CANDIDATE_RUNTIME_PATTERN = /(?:^|\/)(?:chatgpt-r4(?:-contracts)?|chatgpt-edge|local-recall-relay|(?:chatgpt-)?memory-scope-widget)(?:\/|$)/u;
 const ACTIVE_RUNTIME_DYNAMIC_REQUIRE_ALLOWLIST = Object.freeze({
@@ -59,7 +74,11 @@ const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
     bracketPattern: /\bdocument\s*\[\s*['"]cookie['"]\s*\]/u,
     code: 'durable_browser_storage'
   },
-  { pattern: /\b(?:createServer|listen)\b/u, code: 'service_listener' },
+  {
+    pattern: /\b(?:createServer|listen)\b/u,
+    bracketPattern: /\[\s*['"](?:createServer|listen)['"]\s*\]/u,
+    code: 'service_listener'
+  },
   {
     pattern: /\b(?:fetch|XMLHttpRequest|WebSocket|EventSource|WebTransport|RTCPeerConnection|navigator|sendBeacon|importScripts)\b/u,
     code: 'network_invocation'
@@ -344,8 +363,24 @@ function validateComponentSource(component, { file, source }) {
   const bracketMaskedSource = maskCommentsAndStringContents(source, {
     preserveBracketStringContents: true
   });
+  const runtimeFilePolicy = R4C_RUNTIME_FILE_POLICIES[relativeFile];
+  let listenerCheckedSource = maskedSource;
+  if (runtimeFilePolicy?.allowedRuntimeRules.includes('service_listener')) {
+    const exactLoopbackListen = /\bserver\s*\.\s*listen\s*\(\s*0\s*,\s*['"]127\.0\.0\.1['"]\s*\)/u;
+    const exactServerCreation = /\bhttp\s*\.\s*createServer\s*\(/u;
+    const listenerCalls = [...maskedSource.matchAll(/\bserver\s*\.\s*listen\s*\(/gu)].length;
+    const serverCreations = [...maskedSource.matchAll(/\bhttp\s*\.\s*createServer\s*\(/gu)].length;
+    if (!exactLoopbackListen.test(source) || listenerCalls !== 1 || serverCreations !== 1) {
+      throw new Error(`loopback_listener_contract_invalid:${relativeFile}`);
+    }
+    const withoutAllowedListeners = source
+      .replace(exactServerCreation, match => ' '.repeat(match.length))
+      .replace(exactLoopbackListen, match => ' '.repeat(match.length));
+    listenerCheckedSource = maskCommentsAndStringContents(withoutAllowedListeners);
+  }
   for (const rule of FORBIDDEN_RUNTIME_PATTERNS) {
-    if (rule.pattern.test(maskedSource) || rule.bracketPattern?.test(bracketMaskedSource)) {
+    const ruleSource = rule.code === 'service_listener' ? listenerCheckedSource : maskedSource;
+    if (rule.pattern.test(ruleSource) || rule.bracketPattern?.test(bracketMaskedSource)) {
       throw new Error(`${rule.code}:${relativeFile}`);
     }
   }
@@ -357,7 +392,11 @@ function validateComponentSource(component, { file, source }) {
   for (const specifier of extractImports(source, relativeFile)) {
     const resolved = resolveImport(file, specifier);
     imports.push({ relativeFile, specifier });
-    if (resolved.builtin && !policy.allowedBuiltins.includes(resolved.builtin)) {
+    const allowedBuiltins = [
+      ...policy.allowedBuiltins,
+      ...(runtimeFilePolicy?.allowedBuiltins || [])
+    ];
+    if (resolved.builtin && !allowedBuiltins.includes(resolved.builtin)) {
       throw new Error(`builtin_import_forbidden:${component}:${relativeFile}:${specifier}`);
     }
     if (resolved.package) {
@@ -373,7 +412,8 @@ function validateComponentSource(component, { file, source }) {
 function readBoundary(component) {
   const file = path.join(ROOTS[component], 'package-boundary.json');
   const value = JSON.parse(fs.readFileSync(file, 'utf8'));
-  if (value.stage !== 'R4-B' || value.activated !== false) {
+  const expectedStage = ['edge', 'relay'].includes(component) ? 'R4-C' : 'R4-B';
+  if (value.stage !== expectedStage || value.activated !== false) {
     throw new Error(`boundary_activation_invalid:${component}`);
   }
   return value;
@@ -387,8 +427,16 @@ function validateBoundaryManifests() {
   if (edge.defaultProfile !== false || !edge.forbiddenCapabilities.includes('durable_memory')) {
     throw new Error('edge_boundary_invalid');
   }
+  if (edge.loopbackReferenceListenerImplemented !== true || edge.bindHost !== '127.0.0.1' ||
+      edge.bindPort !== 0 || edge.boundedInMemoryState !== true || edge.durableStateImplemented !== false) {
+    throw new Error('edge_loopback_boundary_invalid');
+  }
   for (const capability of ['diary_mapping_load', 'provider_invocation', 'memory_storage', 'scope_authorization']) {
     if (!relay.forbiddenCapabilities.includes(capability)) throw new Error(`relay_capability_not_forbidden:${capability}`);
+  }
+  if (relay.loopbackHttpClientImplemented !== true || relay.temporaryUdsClientImplemented !== true ||
+      relay.serviceListenerImplemented !== false || relay.durableStateImplemented !== false) {
+    throw new Error('relay_loopback_boundary_invalid');
   }
   if (widget.authorizationAuthority !== false || widget.rawMemoryDisplayAllowed !== false) {
     throw new Error('widget_boundary_invalid');
@@ -456,9 +504,10 @@ function validateImportFences() {
   const components = ['contracts', 'edge', 'relay', 'widget', 'governance'].map(component => validateComponent(component));
   return {
     accepted: true,
-    stage: 'R4-B',
+    stage: 'R4-C',
     components,
     candidateActivated: false,
+    loopbackReferenceRuntimeImplemented: true,
     activationEntrypointCount: activation.entrypointCount,
     activationModuleCount: activation.moduleCount,
     externalRuntimeUsed: false,
@@ -482,6 +531,7 @@ module.exports = {
   ROOT,
   ROOTS,
   COMPONENT_POLICIES,
+  R4C_RUNTIME_FILE_POLICIES,
   extractImports,
   extractStaticRuntimeImports,
   maskCommentsAndStringContents,

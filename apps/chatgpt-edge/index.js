@@ -2,5 +2,6 @@
 
 module.exports = {
   ...require('./candidate-tool-profile'),
-  ...require('./request-envelope')
+  ...require('./request-envelope'),
+  ...require('./loopback-runtime')
 };
