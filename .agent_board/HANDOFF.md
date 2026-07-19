@@ -4,15 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2139 ChatGPT Web R4-D D2A external Edge artifact`.
-Current validation: `CMV-2224`.
-Current fact: R4-D D2A implements and locally validates an isolated official-SDK Direct HTTPS Edge artifact without activation.
-Official MCP/OAuth, zero-memory relay, import-fence, secret-reference, source/lockfile binding, and pinned-container checks pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
+Current task: `CM-2140 ChatGPT Web R4-D D2B self-hosted binding and outbound Relay`.
+Current validation: `CMV-2225`.
+Current fact: D2B source and outbound HTTPS-to-UDS Relay pass; exact private binding is blocked on a missing canonical public origin.
+All 64 R4 tests, 13 canonical external tests, 5790 default tests, and both hardening suites pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2140 implements the D2B self-hosted amendment contract and local outbound
+Relay. Owner-only references, canonical HTTPS, separate Ed25519 authorities,
+signed request/response validation, local UDS forwarding, body-log absence, and
+zero counters pass. A value-free audit found the original D1 store and six
+references present, but no canonical public origin or D2B-specific references
+are bound. Select a stable Jenn-controlled DNS name, then generate and validate
+the exact private amendment before D2C deploy/health and D3 OAuth canary. No
+service, remote config, token, memory/provider, deploy, release, cutover, or
+readiness action occurred.
+
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,

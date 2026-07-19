@@ -379,5 +379,8 @@ module.exports = {
   REQUIRED_ENV_REFERENCES,
   STAGE,
   ZERO_PREFLIGHT_COUNTERS,
+  assertCanonicalIssuer,
+  assertCanonicalPublicOrigin,
+  parseHttpsUrl,
   validateExternalOAuthRuntimePreflight
 };

@@ -1,9 +1,12 @@
 {
   "component": "local_recall_relay_candidate",
-  "stage": "R4-C",
+  "stage": "R4-D-D2B",
   "activated": false,
   "serviceListenerImplemented": false,
   "loopbackHttpClientImplemented": true,
+  "outboundHttpsClientImplemented": true,
+  "ownerOnlySecretReferencesRequired": true,
+  "edgeRelaySigningAuthoritySeparated": true,
   "temporaryUdsClientImplemented": true,
   "durableStateImplemented": false,
   "allowedProjectImports": [

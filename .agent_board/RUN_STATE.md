@@ -4,22 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2139 ChatGPT Web R4-D D2A external Edge artifact`.
-Current validation: `CMV-2224`.
-Current fact: R4-D D2A implements and locally validates an isolated official-SDK Direct HTTPS Edge artifact without activation.
-Official MCP/OAuth, zero-memory relay, import-fence, secret-reference, source/lockfile binding, and pinned-container checks pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
+Current task: `CM-2140 ChatGPT Web R4-D D2B self-hosted binding and outbound Relay`.
+Current validation: `CMV-2225`.
+Current fact: D2B source and outbound HTTPS-to-UDS Relay pass; exact private binding is blocked on a missing canonical public origin.
+All 64 R4 tests, 13 canonical external tests, 5790 default tests, and both hardening suites pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R4-D D2A implements an isolated Direct HTTPS Edge artifact; the deployment host binding remains unamended and inactive.
+- Architecture: R4-D D2B implements the self-hosted amendment contract and outbound Relay; the exact private binding remains incomplete and inactive.
 - Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
 - Candidate: official-SDK external MCP/PRMD/Auth0/Widget/Relay code exists but remains non-default/non-activated.
-- D2A proof: all 57 focused R4 tests pass; pinned non-root Docker artifact builds without container start.
-- Host route: private VM read-only preflight passed with a coexistence gate; D1 Render binding must be amended before self-hosted deployment.
-- Status sync: performed locally in CM-2139; PR CI/review and merge remain delivery gates.
+- D2B proof: all 64 focused R4 tests, 13 canonical external tests, 5790 default tests, and both hardening suites pass; outbound HTTPS, temporary UDS, zero-counter response, URL/key/permission negatives, and import fences pass.
+- Host route: D1 prerequisites are present; stable Jenn-controlled public DNS origin is missing, so private amendment/deploy/canary remain blocked.
+- Status sync: performed locally in CM-2140; stacked PR CI/review and base PR merge remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -49,7 +49,7 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Any readiness, release, deploy, cutover, tag, push, native-memory, provider, or real-memory action requires a new exact boundary. Do not replay the consumed full-plan application authorization.
+Bind one stable Jenn-controlled public DNS origin. Then freeze the exact private amendment before D2C deploy/health and D3 OAuth canary. Readiness, release, cutover, native-memory, provider, and real-memory remain closed.
 
 ## Historical Run Notes
 

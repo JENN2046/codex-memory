@@ -8,10 +8,10 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | ChatGPT Web R4-D D2A external Edge artifact implemented and locally validated; activation and readiness remain false |
-| Current task | `CM-2139 ChatGPT Web R4-D D2A external Edge artifact` |
-| Current validation | `CMV-2224` |
-| Current route | Deliver D2A through normal PR/CI/review; then amend the Render-specific D1 private binding for isolated self-hosting before any deployment |
+| Status | ChatGPT Web R4-D D2B self-hosted contract and outbound Relay implemented; exact private binding is blocked on a missing canonical public origin |
+| Current task | `CM-2140 ChatGPT Web R4-D D2B self-hosted binding and outbound Relay` |
+| Current validation | `CMV-2225` |
+| Current route | Bind one stable Jenn-controlled public DNS origin, freeze the private D2B amendment, then enter D2C exact-head deploy/health before D3 OAuth canary |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
@@ -32,6 +32,21 @@ tests pass and the image builds locally; no container or external service was
 started. The private VM's read-only preflight passed with a coexistence gate,
 but the old D1 binding is still Render-specific and is not deployment authority
 for that VM. See `docs/CHATGPT_WEB_R4D_D2A_EDGE_ARTIFACT.md`.
+
+## ChatGPT Web R4-D D2B Self-Hosted Binding And Outbound Relay
+
+D2B adds a frozen self-hosted private-development amendment plus the real
+outbound HTTPS Relay client. Relay transport is canonical public HTTPS to local
+UDS; the Relay has no inbound listener, mapping/scope/provider/storage
+authority, body logging, or durable state. Owner-only `file:` references,
+distinct Ed25519 Edge/Relay identities, exact issuer/resource binding, replay
+checks, signed zero-counter completions, and URL/key/permission negatives pass.
+
+All 64 R4 tests pass. A value-free Windows audit found the original D1 private
+store, protected ACL, low-disclosure receipt, and six D1 references present.
+The canonical public origin and D2B-specific authority references are absent,
+so the private exact amendment is not frozen and deployment did not begin. See
+`docs/CHATGPT_WEB_R4D_D2B_SELF_HOSTED_RELAY.md`.
 
 ## ChatGPT Web R4-D External OAuth/Runtime Preflight
 

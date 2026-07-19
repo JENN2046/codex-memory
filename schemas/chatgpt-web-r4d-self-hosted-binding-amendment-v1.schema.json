@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codex-memory://chatgpt-web-r4d/self-hosted-binding-amendment-v1",
+  "title": "ChatGPT Web R4-D D2B self-hosted private binding amendment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "architecture_reference", "stage", "amendment", "ownership",
+    "oauth", "endpoints", "relay_authority", "rollback", "source_identity",
+    "activation_boundary"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "architecture_reference": { "const": "codex-memory-chatgpt-web-r4-v1" },
+    "stage": { "const": "R4-D-D2B" },
+    "amendment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amendment_reference", "previous_binding_digest", "reason"],
+      "properties": {
+        "amendment_reference": { "type": "string", "minLength": 3, "maxLength": 256 },
+        "previous_binding_digest": { "$ref": "#/$defs/sha256" },
+        "reason": { "const": "self_hosted_private_vm_selected" }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deployment_class", "hosting_provider", "host_service_mode",
+        "host_project_reference", "operator_count", "operator_reference", "operator_role"
+      ],
+      "properties": {
+        "deployment_class": { "const": "private_development" },
+        "hosting_provider": { "const": "self_hosted_private_vm" },
+        "host_service_mode": { "const": "isolated_container_loopback_reverse_proxy" },
+        "host_project_reference": { "const": "env:CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE" },
+        "operator_count": { "const": 1 },
+        "operator_reference": { "const": "env:CODEX_MEMORY_R4_OPERATOR_REFERENCE" },
+        "operator_role": { "const": "owner" }
+      }
+    },
+    "oauth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity_provider", "client_registration_mode", "issuer", "resource",
+        "scopes", "pkce_method", "oauth_client_id"
+      ],
+      "properties": {
+        "identity_provider": { "const": "auth0" },
+        "client_registration_mode": { "const": "predefined_public_client" },
+        "issuer": { "type": "string", "pattern": "^https://[^@/?#]+/$" },
+        "resource": { "type": "string", "pattern": "^https://[^@/?#]+$" },
+        "scopes": { "type": "array", "prefixItems": [{ "const": "memory.read" }], "items": false },
+        "pkce_method": { "const": "S256" },
+        "oauth_client_id": { "const": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID" }
+      }
+    },
+    "endpoints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "public_origin", "mcp_path", "protected_resource_metadata_path",
+        "authorization_server_discovery_url"
+      ],
+      "properties": {
+        "public_origin": { "type": "string", "pattern": "^https://[^@/?#]+$" },
+        "mcp_path": { "const": "/mcp" },
+        "protected_resource_metadata_path": { "const": "/.well-known/oauth-protected-resource" },
+        "authorization_server_discovery_url": {
+          "type": "string",
+          "pattern": "^https://[^@/?#]+/\\.well-known/openid-configuration$"
+        }
+      }
+    },
+    "relay_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transport_mode", "edge_signing_public_key", "edge_signing_key_id",
+        "relay_signing_private_key", "relay_signing_key_id", "relay_auth_token",
+        "relay_uds_path", "inbound_listener_allowed", "body_logging_allowed",
+        "durable_state_allowed"
+      ],
+      "properties": {
+        "transport_mode": { "const": "outbound_https_to_local_uds" },
+        "edge_signing_public_key": { "const": "env:CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY" },
+        "edge_signing_key_id": { "const": "env:CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID" },
+        "relay_signing_private_key": { "const": "env:CODEX_MEMORY_R4_RELAY_SIGNING_PRIVATE_KEY" },
+        "relay_signing_key_id": { "const": "env:CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID" },
+        "relay_auth_token": { "const": "env:CODEX_MEMORY_R4_RELAY_AUTH_TOKEN" },
+        "relay_uds_path": { "const": "env:CODEX_MEMORY_R4_RELAY_UDS_PATH" },
+        "inbound_listener_allowed": { "const": false },
+        "body_logging_allowed": { "const": false },
+        "durable_state_allowed": { "const": false }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "previous_binding_reference", "previous_host_config_reference", "relay_stop_ready",
+        "container_stop_ready", "reverse_proxy_disable_ready", "credential_revocation_ready"
+      ],
+      "properties": {
+        "previous_binding_reference": { "const": "env:CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE" },
+        "previous_host_config_reference": { "const": "env:CODEX_MEMORY_R4_PREVIOUS_HOST_CONFIG_REFERENCE" },
+        "relay_stop_ready": { "const": true },
+        "container_stop_ready": { "const": true },
+        "reverse_proxy_disable_ready": { "const": true },
+        "credential_revocation_ready": { "const": true }
+      }
+    },
+    "source_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "base_commit_sha", "commit_sha", "tree_sha"],
+      "properties": {
+        "repository": { "const": "JENN2046/codex-memory" },
+        "base_commit_sha": { "$ref": "#/$defs/sha40" },
+        "commit_sha": { "$ref": "#/$defs/sha40" },
+        "tree_sha": { "$ref": "#/$defs/sha40" }
+      }
+    },
+    "activation_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "deployed", "service_started", "external_service_changed", "chatgpt_app_created",
+        "oauth_token_exchanges", "provider_calls", "memory_read", "memory_write"
+      ],
+      "properties": {
+        "deployed": { "const": false },
+        "service_started": { "const": false },
+        "external_service_changed": { "const": false },
+        "chatgpt_app_created": { "const": false },
+        "oauth_token_exchanges": { "const": 0 },
+        "provider_calls": { "const": 0 },
+        "memory_read": { "const": false },
+        "memory_write": { "const": false }
+      }
+    }
+  },
+  "$defs": {
+    "sha40": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "sha256": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" }
+  }
+}

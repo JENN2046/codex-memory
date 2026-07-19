@@ -4,13 +4,26 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2139 ChatGPT Web R4-D D2A external Edge artifact`.
-Current validation: `CMV-2224`.
-Current fact: R4-D D2A implements and locally validates an isolated official-SDK Direct HTTPS Edge artifact without activation.
-Official MCP/OAuth, zero-memory relay, import-fence, secret-reference, source/lockfile binding, and pinned-container checks pass; no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
+Current task: `CM-2140 ChatGPT Web R4-D D2B self-hosted binding and outbound Relay`.
+Current validation: `CMV-2225`.
+Current fact: D2B source, schema, amendment contract, and outbound HTTPS-to-UDS Relay pass; the exact private binding remains blocked on a missing canonical public origin.
+All 64 R4 tests pass; D1 private prerequisites are present by value-free audit, while no external service, token exchange, memory/provider call, public local-surface activation, deploy, release, or cutover occurred.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2140 ChatGPT Web R4-D D2B Self-Hosted Binding And Outbound Relay
+
+D2B implements the self-hosted private-development amendment and outbound
+HTTPS Relay while keeping the candidate non-default and inactive. The Relay
+has no listener and forwards signed requests only to the configured local UDS.
+It rejects non-public/HTTP/IP/path origins, insecure or out-of-root secret
+files, key reuse, signature/replay drift, body disclosure, and nonzero counters.
+
+The six original D1 references and protected private store are present. The
+canonical public origin and new D2B authority references are not bound, so the
+exact private amendment, deployment, and OAuth canary remain unperformed. See
+`docs/CHATGPT_WEB_R4D_D2B_SELF_HOSTED_RELAY.md`.
 
 ## CM-2139 ChatGPT Web R4-D D2A External Edge Artifact
 
