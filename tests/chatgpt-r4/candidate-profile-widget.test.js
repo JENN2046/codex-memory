@@ -13,6 +13,7 @@ const { candidateToolProfile } = require('../../apps/chatgpt-edge');
 const {
   buildResolveContextCall,
   createMemoryScopeDto,
+  MEMORY_SCOPE_WIDGET_HTML,
   parseToolResultNotification,
   widgetResource
 } = require('../../apps/chatgpt-memory-scope-widget');
@@ -60,6 +61,8 @@ test('widget resource uses MCP Apps MIME, empty CSP domains, and no authorizatio
   assert.equal(widgetResource.mimeType, 'text/html;profile=mcp-app');
   assert.deepEqual(widgetResource._meta.ui.csp, { connectDomains: [], resourceDomains: [] });
   assert.match(widgetResource._meta['openai/widgetDescription'], /never displays raw memory/u);
+  assert.match(MEMORY_SCOPE_WIDGET_HTML, /Memory scope/u);
+  assert.doesNotMatch(MEMORY_SCOPE_WIDGET_HTML, /diary|mapping_digest|raw memory/iu);
 });
 
 test('widget DTO renders only safe scope status and bridge uses tools/call', () => {

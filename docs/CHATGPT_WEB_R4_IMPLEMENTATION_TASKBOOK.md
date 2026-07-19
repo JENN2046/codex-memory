@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Current stage: `R4-D external_oauth_runtime_preflight`
+Current stage: `R4-E private_chatgpt_app_zero_memory_e2e`
 
 Old R3/M5 Tunnel route: `draft_paused_no_merge`
 
@@ -93,7 +93,7 @@ Implementation evidence: `docs/CHATGPT_WEB_R4C_LOCAL_INTEGRATION.md`.
 
 ## R4-D — OAuth And External Edge Activation
 
-Status: `PREFLIGHT_CONTRACT_IMPLEMENTED_ACTIVATION_NOT_PERFORMED`
+Status: `D2C_D3_D4_DIRECT_CANARY_PASS_ZERO_MEMORY`
 
 This stage crosses external auth/runtime configuration and requires Jenn's
 current exact authorization.
@@ -115,6 +115,38 @@ No real memory is allowed in R4-D.
 
 Preflight evidence:
 `docs/CHATGPT_WEB_R4D_EXTERNAL_RUNTIME_PREFLIGHT.md`.
+
+Execution sequence after preflight:
+
+```text
+D2A isolated external Edge source + pinned container artifact
+  -> D2B self-hosted private-binding amendment + outbound Relay client binding
+  -> D2C exact-head artifact freeze + authorized deploy/health contract
+  -> D3 OAuth discovery/resource/token canary
+  -> D4 zero-memory direct canary
+```
+
+D2A is implemented and locally validated. It uses the official MCP SDK,
+stateless Streamable HTTP, exact Auth0 token binding, an immutable MCP Apps
+resource, a bounded authenticated Relay broker, owner-only secret references,
+actual lockfile/build-source identity checks, and a digest-pinned non-root
+container. It does not start a container, create or change an external service,
+exchange a token, call memory/provider paths, or activate the local default MCP
+surface. Evidence: `docs/CHATGPT_WEB_R4D_D2A_EDGE_ARTIFACT.md`.
+
+The existing D1 binding contract selected Render and cannot be silently reused
+for the preflighted private VM. D2B must amend and revalidate host ownership,
+public origin, rollback references, and Relay signing authority before D2C.
+
+D2B now implements the self-hosted amendment contract and outbound HTTPS Relay
+client. The exact private amendment is frozen against a Jenn-controlled DNS
+origin. D2C deployed one isolated non-root Edge behind loopback/Nginx/TLS; D3
+bound the Auth0 resource, predefined public client, PKCE S256, exact scope, and
+single operator; D4 authenticated only `initialize` and `tools/list`. Six
+read-only candidate tools were discovered with zero tool, Relay, memory,
+provider, native, fallback, or durable-mutation calls. Evidence:
+`docs/CHATGPT_WEB_R4D_D2B_SELF_HOSTED_RELAY.md` and
+`docs/CHATGPT_WEB_R4D_DIRECT_OAUTH_RUNTIME_CANARY.md`.
 
 ## R4-E — Zero-memory ChatGPT E2E
 

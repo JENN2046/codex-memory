@@ -4,13 +4,54 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight`.
-Current validation: `CMV-2223`.
-Current fact: R4-D freezes an Auth0 predefined public client and dedicated single-instance Render Direct HTTPS canary contract without activation.
-Nine focused preflight tests and a presence-only binding check pass; private references are `0/6`, no values were read, and service/config/OAuth/ChatGPT App/memory/provider effects remain zero.
+Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
+Current validation: `CMV-2226`.
+Current fact: D2C-D4 isolated Direct HTTPS Edge, Auth0 PKCE/operator binding, and authenticated initialize/tools-list canary pass.
+All 65 R4 tests and full hardening pass; six read-only candidate tools were discovered with zero tool/Relay/memory/provider/native/fallback/write/durable calls.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2141 ChatGPT Web R4-D Direct OAuth Runtime Canary
+
+Status: `R4D_D2C_D3_D4_DIRECT_CANARY_PASS_ZERO_MEMORY`
+
+- Owner-only exact binding, source/artifact identity, and rollback passed.
+- One isolated non-root Edge serves host-loopback through a dedicated TLS vhost; unrelated container mutations are zero.
+- Auth0 RS256, exact resource, predefined public client, PKCE S256, `memory.read`, and one operator fingerprint passed.
+- D4 made two authenticated requests and discovered six read-only tools.
+- Tool, Relay, memory, provider, native, fallback, write, and durable counters are zero.
+- R4-E ChatGPT App/Widget E2E and R4-F governed live read remain unperformed.
+
+Validation: `CMV-2226`.
+
+## CM-2140 ChatGPT Web R4-D D2B Self-Hosted Binding And Outbound Relay
+
+Status: `R4D_D2B_SOURCE_VALIDATED_PRIVATE_BINDING_BLOCKED_PUBLIC_ORIGIN_MISSING`
+
+- Self-hosted private-development amendment schema and canonical digest contract pass.
+- Outbound authenticated canonical HTTPS to local UDS passes with a signed zero-counter response.
+- Relay has no inbound listener, scope/mapping/provider/storage authority, body log, or durable state.
+- Owner-only file references and distinct Ed25519 Edge/Relay identities are runtime-enforced.
+- Original D1 private store, protected ACL, low-disclosure receipt, and six references are present by value-free audit.
+- Canonical public origin and D2B-specific references are absent; no private amendment was frozen and deployment did not begin.
+- All 64 R4 tests, 13 canonical external tests, 5790 default tests, and both hardening suites pass. External service/config, token exchange, real memory/provider use, production/release/deploy/cutover/readiness remain false.
+
+Validation: `CMV-2225`.
+
+
+## CM-2139 ChatGPT Web R4-D D2A External Edge Artifact
+
+Status: `R4D_D2A_EXTERNAL_EDGE_ARTIFACT_VALIDATED_ACTIVATION_FALSE`
+
+- Official MCP SDK stateless Streamable HTTP exposes the isolated six-tool candidate and immutable scope widget without changing the local default surface.
+- Exact Auth0 RS256 issuer/resource/client/scope/operator verification, PRMD, Relay bearer authentication, Ed25519 request/response binding, bounded in-memory brokerage, and all-zero memory/provider/native/write counters fail closed.
+- Runtime authority accepts owner-only `file:` references and binds actual lockfile bytes plus the image build-source commit; artifact digest remains an external deployment gate.
+- Digest-pinned non-root Docker artifact and whitelist-only context build locally; no container was started.
+- Existing private VM read-only preflight passed with a coexistence gate; D1 remains Render-specific and requires a self-hosted binding amendment before deployment.
+- All 57 focused R4 tests pass. External service/config, token exchange, real memory/provider use, production/release/deploy/cutover/readiness remain false.
+
+Validation: `CMV-2224`.
 
 ## CM-2138 ChatGPT Web R4-D External OAuth/Runtime Preflight
 

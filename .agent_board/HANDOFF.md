@@ -4,15 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2138 ChatGPT Web R4-D external OAuth/runtime preflight`.
-Current validation: `CMV-2223`.
-Current fact: R4-D freezes an Auth0 predefined public client and dedicated single-instance Render Direct HTTPS canary contract without activation.
-Nine focused preflight tests and a presence-only binding check pass; private references are `0/6`, no values were read, and service/config/OAuth/ChatGPT App/memory/provider effects remain zero.
+Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
+Current validation: `CMV-2226`.
+Current fact: D2C-D4 isolated Direct HTTPS Edge, Auth0 PKCE/operator binding, and authenticated initialize/tools-list canary pass.
+All 65 R4 tests and full hardening pass; six read-only candidate tools were discovered with zero tool/Relay/memory/provider/native/fallback/write/durable calls.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2141 completes the D2B private binding plus D2C-D4 Direct HTTPS canary. One
+isolated Edge container, dedicated TLS vhost, Auth0 exact resource/client/scope,
+PKCE S256, and operator fingerprint are active in private development. D4 sent
+only initialize/tools-list and found six read-only tools. Relay/local UDS,
+ChatGPT App, Widget E2E, and memory paths were not invoked. The next exact gate
+is R4-E private ChatGPT App zero-memory E2E; R4-F live recall remains closed.
+
+
+CM-2139 implements the D2A external Edge artifact without activation. The
+official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,
+authenticated transient Relay broker, exact zero-counter response gate,
+owner-only secret references, lockfile/build-source binding, and pinned
+non-root container pass local tests. The existing private VM is viable only
+behind an isolated container, host-loopback high port, and separate reverse-
+proxy vhost; no remote mutation occurred. Before deployment, amend the
+Render-specific D1 private binding for self-hosting, freeze rollback and Relay
+signing references, then rebuild from an exact committed head and verify the
+image digest. No external service, token exchange, memory/provider call, public
+local-surface change, deploy/release/cutover, or readiness action is open from
+D2A alone.
 
 CM-2138 implements the R4-D external OAuth/runtime preflight contract without
 activation. It selects Auth0 predefined public-client PKCE, exact

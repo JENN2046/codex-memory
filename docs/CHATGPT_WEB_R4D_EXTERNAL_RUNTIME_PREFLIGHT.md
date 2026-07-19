@@ -206,6 +206,11 @@ activation-performed: false
 final-verdict: PREFLIGHT_CONTRACT_READY_PRIVATE_BINDING_PENDING
 ```
 
-R4-D is not complete. The next authorized boundary is private exact-value
-binding and offline validation. External service creation/configuration,
-deployment, token exchange, and the Direct HTTPS canary remain unperformed.
+The historical preflight contract remains valid evidence for the Render route,
+but it is no longer sufficient deployment authority for the self-hosted route
+identified after the private VM read-only preflight. D2A now implements the
+host-agnostic external Edge artifact; see
+`docs/CHATGPT_WEB_R4D_D2A_EDGE_ARTIFACT.md`. Before any self-hosted deployment,
+D2B must amend the private D1 binding and rollback references without exposing
+exact values. External service configuration, deployment, token exchange, and
+the Direct HTTPS canary remain unperformed.
