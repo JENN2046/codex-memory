@@ -47,6 +47,7 @@ function createGovernanceUdsServer({
   };
   let started = false;
   let activeConnections = 0;
+  const openSockets = new Set();
 
   const server = net.createServer(socket => {
     observations.connections += 1;
@@ -56,11 +57,13 @@ function createGovernanceUdsServer({
       return;
     }
     activeConnections += 1;
+    openSockets.add(socket);
     let connectionReleased = false;
     const releaseConnection = () => {
       if (connectionReleased) return;
       connectionReleased = true;
       activeConnections -= 1;
+      openSockets.delete(socket);
     };
     socket.once('close', releaseConnection);
     socket.setTimeout(SOCKET_IDLE_TIMEOUT_MS, () => rejectFrame());
@@ -142,6 +145,7 @@ function createGovernanceUdsServer({
     },
     async stop() {
       if (!started) return;
+      for (const socket of openSockets) socket.destroy();
       await new Promise((resolve, rejectStop) => {
         server.close(error => error ? rejectStop(error) : resolve());
       });

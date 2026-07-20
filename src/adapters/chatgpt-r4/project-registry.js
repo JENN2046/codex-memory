@@ -3,6 +3,7 @@
 const {
   CONTEXT_VISIBILITIES,
   canonicalJson,
+  deepFreeze,
   sha256,
   reject
 } = require('../../../packages/chatgpt-r4-contracts');
@@ -161,9 +162,9 @@ function validateProjectRegistry(registry, mappingState, { resolveDiaryRead } = 
       allowedVisibilities: [...project.allowedVisibilities].sort()
     })).sort((left, right) => left.safeProjectAlias.localeCompare(right.safeProjectAlias))
   };
-  return Object.freeze({
+  return deepFreeze({
     accepted: true,
-    registry: Object.freeze(normalized),
+    registry: normalized,
     registryReference: normalized.registryReference,
     registryDigest: sha256(canonicalJson(normalized)),
     mappingReference: normalized.mappingReference,

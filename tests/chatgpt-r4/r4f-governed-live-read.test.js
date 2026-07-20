@@ -227,6 +227,10 @@ test('private registry binds mapping and excludes ChatGPT private and unregister
   assert.equal(accepted.accepted, true);
   assert.equal(accepted.projectCount, 1);
   assert.equal(accepted.mappingDigest, mappingState.mappingDigest);
+  assert.equal(Object.isFrozen(accepted), true);
+  assert.equal(Object.isFrozen(accepted.registry), true);
+  assert.equal(Object.isFrozen(accepted.registry.projects), true);
+  assert.equal(Object.isFrozen(accepted.registry.projects[0]), true);
 
   const withChatGptPrivate = mapping();
   withChatGptPrivate.entries.push(entry({

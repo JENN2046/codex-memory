@@ -8,6 +8,7 @@ const {
   assertCanonicalIssuer,
   assertCanonicalPublicOrigin,
   canonicalJson,
+  deepFreeze,
   sha256,
   reject
 } = require('../../../packages/chatgpt-r4-contracts');
@@ -230,7 +231,7 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
     readReference('CODEX_MEMORY_R4_DIARY_SCOPE_MAPPING_REFERENCE'),
     'r4_governance_mapping_json_invalid'
   );
-  const mappingState = loadDiaryScopeMapping({ mapping });
+  const mappingState = deepFreeze(loadDiaryScopeMapping({ mapping }));
   const registry = parsePrivateJson(
     readReference('CODEX_MEMORY_R4_PROJECT_REGISTRY_REFERENCE'),
     'r4_governance_registry_json_invalid'
