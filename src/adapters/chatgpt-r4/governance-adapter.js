@@ -67,6 +67,7 @@ function createGovernanceAdapter({
       const contextRef = request.tool_request.arguments.project_context_ref;
       let preauthorization = preauthorizeContextUse?.({
         principalFingerprint,
+        projectContextRef: contextRef,
         toolName,
         now
       });
@@ -81,6 +82,7 @@ function createGovernanceAdapter({
       const claim = await resolveProjectContext(contextRef);
       preauthorization = preauthorizeContextUse?.({
         principalFingerprint,
+        projectContextRef: contextRef,
         toolName,
         now: clock()
       });

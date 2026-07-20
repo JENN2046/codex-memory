@@ -477,8 +477,26 @@ test('R4-G runtime denies before provider, permits one bounded read, then consum
   const finalCharacter = validContextRef.slice(-1);
   const unknownContextRef = `${validContextRef.slice(0, -1)}${finalCharacter === 'A' ? 'B' : 'A'}`;
   closedFixture.controller.kill({ reason: 'emergency_stop', now: NOW });
+  closedFixture.controller.activate({
+    requestId: 'op_r4g_closed_read_replacement_0001',
+    requestedVisibility: 'project',
+    ttlSeconds: 300,
+    now: NOW
+  });
+  const replacementResolveRequest = requestFixture(
+    closedFixture.edge,
+    closedFixture.principal,
+    'resolve_memory_context',
+    { project_alias: 'project-alpha', requested_visibility: 'project' },
+    31
+  );
+  const replacementResolved = await closedFixture.runtime.handle({
+    request: replacementResolveRequest,
+    relayReceipt: relayReceipt(replacementResolveRequest)
+  });
+  assert.notEqual(replacementResolved.structured_content.project_context_ref, validContextRef);
   const closedResults = [];
-  for (const [sequence, projectContextRef] of [[31, validContextRef], [32, unknownContextRef]]) {
+  for (const [sequence, projectContextRef] of [[32, validContextRef], [33, unknownContextRef]]) {
     const closedRead = requestFixture(closedFixture.edge, closedFixture.principal, 'search_memory', {
       project_context_ref: projectContextRef,
       query: 'closed session probe',
@@ -497,6 +515,8 @@ test('R4-G runtime denies before provider, permits one bounded read, then consum
     assert.deepEqual(closedResult.counters, ZERO_MEMORY_COUNTERS);
   }
   assert.equal(closedProviderCalls, 0);
+  assert.equal(closedFixture.controller.snapshot().activation_status, 'active');
+  assert.equal(closedFixture.controller.snapshot().remaining_read_calls, 1);
 });
 
 test('R4-G suppresses an in-flight kill and finalizes a failed native invocation', async () => {
