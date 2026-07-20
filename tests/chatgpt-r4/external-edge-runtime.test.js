@@ -30,6 +30,7 @@ const OAUTH_CLIENT_ID = 'r4-private-client-id';
 const OPERATOR_SUBJECT = 'auth0|jenn-synthetic-operator';
 const OPERATOR_FINGERPRINT = sha256(`${ISSUER}\n${OPERATOR_SUBJECT}`);
 const ACCESS_TOKEN = 'synthetic_access_token_value_00000000000000000001';
+const INSUFFICIENT_SCOPE_TOKEN = 'synthetic_scope_token_value_000000000000000000001';
 const RELAY_TOKEN = 'synthetic_relay_token_value_00000000000000000001';
 
 test('Auth0 verifier binds RS256 issuer, audience, client, scope, and single operator', async () => {
@@ -97,6 +98,11 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
     responseTimeoutMs: 2_000,
     eventSink: event => events.push(event),
     async verifyAccessToken(token) {
+      if (token === INSUFFICIENT_SCOPE_TOKEN) {
+        throw Object.assign(new Error('edge_oauth_scope_missing'), {
+          code: 'edge_oauth_scope_missing'
+        });
+      }
       if (token !== ACCESS_TOKEN) throw Object.assign(new Error('edge_oauth_token_invalid'), {
         code: 'edge_oauth_token_invalid'
       });
@@ -135,11 +141,33 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   assert.equal(unauthenticated.statusCode, 401);
   assert.match(unauthenticated.headers['www-authenticate'], /resource_metadata=/u);
   assert.match(unauthenticated.headers['www-authenticate'], /scope="memory\.read"/u);
+  assert.match(unauthenticated.headers['www-authenticate'], /error="invalid_request"/u);
+  assert.match(unauthenticated.headers['www-authenticate'], /error_description="OAuth authorization is required\."/u);
+  assert.equal(unauthenticated.body.jsonrpc, '2.0');
+  assert.equal(unauthenticated.body.id, null);
+  assert.equal(unauthenticated.body.error.code, -32001);
+  assert.deepEqual(unauthenticated.body.error.data, { error: 'invalid_request' });
 
   const unauthenticatedGet = await edgeRequest(address, 'GET', '/mcp');
   assert.equal(unauthenticatedGet.statusCode, 401);
   assert.match(unauthenticatedGet.headers['www-authenticate'], /resource_metadata=/u);
   assert.match(unauthenticatedGet.headers['www-authenticate'], /scope="memory\.read"/u);
+  assert.match(unauthenticatedGet.headers['www-authenticate'], /error="invalid_request"/u);
+  assert.match(unauthenticatedGet.headers['www-authenticate'], /error_description=/u);
+
+  const invalidToken = await mcpRequest(
+    address,
+    initializeRequest(2),
+    'invalid_access_token_value_00000000000000000001'
+  );
+  assert.equal(invalidToken.statusCode, 401);
+  assert.match(invalidToken.headers['www-authenticate'], /error="invalid_token"/u);
+  assert.match(invalidToken.headers['www-authenticate'], /error_description="OAuth token is invalid\."/u);
+
+  const insufficientScope = await mcpRequest(address, initializeRequest(3), INSUFFICIENT_SCOPE_TOKEN);
+  assert.equal(insufficientScope.statusCode, 403);
+  assert.match(insufficientScope.headers['www-authenticate'], /error="insufficient_scope"/u);
+  assert.match(insufficientScope.headers['www-authenticate'], /error_description="OAuth scope is insufficient\."/u);
 
   const authenticatedGet = await edgeRequest(address, 'GET', '/mcp', {
     authorization: `Bearer ${ACCESS_TOKEN}`
@@ -147,11 +175,12 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   assert.equal(authenticatedGet.statusCode, 405);
   assert.equal(authenticatedGet.headers.allow, 'POST');
 
-  const initialized = await mcpRequest(address, initializeRequest(2), ACCESS_TOKEN);
+  const initialized = await mcpRequest(address, initializeRequest(4), ACCESS_TOKEN);
   assert.equal(initialized.statusCode, 200);
+  assert.match(initialized.headers['content-type'], /^text\/event-stream/u);
   assert.equal(initialized.body.result.serverInfo.name, 'codex-memory-chatgpt-r4-edge');
 
-  const tools = await mcpRequest(address, rpcRequest(3, 'tools/list'), ACCESS_TOKEN);
+  const tools = await mcpRequest(address, rpcRequest(5, 'tools/list'), ACCESS_TOKEN);
   assert.equal(tools.statusCode, 200);
   assert.deepEqual(tools.body.result.tools.map(tool => tool.name), [
     'resolve_memory_context',
@@ -163,10 +192,10 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   ]);
   assert.equal(tools.body.result.tools.every(tool => tool.annotations.readOnlyHint === true), true);
 
-  const resources = await mcpRequest(address, rpcRequest(4, 'resources/list'), ACCESS_TOKEN);
+  const resources = await mcpRequest(address, rpcRequest(6, 'resources/list'), ACCESS_TOKEN);
   assert.equal(resources.statusCode, 200);
   assert.equal(resources.body.result.resources[0].mimeType, 'text/html;profile=mcp-app');
-  const resource = await mcpRequest(address, rpcRequest(5, 'resources/read', {
+  const resource = await mcpRequest(address, rpcRequest(7, 'resources/read', {
     uri: resources.body.result.resources[0].uri
   }), ACCESS_TOKEN);
   assert.equal(resource.statusCode, 200);
@@ -179,7 +208,7 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   });
   assert.equal(unauthorizedRelay.statusCode, 401);
 
-  const toolCall = mcpRequest(address, rpcRequest(6, 'tools/call', {
+  const toolCall = mcpRequest(address, rpcRequest(8, 'tools/call', {
     name: 'memory_overview',
     arguments: { project_context_ref: `pctx_${'A'.repeat(32)}` }
   }), ACCESS_TOKEN);
@@ -454,7 +483,7 @@ function rawRequest(address, method, pathname, headers, body) {
         let parsed = null;
         if (text) {
           try {
-            parsed = JSON.parse(text);
+            parsed = parseResponseBody(text, response.headers['content-type']);
           } catch {
             parsed = text;
           }
@@ -466,4 +495,14 @@ function rawRequest(address, method, pathname, headers, body) {
     if (encoded) request.end(encoded);
     else request.end();
   });
+}
+
+function parseResponseBody(text, contentType) {
+  if (!String(contentType || '').startsWith('text/event-stream')) return JSON.parse(text);
+  const dataLines = text.split(/\r?\n/u)
+    .filter(line => line.startsWith('data:'))
+    .map(line => line.slice(5).trim())
+    .filter(Boolean);
+  if (dataLines.length !== 1) throw new Error('unexpected_sse_message_count');
+  return JSON.parse(dataLines[0]);
 }

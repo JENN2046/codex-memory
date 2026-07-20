@@ -58,8 +58,7 @@ function createExternalMcpHandler({
       responseTimeoutMs
     });
     const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: undefined,
-      enableJsonResponse: true
+      sessionIdGenerator: undefined
     });
     incoming.auth = authInfo;
     try {

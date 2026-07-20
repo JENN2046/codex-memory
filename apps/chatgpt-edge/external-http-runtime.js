@@ -115,7 +115,7 @@ function createExternalEdgeRuntime(options = {}) {
       if (outgoing.destroyed || outgoing.headersSent) return;
       const code = safeErrorCode(error?.code, 'edge_request_rejected');
       if (code.startsWith('edge_oauth_') || code === 'edge_mcp_authorization_missing') {
-        return sendOauthChallenge(outgoing, config, code === 'edge_oauth_scope_missing');
+        return sendOauthChallenge(outgoing, config, code);
       }
       if (code === 'edge_relay_authorization_invalid') {
         return sendJson(outgoing, 401, { error: code });
@@ -425,14 +425,29 @@ function assertInteger(value, minimum, maximum, code) {
   if (!Number.isInteger(value) || value < minimum || value > maximum) reject(code);
 }
 
-function sendOauthChallenge(outgoing, config, insufficientScope) {
+function sendOauthChallenge(outgoing, config, rejectionCode) {
   const metadata = `${config.publicOrigin}${PRMD_PATH}`;
-  const error = insufficientScope ? 'insufficient_scope' : 'invalid_token';
+  const insufficientScope = rejectionCode === 'edge_oauth_scope_missing';
+  const error = insufficientScope
+    ? 'insufficient_scope'
+    : (rejectionCode === 'edge_mcp_authorization_missing' ? 'invalid_request' : 'invalid_token');
+  const description = insufficientScope
+    ? 'OAuth scope is insufficient.'
+    : (error === 'invalid_request' ? 'OAuth authorization is required.' : 'OAuth token is invalid.');
+  const challenge = `Bearer resource_metadata="${metadata}", scope="memory.read", error="${error}", error_description="${description}"`;
   outgoing.setHeader(
     'www-authenticate',
-    `Bearer resource_metadata="${metadata}", scope="memory.read", error="${error}"`
+    challenge
   );
-  return sendJson(outgoing, insufficientScope ? 403 : 401, { error });
+  return sendJson(outgoing, insufficientScope ? 403 : 401, {
+    jsonrpc: '2.0',
+    id: null,
+    error: {
+      code: -32001,
+      message: description,
+      data: { error }
+    }
+  });
 }
 
 function sendMethodNotAllowed(outgoing, methods) {

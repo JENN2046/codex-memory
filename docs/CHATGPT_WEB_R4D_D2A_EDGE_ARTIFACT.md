@@ -36,8 +36,11 @@ cutover_ready: false
 
 The external process contains only:
 
-- official MCP SDK stateless Streamable HTTP transport;
-- protected-resource metadata and exact OAuth challenge;
+- official MCP SDK stateless Streamable HTTP transport using the standard SSE
+  response mode;
+- protected-resource metadata and an exact server-level OAuth challenge in the
+  HTTP `WWW-Authenticate` header with explicit missing-token, invalid-token,
+  and insufficient-scope error classes;
 - Auth0 RS256/JWKS verification bound to exact issuer, resource/audience,
   predefined public client, `memory.read`, and one operator fingerprint;
 - five read-only data tools and one render-only scope tool;
