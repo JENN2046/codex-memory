@@ -37,7 +37,8 @@ function createContextAuthority({
       typeof selectedProjectAlias !== 'string' ||
       !signing?.privateKey || typeof signing.keyId !== 'string' ||
       (activationController !== null &&
-       (typeof activationController.authorizeContextIssue !== 'function' ||
+       (typeof activationController.checkContextIssueAuthorization !== 'function' ||
+        typeof activationController.authorizeContextIssue !== 'function' ||
         typeof activationController.bindContext !== 'function'))) {
     reject('r4_context_authority_invalid');
   }
@@ -59,14 +60,38 @@ function createContextAuthority({
       return keyId === signing.keyId ? publicKey : null;
     },
     async issue({ principalFingerprint, safeProjectAlias, requestedVisibility, now }) {
+      const preauthorization = activationController?.checkContextIssueAuthorization({
+        principalFingerprint,
+        safeProjectAlias,
+        requestedVisibility,
+        now
+      });
+      if (preauthorization && preauthorization.accepted !== true) {
+        return {
+          status: 'unavailable',
+          activation_receipt_digest: preauthorization.receipt_digest
+        };
+      }
       const project = resolveRegisteredProject(
         registryState,
         safeProjectAlias,
         requestedVisibility
       );
-      if (!project || project.projectId !== selectedProject.projectId) return { status: 'denied' };
+      if (!project || project.projectId !== selectedProject.projectId) {
+        return activationController ? {
+          status: 'unavailable',
+          activation_receipt_digest: preauthorization.receipt_digest
+        } : { status: 'denied' };
+      }
       prune(now.getTime());
-      if (contexts.size >= MAX_CONTEXTS) return { status: 'unavailable' };
+      if (contexts.size >= MAX_CONTEXTS) {
+        return {
+          status: 'unavailable',
+          ...(preauthorization
+            ? { activation_receipt_digest: preauthorization.receipt_digest }
+            : {})
+        };
+      }
       const activation = activationController?.authorizeContextIssue({
         principalFingerprint,
         safeProjectAlias,

@@ -387,6 +387,21 @@ test('R4-G runtime denies before provider, permits one bounded read, then consum
   assert.equal(inactive.status, 'unavailable');
   assert.deepEqual(inactive.counters, ZERO_MEMORY_COUNTERS);
   assert.equal(providerCalls, 0);
+  for (const [sequence, projectAlias, visibility] of [
+    [4, 'unregistered-project', 'project'],
+    [5, 'project-alpha', 'workspace']
+  ]) {
+    const probe = requestFixture(fixture.edge, fixture.principal, 'resolve_memory_context', {
+      project_alias: projectAlias,
+      requested_visibility: visibility
+    }, sequence);
+    const probeResult = await fixture.runtime.handle({
+      request: probe,
+      relayReceipt: relayReceipt(probe)
+    });
+    assert.equal(probeResult.status, 'unavailable');
+    assert.deepEqual(probeResult.structured_content, { context_status: 'unavailable' });
+  }
   for (let sequence = 6; sequence < 26; sequence += 1) {
     const retry = requestFixture(fixture.edge, fixture.principal, 'resolve_memory_context', {
       project_alias: 'project-alpha',
@@ -398,7 +413,7 @@ test('R4-G runtime denies before provider, permits one bounded read, then consum
     });
     assert.equal(retryResult.status, 'unavailable');
   }
-  assert.equal(fixture.runtime.snapshot().inactive_request_attempts, 21);
+  assert.equal(fixture.runtime.snapshot().inactive_request_attempts, 23);
   assert.equal(fixture.runtime.snapshot().authorized_request_attempts, 0);
   assert.equal(providerCalls, 0);
 

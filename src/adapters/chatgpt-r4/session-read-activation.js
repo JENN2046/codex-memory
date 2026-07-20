@@ -158,7 +158,7 @@ function createSessionReadActivationController({
     });
   }
 
-  function authorizeContextIssue({
+  function checkContextIssueAuthorization({
     principalFingerprint,
     safeProjectAlias,
     requestedVisibility,
@@ -177,6 +177,17 @@ function createSessionReadActivationController({
       observations.denied_operation_count += 1;
       return unavailable('resolve_memory_context', checkedAt);
     }
+    return Object.freeze({
+      accepted: true,
+      status: 'active',
+      receipt_digest: receiptDigest('preauthorize_context', checkedAt)
+    });
+  }
+
+  function authorizeContextIssue(input = {}) {
+    const checkedAt = currentTime(input.now);
+    const preliminary = checkContextIssueAuthorization({ ...input, now: checkedAt });
+    if (preliminary.accepted !== true) return preliminary;
     const remainingMs = Date.parse(lease.expiresAt) - checkedAt.getTime();
     const contextTtlSeconds = Math.min(
       SESSION_ACTIVATION_MAX_TTL_SECONDS,
@@ -337,6 +348,7 @@ function createSessionReadActivationController({
 
   return Object.freeze({
     activate,
+    checkContextIssueAuthorization,
     authorizeContextIssue,
     bindContext,
     authorizeRead,

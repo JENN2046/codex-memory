@@ -71,6 +71,12 @@ Before provider/native invocation, Governance verifies all of the following:
 - no read is already in flight or consumed;
 - the tool is one of the existing four governed read tools.
 
+The session preauthorization check runs before project-registry lookup. While
+inactive, or when principal/alias/visibility does not exactly match the lease,
+all context-resolution probes return the same bounded `unavailable` shape;
+public callers cannot use the closed runtime to enumerate registered projects
+or allowed visibilities.
+
 Failure returns `unavailable` with zero provider/native/write/fallback/global
 search counters. If expiry or kill occurs after provider execution starts,
 Governance rechecks the lease after the native call. It keeps the actual
