@@ -3,6 +3,7 @@
 const {
   COUNTER_MODES,
   InMemoryReplayGuard,
+  ZERO_MEMORY_COUNTERS,
   createOpaqueId,
   createProjectContextClaim,
   digestObject,
@@ -15,6 +16,7 @@ const { resolveRegisteredProject, visibilityScope } = require('./project-registr
 const R4_LIVE_READ_MODE = COUNTER_MODES.governedLiveReadV1;
 const NATIVE_SHARED_READ_CLIENT_ID = 'Codex';
 const MAX_CONTEXTS = 1024;
+const MAX_AUTHORIZED_TOOL_CALLS = 20;
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -260,9 +262,14 @@ function structuredProjection(toolName, nativeResult, projectContextRef) {
   return { status: 'available', kind: 'audit', item_count: 1 };
 }
 
-function createGovernedLiveReadInvoker({ mappingState, resolveDiaryRead, callGovernedTool }) {
+function createGovernedLiveReadInvoker({
+  mappingState,
+  resolveDiaryRead,
+  callGovernedTool,
+  observeNativeEvidence = () => {}
+}) {
   if (!mappingState?.accepted || typeof resolveDiaryRead !== 'function' ||
-      typeof callGovernedTool !== 'function') {
+      typeof callGovernedTool !== 'function' || typeof observeNativeEvidence !== 'function') {
     reject('r4_live_read_invoker_invalid');
   }
   return async function invoke({ toolName, arguments: args, trustedScope, projectContextRef }) {
@@ -303,10 +310,23 @@ function createGovernedLiveReadInvoker({ mappingState, resolveDiaryRead, callGov
     const structuredContent = structuredProjection(toolName, result, projectContextRef);
     assertNoMappingDisclosure(structuredContent, mappingState);
     validatePublicStructuredContent(structuredContent);
+    const counters = countersFromEvidence(evidence);
+    observeNativeEvidence(Object.freeze({
+      project_context_ref_digest: digestObject(projectContextRef),
+      tool_name: toolName,
+      native_runtime_receipt_digest: digestObject(evidence.runtime),
+      native_invocation_receipt_digest: digestObject(evidence.invocation),
+      bridge_receipt_digest: digestObject(evidence.receipt),
+      allowed_diary_count: evidence.runtime.allowedDiaryCount,
+      result_count: Number.isInteger(structuredContent.result_count)
+        ? structuredContent.result_count
+        : Number.isInteger(structuredContent.item_count) ? structuredContent.item_count : 0,
+      counters: Object.freeze({ ...counters })
+    }));
     return {
       status: 'ok',
       structured_content: structuredContent,
-      counters: countersFromEvidence(evidence),
+      counters,
       result_scope_postcheck_passed: true
     };
   };
@@ -326,6 +346,17 @@ function createR4GovernanceRuntime({
   clock = () => new Date(),
   randomBytes
 } = {}) {
+  const observations = {
+    request_attempts: 0,
+    completed_requests: 0,
+    denied_requests: 0,
+    unavailable_requests: 0,
+    successful_read_calls: 0,
+    non_empty_read_calls: 0,
+    receipt_chains: [],
+    counters: { ...ZERO_MEMORY_COUNTERS }
+  };
+  const nativeEvidenceByContext = new Map();
   const contextAuthority = createContextAuthority({
     registryState,
     mappingState,
@@ -346,14 +377,68 @@ function createR4GovernanceRuntime({
     invokeGovernance: createGovernedLiveReadInvoker({
       mappingState,
       resolveDiaryRead,
-      callGovernedTool
+      callGovernedTool,
+      observeNativeEvidence(evidence) {
+        nativeEvidenceByContext.set(evidence.project_context_ref_digest, evidence);
+      }
     }),
     counterMode: R4_LIVE_READ_MODE,
     clock
   });
   return Object.freeze({
-    handle: payload => adapter.handle(payload),
-    snapshot: () => contextAuthority.snapshot(),
+    async handle(payload) {
+      if (observations.request_attempts >= MAX_AUTHORIZED_TOOL_CALLS) {
+        reject('r4_governance_authorized_call_budget_exhausted');
+      }
+      observations.request_attempts += 1;
+      const result = await adapter.handle(payload);
+      observations.completed_requests += 1;
+      if (result.status === 'denied') observations.denied_requests += 1;
+      if (result.status === 'unavailable') observations.unavailable_requests += 1;
+      const toolName = payload?.request?.tool_request?.name;
+      if (toolName !== 'resolve_memory_context' && result.status === 'ok') {
+        observations.successful_read_calls += 1;
+        const resultCount = Number(result.structured_content?.result_count ??
+          result.structured_content?.item_count ?? 0);
+        if (Number.isInteger(resultCount) && resultCount > 0) {
+          observations.non_empty_read_calls += 1;
+        }
+        for (const [key, value] of Object.entries(result.counters)) {
+          observations.counters[key] += value;
+        }
+        const contextRef = payload.request.tool_request.arguments.project_context_ref;
+        const contextDigest = digestObject(contextRef);
+        const nativeEvidence = nativeEvidenceByContext.get(contextDigest);
+        if (!nativeEvidence) reject('r4_live_read_native_evidence_missing');
+        nativeEvidenceByContext.delete(contextDigest);
+        observations.receipt_chains.push(Object.freeze({
+          tool_name: toolName,
+          native_runtime: nativeEvidence.native_runtime_receipt_digest,
+          native_invocation: nativeEvidence.native_invocation_receipt_digest,
+          bridge: nativeEvidence.bridge_receipt_digest,
+          governance: result.receipt_digests.governance,
+          context: result.receipt_digests.context,
+          allowed_diary_count: nativeEvidence.allowed_diary_count,
+          result_count: nativeEvidence.result_count
+        }));
+      }
+      return result;
+    },
+    snapshot: () => Object.freeze({
+      ...contextAuthority.snapshot(),
+      request_attempts: observations.request_attempts,
+      max_authorized_tool_calls: MAX_AUTHORIZED_TOOL_CALLS,
+      completed_requests: observations.completed_requests,
+      denied_requests: observations.denied_requests,
+      unavailable_requests: observations.unavailable_requests,
+      successful_read_calls: observations.successful_read_calls,
+      non_empty_read_calls: observations.non_empty_read_calls,
+      counters: Object.freeze({ ...observations.counters }),
+      receipt_chains: Object.freeze(observations.receipt_chains.map(item => Object.freeze({ ...item }))),
+      request_bodies_logged: 0,
+      response_bodies_logged: 0,
+      raw_memory_persisted: false
+    }),
     counterMode: R4_LIVE_READ_MODE
   });
 }
@@ -361,6 +446,7 @@ function createR4GovernanceRuntime({
 module.exports = {
   R4_LIVE_READ_MODE,
   NATIVE_SHARED_READ_CLIENT_ID,
+  MAX_AUTHORIZED_TOOL_CALLS,
   buildNativeRequest,
   countersFromEvidence,
   createContextAuthority,

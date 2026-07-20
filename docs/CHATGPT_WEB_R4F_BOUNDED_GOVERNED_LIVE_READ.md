@@ -88,6 +88,14 @@ before provider use, allowlist enforcement before index load and vector search,
 result source post-check, exact mapping binding, no native write, no fallback,
 and no unscoped search.
 
+One Governance runtime process accepts at most 20 request attempts, matching the
+authorized MCP-call ceiling conservatively even when an attempt is rejected.
+It retains only in-memory aggregate counters and receipt-chain digests for the
+owner-only proof handoff; request bodies, response bodies, query text, result
+summaries, diary names, and raw memory are not retained by this observation
+surface. At the call ceiling it fails closed before another provider/native
+invocation.
+
 ## Rollback
 
 Rollback does not touch memory:

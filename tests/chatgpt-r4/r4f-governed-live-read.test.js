@@ -391,6 +391,18 @@ test('R4-F resolves an explicit project then returns a bounded live read through
   assert.equal(searchResponse.counters.primary_memory_writes, 0);
   assert.equal(searchResponse.counters.unrestricted_native_searches, 0);
   assert.equal(governedCalls, 1);
+  const runtimeSnapshot = runtime.snapshot();
+  assert.equal(runtimeSnapshot.request_attempts, 2);
+  assert.equal(runtimeSnapshot.completed_requests, 2);
+  assert.equal(runtimeSnapshot.successful_read_calls, 1);
+  assert.equal(runtimeSnapshot.non_empty_read_calls, 1);
+  assert.equal(runtimeSnapshot.counters.provider_calls, 1);
+  assert.equal(runtimeSnapshot.counters.primary_memory_writes, 0);
+  assert.equal(runtimeSnapshot.counters.unrestricted_native_searches, 0);
+  assert.equal(runtimeSnapshot.receipt_chains.length, 1);
+  assert.match(runtimeSnapshot.receipt_chains[0].native_runtime, /^sha256:[a-f0-9]{64}$/u);
+  assert.match(runtimeSnapshot.receipt_chains[0].governance, /^sha256:[a-f0-9]{64}$/u);
+  assert.equal(runtimeSnapshot.raw_memory_persisted, false);
   assert.doesNotThrow(() => validateResponseEnvelope(searchResponse, {
     now: NOW,
     resolveResponsePublicKey: keyId => keyId === relay.keyId ? relay.publicKey : null,
@@ -529,6 +541,54 @@ test('R4-F denies a different registered project when the runtime is bound to on
   const result = await runtime.handle({ request, relayReceipt: relayReceipt(request) });
   assert.equal(result.status, 'denied');
   assert.equal(calls, 0);
+});
+
+test('R4-F fails closed after the authorized twenty-call runtime budget', async () => {
+  const mappingState = loadDiaryScopeMapping({ mapping: mapping() });
+  const registryState = validateProjectRegistry(registry(mappingState), mappingState, {
+    resolveDiaryRead: resolveRead
+  });
+  const edge = identity('r4f-budget-edge');
+  const context = identity('r4f-budget-context');
+  const runtime = createR4GovernanceRuntime({
+    expectedIssuer: ISSUER,
+    expectedAudience: AUDIENCE,
+    resolveRequestPublicKey: keyId => keyId === edge.keyId ? edge.publicKey : null,
+    resolvePrincipalPublicKey: candidate =>
+      candidate?.issuer === ISSUER && candidate?.key_id === edge.keyId ? edge.publicKey : null,
+    registryState,
+    mappingState,
+    selectedProjectAlias: 'project-alpha',
+    resolveDiaryRead: resolveRead,
+    contextSigning: { privateKey: context.privateKey, keyId: context.keyId },
+    clock: () => new Date(NOW),
+    async callGovernedTool() { throw new Error('native must not run'); }
+  });
+  const principal = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: sha256('r4f-budget-operator'),
+    now: NOW,
+    nonce: 'r4f_budget_principal_nonce_00001',
+    signing: { privateKey: edge.privateKey, keyId: edge.keyId }
+  });
+  for (let index = 0; index < 20; index += 1) {
+    const request = requestFixture(edge, principal, 'resolve_memory_context', {
+      project_alias: 'project-other',
+      requested_visibility: 'project'
+    }, 100 + index);
+    const result = await runtime.handle({ request, relayReceipt: relayReceipt(request) });
+    assert.equal(result.status, 'denied');
+  }
+  const overflow = requestFixture(edge, principal, 'resolve_memory_context', {
+    project_alias: 'project-other',
+    requested_visibility: 'project'
+  }, 120);
+  await assert.rejects(runtime.handle({
+    request: overflow,
+    relayReceipt: relayReceipt(overflow)
+  }), { code: 'r4_governance_authorized_call_budget_exhausted' });
+  assert.equal(runtime.snapshot().request_attempts, 20);
 });
 
 test('R4-F UDS requires owner-only parent and never logs frames', async t => {
