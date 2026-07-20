@@ -15,6 +15,7 @@ const { createTransientRequestBroker } = require('./transient-request-broker');
 
 const PRMD_PATH = '/.well-known/oauth-protected-resource';
 const MCP_PATH = '/mcp';
+const PRMD_MCP_PATH = `${PRMD_PATH}${MCP_PATH}`;
 const HEALTH_PATH = '/healthz';
 const RELAY_PATHS = new Set([
   '/v1/relay/claim',
@@ -30,10 +31,11 @@ const NON_PUBLIC_DNS_SUFFIXES = Object.freeze([
 
 function createExternalEdgeRuntime(options = {}) {
   const config = validateExternalEdgeRuntimeConfig(options);
+  const mcpResource = `${config.publicOrigin}${MCP_PATH}`;
   const edgePublicKey = crypto.createPublicKey(config.edgeSigning.privateKey);
   const verifyAccessToken = config.verifyAccessToken || createAuth0TokenVerifier({
     issuer: config.issuer,
-    audience: config.publicOrigin,
+    audience: mcpResource,
     jwksUri: config.jwksUri,
     expectedClientId: config.oauthClientId,
     operatorSubjectFingerprint: config.operatorSubjectFingerprint
@@ -52,7 +54,7 @@ function createExternalEdgeRuntime(options = {}) {
         resolveRequestPublicKey: keyId => keyId === config.edgeSigning.keyId ? edgePublicKey : null,
         resolvePrincipalPublicKey: ({ key_id: keyId }) => keyId === config.edgeSigning.keyId ? edgePublicKey : null,
         expectedIssuer: config.issuer,
-        expectedAudience: config.publicOrigin,
+        expectedAudience: mcpResource,
         consumeReplay: false
       });
     },
@@ -70,7 +72,7 @@ function createExternalEdgeRuntime(options = {}) {
   const mcp = createExternalMcpHandler({
     broker,
     issuer: config.issuer,
-    audience: config.publicOrigin,
+    audience: mcpResource,
     edgeSigning: config.edgeSigning,
     clock: config.clock,
     requestTtlSeconds: config.requestTtlSeconds,
@@ -95,7 +97,7 @@ function createExternalEdgeRuntime(options = {}) {
           durable_remote_state: false
         });
       }
-      if (method === 'GET' && pathname === PRMD_PATH) {
+      if (method === 'GET' && (pathname === PRMD_PATH || pathname === PRMD_MCP_PATH)) {
         return sendJson(outgoing, 200, protectedResourceMetadata(config));
       }
       if (pathname === MCP_PATH) {
@@ -268,7 +270,7 @@ function validateExternalEdgeRuntimeConfig(options) {
 
 function protectedResourceMetadata(config) {
   return {
-    resource: config.publicOrigin,
+    resource: `${config.publicOrigin}${MCP_PATH}`,
     authorization_servers: [config.issuer],
     scopes_supported: ['memory.read'],
     bearer_methods_supported: ['header'],
@@ -279,7 +281,8 @@ function protectedResourceMetadata(config) {
 async function authenticateMcp(incoming, verifyAccessToken, config) {
   const token = extractBearerToken(incoming.headers.authorization, 'edge_mcp_authorization_missing');
   const verified = await verifyAccessToken(token);
-  if (!verified || verified.issuer !== config.issuer || verified.audience !== config.publicOrigin ||
+  if (!verified || verified.issuer !== config.issuer ||
+      verified.audience !== `${config.publicOrigin}${MCP_PATH}` ||
       verified.clientId !== config.oauthClientId ||
       verified.subjectFingerprint !== config.operatorSubjectFingerprint ||
       !Array.isArray(verified.scopes) || !verified.scopes.includes('memory.read')) {
@@ -426,7 +429,7 @@ function assertInteger(value, minimum, maximum, code) {
 }
 
 function sendOauthChallenge(outgoing, config, rejectionCode) {
-  const metadata = `${config.publicOrigin}${PRMD_PATH}`;
+  const metadata = `${config.publicOrigin}${PRMD_MCP_PATH}`;
   const insufficientScope = rejectionCode === 'edge_oauth_scope_missing';
   const error = insufficientScope
     ? 'insufficient_scope'
@@ -445,7 +448,10 @@ function sendOauthChallenge(outgoing, config, rejectionCode) {
     error: {
       code: -32001,
       message: description,
-      data: { error }
+      data: {
+        error,
+        _meta: { 'mcp/www_authenticate': [challenge] }
+      }
     }
   });
 }
@@ -493,6 +499,7 @@ module.exports = {
   HEALTH_PATH,
   MCP_PATH,
   PRMD_PATH,
+  PRMD_MCP_PATH,
   RELAY_PATHS,
   authenticateRelay,
   canonicalIssuer,

@@ -63,7 +63,7 @@
         "identity_provider": { "const": "auth0" },
         "client_registration_mode": { "const": "predefined_public_client" },
         "issuer": { "type": "string", "format": "uri", "pattern": "^https://[^@/?#]+/$" },
-        "resource": { "type": "string", "format": "uri", "pattern": "^https://[^@/?#]+$" },
+        "resource": { "type": "string", "format": "uri", "pattern": "^https://[^@/?#]+/mcp$" },
         "scopes": {
           "type": "array",
           "prefixItems": [{ "const": "memory.read" }],

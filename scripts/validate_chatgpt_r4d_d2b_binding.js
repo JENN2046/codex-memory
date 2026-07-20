@@ -25,7 +25,7 @@ const EXAMPLE_PATH = path.join(
   'examples',
   'chatgpt-web-r4d-self-hosted-binding-amendment.redacted.example.json'
 );
-const EXPECTED_SCHEMA_SHA256 = 'be20ad7859f4139b178a7b1740c7de61dd023541263048bf3623b01a54f3623f';
+const EXPECTED_SCHEMA_SHA256 = '66cbd2c0915acd95989b932e9b3192f32c3ccc5cc754f21037149b95c73e77e0';
 const PRIVATE_FINGERPRINT_KEYS = Object.freeze([
   'auth0_issuer_sha256',
   'auth0_jwks_uri_sha256',

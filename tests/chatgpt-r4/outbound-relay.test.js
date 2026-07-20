@@ -25,6 +25,7 @@ const {
 
 const ISSUER = 'https://tenant.jenn.dev/';
 const ORIGIN = 'https://memory.jenn.dev';
+const MCP_RESOURCE = `${ORIGIN}/mcp`;
 const TOKEN = 'r'.repeat(48);
 
 test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes signed zero-counter UDS work', async t => {
@@ -37,7 +38,7 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   const now = new Date('2026-07-19T12:00:00.000Z');
   const principal = createPrincipalAssertion({
     issuer: ISSUER,
-    audience: ORIGIN,
+    audience: MCP_RESOURCE,
     subjectFingerprint: sha256('single-operator'),
     now,
     nonce: 'd2b_principal_nonce_00001',
@@ -103,7 +104,7 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
     socketPath,
     relayId: 'local-relay-r4d-test',
     expectedIssuer: ISSUER,
-    expectedAudience: ORIGIN,
+    expectedAudience: MCP_RESOURCE,
     resolveRequestPublicKey: keyId => keyId === edgeKeyId ? edge.publicKey : null,
     resolvePrincipalPublicKey: value =>
       value?.issuer === ISSUER && value?.key_id === edgeKeyId ? edge.publicKey : null,
