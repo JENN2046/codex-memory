@@ -15,6 +15,7 @@ const { createTransientRequestBroker } = require('./transient-request-broker');
 
 const PRMD_PATH = '/.well-known/oauth-protected-resource';
 const MCP_PATH = '/mcp';
+const PRMD_MCP_PATH = `${PRMD_PATH}${MCP_PATH}`;
 const HEALTH_PATH = '/healthz';
 const RELAY_PATHS = new Set([
   '/v1/relay/claim',
@@ -95,7 +96,7 @@ function createExternalEdgeRuntime(options = {}) {
           durable_remote_state: false
         });
       }
-      if (method === 'GET' && pathname === PRMD_PATH) {
+      if (method === 'GET' && (pathname === PRMD_PATH || pathname === PRMD_MCP_PATH)) {
         return sendJson(outgoing, 200, protectedResourceMetadata(config));
       }
       if (pathname === MCP_PATH) {
@@ -445,7 +446,10 @@ function sendOauthChallenge(outgoing, config, rejectionCode) {
     error: {
       code: -32001,
       message: description,
-      data: { error }
+      data: {
+        error,
+        _meta: { 'mcp/www_authenticate': [challenge] }
+      }
     }
   });
 }
@@ -493,6 +497,7 @@ module.exports = {
   HEALTH_PATH,
   MCP_PATH,
   PRMD_PATH,
+  PRMD_MCP_PATH,
   RELAY_PATHS,
   authenticateRelay,
   canonicalIssuer,

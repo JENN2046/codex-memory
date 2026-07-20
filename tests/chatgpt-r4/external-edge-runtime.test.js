@@ -137,6 +137,9 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
     bearer_methods_supported: ['header'],
     resource_name: 'codex-memory private project memory'
   });
+  const pathAwarePrmd = await edgeRequest(address, 'GET', '/.well-known/oauth-protected-resource/mcp');
+  assert.equal(pathAwarePrmd.statusCode, 200);
+  assert.deepEqual(pathAwarePrmd.body, prmd.body);
   const unauthenticated = await mcpRequest(address, initializeRequest(1), null);
   assert.equal(unauthenticated.statusCode, 401);
   assert.match(unauthenticated.headers['www-authenticate'], /resource_metadata=/u);
@@ -146,7 +149,12 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   assert.equal(unauthenticated.body.jsonrpc, '2.0');
   assert.equal(unauthenticated.body.id, null);
   assert.equal(unauthenticated.body.error.code, -32001);
-  assert.deepEqual(unauthenticated.body.error.data, { error: 'invalid_request' });
+  assert.deepEqual(unauthenticated.body.error.data, {
+    error: 'invalid_request',
+    _meta: {
+      'mcp/www_authenticate': [unauthenticated.headers['www-authenticate']]
+    }
+  });
 
   const unauthenticatedGet = await edgeRequest(address, 'GET', '/mcp');
   assert.equal(unauthenticatedGet.statusCode, 401);
@@ -163,11 +171,17 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   assert.equal(invalidToken.statusCode, 401);
   assert.match(invalidToken.headers['www-authenticate'], /error="invalid_token"/u);
   assert.match(invalidToken.headers['www-authenticate'], /error_description="OAuth token is invalid\."/u);
+  assert.deepEqual(invalidToken.body.error.data._meta['mcp/www_authenticate'], [
+    invalidToken.headers['www-authenticate']
+  ]);
 
   const insufficientScope = await mcpRequest(address, initializeRequest(3), INSUFFICIENT_SCOPE_TOKEN);
   assert.equal(insufficientScope.statusCode, 403);
   assert.match(insufficientScope.headers['www-authenticate'], /error="insufficient_scope"/u);
   assert.match(insufficientScope.headers['www-authenticate'], /error_description="OAuth scope is insufficient\."/u);
+  assert.deepEqual(insufficientScope.body.error.data._meta['mcp/www_authenticate'], [
+    insufficientScope.headers['www-authenticate']
+  ]);
 
   const authenticatedGet = await edgeRequest(address, 'GET', '/mcp', {
     authorization: `Bearer ${ACCESS_TOKEN}`
