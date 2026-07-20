@@ -431,7 +431,10 @@ function sendOauthChallenge(outgoing, config, rejectionCode) {
   const error = insufficientScope
     ? 'insufficient_scope'
     : (rejectionCode === 'edge_mcp_authorization_missing' ? 'invalid_request' : 'invalid_token');
-  const challenge = `Bearer resource_metadata="${metadata}", scope="memory.read", error="${error}"`;
+  const description = insufficientScope
+    ? 'OAuth scope is insufficient.'
+    : (error === 'invalid_request' ? 'OAuth authorization is required.' : 'OAuth token is invalid.');
+  const challenge = `Bearer resource_metadata="${metadata}", scope="memory.read", error="${error}", error_description="${description}"`;
   outgoing.setHeader(
     'www-authenticate',
     challenge
@@ -441,11 +444,8 @@ function sendOauthChallenge(outgoing, config, rejectionCode) {
     id: null,
     error: {
       code: -32001,
-      message: insufficientScope ? 'OAuth scope is insufficient.' : 'OAuth authorization is required.',
-      data: {
-        error,
-        _meta: { 'mcp/www_authenticate': [challenge] }
-      }
+      message: description,
+      data: { error }
     }
   });
 }

@@ -142,23 +142,18 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   assert.match(unauthenticated.headers['www-authenticate'], /resource_metadata=/u);
   assert.match(unauthenticated.headers['www-authenticate'], /scope="memory\.read"/u);
   assert.match(unauthenticated.headers['www-authenticate'], /error="invalid_request"/u);
+  assert.match(unauthenticated.headers['www-authenticate'], /error_description="OAuth authorization is required\."/u);
   assert.equal(unauthenticated.body.jsonrpc, '2.0');
   assert.equal(unauthenticated.body.id, null);
   assert.equal(unauthenticated.body.error.code, -32001);
-  assert.deepEqual(
-    unauthenticated.body.error.data._meta['mcp/www_authenticate'],
-    [unauthenticated.headers['www-authenticate']]
-  );
+  assert.deepEqual(unauthenticated.body.error.data, { error: 'invalid_request' });
 
   const unauthenticatedGet = await edgeRequest(address, 'GET', '/mcp');
   assert.equal(unauthenticatedGet.statusCode, 401);
   assert.match(unauthenticatedGet.headers['www-authenticate'], /resource_metadata=/u);
   assert.match(unauthenticatedGet.headers['www-authenticate'], /scope="memory\.read"/u);
   assert.match(unauthenticatedGet.headers['www-authenticate'], /error="invalid_request"/u);
-  assert.deepEqual(
-    unauthenticatedGet.body.error.data._meta['mcp/www_authenticate'],
-    [unauthenticatedGet.headers['www-authenticate']]
-  );
+  assert.match(unauthenticatedGet.headers['www-authenticate'], /error_description=/u);
 
   const invalidToken = await mcpRequest(
     address,
@@ -167,18 +162,12 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   );
   assert.equal(invalidToken.statusCode, 401);
   assert.match(invalidToken.headers['www-authenticate'], /error="invalid_token"/u);
-  assert.deepEqual(
-    invalidToken.body.error.data._meta['mcp/www_authenticate'],
-    [invalidToken.headers['www-authenticate']]
-  );
+  assert.match(invalidToken.headers['www-authenticate'], /error_description="OAuth token is invalid\."/u);
 
   const insufficientScope = await mcpRequest(address, initializeRequest(3), INSUFFICIENT_SCOPE_TOKEN);
   assert.equal(insufficientScope.statusCode, 403);
   assert.match(insufficientScope.headers['www-authenticate'], /error="insufficient_scope"/u);
-  assert.deepEqual(
-    insufficientScope.body.error.data._meta['mcp/www_authenticate'],
-    [insufficientScope.headers['www-authenticate']]
-  );
+  assert.match(insufficientScope.headers['www-authenticate'], /error_description="OAuth scope is insufficient\."/u);
 
   const authenticatedGet = await edgeRequest(address, 'GET', '/mcp', {
     authorization: `Bearer ${ACCESS_TOKEN}`
@@ -188,6 +177,7 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
 
   const initialized = await mcpRequest(address, initializeRequest(4), ACCESS_TOKEN);
   assert.equal(initialized.statusCode, 200);
+  assert.match(initialized.headers['content-type'], /^text\/event-stream/u);
   assert.equal(initialized.body.result.serverInfo.name, 'codex-memory-chatgpt-r4-edge');
 
   const tools = await mcpRequest(address, rpcRequest(5, 'tools/list'), ACCESS_TOKEN);
@@ -493,7 +483,7 @@ function rawRequest(address, method, pathname, headers, body) {
         let parsed = null;
         if (text) {
           try {
-            parsed = JSON.parse(text);
+            parsed = parseResponseBody(text, response.headers['content-type']);
           } catch {
             parsed = text;
           }
@@ -505,4 +495,14 @@ function rawRequest(address, method, pathname, headers, body) {
     if (encoded) request.end(encoded);
     else request.end();
   });
+}
+
+function parseResponseBody(text, contentType) {
+  if (!String(contentType || '').startsWith('text/event-stream')) return JSON.parse(text);
+  const dataLines = text.split(/\r?\n/u)
+    .filter(line => line.startsWith('data:'))
+    .map(line => line.slice(5).trim())
+    .filter(Boolean);
+  if (dataLines.length !== 1) throw new Error('unexpected_sse_message_count');
+  return JSON.parse(dataLines[0]);
 }
