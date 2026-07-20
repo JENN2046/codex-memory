@@ -31,6 +31,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R4-D D2A External Edge Artifact](docs/CHATGPT_WEB_R4D_D2A_EDGE_ARTIFACT.md)
 - [ChatGPT Web R4-D D2B Self-Hosted Binding And Outbound Relay](docs/CHATGPT_WEB_R4D_D2B_SELF_HOSTED_RELAY.md)
 - [ChatGPT Web R4-D Direct OAuth Runtime Canary](docs/CHATGPT_WEB_R4D_DIRECT_OAUTH_RUNTIME_CANARY.md)
+- [ChatGPT Web R4-F Bounded Governed Live Read](docs/CHATGPT_WEB_R4F_BOUNDED_GOVERNED_LIVE_READ.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 

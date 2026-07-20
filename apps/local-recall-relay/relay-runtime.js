@@ -16,6 +16,7 @@ function createRelayRuntime({
   resolvePrincipalPublicKey,
   requestReplayGuard,
   responseSigning,
+  counterMode,
   clock = () => new Date(),
   cancelPollMs = 10,
   eventComponent = 'outbound_relay',
@@ -96,6 +97,7 @@ function createRelayRuntime({
         resolvePrincipalPublicKey,
         requestReplayGuard: replayGuard,
         responseSigning,
+        counterMode,
         clock,
         async forwardToUds(payload) {
           emit('uds_forward_started', claim.request_id, { attempt: claim.attempt });

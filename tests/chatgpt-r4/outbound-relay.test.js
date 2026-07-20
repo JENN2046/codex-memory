@@ -172,6 +172,10 @@ test('R4-D D2B runtime authority requires owner-only files and distinct Ed25519 
   fs.writeFileSync(files.relayPublic, relay.publicKey.export({ type: 'spki', format: 'pem' }), { mode: 0o600 });
   fs.writeFileSync(files.token, `${TOKEN}\n`, { mode: 0o600 });
   const environment = runtimeEnvironment(files);
+  assert.throws(() => loadOutboundRelayRuntimeFromEnvironment({
+    ...environment,
+    CODEX_MEMORY_R4_COUNTER_MODE: 'governed_live_read_typo'
+  }, { secretRoot: root }), { code: 'counter_mode_invalid' });
   assert.doesNotThrow(() => loadOutboundRelayRuntimeFromEnvironment(environment, {
     secretRoot: root,
     edgeRequest: createFakeHttpsRequest(() => ({ statusCode: 204, body: null }))

@@ -6,6 +6,8 @@ const {
   KINDS,
   DATA_TOOL_NAMES,
   CONTEXT_VISIBILITIES,
+  COUNTER_MODES,
+  GOVERNED_LIVE_READ_COUNTER_MAXIMUMS,
   ZERO_MEMORY_COUNTER_KEYS,
   LIMITS,
   PROJECT_CONTEXT_REF_PATTERN_SOURCE,
@@ -345,11 +347,28 @@ function validateRequestEnvelope(envelope, {
   };
 }
 
-function validateCounters(counters, { requireZero = false } = {}) {
+function validateCounterMode(value) {
+  if (!Object.values(COUNTER_MODES).includes(value)) reject('counter_mode_invalid');
+  return value;
+}
+
+function validateCounters(counters, {
+  requireZero = false,
+  counterMode = requireZero ? COUNTER_MODES.zeroMemory : null
+} = {}) {
   assertExactKeys(counters, ZERO_MEMORY_COUNTER_KEYS, 'counter_shape_invalid');
+  if (counterMode !== null) validateCounterMode(counterMode);
   for (const key of ZERO_MEMORY_COUNTER_KEYS) {
     if (!Number.isInteger(counters[key]) || counters[key] < 0) reject('counter_value_invalid');
-    if (requireZero && counters[key] !== 0) reject('zero_memory_counter_nonzero');
+    if (counterMode === COUNTER_MODES.zeroMemory && counters[key] !== 0) {
+      reject('zero_memory_counter_nonzero');
+    }
+    if (
+      counterMode === COUNTER_MODES.governedLiveReadV1 &&
+      counters[key] > GOVERNED_LIVE_READ_COUNTER_MAXIMUMS[key]
+    ) {
+      reject('governed_live_read_counter_out_of_bounds');
+    }
   }
   return counters;
 }
@@ -462,7 +481,8 @@ function validateResponseEnvelope(envelope, {
   now = new Date(),
   resolveResponsePublicKey,
   expectedRequest,
-  requireZeroCounters = false
+  requireZeroCounters = false,
+  counterMode = requireZeroCounters ? COUNTER_MODES.zeroMemory : null
 } = {}) {
   if (utf8ByteLength(envelope) > LIMITS.maxResponseBytes) reject('response_envelope_too_large');
   assertExactKeys(envelope, [
@@ -488,7 +508,7 @@ function validateResponseEnvelope(envelope, {
   validateToolStructuredContent(envelope.tool_name, envelope.structured_content, {
     status: envelope.status
   });
-  validateCounters(envelope.counters, { requireZero: requireZeroCounters });
+  validateCounters(envelope.counters, { counterMode });
   validateReceiptChain(envelope.receipt_chain);
   if (envelope.receipt_chain.edge_request !== envelope.request_digest) {
     reject('response_receipt_request_mismatch');
@@ -552,6 +572,7 @@ module.exports = {
   validateToolArguments,
   validateToolRequest,
   validateRequestEnvelope,
+  validateCounterMode,
   validateCounters,
   validateReceiptChain,
   validatePublicStructuredContent,
