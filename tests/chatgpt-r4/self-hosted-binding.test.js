@@ -200,6 +200,7 @@ test('R4-D D2B schema is frozen and redacted example remains activation-ineligib
   assert.equal(publicOrigin.test('https://memory.jenn.dev'), true);
   assert.equal(publicOrigin.test('https://memory.jenn.dev:65535'), true);
   assert.equal(mcpResource.test('https://memory.jenn.dev/mcp'), true);
+  assert.equal(mcpResource.test('https://memory.jenn.dev:65535/mcp'), true);
   assert.equal(mcpResource.test('https://memory.jenn.dev'), false);
   assert.equal(publicIssuer.test('https://tenant.auth0.com/'), true);
   assert.equal(publicDiscovery.test('https://tenant.auth0.com/.well-known/openid-configuration'), true);
@@ -211,6 +212,7 @@ test('R4-D D2B schema is frozen and redacted example remains activation-ineligib
     'https://memory.jenn.dev:65536'
   ]) {
     assert.equal(publicOrigin.test(value), false);
+    assert.equal(mcpResource.test(`${value}/mcp`), false);
     assert.equal(publicIssuer.test(`${value}/`), false);
     assert.equal(publicDiscovery.test(`${value}/.well-known/openid-configuration`), false);
   }

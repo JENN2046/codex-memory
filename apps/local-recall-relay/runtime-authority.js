@@ -25,6 +25,7 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
   const issuer = getEnvironment(environment, 'CODEX_MEMORY_R4_AUTH0_ISSUER');
   assertCanonicalPublicOrigin(edgeOrigin);
   assertCanonicalIssuer(issuer);
+  const mcpResource = `${edgeOrigin}/mcp`;
 
   const edgePublicKeyPem = readSecretReference(
     getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY'),
@@ -76,7 +77,7 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
     socketPath: validateSocketPath(getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_UDS_PATH')),
     relayId,
     expectedIssuer: issuer,
-    expectedAudience: edgeOrigin,
+    expectedAudience: mcpResource,
     resolveRequestPublicKey: candidate => candidate === edgeKeyId ? edgePublicKey : null,
     resolvePrincipalPublicKey: candidate =>
       candidate?.issuer === issuer && candidate?.key_id === edgeKeyId ? edgePublicKey : null,
