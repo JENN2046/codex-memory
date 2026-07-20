@@ -1,6 +1,7 @@
 'use strict';
 
 const {
+  COUNTER_MODES,
   createResponseEnvelope,
   digestObject,
   validateCounters,
@@ -19,6 +20,7 @@ function createRelayProcessor({
   requestReplayGuard,
   forwardToUds,
   responseSigning,
+  counterMode = COUNTER_MODES.zeroMemory,
   clock = () => new Date()
 }) {
   if (typeof forwardToUds !== 'function') reject('relay_forwarder_missing');
@@ -50,7 +52,7 @@ function createRelayProcessor({
       });
       const invocation = await forwardToUds({ request: forwardedRequest, relayReceipt });
       const responseNow = clock();
-      validateInvocation(invocation, toolName);
+      validateInvocation(invocation, toolName, { counterMode });
       const receiptChain = {
         edge_request: validation.requestDigest,
         relay: digestObject(relayReceipt),
@@ -74,7 +76,7 @@ function createRelayProcessor({
   });
 }
 
-function validateInvocation(invocation, toolName) {
+function validateInvocation(invocation, toolName, { counterMode = COUNTER_MODES.zeroMemory } = {}) {
   if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
     reject('relay_invocation_invalid');
   }
@@ -86,7 +88,7 @@ function validateInvocation(invocation, toolName) {
   validateToolStructuredContent(toolName, invocation.structured_content, {
     status: invocation.status
   });
-  validateCounters(invocation.counters, { requireZero: true });
+  validateCounters(invocation.counters, { counterMode });
   if (!invocation.receipt_digests ||
       typeof invocation.receipt_digests !== 'object' ||
       Array.isArray(invocation.receipt_digests) ||

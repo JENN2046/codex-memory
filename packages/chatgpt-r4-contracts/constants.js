@@ -46,6 +46,21 @@ const ZERO_MEMORY_COUNTERS = Object.freeze(Object.fromEntries(
   ZERO_MEMORY_COUNTER_KEYS.map(key => [key, 0])
 ));
 
+const COUNTER_MODES = Object.freeze({
+  zeroMemory: 'zero_memory',
+  governedLiveReadV1: 'governed_live_read_v1'
+});
+
+const GOVERNED_LIVE_READ_COUNTER_MAXIMUMS = Object.freeze({
+  provider_calls: 1,
+  native_invocations: 1,
+  local_fallbacks: 0,
+  primary_memory_writes: 0,
+  derived_index_writes: 1,
+  other_durable_mutations: 1,
+  unrestricted_native_searches: 0
+});
+
 const LIMITS = Object.freeze({
   maxAssertionTtlSeconds: 300,
   maxContextTtlSeconds: 300,
@@ -110,6 +125,8 @@ module.exports = {
   CONTEXT_VISIBILITIES,
   ZERO_MEMORY_COUNTER_KEYS,
   ZERO_MEMORY_COUNTERS,
+  COUNTER_MODES,
+  GOVERNED_LIVE_READ_COUNTER_MAXIMUMS,
   LIMITS,
   FORBIDDEN_AUTHORITY_KEYS,
   FORBIDDEN_PUBLIC_DISCLOSURE_KEYS

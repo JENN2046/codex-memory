@@ -5,7 +5,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const { reject, sha256 } = require('../../packages/chatgpt-r4-contracts');
+const { COUNTER_MODES, reject, sha256 } = require('../../packages/chatgpt-r4-contracts');
 const { createExternalEdgeRuntime } = require('./external-http-runtime');
 
 const DEFAULT_SECRET_ROOT = '/run/secrets/codex-memory-r4';
@@ -91,7 +91,8 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
     maxInFlight: parseIntegerEnvironment(
       environment.CODEX_MEMORY_R4_MAX_IN_FLIGHT || '32',
       'edge_inflight_limit_invalid'
-    )
+    ),
+    counterMode: environment.CODEX_MEMORY_R4_COUNTER_MODE || COUNTER_MODES.zeroMemory
   });
 }
 

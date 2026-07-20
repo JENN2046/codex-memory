@@ -37,6 +37,10 @@ const COMPONENT_POLICIES = Object.freeze({
 });
 
 const R4C_RUNTIME_FILE_POLICIES = Object.freeze({
+  'src/adapters/chatgpt-r4/governed-live-read-runtime.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:crypto']),
+    allowedRuntimeRules: Object.freeze([])
+  }),
   'apps/chatgpt-edge/loopback-runtime.js': Object.freeze({
     allowedBuiltins: Object.freeze(['node:http']),
     allowedRuntimeRules: Object.freeze(['service_listener'])

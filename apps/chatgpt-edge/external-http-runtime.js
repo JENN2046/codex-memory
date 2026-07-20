@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const http = require('node:http');
 
 const {
+  COUNTER_MODES,
   LIMITS,
   validateRequestEnvelope,
   validateResponseEnvelope,
@@ -65,7 +66,7 @@ function createExternalEdgeRuntime(options = {}) {
           ? config.relaySigningPublicKey
           : null,
         expectedRequest: request,
-        requireZeroCounters: true
+        counterMode: config.counterMode
       });
     }
   });
@@ -242,6 +243,8 @@ function validateExternalEdgeRuntimeConfig(options) {
     reject('edge_oauth_verifier_invalid');
   }
   if (options.eventSink !== undefined && typeof options.eventSink !== 'function') reject('edge_event_sink_invalid');
+  const counterMode = options.counterMode || COUNTER_MODES.zeroMemory;
+  if (!Object.values(COUNTER_MODES).includes(counterMode)) reject('edge_counter_mode_invalid');
   return Object.freeze({
     publicOrigin,
     issuer,
@@ -264,6 +267,7 @@ function validateExternalEdgeRuntimeConfig(options) {
     clock: options.clock || (() => new Date()),
     verifyAccessToken: options.verifyAccessToken,
     eventSink: options.eventSink,
+    counterMode,
     broker: options.broker
   });
 }

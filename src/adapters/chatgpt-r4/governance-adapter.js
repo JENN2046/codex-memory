@@ -1,6 +1,7 @@
 'use strict';
 
 const {
+  COUNTER_MODES,
   ZERO_MEMORY_COUNTERS,
   digestObject,
   validateCounters,
@@ -20,6 +21,7 @@ function createGovernanceAdapter({
   resolveProjectContext,
   contextReplayGuard,
   invokeGovernance,
+  counterMode = COUNTER_MODES.zeroMemory,
   clock = () => new Date()
 }) {
   if (typeof issueProjectContext !== 'function') reject('context_issuer_missing');
@@ -85,7 +87,7 @@ function createGovernanceAdapter({
         principalFingerprint,
         projectContextRef: contextRef
       });
-      validateGovernanceInvocation(invocation);
+      validateGovernanceInvocation(invocation, { counterMode });
 
       const contextReceipt = {
         schema_version: 1,
@@ -264,7 +266,7 @@ function stripContextReference(args) {
   return Object.freeze({ ...rest });
 }
 
-function validateGovernanceInvocation(invocation) {
+function validateGovernanceInvocation(invocation, { counterMode = COUNTER_MODES.zeroMemory } = {}) {
   if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
     reject('governance_invocation_invalid');
   }
@@ -276,7 +278,7 @@ function validateGovernanceInvocation(invocation) {
   if (!['ok', 'denied', 'unavailable'].includes(invocation.status)) reject('governance_status_invalid');
   if (invocation.result_scope_postcheck_passed !== true) reject('governance_result_postcheck_failed');
   validatePublicStructuredContent(invocation.structured_content);
-  validateCounters(invocation.counters, { requireZero: true });
+  validateCounters(invocation.counters, { counterMode });
 }
 
 module.exports = {

@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Current stage: `R4-E private_chatgpt_app_zero_memory_e2e`
+Current stage: `R4-F bounded_governed_live_read_implementation`
 
 Old R3/M5 Tunnel route: `draft_paused_no_merge`
 
@@ -150,6 +150,8 @@ provider, native, fallback, or durable-mutation calls. Evidence:
 
 ## R4-E — Zero-memory ChatGPT E2E
 
+Status: `COMPLETE_PRIVATE_MANAGED_CANARY`
+
 Create or bind the private single-operator ChatGPT App and prove:
 
 - OAuth login and exact principal/resource/scope;
@@ -163,6 +165,8 @@ Create or bind the private single-operator ChatGPT App and prove:
 This stage does not prove recall, relevance, or automatic task-start use.
 
 ## R4-F — Bounded Governed Live Read
+
+Status: `IMPLEMENTATION_IN_PROGRESS_LIVE_PROOF_PENDING`
 
 This is the only R4 stage that may authorize real memory. It requires a new
 exact authorization after R4-E passes and after Jenn accepts the residual edge
@@ -183,6 +187,9 @@ Minimum proof matrix:
 
 Do not claim `automatic-first-task-call-guaranteed`; report actual call receipts
 per session.
+
+Implementation boundary and activation procedure:
+`docs/CHATGPT_WEB_R4F_BOUNDED_GOVERNED_LIVE_READ.md`.
 
 ## R4-G — Observation And Closeout
 
