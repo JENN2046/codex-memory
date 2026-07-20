@@ -53,7 +53,7 @@
         "identity_provider": { "const": "auth0" },
         "client_registration_mode": { "const": "predefined_public_client" },
         "issuer": { "$ref": "#/$defs/publicIssuer" },
-        "resource": { "$ref": "#/$defs/publicOrigin" },
+        "resource": { "$ref": "#/$defs/mcpResource" },
         "scopes": {
           "type": "array",
           "minItems": 1,
@@ -157,6 +157,11 @@
     }
   },
   "$defs": {
+    "mcpResource": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://[^@/?#]+/mcp$"
+    },
     "publicOrigin": {
       "type": "string",
       "pattern": "^(?!https://[^/?#]+:443$)https://(?!(?:[a-z0-9-]+\\.)*(?:alt|arpa|example|example\\.com|example\\.net|example\\.org|internal|invalid|local|localhost|onion|test)(?::(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?$)(?![0-9]{1,3}(?:\\.[0-9]{1,3}){3}(?::(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?::(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?$"

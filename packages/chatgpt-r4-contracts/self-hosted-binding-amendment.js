@@ -96,7 +96,6 @@ function resolveSelfHostedBindingAmendment(input) {
   exactEnv(input.oauth.auth0_jwks_uri, 'auth0_jwks_uri');
   exactEnv(input.oauth.operator_subject_fingerprint, 'operator_subject_fingerprint');
   const issuer = assertCanonicalIssuer(input.oauth.issuer);
-  const publicOrigin = assertCanonicalPublicOrigin(input.oauth.resource);
   if (!Array.isArray(input.oauth.scopes) || input.oauth.scopes.length !== 1 ||
       input.oauth.scopes[0] !== 'memory.read') reject('r4d_d2b_scopes_invalid');
 
@@ -105,8 +104,10 @@ function resolveSelfHostedBindingAmendment(input) {
     'public_origin'
   ], 'r4d_d2b_endpoints_shape_invalid');
   const endpointOrigin = assertCanonicalPublicOrigin(input.endpoints.public_origin);
-  if (endpointOrigin.origin !== publicOrigin.origin) reject('r4d_d2b_resource_origin_mismatch');
   literal(input.endpoints.mcp_path, '/mcp', 'r4d_d2b_mcp_path_invalid');
+  if (input.oauth.resource !== `${endpointOrigin.origin}${input.endpoints.mcp_path}`) {
+    reject('r4d_d2b_resource_origin_mismatch');
+  }
   literal(
     input.endpoints.protected_resource_metadata_path,
     '/.well-known/oauth-protected-resource',

@@ -43,7 +43,7 @@ function candidate() {
       identity_provider: 'auth0',
       client_registration_mode: 'predefined_public_client',
       issuer: 'https://jenn-dev.us.auth0.com/',
-      resource: 'https://memory-edge.jenn.dev',
+      resource: 'https://memory-edge.jenn.dev/mcp',
       scopes: ['memory.read'],
       pkce_method: 'S256',
       oauth_client_id: 'env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID',
@@ -167,8 +167,8 @@ test('R4-D D2B rejects reused references, placeholders, IP origins, and source p
   });
 
   const ip = candidate();
-  ip.oauth.resource = 'https://127.0.0.1';
-  ip.endpoints.public_origin = ip.oauth.resource;
+  ip.endpoints.public_origin = 'https://127.0.0.1';
+  ip.oauth.resource = `${ip.endpoints.public_origin}/mcp`;
   assert.throws(() => validateSelfHostedBindingAmendment(ip), {
     code: 'r4d_public_origin_invalid_non_public'
   });
@@ -194,10 +194,13 @@ test('R4-D D2B schema is frozen and redacted example remains activation-ineligib
   assert.equal(new RegExp(schema.$defs.sha40.pattern, 'u').test('0'.repeat(40)), false);
   assert.equal(new RegExp(schema.$defs.sha256.pattern, 'u').test(`sha256:${'f'.repeat(64)}`), false);
   const publicOrigin = new RegExp(schema.$defs.publicOrigin.pattern, 'u');
+  const mcpResource = new RegExp(schema.$defs.mcpResource.pattern, 'u');
   const publicIssuer = new RegExp(schema.$defs.publicIssuer.pattern, 'u');
   const publicDiscovery = new RegExp(schema.$defs.publicDiscovery.pattern, 'u');
   assert.equal(publicOrigin.test('https://memory.jenn.dev'), true);
   assert.equal(publicOrigin.test('https://memory.jenn.dev:65535'), true);
+  assert.equal(mcpResource.test('https://memory.jenn.dev/mcp'), true);
+  assert.equal(mcpResource.test('https://memory.jenn.dev'), false);
   assert.equal(publicIssuer.test('https://tenant.auth0.com/'), true);
   assert.equal(publicDiscovery.test('https://tenant.auth0.com/.well-known/openid-configuration'), true);
   for (const value of [

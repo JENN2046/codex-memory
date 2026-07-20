@@ -22,7 +22,7 @@ function createAuth0TokenVerifier({
   jwks
 } = {}) {
   const issuerUrl = parseCanonicalHttpsRoot(issuer, 'edge_oauth_issuer_invalid', true);
-  const audienceUrl = parseCanonicalHttpsRoot(audience, 'edge_oauth_audience_invalid', false);
+  const audienceUrl = parseCanonicalHttpsMcpResource(audience, 'edge_oauth_audience_invalid');
   const jwksUrl = parseHttpsUrl(jwksUri, 'edge_oauth_jwks_uri_invalid');
   if (jwksUrl.origin !== issuerUrl.origin || jwksUrl.pathname !== '/.well-known/jwks.json' ||
       jwksUrl.search || jwksUrl.hash) {
@@ -115,6 +115,12 @@ function parseCanonicalHttpsRoot(value, code, trailingSlashRequired) {
     reject(code);
   }
   if (trailingSlashRequired !== value.endsWith('/')) reject(code);
+  return parsed;
+}
+
+function parseCanonicalHttpsMcpResource(value, code) {
+  const parsed = parseHttpsUrl(value, code);
+  if (parsed.pathname !== '/mcp' || parsed.search || parsed.hash || parsed.href !== value) reject(code);
   return parsed;
 }
 

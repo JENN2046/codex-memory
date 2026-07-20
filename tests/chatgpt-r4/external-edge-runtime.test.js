@@ -24,6 +24,7 @@ const {
 } = require('../../apps/chatgpt-edge');
 
 const PUBLIC_ORIGIN = 'https://memory.codex-memory.dev';
+const MCP_RESOURCE = `${PUBLIC_ORIGIN}/mcp`;
 const ISSUER = 'https://tenant.codex-memory.dev/';
 const JWKS_URI = 'https://tenant.codex-memory.dev/.well-known/jwks.json';
 const OAUTH_CLIENT_ID = 'r4-private-client-id';
@@ -41,7 +42,7 @@ test('Auth0 verifier binds RS256 issuer, audience, client, scope, and single ope
   publicJwk.alg = 'RS256';
   const verifier = createAuth0TokenVerifier({
     issuer: ISSUER,
-    audience: PUBLIC_ORIGIN,
+    audience: MCP_RESOURCE,
     jwksUri: JWKS_URI,
     expectedClientId: OAUTH_CLIENT_ID,
     operatorSubjectFingerprint: OPERATOR_FINGERPRINT,
@@ -50,13 +51,13 @@ test('Auth0 verifier binds RS256 issuer, audience, client, scope, and single ope
 
   const valid = await signAccessToken(privateKey, {
     subject: OPERATOR_SUBJECT,
-    audience: PUBLIC_ORIGIN,
+    audience: MCP_RESOURCE,
     clientId: OAUTH_CLIENT_ID,
     scope: 'memory.read'
   });
   const accepted = await verifier(valid);
   assert.equal(accepted.issuer, ISSUER);
-  assert.equal(accepted.audience, PUBLIC_ORIGIN);
+  assert.equal(accepted.audience, MCP_RESOURCE);
   assert.equal(accepted.clientId, OAUTH_CLIENT_ID);
   assert.equal(accepted.subjectFingerprint, OPERATOR_FINGERPRINT);
   assert.deepEqual(accepted.scopes, ['memory.read']);
@@ -64,13 +65,13 @@ test('Auth0 verifier binds RS256 issuer, audience, client, scope, and single ope
   for (const mutation of [
     { subject: 'auth0|other-operator' },
     { audience: 'https://other.codex-memory.dev' },
-    { audience: [PUBLIC_ORIGIN, 'https://other.codex-memory.dev'] },
+    { audience: [MCP_RESOURCE, 'https://other.codex-memory.dev'] },
     { clientId: 'other-client-id' },
     { scope: 'openid' }
   ]) {
     const token = await signAccessToken(privateKey, {
       subject: OPERATOR_SUBJECT,
-      audience: PUBLIC_ORIGIN,
+      audience: MCP_RESOURCE,
       clientId: OAUTH_CLIENT_ID,
       scope: 'memory.read',
       ...mutation
@@ -108,7 +109,7 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
       });
       return {
         issuer: ISSUER,
-        audience: PUBLIC_ORIGIN,
+        audience: MCP_RESOURCE,
         clientId: OAUTH_CLIENT_ID,
         subjectFingerprint: OPERATOR_FINGERPRINT,
         scopes: ['memory.read'],
@@ -131,7 +132,7 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   const prmd = await edgeRequest(address, 'GET', '/.well-known/oauth-protected-resource');
   assert.equal(prmd.statusCode, 200);
   assert.deepEqual(prmd.body, {
-    resource: PUBLIC_ORIGIN,
+    resource: MCP_RESOURCE,
     authorization_servers: [ISSUER],
     scopes_supported: ['memory.read'],
     bearer_methods_supported: ['header'],
@@ -142,7 +143,10 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   assert.deepEqual(pathAwarePrmd.body, prmd.body);
   const unauthenticated = await mcpRequest(address, initializeRequest(1), null);
   assert.equal(unauthenticated.statusCode, 401);
-  assert.match(unauthenticated.headers['www-authenticate'], /resource_metadata=/u);
+  assert.match(
+    unauthenticated.headers['www-authenticate'],
+    /resource_metadata="https:\/\/memory\.codex-memory\.dev\/\.well-known\/oauth-protected-resource\/mcp"/u
+  );
   assert.match(unauthenticated.headers['www-authenticate'], /scope="memory\.read"/u);
   assert.match(unauthenticated.headers['www-authenticate'], /error="invalid_request"/u);
   assert.match(unauthenticated.headers['www-authenticate'], /error_description="OAuth authorization is required\."/u);
@@ -287,7 +291,7 @@ test('external Edge fails closed on proxy, OAuth, relay signature, and nonzero c
     async verifyAccessToken() {
       return {
         issuer: ISSUER,
-        audience: PUBLIC_ORIGIN,
+        audience: MCP_RESOURCE,
         clientId: OAUTH_CLIENT_ID,
         subjectFingerprint: OPERATOR_FINGERPRINT,
         scopes: ['memory.read'],

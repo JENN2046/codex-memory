@@ -22,7 +22,7 @@ const EXAMPLE_PATH = path.join(
   'chatgpt-web-r4d-oauth-runtime-preflight.redacted.example.json'
 );
 const DOC_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4D_EXTERNAL_RUNTIME_PREFLIGHT.md');
-const EXPECTED_SCHEMA_SHA256 = 'a4e2802cb8f9a3fcbb73a2027f4b3686e1494a9c494a7533f5799603b2d7f429';
+const EXPECTED_SCHEMA_SHA256 = '3a52ec5d2fb52688c4b8fd5f074809c43826d7c96af8b18477aadfc06b023878';
 
 const ENV_REFERENCE_NAMES = Object.freeze([
   'CODEX_MEMORY_R4_OPERATOR_REFERENCE',

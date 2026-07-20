@@ -6,6 +6,7 @@ const { reject } = require('./errors');
 
 const STAGE = 'R4-D';
 const REQUIRED_SCOPE = 'memory.read';
+const MCP_PATH = '/mcp';
 const PUBLIC_ORIGIN_PATTERN = /^https:\/\/[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?(?::[1-9][0-9]{0,4})?$/u;
 const ENV_REFERENCE_PATTERN = /^env:[A-Z][A-Z0-9_]{2,119}$/u;
 const SHA40_PATTERN = /^[a-f0-9]{40}$/u;
@@ -167,7 +168,7 @@ function validateOwnership(value) {
   );
 }
 
-function validateOAuth(value, publicOrigin) {
+function validateOAuth(value, mcpResource) {
   assertExactKeys(value, [
     'anonymous_access', 'audience_claim_required', 'client_registration_mode',
     'identity_provider', 'issuer', 'pkce_method', 'resource',
@@ -190,7 +191,7 @@ function validateOAuth(value, publicOrigin) {
     reject('r4d_scopes_invalid');
   }
   assertCanonicalIssuer(value.issuer);
-  if (value.resource !== publicOrigin) reject('r4d_resource_audience_mismatch');
+  if (value.resource !== mcpResource) reject('r4d_resource_audience_mismatch');
 }
 
 function validateEndpoints(value, publicOrigin, issuer) {
@@ -200,7 +201,7 @@ function validateEndpoints(value, publicOrigin, issuer) {
   ], 'r4d_endpoints_shape_invalid');
   assertCanonicalPublicOrigin(value.public_origin);
   if (value.public_origin !== publicOrigin) reject('r4d_public_origin_mismatch');
-  assertLiteral(value.mcp_path, '/mcp', 'r4d_mcp_path_invalid');
+  assertLiteral(value.mcp_path, MCP_PATH, 'r4d_mcp_path_invalid');
   assertLiteral(
     value.protected_resource_metadata_path,
     '/.well-known/oauth-protected-resource',
@@ -319,7 +320,8 @@ function validateExternalOAuthRuntimePreflight(input) {
   validateOwnership(input.ownership);
   const publicOrigin = assertCanonicalPublicOrigin(input.endpoints?.public_origin);
   const issuer = assertCanonicalIssuer(input.oauth?.issuer);
-  validateOAuth(input.oauth, publicOrigin.origin);
+  const mcpResource = `${publicOrigin.origin}${MCP_PATH}`;
+  validateOAuth(input.oauth, mcpResource);
   validateEndpoints(input.endpoints, publicOrigin.origin, issuer);
   validateCredentialReferences(input.credential_references);
   validateRuntime(input.runtime);

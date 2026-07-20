@@ -80,15 +80,17 @@ pieces used by this preflight:
 The frozen paths are:
 
 ```text
-MCP:   /mcp
-PRMD:  /.well-known/oauth-protected-resource
+MCP:            /mcp
+canonical PRMD: /.well-known/oauth-protected-resource/mcp
+compat PRMD:    /.well-known/oauth-protected-resource
 OIDC:  <issuer>/.well-known/openid-configuration
 scope: memory.read
 ```
 
-The canonical protected-resource identifier is the exact public HTTPS origin,
-without `/mcp`, query, fragment, credentials, localhost, or IP literal. The same
-value must be the token audience/resource binding.
+The canonical protected-resource identifier is the exact public HTTPS origin
+plus `/mcp`, without a query, fragment, credentials, localhost, or IP literal.
+The same value must be the token audience/resource binding. The origin-only
+well-known route remains a compatibility alias for the same path-bound metadata.
 
 ## Preflight Contract
 

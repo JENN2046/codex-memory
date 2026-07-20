@@ -44,7 +44,8 @@ The external process contains only:
   plus explicit missing-token, invalid-token, and insufficient-scope error
   classes;
 - Auth0 RS256/JWKS verification bound to exact issuer, resource/audience,
-  predefined public client, `memory.read`, and one operator fingerprint;
+  predefined public client, `memory.read`, and one operator fingerprint, where
+  the canonical resource is the public origin plus `/mcp`;
 - five read-only data tools and one render-only scope tool;
 - immutable `text/html;profile=mcp-app` scope resource;
 - bounded in-memory request broker and authenticated outbound Relay endpoints;

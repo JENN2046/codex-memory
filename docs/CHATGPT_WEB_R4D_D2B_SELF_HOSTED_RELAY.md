@@ -75,7 +75,7 @@ private single operator
   -> host-loopback publish only
   -> separate reverse-proxy vhost
   -> exact Auth0 predefined public client / PKCE S256
-  -> exact resource == public origin
+  -> exact resource == public origin + /mcp
   -> outbound HTTPS Relay -> local UDS
 ```
 

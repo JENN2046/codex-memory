@@ -21,7 +21,7 @@
     "identity_provider": "auth0",
     "client_registration_mode": "predefined_public_client",
     "issuer": "https://tenant.example.invalid/",
-    "resource": "https://edge.example.invalid",
+    "resource": "https://edge.example.invalid/mcp",
     "scopes": ["memory.read"],
     "pkce_method": "S256",
     "oauth_client_id": "env:CODEX_MEMORY_R4_OAUTH_CLIENT_ID",
