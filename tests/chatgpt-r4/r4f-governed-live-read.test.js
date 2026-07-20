@@ -143,6 +143,7 @@ function delegatedResult({ statement = 'Memory signal 1: bounded recall current-
           providerApiCalled: true,
           memoryReadPerformed: true,
           memoryWritePerformed: false,
+          durableWritePerformed: false,
           primaryMemoryStoreWritePerformed: false,
           derivedIndexWritePerformed: false,
           authorizationResolvedBeforeProvider: true,
@@ -154,7 +155,11 @@ function delegatedResult({ statement = 'Memory signal 1: bounded recall current-
           mappingDigestBound: true,
           allowedDiaryCount: 1,
           rawDiaryNamesReturned: false,
-          rawMemoryContentDisclosed: false
+          rawRuntimeOutputDisclosed: false,
+          rawMemoryContentDisclosed: false,
+          runtimeLocatorDisclosed: false,
+          tokenMaterialDisclosed: false,
+          readinessClaimed: false
         }
       }
     }
@@ -314,6 +319,40 @@ test('R4-F validates bounded projections for every governed read tool', async ()
   }
   assert.equal(calls.length, 4);
   assert.equal(calls.every(call => call.requestContext.executionContext.clientId === 'Codex'), true);
+});
+
+test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async () => {
+  const mappingState = loadDiaryScopeMapping({ mapping: mapping() });
+  const trustedScope = {
+    clientId: 'ChatGPT',
+    projectId: 'project-alpha',
+    workspaceId: 'workspace-alpha',
+    visibilityAllowlist: ['project'],
+    mappingReference: mappingState.mappingReference,
+    mappingDigest: mappingState.mappingDigest
+  };
+  const mutations = [
+    result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.memoryWritePerformed; },
+    result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.rawMemoryContentDisclosed; },
+    result => { delete result.receipt.nativeInvocationReceipt.rawRequestBodyDisclosed; },
+    result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.providerApiCalled; },
+    result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.derivedIndexWritePerformed; }
+  ];
+  for (const mutate of mutations) {
+    const malformed = delegatedResult();
+    mutate(malformed);
+    const invoke = createGovernedLiveReadInvoker({
+      mappingState,
+      resolveDiaryRead: resolveRead,
+      async callGovernedTool() { return malformed; }
+    });
+    await assert.rejects(invoke({
+      toolName: 'search_memory',
+      arguments: { query: 'bounded', limit: 1 },
+      trustedScope,
+      projectContextRef: 'pctx_malformed_evidence_xxxxxxxxxxxxxxxxxxxxx'
+    }), { code: 'r4_live_read_native_receipt_invalid' });
+  }
 });
 
 test('R4-F resolves an explicit project then returns a bounded live read through signed Relay response', async () => {
@@ -617,6 +656,27 @@ test('R4-F UDS requires owner-only parent and never logs frames', async t => {
     governanceRuntime: { handle() {} }
   }), { code: 'r4_governance_uds_parent_security_invalid' });
   fs.rmSync(unsafe, { recursive: true, force: true });
+});
+
+test('R4-F UDS closes a bound listener when owner-only chmod fails', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4f-uds-chmod-'));
+  fs.chmodSync(root, 0o700);
+  const socketPath = path.join(root, 'governance.sock');
+  const first = createGovernanceUdsServer({
+    socketPath,
+    governanceRuntime: { async handle() { return { accepted: true }; } },
+    chmodSync() { throw new Error('synthetic chmod failure'); }
+  });
+  await assert.rejects(first.start(), /synthetic chmod failure/u);
+  assert.equal(first.snapshot().started, false);
+
+  const second = createGovernanceUdsServer({
+    socketPath,
+    governanceRuntime: { async handle() { return { accepted: true }; } }
+  });
+  await second.start();
+  await second.stop();
+  fs.rmSync(root, { recursive: true, force: true });
 });
 
 test('R4-F runtime authority is default-off and loads only owner-only exact bindings', async t => {

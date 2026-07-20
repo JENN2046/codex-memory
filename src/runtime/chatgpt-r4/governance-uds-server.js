@@ -139,7 +139,13 @@ function createGovernanceUdsServer({
         server.once('listening', onListening);
         server.listen(socketPath);
       });
-      chmodSync(socketPath, 0o600);
+      try {
+        chmodSync(socketPath, 0o600);
+      } catch (error) {
+        for (const socket of openSockets) socket.destroy();
+        await new Promise(resolve => server.close(() => resolve()));
+        throw error;
+      }
       started = true;
       return Object.freeze({ started: true, owner_only_socket: true });
     },

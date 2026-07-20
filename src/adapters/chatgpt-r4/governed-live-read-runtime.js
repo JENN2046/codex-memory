@@ -174,14 +174,19 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
   const invocation = receipt?.nativeInvocationReceipt;
   const runtime = invocation?.nativeRuntimeReceipt;
   if (!isPlainObject(receipt) || !isPlainObject(invocation) || !isPlainObject(runtime) ||
-      result?.access?.localMemoryFallbackUsed === true ||
+      result?.access?.localMemoryFallbackUsed !== false ||
       invocation.invocationBindingMatched !== true ||
       invocation.governanceMetadataSent !== true ||
+      invocation.rawRequestBodyDisclosed !== false ||
+      invocation.rawResponseBodyDisclosed !== false ||
       runtime.present !== true ||
       runtime.nativeRuntimeCalled !== true ||
+      typeof runtime.providerApiCalled !== 'boolean' ||
+      typeof runtime.derivedIndexWritePerformed !== 'boolean' ||
       runtime.memoryReadPerformed !== true ||
-      runtime.memoryWritePerformed === true ||
-      runtime.primaryMemoryStoreWritePerformed === true ||
+      runtime.memoryWritePerformed !== false ||
+      runtime.durableWritePerformed !== false ||
+      runtime.primaryMemoryStoreWritePerformed !== false ||
       runtime.authorizationResolvedBeforeProvider !== true ||
       runtime.diaryAllowlistEnforcedBeforeIndexLoad !== true ||
       runtime.diaryAllowlistEnforcedBeforeVectorSearch !== true ||
@@ -191,9 +196,11 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       runtime.mappingDigestBound !== true ||
       runtime.allowedDiaryCount !== expectedAllowedDiaryCount ||
       runtime.rawDiaryNamesReturned !== false ||
-      runtime.rawMemoryContentDisclosed === true ||
-      invocation.rawRequestBodyDisclosed === true ||
-      invocation.rawResponseBodyDisclosed === true ||
+      runtime.rawRuntimeOutputDisclosed !== false ||
+      runtime.rawMemoryContentDisclosed !== false ||
+      runtime.runtimeLocatorDisclosed !== false ||
+      runtime.tokenMaterialDisclosed !== false ||
+      runtime.readinessClaimed !== false ||
       receipt.localAuditReceipt?.appended !== true) {
     reject('r4_live_read_native_receipt_invalid');
   }
