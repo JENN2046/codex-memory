@@ -402,7 +402,7 @@ test('R4-G runtime denies before provider, permits one bounded read, then consum
   assert.match(fixture.runtime.snapshot().receipt_chains[0].activation, /^sha256:[a-f0-9]{64}$/u);
 });
 
-test('R4-G suppresses an in-flight read result when the operator kill switch fires', async () => {
+test('R4-G suppresses an in-flight kill and finalizes a failed native invocation', async () => {
   let releaseProvider;
   let providerStarted;
   const started = new Promise(resolve => { providerStarted = resolve; });
@@ -456,6 +456,48 @@ test('R4-G suppresses an in-flight read result when the operator kill switch fir
   ));
   assert.equal(fixture.controller.snapshot().suppressed_read_count, 1);
   assert.equal(fixture.controller.snapshot().read_in_flight, false);
+
+  const failing = createRuntimeFixture({
+    async callGovernedTool() {
+      throw Object.assign(new Error('synthetic native failure'), {
+        code: 'synthetic_native_failure'
+      });
+    }
+  });
+  failing.controller.activate({
+    requestId: 'op_r4g_failing_activation_000001',
+    requestedVisibility: 'project',
+    ttlSeconds: 300,
+    now: NOW
+  });
+  const failingResolveRequest = requestFixture(
+    failing.edge,
+    failing.principal,
+    'resolve_memory_context',
+    { project_alias: 'project-alpha', requested_visibility: 'project' },
+    30
+  );
+  const failingResolved = await failing.runtime.handle({
+    request: failingResolveRequest,
+    relayReceipt: relayReceipt(failingResolveRequest)
+  });
+  const failingSearchRequest = requestFixture(failing.edge, failing.principal, 'search_memory', {
+    project_context_ref: failingResolved.structured_content.project_context_ref,
+    query: 'bounded project signal',
+    limit: 1
+  }, 31);
+  await assert.rejects(() => failing.runtime.handle({
+    request: failingSearchRequest,
+    relayReceipt: relayReceipt(failingSearchRequest)
+  }), { code: 'synthetic_native_failure' });
+  assert.equal(failing.controller.snapshot().activation_status, 'consumed');
+  assert.equal(failing.controller.snapshot().read_in_flight, false);
+  assert.doesNotThrow(() => failing.controller.activate({
+    requestId: 'op_r4g_replacement_activation_0001',
+    requestedVisibility: 'project',
+    ttlSeconds: 30,
+    now: NOW
+  }));
 });
 
 test('R4-G owner-only control UDS supports bounded activate/status/kill and replay safety', async t => {

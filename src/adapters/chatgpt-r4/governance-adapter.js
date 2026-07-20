@@ -107,19 +107,24 @@ function createGovernanceAdapter({
         mappingReference: claim.mapping_reference,
         mappingDigest: claim.mapping_digest
       });
-      const invocation = await invokeGovernance({
-        toolName,
-        arguments: stripContextReference(request.tool_request.arguments),
-        trustedScope,
-        principalFingerprint,
-        projectContextRef: contextRef,
-        activationReceiptDigest: activation?.receipt_digest || null
-      });
-      validateGovernanceInvocation(invocation, { counterMode });
-      const completion = activation ? finalizeContextUse({
-        useToken: activation.use_token,
-        now: clock()
-      }) : null;
+      let invocation;
+      let completion = null;
+      try {
+        invocation = await invokeGovernance({
+          toolName,
+          arguments: stripContextReference(request.tool_request.arguments),
+          trustedScope,
+          principalFingerprint,
+          projectContextRef: contextRef,
+          activationReceiptDigest: activation?.receipt_digest || null
+        });
+        validateGovernanceInvocation(invocation, { counterMode });
+      } finally {
+        completion = activation ? finalizeContextUse({
+          useToken: activation.use_token,
+          now: clock()
+        }) : null;
+      }
       const responseSuppressed = completion && completion.accepted !== true;
       return buildReadResult({
         relayReceipt,

@@ -76,6 +76,9 @@ search counters. If expiry or kill occurs after provider execution starts,
 Governance rechecks the lease after the native call. It keeps the actual
 provider/native/derived-index/audit counters, replaces the result with an empty
 low-disclosure `unavailable` projection, and does not forward the memory result.
+Provider/native or receipt-validation failures also finalize and consume the
+authorized lease before the error propagates, so a failed invocation cannot
+hold `read_in_flight` until TTL or block a replacement operator session.
 
 Default-closed requests use a separate bounded 128-attempt process retry
 budget. They never consume the legacy 20-call authorized runtime budget, so
