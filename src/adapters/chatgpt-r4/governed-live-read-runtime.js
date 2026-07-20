@@ -228,10 +228,14 @@ function countersFromEvidence(evidence) {
 }
 
 function assertNoMappingDisclosure(value, mappingState) {
-  const forbidden = mappingState.mapping.entries.flatMap(entry => [
+  const forbidden = [
+    mappingState.mappingReference,
+    mappingState.mappingDigest,
+    ...mappingState.mapping.entries.flatMap(entry => [
     entry.diaryName,
     entry.partitionReference
-  ]).filter(Boolean).map(item => item.normalize('NFKC').toLocaleLowerCase('en-US'));
+    ])
+  ].filter(Boolean).map(item => item.normalize('NFKC').toLocaleLowerCase('en-US'));
   const strings = [];
   (function collect(candidate) {
     if (typeof candidate === 'string') strings.push(candidate);

@@ -393,6 +393,33 @@ test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async
   }
 });
 
+test('R4-F rejects mapping reference and digest disclosure in native summaries', async () => {
+  const mappingState = loadDiaryScopeMapping({ mapping: mapping() });
+  const trustedScope = {
+    clientId: 'ChatGPT',
+    projectId: 'project-alpha',
+    workspaceId: 'workspace-alpha',
+    visibilityAllowlist: ['project'],
+    mappingReference: mappingState.mappingReference,
+    mappingDigest: mappingState.mappingDigest
+  };
+  for (const leakedValue of [mappingState.mappingReference, mappingState.mappingDigest]) {
+    const invoke = createGovernedLiveReadInvoker({
+      mappingState,
+      resolveDiaryRead: resolveRead,
+      async callGovernedTool() {
+        return delegatedResult({ statement: `Bound value ${leakedValue}` });
+      }
+    });
+    await assert.rejects(invoke({
+      toolName: 'search_memory',
+      arguments: { query: 'bounded', limit: 1 },
+      trustedScope,
+      projectContextRef: 'pctx_mapping_disclosure_xxxxxxxxxxxxxxxxx'
+    }), { code: 'r4_live_read_mapping_disclosure_forbidden' });
+  }
+});
+
 test('R4-F resolves an explicit project then returns a bounded live read through signed Relay response', async () => {
   const edge = identity('r4f-edge');
   const context = identity('r4f-context');
@@ -814,5 +841,20 @@ test('R4-F runtime authority is default-off and loads only owner-only exact bind
   assert.equal(initialized, 1);
   await runtime.stop();
   assert.equal(closed, 1);
+
+  const ipv6Environment = {
+    ...environment,
+    CODEX_MEMORY_R4_NATIVE_HTTP_ENDPOINT: 'http://[::1]:7615/mcp/vcp-native'
+  };
+  ipv6Environment.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST =
+    computeGovernanceRuntimeBindingDigest(ipv6Environment);
+  const ipv6Runtime = await loadGovernanceRuntimeFromEnvironment(ipv6Environment, {
+    privateRoot: root,
+    appFactory
+  });
+  await ipv6Runtime.start();
+  await ipv6Runtime.stop();
+  assert.equal(initialized, 2);
+  assert.equal(closed, 2);
   fs.rmSync(root, { recursive: true, force: true });
 });

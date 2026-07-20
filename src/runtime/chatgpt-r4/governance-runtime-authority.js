@@ -183,7 +183,7 @@ function validateLoopbackEndpoint(value) {
   } catch {
     reject('r4_governance_native_endpoint_invalid');
   }
-  if (parsed.protocol !== 'http:' || !['127.0.0.1', '::1', 'localhost'].includes(parsed.hostname) ||
+  if (parsed.protocol !== 'http:' || !['127.0.0.1', '::1', '[::1]', 'localhost'].includes(parsed.hostname) ||
       parsed.username || parsed.password || parsed.search || parsed.hash) {
     reject('r4_governance_native_endpoint_invalid');
   }
