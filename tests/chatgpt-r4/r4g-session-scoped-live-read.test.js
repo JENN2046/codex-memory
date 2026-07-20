@@ -312,6 +312,42 @@ test('R4-G activation controller is default-closed, one-shot, killable, and ephe
   assert.equal(controller.snapshot().activation_status, 'expired');
   assert.equal(controller.snapshot().expiry_count, 1);
   assert.equal(controller.snapshot().suppressed_read_count, 1);
+
+  controller.activate({
+    requestId: 'op_abcdefghijklmnopqrstuvwxyz012349',
+    requestedVisibility: 'project',
+    ttlSeconds: 30,
+    now
+  });
+  assert.equal(controller.authorizeContextIssue({
+    principalFingerprint,
+    safeProjectAlias: 'project-alpha',
+    requestedVisibility: 'project',
+    now
+  }).accepted, true);
+  controller.bindContext({ projectContextRef: 'pctx_abcdefghijklmnopqrstuvwxyz123458', now });
+  const replacementRaceRead = controller.authorizeRead({
+    principalFingerprint,
+    projectContextRef: 'pctx_abcdefghijklmnopqrstuvwxyz123458',
+    toolName: 'search_memory',
+    now
+  });
+  controller.kill({ reason: 'emergency_stop', now });
+  controller.activate({
+    requestId: 'op_abcdefghijklmnopqrstuvwxyz012350',
+    requestedVisibility: 'project',
+    ttlSeconds: 30,
+    now
+  });
+  assert.equal(controller.snapshot().read_in_flight, true);
+  const replacedCompletion = controller.completeRead({
+    useToken: replacementRaceRead.use_token,
+    now
+  });
+  assert.equal(replacedCompletion.accepted, false);
+  assert.equal(replacedCompletion.status, 'killed');
+  assert.equal(controller.snapshot().activation_status, 'active');
+  assert.equal(controller.snapshot().read_in_flight, false);
 });
 
 test('R4-G counter mode preserves bounded live-read maxima without changing zero-memory', () => {
@@ -439,6 +475,13 @@ test('R4-G suppresses an in-flight kill and finalizes a failed native invocation
   await started;
   fixture.controller.kill({ reason: 'emergency_stop', now: NOW });
   assert.equal(fixture.controller.snapshot().read_in_flight, true);
+  fixture.controller.activate({
+    requestId: 'op_r4g_inflight_replacement_0001',
+    requestedVisibility: 'project',
+    ttlSeconds: 300,
+    now: NOW
+  });
+  assert.equal(fixture.controller.snapshot().read_in_flight, true);
   releaseProvider();
   const suppressed = await pending;
   assert.equal(suppressed.status, 'unavailable');
@@ -456,6 +499,7 @@ test('R4-G suppresses an in-flight kill and finalizes a failed native invocation
   ));
   assert.equal(fixture.controller.snapshot().suppressed_read_count, 1);
   assert.equal(fixture.controller.snapshot().read_in_flight, false);
+  assert.equal(fixture.controller.snapshot().activation_status, 'active');
 
   const failing = createRuntimeFixture({
     async callGovernedTool() {

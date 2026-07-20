@@ -79,6 +79,11 @@ low-disclosure `unavailable` projection, and does not forward the memory result.
 Provider/native or receipt-validation failures also finalize and consume the
 authorized lease before the error propagates, so a failed invocation cannot
 hold `read_in_flight` until TTL or block a replacement operator session.
+When an operator kills and replaces a lease while the old native call is still
+running, Governance retains a bounded digest-only snapshot of the old in-flight
+lease. Its eventual suppression receipt binds to that original activation;
+completion cannot consume or relabel the replacement lease. At most eight such
+in-flight snapshots can be retained by the controller.
 
 Default-closed requests use a separate bounded 128-attempt process retry
 budget. They never consume the legacy 20-call authorized runtime budget, so

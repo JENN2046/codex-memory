@@ -15,6 +15,7 @@ const SESSION_READ_TOOLS = Object.freeze([
 const SESSION_ACTIVATION_MIN_TTL_SECONDS = 30;
 const SESSION_ACTIVATION_MAX_TTL_SECONDS = 300;
 const SESSION_ACTIVATION_DEFAULT_TTL_SECONDS = 300;
+const MAX_RETAINED_IN_FLIGHT_READS = 8;
 const PRINCIPAL_FINGERPRINT_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 const SAFE_ALIAS_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/u;
 const CONTROL_REQUEST_ID_PATTERN = /^op_[A-Za-z0-9_-]{24,96}$/u;
@@ -37,6 +38,7 @@ function createSessionReadActivationController({
   let generation = 0;
   let lease = null;
   let expirationTimer = null;
+  const inFlightReads = new Map();
   const observations = {
     activation_count: 0,
     context_bind_count: 0,
@@ -67,6 +69,12 @@ function createSessionReadActivationController({
     lease.status = status;
     lease.terminalReason = reason;
     lease.terminalAt = now.toISOString();
+    const retainedRead = inFlightReads.get(lease.readUseTokenDigest);
+    if (retainedRead) {
+      retainedRead.status = status;
+      retainedRead.terminalReason = reason;
+      retainedRead.terminalAt = lease.terminalAt;
+    }
     if (status === 'expired') observations.expiry_count += 1;
     if (status === 'killed') observations.kill_count += 1;
   }
@@ -77,20 +85,20 @@ function createSessionReadActivationController({
     }
   }
 
-  function receiptDigest(operation, now = currentTime()) {
+  function receiptDigest(operation, now = currentTime(), sourceLease = lease) {
     expireIfNeeded(now);
     return digestObject({
       schemaVersion: 1,
       kind: 'r4_session_activation_receipt',
       operation,
-      generation,
-      status: lease?.status || 'inactive',
-      activationReferenceDigest: lease?.activationReferenceDigest || null,
-      contextBound: Boolean(lease?.contextRefDigest),
-      readInFlight: Boolean(lease?.readUseTokenDigest),
-      readConsumed: lease?.readConsumed === true,
-      expiresAt: lease?.expiresAt || null,
-      terminalReason: lease?.terminalReason || null
+      generation: sourceLease?.generation ?? generation,
+      status: sourceLease?.status || 'inactive',
+      activationReferenceDigest: sourceLease?.activationReferenceDigest || null,
+      contextBound: Boolean(sourceLease?.contextRefDigest),
+      readInFlight: Boolean(sourceLease?.readUseTokenDigest),
+      readConsumed: sourceLease?.readConsumed === true,
+      expiresAt: sourceLease?.expiresAt || null,
+      terminalReason: sourceLease?.terminalReason || null
     });
   }
 
@@ -125,6 +133,7 @@ function createSessionReadActivationController({
     generation += 1;
     const expiresAt = new Date(activatedAt.getTime() + ttlSeconds * 1000).toISOString();
     lease = {
+      generation,
       status: 'active',
       controlRequestDigest: digestObject(requestId),
       activationReferenceDigest: digestObject({ requestId, generation, expiresAt }),
@@ -217,7 +226,8 @@ function createSessionReadActivationController({
         principalFingerprint !== expectedPrincipalFingerprint ||
         !SESSION_READ_TOOLS.includes(toolName) ||
         lease.contextRefDigest !== digestObject(projectContextRef || '') ||
-        lease.readUseTokenDigest || lease.readConsumed) {
+        lease.readUseTokenDigest || lease.readConsumed ||
+        inFlightReads.size >= MAX_RETAINED_IN_FLIGHT_READS) {
       observations.denied_operation_count += 1;
       return unavailable(toolName, checkedAt);
     }
@@ -228,6 +238,17 @@ function createSessionReadActivationController({
       generation
     });
     lease.readUseTokenDigest = digestObject(useToken);
+    inFlightReads.set(lease.readUseTokenDigest, {
+      generation: lease.generation,
+      status: lease.status,
+      activationReferenceDigest: lease.activationReferenceDigest,
+      contextRefDigest: lease.contextRefDigest,
+      readUseTokenDigest: lease.readUseTokenDigest,
+      readConsumed: false,
+      expiresAt: lease.expiresAt,
+      terminalReason: lease.terminalReason,
+      terminalAt: lease.terminalAt
+    });
     observations.authorized_read_count += 1;
     return Object.freeze({
       accepted: true,
@@ -240,21 +261,30 @@ function createSessionReadActivationController({
   function completeRead({ useToken, now } = {}) {
     const completedAt = currentTime(now);
     expireIfNeeded(completedAt);
-    const tokenMatches = lease?.readUseTokenDigest === digestObject(useToken || '');
+    const tokenDigest = digestObject(useToken || '');
+    const retainedRead = inFlightReads.get(tokenDigest);
+    if (!retainedRead) {
+      observations.denied_operation_count += 1;
+      reject('r4_session_read_completion_token_invalid');
+    }
+    const tokenMatches = lease?.readUseTokenDigest === tokenDigest &&
+      lease.activationReferenceDigest === retainedRead.activationReferenceDigest;
     const matches = tokenMatches && lease.status === 'active';
     if (!matches) {
-      if (tokenMatches) lease.readUseTokenDigest = null;
+      inFlightReads.delete(tokenDigest);
+      retainedRead.readUseTokenDigest = null;
       observations.suppressed_read_count += 1;
       return Object.freeze({
         accepted: false,
-        status: lease?.status || 'inactive',
-        receipt_digest: receiptDigest('suppress_read', completedAt)
+        status: retainedRead.status,
+        receipt_digest: receiptDigest('suppress_read', completedAt, retainedRead)
       });
     }
     lease.readUseTokenDigest = null;
     lease.readConsumed = true;
     observations.completed_read_count += 1;
     terminalize('consumed', 'read_completed', completedAt);
+    inFlightReads.delete(tokenDigest);
     return Object.freeze({
       accepted: true,
       status: 'consumed',
@@ -296,7 +326,8 @@ function createSessionReadActivationController({
       active: lease?.status === 'active',
       remaining_ttl_seconds: remainingTtlSeconds,
       context_bound: Boolean(lease?.contextRefDigest),
-      read_in_flight: Boolean(lease?.readUseTokenDigest),
+      read_in_flight: inFlightReads.size > 0,
+      retained_in_flight_read_count: inFlightReads.size,
       remaining_read_calls: lease?.status === 'active' && !lease.readConsumed && !lease.readUseTokenDigest ? 1 : 0,
       durable_activation_state_written: false,
       receipt_digest: receiptDigest('status', checkedAt),
@@ -323,6 +354,7 @@ function defaultSchedule(callback, delay) {
 
 module.exports = {
   CONTROL_REQUEST_ID_PATTERN,
+  MAX_RETAINED_IN_FLIGHT_READS,
   PRINCIPAL_FINGERPRINT_PATTERN,
   SESSION_ACTIVATION_DEFAULT_TTL_SECONDS,
   SESSION_ACTIVATION_MAX_TTL_SECONDS,
