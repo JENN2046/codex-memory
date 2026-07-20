@@ -77,6 +77,12 @@ Governance rechecks the lease after the native call. It keeps the actual
 provider/native/derived-index/audit counters, replaces the result with an empty
 low-disclosure `unavailable` projection, and does not forward the memory result.
 
+Default-closed requests use a separate bounded 128-attempt process retry
+budget. They never consume the legacy 20-call authorized runtime budget, so
+platform discovery or context retries before activation cannot disable a later
+operator-authorized session. Active-session requests still consume the
+authorized budget, and both budgets fail closed independently.
+
 ## Startup-only binding
 
 R4-G uses the existing private R4-F binding plus:

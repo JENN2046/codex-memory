@@ -18,6 +18,7 @@ const R4_SESSION_SCOPED_LIVE_READ_MODE = COUNTER_MODES.sessionScopedLiveReadV1;
 const NATIVE_SHARED_READ_CLIENT_ID = 'Codex';
 const MAX_CONTEXTS = 1024;
 const MAX_AUTHORIZED_TOOL_CALLS = 20;
+const MAX_INACTIVE_REQUEST_ATTEMPTS = 128;
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -405,6 +406,8 @@ function createR4GovernanceRuntime({
   }
   const observations = {
     request_attempts: 0,
+    authorized_request_attempts: 0,
+    inactive_request_attempts: 0,
     completed_requests: 0,
     denied_requests: 0,
     unavailable_requests: 0,
@@ -451,8 +454,18 @@ function createR4GovernanceRuntime({
   });
   return Object.freeze({
     async handle(payload) {
-      if (observations.request_attempts >= MAX_AUTHORIZED_TOOL_CALLS) {
-        reject('r4_governance_authorized_call_budget_exhausted');
+      const inactiveSessionRequest = activationController &&
+        activationController.snapshot().active !== true;
+      if (inactiveSessionRequest) {
+        if (observations.inactive_request_attempts >= MAX_INACTIVE_REQUEST_ATTEMPTS) {
+          reject('r4_governance_inactive_request_budget_exhausted');
+        }
+        observations.inactive_request_attempts += 1;
+      } else {
+        if (observations.authorized_request_attempts >= MAX_AUTHORIZED_TOOL_CALLS) {
+          reject('r4_governance_authorized_call_budget_exhausted');
+        }
+        observations.authorized_request_attempts += 1;
       }
       observations.request_attempts += 1;
       const result = await adapter.handle(payload);
@@ -494,7 +507,10 @@ function createR4GovernanceRuntime({
     snapshot: () => Object.freeze({
       ...contextAuthority.snapshot(),
       request_attempts: observations.request_attempts,
+      authorized_request_attempts: observations.authorized_request_attempts,
+      inactive_request_attempts: observations.inactive_request_attempts,
       max_authorized_tool_calls: MAX_AUTHORIZED_TOOL_CALLS,
+      max_inactive_request_attempts: MAX_INACTIVE_REQUEST_ATTEMPTS,
       completed_requests: observations.completed_requests,
       denied_requests: observations.denied_requests,
       unavailable_requests: observations.unavailable_requests,
@@ -516,6 +532,7 @@ module.exports = {
   R4_SESSION_SCOPED_LIVE_READ_MODE,
   NATIVE_SHARED_READ_CLIENT_ID,
   MAX_AUTHORIZED_TOOL_CALLS,
+  MAX_INACTIVE_REQUEST_ATTEMPTS,
   buildNativeRequest,
   countersFromEvidence,
   createContextAuthority,

@@ -351,6 +351,20 @@ test('R4-G runtime denies before provider, permits one bounded read, then consum
   assert.equal(inactive.status, 'unavailable');
   assert.deepEqual(inactive.counters, ZERO_MEMORY_COUNTERS);
   assert.equal(providerCalls, 0);
+  for (let sequence = 6; sequence < 26; sequence += 1) {
+    const retry = requestFixture(fixture.edge, fixture.principal, 'resolve_memory_context', {
+      project_alias: 'project-alpha',
+      requested_visibility: 'project'
+    }, sequence);
+    const retryResult = await fixture.runtime.handle({
+      request: retry,
+      relayReceipt: relayReceipt(retry)
+    });
+    assert.equal(retryResult.status, 'unavailable');
+  }
+  assert.equal(fixture.runtime.snapshot().inactive_request_attempts, 21);
+  assert.equal(fixture.runtime.snapshot().authorized_request_attempts, 0);
+  assert.equal(providerCalls, 0);
 
   fixture.controller.activate({
     requestId: 'op_r4g_runtime_activation_000001',
@@ -382,6 +396,7 @@ test('R4-G runtime denies before provider, permits one bounded read, then consum
   assert.equal(found.counters.provider_calls, 1);
   assert.equal(providerCalls, 1);
   assert.equal(fixture.controller.snapshot().activation_status, 'consumed');
+  assert.equal(fixture.runtime.snapshot().authorized_request_attempts, 2);
   assert.equal(fixture.runtime.snapshot().session_activation.completed_read_count, 1);
   assert.equal(fixture.runtime.snapshot().receipt_chains.length, 1);
   assert.match(fixture.runtime.snapshot().receipt_chains[0].activation, /^sha256:[a-f0-9]{64}$/u);
