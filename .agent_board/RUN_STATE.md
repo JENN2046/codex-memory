@@ -4,22 +4,22 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
-Current validation: `CMV-2226`.
-Current fact: D2C-D4 isolated Direct HTTPS Edge, Auth0 PKCE/operator binding, and authenticated initialize/tools-list canary pass.
-All 65 R4 tests and full hardening pass; six read-only candidate tools were discovered with zero tool/Relay/memory/provider/native/fallback/write/durable calls.
+Current task: `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch`.
+Current validation: `CMV-2227`.
+Current fact: source implements a default-closed one-shot principal/project/visibility lease, 30–300 second TTL, and owner-only UDS kill switch.
+Six focused R4-G tests and all 85 R4 tests pass; external activation/provider/memory actions are zero and the six-tool public surface is unchanged.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R4-D Direct HTTPS self-hosted Edge and exact private binding are active for one private-development operator.
+- Architecture: R4-G keeps Edge/Relay authority-free and grants live-read authority only through an in-memory local Governance lease.
 - Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
 - Candidate: the external six-tool candidate is discoverable behind OAuth but remains absent from the default local MCP surface.
-- D2C-D4 proof: exact binding, isolated container, TLS/health/PRMD, Auth0 PKCE/operator binding, initialize, and tools/list pass with zero memory/provider/native/write effects.
-- Host route: Jenn-controlled Direct HTTPS is validated; outbound Relay/local UDS and ChatGPT App remain inactive.
-- Status sync: performed locally in CM-2141; stacked PR CI/review remain delivery gates.
+- Session control: startup inactive; one exact principal/project/visibility, one context, one read, 30–300 second TTL, explicit kill, and in-flight result suppression.
+- Host route: existing private-development Direct HTTPS remains unchanged; this task performed no external binding, service, provider, or memory action.
+- Status sync: performed locally in CM-2142; PR CI/review remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 

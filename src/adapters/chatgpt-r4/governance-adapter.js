@@ -21,12 +21,19 @@ function createGovernanceAdapter({
   resolveProjectContext,
   contextReplayGuard,
   invokeGovernance,
+  authorizeContextUse = null,
+  finalizeContextUse = null,
   counterMode = COUNTER_MODES.zeroMemory,
   clock = () => new Date()
 }) {
   if (typeof issueProjectContext !== 'function') reject('context_issuer_missing');
   if (typeof resolveProjectContext !== 'function') reject('context_resolver_missing');
   if (typeof invokeGovernance !== 'function') reject('governance_invoker_missing');
+  if ((authorizeContextUse === null) !== (finalizeContextUse === null) ||
+      (authorizeContextUse !== null && typeof authorizeContextUse !== 'function') ||
+      (finalizeContextUse !== null && typeof finalizeContextUse !== 'function')) {
+    reject('session_activation_callbacks_invalid');
+  }
 
   return Object.freeze({
     async handle({ request, relayReceipt }) {
@@ -71,6 +78,26 @@ function createGovernanceAdapter({
         expiresAt: claim.expires_at
       });
 
+      const activation = authorizeContextUse?.({
+        principalFingerprint,
+        projectContextRef: contextRef,
+        toolName,
+        now
+      });
+      if (activation && activation.accepted !== true) {
+        return buildReadResult({
+          relayReceipt,
+          claim,
+          validation,
+          toolName,
+          status: 'unavailable',
+          structuredContent: unavailableStructuredContent(toolName),
+          counters: ZERO_MEMORY_COUNTERS,
+          authorizationResolvedLocally: false,
+          activationReceiptDigest: activation.receipt_digest
+        });
+      }
+
       const trustedScope = Object.freeze({
         clientId: claim.client_id,
         projectId: claim.project_id,
@@ -85,46 +112,30 @@ function createGovernanceAdapter({
         arguments: stripContextReference(request.tool_request.arguments),
         trustedScope,
         principalFingerprint,
-        projectContextRef: contextRef
+        projectContextRef: contextRef,
+        activationReceiptDigest: activation?.receipt_digest || null
       });
       validateGovernanceInvocation(invocation, { counterMode });
-
-      const contextReceipt = {
-        schema_version: 1,
-        kind: 'chatgpt_r4_context_receipt',
-        project_context_ref_digest: digestObject(contextRef),
-        principal_bound: true,
-        client_bound: claim.client_id === 'ChatGPT',
-        project_bound: true,
-        workspace_bound: true,
-        visibility_bound: true,
-        registry_reference_bound: true,
-        mapping_reference_bound: true,
-        mapping_digest_bound: true,
-        private_partition_access: false,
-        legacy_partition_access: false
-      };
-      const governanceReceipt = {
-        schema_version: 1,
-        kind: 'chatgpt_r4_governance_receipt',
-        request_digest: validation.requestDigest,
-        relay_receipt_digest: digestObject(relayReceipt),
-        context_receipt_digest: digestObject(contextReceipt),
-        tool_name: toolName,
-        authorization_resolved_locally: true,
-        tool_arguments_used_as_diary_acl: false,
-        result_scope_postcheck_passed: invocation.result_scope_postcheck_passed,
-        counters_digest: digestObject(invocation.counters)
-      };
-      return {
-        status: invocation.status,
-        structured_content: invocation.structured_content,
-        counters: { ...invocation.counters },
-        receipt_digests: {
-          governance: digestObject(governanceReceipt),
-          context: digestObject(contextReceipt)
-        }
-      };
+      const completion = activation ? finalizeContextUse({
+        useToken: activation.use_token,
+        now: clock()
+      }) : null;
+      const responseSuppressed = completion && completion.accepted !== true;
+      return buildReadResult({
+        relayReceipt,
+        claim,
+        validation,
+        toolName,
+        status: responseSuppressed ? 'unavailable' : invocation.status,
+        structuredContent: responseSuppressed
+          ? unavailableStructuredContent(toolName)
+          : invocation.structured_content,
+        counters: invocation.counters,
+        resultScopePostcheckPassed: invocation.result_scope_postcheck_passed,
+        authorizationResolvedLocally: true,
+        activationReceiptDigest: completion?.receipt_digest || activation?.receipt_digest || null,
+        responseSuppressed: Boolean(responseSuppressed)
+      });
     }
   });
 }
@@ -146,7 +157,15 @@ async function handleResolve({
   });
   if (issued && typeof issued === 'object' && !Array.isArray(issued) &&
       ['denied', 'unavailable'].includes(issued.status)) {
-    if (Object.keys(issued).length !== 1) reject('context_issue_denial_shape_invalid');
+    const keys = Object.keys(issued).sort();
+    const expected = issued.activation_receipt_digest
+      ? ['activation_receipt_digest', 'status']
+      : ['status'];
+    if (keys.length !== expected.length || keys.some((key, index) => key !== expected[index]) ||
+        (issued.activation_receipt_digest &&
+         !/^sha256:[a-f0-9]{64}$/u.test(issued.activation_receipt_digest))) {
+      reject('context_issue_denial_shape_invalid');
+    }
     return buildResolveResult({
       request,
       relayReceipt,
@@ -159,7 +178,10 @@ async function handleResolve({
         context_issued: false,
         principal_bound: true,
         private_partition_access: false,
-        legacy_partition_access: false
+        legacy_partition_access: false,
+        ...(issued.activation_receipt_digest
+          ? { activation_receipt_digest: issued.activation_receipt_digest }
+          : {})
       }
     });
   }
@@ -199,7 +221,10 @@ async function handleResolve({
     mapping_reference_bound: true,
     mapping_digest_bound: true,
     private_partition_access: false,
-    legacy_partition_access: false
+    legacy_partition_access: false,
+    ...(issued.activation_receipt_digest
+      ? { activation_receipt_digest: issued.activation_receipt_digest }
+      : {})
   };
   return buildResolveResult({
     request,
@@ -208,6 +233,82 @@ async function handleResolve({
     structuredContent,
     contextReceipt
   });
+}
+
+function buildReadResult({
+  relayReceipt,
+  claim,
+  validation,
+  toolName,
+  status,
+  structuredContent,
+  counters,
+  resultScopePostcheckPassed = true,
+  authorizationResolvedLocally,
+  activationReceiptDigest = null,
+  responseSuppressed = false
+}) {
+  validatePublicStructuredContent(structuredContent);
+  validateCounters(counters);
+  if (typeof authorizationResolvedLocally !== 'boolean') {
+    reject('governance_authorization_receipt_invalid');
+  }
+  if (activationReceiptDigest !== null &&
+      !/^sha256:[a-f0-9]{64}$/u.test(activationReceiptDigest)) {
+    reject('session_activation_receipt_invalid');
+  }
+  const contextReceipt = {
+    schema_version: 1,
+    kind: 'chatgpt_r4_context_receipt',
+    project_context_ref_digest: digestObject(claim.project_context_ref),
+    principal_bound: true,
+    client_bound: claim.client_id === 'ChatGPT',
+    project_bound: true,
+    workspace_bound: true,
+    visibility_bound: true,
+    registry_reference_bound: true,
+    mapping_reference_bound: true,
+    mapping_digest_bound: true,
+    private_partition_access: false,
+    legacy_partition_access: false,
+    ...(activationReceiptDigest ? { activation_receipt_digest: activationReceiptDigest } : {})
+  };
+  const governanceReceipt = {
+    schema_version: 1,
+    kind: 'chatgpt_r4_governance_receipt',
+    request_digest: validation.requestDigest,
+    relay_receipt_digest: digestObject(relayReceipt),
+    context_receipt_digest: digestObject(contextReceipt),
+    tool_name: toolName,
+    authorization_resolved_locally: authorizationResolvedLocally,
+    tool_arguments_used_as_diary_acl: false,
+    result_scope_postcheck_passed: resultScopePostcheckPassed,
+    response_suppressed_after_activation_recheck: responseSuppressed,
+    counters_digest: digestObject(counters),
+    ...(activationReceiptDigest ? { activation_receipt_digest: activationReceiptDigest } : {})
+  };
+  return {
+    status,
+    structured_content: structuredContent,
+    counters: { ...counters },
+    receipt_digests: {
+      governance: digestObject(governanceReceipt),
+      context: digestObject(contextReceipt)
+    }
+  };
+}
+
+function unavailableStructuredContent(toolName) {
+  if (toolName === 'search_memory') {
+    return { status: 'unavailable', result_count: 0, results: [] };
+  }
+  const kind = {
+    memory_overview: 'overview',
+    audit_memory: 'audit',
+    prepare_memory_context: 'context'
+  }[toolName];
+  if (!kind) reject('session_activation_tool_invalid');
+  return { status: 'unavailable', kind, item_count: 0 };
 }
 
 function buildResolveResult({ request, relayReceipt, status, structuredContent, contextReceipt }) {

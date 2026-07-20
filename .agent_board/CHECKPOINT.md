@@ -4,13 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
-Current validation: `CMV-2226`.
-Current fact: D2C-D4 isolated Direct HTTPS Edge, Auth0 PKCE/operator binding, and authenticated initialize/tools-list canary pass.
-All 65 R4 tests and full hardening pass; six read-only candidate tools were discovered with zero tool/Relay/memory/provider/native/fallback/write/durable calls.
+Current task: `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch`.
+Current validation: `CMV-2227`.
+Current fact: source implements a default-closed one-shot principal/project/visibility lease, 30–300 second TTL, and owner-only UDS kill switch.
+Six focused R4-G tests and all 85 R4 tests pass; external activation/provider/memory actions are zero and the six-tool public surface is unchanged.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch
+
+Status: `R4G_SOURCE_VALIDATED_DEFAULT_CLOSED_EXTERNAL_ACTIVATION_FALSE`
+
+- Process startup is always inactive; activation state is in-memory only.
+- The lease is bound to one operator principal, fixed project, exact visibility, one context, and one read.
+- TTL is bounded to 30–300 seconds; timeout, kill, consumption, and restart close the path.
+- Provider authorization occurs before invocation and is rechecked after native completion.
+- In-flight kill/expiry suppresses returned content while retaining truthful counters.
+- The owner-only control UDS is bounded, replay-safe, and not part of public MCP.
+- Six focused R4-G tests and all 85 R4 tests pass; external runtime, provider, and memory actions are zero.
+
+Validation: `CMV-2227`.
 
 ## CM-2141 ChatGPT Web R4-D Direct OAuth Runtime Canary
 

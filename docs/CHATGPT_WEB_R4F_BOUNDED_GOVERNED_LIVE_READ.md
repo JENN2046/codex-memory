@@ -106,6 +106,11 @@ Rollback does not touch memory:
 4. keep the startup-only mapping, registry, and proof artifact private;
 5. verify health and the zero-memory contract before any later retry.
 
+R4-G replaces this per-session public configuration switch with a default-
+closed local one-shot lease and kill switch. See
+`docs/CHATGPT_WEB_R4G_SESSION_SCOPED_LIVE_READ.md`. R4-F remains the bounded
+read data path; R4-G controls when one session may enter it.
+
 ## Validation before activation
 
 The source gate covers:

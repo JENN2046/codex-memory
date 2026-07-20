@@ -364,7 +364,7 @@ function validateCounters(counters, {
       reject('zero_memory_counter_nonzero');
     }
     if (
-      counterMode === COUNTER_MODES.governedLiveReadV1 &&
+      [COUNTER_MODES.governedLiveReadV1, COUNTER_MODES.sessionScopedLiveReadV1].includes(counterMode) &&
       counters[key] > GOVERNED_LIVE_READ_COUNTER_MAXIMUMS[key]
     ) {
       reject('governed_live_read_counter_out_of_bounds');

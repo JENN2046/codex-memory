@@ -48,7 +48,8 @@ const ZERO_MEMORY_COUNTERS = Object.freeze(Object.fromEntries(
 
 const COUNTER_MODES = Object.freeze({
   zeroMemory: 'zero_memory',
-  governedLiveReadV1: 'governed_live_read_v1'
+  governedLiveReadV1: 'governed_live_read_v1',
+  sessionScopedLiveReadV1: 'session_scoped_live_read_v1'
 });
 
 const GOVERNED_LIVE_READ_COUNTER_MAXIMUMS = Object.freeze({

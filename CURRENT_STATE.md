@@ -8,13 +8,30 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | ChatGPT Web R4-D D2C-D4 Direct HTTPS Edge, Auth0 PKCE, operator binding, and zero-memory MCP discovery canary passed |
-| Current task | `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary` |
-| Current validation | `CMV-2226` |
-| Current route | Enter R4-E private single-operator ChatGPT App attachment and zero-memory Widget/`memory_overview` E2E |
+| Status | ChatGPT Web R4-G session-scoped live-read source is implemented and default-closed |
+| Current task | `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch` |
+| Current validation | `CMV-2227` |
+| Current route | Deliver source through PR/CI/review; external private binding and live kill-switch proof remain separately authorized |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R4-G Session-Scoped Live Read Activation
+
+R4-G replaces the manual whole-runtime mode flip with an in-memory, one-shot
+session lease owned only by local Governance. Every process start is inactive.
+The operator-only control UDS can authorize exactly one principal, the fixed
+registered project, one visibility, one context, and one bounded read for
+30–300 seconds. Consumption, timeout, explicit kill, or process restart returns
+the runtime to closed state; no activation authority is durable.
+
+Authorization is checked before provider use and again after native completion.
+If expiry or kill occurs while a read is in flight, the public result is
+suppressed while actual provider/native counters remain truthful. The six-tool
+public MCP surface is unchanged. Six focused R4-G tests and all 85 R4 tests
+pass; external binding, service activation, provider calls, and real memory
+reads/writes were not performed in this source stage. See
+`docs/CHATGPT_WEB_R4G_SESSION_SCOPED_LIVE_READ.md`.
 
 ## ChatGPT Web R4-D D2A External Edge Artifact
 
