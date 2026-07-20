@@ -79,7 +79,11 @@ function createSessionActivationControlServer({
       observations.status_commands += 1;
       response = activationController.snapshot();
     }
-    const projected = projectControlResponse(request.operation, response);
+    const projected = projectControlResponse(
+      request.operation,
+      response,
+      request.operation === 'status' ? response : activationController.snapshot()
+    );
     if (request.operation !== 'status') {
       replayReceipts.set(request.request_id, { requestDigest, response: projected });
     }
@@ -226,8 +230,8 @@ function validateControlRequest(request) {
   return request;
 }
 
-function projectControlResponse(operation, response) {
-  const snapshot = operation === 'status' ? response : null;
+function projectControlResponse(operation, response, postOperationSnapshot = response) {
+  const snapshot = postOperationSnapshot;
   const value = {
     schema_version: 1,
     operation,

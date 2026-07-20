@@ -711,6 +711,45 @@ test('R4-G owner-only control UDS supports bounded activate/status/kill and repl
     requested_visibility: 'project',
     ttl_seconds: 30
   }), { code: 'r4_session_control_mutation_budget_exhausted' });
+
+  const inflightPrincipal = sha256('r4g-inflight-kill-projection-owner');
+  const inflightController = createSessionReadActivationController({
+    expectedPrincipalFingerprint: inflightPrincipal,
+    selectedProjectAlias: 'project-alpha'
+  });
+  const inflightServer = createSessionActivationControlServer({
+    socketPath: path.join(root, 'inflight-control.sock'),
+    activationController: inflightController
+  });
+  inflightServer.handleControlRequest({
+    schema_version: 1,
+    operation: 'activate',
+    request_id: 'op_r4g_inflight_projection_activate_01',
+    requested_visibility: 'project',
+    ttl_seconds: 30
+  });
+  inflightController.authorizeContextIssue({
+    principalFingerprint: inflightPrincipal,
+    safeProjectAlias: 'project-alpha',
+    requestedVisibility: 'project'
+  });
+  inflightController.bindContext({ projectContextRef: 'pctx_inflight_projection' });
+  const inflightRead = inflightController.authorizeRead({
+    principalFingerprint: inflightPrincipal,
+    projectContextRef: 'pctx_inflight_projection',
+    toolName: 'search_memory'
+  });
+  const projectedKill = inflightServer.handleControlRequest({
+    schema_version: 1,
+    operation: 'kill',
+    request_id: 'op_r4g_inflight_projection_kill_0001',
+    reason: 'emergency_stop'
+  });
+  assert.equal(projectedKill.activation_status, 'killed');
+  assert.equal(projectedKill.context_bound, true);
+  assert.equal(projectedKill.read_in_flight, true);
+  assert.equal(projectedKill.remaining_read_calls, 0);
+  inflightController.completeRead({ useToken: inflightRead.use_token });
 });
 
 test('R4-G runtime authority binds operator/control references and starts default-closed', async t => {

@@ -135,7 +135,9 @@ reusing an ID with a different command is rejected. The process accepts at
 most 64 unique state-changing control commands; the final mutation slot is
 reserved for `kill`, so an active lease cannot make its emergency stop
 unavailable. Status checks do not consume that budget or evict mutation
-receipts.
+receipts. Mutation responses project the post-operation session snapshot, so
+a kill receipt truthfully reports any native read that remains in flight while
+its response is awaiting suppression.
 
 ## Counters and receipts
 
