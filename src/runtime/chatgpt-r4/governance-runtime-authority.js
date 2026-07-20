@@ -17,10 +17,16 @@ const { loadDiaryScopeMapping } = require('../../core/DiaryScopeMappingLoader');
 const { resolveRead } = require('../../core/DiaryScopeMapping');
 const {
   createR4GovernanceRuntime,
-  R4_LIVE_READ_MODE
+  R4_LIVE_READ_MODE,
+  R4_SESSION_SCOPED_LIVE_READ_MODE
 } = require('../../adapters/chatgpt-r4/governed-live-read-runtime');
+const {
+  PRINCIPAL_FINGERPRINT_PATTERN,
+  createSessionReadActivationController
+} = require('../../adapters/chatgpt-r4/session-read-activation');
 const { validateProjectRegistry } = require('../../adapters/chatgpt-r4/project-registry');
 const { createGovernanceUdsServer } = require('./governance-uds-server');
+const { createSessionActivationControlServer } = require('./session-activation-control-server');
 
 const DEFAULT_PRIVATE_ROOT = '/run/secrets/codex-memory-r4-governance';
 const MAX_PRIVATE_FILE_BYTES = 262_144;
@@ -142,11 +148,12 @@ function assertSafeReference(value, code) {
 }
 
 function governanceBindingPayload(environment) {
-  return {
+  const counterMode = getEnvironment(environment, 'CODEX_MEMORY_R4_COUNTER_MODE');
+  const payload = {
     schemaVersion: 1,
     bindingReference: getEnvironment(environment, 'CODEX_MEMORY_R4_GOVERNANCE_BINDING_REFERENCE'),
     rollbackReference: getEnvironment(environment, 'CODEX_MEMORY_R4_GOVERNANCE_ROLLBACK_REFERENCE'),
-    counterMode: getEnvironment(environment, 'CODEX_MEMORY_R4_COUNTER_MODE'),
+    counterMode,
     liveReadEnabled: getEnvironment(environment, 'CODEX_MEMORY_R4_GOVERNANCE_LIVE_READ_ENABLED'),
     mappingFileReference: getEnvironment(environment, 'CODEX_MEMORY_R4_DIARY_SCOPE_MAPPING_REFERENCE'),
     registryFileReference: getEnvironment(environment, 'CODEX_MEMORY_R4_PROJECT_REGISTRY_REFERENCE'),
@@ -170,6 +177,17 @@ function governanceBindingPayload(environment) {
     nativeTargetReference: getEnvironment(environment, 'CODEX_MEMORY_R4_NATIVE_TARGET_REFERENCE'),
     nativeEndpoint: getEnvironment(environment, 'CODEX_MEMORY_R4_NATIVE_HTTP_ENDPOINT')
   };
+  if (counterMode === R4_SESSION_SCOPED_LIVE_READ_MODE) {
+    payload.operatorFingerprintReference = getEnvironment(
+      environment,
+      'CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT_REFERENCE'
+    );
+    payload.controlSocketPath = getEnvironment(
+      environment,
+      'CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH'
+    );
+  }
+  return payload;
 }
 
 function computeGovernanceRuntimeBindingDigest(environment) {
@@ -216,7 +234,8 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
   realpathSync = fs.realpathSync,
   appFactory = createCodexMemoryApplication
 } = {}) {
-  if ((environment.CODEX_MEMORY_R4_COUNTER_MODE || 'zero_memory') !== R4_LIVE_READ_MODE ||
+  const counterMode = environment.CODEX_MEMORY_R4_COUNTER_MODE || 'zero_memory';
+  if (![R4_LIVE_READ_MODE, R4_SESSION_SCOPED_LIVE_READ_MODE].includes(counterMode) ||
       environment.CODEX_MEMORY_R4_GOVERNANCE_LIVE_READ_ENABLED !== 'true') {
     reject('r4_governance_live_read_disabled');
   }
@@ -292,6 +311,38 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
     { statSync, realpathSync }
   );
   if (path.dirname(socketPath) !== socketParent) reject('r4_governance_socket_path_invalid');
+  let activationController = null;
+  let controlServer = null;
+  if (counterMode === R4_SESSION_SCOPED_LIVE_READ_MODE) {
+    const expectedPrincipalFingerprint = normalizeSingleLineSecret(
+      readReference('CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT_REFERENCE')
+    );
+    if (!PRINCIPAL_FINGERPRINT_PATTERN.test(expectedPrincipalFingerprint) ||
+        /^(.)\1+$/u.test(expectedPrincipalFingerprint.slice(7))) {
+      reject('r4_governance_operator_fingerprint_invalid');
+    }
+    const controlSocketPath = getEnvironment(
+      environment,
+      'CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH'
+    );
+    const controlSocketParent = validateOwnedDirectoryWithinRoot(
+      path.dirname(controlSocketPath),
+      resolvedPrivateRoot,
+      { statSync, realpathSync }
+    );
+    if (path.dirname(controlSocketPath) !== controlSocketParent || controlSocketPath === socketPath) {
+      reject('r4_governance_control_socket_path_invalid');
+    }
+    activationController = createSessionReadActivationController({
+      expectedPrincipalFingerprint,
+      selectedProjectAlias
+    });
+    controlServer = createSessionActivationControlServer({
+      socketPath: controlSocketPath,
+      activationController,
+      statSync
+    });
+  }
 
   const nativeTargetReference = assertSafeReference(
     getEnvironment(environment, 'CODEX_MEMORY_R4_NATIVE_TARGET_REFERENCE'),
@@ -369,27 +420,47 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
     resolveDiaryRead: resolveRead,
     contextSigning: { privateKey: contextPrivateKey, keyId: contextKeyId },
     callGovernedTool: (toolName, args, requestContext) =>
-      app.callTool(toolName, args, requestContext)
+      app.callTool(toolName, args, requestContext),
+    activationController,
+    counterMode
   });
   const udsServer = createGovernanceUdsServer({ socketPath, governanceRuntime, statSync });
 
   return Object.freeze({
     async start() {
       try {
-        return await udsServer.start();
+        if (controlServer) await controlServer.start();
+        const started = await udsServer.start();
+        return Object.freeze({
+          ...started,
+          session_control_started: Boolean(controlServer),
+          default_closed: Boolean(controlServer)
+        });
       } catch (error) {
+        await controlServer?.stop().catch(() => {});
         await closeApp().catch(() => {});
         throw error;
       }
     },
     async stop() {
-      await udsServer.stop();
-      await closeApp();
+      let failure = null;
+      for (const operation of [
+        () => controlServer?.stop(),
+        () => udsServer.stop(),
+        () => closeApp()
+      ]) {
+        try {
+          await operation();
+        } catch (error) {
+          failure ||= error;
+        }
+      }
+      if (failure) throw failure;
     },
     snapshot() {
       return Object.freeze({
         activated: udsServer.snapshot().started,
-        mode: R4_LIVE_READ_MODE,
+        mode: counterMode,
         registry_bound: true,
         mapping_bound: true,
         governance_binding_bound: true,
@@ -398,6 +469,11 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
         public_write_surface_enabled: false,
         readiness_claimed: false,
         uds: udsServer.snapshot(),
+        ...(controlServer ? {
+          session_control: controlServer.snapshot(),
+          session_activation_default_closed: true,
+          session_activation_durable_state_written: false
+        } : {}),
         context: governanceRuntime.snapshot()
       });
     }

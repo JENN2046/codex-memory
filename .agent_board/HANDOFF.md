@@ -4,15 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
-Current validation: `CMV-2226`.
-Current fact: D2C-D4 isolated Direct HTTPS Edge, Auth0 PKCE/operator binding, and authenticated initialize/tools-list canary pass.
-All 65 R4 tests and full hardening pass; six read-only candidate tools were discovered with zero tool/Relay/memory/provider/native/fallback/write/durable calls.
+Current task: `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch`.
+Current validation: `CMV-2227`.
+Current fact: source implements a default-closed one-shot principal/project/visibility lease, 30–300 second TTL, and owner-only UDS kill switch.
+Six focused R4-G tests and all 85 R4 tests pass; external activation/provider/memory actions are zero and the six-tool public surface is unchanged.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2142 replaces the R4-F manual mode flip with local, in-memory session
+authority. Each start is inactive; activate grants one fixed-project context
+and one bounded read, then consumption/expiry/kill/restart closes the path.
+Authorization is checked both before provider use and after native completion,
+so an in-flight kill suppresses content while preserving truthful counters.
+The next delivery gate is PR/CI/review. Private binding and a real live
+kill-switch proof require a separate exact runtime authorization.
 
 CM-2141 completes the D2B private binding plus D2C-D4 Direct HTTPS canary. One
 isolated Edge container, dedicated TLS vhost, Auth0 exact resource/client/scope,

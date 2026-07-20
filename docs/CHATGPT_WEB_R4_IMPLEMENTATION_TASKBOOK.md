@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Current stage: `R4-F bounded_governed_live_read_implementation`
+Current stage: `R4-G session_scoped_live_read_activation_implementation`
 
 Old R3/M5 Tunnel route: `draft_paused_no_merge`
 
@@ -191,7 +191,30 @@ per session.
 Implementation boundary and activation procedure:
 `docs/CHATGPT_WEB_R4F_BOUNDED_GOVERNED_LIVE_READ.md`.
 
-## R4-G — Observation And Closeout
+## R4-G — Session-Scoped Live Read Activation And Kill Switch
+
+Status: `IMPLEMENTED_DEFAULT_CLOSED_EXTERNAL_ACTIVATION_NOT_PERFORMED`
+
+Replace per-proof public Edge environment switching with local, ephemeral
+Governance authority:
+
+- every Governance process start is inactive;
+- an owner-only local control UDS can grant one principal/project/visibility
+  lease for 30 to 300 seconds;
+- one lease can issue one `project_context_ref` and perform one governed read;
+- the lease is consumed after that read and cannot be reused;
+- expiry and explicit kill are checked before provider invocation and again
+  before returning an in-flight result;
+- activation state is never durable and restart returns to inactive;
+- the six-tool public MCP profile and schemas do not change.
+
+Implementation evidence:
+`docs/CHATGPT_WEB_R4G_SESSION_SCOPED_LIVE_READ.md`.
+
+External binding replacement, service restart, provider call, and real-memory
+verification remain separately authorized runtime actions.
+
+## R4-H — Observation And Closeout
 
 After bounded live proof:
 
@@ -222,4 +245,4 @@ core change is part of rollback.
 
 `R4-A COMPLETE` means the architecture is frozen and validated. It does not
 mean R4 is implemented. `R4 COMPLETE` requires all separately authorized stages
-through R4-G and still does not imply production/release/cutover readiness.
+through R4-H and still does not imply production/release/cutover readiness.

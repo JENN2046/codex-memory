@@ -4,13 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2141 ChatGPT Web R4-D Direct OAuth runtime canary`.
-Current validation: `CMV-2226`.
-Current fact: D2C-D4 Direct HTTPS deployment, Auth0 PKCE/operator binding, and authenticated MCP initialize/tools-list canary pass.
-All 65 R4 tests pass; six read-only candidate tools were discovered with zero tool, Relay, memory, provider, native, fallback, write, or durable-mutation calls.
+Current task: `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch`.
+Current validation: `CMV-2227`.
+Current fact: source implements an in-memory, default-closed, one-shot principal/project/visibility lease with bounded TTL and owner-only kill switch.
+Six focused R4-G tests and all 85 R4 tests pass; the six-tool public MCP surface is unchanged and no external activation, provider call, or real memory read/write occurred in this stage.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch
+
+R4-G adds a local Governance-owned session lease instead of changing the Edge
+mode for every live-read session. Startup is inactive. An owner-only UDS can
+authorize one exact principal, the runtime-bound project, one visibility, one
+context, and one read for 30–300 seconds. The lease is consumed after the read;
+timeout, explicit kill, or process restart returns the runtime to inactive.
+
+Authorization is checked before provider execution and rechecked after native
+completion. A kill or expiry during an in-flight read suppresses the content
+while retaining truthful actual counters. Activation state is never written to
+disk, the existing six public tools and schemas are unchanged, and the legacy
+R4-F path remains available only under its explicit private mode. External
+binding, service activation, provider calls, and real memory reads/writes were
+not performed. See `docs/CHATGPT_WEB_R4G_SESSION_SCOPED_LIVE_READ.md`.
 
 ## CM-2141 ChatGPT Web R4-D Direct OAuth Runtime Canary
 

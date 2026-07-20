@@ -14,9 +14,11 @@ const { createGovernanceAdapter } = require('./governance-adapter');
 const { resolveRegisteredProject, visibilityScope } = require('./project-registry');
 
 const R4_LIVE_READ_MODE = COUNTER_MODES.governedLiveReadV1;
+const R4_SESSION_SCOPED_LIVE_READ_MODE = COUNTER_MODES.sessionScopedLiveReadV1;
 const NATIVE_SHARED_READ_CLIENT_ID = 'Codex';
 const MAX_CONTEXTS = 1024;
 const MAX_AUTHORIZED_TOOL_CALLS = 20;
+const MAX_INACTIVE_REQUEST_ATTEMPTS = 128;
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -27,12 +29,18 @@ function createContextAuthority({
   mappingState,
   selectedProjectAlias,
   signing,
+  activationController = null,
   clock = () => new Date(),
   randomBytes
 }) {
   if (!registryState?.accepted || !mappingState?.accepted ||
       typeof selectedProjectAlias !== 'string' ||
-      !signing?.privateKey || typeof signing.keyId !== 'string') {
+      !signing?.privateKey || typeof signing.keyId !== 'string' ||
+      (activationController !== null &&
+       (typeof activationController.checkContextIssueAuthorization !== 'function' ||
+        typeof activationController.authorizeContextIssue !== 'function' ||
+        typeof activationController.bindContext !== 'function' ||
+        typeof activationController.checkReadAuthorization !== 'function'))) {
     reject('r4_context_authority_invalid');
   }
   const selectedProject = registryState.registry.projects.find(project =>
@@ -53,14 +61,50 @@ function createContextAuthority({
       return keyId === signing.keyId ? publicKey : null;
     },
     async issue({ principalFingerprint, safeProjectAlias, requestedVisibility, now }) {
+      const preauthorization = activationController?.checkContextIssueAuthorization({
+        principalFingerprint,
+        safeProjectAlias,
+        requestedVisibility,
+        now
+      });
+      if (preauthorization && preauthorization.accepted !== true) {
+        return {
+          status: 'unavailable',
+          activation_receipt_digest: preauthorization.receipt_digest
+        };
+      }
       const project = resolveRegisteredProject(
         registryState,
         safeProjectAlias,
         requestedVisibility
       );
-      if (!project || project.projectId !== selectedProject.projectId) return { status: 'denied' };
+      if (!project || project.projectId !== selectedProject.projectId) {
+        return activationController ? {
+          status: 'unavailable',
+          activation_receipt_digest: preauthorization.receipt_digest
+        } : { status: 'denied' };
+      }
       prune(now.getTime());
-      if (contexts.size >= MAX_CONTEXTS) return { status: 'unavailable' };
+      if (contexts.size >= MAX_CONTEXTS) {
+        return {
+          status: 'unavailable',
+          ...(preauthorization
+            ? { activation_receipt_digest: preauthorization.receipt_digest }
+            : {})
+        };
+      }
+      const activation = activationController?.authorizeContextIssue({
+        principalFingerprint,
+        safeProjectAlias,
+        requestedVisibility,
+        now
+      });
+      if (activation && activation.accepted !== true) {
+        return {
+          status: 'unavailable',
+          activation_receipt_digest: activation.receipt_digest
+        };
+      }
       const projectContextRef = createOpaqueId('pctx_', randomBytes);
       const claim = createProjectContextClaim({
         projectContextRef,
@@ -72,11 +116,17 @@ function createContextAuthority({
         mappingReference: mappingState.mappingReference,
         mappingDigest: mappingState.mappingDigest,
         now,
+        ttlSeconds: activation?.context_ttl_seconds,
         nonce: createOpaqueId('cn_', randomBytes, 18),
         signing
       });
+      const bound = activationController?.bindContext({ projectContextRef, now });
       contexts.set(projectContextRef, claim);
-      return { claim, safe_project_alias: project.safeProjectAlias };
+      return {
+        claim,
+        safe_project_alias: project.safeProjectAlias,
+        ...(bound ? { activation_receipt_digest: bound.receipt_digest } : {})
+      };
     },
     async resolve(reference) {
       prune();
@@ -291,7 +341,13 @@ function createGovernedLiveReadInvoker({
       typeof callGovernedTool !== 'function' || typeof observeNativeEvidence !== 'function') {
     reject('r4_live_read_invoker_invalid');
   }
-  return async function invoke({ toolName, arguments: args, trustedScope, projectContextRef }) {
+  return async function invoke({
+    toolName,
+    arguments: args,
+    trustedScope,
+    projectContextRef,
+    activationReceiptDigest = null
+  }) {
     if (trustedScope.clientId !== 'ChatGPT' ||
         trustedScope.mappingReference !== mappingState.mappingReference ||
         trustedScope.mappingDigest !== mappingState.mappingDigest) {
@@ -336,6 +392,7 @@ function createGovernedLiveReadInvoker({
       native_runtime_receipt_digest: digestObject(evidence.runtime),
       native_invocation_receipt_digest: digestObject(evidence.invocation),
       bridge_receipt_digest: digestObject(evidence.receipt),
+      activation_receipt_digest: activationReceiptDigest,
       allowed_diary_count: evidence.runtime.allowedDiaryCount,
       result_count: Number.isInteger(structuredContent.result_count)
         ? structuredContent.result_count
@@ -362,11 +419,21 @@ function createR4GovernanceRuntime({
   resolveDiaryRead,
   contextSigning,
   callGovernedTool,
+  activationController = null,
+  counterMode = R4_LIVE_READ_MODE,
   clock = () => new Date(),
   randomBytes
 } = {}) {
+  if ((counterMode === R4_SESSION_SCOPED_LIVE_READ_MODE) !== Boolean(activationController)) {
+    reject('r4_session_activation_mode_mismatch');
+  }
+  if (![R4_LIVE_READ_MODE, R4_SESSION_SCOPED_LIVE_READ_MODE].includes(counterMode)) {
+    reject('r4_live_read_counter_mode_invalid');
+  }
   const observations = {
     request_attempts: 0,
+    authorized_request_attempts: 0,
+    inactive_request_attempts: 0,
     completed_requests: 0,
     denied_requests: 0,
     unavailable_requests: 0,
@@ -381,6 +448,7 @@ function createR4GovernanceRuntime({
     mappingState,
     selectedProjectAlias,
     signing: contextSigning,
+    activationController,
     clock,
     randomBytes
   });
@@ -401,13 +469,32 @@ function createR4GovernanceRuntime({
         nativeEvidenceByContext.set(evidence.project_context_ref_digest, evidence);
       }
     }),
-    counterMode: R4_LIVE_READ_MODE,
+    preauthorizeContextUse: activationController
+      ? input => activationController.checkReadAuthorization(input)
+      : null,
+    authorizeContextUse: activationController
+      ? input => activationController.authorizeRead(input)
+      : null,
+    finalizeContextUse: activationController
+      ? input => activationController.completeRead(input)
+      : null,
+    counterMode,
     clock
   });
   return Object.freeze({
     async handle(payload) {
-      if (observations.request_attempts >= MAX_AUTHORIZED_TOOL_CALLS) {
-        reject('r4_governance_authorized_call_budget_exhausted');
+      const inactiveSessionRequest = activationController &&
+        activationController.snapshot().active !== true;
+      if (inactiveSessionRequest) {
+        if (observations.inactive_request_attempts >= MAX_INACTIVE_REQUEST_ATTEMPTS) {
+          reject('r4_governance_inactive_request_budget_exhausted');
+        }
+        observations.inactive_request_attempts += 1;
+      } else {
+        if (observations.authorized_request_attempts >= MAX_AUTHORIZED_TOOL_CALLS) {
+          reject('r4_governance_authorized_call_budget_exhausted');
+        }
+        observations.authorized_request_attempts += 1;
       }
       observations.request_attempts += 1;
       const result = await adapter.handle(payload);
@@ -415,8 +502,8 @@ function createR4GovernanceRuntime({
       if (result.status === 'denied') observations.denied_requests += 1;
       if (result.status === 'unavailable') observations.unavailable_requests += 1;
       const toolName = payload?.request?.tool_request?.name;
-      if (toolName !== 'resolve_memory_context' && result.status === 'ok') {
-        observations.successful_read_calls += 1;
+      if (toolName !== 'resolve_memory_context' && result.counters.native_invocations > 0) {
+        if (result.status === 'ok') observations.successful_read_calls += 1;
         const resultCount = Number(result.structured_content?.result_count ??
           result.structured_content?.item_count ?? 0);
         if (Number.isInteger(resultCount) && resultCount > 0) {
@@ -437,6 +524,9 @@ function createR4GovernanceRuntime({
           bridge: nativeEvidence.bridge_receipt_digest,
           governance: result.receipt_digests.governance,
           context: result.receipt_digests.context,
+          ...(nativeEvidence.activation_receipt_digest
+            ? { activation: nativeEvidence.activation_receipt_digest }
+            : {}),
           allowed_diary_count: nativeEvidence.allowed_diary_count,
           result_count: nativeEvidence.result_count
         }));
@@ -446,7 +536,10 @@ function createR4GovernanceRuntime({
     snapshot: () => Object.freeze({
       ...contextAuthority.snapshot(),
       request_attempts: observations.request_attempts,
+      authorized_request_attempts: observations.authorized_request_attempts,
+      inactive_request_attempts: observations.inactive_request_attempts,
       max_authorized_tool_calls: MAX_AUTHORIZED_TOOL_CALLS,
+      max_inactive_request_attempts: MAX_INACTIVE_REQUEST_ATTEMPTS,
       completed_requests: observations.completed_requests,
       denied_requests: observations.denied_requests,
       unavailable_requests: observations.unavailable_requests,
@@ -456,16 +549,19 @@ function createR4GovernanceRuntime({
       receipt_chains: Object.freeze(observations.receipt_chains.map(item => Object.freeze({ ...item }))),
       request_bodies_logged: 0,
       response_bodies_logged: 0,
-      raw_memory_persisted: false
+      raw_memory_persisted: false,
+      ...(activationController ? { session_activation: activationController.snapshot() } : {})
     }),
-    counterMode: R4_LIVE_READ_MODE
+    counterMode
   });
 }
 
 module.exports = {
   R4_LIVE_READ_MODE,
+  R4_SESSION_SCOPED_LIVE_READ_MODE,
   NATIVE_SHARED_READ_CLIENT_ID,
   MAX_AUTHORIZED_TOOL_CALLS,
+  MAX_INACTIVE_REQUEST_ATTEMPTS,
   buildNativeRequest,
   countersFromEvidence,
   createContextAuthority,
