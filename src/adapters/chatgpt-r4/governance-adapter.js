@@ -21,6 +21,7 @@ function createGovernanceAdapter({
   resolveProjectContext,
   contextReplayGuard,
   invokeGovernance,
+  preauthorizeContextUse = null,
   authorizeContextUse = null,
   finalizeContextUse = null,
   counterMode = COUNTER_MODES.zeroMemory,
@@ -29,7 +30,9 @@ function createGovernanceAdapter({
   if (typeof issueProjectContext !== 'function') reject('context_issuer_missing');
   if (typeof resolveProjectContext !== 'function') reject('context_resolver_missing');
   if (typeof invokeGovernance !== 'function') reject('governance_invoker_missing');
-  if ((authorizeContextUse === null) !== (finalizeContextUse === null) ||
+  if ((preauthorizeContextUse === null) !== (authorizeContextUse === null) ||
+      (authorizeContextUse === null) !== (finalizeContextUse === null) ||
+      (preauthorizeContextUse !== null && typeof preauthorizeContextUse !== 'function') ||
       (authorizeContextUse !== null && typeof authorizeContextUse !== 'function') ||
       (finalizeContextUse !== null && typeof finalizeContextUse !== 'function')) {
     reject('session_activation_callbacks_invalid');
@@ -62,7 +65,33 @@ function createGovernanceAdapter({
       }
 
       const contextRef = request.tool_request.arguments.project_context_ref;
+      let preauthorization = preauthorizeContextUse?.({
+        principalFingerprint,
+        toolName,
+        now
+      });
+      if (preauthorization && preauthorization.accepted !== true) {
+        return buildPreclaimUnavailableReadResult({
+          relayReceipt,
+          validation,
+          toolName,
+          activationReceiptDigest: preauthorization.receipt_digest
+        });
+      }
       const claim = await resolveProjectContext(contextRef);
+      preauthorization = preauthorizeContextUse?.({
+        principalFingerprint,
+        toolName,
+        now: clock()
+      });
+      if (preauthorization && preauthorization.accepted !== true) {
+        return buildPreclaimUnavailableReadResult({
+          relayReceipt,
+          validation,
+          toolName,
+          activationReceiptDigest: preauthorization.receipt_digest
+        });
+      }
       validateProjectContextClaim(claim, {
         now,
         resolvePublicKey: resolveContextPublicKey,
@@ -238,6 +267,52 @@ async function handleResolve({
     structuredContent,
     contextReceipt
   });
+}
+
+function buildPreclaimUnavailableReadResult({
+  relayReceipt,
+  validation,
+  toolName,
+  activationReceiptDigest
+}) {
+  if (!/^sha256:[a-f0-9]{64}$/u.test(activationReceiptDigest || '')) {
+    reject('session_activation_receipt_invalid');
+  }
+  const structuredContent = unavailableStructuredContent(toolName);
+  validatePublicStructuredContent(structuredContent);
+  const contextReceipt = {
+    schema_version: 1,
+    kind: 'chatgpt_r4_context_receipt',
+    context_status: 'unavailable',
+    context_resolved: false,
+    principal_bound: true,
+    private_partition_access: false,
+    legacy_partition_access: false,
+    activation_receipt_digest: activationReceiptDigest
+  };
+  const governanceReceipt = {
+    schema_version: 1,
+    kind: 'chatgpt_r4_governance_receipt',
+    request_digest: validation.requestDigest,
+    relay_receipt_digest: digestObject(relayReceipt),
+    context_receipt_digest: digestObject(contextReceipt),
+    tool_name: toolName,
+    authorization_resolved_locally: false,
+    tool_arguments_used_as_diary_acl: false,
+    result_scope_postcheck_passed: true,
+    response_suppressed_after_activation_recheck: false,
+    counters_digest: digestObject(ZERO_MEMORY_COUNTERS),
+    activation_receipt_digest: activationReceiptDigest
+  };
+  return {
+    status: 'unavailable',
+    structured_content: structuredContent,
+    counters: { ...ZERO_MEMORY_COUNTERS },
+    receipt_digests: {
+      governance: digestObject(governanceReceipt),
+      context: digestObject(contextReceipt)
+    }
+  };
 }
 
 function buildReadResult({

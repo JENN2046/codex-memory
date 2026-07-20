@@ -451,6 +451,52 @@ test('R4-G runtime denies before provider, permits one bounded read, then consum
   assert.equal(fixture.runtime.snapshot().session_activation.completed_read_count, 1);
   assert.equal(fixture.runtime.snapshot().receipt_chains.length, 1);
   assert.match(fixture.runtime.snapshot().receipt_chains[0].activation, /^sha256:[a-f0-9]{64}$/u);
+
+  let closedProviderCalls = 0;
+  const closedFixture = createRuntimeFixture({
+    async callGovernedTool() { closedProviderCalls += 1; return delegatedResult(); }
+  });
+  closedFixture.controller.activate({
+    requestId: 'op_r4g_closed_read_activation_0001',
+    requestedVisibility: 'project',
+    ttlSeconds: 300,
+    now: NOW
+  });
+  const closedResolveRequest = requestFixture(
+    closedFixture.edge,
+    closedFixture.principal,
+    'resolve_memory_context',
+    { project_alias: 'project-alpha', requested_visibility: 'project' },
+    30
+  );
+  const closedResolved = await closedFixture.runtime.handle({
+    request: closedResolveRequest,
+    relayReceipt: relayReceipt(closedResolveRequest)
+  });
+  const validContextRef = closedResolved.structured_content.project_context_ref;
+  const finalCharacter = validContextRef.slice(-1);
+  const unknownContextRef = `${validContextRef.slice(0, -1)}${finalCharacter === 'A' ? 'B' : 'A'}`;
+  closedFixture.controller.kill({ reason: 'emergency_stop', now: NOW });
+  const closedResults = [];
+  for (const [sequence, projectContextRef] of [[31, validContextRef], [32, unknownContextRef]]) {
+    const closedRead = requestFixture(closedFixture.edge, closedFixture.principal, 'search_memory', {
+      project_context_ref: projectContextRef,
+      query: 'closed session probe',
+      limit: 1
+    }, sequence);
+    closedResults.push(await closedFixture.runtime.handle({
+      request: closedRead,
+      relayReceipt: relayReceipt(closedRead)
+    }));
+  }
+  for (const closedResult of closedResults) {
+    assert.equal(closedResult.status, 'unavailable');
+    assert.deepEqual(closedResult.structured_content, {
+      status: 'unavailable', result_count: 0, results: []
+    });
+    assert.deepEqual(closedResult.counters, ZERO_MEMORY_COUNTERS);
+  }
+  assert.equal(closedProviderCalls, 0);
 });
 
 test('R4-G suppresses an in-flight kill and finalizes a failed native invocation', async () => {

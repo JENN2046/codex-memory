@@ -39,7 +39,8 @@ function createContextAuthority({
       (activationController !== null &&
        (typeof activationController.checkContextIssueAuthorization !== 'function' ||
         typeof activationController.authorizeContextIssue !== 'function' ||
-        typeof activationController.bindContext !== 'function'))) {
+        typeof activationController.bindContext !== 'function' ||
+        typeof activationController.checkReadAuthorization !== 'function'))) {
     reject('r4_context_authority_invalid');
   }
   const selectedProject = registryState.registry.projects.find(project =>
@@ -468,6 +469,9 @@ function createR4GovernanceRuntime({
         nativeEvidenceByContext.set(evidence.project_context_ref_digest, evidence);
       }
     }),
+    preauthorizeContextUse: activationController
+      ? input => activationController.checkReadAuthorization(input)
+      : null,
     authorizeContextUse: activationController
       ? input => activationController.authorizeRead(input)
       : null,

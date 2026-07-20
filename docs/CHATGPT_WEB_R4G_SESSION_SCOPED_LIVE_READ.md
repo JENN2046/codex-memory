@@ -77,6 +77,11 @@ all context-resolution probes return the same bounded `unavailable` shape;
 public callers cannot use the closed runtime to enumerate registered projects
 or allowed visibilities.
 
+Read tools perform the same session preauthorization before resolving or
+validating `project_context_ref`. Once a lease is killed, expired, consumed, or
+otherwise closed, both a formerly valid ref and an unknown ref return the same
+bounded `unavailable` result without touching provider or native execution.
+
 Failure returns `unavailable` with zero provider/native/write/fallback/global
 search counters. If expiry or kill occurs after provider execution starts,
 Governance rechecks the lease after the native call. It keeps the actual

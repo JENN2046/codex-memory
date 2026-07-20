@@ -225,6 +225,28 @@ function createSessionReadActivationController({
     });
   }
 
+  function checkReadAuthorization({
+    principalFingerprint,
+    toolName,
+    now
+  } = {}) {
+    const checkedAt = currentTime(now);
+    expireIfNeeded(checkedAt);
+    if (!lease || lease.status !== 'active' ||
+        principalFingerprint !== expectedPrincipalFingerprint ||
+        !SESSION_READ_TOOLS.includes(toolName) ||
+        !lease.contextRefDigest || lease.readUseTokenDigest || lease.readConsumed ||
+        inFlightReads.size >= MAX_RETAINED_IN_FLIGHT_READS) {
+      observations.denied_operation_count += 1;
+      return unavailable(toolName, checkedAt);
+    }
+    return Object.freeze({
+      accepted: true,
+      status: 'active',
+      receipt_digest: receiptDigest('preauthorize_read', checkedAt)
+    });
+  }
+
   function authorizeRead({
     principalFingerprint,
     projectContextRef,
@@ -351,6 +373,7 @@ function createSessionReadActivationController({
     checkContextIssueAuthorization,
     authorizeContextIssue,
     bindContext,
+    checkReadAuthorization,
     authorizeRead,
     completeRead,
     kill,
