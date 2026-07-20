@@ -177,6 +177,8 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       result?.access?.localMemoryFallbackUsed !== false ||
       invocation.invocationBindingMatched !== true ||
       invocation.governanceMetadataSent !== true ||
+      invocation.endpointDisclosed !== false ||
+      invocation.tokenMaterialDisclosed !== false ||
       invocation.rawRequestBodyDisclosed !== false ||
       invocation.rawResponseBodyDisclosed !== false ||
       runtime.present !== true ||

@@ -135,6 +135,8 @@ function delegatedResult({ statement = 'Memory signal 1: bounded recall current-
       nativeInvocationReceipt: {
         invocationBindingMatched: true,
         governanceMetadataSent: true,
+        endpointDisclosed: false,
+        tokenMaterialDisclosed: false,
         rawRequestBodyDisclosed: false,
         rawResponseBodyDisclosed: false,
         nativeRuntimeReceipt: {
@@ -335,6 +337,8 @@ test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.memoryWritePerformed; },
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.rawMemoryContentDisclosed; },
     result => { delete result.receipt.nativeInvocationReceipt.rawRequestBodyDisclosed; },
+    result => { delete result.receipt.nativeInvocationReceipt.endpointDisclosed; },
+    result => { delete result.receipt.nativeInvocationReceipt.tokenMaterialDisclosed; },
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.providerApiCalled; },
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.derivedIndexWritePerformed; }
   ];
