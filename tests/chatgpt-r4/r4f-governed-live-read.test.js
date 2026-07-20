@@ -113,7 +113,11 @@ function registry(mappingState, overrides = {}) {
   };
 }
 
-function delegatedResult({ statement = 'Memory signal 1: bounded recall current-state signal.', score = 0.91 } = {}) {
+function delegatedResult({
+  statement = 'Memory signal 1: bounded recall current-state signal.',
+  score = 0.91,
+  derivedIndexWritePerformed = false
+} = {}) {
   return {
     status: 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED',
     accepted: true,
@@ -135,6 +139,7 @@ function delegatedResult({ statement = 'Memory signal 1: bounded recall current-
       nativeInvocationReceipt: {
         invocationBindingMatched: true,
         governanceMetadataSent: true,
+        governanceMetadataRawValueDisclosed: false,
         endpointDisclosed: false,
         tokenMaterialDisclosed: false,
         rawRequestBodyDisclosed: false,
@@ -145,9 +150,10 @@ function delegatedResult({ statement = 'Memory signal 1: bounded recall current-
           providerApiCalled: true,
           memoryReadPerformed: true,
           memoryWritePerformed: false,
-          durableWritePerformed: false,
+          durableWritePerformed: derivedIndexWritePerformed,
+          durableWriteScope: derivedIndexWritePerformed ? 'isolated_derived_index' : null,
           primaryMemoryStoreWritePerformed: false,
-          derivedIndexWritePerformed: false,
+          derivedIndexWritePerformed,
           authorizationResolvedBeforeProvider: true,
           diaryAllowlistEnforcedBeforeIndexLoad: true,
           diaryAllowlistEnforcedBeforeVectorSearch: true,
@@ -323,6 +329,32 @@ test('R4-F validates bounded projections for every governed read tool', async ()
   assert.equal(calls.every(call => call.requestContext.executionContext.clientId === 'Codex'), true);
 });
 
+test('R4-F accepts and counts only a bound derived-index durable write', async () => {
+  const mappingState = loadDiaryScopeMapping({ mapping: mapping() });
+  const invoke = createGovernedLiveReadInvoker({
+    mappingState,
+    resolveDiaryRead: resolveRead,
+    async callGovernedTool() {
+      return delegatedResult({ derivedIndexWritePerformed: true });
+    }
+  });
+  const result = await invoke({
+    toolName: 'search_memory',
+    arguments: { query: 'bounded', limit: 1 },
+    trustedScope: {
+      clientId: 'ChatGPT',
+      projectId: 'project-alpha',
+      workspaceId: 'workspace-alpha',
+      visibilityAllowlist: ['project'],
+      mappingReference: mappingState.mappingReference,
+      mappingDigest: mappingState.mappingDigest
+    },
+    projectContextRef: 'pctx_derived_index_xxxxxxxxxxxxxxxxxxxxxxxx'
+  });
+  assert.equal(result.counters.derived_index_writes, 1);
+  assert.equal(result.counters.primary_memory_writes, 0);
+});
+
 test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async () => {
   const mappingState = loadDiaryScopeMapping({ mapping: mapping() });
   const trustedScope = {
@@ -337,9 +369,11 @@ test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.memoryWritePerformed; },
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.rawMemoryContentDisclosed; },
     result => { delete result.receipt.nativeInvocationReceipt.rawRequestBodyDisclosed; },
+    result => { delete result.receipt.nativeInvocationReceipt.governanceMetadataRawValueDisclosed; },
     result => { delete result.receipt.nativeInvocationReceipt.endpointDisclosed; },
     result => { delete result.receipt.nativeInvocationReceipt.tokenMaterialDisclosed; },
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.providerApiCalled; },
+    result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.durableWritePerformed; },
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.derivedIndexWritePerformed; }
   ];
   for (const mutate of mutations) {

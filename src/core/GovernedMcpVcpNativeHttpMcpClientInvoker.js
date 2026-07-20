@@ -199,8 +199,45 @@ function extractJsonRpcNativeRuntimeReceipt(jsonRpcResponse = {}) {
   return isPlainObject(receipt) ? receipt : null;
 }
 
+const REQUIRED_NATIVE_RUNTIME_EVIDENCE_BOOLEAN_FIELDS = Object.freeze([
+  'nativeRuntimeCalled',
+  'nativeRuntimeInitialized',
+  'providerApiCalled',
+  'memoryReadPerformed',
+  'memoryWritePerformed',
+  'durableWritePerformed',
+  'isolatedRuntimeStoreUsed',
+  'primaryMemoryStoreWritePerformed',
+  'derivedIndexWritePerformed',
+  'authorizationResolvedBeforeProvider',
+  'diaryAllowlistEnforcedBeforeIndexLoad',
+  'diaryAllowlistEnforcedBeforeVectorSearch',
+  'resultScopePostcheckPassed',
+  'unscopedNativeSearchUsed',
+  'mappingReferenceBound',
+  'mappingDigestBound',
+  'rawDiaryNamesReturned',
+  'scopeIdAccepted',
+  'scopeIdAudited',
+  'scopeIdFingerprintBound',
+  'scopeIdAffectsDiaryAcl',
+  'scopeIdEnforcementClaimed',
+  'rawRuntimeOutputDisclosed',
+  'rawMemoryContentDisclosed',
+  'runtimeLocatorDisclosed',
+  'tokenMaterialDisclosed',
+  'readinessClaimed'
+]);
+
+function nativeRuntimeReceiptEvidenceComplete(receipt) {
+  return isPlainObject(receipt) &&
+    REQUIRED_NATIVE_RUNTIME_EVIDENCE_BOOLEAN_FIELDS.every(field =>
+      typeof receipt[field] === 'boolean'
+    );
+}
+
 function lowDisclosureNativeRuntimeReceipt(receipt = null) {
-  if (!isPlainObject(receipt)) {
+  if (!nativeRuntimeReceiptEvidenceComplete(receipt)) {
     return {
       present: false,
       nativeRuntimeCalled: false,

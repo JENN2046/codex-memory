@@ -177,6 +177,7 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       result?.access?.localMemoryFallbackUsed !== false ||
       invocation.invocationBindingMatched !== true ||
       invocation.governanceMetadataSent !== true ||
+      invocation.governanceMetadataRawValueDisclosed !== false ||
       invocation.endpointDisclosed !== false ||
       invocation.tokenMaterialDisclosed !== false ||
       invocation.rawRequestBodyDisclosed !== false ||
@@ -187,8 +188,13 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       typeof runtime.derivedIndexWritePerformed !== 'boolean' ||
       runtime.memoryReadPerformed !== true ||
       runtime.memoryWritePerformed !== false ||
-      runtime.durableWritePerformed !== false ||
+      typeof runtime.durableWritePerformed !== 'boolean' ||
       runtime.primaryMemoryStoreWritePerformed !== false ||
+      runtime.durableWritePerformed !== runtime.derivedIndexWritePerformed ||
+      (runtime.derivedIndexWritePerformed === true && ![
+        'isolated_derived_index',
+        'native_runtime_store'
+      ].includes(runtime.durableWriteScope)) ||
       runtime.authorizationResolvedBeforeProvider !== true ||
       runtime.diaryAllowlistEnforcedBeforeIndexLoad !== true ||
       runtime.diaryAllowlistEnforcedBeforeVectorSearch !== true ||

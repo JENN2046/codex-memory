@@ -671,8 +671,34 @@ function nativeInvocationReceiptReadSideEffectsAbsent(receipt) {
   const nativeRuntimeReceipt = isPlainObject(receipt?.nativeRuntimeReceipt)
     ? receipt.nativeRuntimeReceipt
     : {};
-  return nativeRuntimeReceipt.memoryWritePerformed !== true &&
-    nativeRuntimeReceipt.primaryMemoryStoreWritePerformed !== true;
+  const derivedWrite = nativeRuntimeReceipt.derivedIndexWritePerformed === true;
+  const durableWrite = nativeRuntimeReceipt.durableWritePerformed === true;
+  const derivedWriteScopeBound = !derivedWrite || [
+    'isolated_derived_index',
+    'native_runtime_store'
+  ].includes(nativeRuntimeReceipt.durableWriteScope);
+  return nativeRuntimeReceipt.memoryWritePerformed === false &&
+    nativeRuntimeReceipt.primaryMemoryStoreWritePerformed === false &&
+    typeof nativeRuntimeReceipt.durableWritePerformed === 'boolean' &&
+    typeof nativeRuntimeReceipt.derivedIndexWritePerformed === 'boolean' &&
+    durableWrite === derivedWrite &&
+    derivedWriteScopeBound;
+}
+
+function nativeInvocationReceiptDisclosuresAbsent(receipt) {
+  const runtime = isPlainObject(receipt?.nativeRuntimeReceipt)
+    ? receipt.nativeRuntimeReceipt
+    : {};
+  return receipt?.endpointDisclosed === false &&
+    receipt?.tokenMaterialDisclosed === false &&
+    receipt?.rawRequestBodyDisclosed === false &&
+    receipt?.rawResponseBodyDisclosed === false &&
+    receipt?.governanceMetadataRawValueDisclosed === false &&
+    runtime.rawRuntimeOutputDisclosed === false &&
+    runtime.rawMemoryContentDisclosed === false &&
+    runtime.runtimeLocatorDisclosed === false &&
+    runtime.tokenMaterialDisclosed === false &&
+    runtime.readinessClaimed === false;
 }
 
 function nativeInvocationReceiptDiaryScopeBound(receipt) {
@@ -1307,7 +1333,8 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
     !nativeInvocationReceipt ||
     nativeInvocationReceiptExecutionBound(receipt.nativeInvocationReceipt) !== true ||
     nativeInvocationReceiptGovernanceMetadataBound(receipt.nativeInvocationReceipt) !== true ||
-    nativeInvocationReceiptDiaryScopeBound(receipt.nativeInvocationReceipt) !== true
+    nativeInvocationReceiptDiaryScopeBound(receipt.nativeInvocationReceipt) !== true ||
+    nativeInvocationReceiptDisclosuresAbsent(receipt.nativeInvocationReceipt) !== true
   ) {
     return {
       ...rejected('native_read_delegation_native_invocation_receipt_unbound', input),

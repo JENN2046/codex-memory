@@ -474,8 +474,41 @@ test('HTTP MCP tool caller sends governed metadata through params _meta only', a
 
 test('HTTP MCP tool caller projects native runtime receipt without raw disclosure', async () => {
   const rawPrivateValue = 'RAW_PRIVATE_NATIVE_VALUE_SHOULD_NOT_ECHO_IN_RUNTIME_RECEIPT_TEST';
+  let omitProviderEvidence = false;
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
+    const nativeRuntimeReceipt = {
+      nativeRuntimeCalled: true,
+      nativeRuntimeInitialized: true,
+      providerApiCalled: true,
+      memoryReadPerformed: true,
+      memoryWritePerformed: false,
+      durableWritePerformed: false,
+      durableWriteScope: null,
+      isolatedRuntimeStoreUsed: false,
+      primaryMemoryStoreWritePerformed: false,
+      derivedIndexWritePerformed: false,
+      authorizationResolvedBeforeProvider: true,
+      diaryAllowlistEnforcedBeforeIndexLoad: true,
+      diaryAllowlistEnforcedBeforeVectorSearch: true,
+      resultScopePostcheckPassed: true,
+      unscopedNativeSearchUsed: false,
+      mappingReferenceBound: true,
+      mappingDigestBound: true,
+      allowedDiaryCount: 1,
+      rawDiaryNamesReturned: false,
+      scopeIdAccepted: true,
+      scopeIdAudited: true,
+      scopeIdFingerprintBound: true,
+      scopeIdAffectsDiaryAcl: false,
+      scopeIdEnforcementClaimed: false,
+      rawRuntimeOutputDisclosed: false,
+      rawMemoryContentDisclosed: false,
+      runtimeLocatorDisclosed: false,
+      tokenMaterialDisclosed: false,
+      readinessClaimed: false
+    };
+    if (omitProviderEvidence) delete nativeRuntimeReceipt.providerApiCalled;
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({
       jsonrpc: '2.0',
@@ -485,19 +518,7 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
           results: [{ content: rawPrivateValue }]
         },
         _meta: {
-          codexMemoryNativeRuntimeReceipt: {
-            nativeRuntimeCalled: true,
-            nativeRuntimeInitialized: true,
-            providerApiCalled: true,
-            memoryReadPerformed: true,
-            memoryWritePerformed: false,
-            durableWritePerformed: false,
-            rawRuntimeOutputDisclosed: false,
-            rawMemoryContentDisclosed: false,
-            runtimeLocatorDisclosed: false,
-            tokenMaterialDisclosed: false,
-            readinessClaimed: false
-          }
+          codexMemoryNativeRuntimeReceipt: nativeRuntimeReceipt
         }
       }
     }));
@@ -535,6 +556,15 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
     assert.equal(runtimeReceipt.readinessClaimed, false);
     assert.equal(serializedReceipt.includes(rawPrivateValue), false);
     assert.equal(serializedReceipt.includes(server.url), false);
+
+    omitProviderEvidence = true;
+    const incomplete = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(incomplete.receipt.nativeRuntimeReceipt.present, false);
   } finally {
     await server.close();
   }
