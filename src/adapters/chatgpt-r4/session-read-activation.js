@@ -191,7 +191,7 @@ function createSessionReadActivationController({
     const remainingMs = Date.parse(lease.expiresAt) - checkedAt.getTime();
     const contextTtlSeconds = Math.min(
       SESSION_ACTIVATION_MAX_TTL_SECONDS,
-      Math.floor(remainingMs / 1000)
+      remainingMs / 1000
     );
     if (contextTtlSeconds < 1) {
       terminalize('expired', 'ttl_elapsed', checkedAt);

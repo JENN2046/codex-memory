@@ -517,6 +517,32 @@ test('R4-G runtime denies before provider, permits one bounded read, then consum
   assert.equal(closedProviderCalls, 0);
   assert.equal(closedFixture.controller.snapshot().activation_status, 'active');
   assert.equal(closedFixture.controller.snapshot().remaining_read_calls, 1);
+
+  let fractionalNow = new Date(NOW);
+  const fractionalFixture = createRuntimeFixture({
+    clock: () => new Date(fractionalNow)
+  });
+  const fractionalActivation = fractionalFixture.controller.activate({
+    requestId: 'op_r4g_fractional_expiry_activation_01',
+    requestedVisibility: 'project',
+    ttlSeconds: 30,
+    now: fractionalNow
+  });
+  fractionalNow = new Date(NOW.getTime() + 501);
+  const fractionalResolveRequest = requestFixture(
+    fractionalFixture.edge,
+    fractionalFixture.principal,
+    'resolve_memory_context',
+    { project_alias: 'project-alpha', requested_visibility: 'project' },
+    40,
+    fractionalNow
+  );
+  const fractionalResolved = await fractionalFixture.runtime.handle({
+    request: fractionalResolveRequest,
+    relayReceipt: relayReceipt(fractionalResolveRequest)
+  });
+  assert.equal(fractionalResolved.status, 'ok');
+  assert.equal(fractionalResolved.structured_content.expires_at, fractionalActivation.expires_at);
 });
 
 test('R4-G suppresses an in-flight kill and finalizes a failed native invocation', async () => {

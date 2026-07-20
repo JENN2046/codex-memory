@@ -29,6 +29,9 @@ owner-only local CLI
   -> existing bounded R4-F selected-diary read
 ```
 
+An issued context uses the lease's exact millisecond expiry, so whole-second
+rounding cannot make the context expire before its authorizing lease.
+
 The activation tool is not an MCP tool. No activation, kill, TTL, project,
 mapping, diary, or scope authority is added to the six-tool ChatGPT surface.
 The public Edge and outbound Relay still do not own the project registry,
