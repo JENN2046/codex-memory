@@ -510,6 +510,45 @@ test('R4-G owner-only control UDS supports bounded activate/status/kill and repl
   assert.throws(() => parseArguments(['activate', '--ttl-seconds', '301']), {
     code: 'r4_session_cli_activation_invalid'
   });
+
+  const reservedController = createSessionReadActivationController({
+    expectedPrincipalFingerprint: sha256('r4g-reserved-kill-owner'),
+    selectedProjectAlias: 'project-alpha'
+  });
+  const reservedServer = createSessionActivationControlServer({
+    socketPath: path.join(root, 'reserved-control.sock'),
+    activationController: reservedController
+  });
+  for (let index = 0; index < 62; index += 1) {
+    reservedServer.handleControlRequest({
+      schema_version: 1,
+      operation: 'kill',
+      request_id: `op_r4g_reserved_kill_${String(index).padStart(32, '0')}`,
+      reason: 'operator_requested'
+    });
+  }
+  reservedServer.handleControlRequest({
+    schema_version: 1,
+    operation: 'activate',
+    request_id: 'op_r4g_reserved_final_activation_000001',
+    requested_visibility: 'project',
+    ttl_seconds: 30
+  });
+  const finalKill = reservedServer.handleControlRequest({
+    schema_version: 1,
+    operation: 'kill',
+    request_id: 'op_r4g_reserved_emergency_kill_0000001',
+    reason: 'emergency_stop'
+  });
+  assert.equal(finalKill.activation_status, 'killed');
+  assert.equal(reservedServer.snapshot().replay_receipt_count, 64);
+  assert.throws(() => reservedServer.handleControlRequest({
+    schema_version: 1,
+    operation: 'activate',
+    request_id: 'op_r4g_reserved_over_budget_activate_001',
+    requested_visibility: 'project',
+    ttl_seconds: 30
+  }), { code: 'r4_session_control_mutation_budget_exhausted' });
 });
 
 test('R4-G runtime authority binds operator/control references and starts default-closed', async t => {

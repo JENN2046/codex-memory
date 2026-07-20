@@ -107,8 +107,10 @@ Accepted kill reasons are `operator_requested`, `emergency_stop`, and
 `verification_complete`. State-changing command request IDs have replay
 protection: an exact retry returns the same low-disclosure receipt, while
 reusing an ID with a different command is rejected. The process accepts at
-most 64 unique state-changing control commands; status checks do not consume
-that budget or evict mutation receipts.
+most 64 unique state-changing control commands; the final mutation slot is
+reserved for `kill`, so an active lease cannot make its emergency stop
+unavailable. Status checks do not consume that budget or evict mutation
+receipts.
 
 ## Counters and receipts
 

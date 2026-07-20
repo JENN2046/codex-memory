@@ -58,7 +58,10 @@ function createSessionActivationControlServer({
       observations.replayed_frames += 1;
       return existing.response;
     }
-    if (request.operation !== 'status' && replayReceipts.size >= MAX_CONTROL_MUTATIONS) {
+    const mutationLimit = request.operation === 'kill'
+      ? MAX_CONTROL_MUTATIONS
+      : MAX_CONTROL_MUTATIONS - 1;
+    if (request.operation !== 'status' && replayReceipts.size >= mutationLimit) {
       reject('r4_session_control_mutation_budget_exhausted');
     }
     let response;
