@@ -400,18 +400,19 @@ test('R4-G counter mode preserves bounded live-read maxima without changing zero
   assert.doesNotThrow(() => validateCounters(bounded, {
     counterMode: COUNTER_MODES.sessionScopedLiveReadV1
   }));
-  assert.doesNotThrow(() => validateCounters({
-    ...bounded,
-    derived_index_writes: MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT
-  }, {
-    counterMode: COUNTER_MODES.sessionScopedLiveReadV1
-  }));
-  assert.throws(() => validateCounters({
-    ...bounded,
-    derived_index_writes: MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT + 1
-  }, {
-    counterMode: COUNTER_MODES.sessionScopedLiveReadV1
-  }), { code: 'governed_live_read_counter_out_of_bounds' });
+  for (const counterMode of [
+    COUNTER_MODES.governedLiveReadV1,
+    COUNTER_MODES.sessionScopedLiveReadV1
+  ]) {
+    assert.doesNotThrow(() => validateCounters({
+      ...bounded,
+      derived_index_writes: MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT
+    }, { counterMode }));
+    assert.throws(() => validateCounters({
+      ...bounded,
+      derived_index_writes: MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT + 1
+    }, { counterMode }), { code: 'governed_live_read_counter_out_of_bounds' });
+  }
   assert.throws(() => validateCounters(bounded, {
     counterMode: COUNTER_MODES.zeroMemory
   }), { code: 'zero_memory_counter_nonzero' });
