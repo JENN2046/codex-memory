@@ -63,6 +63,13 @@ completed, or failed. Per-read receipts carry both a cumulative count and a
 delta since the previous receipt. Trigger details, diary names, paths, mapping
 values, queries, result text, and provider responses are never projected.
 
+The per-read counter is deliberately not boolean. A cold selected-diary read
+can legitimately emit several lifecycle events in one receipt. The contract
+accepts at most 64 events between receipt consumptions and the lifecycle fails
+closed before admitting event 65. This keeps initialization, hydration, cache,
+vector/tag, and matrix work truthful while still bounding a runaway background
+queue.
+
 An interim receipt is never a final zero claim. A zero claim is valid only on
 the final shutdown receipt after background work has drained. The bridge
 rejects contradictory evidence, including:
