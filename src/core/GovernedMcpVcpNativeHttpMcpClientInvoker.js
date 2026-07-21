@@ -322,6 +322,8 @@ function nativeRuntimeReceiptEvidenceComplete(receipt) {
     receipt.durableWriteScope !== (receipt.derivedRuntimeMutationCumulativeCount > 0
       ? 'isolated_derived_index'
       : null) ||
+    (receipt.derivedRuntimeMutationCumulativeCount > 0 &&
+      receipt.derivedRuntimeMutationTriggerCategories.length === 0) ||
     (receipt.derivedRuntimeMutationCumulativeCount === 0 &&
       receipt.derivedRuntimeMutationTriggerCategories.length !== 0)
   )) return false;
@@ -1119,6 +1121,7 @@ module.exports = {
   extractJsonRpcToolResultValue,
   GOVERNANCE_METADATA_PATH,
   GOVERNANCE_METADATA_SCHEMA_VERSION,
+  nativeRuntimeReceiptEvidenceComplete,
   normalizeHttpMcpRequestTimeoutMs,
   projectJsonRpcToolResultForReadShape
 };

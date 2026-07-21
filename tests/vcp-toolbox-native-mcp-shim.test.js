@@ -179,6 +179,112 @@ test('isolated runtime accounts startup, background matrix, shutdown saves, and 
   assert.equal(calls.filter(value => Array.isArray(value) && value[0] === 'hydrate').length, 1);
 });
 
+test('isolated runtime accounts queued matrix task types exactly once', async () => {
+  let queuedTask = null;
+  const tagMemoEngine = {
+    _postStartupDerivedRefreshTimer: null,
+    _derivedTaskTimer: null,
+    _matrixRebuildTimer: null,
+    _derivedTaskQueue: [],
+    _derivedTaskRunning: false,
+    _enqueueDerivedTask(type, run) {
+      queuedTask = { type, run };
+      return `${type}-synthetic`;
+    },
+    async doMatrixRebuild() {
+      return true;
+    }
+  };
+  const manager = {
+    config: { fullScanOnStartup: false },
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    tagMemoEngine,
+    async initialize() {},
+    async search() {
+      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+    },
+    async shutdown() {}
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  const first = await adapter.search({ query: 'initialize', limit: 1 }, { authorization });
+  assert.equal(first._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 1);
+
+  for (const type of ['matrix-rebuild', 'active-full-training']) {
+    manager.tagMemoEngine._enqueueDerivedTask(type, async () =>
+      manager.tagMemoEngine.doMatrixRebuild()
+    );
+    assert.equal(queuedTask.type, type);
+    await queuedTask.run();
+  }
+
+  const second = await adapter.search({ query: 'after queues', limit: 1 }, { authorization });
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta, 2);
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 3);
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationCompletedCount, 3);
+  assert.deepEqual(second._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
+    ['matrix', 'startup']);
+
+  await adapter.shutdown();
+});
+
+test('isolated runtime fails closed before an unknown queued derived task executes', async () => {
+  let queuedRun = null;
+  let operationRan = false;
+  const tagMemoEngine = {
+    _postStartupDerivedRefreshTimer: null,
+    _derivedTaskTimer: null,
+    _matrixRebuildTimer: null,
+    _derivedTaskQueue: [],
+    _derivedTaskRunning: false,
+    _enqueueDerivedTask(_type, run) {
+      queuedRun = run;
+      return 'unknown-synthetic';
+    }
+  };
+  const manager = {
+    config: { fullScanOnStartup: false },
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    tagMemoEngine,
+    async initialize() {},
+    async search() {
+      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+    }
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  await adapter.search({ query: 'initialize', limit: 1 }, { authorization });
+  manager.tagMemoEngine._enqueueDerivedTask('unknown-derived-task', () => {
+    operationRan = true;
+  });
+  assert.throws(() => queuedRun(), { message: 'derived_runtime_mutation_trigger_forbidden' });
+  assert.equal(operationRan, false);
+});
+
 test('isolated runtime rejects a mismatched derived mutation policy before provider use', () => {
   assert.throws(() => createVcpToolBoxNativeMemoryAdapter({
     knowledgeBaseStorePath: '/isolated/runtime/store',

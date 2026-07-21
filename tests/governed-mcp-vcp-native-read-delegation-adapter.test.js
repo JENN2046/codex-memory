@@ -731,6 +731,64 @@ test('read delegation rejects successful native value when invocation receipt is
   assert.equal(serialized.includes('RAW_PRIVATE_CONTENT_SHOULD_NOT_ECHO'), false);
 });
 
+test('read delegation rejects derived mutation receipts without complete lifecycle evidence', async () => {
+  const cases = [
+    {
+      name: 'missing lifecycle policy',
+      mutate(runtime) {
+        delete runtime.derivedRuntimeMutationPolicy;
+      }
+    },
+    {
+      name: 'count total mismatch',
+      mutate(runtime) {
+        runtime.derivedRuntimeMutationCompletedCount = 0;
+      }
+    },
+    {
+      name: 'derived write without trigger',
+      mutate(runtime) {
+        runtime.derivedRuntimeMutationTriggerCategories = [];
+      }
+    }
+  ];
+
+  for (const testCase of cases) {
+    const callMcpTool = async () => {
+      throw new Error('fallback call path should not run');
+    };
+    callMcpTool.callWithReceipt = async payload => {
+      const receipt = nativeInvocationReceiptForPayload(payload);
+      testCase.mutate(receipt.nativeRuntimeReceipt);
+      return {
+        value: { results: [{ content: 'RAW_PRIVATE_CONTENT_SHOULD_NOT_ECHO' }] },
+        receipt
+      };
+    };
+
+    const result = await executeGovernedMcpVcpNativeReadDelegation({
+      toolName: 'search_memory',
+      args: { query: 'needle' },
+      gateResult: gateResult('search_memory'),
+      callMcpTool
+    });
+
+    assert.equal(result.accepted, false, testCase.name);
+    assert.equal(
+      result.reasonCode,
+      'native_read_delegation_native_invocation_receipt_unbound',
+      testCase.name
+    );
+    assert.equal(result.receipt.statusClass, 'native_invocation_receipt_unbound', testCase.name);
+    assert.equal(result.localMemoryFallbackEligible, false, testCase.name);
+    assert.equal(
+      JSON.stringify(result).includes('RAW_PRIVATE_CONTENT_SHOULD_NOT_ECHO'),
+      false,
+      testCase.name
+    );
+  }
+});
+
 test('read delegation rejects matching native receipt when governance metadata was not sent', async () => {
   const result = await executeGovernedMcpVcpNativeReadDelegation({
     toolName: 'search_memory',

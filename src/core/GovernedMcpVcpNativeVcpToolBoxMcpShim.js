@@ -1,5 +1,6 @@
 'use strict';
 
+const { AsyncLocalStorage } = require('node:async_hooks');
 const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const http = require('node:http');
@@ -727,6 +728,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   let shutdownError = null;
   let shuttingDown = false;
   const restoreRuntimeHooks = [];
+  const derivedTaskAccountingContext = new AsyncLocalStorage();
 
   function bindDerivedMutationAuthorization(authorization) {
     derivedRuntimeMutationLifecycle.bindAuthorization({
@@ -748,6 +750,9 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     if (typeof tagMemo.doMatrixRebuild === 'function') {
       const original = tagMemo.doMatrixRebuild;
       tagMemo.doMatrixRebuild = function governedMatrixRebuild(...args) {
+        if (derivedTaskAccountingContext.getStore()?.trigger === 'matrix') {
+          return original.apply(this, args);
+        }
         return derivedRuntimeMutationLifecycle.track('matrix', () => original.apply(this, args));
       };
       restoreRuntimeHooks.push(() => { tagMemo.doMatrixRebuild = original; });
@@ -757,15 +762,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       const original = tagMemo._enqueueDerivedTask;
       tagMemo._enqueueDerivedTask = function governedDerivedTask(type, run, taskOptions) {
         if (shuttingDown) return null;
-        let governedRun = run;
-        if (type === 'epa-basis') {
-          governedRun = () => derivedRuntimeMutationLifecycle.track('vector', run);
-        } else if (!['matrix-rebuild', 'active-full-training'].includes(type)) {
-          governedRun = () => derivedRuntimeMutationLifecycle.track(
-            'unsupported_derived_task',
-            run
-          );
-        }
+        const trigger = type === 'epa-basis'
+          ? 'vector'
+          : ['matrix-rebuild', 'active-full-training'].includes(type)
+            ? 'matrix'
+            : 'unsupported_derived_task';
+        const governedRun = () => derivedRuntimeMutationLifecycle.track(trigger, () =>
+          derivedTaskAccountingContext.run({ trigger }, run)
+        );
         return original.call(this, type, governedRun, taskOptions);
       };
       restoreRuntimeHooks.push(() => { tagMemo._enqueueDerivedTask = original; });

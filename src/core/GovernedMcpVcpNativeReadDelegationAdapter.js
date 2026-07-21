@@ -20,6 +20,9 @@ const {
 const {
   normalizeMemoryContextProjection
 } = require('./MemoryContextPackageService');
+const {
+  nativeRuntimeReceiptEvidenceComplete
+} = require('./GovernedMcpVcpNativeHttpMcpClientInvoker');
 
 const CONTRACT_NAME = 'GovernedMcpVcpNativeReadDelegationAdapter';
 const CONTRACT_MODE = 'governed_mcp_vcp_native_primary_read_low_disclosure_delegation';
@@ -775,6 +778,10 @@ function nativeInvocationReceiptDiaryScopeBound(receipt) {
     runtime.scopeIdEnforcementClaimed === false;
 }
 
+function nativeInvocationReceiptRuntimeEvidenceBound(receipt) {
+  return nativeRuntimeReceiptEvidenceComplete(receipt?.nativeRuntimeReceipt) === true;
+}
+
 function sanitizeScope(scope) {
   if (!isPlainObject(scope)) return undefined;
   const output = {};
@@ -1424,6 +1431,22 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
       mcpToolCalled: true,
       memoryReadPerformed: true,
       memoryWritten: true,
+      localMemoryFallbackEligible: false
+    };
+  }
+
+  if (nativeInvocationReceiptRuntimeEvidenceBound(receipt.nativeInvocationReceipt) !== true) {
+    return {
+      ...rejected('native_read_delegation_native_invocation_receipt_unbound', input),
+      receipt: {
+        ...receipt,
+        statusClass: 'native_invocation_receipt_unbound',
+        outputBudgetExceeded: false
+      },
+      runtimeCalled: true,
+      vcpToolBoxCalled: true,
+      mcpToolCalled: true,
+      memoryReadPerformed: true,
       localMemoryFallbackEligible: false
     };
   }
