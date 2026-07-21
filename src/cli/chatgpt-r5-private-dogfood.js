@@ -111,15 +111,20 @@ function validateObservation(observation) {
       observation.resolve_then_read_sessions > observation.sessions_started ||
       observation.timeout_count > observation.sessions_started ||
       typeof observation.emergency_stop_latched !== 'boolean' ||
-      observation.local_fallbacks !== 0 ||
-      observation.primary_memory_writes !== 0 || observation.derived_index_writes !== 0 ||
-      observation.unrestricted_native_searches !== 0 ||
       observation.durable_observation_state_written !== false ||
       observation.request_bodies_logged !== 0 || observation.response_bodies_logged !== 0 ||
       observation.raw_memory_recorded !== false) {
     reject('r5a_dogfood_cli_observation_invalid');
   }
   validateLastSession(observation.last_session, observation.sessions_started);
+  const forbiddenCounterObserved = observation.local_fallbacks !== 0 ||
+    observation.primary_memory_writes !== 0 || observation.derived_index_writes !== 0 ||
+    observation.unrestricted_native_searches !== 0;
+  if (forbiddenCounterObserved &&
+      (observation.emergency_stop_latched !== true ||
+       observation.last_session?.status !== 'emergency_stopped')) {
+    reject('r5a_dogfood_cli_observation_invalid');
+  }
   return observation;
 }
 

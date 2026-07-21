@@ -89,6 +89,9 @@ verification.
   `emergency_stopped`, even when the one-read controller has already consumed
   its lease; the observer then latches closed for the rest of the process, so
   only a full Governance restart can permit another R5-A activation;
+- a violating tool name and its low-disclosure counters are recorded before
+  suppression, so the owner artifact cannot report a false zero for the event
+  that stopped the run;
 - public receipts remain low-disclosure and contain no observation authority;
 - stop/restart clears activation and observation state.
 

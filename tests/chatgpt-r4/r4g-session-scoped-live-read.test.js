@@ -1118,10 +1118,14 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
     request: searchRequest,
     relayReceipt: relayReceipt(searchRequest)
   }), { code: 'r5a_dogfood_forbidden_counter_observed' });
-  assert.equal(observer.snapshot().derived_index_writes, 0);
+  assert.equal(observer.snapshot().derived_index_writes, 1);
   assert.equal(observer.snapshot().primary_memory_writes, 0);
   assert.equal(observer.snapshot().last_session.status, 'emergency_stopped');
   assert.equal(observer.snapshot().emergency_stop_latched, true);
+  assert.deepEqual(observer.snapshot().last_session.tool_sequence, [
+    'resolve_memory_context',
+    'search_memory'
+  ]);
   assert.equal(
     observer.snapshot().last_session.error_code,
     'r5a_dogfood_forbidden_counter_observed'
@@ -1140,6 +1144,23 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
     receipt_digest: fixture.controller.snapshot().receipt_digest,
     observation: observer.snapshot()
   }, 'status'));
+  assert.throws(() => validateDogfoodResponse({
+    schema_version: 2,
+    operation: 'status',
+    accepted: true,
+    activation_status: fixture.controller.snapshot().activation_status,
+    remaining_ttl_seconds: 0,
+    context_bound: true,
+    read_in_flight: false,
+    remaining_read_calls: 0,
+    default_closed: true,
+    durable_state_written: false,
+    receipt_digest: fixture.controller.snapshot().receipt_digest,
+    observation: {
+      ...observer.snapshot(),
+      emergency_stop_latched: false
+    }
+  }, 'status'), { code: 'r5a_dogfood_cli_observation_invalid' });
   assert.throws(() => observer.prepareActivation(fixture.controller.snapshot()), {
     code: 'r5a_dogfood_emergency_stop_latched'
   });

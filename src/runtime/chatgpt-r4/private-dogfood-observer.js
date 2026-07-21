@@ -124,19 +124,19 @@ function createPrivateDogfoodObserver({
           !Number.isInteger(observedCounters[key]) || observedCounters[key] < 0)) {
       reject('r5a_dogfood_counter_shape_invalid');
     }
-    if (observedCounters.primary_memory_writes !== 0 ||
-        observedCounters.derived_index_writes !== 0 ||
-        observedCounters.local_fallbacks !== 0 ||
-        observedCounters.unrestricted_native_searches !== 0) {
-      reject('r5a_dogfood_forbidden_counter_observed');
-    }
-    if (counters.provider_calls + observedCounters.provider_calls > maxProviderCalls) {
-      reject('r5a_dogfood_provider_budget_exhausted');
-    }
+    const providerBudgetExceeded =
+      counters.provider_calls + observedCounters.provider_calls > maxProviderCalls;
+    const forbiddenCounterObserved = observedCounters.primary_memory_writes !== 0 ||
+      observedCounters.derived_index_writes !== 0 ||
+      observedCounters.local_fallbacks !== 0 ||
+      observedCounters.unrestricted_native_searches !== 0;
     for (const key of keys) {
       session.counters[key] += observedCounters[key];
       counters[key] += observedCounters[key];
     }
+    if (forbiddenCounterObserved) return 'r5a_dogfood_forbidden_counter_observed';
+    if (providerBudgetExceeded) return 'r5a_dogfood_provider_budget_exhausted';
+    return null;
   }
 
   function observeToolResult({
@@ -155,7 +155,7 @@ function createPrivateDogfoodObserver({
         (relevance !== null && (!Number.isFinite(relevance) || relevance < 0 || relevance > 1))) {
       reject('r5a_dogfood_tool_result_invalid');
     }
-    addCounters(session, observedCounters);
+    const counterViolation = addCounters(session, observedCounters);
     session.tool_sequence.push(toolName);
     session.total_latency_ms += latencyMs;
     session.result_count = resultCount;
@@ -165,6 +165,7 @@ function createPrivateDogfoodObserver({
         : Math.max(session.max_relevance, relevance);
     }
     syncActivation(activationSnapshot);
+    if (counterViolation) reject(counterViolation);
     return true;
   }
 
