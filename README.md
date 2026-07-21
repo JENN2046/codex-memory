@@ -36,6 +36,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R4-H Private-Development Closeout](docs/CHATGPT_WEB_R4H_PRIVATE_DEVELOPMENT_CLOSEOUT.md)
 - [ChatGPT Web R5-A Private Dogfood Operations](docs/CHATGPT_WEB_R5A_PRIVATE_DOGFOOD_OPERATIONS.md)
 - [ChatGPT Web R5-B One-Read Model Guidance](docs/CHATGPT_WEB_R5B_ONE_READ_MODEL_GUIDANCE.md)
+- [ChatGPT Web R5-D Derived Runtime Mutation Governance](docs/CHATGPT_WEB_R5D_DERIVED_RUNTIME_MUTATION_GOVERNANCE.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
@@ -203,6 +204,14 @@ digest, and the shim must load the matching mapping with
 redacted example; it does not contain or derive a live diary inventory. See
 [Diary scope enforcement v1](docs/DIARY_SCOPE_ENFORCEMENT_V1.md) and the
 [Stage 3B closeout](docs/DIARY_SCOPE_STAGE3B_CLOSEOUT.md).
+
+An isolated read runtime may perform VCP's normal derived maintenance without
+becoming a primary-memory writer. The native shim accounts startup,
+selected-diary hydration/cache, vector/tag persistence, and matrix refresh
+under `isolated_derived_runtime_mutation_v1`; interim receipts cannot claim a
+final zero, and shutdown drains background work before its final receipt. This
+does not authorize source-partition mutation, native write, legacy access, or
+global search. See [R5-D derived runtime mutation governance](docs/CHATGPT_WEB_R5D_DERIVED_RUNTIME_MUTATION_GOVERNANCE.md).
 
 Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
 only when the native target exposes shape-compatible tools for those public

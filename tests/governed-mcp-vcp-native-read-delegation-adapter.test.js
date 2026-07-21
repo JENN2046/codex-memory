@@ -128,10 +128,28 @@ function nativeInvocationReceiptForPayload(payload, overrides = {}) {
       memoryReadPerformed: true,
       memoryWritePerformed: false,
       durableWritePerformed: true,
-      durableWriteScope: 'native_runtime_store',
-      isolatedRuntimeStoreUsed: false,
+      durableWriteScope: 'isolated_derived_index',
+      isolatedRuntimeStoreUsed: true,
       primaryMemoryStoreWritePerformed: false,
       derivedIndexWritePerformed: true,
+      derivedRuntimeMutationPolicy: 'isolated_derived_runtime_mutation_v1',
+      derivedRuntimeMutationAccountingMode: 'lifecycle_event_v1',
+      derivedRuntimeMutationAuthorized: true,
+      derivedRuntimeMutationAccountingFinal: false,
+      derivedRuntimeMutationBackgroundTasksDrained: false,
+      derivedRuntimeMutationCumulativeCount: 1,
+      derivedRuntimeMutationReceiptDelta: 1,
+      derivedRuntimeMutationActiveCount: 0,
+      derivedRuntimeMutationCompletedCount: 1,
+      derivedRuntimeMutationFailedCount: 0,
+      derivedRuntimeMutationTriggerCategories: ['startup'],
+      derivedRuntimeMutationZeroClaimed: false,
+      derivedRuntimeMutationPolicyViolation: false,
+      sourcePartitionMutationPerformed: false,
+      legacyPartitionAccessed: false,
+      ambiguousPartitionAccessed: false,
+      unregisteredPartitionAccessed: false,
+      derivedRuntimeMutationRawDetailsDisclosed: false,
       authorizationResolvedBeforeProvider: true,
       diaryAllowlistEnforcedBeforeIndexLoad: true,
       diaryAllowlistEnforcedBeforeVectorSearch: true,
@@ -596,6 +614,21 @@ test('delegates governed read to native MCP caller and returns only low-disclosu
   assert.equal(result.delegatedResult.receipt.localMemoryResultReturned, false);
   assert.equal(result.delegatedResult.receipt.localMemoryResultCanBeMistakenForVcpNative, false);
   assert.equal(result.delegatedResult.receipt.localMemoryRawContentDisclosed, false);
+  assert.equal(
+    result.delegatedResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt
+      .derivedRuntimeMutationPolicy,
+    'isolated_derived_runtime_mutation_v1'
+  );
+  assert.equal(
+    result.delegatedResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt
+      .derivedRuntimeMutationReceiptDelta,
+    1
+  );
+  assert.deepEqual(
+    result.delegatedResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt
+      .derivedRuntimeMutationTriggerCategories,
+    ['startup']
+  );
   assert.equal(result.delegatedResult.receipt.readWriteAuthoritySource, 'bridge_tool_binding');
   assert.equal(result.delegatedResult.receipt.readWriteAuthorityForbiddenFieldCount, 0);
   assert.equal(result.delegatedResult.receipt.readWriteAuthorityBound, true);
@@ -696,6 +729,64 @@ test('read delegation rejects successful native value when invocation receipt is
   assert.equal(result.memoryReadPerformed, true);
   assert.equal(result.localMemoryFallbackEligible, false);
   assert.equal(serialized.includes('RAW_PRIVATE_CONTENT_SHOULD_NOT_ECHO'), false);
+});
+
+test('read delegation rejects derived mutation receipts without complete lifecycle evidence', async () => {
+  const cases = [
+    {
+      name: 'missing lifecycle policy',
+      mutate(runtime) {
+        delete runtime.derivedRuntimeMutationPolicy;
+      }
+    },
+    {
+      name: 'count total mismatch',
+      mutate(runtime) {
+        runtime.derivedRuntimeMutationCompletedCount = 0;
+      }
+    },
+    {
+      name: 'derived write without trigger',
+      mutate(runtime) {
+        runtime.derivedRuntimeMutationTriggerCategories = [];
+      }
+    }
+  ];
+
+  for (const testCase of cases) {
+    const callMcpTool = async () => {
+      throw new Error('fallback call path should not run');
+    };
+    callMcpTool.callWithReceipt = async payload => {
+      const receipt = nativeInvocationReceiptForPayload(payload);
+      testCase.mutate(receipt.nativeRuntimeReceipt);
+      return {
+        value: { results: [{ content: 'RAW_PRIVATE_CONTENT_SHOULD_NOT_ECHO' }] },
+        receipt
+      };
+    };
+
+    const result = await executeGovernedMcpVcpNativeReadDelegation({
+      toolName: 'search_memory',
+      args: { query: 'needle' },
+      gateResult: gateResult('search_memory'),
+      callMcpTool
+    });
+
+    assert.equal(result.accepted, false, testCase.name);
+    assert.equal(
+      result.reasonCode,
+      'native_read_delegation_native_invocation_receipt_unbound',
+      testCase.name
+    );
+    assert.equal(result.receipt.statusClass, 'native_invocation_receipt_unbound', testCase.name);
+    assert.equal(result.localMemoryFallbackEligible, false, testCase.name);
+    assert.equal(
+      JSON.stringify(result).includes('RAW_PRIVATE_CONTENT_SHOULD_NOT_ECHO'),
+      false,
+      testCase.name
+    );
+  }
 });
 
 test('read delegation rejects matching native receipt when governance metadata was not sent', async () => {

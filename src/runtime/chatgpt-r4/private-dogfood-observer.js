@@ -27,6 +27,7 @@ function createPrivateDogfoodObserver({
 
   const sessions = [];
   let emergencyStopLatched = false;
+  let derivedRuntimeMutationEvidenceCount = 0;
   const counters = {
     provider_calls: 0,
     native_invocations: 0,
@@ -138,7 +139,43 @@ function createPrivateDogfoodObserver({
     return session;
   }
 
-  function addCounters(session, observedCounters) {
+  function validateDerivedRuntimeMutationEvidence(observedCounters, evidence) {
+    if (observedCounters.native_invocations === 0) {
+      return observedCounters.derived_index_writes === 0 &&
+        (evidence === null || evidence === undefined)
+        ? null
+        : 'r5d_derived_runtime_mutation_evidence_invalid';
+    }
+    const allowedTriggers = ['startup', 'hydration', 'cache', 'vector', 'tag', 'matrix'];
+    if (!evidence || typeof evidence !== 'object' || Array.isArray(evidence) ||
+        evidence.policy !== 'isolated_derived_runtime_mutation_v1' ||
+        evidence.authorized !== true || evidence.isolated_runtime_store !== true ||
+        evidence.accounting_final !== false || evidence.policy_violation !== false ||
+        evidence.source_partition_mutation !== false ||
+        evidence.legacy_partition_accessed !== false ||
+        evidence.ambiguous_partition_accessed !== false ||
+        evidence.unregistered_partition_accessed !== false ||
+        evidence.unrestricted_native_search !== false ||
+        evidence.raw_details_disclosed !== false ||
+        !Number.isInteger(evidence.cumulative_count) || evidence.cumulative_count < 0 ||
+        !Number.isInteger(evidence.receipt_delta) || evidence.receipt_delta < 0 ||
+        evidence.receipt_delta !== observedCounters.derived_index_writes ||
+        evidence.receipt_delta > evidence.cumulative_count ||
+        !Number.isInteger(evidence.active_count) || evidence.active_count < 0 ||
+        !Number.isInteger(evidence.completed_count) || evidence.completed_count < 0 ||
+        !Number.isInteger(evidence.failed_count) || evidence.failed_count !== 0 ||
+        evidence.active_count + evidence.completed_count + evidence.failed_count !==
+          evidence.cumulative_count ||
+        !Array.isArray(evidence.trigger_categories) ||
+        evidence.trigger_categories.some(trigger => !allowedTriggers.includes(trigger)) ||
+        (evidence.cumulative_count > 0 && evidence.trigger_categories.length === 0)) {
+      return 'r5d_derived_runtime_mutation_evidence_invalid';
+    }
+    derivedRuntimeMutationEvidenceCount += 1;
+    return null;
+  }
+
+  function addCounters(session, observedCounters, derivedRuntimeMutationEvidence) {
     const keys = Object.keys(counters);
     if (!observedCounters || typeof observedCounters !== 'object' || Array.isArray(observedCounters) ||
         Object.keys(observedCounters).length !== keys.length ||
@@ -148,8 +185,11 @@ function createPrivateDogfoodObserver({
     }
     const providerBudgetExceeded =
       counters.provider_calls + observedCounters.provider_calls > maxProviderCalls;
+    const derivedEvidenceViolation = validateDerivedRuntimeMutationEvidence(
+      observedCounters,
+      derivedRuntimeMutationEvidence
+    );
     const forbiddenCounterObserved = observedCounters.primary_memory_writes !== 0 ||
-      observedCounters.derived_index_writes !== 0 ||
       observedCounters.local_fallbacks !== 0 ||
       observedCounters.unrestricted_native_searches !== 0;
     for (const key of keys) {
@@ -157,6 +197,7 @@ function createPrivateDogfoodObserver({
       counters[key] += observedCounters[key];
     }
     if (forbiddenCounterObserved) return 'r5a_dogfood_forbidden_counter_observed';
+    if (derivedEvidenceViolation) return derivedEvidenceViolation;
     if (providerBudgetExceeded) return 'r5a_dogfood_provider_budget_exhausted';
     return null;
   }
@@ -168,6 +209,7 @@ function createPrivateDogfoodObserver({
     resultCount = 0,
     relevance = null,
     counters: observedCounters,
+    derivedRuntimeMutationEvidence = null,
     activationSnapshot,
     sessionOrdinal = null
   } = {}) {
@@ -178,7 +220,11 @@ function createPrivateDogfoodObserver({
         (relevance !== null && (!Number.isFinite(relevance) || relevance < 0 || relevance > 1))) {
       reject('r5a_dogfood_tool_result_invalid');
     }
-    const counterViolation = addCounters(session, observedCounters);
+    const counterViolation = addCounters(
+      session,
+      observedCounters,
+      derivedRuntimeMutationEvidence
+    );
     session.tool_sequence.push(toolName);
     session.tool_attempt_in_flight = false;
     session.total_latency_ms += latencyMs;
@@ -270,6 +316,12 @@ function createPrivateDogfoodObserver({
       local_fallbacks: counters.local_fallbacks,
       primary_memory_writes: counters.primary_memory_writes,
       derived_index_writes: counters.derived_index_writes,
+      derived_runtime_mutation_policy: 'isolated_derived_runtime_mutation_v1',
+      derived_runtime_mutation_evidence_count: derivedRuntimeMutationEvidenceCount,
+      derived_runtime_mutation_policy_violations: emergencyStopLatched &&
+        currentSession()?.error_code?.startsWith('r5d_derived_runtime_mutation_')
+        ? 1
+        : 0,
       other_durable_mutations: counters.other_durable_mutations,
       unrestricted_native_searches: counters.unrestricted_native_searches,
       durable_observation_state_written: false,

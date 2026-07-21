@@ -85,6 +85,8 @@ function validateObservation(observation) {
     'resolve_then_read_sessions', 'timeout_count', 'emergency_stop_latched', 'provider_calls',
     'provider_call_limit', 'native_invocations', 'local_fallbacks',
     'primary_memory_writes', 'derived_index_writes', 'other_durable_mutations',
+    'derived_runtime_mutation_policy', 'derived_runtime_mutation_evidence_count',
+    'derived_runtime_mutation_policy_violations',
     'unrestricted_native_searches',
     'durable_observation_state_written', 'request_bodies_logged',
     'response_bodies_logged', 'raw_memory_recorded', 'last_session'
@@ -94,6 +96,7 @@ function validateObservation(observation) {
     'sessions_with_read', 'resolve_then_read_sessions', 'timeout_count',
     'provider_calls', 'native_invocations', 'local_fallbacks',
     'primary_memory_writes', 'derived_index_writes', 'other_durable_mutations',
+    'derived_runtime_mutation_evidence_count', 'derived_runtime_mutation_policy_violations',
     'unrestricted_native_searches'
   ];
   if (!observation || typeof observation !== 'object' || Array.isArray(observation) ||
@@ -102,6 +105,8 @@ function validateObservation(observation) {
       observation.observation_kind !== DOGFOOD_OBSERVATION_KIND ||
       observation.session_limit !== MAX_DOGFOOD_SESSIONS ||
       observation.provider_call_limit !== MAX_DOGFOOD_PROVIDER_CALLS ||
+      observation.derived_runtime_mutation_policy !==
+        'isolated_derived_runtime_mutation_v1' ||
       countKeys.some(key => !Number.isInteger(observation[key]) || observation[key] < 0) ||
       observation.sessions_started < 0 || observation.sessions_started > MAX_DOGFOOD_SESSIONS ||
       observation.provider_calls < 0 || observation.provider_calls > MAX_DOGFOOD_PROVIDER_CALLS ||
@@ -110,6 +115,9 @@ function validateObservation(observation) {
       observation.sessions_with_read > observation.sessions_started ||
       observation.resolve_then_read_sessions > observation.sessions_started ||
       observation.timeout_count > observation.sessions_started ||
+      observation.derived_runtime_mutation_evidence_count > observation.native_invocations ||
+      (observation.derived_index_writes > 0 &&
+       observation.derived_runtime_mutation_evidence_count === 0) ||
       typeof observation.emergency_stop_latched !== 'boolean' ||
       observation.durable_observation_state_written !== false ||
       observation.request_bodies_logged !== 0 || observation.response_bodies_logged !== 0 ||
@@ -118,8 +126,9 @@ function validateObservation(observation) {
   }
   validateLastSession(observation.last_session, observation.sessions_started);
   const forbiddenCounterObserved = observation.local_fallbacks !== 0 ||
-    observation.primary_memory_writes !== 0 || observation.derived_index_writes !== 0 ||
-    observation.unrestricted_native_searches !== 0;
+    observation.primary_memory_writes !== 0 ||
+    observation.unrestricted_native_searches !== 0 ||
+    observation.derived_runtime_mutation_policy_violations !== 0;
   if (forbiddenCounterObserved &&
       (observation.emergency_stop_latched !== true ||
        observation.last_session?.status !== 'emergency_stopped')) {

@@ -80,6 +80,347 @@ test('native read initializes the selected-diary runtime before provider and sco
   assert.equal(result._nativeRuntimeReceipt.unscopedNativeSearchUsed, false);
 });
 
+test('isolated runtime accounts startup, background matrix, shutdown saves, and final drain', async () => {
+  const calls = [];
+  const tagMemoEngine = {
+    _postStartupDerivedRefreshTimer: null,
+    _derivedTaskTimer: null,
+    _matrixRebuildTimer: null,
+    _derivedTaskQueue: [],
+    _derivedTaskRunning: false,
+    async doMatrixRebuild() {
+      calls.push('matrix');
+      return true;
+    }
+  };
+  const manager = {
+    config: { fullScanOnStartup: false },
+    diaryIndices: new Map(),
+    diaryDateIndexCache: new Map(),
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    async initialize() {
+      calls.push('initialize');
+      this._saveIndexToDisk('global_tags');
+      this.tagMemoEngine = tagMemoEngine;
+      this.watcher = { async close() { calls.push('watcher-close'); } };
+      this.ragParamsWatcher = { async close() { calls.push('rag-watcher-close'); } };
+    },
+    _saveIndexToDisk(name) {
+      calls.push(['save', name]);
+    },
+    async _getOrLoadDiaryIndex(diaryName) {
+      if (this.diaryIndices.has(diaryName)) return this.diaryIndices.get(diaryName);
+      calls.push(['hydrate', diaryName]);
+      await this._recoverIndexFromDB(diaryName);
+      const index = { diaryName };
+      this.diaryIndices.set(diaryName, index);
+      this._ensureDiaryDateIndexCached(diaryName);
+      return index;
+    },
+    async _recoverIndexFromDB(diaryName) {
+      calls.push(['recover', diaryName]);
+    },
+    _ensureDiaryDateIndexCached(diaryName) {
+      if (!this.diaryDateIndexCache.has(diaryName)) {
+        calls.push(['cache', diaryName]);
+        this.diaryDateIndexCache.set(diaryName, true);
+      }
+      return this.diaryDateIndexCache.get(diaryName);
+    },
+    async search(diaryNames) {
+      calls.push(['search', diaryNames]);
+      await this._getOrLoadDiaryIndex(diaryNames[0]);
+      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+    },
+    async shutdown() {
+      calls.push('shutdown');
+      this._saveIndexToDisk('selected_diary');
+    }
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  const first = await adapter.search({ query: 'first', limit: 1 }, { authorization });
+  assert.equal(first._nativeRuntimeReceipt.derivedIndexWritePerformed, true);
+  assert.equal(first._nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta, 5);
+  assert.equal(first._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 5);
+  assert.deepEqual(first._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
+    ['cache', 'hydration', 'startup', 'tag', 'vector']);
+
+  await manager.tagMemoEngine.doMatrixRebuild();
+  const second = await adapter.search({ query: 'second', limit: 1 }, { authorization });
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta, 1);
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 6);
+  assert.deepEqual(second._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
+    ['cache', 'hydration', 'matrix', 'startup', 'tag', 'vector']);
+
+  const final = await adapter.shutdown();
+  assert.equal(final.derivedRuntimeMutationAccountingFinal, true);
+  assert.equal(final.derivedRuntimeMutationBackgroundTasksDrained, true);
+  assert.equal(final.derivedRuntimeMutationReceiptDelta, 1);
+  assert.equal(final.derivedRuntimeMutationCumulativeCount, 7);
+  assert.equal(final.derivedRuntimeMutationCompletedCount, 7);
+  assert.deepEqual(final.derivedRuntimeMutationTriggerCategories,
+    ['cache', 'hydration', 'matrix', 'startup', 'tag', 'vector']);
+  assert.equal(calls.filter(value => value === 'initialize').length, 1);
+  assert.equal(calls.filter(value => value === 'watcher-close').length, 1);
+  assert.equal(calls.filter(value => value === 'rag-watcher-close').length, 1);
+  assert.equal(calls.filter(value => Array.isArray(value) && value[0] === 'hydrate').length, 1);
+});
+
+test('isolated runtime accounts queued matrix task types exactly once', async () => {
+  let queuedTask = null;
+  const tagMemoEngine = {
+    _postStartupDerivedRefreshTimer: null,
+    _derivedTaskTimer: null,
+    _matrixRebuildTimer: null,
+    _derivedTaskQueue: [],
+    _derivedTaskRunning: false,
+    _enqueueDerivedTask(type, run) {
+      queuedTask = { type, run };
+      return `${type}-synthetic`;
+    },
+    async doMatrixRebuild() {
+      return true;
+    }
+  };
+  const manager = {
+    config: { fullScanOnStartup: false },
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    tagMemoEngine,
+    async initialize() {},
+    async search() {
+      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+    },
+    async shutdown() {}
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  const first = await adapter.search({ query: 'initialize', limit: 1 }, { authorization });
+  assert.equal(first._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 1);
+
+  for (const type of ['matrix-rebuild', 'active-full-training']) {
+    manager.tagMemoEngine._enqueueDerivedTask(type, async () =>
+      manager.tagMemoEngine.doMatrixRebuild()
+    );
+    assert.equal(queuedTask.type, type);
+    await queuedTask.run();
+  }
+
+  const second = await adapter.search({ query: 'after queues', limit: 1 }, { authorization });
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta, 2);
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 3);
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationCompletedCount, 3);
+  assert.deepEqual(second._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
+    ['matrix', 'startup']);
+
+  await adapter.shutdown();
+});
+
+test('isolated runtime keeps derived accounting enabled for write-capable reads', async () => {
+  const manager = {
+    config: { fullScanOnStartup: false },
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    async initialize() {
+      this._saveIndexToDisk('global_tags');
+    },
+    _saveIndexToDisk() {},
+    async search() {
+      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+    },
+    async shutdown() {}
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    enableWrite: true,
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  const result = await adapter.search({ query: 'write capable read', limit: 1 }, {
+    authorization
+  });
+
+  assert.equal(
+    result._nativeRuntimeReceipt.derivedRuntimeMutationPolicy,
+    'isolated_derived_runtime_mutation_v1'
+  );
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationAccountingMode,
+    'lifecycle_event_v1');
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationAuthorized, true);
+  assert.equal(result._nativeRuntimeReceipt.isolatedRuntimeStoreUsed, true);
+  assert.equal(result._nativeRuntimeReceipt.derivedIndexWritePerformed, true);
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 2);
+  assert.deepEqual(result._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
+    ['startup', 'tag']);
+
+  await adapter.shutdown();
+});
+
+test('write-capable primary writes do not initialize or mutate the derived runtime', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'vcp-write-capable-primary-'));
+  const isolatedStore = path.join(root, 'isolated-runtime-store');
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  let initializeCalls = 0;
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    enableWrite: true,
+    knowledgeBaseRootPath: root,
+    knowledgeBaseStorePath: isolatedStore,
+    knowledgeBaseManager: {
+      config: { fullScanOnStartup: false },
+      async initialize() { initializeCalls += 1; },
+      async shutdown() {}
+    },
+    embeddingUtils: {}
+  });
+
+  const result = await adapter.record({
+    title: 'synthetic primary write',
+    content: 'synthetic fixture only'
+  });
+
+  assert.equal(initializeCalls, 0);
+  assert.equal(result._nativeRuntimeReceipt.nativeRuntimeCalled, false);
+  assert.equal(result._nativeRuntimeReceipt.nativeRuntimeInitialized, false);
+  assert.equal(result._nativeRuntimeReceipt.primaryMemoryStoreWritePerformed, true);
+  assert.equal(result._nativeRuntimeReceipt.derivedIndexWritePerformed, false);
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationPolicy, 'disabled');
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 0);
+  assert.equal(result._nativeRuntimeReceipt.isolatedRuntimeStoreUsed, false);
+  await assert.rejects(fs.lstat(isolatedStore), error => error.code === 'ENOENT');
+
+  await adapter.shutdown();
+});
+
+test('isolated runtime fails closed before an unknown queued derived task executes', async () => {
+  let queuedRun = null;
+  let operationRan = false;
+  const tagMemoEngine = {
+    _postStartupDerivedRefreshTimer: null,
+    _derivedTaskTimer: null,
+    _matrixRebuildTimer: null,
+    _derivedTaskQueue: [],
+    _derivedTaskRunning: false,
+    _enqueueDerivedTask(_type, run) {
+      queuedRun = run;
+      return 'unknown-synthetic';
+    }
+  };
+  const manager = {
+    config: { fullScanOnStartup: false },
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    tagMemoEngine,
+    async initialize() {},
+    async search() {
+      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+    }
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  await adapter.search({ query: 'initialize', limit: 1 }, { authorization });
+  manager.tagMemoEngine._enqueueDerivedTask('unknown-derived-task', () => {
+    operationRan = true;
+  });
+  assert.throws(() => queuedRun(), { message: 'derived_runtime_mutation_trigger_forbidden' });
+  assert.equal(operationRan, false);
+});
+
+test('isolated runtime rejects a mismatched derived mutation policy before provider use', () => {
+  assert.throws(() => createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    derivedRuntimeMutationPolicy: 'legacy_zero_write_v0',
+    knowledgeBaseManager: {},
+    embeddingUtils: {}
+  }), { message: 'derived_runtime_mutation_policy_mismatch' });
+});
+
+test('shutdown rejects pending source work and preserves the failure on replay', async () => {
+  const manager = {
+    pendingFiles: new Set(['synthetic-pending-source']),
+    pendingDeletes: new Set(),
+    async shutdown() {}
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: {}
+  });
+
+  await assert.rejects(adapter.shutdown(), {
+    message: 'native_source_partition_mutation_pending'
+  });
+  await assert.rejects(adapter.shutdown(), {
+    message: 'native_source_partition_mutation_pending'
+  });
+  assert.equal(manager.pendingFiles.size, 0);
+});
+
+test('server closes its listener when governed runtime shutdown fails', async () => {
+  const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({
+    diaryScopeMapping: SYNTHETIC_DIARY_SCOPE_MAPPING,
+    adapter: {
+      async shutdown() {
+        throw new Error('native_source_partition_mutation_pending');
+      }
+    }
+  });
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      server.off('error', reject);
+      resolve();
+    });
+  });
+  assert.equal(server.listening, true);
+  await assert.rejects(server.shutdownGovernedRuntime(), {
+    message: 'native_source_partition_mutation_pending'
+  });
+  assert.equal(server.listening, false);
+});
+
 test('native read rejects a manager configured for an unscoped startup scan before initialization', async () => {
   const calls = [];
   const adapter = createVcpToolBoxNativeMemoryAdapter({
@@ -114,6 +455,46 @@ test('native read rejects a manager configured for an unscoped startup scan befo
     error => error.reasonCode === 'native_runtime_initialization_failed'
   );
   assert.deepEqual(calls, []);
+});
+
+test('isolated read stops broad source watchers and rejects queued source work before provider', async () => {
+  const calls = [];
+  const manager = {
+    config: { fullScanOnStartup: false },
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    async initialize() {
+      calls.push('initialize');
+      this.watcher = { async close() { calls.push('watcher-close'); } };
+      this.pendingFiles.add('synthetic-unregistered-source-event');
+    },
+    async search() {
+      calls.push('search');
+      return [];
+    }
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: {
+      async getEmbeddingsBatch() {
+        calls.push('embedding');
+        return [[0.1, 0.2]];
+      }
+    }
+  });
+
+  await assert.rejects(adapter.search({ query: 'governed read' }, {
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+      allowedDiaryCount: 1,
+      mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+      mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+    }
+  }), error => error.reasonCode === 'native_runtime_initialization_failed');
+  assert.deepEqual(calls, ['initialize', 'watcher-close']);
+  assert.equal(manager.pendingFiles.size, 0);
 });
 
 test('native read classifies provider, scoped search, and postcheck failures without raw errors', async () => {

@@ -475,6 +475,12 @@ test('HTTP MCP tool caller sends governed metadata through params _meta only', a
 test('HTTP MCP tool caller projects native runtime receipt without raw disclosure', async () => {
   const rawPrivateValue = 'RAW_PRIVATE_NATIVE_VALUE_SHOULD_NOT_ECHO_IN_RUNTIME_RECEIPT_TEST';
   let omitProviderEvidence = false;
+  let falseZeroReceipt = false;
+  let falsePositiveReceipt = false;
+  let impossibleTriggerReceipt = false;
+  let forbiddenBoundaryReceipt = false;
+  let invalidFinalZeroReceipt = false;
+  let nonIsolatedLifecycleReceipt = false;
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
     const nativeRuntimeReceipt = {
@@ -488,6 +494,24 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
       isolatedRuntimeStoreUsed: false,
       primaryMemoryStoreWritePerformed: false,
       derivedIndexWritePerformed: false,
+      derivedRuntimeMutationPolicy: 'disabled',
+      derivedRuntimeMutationAccountingMode: 'not_applicable',
+      derivedRuntimeMutationAuthorized: false,
+      derivedRuntimeMutationAccountingFinal: false,
+      derivedRuntimeMutationBackgroundTasksDrained: false,
+      derivedRuntimeMutationCumulativeCount: 0,
+      derivedRuntimeMutationReceiptDelta: 0,
+      derivedRuntimeMutationActiveCount: 0,
+      derivedRuntimeMutationCompletedCount: 0,
+      derivedRuntimeMutationFailedCount: 0,
+      derivedRuntimeMutationTriggerCategories: [],
+      derivedRuntimeMutationZeroClaimed: false,
+      derivedRuntimeMutationPolicyViolation: false,
+      sourcePartitionMutationPerformed: false,
+      legacyPartitionAccessed: false,
+      ambiguousPartitionAccessed: false,
+      unregisteredPartitionAccessed: false,
+      derivedRuntimeMutationRawDetailsDisclosed: false,
       authorizationResolvedBeforeProvider: true,
       diaryAllowlistEnforcedBeforeIndexLoad: true,
       diaryAllowlistEnforcedBeforeVectorSearch: true,
@@ -509,6 +533,44 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
       readinessClaimed: false
     };
     if (omitProviderEvidence) delete nativeRuntimeReceipt.providerApiCalled;
+    if (falseZeroReceipt) {
+      nativeRuntimeReceipt.derivedRuntimeMutationPolicy =
+        'isolated_derived_runtime_mutation_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAccountingMode = 'lifecycle_event_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAuthorized = true;
+      nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount = 1;
+      nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta = 1;
+      nativeRuntimeReceipt.derivedRuntimeMutationCompletedCount = 1;
+      nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories = ['startup'];
+    }
+    if (falsePositiveReceipt) {
+      nativeRuntimeReceipt.derivedRuntimeMutationPolicy =
+        'isolated_derived_runtime_mutation_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAccountingMode = 'lifecycle_event_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAuthorized = true;
+      nativeRuntimeReceipt.derivedIndexWritePerformed = true;
+      nativeRuntimeReceipt.durableWritePerformed = true;
+    }
+    if (impossibleTriggerReceipt) {
+      nativeRuntimeReceipt.derivedRuntimeMutationPolicy =
+        'isolated_derived_runtime_mutation_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAccountingMode = 'lifecycle_event_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAuthorized = true;
+      nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories = ['cache'];
+    }
+    if (forbiddenBoundaryReceipt) {
+      nativeRuntimeReceipt.sourcePartitionMutationPerformed = true;
+    }
+    if (invalidFinalZeroReceipt) {
+      nativeRuntimeReceipt.derivedRuntimeMutationAccountingFinal = true;
+      nativeRuntimeReceipt.derivedRuntimeMutationBackgroundTasksDrained = true;
+    }
+    if (nonIsolatedLifecycleReceipt) {
+      nativeRuntimeReceipt.derivedRuntimeMutationPolicy =
+        'isolated_derived_runtime_mutation_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAccountingMode = 'lifecycle_event_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAuthorized = true;
+    }
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({
       jsonrpc: '2.0',
@@ -549,6 +611,9 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
     assert.equal(runtimeReceipt.memoryReadPerformed, true);
     assert.equal(runtimeReceipt.memoryWritePerformed, false);
     assert.equal(runtimeReceipt.durableWritePerformed, false);
+    assert.equal(runtimeReceipt.derivedRuntimeMutationPolicy, 'disabled');
+    assert.equal(runtimeReceipt.derivedRuntimeMutationCumulativeCount, 0);
+    assert.equal(runtimeReceipt.derivedRuntimeMutationZeroClaimed, false);
     assert.equal(runtimeReceipt.rawRuntimeOutputDisclosed, false);
     assert.equal(runtimeReceipt.rawMemoryContentDisclosed, false);
     assert.equal(runtimeReceipt.runtimeLocatorDisclosed, false);
@@ -565,6 +630,66 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
       governanceMeta: validReadGovernanceMeta()
     });
     assert.equal(incomplete.receipt.nativeRuntimeReceipt.present, false);
+
+    omitProviderEvidence = false;
+    falseZeroReceipt = true;
+    const falseZero = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(falseZero.receipt.nativeRuntimeReceipt.present, false);
+
+    falseZeroReceipt = false;
+    falsePositiveReceipt = true;
+    const falsePositive = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(falsePositive.receipt.nativeRuntimeReceipt.present, false);
+
+    falsePositiveReceipt = false;
+    impossibleTriggerReceipt = true;
+    const impossibleTrigger = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(impossibleTrigger.receipt.nativeRuntimeReceipt.present, false);
+
+    impossibleTriggerReceipt = false;
+    forbiddenBoundaryReceipt = true;
+    const forbiddenBoundary = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(forbiddenBoundary.receipt.nativeRuntimeReceipt.present, false);
+
+    forbiddenBoundaryReceipt = false;
+    invalidFinalZeroReceipt = true;
+    const invalidFinalZero = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(invalidFinalZero.receipt.nativeRuntimeReceipt.present, false);
+
+    invalidFinalZeroReceipt = false;
+    nonIsolatedLifecycleReceipt = true;
+    const nonIsolatedLifecycle = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(nonIsolatedLifecycle.receipt.nativeRuntimeReceipt.present, false);
   } finally {
     await server.close();
   }

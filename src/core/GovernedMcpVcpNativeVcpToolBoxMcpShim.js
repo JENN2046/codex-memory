@@ -1,5 +1,6 @@
 'use strict';
 
+const { AsyncLocalStorage } = require('node:async_hooks');
 const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const http = require('node:http');
@@ -23,6 +24,10 @@ const {
 const { resolveRead } = require('./DiaryScopeMapping');
 const { loadDiaryScopeMapping } = require('./DiaryScopeMappingLoader');
 const { postCheckNativeDiaryResults } = require('./NativeDiaryResultPostCheck');
+const {
+  DERIVED_RUNTIME_MUTATION_POLICY,
+  createDerivedRuntimeMutationLifecycle
+} = require('./DerivedRuntimeMutationLifecycle');
 
 const GOVERNANCE_METADATA_PATH = 'params._meta.codexMemoryGovernance';
 const PUBLIC_TOOL_TO_NATIVE_TOOLS = Object.freeze({
@@ -103,6 +108,16 @@ function nativeRuntimeFailureReasonCode(error) {
 }
 
 function nativeRuntimeReceipt(overrides = {}) {
+  const derivedRuntimeMutationCumulativeCount = Number.isInteger(
+    overrides.derivedRuntimeMutationCumulativeCount
+  ) && overrides.derivedRuntimeMutationCumulativeCount >= 0
+    ? overrides.derivedRuntimeMutationCumulativeCount
+    : 0;
+  const derivedRuntimeMutationReceiptDelta = Number.isInteger(
+    overrides.derivedRuntimeMutationReceiptDelta
+  ) && overrides.derivedRuntimeMutationReceiptDelta >= 0
+    ? overrides.derivedRuntimeMutationReceiptDelta
+    : 0;
   return {
     nativeRuntimeCalled: overrides.nativeRuntimeCalled === true,
     nativeRuntimeInitialized: overrides.nativeRuntimeInitialized === true,
@@ -116,6 +131,50 @@ function nativeRuntimeReceipt(overrides = {}) {
     isolatedRuntimeStoreUsed: overrides.isolatedRuntimeStoreUsed === true,
     primaryMemoryStoreWritePerformed: overrides.primaryMemoryStoreWritePerformed === true,
     derivedIndexWritePerformed: overrides.derivedIndexWritePerformed === true,
+    derivedRuntimeMutationPolicy: overrides.derivedRuntimeMutationPolicy ===
+      DERIVED_RUNTIME_MUTATION_POLICY
+      ? DERIVED_RUNTIME_MUTATION_POLICY
+      : 'disabled',
+    derivedRuntimeMutationAccountingMode: overrides.derivedRuntimeMutationAccountingMode ===
+      'lifecycle_event_v1'
+      ? 'lifecycle_event_v1'
+      : 'not_applicable',
+    derivedRuntimeMutationAuthorized: overrides.derivedRuntimeMutationAuthorized === true,
+    derivedRuntimeMutationAccountingFinal:
+      overrides.derivedRuntimeMutationAccountingFinal === true,
+    derivedRuntimeMutationBackgroundTasksDrained:
+      overrides.derivedRuntimeMutationBackgroundTasksDrained === true,
+    derivedRuntimeMutationCumulativeCount,
+    derivedRuntimeMutationReceiptDelta,
+    derivedRuntimeMutationActiveCount: Number.isInteger(overrides.derivedRuntimeMutationActiveCount) &&
+      overrides.derivedRuntimeMutationActiveCount >= 0
+      ? overrides.derivedRuntimeMutationActiveCount
+      : 0,
+    derivedRuntimeMutationCompletedCount:
+      Number.isInteger(overrides.derivedRuntimeMutationCompletedCount) &&
+      overrides.derivedRuntimeMutationCompletedCount >= 0
+        ? overrides.derivedRuntimeMutationCompletedCount
+        : 0,
+    derivedRuntimeMutationFailedCount:
+      Number.isInteger(overrides.derivedRuntimeMutationFailedCount) &&
+      overrides.derivedRuntimeMutationFailedCount >= 0
+        ? overrides.derivedRuntimeMutationFailedCount
+        : 0,
+    derivedRuntimeMutationTriggerCategories: Array.isArray(
+      overrides.derivedRuntimeMutationTriggerCategories
+    )
+      ? overrides.derivedRuntimeMutationTriggerCategories.filter(value =>
+          ['startup', 'hydration', 'cache', 'vector', 'tag', 'matrix'].includes(value)
+        )
+      : [],
+    derivedRuntimeMutationZeroClaimed: overrides.derivedRuntimeMutationZeroClaimed === true,
+    derivedRuntimeMutationPolicyViolation:
+      overrides.derivedRuntimeMutationPolicyViolation === true,
+    sourcePartitionMutationPerformed: overrides.sourcePartitionMutationPerformed === true,
+    legacyPartitionAccessed: overrides.legacyPartitionAccessed === true,
+    ambiguousPartitionAccessed: overrides.ambiguousPartitionAccessed === true,
+    unregisteredPartitionAccessed: overrides.unregisteredPartitionAccessed === true,
+    derivedRuntimeMutationRawDetailsDisclosed: false,
     authorizationResolvedBeforeProvider: overrides.authorizationResolvedBeforeProvider === true,
     diaryAllowlistEnforcedBeforeIndexLoad: overrides.diaryAllowlistEnforcedBeforeIndexLoad === true,
     diaryAllowlistEnforcedBeforeVectorSearch: overrides.diaryAllowlistEnforcedBeforeVectorSearch === true,
@@ -507,19 +566,23 @@ function defaultReadRuntimeReceipt({
   memoryReadPerformed = true,
   isolatedRuntimeStoreUsed = false,
   authorization = null,
-  resultScopePostcheckPassed = false
+  resultScopePostcheckPassed = false,
+  derivedRuntimeMutation = null
 } = {}) {
+  const derivedMutationObserved =
+    derivedRuntimeMutation?.derivedRuntimeMutationCumulativeCount > 0;
   return nativeRuntimeReceipt({
     nativeRuntimeCalled: true,
     nativeRuntimeInitialized,
     providerApiCalled,
     memoryReadPerformed,
     memoryWritePerformed: false,
-    durableWritePerformed: false,
-    durableWriteScope: null,
+    durableWritePerformed: derivedMutationObserved,
+    durableWriteScope: derivedMutationObserved ? 'isolated_derived_index' : null,
     isolatedRuntimeStoreUsed,
     primaryMemoryStoreWritePerformed: false,
-    derivedIndexWritePerformed: false,
+    derivedIndexWritePerformed: derivedMutationObserved,
+    ...(isPlainObject(derivedRuntimeMutation) ? derivedRuntimeMutation : {}),
     authorizationResolvedBeforeProvider: authorization?.accepted === true,
     diaryAllowlistEnforcedBeforeIndexLoad: authorization?.accepted === true,
     diaryAllowlistEnforcedBeforeVectorSearch: authorization?.accepted === true,
@@ -640,12 +703,135 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       : '';
   const isolatedRuntimeStoreConfigured = Boolean(knowledgeBaseStorePath);
   const primaryWriteOnly = options.primaryWriteOnly === true;
+  const derivedRuntimeMutationGovernanceEnabled = isolatedRuntimeStoreConfigured &&
+    !primaryWriteOnly;
+  const derivedRuntimeMutationPolicy = options.derivedRuntimeMutationPolicy ||
+    DERIVED_RUNTIME_MUTATION_POLICY;
+  if (derivedRuntimeMutationGovernanceEnabled &&
+      derivedRuntimeMutationPolicy !== DERIVED_RUNTIME_MUTATION_POLICY) {
+    throw new Error('derived_runtime_mutation_policy_mismatch');
+  }
+  const derivedRuntimeMutationLifecycle = createDerivedRuntimeMutationLifecycle({
+    enabled: derivedRuntimeMutationGovernanceEnabled,
+    isolatedRuntimeStore: isolatedRuntimeStoreConfigured
+  });
   const primaryWritePreflight = typeof options.primaryWritePreflight === 'function'
     ? options.primaryWritePreflight
     : null;
   const writeSubdir = safeFilenamePart(options.writeSubdir || 'codex-memory-governed');
   let knowledgeBaseManager = options.knowledgeBaseManager || null;
   let embeddingUtils = options.embeddingUtils || null;
+  let runtimeInitialized = false;
+  let runtimeInstrumented = false;
+  let tagMemoInstrumented = false;
+  let shutdownReceipt = null;
+  let shutdownError = null;
+  let shuttingDown = false;
+  const restoreRuntimeHooks = [];
+  const derivedTaskAccountingContext = new AsyncLocalStorage();
+
+  function bindDerivedMutationAuthorization(authorization) {
+    derivedRuntimeMutationLifecycle.bindAuthorization({
+      accepted: authorization?.accepted === true,
+      allowedDiaryCount: authorization?.allowedDiaryCount,
+      mappingReferenceBound: typeof authorization?.mappingReference === 'string',
+      mappingDigestBound: /^sha256:[a-f0-9]{64}$/.test(authorization?.mappingDigest || '')
+    });
+  }
+
+  function takeDerivedMutationReceipt() {
+    return derivedRuntimeMutationLifecycle.projection({ consume: true });
+  }
+
+  function instrumentTagMemoRuntime() {
+    if (tagMemoInstrumented || !knowledgeBaseManager?.tagMemoEngine) return;
+    const tagMemo = knowledgeBaseManager.tagMemoEngine;
+
+    if (typeof tagMemo.doMatrixRebuild === 'function') {
+      const original = tagMemo.doMatrixRebuild;
+      tagMemo.doMatrixRebuild = function governedMatrixRebuild(...args) {
+        if (derivedTaskAccountingContext.getStore()?.trigger === 'matrix') {
+          return original.apply(this, args);
+        }
+        return derivedRuntimeMutationLifecycle.track('matrix', () => original.apply(this, args));
+      };
+      restoreRuntimeHooks.push(() => { tagMemo.doMatrixRebuild = original; });
+    }
+
+    if (typeof tagMemo._enqueueDerivedTask === 'function') {
+      const original = tagMemo._enqueueDerivedTask;
+      tagMemo._enqueueDerivedTask = function governedDerivedTask(type, run, taskOptions) {
+        if (shuttingDown) return null;
+        const trigger = type === 'epa-basis'
+          ? 'vector'
+          : ['matrix-rebuild', 'active-full-training'].includes(type)
+            ? 'matrix'
+            : 'unsupported_derived_task';
+        const governedRun = () => derivedRuntimeMutationLifecycle.track(trigger, () =>
+          derivedTaskAccountingContext.run({ trigger }, run)
+        );
+        return original.call(this, type, governedRun, taskOptions);
+      };
+      restoreRuntimeHooks.push(() => { tagMemo._enqueueDerivedTask = original; });
+    }
+    tagMemoInstrumented = true;
+  }
+
+  function instrumentRuntime() {
+    if (runtimeInstrumented || !knowledgeBaseManager) return;
+    if (typeof knowledgeBaseManager._getOrLoadDiaryIndex === 'function') {
+      const original = knowledgeBaseManager._getOrLoadDiaryIndex;
+      knowledgeBaseManager._getOrLoadDiaryIndex = function governedDiaryIndexHydration(
+        diaryName,
+        ...args
+      ) {
+        const alreadyLoaded = this.diaryIndices instanceof Map &&
+          this.diaryIndices.has(diaryName);
+        if (alreadyLoaded) return original.call(this, diaryName, ...args);
+        return derivedRuntimeMutationLifecycle.track('hydration', () =>
+          original.call(this, diaryName, ...args)
+        );
+      };
+      restoreRuntimeHooks.push(() => { knowledgeBaseManager._getOrLoadDiaryIndex = original; });
+    }
+    if (typeof knowledgeBaseManager._recoverIndexFromDB === 'function') {
+      const original = knowledgeBaseManager._recoverIndexFromDB;
+      knowledgeBaseManager._recoverIndexFromDB = function governedVectorRecovery(...args) {
+        return derivedRuntimeMutationLifecycle.track('vector', () =>
+          original.apply(this, args)
+        );
+      };
+      restoreRuntimeHooks.push(() => { knowledgeBaseManager._recoverIndexFromDB = original; });
+    }
+    if (typeof knowledgeBaseManager._ensureDiaryDateIndexCached === 'function') {
+      const original = knowledgeBaseManager._ensureDiaryDateIndexCached;
+      knowledgeBaseManager._ensureDiaryDateIndexCached = function governedDiaryCache(
+        diaryName,
+        ...args
+      ) {
+        const alreadyCached = this.diaryDateIndexCache instanceof Map &&
+          this.diaryDateIndexCache.has(diaryName);
+        if (alreadyCached) return original.call(this, diaryName, ...args);
+        return derivedRuntimeMutationLifecycle.track('cache', () =>
+          original.call(this, diaryName, ...args)
+        );
+      };
+      restoreRuntimeHooks.push(() => {
+        knowledgeBaseManager._ensureDiaryDateIndexCached = original;
+      });
+    }
+    if (typeof knowledgeBaseManager._saveIndexToDisk === 'function') {
+      const original = knowledgeBaseManager._saveIndexToDisk;
+      knowledgeBaseManager._saveIndexToDisk = function governedIndexSave(name, ...args) {
+        const trigger = name === 'global_tags' ? 'tag' : 'vector';
+        return derivedRuntimeMutationLifecycle.track(trigger, () =>
+          original.call(this, name, ...args)
+        );
+      };
+      restoreRuntimeHooks.push(() => { knowledgeBaseManager._saveIndexToDisk = original; });
+    }
+    runtimeInstrumented = true;
+  }
 
   function loadRuntime() {
     if (!runtimeInjected) {
@@ -661,6 +847,32 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     if (!embeddingUtils) {
       embeddingUtils = require(embeddingUtilsPath);
     }
+    instrumentRuntime();
+  }
+
+  async function stopSourceMutationWatchers() {
+    const watcher = knowledgeBaseManager?.watcher;
+    if (watcher) {
+      const stopWatch = watcher.stopWatch || watcher.stop_watch;
+      if (knowledgeBaseManager.watcherType === 'rust' && typeof stopWatch === 'function') {
+        await stopWatch.call(watcher);
+      } else if (typeof watcher.close === 'function') {
+        await watcher.close();
+      }
+      knowledgeBaseManager.watcher = null;
+    }
+    const ragParamsWatcher = knowledgeBaseManager?.ragParamsWatcher;
+    if (ragParamsWatcher && typeof ragParamsWatcher.close === 'function') {
+      await ragParamsWatcher.close();
+      knowledgeBaseManager.ragParamsWatcher = null;
+    }
+    const pendingSourceWork = Number(knowledgeBaseManager?.pendingFiles?.size || 0) +
+      Number(knowledgeBaseManager?.pendingDeletes?.size || 0);
+    if (knowledgeBaseManager?.pendingFiles?.clear) knowledgeBaseManager.pendingFiles.clear();
+    if (knowledgeBaseManager?.pendingDeletes?.clear) knowledgeBaseManager.pendingDeletes.clear();
+    if (pendingSourceWork > 0) {
+      throw new Error('native_source_partition_mutation_pending');
+    }
   }
 
   async function ensureReady() {
@@ -668,15 +880,20 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     if (knowledgeBaseManager?.config?.fullScanOnStartup === true) {
       throw new Error('native_unscoped_initialization_forbidden');
     }
-    if (knowledgeBaseManager && typeof knowledgeBaseManager.initialize === 'function') {
-      await knowledgeBaseManager.initialize();
+    if (!runtimeInitialized && knowledgeBaseManager &&
+        typeof knowledgeBaseManager.initialize === 'function') {
+      await derivedRuntimeMutationLifecycle.track('startup', () =>
+        knowledgeBaseManager.initialize()
+      );
+      await stopSourceMutationWatchers();
+      runtimeInitialized = true;
+      instrumentTagMemoRuntime();
     }
   }
 
   async function ensurePrimaryWriteReady(toolName) {
     if (!primaryWriteOnly) {
-      await ensureReady();
-      return;
+      await fs.mkdir(knowledgeBaseRootPath, { recursive: true });
     }
     const rootStat = await fs.lstat(knowledgeBaseRootPath);
     if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) {
@@ -706,6 +923,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     ) {
       throw new Error('native_diary_authorization_required');
     }
+    bindDerivedMutationAuthorization(authorization);
     try {
       await ensureReady();
     } catch {
@@ -760,7 +978,8 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
         memoryReadPerformed: true,
         isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured,
         authorization,
-        resultScopePostcheckPassed: true
+        resultScopePostcheckPassed: true,
+        derivedRuntimeMutation: takeDerivedMutationReceipt()
       })
     };
   }
@@ -769,6 +988,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     if (context.authorization?.accepted !== true) {
       throw new Error('native_diary_authorization_required');
     }
+    bindDerivedMutationAuthorization(context.authorization);
     const query = boundedString(args.query, 1000);
     if (!query.trim()) {
       return {
@@ -776,8 +996,10 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
         _nativeRuntimeReceipt: defaultReadRuntimeReceipt({
           providerApiCalled: false,
           memoryReadPerformed: false,
+          isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured,
           authorization: context.authorization,
-          resultScopePostcheckPassed: true
+          resultScopePostcheckPassed: true,
+          derivedRuntimeMutation: takeDerivedMutationReceipt()
         })
       };
     }
@@ -851,14 +1073,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       write_shape: 'markdown_dailynote_file',
       raw_path_disclosed: false,
       _nativeRuntimeReceipt: nativeRuntimeReceipt({
-        nativeRuntimeCalled: !primaryWriteOnly,
-        nativeRuntimeInitialized: !primaryWriteOnly,
+        nativeRuntimeCalled: false,
+        nativeRuntimeInitialized: false,
         providerApiCalled: false,
         memoryReadPerformed: false,
         memoryWritePerformed: true,
         durableWritePerformed: true,
         durableWriteScope: 'primary_memory_write',
-        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured && !primaryWriteOnly,
+        isolatedRuntimeStoreUsed: false,
         primaryMemoryStoreWritePerformed: true,
         derivedIndexWritePerformed: false
       })
@@ -885,14 +1107,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       mutation_tool: toolName,
       raw_path_disclosed: false,
       _nativeRuntimeReceipt: nativeRuntimeReceipt({
-        nativeRuntimeCalled: !primaryWriteOnly,
-        nativeRuntimeInitialized: !primaryWriteOnly,
+        nativeRuntimeCalled: false,
+        nativeRuntimeInitialized: false,
         providerApiCalled: false,
         memoryReadPerformed: false,
         memoryWritePerformed: true,
         durableWritePerformed: true,
         durableWriteScope: 'primary_memory_mutation_marker',
-        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured && !primaryWriteOnly,
+        isolatedRuntimeStoreUsed: false,
         primaryMemoryStoreWritePerformed: true,
         derivedIndexWritePerformed: false
       })
@@ -906,12 +1128,56 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     record,
     tombstone: args => mutationMarker('tombstone_memory', args),
     supersede: args => mutationMarker('supersede_memory', args),
+    takeDerivedRuntimeMutationReceipt: () => derivedRuntimeMutationLifecycle.projection(),
+    getDerivedRuntimeMutationShutdownReceipt: () => shutdownReceipt,
     async shutdown() {
-      if (knowledgeBaseManager && typeof knowledgeBaseManager.shutdown === 'function') {
-        await knowledgeBaseManager.shutdown();
+      if (shutdownReceipt) return shutdownReceipt;
+      if (shutdownError) throw shutdownError;
+      shuttingDown = true;
+      const tagMemo = knowledgeBaseManager?.tagMemoEngine;
+      const cancelBackgroundScheduling = () => {
+        for (const timerField of [
+          '_postStartupDerivedRefreshTimer',
+          '_derivedTaskTimer',
+          '_matrixRebuildTimer'
+        ]) {
+          if (tagMemo?.[timerField]) {
+            clearTimeout(tagMemo[timerField]);
+            tagMemo[timerField] = null;
+          }
+        }
+        if (Array.isArray(tagMemo?._derivedTaskQueue) &&
+            tagMemo?._derivedTaskRunning !== true) {
+          tagMemo._derivedTaskQueue = [];
+        }
+      };
+      try {
+        cancelBackgroundScheduling();
+        await derivedRuntimeMutationLifecycle.waitForIdle({ timeoutMs: 10_000 });
+        cancelBackgroundScheduling();
+        const pendingSourceWork = Number(knowledgeBaseManager?.pendingFiles?.size || 0) +
+          Number(knowledgeBaseManager?.pendingDeletes?.size || 0);
+        if (knowledgeBaseManager?.pendingFiles?.clear) knowledgeBaseManager.pendingFiles.clear();
+        if (knowledgeBaseManager?.pendingDeletes?.clear) knowledgeBaseManager.pendingDeletes.clear();
+        if (knowledgeBaseManager && typeof knowledgeBaseManager.shutdown === 'function') {
+          await knowledgeBaseManager.shutdown();
+        }
+        cancelBackgroundScheduling();
+        const finalReceipt = await derivedRuntimeMutationLifecycle.drain({ timeoutMs: 10_000 });
+        if (pendingSourceWork > 0) {
+          shutdownError = new Error('native_source_partition_mutation_pending');
+          throw shutdownError;
+        }
+        shutdownReceipt = finalReceipt;
+        return shutdownReceipt;
+      } catch (error) {
+        shutdownError = error;
+        throw error;
+      } finally {
+        while (restoreRuntimeHooks.length > 0) restoreRuntimeHooks.pop()();
+        knowledgeBaseManager = null;
+        embeddingUtils = null;
       }
-      knowledgeBaseManager = null;
-      embeddingUtils = null;
     }
   };
 }
@@ -925,7 +1191,7 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
     readFileSync: options.readFileSync
   });
 
-  return async function handleJsonRpc(body = {}) {
+  const handleJsonRpc = async function handleJsonRpc(body = {}) {
     if (!isPlainObject(body) || body.jsonrpc !== '2.0') {
       return jsonRpcError(body?.id, -32600, 'Invalid Request');
     }
@@ -1081,6 +1347,13 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
       });
     }
   };
+  handleJsonRpc.takeDerivedRuntimeMutationReceipt = () =>
+    typeof adapter.takeDerivedRuntimeMutationReceipt === 'function'
+      ? adapter.takeDerivedRuntimeMutationReceipt()
+      : null;
+  handleJsonRpc.shutdownGovernedRuntime = async () =>
+    typeof adapter.shutdown === 'function' ? adapter.shutdown() : null;
+  return handleJsonRpc;
 }
 
 function createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options = {}) {
@@ -1132,6 +1405,30 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options = {}) {
     rejectedAuthorizationCount,
     tokenMaterialDisclosed: false
   });
+  server.takeDerivedRuntimeMutationReceipt = () =>
+    handler.takeDerivedRuntimeMutationReceipt();
+  server.shutdownGovernedRuntime = async () => {
+    let finalReceipt = null;
+    let runtimeError = null;
+    let closeError = null;
+    try {
+      finalReceipt = await handler.shutdownGovernedRuntime();
+    } catch (error) {
+      runtimeError = error;
+    }
+    try {
+      if (server.listening) {
+        await new Promise((resolve, reject) => {
+          server.close(error => error ? reject(error) : resolve());
+        });
+      }
+    } catch (error) {
+      closeError = error;
+    }
+    if (runtimeError) throw runtimeError;
+    if (closeError) throw closeError;
+    return finalReceipt;
+  };
   return server;
 }
 

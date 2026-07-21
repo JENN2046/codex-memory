@@ -253,9 +253,48 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       typeof runtime.derivedIndexWritePerformed !== 'boolean' ||
       runtime.memoryReadPerformed !== true ||
       runtime.memoryWritePerformed !== false ||
+      runtime.isolatedRuntimeStoreUsed !== true ||
       typeof runtime.durableWritePerformed !== 'boolean' ||
       runtime.primaryMemoryStoreWritePerformed !== false ||
       runtime.durableWritePerformed !== runtime.derivedIndexWritePerformed ||
+      runtime.derivedRuntimeMutationPolicy !== 'isolated_derived_runtime_mutation_v1' ||
+      runtime.derivedRuntimeMutationAccountingMode !== 'lifecycle_event_v1' ||
+      runtime.derivedRuntimeMutationAuthorized !== true ||
+      runtime.derivedRuntimeMutationAccountingFinal !== false ||
+      runtime.derivedRuntimeMutationBackgroundTasksDrained !== false ||
+      runtime.derivedRuntimeMutationZeroClaimed !== false ||
+      runtime.derivedRuntimeMutationPolicyViolation !== false ||
+      runtime.sourcePartitionMutationPerformed !== false ||
+      runtime.legacyPartitionAccessed !== false ||
+      runtime.ambiguousPartitionAccessed !== false ||
+      runtime.unregisteredPartitionAccessed !== false ||
+      runtime.derivedRuntimeMutationRawDetailsDisclosed !== false ||
+      !Number.isInteger(runtime.derivedRuntimeMutationCumulativeCount) ||
+      runtime.derivedRuntimeMutationCumulativeCount < 0 ||
+      !Number.isInteger(runtime.derivedRuntimeMutationReceiptDelta) ||
+      runtime.derivedRuntimeMutationReceiptDelta < 0 ||
+      runtime.derivedRuntimeMutationReceiptDelta >
+        runtime.derivedRuntimeMutationCumulativeCount ||
+      !Number.isInteger(runtime.derivedRuntimeMutationActiveCount) ||
+      runtime.derivedRuntimeMutationActiveCount < 0 ||
+      !Number.isInteger(runtime.derivedRuntimeMutationCompletedCount) ||
+      runtime.derivedRuntimeMutationCompletedCount < 0 ||
+      !Number.isInteger(runtime.derivedRuntimeMutationFailedCount) ||
+      runtime.derivedRuntimeMutationFailedCount < 0 ||
+      runtime.derivedRuntimeMutationCompletedCount +
+        runtime.derivedRuntimeMutationFailedCount +
+        runtime.derivedRuntimeMutationActiveCount !==
+        runtime.derivedRuntimeMutationCumulativeCount ||
+      !Array.isArray(runtime.derivedRuntimeMutationTriggerCategories) ||
+      runtime.derivedRuntimeMutationTriggerCategories.some(value =>
+        !['startup', 'hydration', 'cache', 'vector', 'tag', 'matrix'].includes(value)
+      ) ||
+      new Set(runtime.derivedRuntimeMutationTriggerCategories).size !==
+        runtime.derivedRuntimeMutationTriggerCategories.length ||
+      (runtime.derivedRuntimeMutationCumulativeCount > 0 &&
+        runtime.derivedRuntimeMutationTriggerCategories.length === 0) ||
+      runtime.derivedIndexWritePerformed !==
+        (runtime.derivedRuntimeMutationCumulativeCount > 0) ||
       (runtime.derivedIndexWritePerformed === true && ![
         'isolated_derived_index',
         'native_runtime_store'
@@ -286,7 +325,7 @@ function countersFromEvidence(evidence) {
     native_invocations: 1,
     local_fallbacks: 0,
     primary_memory_writes: 0,
-    derived_index_writes: evidence.runtime.derivedIndexWritePerformed === true ? 1 : 0,
+    derived_index_writes: evidence.runtime.derivedRuntimeMutationReceiptDelta,
     other_durable_mutations: evidence.receipt.localAuditReceipt.appended === true ? 1 : 0,
     unrestricted_native_searches: 0
   };
@@ -412,7 +451,28 @@ function createGovernedLiveReadInvoker({
       result_count: Number.isInteger(structuredContent.result_count)
         ? structuredContent.result_count
         : Number.isInteger(structuredContent.item_count) ? structuredContent.item_count : 0,
-      counters: Object.freeze({ ...counters })
+      counters: Object.freeze({ ...counters }),
+      derived_runtime_mutation: Object.freeze({
+        policy: evidence.runtime.derivedRuntimeMutationPolicy,
+        authorized: evidence.runtime.derivedRuntimeMutationAuthorized,
+        isolated_runtime_store: evidence.runtime.isolatedRuntimeStoreUsed,
+        accounting_final: evidence.runtime.derivedRuntimeMutationAccountingFinal,
+        cumulative_count: evidence.runtime.derivedRuntimeMutationCumulativeCount,
+        receipt_delta: evidence.runtime.derivedRuntimeMutationReceiptDelta,
+        active_count: evidence.runtime.derivedRuntimeMutationActiveCount,
+        completed_count: evidence.runtime.derivedRuntimeMutationCompletedCount,
+        failed_count: evidence.runtime.derivedRuntimeMutationFailedCount,
+        trigger_categories: Object.freeze([
+          ...evidence.runtime.derivedRuntimeMutationTriggerCategories
+        ]),
+        policy_violation: evidence.runtime.derivedRuntimeMutationPolicyViolation,
+        source_partition_mutation: evidence.runtime.sourcePartitionMutationPerformed,
+        legacy_partition_accessed: evidence.runtime.legacyPartitionAccessed,
+        ambiguous_partition_accessed: evidence.runtime.ambiguousPartitionAccessed,
+        unregistered_partition_accessed: evidence.runtime.unregisteredPartitionAccessed,
+        unrestricted_native_search: evidence.runtime.unscopedNativeSearchUsed,
+        raw_details_disclosed: evidence.runtime.derivedRuntimeMutationRawDetailsDisclosed
+      })
     }));
     return {
       status: 'ok',
@@ -520,6 +580,7 @@ function createR4GovernanceRuntime({
       }
       let observationAttempted = false;
       let observationSessionOrdinal = null;
+      let observedNativeEvidence = null;
       try {
         if (dogfoodObserver && R5A_OBSERVED_TOOL_NAMES.has(toolName)) {
           observationSessionOrdinal = dogfoodObserver.beginToolAttempt({ toolName });
@@ -556,6 +617,7 @@ function createR4GovernanceRuntime({
           const contextDigest = digestObject(contextRef);
           const nativeEvidence = nativeEvidenceByContext.get(contextDigest);
           if (!nativeEvidence) reject('r4_live_read_native_evidence_missing');
+          observedNativeEvidence = nativeEvidence;
           nativeEvidenceByContext.delete(contextDigest);
           observations.receipt_chains.push(Object.freeze({
             tool_name: toolName,
@@ -590,6 +652,8 @@ function createR4GovernanceRuntime({
                 result.structured_content?.item_count ?? 0),
               relevance: relevanceValues.length > 0 ? Math.max(...relevanceValues) : null,
               counters: result.counters,
+              derivedRuntimeMutationEvidence:
+                observedNativeEvidence?.derived_runtime_mutation || null,
               activationSnapshot: activationController.snapshot(),
               sessionOrdinal: observationSessionOrdinal
             });

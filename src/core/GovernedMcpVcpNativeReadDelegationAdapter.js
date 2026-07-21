@@ -20,6 +20,9 @@ const {
 const {
   normalizeMemoryContextProjection
 } = require('./MemoryContextPackageService');
+const {
+  nativeRuntimeReceiptEvidenceComplete
+} = require('./GovernedMcpVcpNativeHttpMcpClientInvoker');
 
 const CONTRACT_NAME = 'GovernedMcpVcpNativeReadDelegationAdapter';
 const CONTRACT_MODE = 'governed_mcp_vcp_native_primary_read_low_disclosure_delegation';
@@ -615,6 +618,61 @@ function lowDisclosureNativeInvocationReceipt(value, expected = {}) {
       isolatedRuntimeStoreUsed: nativeRuntimeReceipt.isolatedRuntimeStoreUsed === true,
       primaryMemoryStoreWritePerformed: nativeRuntimeReceipt.primaryMemoryStoreWritePerformed === true,
       derivedIndexWritePerformed: nativeRuntimeReceipt.derivedIndexWritePerformed === true,
+      derivedRuntimeMutationPolicy: safeEnum(
+        nativeRuntimeReceipt.derivedRuntimeMutationPolicy,
+        ['isolated_derived_runtime_mutation_v1', 'disabled']
+      ),
+      derivedRuntimeMutationAccountingMode: safeEnum(
+        nativeRuntimeReceipt.derivedRuntimeMutationAccountingMode,
+        ['lifecycle_event_v1', 'not_applicable']
+      ),
+      derivedRuntimeMutationAuthorized:
+        nativeRuntimeReceipt.derivedRuntimeMutationAuthorized === true,
+      derivedRuntimeMutationAccountingFinal:
+        nativeRuntimeReceipt.derivedRuntimeMutationAccountingFinal === true,
+      derivedRuntimeMutationBackgroundTasksDrained:
+        nativeRuntimeReceipt.derivedRuntimeMutationBackgroundTasksDrained === true,
+      derivedRuntimeMutationCumulativeCount:
+        Number.isInteger(nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount) &&
+        nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount >= 0
+          ? nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount
+          : null,
+      derivedRuntimeMutationReceiptDelta:
+        Number.isInteger(nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta) &&
+        nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta >= 0
+          ? nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta
+          : null,
+      derivedRuntimeMutationActiveCount:
+        Number.isInteger(nativeRuntimeReceipt.derivedRuntimeMutationActiveCount) &&
+        nativeRuntimeReceipt.derivedRuntimeMutationActiveCount >= 0
+          ? nativeRuntimeReceipt.derivedRuntimeMutationActiveCount
+          : null,
+      derivedRuntimeMutationCompletedCount:
+        Number.isInteger(nativeRuntimeReceipt.derivedRuntimeMutationCompletedCount) &&
+        nativeRuntimeReceipt.derivedRuntimeMutationCompletedCount >= 0
+          ? nativeRuntimeReceipt.derivedRuntimeMutationCompletedCount
+          : null,
+      derivedRuntimeMutationFailedCount:
+        Number.isInteger(nativeRuntimeReceipt.derivedRuntimeMutationFailedCount) &&
+        nativeRuntimeReceipt.derivedRuntimeMutationFailedCount >= 0
+          ? nativeRuntimeReceipt.derivedRuntimeMutationFailedCount
+          : null,
+      derivedRuntimeMutationTriggerCategories:
+        Array.isArray(nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories)
+          ? nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories.map(value =>
+              safeEnum(value, ['startup', 'hydration', 'cache', 'vector', 'tag', 'matrix'])
+            )
+          : null,
+      derivedRuntimeMutationZeroClaimed:
+        nativeRuntimeReceipt.derivedRuntimeMutationZeroClaimed === true,
+      derivedRuntimeMutationPolicyViolation:
+        nativeRuntimeReceipt.derivedRuntimeMutationPolicyViolation === true,
+      sourcePartitionMutationPerformed:
+        nativeRuntimeReceipt.sourcePartitionMutationPerformed === true,
+      legacyPartitionAccessed: nativeRuntimeReceipt.legacyPartitionAccessed === true,
+      ambiguousPartitionAccessed: nativeRuntimeReceipt.ambiguousPartitionAccessed === true,
+      unregisteredPartitionAccessed: nativeRuntimeReceipt.unregisteredPartitionAccessed === true,
+      derivedRuntimeMutationRawDetailsDisclosed: false,
       authorizationResolvedBeforeProvider: nativeRuntimeReceipt.authorizationResolvedBeforeProvider === true,
       diaryAllowlistEnforcedBeforeIndexLoad: nativeRuntimeReceipt.diaryAllowlistEnforcedBeforeIndexLoad === true,
       diaryAllowlistEnforcedBeforeVectorSearch: nativeRuntimeReceipt.diaryAllowlistEnforcedBeforeVectorSearch === true,
@@ -718,6 +776,10 @@ function nativeInvocationReceiptDiaryScopeBound(receipt) {
     runtime.rawDiaryNamesReturned === false &&
     runtime.scopeIdAffectsDiaryAcl === false &&
     runtime.scopeIdEnforcementClaimed === false;
+}
+
+function nativeInvocationReceiptRuntimeEvidenceBound(receipt) {
+  return nativeRuntimeReceiptEvidenceComplete(receipt?.nativeRuntimeReceipt) === true;
 }
 
 function sanitizeScope(scope) {
@@ -1369,6 +1431,22 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
       mcpToolCalled: true,
       memoryReadPerformed: true,
       memoryWritten: true,
+      localMemoryFallbackEligible: false
+    };
+  }
+
+  if (nativeInvocationReceiptRuntimeEvidenceBound(receipt.nativeInvocationReceipt) !== true) {
+    return {
+      ...rejected('native_read_delegation_native_invocation_receipt_unbound', input),
+      receipt: {
+        ...receipt,
+        statusClass: 'native_invocation_receipt_unbound',
+        outputBudgetExceeded: false
+      },
+      runtimeCalled: true,
+      vcpToolBoxCalled: true,
+      mcpToolCalled: true,
+      memoryReadPerformed: true,
       localMemoryFallbackEligible: false
     };
   }
