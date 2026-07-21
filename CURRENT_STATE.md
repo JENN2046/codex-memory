@@ -21,8 +21,9 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 R5-D replaced the incorrect “all derived writes must be zero” interpretation
 with bounded lifecycle accounting for an isolated selected-diary runtime. The
 source contract, false-zero rejection, shutdown drain, counter budget, and
-selected-diary hydration seam passed local tests, strict mainline gates, CI,
-and review.
+selected-diary hydration seam passed local tests and strict mainline gates.
+The current runtime-failure closeout PR still treats its own CI and exact-head
+review as pending delivery gates.
 
 The private-development run completed one bounded read with provider/native
 counts `1/1`. Final drain recorded six completed derived lifecycle events and
