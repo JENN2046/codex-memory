@@ -80,6 +80,135 @@ test('native read initializes the selected-diary runtime before provider and sco
   assert.equal(result._nativeRuntimeReceipt.unscopedNativeSearchUsed, false);
 });
 
+test('isolated runtime hydrates only the authorized diaries after provider and before search', async () => {
+  const calls = [];
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+  const manager = {
+    config: { fullScanOnStartup: false },
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    async initialize() { calls.push('initialize'); },
+    async search(diaryNames) {
+      calls.push(['search', diaryNames]);
+      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+    }
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: {
+      async getEmbeddingsBatch() {
+        calls.push('embedding');
+        return [[0.1, 0.2]];
+      }
+    },
+    async selectedDiaryRuntimeHydrator(input) {
+      calls.push(['hydrate', input.allowedDiaryNames]);
+      assert.equal(input.knowledgeBaseManager, manager);
+      assert.equal(Object.isFrozen(input.allowedDiaryNames), true);
+      return {
+        accepted: true,
+        authorizationResolvedBeforeHydration: true,
+        selectedDiaryOnly: true,
+        sourcePartitionMutationPerformed: false,
+        primaryMemoryWritePerformed: false,
+        unauthorizedSourceRowsRead: false,
+        hydratedDiaryCount: 1,
+        hydratedFileCount: 1,
+        hydratedChunkCount: 1
+      };
+    }
+  });
+
+  const result = await adapter.search({ query: 'governed read', limit: 1 }, {
+    authorization
+  });
+
+  assert.deepEqual(calls, [
+    'initialize',
+    'embedding',
+    ['hydrate', ['SYNTHETIC_CODEX_PRIVATE']],
+    ['search', ['SYNTHETIC_CODEX_PRIVATE']]
+  ]);
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta, 2);
+  assert.deepEqual(result._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
+    ['hydration', 'startup']);
+
+  await adapter.search({ query: 'same scope', limit: 1 }, { authorization });
+  assert.equal(calls.filter(value => Array.isArray(value) && value[0] === 'hydrate').length, 1);
+  const callCountBeforeScopeChange = calls.length;
+  await assert.rejects(adapter.search({ query: 'different scope', limit: 1 }, {
+    authorization: {
+      ...authorization,
+      allowedDiaryNames: ['SYNTHETIC_OTHER_PRIVATE']
+    }
+  }), { message: 'selected_diary_hydration_scope_change_forbidden' });
+  assert.equal(calls.length, callCountBeforeScopeChange);
+});
+
+test('selected-diary hydrator fails closed on invalid receipts and missing isolation', async () => {
+  let embeddingCalls = 0;
+  let searchCalls = 0;
+  let hydrationCalls = 0;
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: {
+      config: { fullScanOnStartup: false },
+      pendingFiles: new Set(),
+      pendingDeletes: new Set(),
+      async initialize() {},
+      async search() {
+        searchCalls += 1;
+        return [];
+      }
+    },
+    embeddingUtils: {
+      async getEmbeddingsBatch() {
+        embeddingCalls += 1;
+        return [[0.1, 0.2]];
+      }
+    },
+    async selectedDiaryRuntimeHydrator() {
+      hydrationCalls += 1;
+      return { accepted: true };
+    }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  await assert.rejects(
+    adapter.search({ query: 'governed read', limit: 1 }, { authorization }),
+    error => error.reasonCode === 'native_runtime_call_failed'
+  );
+  assert.equal(embeddingCalls, 1);
+  assert.equal(hydrationCalls, 1);
+  assert.equal(searchCalls, 0);
+  await assert.rejects(
+    adapter.search({ query: 'retry after invalid receipt', limit: 1 }, { authorization }),
+    error => error.message === 'selected_diary_hydration_failure_latched'
+  );
+  assert.equal(embeddingCalls, 1);
+  assert.equal(hydrationCalls, 1);
+  assert.equal(searchCalls, 0);
+
+  assert.throws(() => createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseManager: {},
+    embeddingUtils: {},
+    selectedDiaryRuntimeHydrator() {}
+  }), { message: 'selected_diary_runtime_hydrator_isolation_required' });
+});
+
 test('isolated runtime accounts startup, background matrix, shutdown saves, and final drain', async () => {
   const calls = [];
   const tagMemoEngine = {

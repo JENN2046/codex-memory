@@ -718,6 +718,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   const primaryWritePreflight = typeof options.primaryWritePreflight === 'function'
     ? options.primaryWritePreflight
     : null;
+  if (options.selectedDiaryRuntimeHydrator != null &&
+      typeof options.selectedDiaryRuntimeHydrator !== 'function') {
+    throw new Error('selected_diary_runtime_hydrator_invalid');
+  }
+  const selectedDiaryRuntimeHydrator = options.selectedDiaryRuntimeHydrator || null;
+  if (selectedDiaryRuntimeHydrator && !derivedRuntimeMutationGovernanceEnabled) {
+    throw new Error('selected_diary_runtime_hydrator_isolation_required');
+  }
   const writeSubdir = safeFilenamePart(options.writeSubdir || 'codex-memory-governed');
   let knowledgeBaseManager = options.knowledgeBaseManager || null;
   let embeddingUtils = options.embeddingUtils || null;
@@ -727,6 +735,8 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   let shutdownReceipt = null;
   let shutdownError = null;
   let shuttingDown = false;
+  let hydratedAuthorizationKey = null;
+  let selectedDiaryHydrationFailureLatched = false;
   const restoreRuntimeHooks = [];
   const derivedTaskAccountingContext = new AsyncLocalStorage();
 
@@ -741,6 +751,55 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
 
   function takeDerivedMutationReceipt() {
     return derivedRuntimeMutationLifecycle.projection({ consume: true });
+  }
+
+  function selectedDiaryAuthorizationKey(authorization) {
+    return JSON.stringify({
+      allowedDiaryNames: [...authorization.allowedDiaryNames].sort(),
+      mappingReference: authorization.mappingReference,
+      mappingDigest: authorization.mappingDigest
+    });
+  }
+
+  function assertSelectedDiaryHydrationScope(authorization) {
+    if (!selectedDiaryRuntimeHydrator) return;
+    if (selectedDiaryHydrationFailureLatched) {
+      throw new Error('selected_diary_hydration_failure_latched');
+    }
+    if (hydratedAuthorizationKey === null) return;
+    if (selectedDiaryAuthorizationKey(authorization) !== hydratedAuthorizationKey) {
+      throw new Error('selected_diary_hydration_scope_change_forbidden');
+    }
+  }
+
+  async function hydrateAuthorizedSelectedDiaries(authorization) {
+    if (!selectedDiaryRuntimeHydrator || hydratedAuthorizationKey !== null) return;
+    const authorizationKey = selectedDiaryAuthorizationKey(authorization);
+    try {
+      await derivedRuntimeMutationLifecycle.track('hydration', async () => {
+        const receipt = await selectedDiaryRuntimeHydrator({
+          allowedDiaryNames: Object.freeze([...authorization.allowedDiaryNames]),
+          knowledgeBaseManager,
+          knowledgeBaseRootPath,
+          knowledgeBaseStorePath
+        });
+        if (receipt?.accepted !== true ||
+            receipt.authorizationResolvedBeforeHydration !== true ||
+            receipt.selectedDiaryOnly !== true ||
+            receipt.sourcePartitionMutationPerformed !== false ||
+            receipt.primaryMemoryWritePerformed !== false ||
+            receipt.unauthorizedSourceRowsRead !== false ||
+            receipt.hydratedDiaryCount !== authorization.allowedDiaryCount ||
+            !Number.isInteger(receipt.hydratedFileCount) || receipt.hydratedFileCount < 0 ||
+            !Number.isInteger(receipt.hydratedChunkCount) || receipt.hydratedChunkCount < 0) {
+          throw new Error('selected_diary_hydration_receipt_invalid');
+        }
+      });
+    } catch (error) {
+      selectedDiaryHydrationFailureLatched = true;
+      throw error;
+    }
+    hydratedAuthorizationKey = authorizationKey;
   }
 
   function instrumentTagMemoRuntime() {
@@ -924,6 +983,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       throw new Error('native_diary_authorization_required');
     }
     bindDerivedMutationAuthorization(authorization);
+    assertSelectedDiaryHydrationScope(authorization);
     try {
       await ensureReady();
     } catch {
@@ -949,6 +1009,11 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     const vector = embeddings && embeddings[0];
     if (!vector) {
       throw nativeRuntimeStageError('native_provider_embedding_failed');
+    }
+    try {
+      await hydrateAuthorizedSelectedDiaries(authorization);
+    } catch {
+      throw nativeRuntimeStageError('native_selected_diary_hydration_failed');
     }
     let results;
     try {
