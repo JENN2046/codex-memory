@@ -1168,4 +1168,27 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
     observationKind: DOGFOOD_OBSERVATION_KIND,
     activationSnapshot: { activation_status: 'active' }
   }), { code: 'r5a_dogfood_emergency_stop_latched' });
+
+  for (const terminalStatus of ['expired', 'killed']) {
+    const terminalObserver = createPrivateDogfoodObserver();
+    terminalObserver.beginSession({
+      observationKind: DOGFOOD_OBSERVATION_KIND,
+      activationSnapshot: { activation_status: 'active' }
+    });
+    assert.throws(() => terminalObserver.observeToolResult({
+      toolName: 'search_memory',
+      latencyMs: 1,
+      status: 'found',
+      resultCount: 1,
+      relevance: 0.5,
+      counters: { ...ZERO_MEMORY_COUNTERS, derived_index_writes: 1 },
+      activationSnapshot: { activation_status: terminalStatus }
+    }), { code: 'r5a_dogfood_forbidden_counter_observed' });
+    assert.equal(terminalObserver.snapshot().last_session.status, terminalStatus);
+    assert.doesNotThrow(() => terminalObserver.markEmergencyStop({
+      errorCode: 'r5a_dogfood_forbidden_counter_observed'
+    }));
+    assert.equal(terminalObserver.snapshot().last_session.status, 'emergency_stopped');
+    assert.equal(terminalObserver.snapshot().emergency_stop_latched, true);
+  }
 });

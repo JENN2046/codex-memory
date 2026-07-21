@@ -87,8 +87,9 @@ verification.
 - primary-memory write, derived-index write, local fallback, or unrestricted
   native search rejects the result and marks the owner-only observation
   `emergency_stopped`, even when the one-read controller has already consumed
-  its lease; the observer then latches closed for the rest of the process, so
-  only a full Governance restart can permit another R5-A activation;
+  or terminalized its lease as expired/killed; the observer then latches closed
+  for the rest of the process, so only a full Governance restart can permit
+  another R5-A activation;
 - a violating tool name and its low-disclosure counters are recorded before
   suppression, so the owner artifact cannot report a false zero for the event
   that stopped the run;

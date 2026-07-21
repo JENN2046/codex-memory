@@ -183,7 +183,7 @@ function createPrivateDogfoodObserver({
 
   function markEmergencyStop({ errorCode } = {}) {
     const session = currentSession();
-    if (!session || !['active', 'consumed'].includes(session.status) ||
+    if (!session || !['active', 'inactive', 'consumed', 'killed', 'expired'].includes(session.status) ||
         !SAFE_ERROR_CODE_PATTERN.test(errorCode || '')) {
       reject('r5a_dogfood_emergency_stop_invalid');
     }
