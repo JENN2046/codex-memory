@@ -35,6 +35,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R4-G Session-Scoped Live Read Activation](docs/CHATGPT_WEB_R4G_SESSION_SCOPED_LIVE_READ.md)
 - [ChatGPT Web R4-H Private-Development Closeout](docs/CHATGPT_WEB_R4H_PRIVATE_DEVELOPMENT_CLOSEOUT.md)
 - [ChatGPT Web R5-A Private Dogfood Operations](docs/CHATGPT_WEB_R5A_PRIVATE_DOGFOOD_OPERATIONS.md)
+- [ChatGPT Web R5-B One-Read Model Guidance](docs/CHATGPT_WEB_R5B_ONE_READ_MODEL_GUIDANCE.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 

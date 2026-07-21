@@ -23,7 +23,11 @@ const {
   MEMORY_SCOPE_WIDGET_HTML,
   widgetResource
 } = require('../chatgpt-memory-scope-widget');
-const { candidateToolProfile, toolDescriptors } = require('./candidate-tool-profile');
+const {
+  MODEL_WORKFLOW_INSTRUCTIONS,
+  candidateToolProfile,
+  toolDescriptors
+} = require('./candidate-tool-profile');
 
 function createExternalMcpHandler({
   broker,
@@ -93,7 +97,7 @@ function createMcpProtocolServer({
       tools: {},
       resources: {}
     },
-    instructions: 'Read-only project-aware memory tools. Resolve a safe project context before governed reads. Never infer that memory was loaded without a tool result.'
+    instructions: MODEL_WORKFLOW_INSTRUCTIONS
   });
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
@@ -160,9 +164,7 @@ function createMcpProtocolServer({
     const result = {
       content: [{
         type: 'text',
-        text: response.status === 'ok'
-          ? `Governed ${name} completed with ${resultCount(response.structured_content)} item(s).`
-          : `Governed ${name} returned ${response.status}.`
+        text: modelVisibleResultText(name, response)
       }],
       structuredContent: response.structured_content,
       _meta: {
@@ -185,7 +187,10 @@ function renderScopeTool(name, args) {
   }
   validateWidgetDto(args.scope);
   return {
-    content: [{ type: 'text', text: 'Memory scope status is ready.' }],
+    content: [{
+      type: 'text',
+      text: 'Memory scope status is ready. This display does not authorize or perform another memory read.'
+    }],
     structuredContent: { scope: structuredClone(args.scope) }
   };
 }
@@ -205,6 +210,19 @@ function resultCount(content) {
   return content?.context_status === 'resolved' ? 1 : 0;
 }
 
+function modelVisibleResultText(name, response) {
+  if (name === 'resolve_memory_context') {
+    if (response.status === 'ok') {
+      return 'Governed project context resolved. Use the returned project_context_ref for exactly one read tool chosen by the user intent; do not resolve again.';
+    }
+    return `Governed resolve_memory_context returned ${response.status}. Stop this workflow and ask the user or operator for a new exact context; do not retry alternative aliases or visibilities.`;
+  }
+  if (response.status === 'ok') {
+    return `Governed ${name} completed with ${resultCount(response.structured_content)} item(s). This is the terminal result for the current one-read workflow; answer the user and do not call another memory read or resolve again.`;
+  }
+  return `Governed ${name} returned ${response.status}. This is the terminal result for the current one-read workflow; answer with the bounded status and do not call another memory read or resolve again.`;
+}
+
 function safeMcpError(error, fallback) {
   const code = typeof error?.code === 'string' && /^[a-z][a-z0-9_]{0,79}$/u.test(error.code)
     ? error.code
@@ -215,6 +233,7 @@ function safeMcpError(error, fallback) {
 module.exports = {
   createExternalMcpHandler,
   createMcpProtocolServer,
+  modelVisibleResultText,
   renderScopeTool,
   requireAuthInfo
 };
