@@ -213,6 +213,11 @@ final zero, and shutdown drains background work before its final receipt. This
 does not authorize source-partition mutation, native write, legacy access, or
 global search. See [R5-D derived runtime mutation governance](docs/CHATGPT_WEB_R5D_DERIVED_RUNTIME_MUTATION_GOVERNANCE.md).
 
+The first post-merge private R5-D run truthfully accounted six completed
+derived lifecycle events with zero primary/source/global mutation, but its
+bounded read returned a safe empty result. Non-empty recall and relevance did
+not pass, so runtime verification and readiness remain false.
+
 Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
 only when the native target exposes shape-compatible tools for those public
 response shapes. The included shim exposes `knowledge_base.search`,
