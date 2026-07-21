@@ -14,20 +14,25 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Active Handoff
 
-CM-2143 closes R4 for private development. The bounded proof passed inactive,
-exact activation, automatic consumption, replay/second-read denial,
-kill-before-read, in-flight suppression, TTL expiry, restart-inactive,
-mapping-mismatch, Relay-unavailable, and scope-isolation gates. The final
-ChatGPT session used `resolve_memory_context -> search_memory` and returned one
-result at relevance `0.5` without a memory write. The independent owner-only
-artifact remains outside Git. Governance/Relay are stopped and the retained
-zero-memory Edge binding is restored. No production/release/deploy/cutover/
-readiness or automatic-first-task-call guarantee follows from this closeout.
+CM-2144 closes the authorized R5-D attempt truthfully. Isolated VCP startup,
+hydration, cache, vector/tag, and matrix maintenance now have bounded lifecycle
+accounting, false-zero rejection, and shutdown drain. The final bounded read
+used one provider call and one native invocation; drain recorded six completed
+derived events with zero failed events, primary writes, source-partition
+mutations, or unrestricted searches. The read returned zero results, so
+non-empty recall and relevance remain failed. The full provider/read budgets
+are exhausted and must not be retried under this authorization.
+
+The immutable owner-only R5-D failure artifact remains outside Git, and the old
+R5-C artifact remains unchanged. Governance, Relay, and the shim are stopped;
+the Edge remains `zero_memory`. The next safe route is an offline/source-level
+vector-retrieval diagnosis. Any provider-bound retry needs a new exact budget.
+No production/release/deploy/cutover/readiness conclusion follows.
 
 ## Historical Handoff Context
 
 The entries below are retained as chronology only. They are not current route
-instructions; CM-2143 and the zero-memory-preservation boundary above control.
+instructions; CM-2144 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,

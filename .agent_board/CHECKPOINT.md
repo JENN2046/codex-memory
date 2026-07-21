@@ -12,6 +12,27 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
+## CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance
+
+Status: `R5_D_RUNTIME_PROOF_FAILED_SAFE_EMPTY`
+
+- Isolated selected-diary derived maintenance has bounded lifecycle accounting,
+  false-zero rejection, and shutdown drain.
+- The final bounded read used provider/native counts `1/1`; drain recorded six
+  completed derived events and zero failed events.
+- Primary-memory writes, source-partition mutations, legacy/unregistered
+  effects, and unrestricted/global searches remained zero.
+- The read returned zero results, so non-empty recall and relevance failed.
+- Authorized budgets are exhausted; no provider-bound or authenticated-read
+  retry remains authorized under R5-D.
+- Governance, Relay, and the loopback shim are stopped. Edge remains
+  `zero_memory`; owner-only R5-D evidence exists outside Git and the old R5-C
+  artifact remains unchanged.
+- Production, release, deploy, cutover, readiness, and public-write remain
+  false.
+
+Validation: `CMV-2229`.
+
 ## CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout
 
 Status: `R4_COMPLETE_PRIVATE_DEVELOPMENT_NOT_READY`
