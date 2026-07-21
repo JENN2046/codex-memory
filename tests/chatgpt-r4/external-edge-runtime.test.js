@@ -18,6 +18,7 @@ const {
   sha256
 } = require('../../packages/chatgpt-r4-contracts');
 const {
+  MODEL_WORKFLOW_INSTRUCTIONS,
   createAuth0TokenVerifier,
   createExternalEdgeRuntime,
   createExternalMcpHandler,
@@ -198,6 +199,7 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   assert.equal(initialized.statusCode, 200);
   assert.match(initialized.headers['content-type'], /^text\/event-stream/u);
   assert.equal(initialized.body.result.serverInfo.name, 'codex-memory-chatgpt-r4-edge');
+  assert.equal(initialized.body.result.instructions, MODEL_WORKFLOW_INSTRUCTIONS);
 
   const tools = await mcpRequest(address, rpcRequest(5, 'tools/list'), ACCESS_TOKEN);
   assert.equal(tools.statusCode, 200);
@@ -265,6 +267,8 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
     kind: 'overview',
     item_count: 0
   });
+  assert.match(toolResult.body.result.content[0].text, /terminal result for the current one-read workflow/u);
+  assert.match(toolResult.body.result.content[0].text, /do not call another memory read or resolve again/u);
   assert.deepEqual(toolResult.body.result._meta['codex-memory/counters'], ZERO_MEMORY_COUNTERS);
   assert.match(toolResult.body.result._meta['codex-memory/receiptChainDigest'], /^sha256:[a-f0-9]{64}$/u);
 
