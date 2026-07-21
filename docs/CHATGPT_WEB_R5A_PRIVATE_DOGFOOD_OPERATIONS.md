@@ -85,7 +85,9 @@ verification.
 - 21st session and provider call 26 are rejected;
 - unobserved v1 activation is rejected while R5-A mode is enabled;
 - primary-memory write, derived-index write, local fallback, or unrestricted
-  native search rejects the result and triggers the emergency kill path;
+  native search rejects the result and marks the owner-only observation
+  `emergency_stopped`, even when the one-read controller has already consumed
+  its lease;
 - public receipts remain low-disclosure and contain no observation authority;
 - stop/restart clears activation and observation state.
 

@@ -135,7 +135,8 @@ function validateLastSession(lastSession, sessionsStarted) {
       Object.keys(lastSession).length !== keys.length ||
       Object.keys(lastSession).sort().some((key, index) => key !== keys[index]) ||
       lastSession.ordinal !== sessionsStarted ||
-      !['active', 'inactive', 'consumed', 'killed', 'expired'].includes(lastSession.status) ||
+      !['active', 'inactive', 'consumed', 'killed', 'expired',
+        'emergency_stopped'].includes(lastSession.status) ||
       !Array.isArray(lastSession.tool_sequence) || lastSession.tool_sequence.length > 4 ||
       lastSession.tool_sequence.some(toolName => ![
         'resolve_memory_context', 'memory_overview', 'search_memory',

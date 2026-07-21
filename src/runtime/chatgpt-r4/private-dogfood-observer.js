@@ -177,6 +177,18 @@ function createPrivateDogfoodObserver({
     return true;
   }
 
+  function markEmergencyStop({ errorCode } = {}) {
+    const session = currentSession();
+    if (!session || !['active', 'consumed'].includes(session.status) ||
+        !SAFE_ERROR_CODE_PATTERN.test(errorCode || '')) {
+      reject('r5a_dogfood_emergency_stop_invalid');
+    }
+    session.status = 'emergency_stopped';
+    session.error_code = errorCode;
+    session.ended_at = now().toISOString();
+    return true;
+  }
+
   function sessionProjection(session) {
     if (!session) return null;
     return Object.freeze({
@@ -241,6 +253,7 @@ function createPrivateDogfoodObserver({
     beginSession,
     observeToolResult,
     observeToolError,
+    markEmergencyStop,
     syncActivation,
     snapshot,
     exportObservation

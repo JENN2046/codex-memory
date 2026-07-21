@@ -1119,4 +1119,23 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
   }), { code: 'r5a_dogfood_forbidden_counter_observed' });
   assert.equal(observer.snapshot().derived_index_writes, 0);
   assert.equal(observer.snapshot().primary_memory_writes, 0);
+  assert.equal(observer.snapshot().last_session.status, 'emergency_stopped');
+  assert.equal(
+    observer.snapshot().last_session.error_code,
+    'r5a_dogfood_forbidden_counter_observed'
+  );
+  assert.doesNotThrow(() => validateDogfoodResponse({
+    schema_version: 2,
+    operation: 'status',
+    accepted: true,
+    activation_status: fixture.controller.snapshot().activation_status,
+    remaining_ttl_seconds: 0,
+    context_bound: true,
+    read_in_flight: false,
+    remaining_read_calls: 0,
+    default_closed: true,
+    durable_state_written: false,
+    receipt_digest: fixture.controller.snapshot().receipt_digest,
+    observation: observer.snapshot()
+  }, 'status'));
 });

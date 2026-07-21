@@ -437,6 +437,7 @@ function createR4GovernanceRuntime({
       (dogfoodObserver !== null &&
        (typeof dogfoodObserver.observeToolResult !== 'function' ||
         typeof dogfoodObserver.observeToolError !== 'function' ||
+        typeof dogfoodObserver.markEmergencyStop !== 'function' ||
         typeof dogfoodObserver.snapshot !== 'function')) ||
       typeof monotonicClock !== 'function') {
     reject('r5a_dogfood_runtime_observer_invalid');
@@ -573,6 +574,11 @@ function createR4GovernanceRuntime({
               activationSnapshot: activationController.snapshot()
             });
           } catch (error) {
+            const errorCode = typeof error?.code === 'string' &&
+              /^[a-z][a-z0-9_]{0,79}$/u.test(error.code)
+              ? error.code
+              : 'r5a_dogfood_runtime_error';
+            dogfoodObserver.markEmergencyStop({ errorCode });
             activationController.kill({ reason: 'emergency_stop' });
             throw error;
           }
