@@ -20,6 +20,13 @@ const MAX_CONTEXTS = 1024;
 const MAX_AUTHORIZED_TOOL_CALLS = 20;
 const MAX_R5A_AUTHORIZED_TOOL_CALLS = 40;
 const MAX_INACTIVE_REQUEST_ATTEMPTS = 128;
+const R5A_POST_CALL_SAFETY_ERROR_CODES = new Set([
+  'r4_live_read_native_delegation_rejected',
+  'r4_live_read_native_receipt_invalid',
+  'r4_live_read_mapping_disclosure_forbidden',
+  'r4_live_read_native_evidence_missing',
+  'response_structured_content_shape_invalid'
+]);
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -602,6 +609,10 @@ function createR4GovernanceRuntime({
             errorCode,
             activationSnapshot: activationController.snapshot()
           });
+          if (R5A_POST_CALL_SAFETY_ERROR_CODES.has(errorCode)) {
+            dogfoodObserver.markEmergencyStop({ errorCode });
+            activationController.kill({ reason: 'emergency_stop' });
+          }
         }
         throw error;
       }
@@ -639,6 +650,7 @@ module.exports = {
   MAX_AUTHORIZED_TOOL_CALLS,
   MAX_R5A_AUTHORIZED_TOOL_CALLS,
   MAX_INACTIVE_REQUEST_ATTEMPTS,
+  R5A_POST_CALL_SAFETY_ERROR_CODES,
   buildNativeRequest,
   countersFromEvidence,
   createContextAuthority,

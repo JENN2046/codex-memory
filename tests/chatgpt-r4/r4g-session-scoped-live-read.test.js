@@ -1192,3 +1192,61 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
     assert.equal(terminalObserver.snapshot().emergency_stop_latched, true);
   }
 });
+
+test('R5-A latches closed when native safety receipts fail before counters exist', async () => {
+  const unsafeReceipts = [
+    result => { result.access.localMemoryFallbackUsed = true; },
+    result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.memoryWritePerformed = true; },
+    result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.unscopedNativeSearchUsed = true; }
+  ];
+  for (const [index, mutateReceipt] of unsafeReceipts.entries()) {
+    const observer = createPrivateDogfoodObserver();
+    const unsafeResult = delegatedResult();
+    mutateReceipt(unsafeResult);
+    const fixture = createRuntimeFixture({
+      dogfoodObserver: observer,
+      async callGovernedTool() { return unsafeResult; }
+    });
+    fixture.controller.activate({
+      requestId: `op_r5a_receipt_guard_activation_00${index + 1}`,
+      requestedVisibility: 'project',
+      ttlSeconds: 300,
+      now: NOW
+    });
+    observer.beginSession({
+      observationKind: DOGFOOD_OBSERVATION_KIND,
+      activationSnapshot: fixture.controller.snapshot(NOW)
+    });
+    const resolveRequest = requestFixture(
+      fixture.edge,
+      fixture.principal,
+      'resolve_memory_context',
+      { project_alias: 'project-alpha', requested_visibility: 'project' },
+      100 + index * 2
+    );
+    const resolved = await fixture.runtime.handle({
+      request: resolveRequest,
+      relayReceipt: relayReceipt(resolveRequest)
+    });
+    const searchRequest = requestFixture(fixture.edge, fixture.principal, 'search_memory', {
+      project_context_ref: resolved.structured_content.project_context_ref,
+      query: 'bounded project signal',
+      limit: 1
+    }, 101 + index * 2);
+    await assert.rejects(fixture.runtime.handle({
+      request: searchRequest,
+      relayReceipt: relayReceipt(searchRequest)
+    }), { code: 'r4_live_read_native_receipt_invalid' });
+    const observation = observer.snapshot();
+    assert.equal(observation.emergency_stop_latched, true);
+    assert.equal(observation.last_session.status, 'emergency_stopped');
+    assert.equal(observation.last_session.error_code, 'r4_live_read_native_receipt_invalid');
+    assert.deepEqual(observation.last_session.tool_sequence, [
+      'resolve_memory_context',
+      'search_memory'
+    ]);
+    assert.throws(() => observer.prepareActivation(fixture.controller.snapshot()), {
+      code: 'r5a_dogfood_emergency_stop_latched'
+    });
+  }
+});

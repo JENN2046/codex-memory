@@ -93,6 +93,9 @@ verification.
 - a violating tool name and its low-disclosure counters are recorded before
   suppression, so the owner artifact cannot report a false zero for the event
   that stopped the run;
+- native receipt/delegation/integrity failures that occur before trustworthy
+  counters exist are recorded as post-call safety errors and also latch the
+  process closed; values from an invalid receipt are never promoted as facts;
 - public receipts remain low-disclosure and contain no observation authority;
 - stop/restart clears activation and observation state.
 
