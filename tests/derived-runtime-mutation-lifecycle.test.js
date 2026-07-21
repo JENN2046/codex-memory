@@ -93,14 +93,28 @@ test('derived runtime lifecycle bounds each receipt interval without forcing a f
   for (let index = 0; index < MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT; index += 1) {
     assert.equal(lifecycle.track('cache', () => index), index);
   }
-  assert.throws(() => lifecycle.track('cache', () => true), {
+  let postBudgetOperationCalled = false;
+  assert.throws(() => lifecycle.track('cache', () => {
+    postBudgetOperationCalled = true;
+  }), {
     code: 'derived_runtime_mutation_budget_exhausted'
   });
+  assert.equal(postBudgetOperationCalled, false);
   const receipt = lifecycle.projection({ consume: true });
   assert.equal(
     receipt.derivedRuntimeMutationReceiptDelta,
     MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT
   );
+  assert.equal(receipt.derivedRuntimeMutationPolicyViolation, true);
+  assert.throws(() => lifecycle.track('cache', () => {
+    postBudgetOperationCalled = true;
+  }), {
+    code: 'derived_runtime_mutation_policy_latched'
+  });
+  assert.equal(postBudgetOperationCalled, false);
+  const afterRetry = lifecycle.projection();
+  assert.equal(afterRetry.derivedRuntimeMutationCumulativeCount, receipt.derivedRuntimeMutationCumulativeCount);
+  assert.equal(afterRetry.derivedRuntimeMutationReceiptDelta, 0);
 });
 
 test('disabled lifecycle does not claim authorization or mutation', async () => {

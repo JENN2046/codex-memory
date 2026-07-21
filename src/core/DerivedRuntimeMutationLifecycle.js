@@ -64,6 +64,9 @@ function createDerivedRuntimeMutationLifecycle({
 
   function begin(trigger) {
     if (enabled !== true) return null;
+    if (policyViolation) {
+      throw policyError('derived_runtime_mutation_policy_latched');
+    }
     if (finalized) latch('derived_runtime_mutation_lifecycle_finalized');
     if (!authorizationBound) latch('derived_runtime_mutation_authorization_required');
     if (!ALLOWED_DERIVED_RUNTIME_MUTATION_TRIGGERS.has(trigger)) {
