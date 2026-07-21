@@ -480,6 +480,7 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
   let impossibleTriggerReceipt = false;
   let forbiddenBoundaryReceipt = false;
   let invalidFinalZeroReceipt = false;
+  let nonIsolatedLifecycleReceipt = false;
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
     const nativeRuntimeReceipt = {
@@ -563,6 +564,12 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
     if (invalidFinalZeroReceipt) {
       nativeRuntimeReceipt.derivedRuntimeMutationAccountingFinal = true;
       nativeRuntimeReceipt.derivedRuntimeMutationBackgroundTasksDrained = true;
+    }
+    if (nonIsolatedLifecycleReceipt) {
+      nativeRuntimeReceipt.derivedRuntimeMutationPolicy =
+        'isolated_derived_runtime_mutation_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAccountingMode = 'lifecycle_event_v1';
+      nativeRuntimeReceipt.derivedRuntimeMutationAuthorized = true;
     }
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({
@@ -673,6 +680,16 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
       governanceMeta: validReadGovernanceMeta()
     });
     assert.equal(invalidFinalZero.receipt.nativeRuntimeReceipt.present, false);
+
+    invalidFinalZeroReceipt = false;
+    nonIsolatedLifecycleReceipt = true;
+    const nonIsolatedLifecycle = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(nonIsolatedLifecycle.receipt.nativeRuntimeReceipt.present, false);
   } finally {
     await server.close();
   }

@@ -209,6 +209,29 @@ test('shutdown rejects pending source work and preserves the failure on replay',
   assert.equal(manager.pendingFiles.size, 0);
 });
 
+test('server closes its listener when governed runtime shutdown fails', async () => {
+  const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer({
+    diaryScopeMapping: SYNTHETIC_DIARY_SCOPE_MAPPING,
+    adapter: {
+      async shutdown() {
+        throw new Error('native_source_partition_mutation_pending');
+      }
+    }
+  });
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', () => {
+      server.off('error', reject);
+      resolve();
+    });
+  });
+  assert.equal(server.listening, true);
+  await assert.rejects(server.shutdownGovernedRuntime(), {
+    message: 'native_source_partition_mutation_pending'
+  });
+  assert.equal(server.listening, false);
+});
+
 test('native read rejects a manager configured for an unscoped startup scan before initialization', async () => {
   const calls = [];
   const adapter = createVcpToolBoxNativeMemoryAdapter({

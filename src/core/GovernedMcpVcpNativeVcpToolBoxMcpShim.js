@@ -1405,12 +1405,25 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options = {}) {
   server.takeDerivedRuntimeMutationReceipt = () =>
     handler.takeDerivedRuntimeMutationReceipt();
   server.shutdownGovernedRuntime = async () => {
-    const finalReceipt = await handler.shutdownGovernedRuntime();
-    if (server.listening) {
-      await new Promise((resolve, reject) => {
-        server.close(error => error ? reject(error) : resolve());
-      });
+    let finalReceipt = null;
+    let runtimeError = null;
+    let closeError = null;
+    try {
+      finalReceipt = await handler.shutdownGovernedRuntime();
+    } catch (error) {
+      runtimeError = error;
     }
+    try {
+      if (server.listening) {
+        await new Promise((resolve, reject) => {
+          server.close(error => error ? reject(error) : resolve());
+        });
+      }
+    } catch (error) {
+      closeError = error;
+    }
+    if (runtimeError) throw runtimeError;
+    if (closeError) throw closeError;
     return finalReceipt;
   };
   return server;

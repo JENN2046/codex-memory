@@ -289,6 +289,7 @@ function nativeRuntimeReceiptEvidenceComplete(receipt) {
   const lifecycleDisabled = receipt.derivedRuntimeMutationPolicy === 'disabled' &&
     receipt.derivedRuntimeMutationAccountingMode === 'not_applicable';
   if (!lifecycleEnabled && !lifecycleDisabled) return false;
+  if (lifecycleEnabled && receipt.isolatedRuntimeStoreUsed !== true) return false;
   if (receipt.derivedRuntimeMutationPolicyViolation !== false ||
       receipt.sourcePartitionMutationPerformed !== false ||
       receipt.legacyPartitionAccessed !== false ||
