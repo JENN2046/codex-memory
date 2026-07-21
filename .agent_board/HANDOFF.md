@@ -24,21 +24,10 @@ artifact remains outside Git. Governance/Relay are stopped and the retained
 zero-memory Edge binding is restored. No production/release/deploy/cutover/
 readiness or automatic-first-task-call guarantee follows from this closeout.
 
-CM-2142 replaces the R4-F manual mode flip with local, in-memory session
-authority. Each start is inactive; activate grants one fixed-project context
-and one bounded read, then consumption/expiry/kill/restart closes the path.
-Authorization is checked both before provider use and after native completion,
-so an in-flight kill suppresses content while preserving truthful counters.
-The next delivery gate is PR/CI/review. Private binding and a real live
-kill-switch proof require a separate exact runtime authorization.
+## Historical Handoff Context
 
-CM-2141 completes the D2B private binding plus D2C-D4 Direct HTTPS canary. One
-isolated Edge container, dedicated TLS vhost, Auth0 exact resource/client/scope,
-PKCE S256, and operator fingerprint are active in private development. D4 sent
-only initialize/tools-list and found six read-only tools. Relay/local UDS,
-ChatGPT App, Widget E2E, and memory paths were not invoked. The next exact gate
-is R4-E private ChatGPT App zero-memory E2E; R4-F live recall remains closed.
-
+The entries below are retained as chronology only. They are not current route
+instructions; CM-2143 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,
