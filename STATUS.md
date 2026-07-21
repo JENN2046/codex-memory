@@ -14,6 +14,14 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout
 
+CMV-2228 also closes the previously separate R4-E and R4-F evidence gates.
+R4-E passed OAuth, six-tool discovery, scope Widget render, and one empty
+`memory_overview` with all memory/provider/native/fallback/durable counters
+zero. R4-F passed registered project/workspace recall, negative scope controls,
+mapping/source checks, and zero primary write/global search. These receipts are
+now explicitly bound to the machine facts instead of being inferred from the
+older CMV-2226 follow-up text.
+
 R4-G completed the bounded private single-operator runtime matrix. Default
 closed, exact session activation, one-context/one-read consumption,
 kill-before-read, in-flight suppression, TTL expiry, restart-inactive,

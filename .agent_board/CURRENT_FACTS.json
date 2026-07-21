@@ -180,6 +180,7 @@
     "chatgptWebR4eProviderCalls": 0,
     "chatgptWebR4eRealMemoryReads": 0,
     "chatgptWebR4eScopeWidgetRendered": true,
+    "chatgptWebR4eValidationReference": "CMV-2228",
     "chatgptWebR4eZeroMemoryE2ePassed": true,
     "chatgptWebR4fBoundedLiveReadPassed": true,
     "chatgptWebR4fClientPrivateResults": 0,
@@ -189,6 +190,7 @@
     "chatgptWebR4fPrimaryMemoryWrites": 0,
     "chatgptWebR4fProjectWorkspaceIsolationPassed": true,
     "chatgptWebR4fUnrestrictedNativeSearches": 0,
+    "chatgptWebR4fValidationReference": "CMV-2228",
     "chatgptWebR4gActivationDurableStateWritten": false,
     "chatgptWebR4gAllR4TestCount": 85,
     "chatgptWebR4gDefaultClosed": true,
@@ -853,7 +855,7 @@
   "validationSummary": [
     {
       "id": "CMV-2228",
-      "scope": "CM-2143 ChatGPT Web R4-G runtime proof and R4-H closeout",
+      "scope": "CM-2143 ChatGPT Web R4-E/F receipt binding, R4-G runtime proof, and R4-H closeout",
       "status": "COMPLETED_R4_PRIVATE_DEVELOPMENT_RUNTIME_PROOF_ROLLBACK_PASS_NOT_READY"
     },
     {
