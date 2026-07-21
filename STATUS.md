@@ -4,13 +4,45 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch`.
-Current validation: `CMV-2227`.
-Current fact: source implements an in-memory, default-closed, one-shot principal/project/visibility lease with bounded TTL and owner-only kill switch.
-Six focused R4-G tests and all 85 R4 tests pass; the six-tool public MCP surface is unchanged and no external activation, provider call, or real memory read/write occurred in this stage.
+Current task: `CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout`.
+Current validation: `CMV-2228`.
+Current fact: private-development session activation, one-context/one-read consumption, kill, TTL, restart, scope isolation, and zero-memory rollback passed.
+The final external session used `resolve_memory_context -> search_memory`, returned one result at relevance `0.5`, and performed no memory write; Governance/Relay are stopped and the Edge is restored to zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout
+
+CMV-2228 also closes the previously separate R4-E and R4-F evidence gates.
+R4-E passed OAuth, six-tool discovery, scope Widget render, and one empty
+`memory_overview` with all memory/provider/native/fallback/durable counters
+zero. R4-F passed registered project/workspace recall, negative scope controls,
+mapping/source checks, and zero primary write/global search. These receipts are
+now explicitly bound to the machine facts instead of being inferred from the
+older CMV-2226 follow-up text.
+
+R4-G completed the bounded private single-operator runtime matrix. Default
+closed, exact session activation, one-context/one-read consumption,
+kill-before-read, in-flight suppression, TTL expiry, restart-inactive,
+mapping-mismatch, Relay-unavailable, project/workspace isolation, and exclusion
+of client-private, legacy, ambiguous, and unregistered results passed. No
+unauthorized index or global/unscoped native search was observed.
+
+The owner-only non-Git artifact records 28 authenticated Governance request
+attempts, 5 provider calls, 5 native invocations, 4 successful non-empty reads,
+0 primary-memory writes, 0 derived-index writes, 5 governance audit/receipt
+durable mutations, and 0 unrestricted native searches. The final ChatGPT
+observation found one result with relevance `0.5` after
+`resolve_memory_context -> search_memory`; one read-only schema discovery
+preceded the memory-tool calls.
+
+Verification-complete kill was executed, Governance and Relay were stopped,
+and the retained zero-memory Edge binding was restored. OAuth, HTTPS health,
+protected-resource metadata, anonymous rejection, and the six-tool contract
+remain preserved by exact rollback identity. Final verdict:
+`R4_COMPLETE_PRIVATE_DEVELOPMENT_NOT_READY`. See
+`docs/CHATGPT_WEB_R4H_PRIVATE_DEVELOPMENT_CLOSEOUT.md`.
 
 ## CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch
 

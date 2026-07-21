@@ -8,15 +8,36 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | ChatGPT Web R4-G session-scoped live-read source is implemented and default-closed |
-| Current task | `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch` |
-| Current validation | `CMV-2227` |
-| Current route | Deliver source through PR/CI/review; external private binding and live kill-switch proof remain separately authorized |
+| Status | `R4_COMPLETE_PRIVATE_DEVELOPMENT_NOT_READY` |
+| Current task | `CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout` |
+| Current validation | `CMV-2228` |
+| Current route | Preserve zero-memory default and owner-only evidence; no production/release/deploy/cutover/readiness action |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
-## ChatGPT Web R4-G Session-Scoped Live Read Activation
+## ChatGPT Web R4-G Runtime Proof And R4-H Closeout
+
+The private single-operator route completed the authorized session-scoped live
+proof. Inactive, kill-before-read, TTL-expiry, replay, second-read, restart,
+mapping-mismatch, Relay-unavailable, cross-project, client-private,
+legacy/ambiguous, and unregistered paths failed closed. In-flight kill
+suppressed content while preserving truthful counters. The final external
+session used `resolve_memory_context -> search_memory`, returned one result at
+relevance `0.5`, and performed no memory write.
+
+Across three bounded proof-process segments, the owner-only non-Git artifact
+records 28 authenticated Governance request attempts, 5 provider calls, 5
+native invocations, 4 successful non-empty reads, 0 primary-memory writes, 0
+derived-index writes, 5 governance audit/receipt durable mutations, and 0
+unrestricted native searches. After proof, Governance and Relay were stopped
+and the exact retained zero-memory Edge binding was restored. See
+`docs/CHATGPT_WEB_R4H_PRIVATE_DEVELOPMENT_CLOSEOUT.md`.
+
+Production, release, deploy, cutover, readiness, and
+`automatic-first-task-call-guaranteed` remain false.
+
+## ChatGPT Web R4-G Session-Scoped Live Read Source
 
 R4-G replaces the manual whole-runtime mode flip with an in-memory, one-shot
 session lease owned only by local Governance. Every process start is inactive.

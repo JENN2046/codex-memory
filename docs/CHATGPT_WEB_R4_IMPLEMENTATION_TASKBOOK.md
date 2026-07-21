@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Current stage: `R4-G session_scoped_live_read_activation_implementation`
+Current stage: `R4-H private_development_closeout_complete_not_ready`
 
 Old R3/M5 Tunnel route: `draft_paused_no_merge`
 
@@ -166,11 +166,11 @@ This stage does not prove recall, relevance, or automatic task-start use.
 
 ## R4-F — Bounded Governed Live Read
 
-Status: `IMPLEMENTATION_IN_PROGRESS_LIVE_PROOF_PENDING`
+Status: `COMPLETE_PRIVATE_BOUNDED_LIVE_READ`
 
-This is the only R4 stage that may authorize real memory. It requires a new
-exact authorization after R4-E passes and after Jenn accepts the residual edge
-processing risk.
+This was the only R4 stage authorized to read real memory. Execution required
+the exact R4-F authorization issued after R4-E passed and after Jenn accepted
+the residual Edge processing risk.
 
 Minimum proof matrix:
 
@@ -191,9 +191,15 @@ per session.
 Implementation boundary and activation procedure:
 `docs/CHATGPT_WEB_R4F_BOUNDED_GOVERNED_LIVE_READ.md`.
 
+The authorized private-development proof completed project/workspace positive
+reads, negative scope controls, mapping/receipt binding, source post-check,
+non-empty relevance, zero unrestricted native search, and zero live-proof
+primary-memory write. It did not enable a public write surface or establish a
+general automatic-first-task-call guarantee.
+
 ## R4-G — Session-Scoped Live Read Activation And Kill Switch
 
-Status: `IMPLEMENTED_DEFAULT_CLOSED_EXTERNAL_ACTIVATION_NOT_PERFORMED`
+Status: `COMPLETE_PRIVATE_RUNTIME_PROOF_ROLLED_BACK_ZERO_MEMORY`
 
 Replace per-proof public Edge environment switching with local, ephemeral
 Governance authority:
@@ -211,10 +217,14 @@ Governance authority:
 Implementation evidence:
 `docs/CHATGPT_WEB_R4G_SESSION_SCOPED_LIVE_READ.md`.
 
-External binding replacement, service restart, provider call, and real-memory
-verification remain separately authorized runtime actions.
+The authorized runtime proof passed exact activation, one-context/one-read,
+automatic consumption, kill-before-read, in-flight suppression, TTL expiry,
+restart-inactive, scope isolation, and zero unrestricted native search. The
+private runtime is stopped and the Edge is restored to zero-memory.
 
 ## R4-H — Observation And Closeout
+
+Status: `COMPLETE_PRIVATE_DEVELOPMENT_NOT_READY`
 
 After bounded live proof:
 
@@ -226,6 +236,14 @@ After bounded live proof:
 - decide whether an optional transport adapter is useful;
 - keep production/release/deploy/cutover/readiness false unless separately
   authorized and evidenced.
+
+All listed drills and closeout actions passed. The immutable owner-only proof
+artifact remains outside Git. Public closeout evidence is recorded in
+`docs/CHATGPT_WEB_R4H_PRIVATE_DEVELOPMENT_CLOSEOUT.md`. Final verdict:
+`R4_COMPLETE_PRIVATE_DEVELOPMENT_NOT_READY`.
+
+No optional transport adapter is needed for the accepted private-development
+route. Direct managed HTTPS remains canonical; Tunnel stays non-canonical.
 
 ## Rollback
 

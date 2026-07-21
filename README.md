@@ -33,12 +33,24 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R4-D Direct OAuth Runtime Canary](docs/CHATGPT_WEB_R4D_DIRECT_OAUTH_RUNTIME_CANARY.md)
 - [ChatGPT Web R4-F Bounded Governed Live Read](docs/CHATGPT_WEB_R4F_BOUNDED_GOVERNED_LIVE_READ.md)
 - [ChatGPT Web R4-G Session-Scoped Live Read Activation](docs/CHATGPT_WEB_R4G_SESSION_SCOPED_LIVE_READ.md)
+- [ChatGPT Web R4-H Private-Development Closeout](docs/CHATGPT_WEB_R4H_PRIVATE_DEVELOPMENT_CLOSEOUT.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
 ## Current Status
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
+
+ChatGPT Web R4 is closed out with verdict
+`R4_COMPLETE_PRIVATE_DEVELOPMENT_NOT_READY`. The private single-operator route
+proved one-context/one-read session activation, automatic consumption,
+kill-before-read, in-flight result suppression, TTL expiry, restart-inactive,
+scope isolation, and zero unrestricted native searches. The final external
+observation used `resolve_memory_context -> search_memory`, returned one result
+with relevance `0.5`, and performed no memory write. The owner-only proof
+artifact remains outside Git; Governance/Relay are stopped and the retained
+zero-memory Edge binding is restored. Production, release, deploy, cutover,
+readiness, and automatic-first-task-call guarantees remain false.
 
 Current primary work goal: Native Context and Contract Convergence.
 The Phase 3 `prepare_memory_context` MVP is implemented as a default read-only

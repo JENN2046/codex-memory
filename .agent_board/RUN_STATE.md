@@ -4,10 +4,10 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch`.
-Current validation: `CMV-2227`.
-Current fact: source implements a default-closed one-shot principal/project/visibility lease, 30–300 second TTL, and owner-only UDS kill switch.
-Six focused R4-G tests and all 85 R4 tests pass; external activation/provider/memory actions are zero and the six-tool public surface is unchanged.
+Current task: `CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout`.
+Current validation: `CMV-2228`.
+Current fact: session activation, one-context/one-read consumption, kill, TTL, restart, scope isolation, and zero-memory rollback passed.
+The final ChatGPT observation found one result at relevance `0.5`; primary and derived memory writes and unrestricted native searches remained zero.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
@@ -18,8 +18,8 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 - Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
 - Candidate: the external six-tool candidate is discoverable behind OAuth but remains absent from the default local MCP surface.
 - Session control: startup inactive; one exact principal/project/visibility, one context, one read, 30–300 second TTL, explicit kill, and in-flight result suppression.
-- Host route: existing private-development Direct HTTPS remains unchanged; this task performed no external binding, service, provider, or memory action.
-- Status sync: performed locally in CM-2142; PR CI/review remain delivery gates.
+- Host route: private-development Direct HTTPS is restored to the retained zero-memory binding; Governance and Relay are stopped.
+- Status sync: R4-G runtime proof and R4-H low-disclosure closeout are recorded in CM-2143; PR CI/review remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -49,7 +49,7 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Enter R4-E private single-operator ChatGPT App attachment and zero-memory Widget/`memory_overview` E2E. R4-F native-memory/provider/real-memory, readiness, release, and cutover remain closed.
+Preserve the zero-memory default and owner-only proof artifact. Any production, release, deploy, cutover, readiness, public-write, or broader live-memory route requires a new exact decision.
 
 ## Historical Run Notes
 

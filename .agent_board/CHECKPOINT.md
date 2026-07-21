@@ -4,13 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch`.
-Current validation: `CMV-2227`.
-Current fact: source implements a default-closed one-shot principal/project/visibility lease, 30–300 second TTL, and owner-only UDS kill switch.
-Six focused R4-G tests and all 85 R4 tests pass; external activation/provider/memory actions are zero and the six-tool public surface is unchanged.
+Current task: `CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout`.
+Current validation: `CMV-2228`.
+Current fact: session activation, one-context/one-read consumption, kill, TTL, restart, scope isolation, and zero-memory rollback passed.
+The final ChatGPT observation found one result at relevance `0.5`; primary and derived memory writes and unrestricted native searches remained zero.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout
+
+Status: `R4_COMPLETE_PRIVATE_DEVELOPMENT_NOT_READY`
+
+- Default-closed, exact activation, one-context/one-read, automatic consumption,
+  kill-before-read, in-flight suppression, TTL expiry, and restart-inactive passed.
+- Project/workspace isolation passed; client-private, legacy, ambiguous,
+  unregistered, unauthorized-index, and unrestricted/global-search results were zero.
+- The final ChatGPT sequence was `resolve_memory_context -> search_memory`, with
+  `status=found`, `result_count=1`, relevance `0.5`, and no memory write.
+- Three proof-process segments recorded 28 authenticated Governance requests,
+  5 provider calls, 5 native invocations, 4 non-empty reads, 0 primary writes,
+  0 derived-index writes, 5 governance audit/receipt durable mutations, and 0
+  unrestricted native searches.
+- The immutable owner-only proof remains outside Git. Governance/Relay are
+  stopped and the exact retained zero-memory Edge binding is restored.
+- Production, release, deploy, cutover, readiness, and automatic-first-task-call
+  guarantees remain false.
+
+Validation: `CMV-2228`.
 
 ## CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch
 
