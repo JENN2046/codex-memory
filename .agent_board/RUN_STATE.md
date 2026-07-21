@@ -4,22 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout`.
-Current validation: `CMV-2228`.
-Current fact: session activation, one-context/one-read consumption, kill, TTL, restart, scope isolation, and zero-memory rollback passed.
-The final ChatGPT observation found one result at relevance `0.5`; primary and derived memory writes and unrestricted native searches remained zero.
+Current task: `CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance And Safe-Empty Closeout`.
+Current validation: `CMV-2229`.
+Current fact: isolated derived-runtime accounting and shutdown drain passed with six completed events and zero primary/source/global mutation.
+The bounded read safely returned zero results; non-empty recall and relevance failed, budgets are exhausted, local runtimes are stopped, and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R4-G keeps Edge/Relay authority-free and grants live-read authority only through an in-memory local Governance lease.
-- Project scope: signed opaque `project_context_ref`; public authority fields and private visibility fail closed.
-- Candidate: the external six-tool candidate is discoverable behind OAuth but remains absent from the default local MCP surface.
-- Session control: startup inactive; one exact principal/project/visibility, one context, one read, 30–300 second TTL, explicit kill, and in-flight result suppression.
-- Host route: private-development Direct HTTPS is restored to the retained zero-memory binding; Governance and Relay are stopped.
-- Status sync: R4-G runtime proof and R4-H low-disclosure closeout are recorded in CM-2143; PR CI/review remain delivery gates.
+- Architecture: R5-D permits bounded derived maintenance only in the isolated selected-diary runtime store; primary memory and source partitions remain immutable.
+- Accounting: lifecycle receipts cover startup, hydration, cache, vector/tag, and matrix work; interim false-zero claims fail closed and shutdown drains background work.
+- Final attempt: one provider call and one native invocation completed; six derived events completed, none failed, and primary/source/global effects remained zero.
+- Recall verdict: the bounded read safely returned zero results, so non-empty recall and relevance failed.
+- Budget: all eight provider/embedding and twelve authenticated-read calls authorized for R5-D are consumed; no retry remains authorized.
+- Host route: Governance, Relay, and the loopback shim are stopped; private-development Edge remains on the retained `zero_memory` binding.
+- Evidence: owner-only non-Git R5-D failure artifact is immutable; the old R5-C artifact is preserved unchanged.
+- Status sync: CM-2144/CMV-2229 record the safe-empty failure and zero-memory rollback; PR CI/review remain delivery gates.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -49,7 +51,11 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Preserve the zero-memory default and owner-only proof artifact. Any production, release, deploy, cutover, readiness, public-write, or broader live-memory route requires a new exact decision.
+Preserve the zero-memory default and owner-only artifacts. Diagnose the empty
+VCP vector-retrieval result offline or with source/test doubles first. Any new
+provider-bound or authenticated live-read retry requires a separate exact
+budget. Production, release, deploy, cutover, readiness, public-write, and
+broader live-memory routes remain closed.
 
 ## Historical Run Notes
 

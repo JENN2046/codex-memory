@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Source status: `IMPLEMENTED_LOCAL_VALIDATION_RUNTIME_PROOF_PENDING`
+Source status: `IMPLEMENTED_RUNTIME_PROOF_FAILED_SAFE_EMPTY`
 
 R5-D corrects an over-strict interpretation used by the R5-C runtime gate.
 VCPToolBox can remain read-only with respect to primary memory while still
@@ -114,12 +114,33 @@ or forged evidence latches the observation closed.
 The owner-only R5-C artifact is preserved unchanged. R5-D supersedes only its
 policy interpretation and its inaccurate zero-derived-write claim: the
 observed isolated background matrix refresh was a normal VCP derived-runtime
-mutation, not a primary-memory write. A new owner-only R5-D runtime proof is
-still required before this source contract is treated as live evidence.
+mutation, not a primary-memory write.
+
+## Private-development runtime outcome
+
+The post-merge R5-D run bound exact source and VCP identities, the private
+mapping and registry, and a fresh isolated runtime store. The selected-diary
+hydration completed before scoped vector search, and final shutdown accounting
+recorded six completed derived lifecycle events across startup, hydration,
+cache, vector, and matrix categories. The final receipt reported zero failed
+derived events, zero primary-memory writes, zero source-partition mutations,
+and zero global/unscoped searches.
+
+The bounded read nevertheless completed with a safe empty result. It did not
+time out or return an authorization error, but it did not meet the non-empty or
+relevance acceptance gates. The authorized provider and authenticated-read
+budgets were exhausted, so the run was not retried. Governance, Relay, and the
+shim were stopped; the retained Edge binding remained `zero_memory`; public
+health, protected-resource metadata, and anonymous rejection were rechecked.
+
+An immutable owner-only non-Git failure artifact records the receipt chain and
+actual counters. The earlier R5-C artifact remains byte-for-byte unchanged.
+R5-D therefore validates the mutation-governance and receipt-integrity model,
+but it does not provide a successful live-recall proof.
 
 ## Non-claims
 
 R5-D does not add a public MCP tool or schema, enable memory write, modify
 VCPToolBox core, authorize migration, access legacy memory, deploy production,
-release, cut over, or claim readiness. Until the post-merge private proof is
-complete, runtime verification remains pending.
+release, cut over, or claim readiness. Runtime verification remains failed at
+the non-empty/relevance gate and must not be described as complete or ready.

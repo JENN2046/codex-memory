@@ -4,13 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout`.
-Current validation: `CMV-2228`.
-Current fact: session activation, one-context/one-read consumption, kill, TTL, restart, scope isolation, and zero-memory rollback passed.
-The final ChatGPT observation found one result at relevance `0.5`; primary and derived memory writes and unrestricted native searches remained zero.
+Current task: `CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance And Safe-Empty Closeout`.
+Current validation: `CMV-2229`.
+Current fact: isolated derived-runtime accounting and shutdown drain passed with six completed events and zero primary/source/global mutation.
+The bounded read safely returned zero results; non-empty recall and relevance failed, budgets are exhausted, local runtimes are stopped, and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance
+
+Status: `R5_D_RUNTIME_PROOF_FAILED_SAFE_EMPTY`
+
+- Isolated selected-diary derived maintenance has bounded lifecycle accounting,
+  false-zero rejection, and shutdown drain.
+- The final bounded read used provider/native counts `1/1`; drain recorded six
+  completed derived events and zero failed events.
+- Primary-memory writes, source-partition mutations, legacy/unregistered
+  effects, and unrestricted/global searches remained zero.
+- The read returned zero results, so non-empty recall and relevance failed.
+- Authorized budgets are exhausted; no provider-bound or authenticated-read
+  retry remains authorized under R5-D.
+- Governance, Relay, and the loopback shim are stopped. Edge remains
+  `zero_memory`; owner-only R5-D evidence exists outside Git and the old R5-C
+  artifact remains unchanged.
+- Production, release, deploy, cutover, readiness, and public-write remain
+  false.
+
+Validation: `CMV-2229`.
 
 ## CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout
 
