@@ -87,6 +87,14 @@ claims even when the underlying VCP operation is an in-memory hydration or a
 durable SQLite/index refresh. It is not a primary-memory write and cannot be
 used as native-write proof.
 
+An isolated runtime may receive an internal selected-diary hydrator. This is a
+constructor-only governance seam, not a public MCP field. It runs only after
+authorization and query embedding, must receive the exact resolved allowlist,
+and must attest that it read no unauthorized source rows and changed neither
+primary memory nor source partitions. Its first successful scope is sticky for
+the runtime lifetime; a later scope change fails before another provider call.
+Invalid or missing hydration evidence fails before vector search.
+
 ## Shutdown and receipt chain
 
 Governed shutdown blocks new queued derived work, cancels future scheduling,
