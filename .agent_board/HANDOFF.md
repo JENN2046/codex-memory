@@ -4,15 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2142 ChatGPT Web R4-G Session-Scoped Live Read Activation And Kill Switch`.
-Current validation: `CMV-2227`.
-Current fact: source implements a default-closed one-shot principal/project/visibility lease, 30–300 second TTL, and owner-only UDS kill switch.
-Six focused R4-G tests and all 85 R4 tests pass; external activation/provider/memory actions are zero and the six-tool public surface is unchanged.
+Current task: `CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout`.
+Current validation: `CMV-2228`.
+Current fact: session activation, one-context/one-read consumption, kill, TTL, restart, scope isolation, and zero-memory rollback passed.
+The final ChatGPT observation found one result at relevance `0.5`; primary and derived memory writes and unrestricted native searches remained zero.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
+
+CM-2143 closes R4 for private development. The bounded proof passed inactive,
+exact activation, automatic consumption, replay/second-read denial,
+kill-before-read, in-flight suppression, TTL expiry, restart-inactive,
+mapping-mismatch, Relay-unavailable, and scope-isolation gates. The final
+ChatGPT session used `resolve_memory_context -> search_memory` and returned one
+result at relevance `0.5` without a memory write. The independent owner-only
+artifact remains outside Git. Governance/Relay are stopped and the retained
+zero-memory Edge binding is restored. No production/release/deploy/cutover/
+readiness or automatic-first-task-call guarantee follows from this closeout.
 
 CM-2142 replaces the R4-F manual mode flip with local, in-memory session
 authority. Each start is inactive; activate grants one fixed-project context
