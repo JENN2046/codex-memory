@@ -135,7 +135,8 @@ function validateLastSession(lastSession, sessionsStarted) {
   }
   const keys = [
     'ordinal', 'status', 'tool_sequence', 'total_latency_ms', 'result_count',
-    'max_relevance', 'timed_out', 'error_code', 'provider_calls', 'native_invocations'
+    'max_relevance', 'timed_out', 'error_code', 'tool_attempt_in_flight',
+    'provider_calls', 'native_invocations'
   ].sort();
   if (!lastSession || typeof lastSession !== 'object' || Array.isArray(lastSession) ||
       Object.keys(lastSession).length !== keys.length ||
@@ -158,6 +159,7 @@ function validateLastSession(lastSession, sessionsStarted) {
       typeof lastSession.timed_out !== 'boolean' ||
       (lastSession.error_code !== null &&
        !/^[a-z][a-z0-9_]{0,79}$/u.test(lastSession.error_code)) ||
+      typeof lastSession.tool_attempt_in_flight !== 'boolean' ||
       !Number.isInteger(lastSession.provider_calls) || lastSession.provider_calls < 0 ||
       !Number.isInteger(lastSession.native_invocations) || lastSession.native_invocations < 0) {
     reject('r5a_dogfood_cli_last_session_invalid');

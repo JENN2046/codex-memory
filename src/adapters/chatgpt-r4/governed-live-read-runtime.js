@@ -27,6 +27,13 @@ const R5A_POST_CALL_SAFETY_ERROR_CODES = new Set([
   'r4_live_read_native_evidence_missing',
   'response_structured_content_shape_invalid'
 ]);
+const R5A_OBSERVED_TOOL_NAMES = new Set([
+  'resolve_memory_context',
+  'memory_overview',
+  'search_memory',
+  'audit_memory',
+  'prepare_memory_context'
+]);
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -444,6 +451,7 @@ function createR4GovernanceRuntime({
       (dogfoodObserver !== null &&
        (typeof dogfoodObserver.observeToolResult !== 'function' ||
         typeof dogfoodObserver.observeToolError !== 'function' ||
+        typeof dogfoodObserver.beginToolAttempt !== 'function' ||
         typeof dogfoodObserver.markEmergencyStop !== 'function' ||
         typeof dogfoodObserver.snapshot !== 'function')) ||
       typeof monotonicClock !== 'function') {
@@ -511,7 +519,11 @@ function createR4GovernanceRuntime({
         reject('r5a_dogfood_monotonic_clock_invalid');
       }
       let observationAttempted = false;
+      let observationSessionOrdinal = null;
       try {
+        if (dogfoodObserver && R5A_OBSERVED_TOOL_NAMES.has(toolName)) {
+          observationSessionOrdinal = dogfoodObserver.beginToolAttempt({ toolName });
+        }
         const inactiveSessionRequest = activationController &&
           activationController.snapshot().active !== true;
         if (inactiveSessionRequest) {
@@ -578,7 +590,8 @@ function createR4GovernanceRuntime({
                 result.structured_content?.item_count ?? 0),
               relevance: relevanceValues.length > 0 ? Math.max(...relevanceValues) : null,
               counters: result.counters,
-              activationSnapshot: activationController.snapshot()
+              activationSnapshot: activationController.snapshot(),
+              sessionOrdinal: observationSessionOrdinal
             });
           } catch (error) {
             const errorCode = typeof error?.code === 'string' &&
@@ -593,8 +606,7 @@ function createR4GovernanceRuntime({
         return result;
       } catch (error) {
         if (dogfoodObserver && !observationAttempted &&
-            ['resolve_memory_context', 'memory_overview', 'search_memory',
-              'audit_memory', 'prepare_memory_context'].includes(toolName)) {
+            R5A_OBSERVED_TOOL_NAMES.has(toolName)) {
           const endedAt = Number(monotonicClock());
           const latencyMs = Number.isFinite(endedAt)
             ? Math.max(0, Math.min(60_000, Math.round(endedAt - startedAt)))
@@ -607,7 +619,8 @@ function createR4GovernanceRuntime({
             toolName,
             latencyMs,
             errorCode,
-            activationSnapshot: activationController.snapshot()
+            activationSnapshot: activationController.snapshot(),
+            sessionOrdinal: observationSessionOrdinal
           });
           if (R5A_POST_CALL_SAFETY_ERROR_CODES.has(errorCode)) {
             dogfoodObserver.markEmergencyStop({ errorCode });
@@ -651,6 +664,7 @@ module.exports = {
   MAX_R5A_AUTHORIZED_TOOL_CALLS,
   MAX_INACTIVE_REQUEST_ATTEMPTS,
   R5A_POST_CALL_SAFETY_ERROR_CODES,
+  R5A_OBSERVED_TOOL_NAMES,
   buildNativeRequest,
   countersFromEvidence,
   createContextAuthority,

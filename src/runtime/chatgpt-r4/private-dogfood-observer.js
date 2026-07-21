@@ -63,6 +63,9 @@ function createPrivateDogfoodObserver({
   function prepareActivation(activationSnapshot) {
     syncActivation(activationSnapshot);
     if (emergencyStopLatched) reject('r5a_dogfood_emergency_stop_latched');
+    if (currentSession()?.tool_attempt_in_flight === true) {
+      reject('r5a_dogfood_tool_attempt_in_flight');
+    }
     if (currentSession()?.status === 'active') reject('r5a_dogfood_session_already_active');
     if (sessions.length >= maxSessions) reject('r5a_dogfood_session_budget_exhausted');
     if (counters.provider_calls >= maxProviderCalls) reject('r5a_dogfood_provider_budget_exhausted');
@@ -71,6 +74,9 @@ function createPrivateDogfoodObserver({
 
   function beginSession({ observationKind, activationSnapshot } = {}) {
     if (emergencyStopLatched) reject('r5a_dogfood_emergency_stop_latched');
+    if (currentSession()?.tool_attempt_in_flight === true) {
+      reject('r5a_dogfood_tool_attempt_in_flight');
+    }
     if (observationKind !== DOGFOOD_OBSERVATION_KIND ||
         activationSnapshot?.activation_status !== 'active') {
       reject('r5a_dogfood_session_begin_invalid');
@@ -92,6 +98,7 @@ function createPrivateDogfoodObserver({
       max_relevance: null,
       timed_out: false,
       error_code: null,
+      tool_attempt_in_flight: false,
       counters: {
         provider_calls: 0,
         native_invocations: 0,
@@ -105,10 +112,25 @@ function createPrivateDogfoodObserver({
     return snapshot();
   }
 
-  function assertToolEvent(toolName, latencyMs) {
+  function beginToolAttempt({ toolName } = {}) {
     const session = currentSession();
     if (!session || session.status !== 'active') return null;
     if (!['resolve_memory_context', ...READ_TOOL_NAMES].includes(toolName) ||
+        session.tool_attempt_in_flight === true ||
+        session.tool_sequence.length >= MAX_DOGFOOD_TOOL_EVENTS_PER_SESSION) {
+      reject('r5a_dogfood_tool_attempt_invalid');
+    }
+    session.tool_attempt_in_flight = true;
+    return session.ordinal;
+  }
+
+  function assertToolEvent(toolName, latencyMs, sessionOrdinal) {
+    if (sessionOrdinal === null) return null;
+    const session = currentSession();
+    if (!session || !Number.isInteger(sessionOrdinal) || session.ordinal !== sessionOrdinal ||
+        session.tool_attempt_in_flight !== true ||
+        !['active', 'inactive', 'consumed', 'killed', 'expired'].includes(session.status) ||
+        !['resolve_memory_context', ...READ_TOOL_NAMES].includes(toolName) ||
         !Number.isInteger(latencyMs) || latencyMs < 0 || latencyMs > 60_000 ||
         session.tool_sequence.length >= MAX_DOGFOOD_TOOL_EVENTS_PER_SESSION) {
       reject('r5a_dogfood_tool_event_invalid');
@@ -146,9 +168,10 @@ function createPrivateDogfoodObserver({
     resultCount = 0,
     relevance = null,
     counters: observedCounters,
-    activationSnapshot
+    activationSnapshot,
+    sessionOrdinal = null
   } = {}) {
-    const session = assertToolEvent(toolName, latencyMs);
+    const session = assertToolEvent(toolName, latencyMs, sessionOrdinal);
     if (!session) return false;
     if (typeof status !== 'string' || !status || status.length > 40 ||
         !Number.isInteger(resultCount) || resultCount < 0 || resultCount > 5 ||
@@ -157,6 +180,7 @@ function createPrivateDogfoodObserver({
     }
     const counterViolation = addCounters(session, observedCounters);
     session.tool_sequence.push(toolName);
+    session.tool_attempt_in_flight = false;
     session.total_latency_ms += latencyMs;
     session.result_count = resultCount;
     if (relevance !== null) {
@@ -169,11 +193,18 @@ function createPrivateDogfoodObserver({
     return true;
   }
 
-  function observeToolError({ toolName, latencyMs, errorCode, activationSnapshot } = {}) {
-    const session = assertToolEvent(toolName, latencyMs);
+  function observeToolError({
+    toolName,
+    latencyMs,
+    errorCode,
+    activationSnapshot,
+    sessionOrdinal = null
+  } = {}) {
+    const session = assertToolEvent(toolName, latencyMs, sessionOrdinal);
     if (!session) return false;
     if (!SAFE_ERROR_CODE_PATTERN.test(errorCode || '')) reject('r5a_dogfood_error_code_invalid');
     session.tool_sequence.push(toolName);
+    session.tool_attempt_in_flight = false;
     session.total_latency_ms += latencyMs;
     session.error_code = errorCode;
     session.timed_out = errorCode.includes('timeout');
@@ -190,6 +221,7 @@ function createPrivateDogfoodObserver({
     session.status = 'emergency_stopped';
     session.error_code = errorCode;
     session.ended_at = now().toISOString();
+    session.tool_attempt_in_flight = false;
     emergencyStopLatched = true;
     return true;
   }
@@ -205,6 +237,7 @@ function createPrivateDogfoodObserver({
       max_relevance: session.max_relevance,
       timed_out: session.timed_out,
       error_code: session.error_code,
+      tool_attempt_in_flight: session.tool_attempt_in_flight,
       provider_calls: session.counters.provider_calls,
       native_invocations: session.counters.native_invocations
     });
@@ -257,6 +290,7 @@ function createPrivateDogfoodObserver({
   return Object.freeze({
     prepareActivation,
     beginSession,
+    beginToolAttempt,
     observeToolResult,
     observeToolError,
     markEmergencyStop,

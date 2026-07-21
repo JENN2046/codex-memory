@@ -999,6 +999,9 @@ test('R5-A observer records only bounded low-disclosure session outcomes', async
     observationKind: DOGFOOD_OBSERVATION_KIND,
     activationSnapshot: { activation_status: 'active' }
   });
+  const providerCappedOrdinal = providerCapped.beginToolAttempt({
+    toolName: 'search_memory'
+  });
   providerCapped.observeToolResult({
     toolName: 'search_memory',
     latencyMs: 1,
@@ -1006,7 +1009,8 @@ test('R5-A observer records only bounded low-disclosure session outcomes', async
     resultCount: 1,
     relevance: 0.5,
     counters: { ...ZERO_MEMORY_COUNTERS, provider_calls: 1, native_invocations: 1 },
-    activationSnapshot: { activation_status: 'consumed' }
+    activationSnapshot: { activation_status: 'consumed' },
+    sessionOrdinal: providerCappedOrdinal
   });
   assert.throws(() => providerCapped.prepareActivation({ activation_status: 'consumed' }), {
     code: 'r5a_dogfood_provider_budget_exhausted'
@@ -1175,6 +1179,9 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
       observationKind: DOGFOOD_OBSERVATION_KIND,
       activationSnapshot: { activation_status: 'active' }
     });
+    const terminalOrdinal = terminalObserver.beginToolAttempt({
+      toolName: 'search_memory'
+    });
     assert.throws(() => terminalObserver.observeToolResult({
       toolName: 'search_memory',
       latencyMs: 1,
@@ -1182,7 +1189,8 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
       resultCount: 1,
       relevance: 0.5,
       counters: { ...ZERO_MEMORY_COUNTERS, derived_index_writes: 1 },
-      activationSnapshot: { activation_status: terminalStatus }
+      activationSnapshot: { activation_status: terminalStatus },
+      sessionOrdinal: terminalOrdinal
     }), { code: 'r5a_dogfood_forbidden_counter_observed' });
     assert.equal(terminalObserver.snapshot().last_session.status, terminalStatus);
     assert.doesNotThrow(() => terminalObserver.markEmergencyStop({
@@ -1249,4 +1257,71 @@ test('R5-A latches closed when native safety receipts fail before counters exist
       code: 'r5a_dogfood_emergency_stop_latched'
     });
   }
+});
+
+test('R5-A keeps an in-flight tool bound across kill and records a late forbidden result', async () => {
+  let releaseProvider;
+  let providerStarted;
+  const started = new Promise(resolve => { providerStarted = resolve; });
+  const observer = createPrivateDogfoodObserver();
+  const lateForbiddenResult = delegatedResult();
+  lateForbiddenResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt = {
+    ...lateForbiddenResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt,
+    derivedIndexWritePerformed: true,
+    durableWritePerformed: true,
+    durableWriteScope: 'isolated_derived_index'
+  };
+  const fixture = createRuntimeFixture({
+    dogfoodObserver: observer,
+    async callGovernedTool() {
+      providerStarted();
+      await new Promise(resolve => { releaseProvider = resolve; });
+      return lateForbiddenResult;
+    }
+  });
+  fixture.controller.activate({
+    requestId: 'op_r5a_inflight_guard_activation_001',
+    requestedVisibility: 'project',
+    ttlSeconds: 300,
+    now: NOW
+  });
+  observer.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    activationSnapshot: fixture.controller.snapshot(NOW)
+  });
+  const resolveRequest = requestFixture(
+    fixture.edge,
+    fixture.principal,
+    'resolve_memory_context',
+    { project_alias: 'project-alpha', requested_visibility: 'project' },
+    120
+  );
+  const resolved = await fixture.runtime.handle({
+    request: resolveRequest,
+    relayReceipt: relayReceipt(resolveRequest)
+  });
+  const searchRequest = requestFixture(fixture.edge, fixture.principal, 'search_memory', {
+    project_context_ref: resolved.structured_content.project_context_ref,
+    query: 'bounded project signal',
+    limit: 1
+  }, 121);
+  const pending = fixture.runtime.handle({
+    request: searchRequest,
+    relayReceipt: relayReceipt(searchRequest)
+  });
+  await started;
+  fixture.controller.kill({ reason: 'emergency_stop', now: NOW });
+  observer.syncActivation(fixture.controller.snapshot(NOW));
+  assert.equal(observer.snapshot().last_session.status, 'killed');
+  assert.equal(observer.snapshot().last_session.tool_attempt_in_flight, true);
+  assert.throws(() => observer.prepareActivation(fixture.controller.snapshot(NOW)), {
+    code: 'r5a_dogfood_tool_attempt_in_flight'
+  });
+  releaseProvider();
+  await assert.rejects(pending, { code: 'r5a_dogfood_forbidden_counter_observed' });
+  const observation = observer.snapshot();
+  assert.equal(observation.derived_index_writes, 1);
+  assert.equal(observation.emergency_stop_latched, true);
+  assert.equal(observation.last_session.status, 'emergency_stopped');
+  assert.equal(observation.last_session.tool_attempt_in_flight, false);
 });

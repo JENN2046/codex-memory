@@ -96,6 +96,9 @@ verification.
 - native receipt/delegation/integrity failures that occur before trustworthy
   counters exist are recorded as post-call safety errors and also latch the
   process closed; values from an invalid receipt are never promoted as facts;
+- each observed tool attempt is bound to its starting session until result or
+  error; kill/expiry cannot discard that in-flight observation, and a new
+  activation is blocked until the attempt settles;
 - public receipts remain low-disclosure and contain no observation authority;
 - stop/restart clears activation and observation state.
 
