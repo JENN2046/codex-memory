@@ -230,10 +230,108 @@ const REQUIRED_NATIVE_RUNTIME_EVIDENCE_BOOLEAN_FIELDS = Object.freeze([
 ]);
 
 function nativeRuntimeReceiptEvidenceComplete(receipt) {
-  return isPlainObject(receipt) &&
-    REQUIRED_NATIVE_RUNTIME_EVIDENCE_BOOLEAN_FIELDS.every(field =>
+  if (!isPlainObject(receipt) ||
+    !REQUIRED_NATIVE_RUNTIME_EVIDENCE_BOOLEAN_FIELDS.every(field =>
       typeof receipt[field] === 'boolean'
-    );
+    )) return false;
+  const lifecycleBooleanFields = [
+    'derivedRuntimeMutationAuthorized',
+    'derivedRuntimeMutationAccountingFinal',
+    'derivedRuntimeMutationBackgroundTasksDrained',
+    'derivedRuntimeMutationZeroClaimed',
+    'derivedRuntimeMutationPolicyViolation',
+    'sourcePartitionMutationPerformed',
+    'legacyPartitionAccessed',
+    'ambiguousPartitionAccessed',
+    'unregisteredPartitionAccessed',
+    'derivedRuntimeMutationRawDetailsDisclosed'
+  ];
+  const lifecycleFieldsPresent = [
+    'derivedRuntimeMutationPolicy',
+    'derivedRuntimeMutationAccountingMode',
+    'derivedRuntimeMutationCumulativeCount',
+    'derivedRuntimeMutationReceiptDelta',
+    'derivedRuntimeMutationActiveCount',
+    'derivedRuntimeMutationCompletedCount',
+    'derivedRuntimeMutationFailedCount',
+    'derivedRuntimeMutationTriggerCategories',
+    ...lifecycleBooleanFields
+  ].every(field => Object.hasOwn(receipt, field));
+  if (!lifecycleFieldsPresent) {
+    return receipt.memoryWritePerformed === true &&
+      receipt.primaryMemoryStoreWritePerformed === true &&
+      receipt.derivedIndexWritePerformed === false;
+  }
+  if (lifecycleBooleanFields.some(field => typeof receipt[field] !== 'boolean')) return false;
+  const integers = [
+    'derivedRuntimeMutationCumulativeCount',
+    'derivedRuntimeMutationReceiptDelta',
+    'derivedRuntimeMutationActiveCount',
+    'derivedRuntimeMutationCompletedCount',
+    'derivedRuntimeMutationFailedCount'
+  ];
+  if (integers.some(field => !Number.isInteger(receipt[field]) || receipt[field] < 0) ||
+      receipt.derivedRuntimeMutationReceiptDelta >
+        receipt.derivedRuntimeMutationCumulativeCount ||
+      receipt.derivedRuntimeMutationCompletedCount +
+        receipt.derivedRuntimeMutationFailedCount +
+        receipt.derivedRuntimeMutationActiveCount !==
+        receipt.derivedRuntimeMutationCumulativeCount ||
+      !Array.isArray(receipt.derivedRuntimeMutationTriggerCategories) ||
+      receipt.derivedRuntimeMutationTriggerCategories.some(value =>
+        !['startup', 'hydration', 'cache', 'vector', 'tag', 'matrix'].includes(value)
+      ) ||
+      new Set(receipt.derivedRuntimeMutationTriggerCategories).size !==
+        receipt.derivedRuntimeMutationTriggerCategories.length) return false;
+  const lifecycleEnabled = receipt.derivedRuntimeMutationPolicy ===
+    'isolated_derived_runtime_mutation_v1' &&
+    receipt.derivedRuntimeMutationAccountingMode === 'lifecycle_event_v1';
+  const lifecycleDisabled = receipt.derivedRuntimeMutationPolicy === 'disabled' &&
+    receipt.derivedRuntimeMutationAccountingMode === 'not_applicable';
+  if (!lifecycleEnabled && !lifecycleDisabled) return false;
+  if (receipt.derivedRuntimeMutationPolicyViolation !== false ||
+      receipt.sourcePartitionMutationPerformed !== false ||
+      receipt.legacyPartitionAccessed !== false ||
+      receipt.ambiguousPartitionAccessed !== false ||
+      receipt.unregisteredPartitionAccessed !== false ||
+      receipt.derivedRuntimeMutationRawDetailsDisclosed !== false) return false;
+  if (lifecycleEnabled && receipt.derivedRuntimeMutationAuthorized !== true) return false;
+  if (lifecycleDisabled) {
+    const primaryWriteReceipt = receipt.memoryWritePerformed === true &&
+      receipt.primaryMemoryStoreWritePerformed === true &&
+      receipt.derivedIndexWritePerformed === false &&
+      receipt.durableWritePerformed === true &&
+      ['primary_memory_write', 'primary_memory_mutation_marker']
+        .includes(receipt.durableWriteScope);
+    const readWithoutDerivedMutation = receipt.memoryWritePerformed === false &&
+      receipt.primaryMemoryStoreWritePerformed === false &&
+      receipt.derivedIndexWritePerformed === false &&
+      receipt.durableWritePerformed === false &&
+      receipt.durableWriteScope === null;
+    if (receipt.derivedRuntimeMutationCumulativeCount !== 0 ||
+        receipt.derivedRuntimeMutationReceiptDelta !== 0 ||
+        receipt.derivedRuntimeMutationAuthorized !== false ||
+        receipt.derivedRuntimeMutationTriggerCategories.length !== 0 ||
+        (!primaryWriteReceipt && !readWithoutDerivedMutation)) return false;
+  }
+  if (lifecycleEnabled && (
+    receipt.derivedIndexWritePerformed !==
+      (receipt.derivedRuntimeMutationCumulativeCount > 0) ||
+    receipt.durableWritePerformed !== receipt.derivedIndexWritePerformed ||
+    receipt.durableWriteScope !== (receipt.derivedRuntimeMutationCumulativeCount > 0
+      ? 'isolated_derived_index'
+      : null) ||
+    (receipt.derivedRuntimeMutationCumulativeCount === 0 &&
+      receipt.derivedRuntimeMutationTriggerCategories.length !== 0)
+  )) return false;
+  const finalZeroClaim = receipt.derivedRuntimeMutationAccountingFinal === true &&
+    receipt.derivedRuntimeMutationCumulativeCount === 0;
+  if (receipt.derivedRuntimeMutationZeroClaimed !== finalZeroClaim ||
+      receipt.derivedRuntimeMutationBackgroundTasksDrained !==
+        receipt.derivedRuntimeMutationAccountingFinal ||
+      (receipt.derivedRuntimeMutationAccountingFinal === true &&
+        receipt.derivedRuntimeMutationActiveCount !== 0)) return false;
+  return true;
 }
 
 function lowDisclosureNativeRuntimeReceipt(receipt = null) {
@@ -250,6 +348,24 @@ function lowDisclosureNativeRuntimeReceipt(receipt = null) {
       isolatedRuntimeStoreUsed: false,
       primaryMemoryStoreWritePerformed: false,
       derivedIndexWritePerformed: false,
+      derivedRuntimeMutationPolicy: null,
+      derivedRuntimeMutationAccountingMode: null,
+      derivedRuntimeMutationAuthorized: false,
+      derivedRuntimeMutationAccountingFinal: false,
+      derivedRuntimeMutationBackgroundTasksDrained: false,
+      derivedRuntimeMutationCumulativeCount: 0,
+      derivedRuntimeMutationReceiptDelta: 0,
+      derivedRuntimeMutationActiveCount: 0,
+      derivedRuntimeMutationCompletedCount: 0,
+      derivedRuntimeMutationFailedCount: 0,
+      derivedRuntimeMutationTriggerCategories: [],
+      derivedRuntimeMutationZeroClaimed: false,
+      derivedRuntimeMutationPolicyViolation: false,
+      sourcePartitionMutationPerformed: false,
+      legacyPartitionAccessed: false,
+      ambiguousPartitionAccessed: false,
+      unregisteredPartitionAccessed: false,
+      derivedRuntimeMutationRawDetailsDisclosed: false,
       authorizationResolvedBeforeProvider: false,
       diaryAllowlistEnforcedBeforeIndexLoad: false,
       diaryAllowlistEnforcedBeforeVectorSearch: false,
@@ -301,6 +417,41 @@ function lowDisclosureNativeRuntimeReceipt(receipt = null) {
     isolatedRuntimeStoreUsed: receipt.isolatedRuntimeStoreUsed === true,
     primaryMemoryStoreWritePerformed: receipt.primaryMemoryStoreWritePerformed === true,
     derivedIndexWritePerformed: receipt.derivedIndexWritePerformed === true,
+    derivedRuntimeMutationPolicy: receipt.derivedRuntimeMutationPolicy || 'disabled',
+    derivedRuntimeMutationAccountingMode:
+      receipt.derivedRuntimeMutationAccountingMode || 'not_applicable',
+    derivedRuntimeMutationAuthorized: receipt.derivedRuntimeMutationAuthorized === true,
+    derivedRuntimeMutationAccountingFinal:
+      receipt.derivedRuntimeMutationAccountingFinal === true,
+    derivedRuntimeMutationBackgroundTasksDrained:
+      receipt.derivedRuntimeMutationBackgroundTasksDrained === true,
+    derivedRuntimeMutationCumulativeCount:
+      Number.isInteger(receipt.derivedRuntimeMutationCumulativeCount)
+        ? receipt.derivedRuntimeMutationCumulativeCount : 0,
+    derivedRuntimeMutationReceiptDelta:
+      Number.isInteger(receipt.derivedRuntimeMutationReceiptDelta)
+        ? receipt.derivedRuntimeMutationReceiptDelta : 0,
+    derivedRuntimeMutationActiveCount:
+      Number.isInteger(receipt.derivedRuntimeMutationActiveCount)
+        ? receipt.derivedRuntimeMutationActiveCount : 0,
+    derivedRuntimeMutationCompletedCount:
+      Number.isInteger(receipt.derivedRuntimeMutationCompletedCount)
+        ? receipt.derivedRuntimeMutationCompletedCount : 0,
+    derivedRuntimeMutationFailedCount:
+      Number.isInteger(receipt.derivedRuntimeMutationFailedCount)
+        ? receipt.derivedRuntimeMutationFailedCount : 0,
+    derivedRuntimeMutationTriggerCategories:
+      Array.isArray(receipt.derivedRuntimeMutationTriggerCategories)
+        ? [...receipt.derivedRuntimeMutationTriggerCategories]
+        : [],
+    derivedRuntimeMutationZeroClaimed: receipt.derivedRuntimeMutationZeroClaimed === true,
+    derivedRuntimeMutationPolicyViolation:
+      receipt.derivedRuntimeMutationPolicyViolation === true,
+    sourcePartitionMutationPerformed: receipt.sourcePartitionMutationPerformed === true,
+    legacyPartitionAccessed: receipt.legacyPartitionAccessed === true,
+    ambiguousPartitionAccessed: receipt.ambiguousPartitionAccessed === true,
+    unregisteredPartitionAccessed: receipt.unregisteredPartitionAccessed === true,
+    derivedRuntimeMutationRawDetailsDisclosed: false,
     authorizationResolvedBeforeProvider: receipt.authorizationResolvedBeforeProvider === true,
     diaryAllowlistEnforcedBeforeIndexLoad: receipt.diaryAllowlistEnforcedBeforeIndexLoad === true,
     diaryAllowlistEnforcedBeforeVectorSearch: receipt.diaryAllowlistEnforcedBeforeVectorSearch === true,

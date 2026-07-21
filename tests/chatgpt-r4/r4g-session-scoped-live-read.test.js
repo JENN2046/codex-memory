@@ -138,8 +138,27 @@ function delegatedResult() {
           memoryWritePerformed: false,
           durableWritePerformed: false,
           durableWriteScope: null,
+          isolatedRuntimeStoreUsed: true,
           primaryMemoryStoreWritePerformed: false,
           derivedIndexWritePerformed: false,
+          derivedRuntimeMutationPolicy: 'isolated_derived_runtime_mutation_v1',
+          derivedRuntimeMutationAccountingMode: 'lifecycle_event_v1',
+          derivedRuntimeMutationAuthorized: true,
+          derivedRuntimeMutationAccountingFinal: false,
+          derivedRuntimeMutationBackgroundTasksDrained: false,
+          derivedRuntimeMutationCumulativeCount: 0,
+          derivedRuntimeMutationReceiptDelta: 0,
+          derivedRuntimeMutationActiveCount: 0,
+          derivedRuntimeMutationCompletedCount: 0,
+          derivedRuntimeMutationFailedCount: 0,
+          derivedRuntimeMutationTriggerCategories: [],
+          derivedRuntimeMutationZeroClaimed: false,
+          derivedRuntimeMutationPolicyViolation: false,
+          sourcePartitionMutationPerformed: false,
+          legacyPartitionAccessed: false,
+          ambiguousPartitionAccessed: false,
+          unregisteredPartitionAccessed: false,
+          derivedRuntimeMutationRawDetailsDisclosed: false,
           authorizationResolvedBeforeProvider: true,
           diaryAllowlistEnforcedBeforeIndexLoad: true,
           diaryAllowlistEnforcedBeforeVectorSearch: true,
@@ -1009,6 +1028,25 @@ test('R5-A observer records only bounded low-disclosure session outcomes', async
     resultCount: 1,
     relevance: 0.5,
     counters: { ...ZERO_MEMORY_COUNTERS, provider_calls: 1, native_invocations: 1 },
+    derivedRuntimeMutationEvidence: {
+      policy: 'isolated_derived_runtime_mutation_v1',
+      authorized: true,
+      isolated_runtime_store: true,
+      accounting_final: false,
+      cumulative_count: 0,
+      receipt_delta: 0,
+      active_count: 0,
+      completed_count: 0,
+      failed_count: 0,
+      trigger_categories: [],
+      policy_violation: false,
+      source_partition_mutation: false,
+      legacy_partition_accessed: false,
+      ambiguous_partition_accessed: false,
+      unregistered_partition_accessed: false,
+      unrestricted_native_search: false,
+      raw_details_disclosed: false
+    },
     activationSnapshot: { activation_status: 'consumed' },
     sessionOrdinal: providerCappedOrdinal
   });
@@ -1079,14 +1117,18 @@ test('R5-A control protocol is operator-only, versioned, and capped at twenty se
   assert.equal(parsed.request.observation_kind, DOGFOOD_OBSERVATION_KIND);
 });
 
-test('R5-A rejects forbidden derived-index mutation before returning a live-read result', async () => {
+test('R5-D permits authorized isolated derived mutation with lifecycle evidence', async () => {
   const observer = createPrivateDogfoodObserver();
   const resultWithDerivedWrite = delegatedResult();
   resultWithDerivedWrite.receipt.nativeInvocationReceipt.nativeRuntimeReceipt = {
     ...resultWithDerivedWrite.receipt.nativeInvocationReceipt.nativeRuntimeReceipt,
     derivedIndexWritePerformed: true,
     durableWritePerformed: true,
-    durableWriteScope: 'isolated_derived_index'
+    durableWriteScope: 'isolated_derived_index',
+    derivedRuntimeMutationCumulativeCount: 1,
+    derivedRuntimeMutationReceiptDelta: 1,
+    derivedRuntimeMutationCompletedCount: 1,
+    derivedRuntimeMutationTriggerCategories: ['startup']
   };
   const fixture = createRuntimeFixture({
     dogfoodObserver: observer,
@@ -1118,22 +1160,22 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
     query: 'bounded project signal',
     limit: 1
   }, 93);
-  await assert.rejects(fixture.runtime.handle({
+  const read = await fixture.runtime.handle({
     request: searchRequest,
     relayReceipt: relayReceipt(searchRequest)
-  }), { code: 'r5a_dogfood_forbidden_counter_observed' });
+  });
+  assert.equal(read.status, 'ok');
   assert.equal(observer.snapshot().derived_index_writes, 1);
   assert.equal(observer.snapshot().primary_memory_writes, 0);
-  assert.equal(observer.snapshot().last_session.status, 'emergency_stopped');
-  assert.equal(observer.snapshot().emergency_stop_latched, true);
+  assert.equal(observer.snapshot().derived_runtime_mutation_evidence_count, 1);
+  assert.equal(observer.snapshot().derived_runtime_mutation_policy_violations, 0);
+  assert.equal(observer.snapshot().last_session.status, 'consumed');
+  assert.equal(observer.snapshot().emergency_stop_latched, false);
   assert.deepEqual(observer.snapshot().last_session.tool_sequence, [
     'resolve_memory_context',
     'search_memory'
   ]);
-  assert.equal(
-    observer.snapshot().last_session.error_code,
-    'r5a_dogfood_forbidden_counter_observed'
-  );
+  assert.equal(observer.snapshot().last_session.error_code, null);
   assert.doesNotThrow(() => validateDogfoodResponse({
     schema_version: 2,
     operation: 'status',
@@ -1148,31 +1190,6 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
     receipt_digest: fixture.controller.snapshot().receipt_digest,
     observation: observer.snapshot()
   }, 'status'));
-  assert.throws(() => validateDogfoodResponse({
-    schema_version: 2,
-    operation: 'status',
-    accepted: true,
-    activation_status: fixture.controller.snapshot().activation_status,
-    remaining_ttl_seconds: 0,
-    context_bound: true,
-    read_in_flight: false,
-    remaining_read_calls: 0,
-    default_closed: true,
-    durable_state_written: false,
-    receipt_digest: fixture.controller.snapshot().receipt_digest,
-    observation: {
-      ...observer.snapshot(),
-      emergency_stop_latched: false
-    }
-  }, 'status'), { code: 'r5a_dogfood_cli_observation_invalid' });
-  assert.throws(() => observer.prepareActivation(fixture.controller.snapshot()), {
-    code: 'r5a_dogfood_emergency_stop_latched'
-  });
-  assert.throws(() => observer.beginSession({
-    observationKind: DOGFOOD_OBSERVATION_KIND,
-    activationSnapshot: { activation_status: 'active' }
-  }), { code: 'r5a_dogfood_emergency_stop_latched' });
-
   for (const terminalStatus of ['expired', 'killed']) {
     const terminalObserver = createPrivateDogfoodObserver();
     terminalObserver.beginSession({
@@ -1191,10 +1208,10 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
       counters: { ...ZERO_MEMORY_COUNTERS, derived_index_writes: 1 },
       activationSnapshot: { activation_status: terminalStatus },
       sessionOrdinal: terminalOrdinal
-    }), { code: 'r5a_dogfood_forbidden_counter_observed' });
+    }), { code: 'r5d_derived_runtime_mutation_evidence_invalid' });
     assert.equal(terminalObserver.snapshot().last_session.status, terminalStatus);
     assert.doesNotThrow(() => terminalObserver.markEmergencyStop({
-      errorCode: 'r5a_dogfood_forbidden_counter_observed'
+      errorCode: 'r5d_derived_runtime_mutation_evidence_invalid'
     }));
     assert.equal(terminalObserver.snapshot().last_session.status, 'emergency_stopped');
     assert.equal(terminalObserver.snapshot().emergency_stop_latched, true);
@@ -1318,10 +1335,11 @@ test('R5-A keeps an in-flight tool bound across kill and records a late forbidde
     code: 'r5a_dogfood_tool_attempt_in_flight'
   });
   releaseProvider();
-  await assert.rejects(pending, { code: 'r5a_dogfood_forbidden_counter_observed' });
+  await assert.rejects(pending, { code: 'r4_live_read_native_receipt_invalid' });
   const observation = observer.snapshot();
-  assert.equal(observation.derived_index_writes, 1);
+  assert.equal(observation.derived_index_writes, 0);
   assert.equal(observation.emergency_stop_latched, true);
   assert.equal(observation.last_session.status, 'emergency_stopped');
   assert.equal(observation.last_session.tool_attempt_in_flight, false);
+  assert.equal(observation.last_session.error_code, 'r4_live_read_native_receipt_invalid');
 });

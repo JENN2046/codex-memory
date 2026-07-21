@@ -84,8 +84,9 @@ verification.
   principal/project/visibility and a 30–300 second TTL;
 - 21st session and provider call 26 are rejected;
 - unobserved v1 activation is rejected while R5-A mode is enabled;
-- primary-memory write, derived-index write, local fallback, or unrestricted
-  native search rejects the result and marks the owner-only observation
+- primary-memory write, local fallback, unrestricted native search, or a
+  derived-runtime mutation without R5-D isolated authorization and matching
+  lifecycle evidence rejects the result and marks the owner-only observation
   `emergency_stopped`, even when the one-read controller has already consumed
   or terminalized its lease as expired/killed; the observer then latches closed
   for the rest of the process, so only a full Governance restart can permit
@@ -103,9 +104,12 @@ verification.
 - stop/restart clears activation and observation state.
 
 Detection of a forbidden post-call counter suppresses the response but cannot
-undo a provider-side effect that has already happened. Runtime dogfood must
-therefore use the already indexed governed partitions and stop immediately if
-any derived-index mutation is reported.
+undo a provider-side effect that has already happened. Under R5-D, an isolated
+derived-index mutation is permitted only when the receipt proves its bounded
+trigger, authorization, lifecycle totals, source immutability, scope exclusion,
+and zero global search. A nonzero counter without that evidence remains a
+fail-closed error. See
+[R5-D Derived Runtime Mutation Governance](CHATGPT_WEB_R5D_DERIVED_RUNTIME_MUTATION_GOVERNANCE.md).
 
 ## Runtime gate and rollback
 

@@ -80,6 +80,135 @@ test('native read initializes the selected-diary runtime before provider and sco
   assert.equal(result._nativeRuntimeReceipt.unscopedNativeSearchUsed, false);
 });
 
+test('isolated runtime accounts startup, background matrix, shutdown saves, and final drain', async () => {
+  const calls = [];
+  const tagMemoEngine = {
+    _postStartupDerivedRefreshTimer: null,
+    _derivedTaskTimer: null,
+    _matrixRebuildTimer: null,
+    _derivedTaskQueue: [],
+    _derivedTaskRunning: false,
+    async doMatrixRebuild() {
+      calls.push('matrix');
+      return true;
+    }
+  };
+  const manager = {
+    config: { fullScanOnStartup: false },
+    diaryIndices: new Map(),
+    diaryDateIndexCache: new Map(),
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    async initialize() {
+      calls.push('initialize');
+      this._saveIndexToDisk('global_tags');
+      this.tagMemoEngine = tagMemoEngine;
+      this.watcher = { async close() { calls.push('watcher-close'); } };
+      this.ragParamsWatcher = { async close() { calls.push('rag-watcher-close'); } };
+    },
+    _saveIndexToDisk(name) {
+      calls.push(['save', name]);
+    },
+    async _getOrLoadDiaryIndex(diaryName) {
+      if (this.diaryIndices.has(diaryName)) return this.diaryIndices.get(diaryName);
+      calls.push(['hydrate', diaryName]);
+      await this._recoverIndexFromDB(diaryName);
+      const index = { diaryName };
+      this.diaryIndices.set(diaryName, index);
+      this._ensureDiaryDateIndexCached(diaryName);
+      return index;
+    },
+    async _recoverIndexFromDB(diaryName) {
+      calls.push(['recover', diaryName]);
+    },
+    _ensureDiaryDateIndexCached(diaryName) {
+      if (!this.diaryDateIndexCache.has(diaryName)) {
+        calls.push(['cache', diaryName]);
+        this.diaryDateIndexCache.set(diaryName, true);
+      }
+      return this.diaryDateIndexCache.get(diaryName);
+    },
+    async search(diaryNames) {
+      calls.push(['search', diaryNames]);
+      await this._getOrLoadDiaryIndex(diaryNames[0]);
+      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+    },
+    async shutdown() {
+      calls.push('shutdown');
+      this._saveIndexToDisk('selected_diary');
+    }
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  const first = await adapter.search({ query: 'first', limit: 1 }, { authorization });
+  assert.equal(first._nativeRuntimeReceipt.derivedIndexWritePerformed, true);
+  assert.equal(first._nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta, 5);
+  assert.equal(first._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 5);
+  assert.deepEqual(first._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
+    ['cache', 'hydration', 'startup', 'tag', 'vector']);
+
+  await manager.tagMemoEngine.doMatrixRebuild();
+  const second = await adapter.search({ query: 'second', limit: 1 }, { authorization });
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta, 1);
+  assert.equal(second._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 6);
+  assert.deepEqual(second._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
+    ['cache', 'hydration', 'matrix', 'startup', 'tag', 'vector']);
+
+  const final = await adapter.shutdown();
+  assert.equal(final.derivedRuntimeMutationAccountingFinal, true);
+  assert.equal(final.derivedRuntimeMutationBackgroundTasksDrained, true);
+  assert.equal(final.derivedRuntimeMutationReceiptDelta, 1);
+  assert.equal(final.derivedRuntimeMutationCumulativeCount, 7);
+  assert.equal(final.derivedRuntimeMutationCompletedCount, 7);
+  assert.deepEqual(final.derivedRuntimeMutationTriggerCategories,
+    ['cache', 'hydration', 'matrix', 'startup', 'tag', 'vector']);
+  assert.equal(calls.filter(value => value === 'initialize').length, 1);
+  assert.equal(calls.filter(value => value === 'watcher-close').length, 1);
+  assert.equal(calls.filter(value => value === 'rag-watcher-close').length, 1);
+  assert.equal(calls.filter(value => Array.isArray(value) && value[0] === 'hydrate').length, 1);
+});
+
+test('isolated runtime rejects a mismatched derived mutation policy before provider use', () => {
+  assert.throws(() => createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    derivedRuntimeMutationPolicy: 'legacy_zero_write_v0',
+    knowledgeBaseManager: {},
+    embeddingUtils: {}
+  }), { message: 'derived_runtime_mutation_policy_mismatch' });
+});
+
+test('shutdown rejects pending source work and preserves the failure on replay', async () => {
+  const manager = {
+    pendingFiles: new Set(['synthetic-pending-source']),
+    pendingDeletes: new Set(),
+    async shutdown() {}
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: {}
+  });
+
+  await assert.rejects(adapter.shutdown(), {
+    message: 'native_source_partition_mutation_pending'
+  });
+  await assert.rejects(adapter.shutdown(), {
+    message: 'native_source_partition_mutation_pending'
+  });
+  assert.equal(manager.pendingFiles.size, 0);
+});
+
 test('native read rejects a manager configured for an unscoped startup scan before initialization', async () => {
   const calls = [];
   const adapter = createVcpToolBoxNativeMemoryAdapter({
@@ -114,6 +243,46 @@ test('native read rejects a manager configured for an unscoped startup scan befo
     error => error.reasonCode === 'native_runtime_initialization_failed'
   );
   assert.deepEqual(calls, []);
+});
+
+test('isolated read stops broad source watchers and rejects queued source work before provider', async () => {
+  const calls = [];
+  const manager = {
+    config: { fullScanOnStartup: false },
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    async initialize() {
+      calls.push('initialize');
+      this.watcher = { async close() { calls.push('watcher-close'); } };
+      this.pendingFiles.add('synthetic-unregistered-source-event');
+    },
+    async search() {
+      calls.push('search');
+      return [];
+    }
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: {
+      async getEmbeddingsBatch() {
+        calls.push('embedding');
+        return [[0.1, 0.2]];
+      }
+    }
+  });
+
+  await assert.rejects(adapter.search({ query: 'governed read' }, {
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+      allowedDiaryCount: 1,
+      mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+      mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+    }
+  }), error => error.reasonCode === 'native_runtime_initialization_failed');
+  assert.deepEqual(calls, ['initialize', 'watcher-close']);
+  assert.equal(manager.pendingFiles.size, 0);
 });
 
 test('native read classifies provider, scoped search, and postcheck failures without raw errors', async () => {

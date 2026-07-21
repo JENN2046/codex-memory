@@ -4,6 +4,9 @@
 const {
   createGovernedMcpVcpNativeVcpToolBoxMcpShimServer
 } = require('../core/GovernedMcpVcpNativeVcpToolBoxMcpShim');
+const {
+  DERIVED_RUNTIME_MUTATION_POLICY
+} = require('../core/DerivedRuntimeMutationLifecycle');
 
 function parseArgs(argv = [], env = process.env) {
   const options = {
@@ -13,6 +16,8 @@ function parseArgs(argv = [], env = process.env) {
     knowledgeBaseRootPath: env.KNOWLEDGEBASE_ROOT_PATH || '',
     knowledgeBaseStorePath: env.KNOWLEDGEBASE_STORE_PATH || '',
     diaryScopeMappingPath: env.CODEX_MEMORY_DIARY_SCOPE_MAPPING_PATH || '',
+    derivedRuntimeMutationPolicy: env.CODEX_MEMORY_DERIVED_RUNTIME_MUTATION_POLICY ||
+      DERIVED_RUNTIME_MUTATION_POLICY,
     enableWrite: false
   };
 
@@ -91,8 +96,33 @@ async function main() {
     readinessClaimed: false
   }) + '\n');
 
-  const close = () => {
-    server.close(() => process.exit(0));
+  let closing = false;
+  const close = async () => {
+    if (closing) return;
+    closing = true;
+    try {
+      const finalReceipt = await server.shutdownGovernedRuntime();
+      process.stdout.write(JSON.stringify({
+        status: 'stopped',
+        derived_runtime_mutation_receipt: finalReceipt,
+        rawRuntimeOutputDisclosed: false,
+        runtimeStorePathDisclosed: false,
+        tokenMaterialDisclosed: false,
+        readinessClaimed: false
+      }) + '\n');
+      process.exit(0);
+    } catch (error) {
+      process.stderr.write(JSON.stringify({
+        status: 'shutdown_failed',
+        reasonCode: /^[a-z][a-z0-9_]{0,100}$/u.test(error?.message || '')
+          ? error.message
+          : 'governed_runtime_shutdown_failed',
+        rawRuntimeOutputDisclosed: false,
+        runtimeStorePathDisclosed: false,
+        tokenMaterialDisclosed: false
+      }) + '\n');
+      process.exit(1);
+    }
   };
   process.on('SIGINT', close);
   process.on('SIGTERM', close);
