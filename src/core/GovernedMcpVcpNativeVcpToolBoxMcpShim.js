@@ -736,6 +736,8 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   let shutdownError = null;
   let shuttingDown = false;
   let selectedDiaryHydrationAuthorizationKey = null;
+  let selectedDiaryHydrationReservationKey = null;
+  let selectedDiaryHydrationReservationCount = 0;
   let selectedDiaryHydrationPromise = null;
   let selectedDiaryHydrationCompleted = false;
   let selectedDiaryHydrationFailureLatched = false;
@@ -763,19 +765,32 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     });
   }
 
-  function assertSelectedDiaryHydrationScope(authorization) {
-    if (!selectedDiaryRuntimeHydrator) return;
+  function reserveSelectedDiaryHydrationScope(authorization) {
+    if (!selectedDiaryRuntimeHydrator) return () => {};
     if (selectedDiaryHydrationFailureLatched) {
       throw new Error('selected_diary_hydration_failure_latched');
     }
     const authorizationKey = selectedDiaryAuthorizationKey(authorization);
-    if (selectedDiaryHydrationAuthorizationKey === null) {
-      selectedDiaryHydrationAuthorizationKey = authorizationKey;
-      return;
-    }
-    if (authorizationKey !== selectedDiaryHydrationAuthorizationKey) {
+    const boundKey = selectedDiaryHydrationAuthorizationKey ||
+      selectedDiaryHydrationReservationKey;
+    if (boundKey !== null && authorizationKey !== boundKey) {
       throw new Error('selected_diary_hydration_scope_change_forbidden');
     }
+    if (selectedDiaryHydrationAuthorizationKey !== null) return () => {};
+    if (selectedDiaryHydrationReservationKey === null) {
+      selectedDiaryHydrationReservationKey = authorizationKey;
+    }
+    selectedDiaryHydrationReservationCount += 1;
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      selectedDiaryHydrationReservationCount -= 1;
+      if (selectedDiaryHydrationReservationCount === 0 &&
+          selectedDiaryHydrationAuthorizationKey === null) {
+        selectedDiaryHydrationReservationKey = null;
+      }
+    };
   }
 
   async function hydrateAuthorizedSelectedDiaries(authorization) {
@@ -807,6 +822,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       selectedDiaryHydrationFailureLatched = true;
       throw error;
     }
+    selectedDiaryHydrationAuthorizationKey = selectedDiaryAuthorizationKey(authorization);
     selectedDiaryHydrationCompleted = true;
   }
 
@@ -991,70 +1007,75 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       throw new Error('native_diary_authorization_required');
     }
     bindDerivedMutationAuthorization(authorization);
-    assertSelectedDiaryHydrationScope(authorization);
+    const releaseSelectedDiaryHydrationScope =
+      reserveSelectedDiaryHydrationScope(authorization);
     try {
-      await ensureReady();
-    } catch {
-      throw nativeRuntimeStageError('native_runtime_initialization_failed');
+      try {
+        await ensureReady();
+      } catch {
+        throw nativeRuntimeStageError('native_runtime_initialization_failed');
+      }
+      const query = boundedString(args.query, 1000) || fallbackQuery;
+      const limit = normalizeLimit(args.limit ?? args.max_results, 1);
+      let embeddings;
+      try {
+        embeddings = await embeddingUtils.getEmbeddingsBatch(
+          [query],
+          runtimeInjected
+            ? {}
+            : {
+                apiUrl: process.env.API_URL,
+                apiKey: process.env.API_Key,
+                model: process.env.WhitelistEmbeddingModel
+              }
+        );
+      } catch {
+        throw nativeRuntimeStageError('native_provider_embedding_failed');
+      }
+      const vector = embeddings && embeddings[0];
+      if (!vector) {
+        throw nativeRuntimeStageError('native_provider_embedding_failed');
+      }
+      try {
+        await hydrateAuthorizedSelectedDiaries(authorization);
+      } catch {
+        throw nativeRuntimeStageError('native_selected_diary_hydration_failed');
+      }
+      let results;
+      try {
+        results = await knowledgeBaseManager.search(
+          authorization.allowedDiaryNames,
+          vector,
+          limit,
+          0,
+          []
+        );
+      } catch {
+        throw nativeRuntimeStageError('native_diary_search_failed');
+      }
+      const postcheck = postCheckNativeDiaryResults(results, authorization.allowedDiaryNames);
+      if (!postcheck.accepted) {
+        throw nativeRuntimeStageError(
+          'native_result_scope_postcheck_failed',
+          postcheck.reasonCode
+        );
+      }
+      return {
+        results: projectReadResults(results),
+        rawResultCount: Array.isArray(results) ? results.length : 0,
+        runtimeReceipt: defaultReadRuntimeReceipt({
+          nativeRuntimeInitialized: true,
+          providerApiCalled: true,
+          memoryReadPerformed: true,
+          isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured,
+          authorization,
+          resultScopePostcheckPassed: true,
+          derivedRuntimeMutation: takeDerivedMutationReceipt()
+        })
+      };
+    } finally {
+      releaseSelectedDiaryHydrationScope();
     }
-    const query = boundedString(args.query, 1000) || fallbackQuery;
-    const limit = normalizeLimit(args.limit ?? args.max_results, 1);
-    let embeddings;
-    try {
-      embeddings = await embeddingUtils.getEmbeddingsBatch(
-        [query],
-        runtimeInjected
-          ? {}
-          : {
-              apiUrl: process.env.API_URL,
-              apiKey: process.env.API_Key,
-              model: process.env.WhitelistEmbeddingModel
-            }
-      );
-    } catch {
-      throw nativeRuntimeStageError('native_provider_embedding_failed');
-    }
-    const vector = embeddings && embeddings[0];
-    if (!vector) {
-      throw nativeRuntimeStageError('native_provider_embedding_failed');
-    }
-    try {
-      await hydrateAuthorizedSelectedDiaries(authorization);
-    } catch {
-      throw nativeRuntimeStageError('native_selected_diary_hydration_failed');
-    }
-    let results;
-    try {
-      results = await knowledgeBaseManager.search(
-        authorization.allowedDiaryNames,
-        vector,
-        limit,
-        0,
-        []
-      );
-    } catch {
-      throw nativeRuntimeStageError('native_diary_search_failed');
-    }
-    const postcheck = postCheckNativeDiaryResults(results, authorization.allowedDiaryNames);
-    if (!postcheck.accepted) {
-      throw nativeRuntimeStageError(
-        'native_result_scope_postcheck_failed',
-        postcheck.reasonCode
-      );
-    }
-    return {
-      results: projectReadResults(results),
-      rawResultCount: Array.isArray(results) ? results.length : 0,
-      runtimeReceipt: defaultReadRuntimeReceipt({
-        nativeRuntimeInitialized: true,
-        providerApiCalled: true,
-        memoryReadPerformed: true,
-        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured,
-        authorization,
-        resultScopePostcheckPassed: true,
-        derivedRuntimeMutation: takeDerivedMutationReceipt()
-      })
-    };
   }
 
   async function search(args = {}, context = {}) {
