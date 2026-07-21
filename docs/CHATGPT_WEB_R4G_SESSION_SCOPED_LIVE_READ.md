@@ -122,7 +122,7 @@ CODEX_MEMORY_R4_COUNTER_MODE: session_scoped_live_read_v1
 CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT_REFERENCE: file:<owner-only-reference>
 CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH: <owner-only-private-root-path>
 CODEX_MEMORY_R4_REQUEST_TTL_SECONDS: 1..60
-CODEX_MEMORY_R4_RELAY_UDS_TIMEOUT_MS: 10..60000
+CODEX_MEMORY_R4_RELAY_UDS_TIMEOUT_MS: 10..55000
 ```
 
 The operator fingerprint reference and control socket path are included in the

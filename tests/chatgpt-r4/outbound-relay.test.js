@@ -189,7 +189,7 @@ test('R4-D D2B runtime authority requires owner-only files and distinct Ed25519 
   }));
   assert.throws(() => loadOutboundRelayRuntimeFromEnvironment({
     ...environment,
-    CODEX_MEMORY_R4_RELAY_UDS_TIMEOUT_MS: '60001'
+    CODEX_MEMORY_R4_RELAY_UDS_TIMEOUT_MS: '55001'
   }, { secretRoot: root }), { code: 'relay_runtime_integer_invalid' });
   const bindingOnlyEnvironment = { ...environment };
   delete bindingOnlyEnvironment.CODEX_MEMORY_R4_RELAY_ID;
