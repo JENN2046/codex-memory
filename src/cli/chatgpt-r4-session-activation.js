@@ -88,7 +88,11 @@ function validateSocket(socketPath, { statSync = fs.statSync } = {}) {
   return socketPath;
 }
 
-async function callControlSocket(socketPath, request, { connect = net.createConnection } = {}) {
+async function callControlSocket(socketPath, request, {
+  connect = net.createConnection,
+  validate = validateResponse
+} = {}) {
+  if (typeof validate !== 'function') reject('r4_session_cli_validator_invalid');
   validateSocket(socketPath);
   return await new Promise((resolve, rejectCall) => {
     const socket = connect({ path: socketPath });
@@ -114,7 +118,7 @@ async function callControlSocket(socketPath, request, { connect = net.createConn
       if (newline !== frame.length - 1) return finish(safeError('r4_session_cli_response_invalid'));
       try {
         const response = JSON.parse(frame.subarray(0, newline).toString('utf8'));
-        validateResponse(response, request.operation);
+        validate(response, request.operation);
         finish(null, response);
       } catch (error) {
         finish(error?.code ? error : safeError('r4_session_cli_response_invalid'));

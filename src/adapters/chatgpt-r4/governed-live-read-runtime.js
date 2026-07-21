@@ -18,7 +18,22 @@ const R4_SESSION_SCOPED_LIVE_READ_MODE = COUNTER_MODES.sessionScopedLiveReadV1;
 const NATIVE_SHARED_READ_CLIENT_ID = 'Codex';
 const MAX_CONTEXTS = 1024;
 const MAX_AUTHORIZED_TOOL_CALLS = 20;
+const MAX_R5A_AUTHORIZED_TOOL_CALLS = 40;
 const MAX_INACTIVE_REQUEST_ATTEMPTS = 128;
+const R5A_POST_CALL_SAFETY_ERROR_CODES = new Set([
+  'r4_live_read_native_delegation_rejected',
+  'r4_live_read_native_receipt_invalid',
+  'r4_live_read_mapping_disclosure_forbidden',
+  'r4_live_read_native_evidence_missing',
+  'response_structured_content_shape_invalid'
+]);
+const R5A_OBSERVED_TOOL_NAMES = new Set([
+  'resolve_memory_context',
+  'memory_overview',
+  'search_memory',
+  'audit_memory',
+  'prepare_memory_context'
+]);
 
 function isPlainObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -420,8 +435,10 @@ function createR4GovernanceRuntime({
   contextSigning,
   callGovernedTool,
   activationController = null,
+  dogfoodObserver = null,
   counterMode = R4_LIVE_READ_MODE,
   clock = () => new Date(),
+  monotonicClock = () => Math.floor(performance.now()),
   randomBytes
 } = {}) {
   if ((counterMode === R4_SESSION_SCOPED_LIVE_READ_MODE) !== Boolean(activationController)) {
@@ -430,6 +447,19 @@ function createR4GovernanceRuntime({
   if (![R4_LIVE_READ_MODE, R4_SESSION_SCOPED_LIVE_READ_MODE].includes(counterMode)) {
     reject('r4_live_read_counter_mode_invalid');
   }
+  if ((dogfoodObserver !== null && !activationController) ||
+      (dogfoodObserver !== null &&
+       (typeof dogfoodObserver.observeToolResult !== 'function' ||
+        typeof dogfoodObserver.observeToolError !== 'function' ||
+        typeof dogfoodObserver.beginToolAttempt !== 'function' ||
+        typeof dogfoodObserver.markEmergencyStop !== 'function' ||
+        typeof dogfoodObserver.snapshot !== 'function')) ||
+      typeof monotonicClock !== 'function') {
+    reject('r5a_dogfood_runtime_observer_invalid');
+  }
+  const maxAuthorizedToolCalls = dogfoodObserver
+    ? MAX_R5A_AUTHORIZED_TOOL_CALLS
+    : MAX_AUTHORIZED_TOOL_CALLS;
   const observations = {
     request_attempts: 0,
     authorized_request_attempts: 0,
@@ -483,62 +513,129 @@ function createR4GovernanceRuntime({
   });
   return Object.freeze({
     async handle(payload) {
-      const inactiveSessionRequest = activationController &&
-        activationController.snapshot().active !== true;
-      if (inactiveSessionRequest) {
-        if (observations.inactive_request_attempts >= MAX_INACTIVE_REQUEST_ATTEMPTS) {
-          reject('r4_governance_inactive_request_budget_exhausted');
-        }
-        observations.inactive_request_attempts += 1;
-      } else {
-        if (observations.authorized_request_attempts >= MAX_AUTHORIZED_TOOL_CALLS) {
-          reject('r4_governance_authorized_call_budget_exhausted');
-        }
-        observations.authorized_request_attempts += 1;
-      }
-      observations.request_attempts += 1;
-      const result = await adapter.handle(payload);
-      observations.completed_requests += 1;
-      if (result.status === 'denied') observations.denied_requests += 1;
-      if (result.status === 'unavailable') observations.unavailable_requests += 1;
       const toolName = payload?.request?.tool_request?.name;
-      if (toolName !== 'resolve_memory_context' && result.counters.native_invocations > 0) {
-        if (result.status === 'ok') observations.successful_read_calls += 1;
-        const resultCount = Number(result.structured_content?.result_count ??
-          result.structured_content?.item_count ?? 0);
-        if (Number.isInteger(resultCount) && resultCount > 0) {
-          observations.non_empty_read_calls += 1;
-        }
-        for (const [key, value] of Object.entries(result.counters)) {
-          observations.counters[key] += value;
-        }
-        const contextRef = payload.request.tool_request.arguments.project_context_ref;
-        const contextDigest = digestObject(contextRef);
-        const nativeEvidence = nativeEvidenceByContext.get(contextDigest);
-        if (!nativeEvidence) reject('r4_live_read_native_evidence_missing');
-        nativeEvidenceByContext.delete(contextDigest);
-        observations.receipt_chains.push(Object.freeze({
-          tool_name: toolName,
-          native_runtime: nativeEvidence.native_runtime_receipt_digest,
-          native_invocation: nativeEvidence.native_invocation_receipt_digest,
-          bridge: nativeEvidence.bridge_receipt_digest,
-          governance: result.receipt_digests.governance,
-          context: result.receipt_digests.context,
-          ...(nativeEvidence.activation_receipt_digest
-            ? { activation: nativeEvidence.activation_receipt_digest }
-            : {}),
-          allowed_diary_count: nativeEvidence.allowed_diary_count,
-          result_count: nativeEvidence.result_count
-        }));
+      const startedAt = dogfoodObserver ? Number(monotonicClock()) : 0;
+      if (dogfoodObserver && !Number.isFinite(startedAt)) {
+        reject('r5a_dogfood_monotonic_clock_invalid');
       }
-      return result;
+      let observationAttempted = false;
+      let observationSessionOrdinal = null;
+      try {
+        if (dogfoodObserver && R5A_OBSERVED_TOOL_NAMES.has(toolName)) {
+          observationSessionOrdinal = dogfoodObserver.beginToolAttempt({ toolName });
+        }
+        const inactiveSessionRequest = activationController &&
+          activationController.snapshot().active !== true;
+        if (inactiveSessionRequest) {
+          if (observations.inactive_request_attempts >= MAX_INACTIVE_REQUEST_ATTEMPTS) {
+            reject('r4_governance_inactive_request_budget_exhausted');
+          }
+          observations.inactive_request_attempts += 1;
+        } else {
+          if (observations.authorized_request_attempts >= maxAuthorizedToolCalls) {
+            reject('r4_governance_authorized_call_budget_exhausted');
+          }
+          observations.authorized_request_attempts += 1;
+        }
+        observations.request_attempts += 1;
+        const result = await adapter.handle(payload);
+        observations.completed_requests += 1;
+        if (result.status === 'denied') observations.denied_requests += 1;
+        if (result.status === 'unavailable') observations.unavailable_requests += 1;
+        if (toolName !== 'resolve_memory_context' && result.counters.native_invocations > 0) {
+          if (result.status === 'ok') observations.successful_read_calls += 1;
+          const resultCount = Number(result.structured_content?.result_count ??
+            result.structured_content?.item_count ?? 0);
+          if (Number.isInteger(resultCount) && resultCount > 0) {
+            observations.non_empty_read_calls += 1;
+          }
+          for (const [key, value] of Object.entries(result.counters)) {
+            observations.counters[key] += value;
+          }
+          const contextRef = payload.request.tool_request.arguments.project_context_ref;
+          const contextDigest = digestObject(contextRef);
+          const nativeEvidence = nativeEvidenceByContext.get(contextDigest);
+          if (!nativeEvidence) reject('r4_live_read_native_evidence_missing');
+          nativeEvidenceByContext.delete(contextDigest);
+          observations.receipt_chains.push(Object.freeze({
+            tool_name: toolName,
+            native_runtime: nativeEvidence.native_runtime_receipt_digest,
+            native_invocation: nativeEvidence.native_invocation_receipt_digest,
+            bridge: nativeEvidence.bridge_receipt_digest,
+            governance: result.receipt_digests.governance,
+            context: result.receipt_digests.context,
+            ...(nativeEvidence.activation_receipt_digest
+              ? { activation: nativeEvidence.activation_receipt_digest }
+              : {}),
+            allowed_diary_count: nativeEvidence.allowed_diary_count,
+            result_count: nativeEvidence.result_count
+          }));
+        }
+        if (dogfoodObserver) {
+          const endedAt = Number(monotonicClock());
+          const latencyMs = Math.max(0, Math.min(60_000, Math.round(endedAt - startedAt)));
+          const relevanceValues = Array.isArray(result.structured_content?.results)
+            ? result.structured_content.results
+              .map(item => Number(item?.relevance))
+              .filter(value => Number.isFinite(value) && value >= 0 && value <= 1)
+            : [];
+          observationAttempted = true;
+          try {
+            dogfoodObserver.observeToolResult({
+              toolName,
+              latencyMs,
+              status: String(result.structured_content?.status ||
+                result.structured_content?.context_status || result.status),
+              resultCount: Number(result.structured_content?.result_count ??
+                result.structured_content?.item_count ?? 0),
+              relevance: relevanceValues.length > 0 ? Math.max(...relevanceValues) : null,
+              counters: result.counters,
+              activationSnapshot: activationController.snapshot(),
+              sessionOrdinal: observationSessionOrdinal
+            });
+          } catch (error) {
+            const errorCode = typeof error?.code === 'string' &&
+              /^[a-z][a-z0-9_]{0,79}$/u.test(error.code)
+              ? error.code
+              : 'r5a_dogfood_runtime_error';
+            dogfoodObserver.markEmergencyStop({ errorCode });
+            activationController.kill({ reason: 'emergency_stop' });
+            throw error;
+          }
+        }
+        return result;
+      } catch (error) {
+        if (dogfoodObserver && !observationAttempted &&
+            R5A_OBSERVED_TOOL_NAMES.has(toolName)) {
+          const endedAt = Number(monotonicClock());
+          const latencyMs = Number.isFinite(endedAt)
+            ? Math.max(0, Math.min(60_000, Math.round(endedAt - startedAt)))
+            : 0;
+          const errorCode = typeof error?.code === 'string' &&
+            /^[a-z][a-z0-9_]{0,79}$/u.test(error.code)
+            ? error.code
+            : 'r5a_dogfood_runtime_error';
+          dogfoodObserver.observeToolError({
+            toolName,
+            latencyMs,
+            errorCode,
+            activationSnapshot: activationController.snapshot(),
+            sessionOrdinal: observationSessionOrdinal
+          });
+          if (R5A_POST_CALL_SAFETY_ERROR_CODES.has(errorCode)) {
+            dogfoodObserver.markEmergencyStop({ errorCode });
+            activationController.kill({ reason: 'emergency_stop' });
+          }
+        }
+        throw error;
+      }
     },
     snapshot: () => Object.freeze({
       ...contextAuthority.snapshot(),
       request_attempts: observations.request_attempts,
       authorized_request_attempts: observations.authorized_request_attempts,
       inactive_request_attempts: observations.inactive_request_attempts,
-      max_authorized_tool_calls: MAX_AUTHORIZED_TOOL_CALLS,
+      max_authorized_tool_calls: maxAuthorizedToolCalls,
       max_inactive_request_attempts: MAX_INACTIVE_REQUEST_ATTEMPTS,
       completed_requests: observations.completed_requests,
       denied_requests: observations.denied_requests,
@@ -550,6 +647,9 @@ function createR4GovernanceRuntime({
       request_bodies_logged: 0,
       response_bodies_logged: 0,
       raw_memory_persisted: false,
+      ...(dogfoodObserver ? {
+        private_dogfood_observation: dogfoodObserver.snapshot(activationController.snapshot())
+      } : {}),
       ...(activationController ? { session_activation: activationController.snapshot() } : {})
     }),
     counterMode
@@ -561,7 +661,10 @@ module.exports = {
   R4_SESSION_SCOPED_LIVE_READ_MODE,
   NATIVE_SHARED_READ_CLIENT_ID,
   MAX_AUTHORIZED_TOOL_CALLS,
+  MAX_R5A_AUTHORIZED_TOOL_CALLS,
   MAX_INACTIVE_REQUEST_ATTEMPTS,
+  R5A_POST_CALL_SAFETY_ERROR_CODES,
+  R5A_OBSERVED_TOOL_NAMES,
   buildNativeRequest,
   countersFromEvidence,
   createContextAuthority,

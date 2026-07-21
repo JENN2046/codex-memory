@@ -32,9 +32,19 @@ const {
   validateControlRequest
 } = require('../../src/runtime/chatgpt-r4/session-activation-control-server');
 const {
+  DOGFOOD_OBSERVATION_KIND,
+  MAX_DOGFOOD_PROVIDER_CALLS,
+  MAX_DOGFOOD_SESSIONS,
+  createPrivateDogfoodObserver
+} = require('../../src/runtime/chatgpt-r4/private-dogfood-observer');
+const {
   callControlSocket,
   parseArguments
 } = require('../../src/cli/chatgpt-r4-session-activation');
+const {
+  parseArguments: parseDogfoodArguments,
+  validateResponse: validateDogfoodResponse
+} = require('../../src/cli/chatgpt-r5-private-dogfood');
 const { loadDiaryScopeMapping } = require('../../src/core/DiaryScopeMappingLoader');
 const { resolveRead } = require('../../src/core/DiaryScopeMapping');
 
@@ -175,7 +185,12 @@ function relayReceipt(request) {
   };
 }
 
-function createRuntimeFixture({ callGovernedTool, clock = () => new Date(NOW) } = {}) {
+function createRuntimeFixture({
+  callGovernedTool,
+  clock = () => new Date(NOW),
+  dogfoodObserver = null,
+  monotonicClock
+} = {}) {
   const edge = identity('r4g-edge-key');
   const context = identity('r4g-context-key');
   const principalFingerprint = sha256('r4g-single-operator');
@@ -201,8 +216,10 @@ function createRuntimeFixture({ callGovernedTool, clock = () => new Date(NOW) } 
     contextSigning: { privateKey: context.privateKey, keyId: context.keyId },
     callGovernedTool: callGovernedTool || (async () => delegatedResult()),
     activationController: controller,
+    dogfoodObserver,
     counterMode: COUNTER_MODES.sessionScopedLiveReadV1,
-    clock
+    clock,
+    ...(monotonicClock ? { monotonicClock } : {})
   });
   const principal = createPrincipalAssertion({
     issuer: ISSUER,
@@ -833,6 +850,7 @@ test('R4-G runtime authority binds operator/control references and starts defaul
     CODEX_MEMORY_R4_GOVERNANCE_PRIVATE_ROOT: root,
     CODEX_MEMORY_R4_COUNTER_MODE: COUNTER_MODES.sessionScopedLiveReadV1,
     CODEX_MEMORY_R4_GOVERNANCE_LIVE_READ_ENABLED: 'true',
+    CODEX_MEMORY_R5_PRIVATE_DOGFOOD_ENABLED: 'true',
     CODEX_MEMORY_R4_DIARY_SCOPE_MAPPING_REFERENCE: `file:${files.mapping}`,
     CODEX_MEMORY_R4_PROJECT_REGISTRY_REFERENCE: `file:${files.registry}`,
     CODEX_MEMORY_R4_CONTEXT_SIGNING_PRIVATE_KEY_REFERENCE: `file:${files.contextPrivate}`,
@@ -876,6 +894,8 @@ test('R4-G runtime authority binds operator/control references and starts defaul
   });
   assert.equal(runtime.snapshot().mode, COUNTER_MODES.sessionScopedLiveReadV1);
   assert.equal(runtime.snapshot().session_activation_default_closed, true);
+  assert.equal(runtime.snapshot().private_dogfood_enabled, true);
+  assert.equal(runtime.snapshot().session_control.private_dogfood_observation.sessions_started, 0);
   assert.equal(runtime.snapshot().session_control.activation.activation_status, 'inactive');
   assert.equal(runtime.snapshot().session_activation_durable_state_written, false);
   assert.equal(initialized, 1);
@@ -885,6 +905,16 @@ test('R4-G runtime authority binds operator/control references and starts defaul
     request_id: 'op_r4g_authority_status_0001'
   });
   assert.equal(status.activation_status, 'inactive');
+  const dogfoodStatus = await callControlSocket(
+    environment.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH,
+    {
+      schema_version: 2,
+      operation: 'status',
+      request_id: 'op_r5a_authority_status_000001'
+    },
+    { validate: validateDogfoodResponse }
+  );
+  assert.equal(dogfoodStatus.observation.sessions_started, 0);
 
   const invalidEnvironment = {
     ...environment,
@@ -899,4 +929,399 @@ test('R4-G runtime authority binds operator/control references and starts defaul
   assert.equal(DATA_TOOL_NAMES.includes('activate_live_read'), false);
   assert.equal(DATA_TOOL_NAMES.includes('kill_live_read'), false);
   assert.equal(closed, 0);
+});
+
+test('R5-A observer records only bounded low-disclosure session outcomes', async () => {
+  const observer = createPrivateDogfoodObserver();
+  let monotonic = 0;
+  const fixture = createRuntimeFixture({
+    dogfoodObserver: observer,
+    monotonicClock() {
+      monotonic += 11;
+      return monotonic;
+    }
+  });
+  fixture.controller.activate({
+    requestId: 'op_r5a_observation_activation_000001',
+    requestedVisibility: 'project',
+    ttlSeconds: 300,
+    now: NOW
+  });
+  observer.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    activationSnapshot: fixture.controller.snapshot(NOW)
+  });
+  const resolveRequest = requestFixture(
+    fixture.edge,
+    fixture.principal,
+    'resolve_memory_context',
+    { project_alias: 'project-alpha', requested_visibility: 'project' },
+    90
+  );
+  const resolved = await fixture.runtime.handle({
+    request: resolveRequest,
+    relayReceipt: relayReceipt(resolveRequest)
+  });
+  const searchRequest = requestFixture(fixture.edge, fixture.principal, 'search_memory', {
+    project_context_ref: resolved.structured_content.project_context_ref,
+    query: 'bounded project signal',
+    limit: 1
+  }, 91);
+  const found = await fixture.runtime.handle({
+    request: searchRequest,
+    relayReceipt: relayReceipt(searchRequest)
+  });
+  assert.equal(found.structured_content.status, 'found');
+  const observation = observer.exportObservation();
+  assert.equal(observation.sessions_started, 1);
+  assert.equal(observation.sessions_with_resolve, 1);
+  assert.equal(observation.sessions_with_read, 1);
+  assert.equal(observation.resolve_then_read_sessions, 1);
+  assert.equal(observation.emergency_stop_latched, false);
+  assert.equal(observation.provider_calls, 1);
+  assert.equal(observation.local_fallbacks, 0);
+  assert.equal(observation.primary_memory_writes, 0);
+  assert.equal(observation.derived_index_writes, 0);
+  assert.equal(observation.other_durable_mutations, 1);
+  assert.equal(observation.last_session.status, 'consumed');
+  assert.deepEqual(observation.last_session.tool_sequence, [
+    'resolve_memory_context',
+    'search_memory'
+  ]);
+  assert.equal(observation.last_session.result_count, 1);
+  assert.equal(observation.last_session.max_relevance, 0.9);
+  assert.equal(observation.last_session.total_latency_ms, 22);
+  assert.equal(JSON.stringify(observation).includes('Bounded project signal.'), false);
+  assert.equal(fixture.runtime.snapshot().max_authorized_tool_calls, 40);
+
+  const providerCapped = createPrivateDogfoodObserver({ maxProviderCalls: 1 });
+  providerCapped.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    activationSnapshot: { activation_status: 'active' }
+  });
+  const providerCappedOrdinal = providerCapped.beginToolAttempt({
+    toolName: 'search_memory'
+  });
+  providerCapped.observeToolResult({
+    toolName: 'search_memory',
+    latencyMs: 1,
+    status: 'found',
+    resultCount: 1,
+    relevance: 0.5,
+    counters: { ...ZERO_MEMORY_COUNTERS, provider_calls: 1, native_invocations: 1 },
+    activationSnapshot: { activation_status: 'consumed' },
+    sessionOrdinal: providerCappedOrdinal
+  });
+  assert.throws(() => providerCapped.prepareActivation({ activation_status: 'consumed' }), {
+    code: 'r5a_dogfood_provider_budget_exhausted'
+  });
+});
+
+test('R5-A control protocol is operator-only, versioned, and capped at twenty sessions', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r5a-control-'));
+  fs.chmodSync(root, 0o700);
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const observer = createPrivateDogfoodObserver();
+  const controller = createSessionReadActivationController({
+    expectedPrincipalFingerprint: sha256('r5a-control-owner'),
+    selectedProjectAlias: 'project-alpha'
+  });
+  const server = createSessionActivationControlServer({
+    socketPath: path.join(root, 'never-started.sock'),
+    activationController: controller,
+    dogfoodObserver: observer
+  });
+  const activate = {
+    schema_version: 2,
+    operation: 'activate',
+    request_id: 'op_r5a_control_activate_0000001',
+    requested_visibility: 'project',
+    ttl_seconds: 30,
+    observation_kind: DOGFOOD_OBSERVATION_KIND
+  };
+  const activated = server.handleControlRequest(activate);
+  assert.equal(activated.schema_version, 2);
+  assert.equal(activated.observation.sessions_started, 1);
+  assert.equal(activated.observation.session_limit, MAX_DOGFOOD_SESSIONS);
+  assert.equal(activated.observation.provider_call_limit, MAX_DOGFOOD_PROVIDER_CALLS);
+  assert.doesNotThrow(() => validateDogfoodResponse(activated, 'activate'));
+  assert.throws(() => server.handleControlRequest({
+    schema_version: 1,
+    operation: 'activate',
+    request_id: 'op_r5a_unobserved_activate_000001',
+    requested_visibility: 'project',
+    ttl_seconds: 30
+  }), { code: 'r5a_dogfood_observation_required' });
+  assert.equal(server.handleControlRequest({
+    schema_version: 2,
+    operation: 'kill',
+    request_id: 'op_r5a_control_kill_0000000001',
+    reason: 'operator_requested'
+  }).activation_status, 'killed');
+  const oneSessionObserver = createPrivateDogfoodObserver({ maxSessions: 1 });
+  oneSessionObserver.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    activationSnapshot: { activation_status: 'active' }
+  });
+  oneSessionObserver.syncActivation({ activation_status: 'killed' });
+  assert.throws(() => oneSessionObserver.prepareActivation({ activation_status: 'killed' }), {
+    code: 'r5a_dogfood_session_budget_exhausted'
+  });
+  assert.throws(() => validateControlRequest({
+    ...activate,
+    request_id: 'op_r5a_invalid_observation_00001',
+    observation_kind: 'prompted'
+  }), { code: 'r5a_dogfood_control_observation_invalid' });
+  const parsed = parseDogfoodArguments([
+    'activate', '--visibility', 'workspace', '--ttl-seconds', '30', '--json'
+  ]);
+  assert.equal(parsed.request.schema_version, 2);
+  assert.equal(parsed.request.observation_kind, DOGFOOD_OBSERVATION_KIND);
+});
+
+test('R5-A rejects forbidden derived-index mutation before returning a live-read result', async () => {
+  const observer = createPrivateDogfoodObserver();
+  const resultWithDerivedWrite = delegatedResult();
+  resultWithDerivedWrite.receipt.nativeInvocationReceipt.nativeRuntimeReceipt = {
+    ...resultWithDerivedWrite.receipt.nativeInvocationReceipt.nativeRuntimeReceipt,
+    derivedIndexWritePerformed: true,
+    durableWritePerformed: true,
+    durableWriteScope: 'isolated_derived_index'
+  };
+  const fixture = createRuntimeFixture({
+    dogfoodObserver: observer,
+    async callGovernedTool() { return resultWithDerivedWrite; }
+  });
+  fixture.controller.activate({
+    requestId: 'op_r5a_derived_guard_activation_001',
+    requestedVisibility: 'project',
+    ttlSeconds: 300,
+    now: NOW
+  });
+  observer.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    activationSnapshot: fixture.controller.snapshot(NOW)
+  });
+  const resolveRequest = requestFixture(
+    fixture.edge,
+    fixture.principal,
+    'resolve_memory_context',
+    { project_alias: 'project-alpha', requested_visibility: 'project' },
+    92
+  );
+  const resolved = await fixture.runtime.handle({
+    request: resolveRequest,
+    relayReceipt: relayReceipt(resolveRequest)
+  });
+  const searchRequest = requestFixture(fixture.edge, fixture.principal, 'search_memory', {
+    project_context_ref: resolved.structured_content.project_context_ref,
+    query: 'bounded project signal',
+    limit: 1
+  }, 93);
+  await assert.rejects(fixture.runtime.handle({
+    request: searchRequest,
+    relayReceipt: relayReceipt(searchRequest)
+  }), { code: 'r5a_dogfood_forbidden_counter_observed' });
+  assert.equal(observer.snapshot().derived_index_writes, 1);
+  assert.equal(observer.snapshot().primary_memory_writes, 0);
+  assert.equal(observer.snapshot().last_session.status, 'emergency_stopped');
+  assert.equal(observer.snapshot().emergency_stop_latched, true);
+  assert.deepEqual(observer.snapshot().last_session.tool_sequence, [
+    'resolve_memory_context',
+    'search_memory'
+  ]);
+  assert.equal(
+    observer.snapshot().last_session.error_code,
+    'r5a_dogfood_forbidden_counter_observed'
+  );
+  assert.doesNotThrow(() => validateDogfoodResponse({
+    schema_version: 2,
+    operation: 'status',
+    accepted: true,
+    activation_status: fixture.controller.snapshot().activation_status,
+    remaining_ttl_seconds: 0,
+    context_bound: true,
+    read_in_flight: false,
+    remaining_read_calls: 0,
+    default_closed: true,
+    durable_state_written: false,
+    receipt_digest: fixture.controller.snapshot().receipt_digest,
+    observation: observer.snapshot()
+  }, 'status'));
+  assert.throws(() => validateDogfoodResponse({
+    schema_version: 2,
+    operation: 'status',
+    accepted: true,
+    activation_status: fixture.controller.snapshot().activation_status,
+    remaining_ttl_seconds: 0,
+    context_bound: true,
+    read_in_flight: false,
+    remaining_read_calls: 0,
+    default_closed: true,
+    durable_state_written: false,
+    receipt_digest: fixture.controller.snapshot().receipt_digest,
+    observation: {
+      ...observer.snapshot(),
+      emergency_stop_latched: false
+    }
+  }, 'status'), { code: 'r5a_dogfood_cli_observation_invalid' });
+  assert.throws(() => observer.prepareActivation(fixture.controller.snapshot()), {
+    code: 'r5a_dogfood_emergency_stop_latched'
+  });
+  assert.throws(() => observer.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    activationSnapshot: { activation_status: 'active' }
+  }), { code: 'r5a_dogfood_emergency_stop_latched' });
+
+  for (const terminalStatus of ['expired', 'killed']) {
+    const terminalObserver = createPrivateDogfoodObserver();
+    terminalObserver.beginSession({
+      observationKind: DOGFOOD_OBSERVATION_KIND,
+      activationSnapshot: { activation_status: 'active' }
+    });
+    const terminalOrdinal = terminalObserver.beginToolAttempt({
+      toolName: 'search_memory'
+    });
+    assert.throws(() => terminalObserver.observeToolResult({
+      toolName: 'search_memory',
+      latencyMs: 1,
+      status: 'found',
+      resultCount: 1,
+      relevance: 0.5,
+      counters: { ...ZERO_MEMORY_COUNTERS, derived_index_writes: 1 },
+      activationSnapshot: { activation_status: terminalStatus },
+      sessionOrdinal: terminalOrdinal
+    }), { code: 'r5a_dogfood_forbidden_counter_observed' });
+    assert.equal(terminalObserver.snapshot().last_session.status, terminalStatus);
+    assert.doesNotThrow(() => terminalObserver.markEmergencyStop({
+      errorCode: 'r5a_dogfood_forbidden_counter_observed'
+    }));
+    assert.equal(terminalObserver.snapshot().last_session.status, 'emergency_stopped');
+    assert.equal(terminalObserver.snapshot().emergency_stop_latched, true);
+  }
+});
+
+test('R5-A latches closed when native safety receipts fail before counters exist', async () => {
+  const unsafeReceipts = [
+    result => { result.access.localMemoryFallbackUsed = true; },
+    result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.memoryWritePerformed = true; },
+    result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.unscopedNativeSearchUsed = true; }
+  ];
+  for (const [index, mutateReceipt] of unsafeReceipts.entries()) {
+    const observer = createPrivateDogfoodObserver();
+    const unsafeResult = delegatedResult();
+    mutateReceipt(unsafeResult);
+    const fixture = createRuntimeFixture({
+      dogfoodObserver: observer,
+      async callGovernedTool() { return unsafeResult; }
+    });
+    fixture.controller.activate({
+      requestId: `op_r5a_receipt_guard_activation_00${index + 1}`,
+      requestedVisibility: 'project',
+      ttlSeconds: 300,
+      now: NOW
+    });
+    observer.beginSession({
+      observationKind: DOGFOOD_OBSERVATION_KIND,
+      activationSnapshot: fixture.controller.snapshot(NOW)
+    });
+    const resolveRequest = requestFixture(
+      fixture.edge,
+      fixture.principal,
+      'resolve_memory_context',
+      { project_alias: 'project-alpha', requested_visibility: 'project' },
+      100 + index * 2
+    );
+    const resolved = await fixture.runtime.handle({
+      request: resolveRequest,
+      relayReceipt: relayReceipt(resolveRequest)
+    });
+    const searchRequest = requestFixture(fixture.edge, fixture.principal, 'search_memory', {
+      project_context_ref: resolved.structured_content.project_context_ref,
+      query: 'bounded project signal',
+      limit: 1
+    }, 101 + index * 2);
+    await assert.rejects(fixture.runtime.handle({
+      request: searchRequest,
+      relayReceipt: relayReceipt(searchRequest)
+    }), { code: 'r4_live_read_native_receipt_invalid' });
+    const observation = observer.snapshot();
+    assert.equal(observation.emergency_stop_latched, true);
+    assert.equal(observation.last_session.status, 'emergency_stopped');
+    assert.equal(observation.last_session.error_code, 'r4_live_read_native_receipt_invalid');
+    assert.deepEqual(observation.last_session.tool_sequence, [
+      'resolve_memory_context',
+      'search_memory'
+    ]);
+    assert.throws(() => observer.prepareActivation(fixture.controller.snapshot()), {
+      code: 'r5a_dogfood_emergency_stop_latched'
+    });
+  }
+});
+
+test('R5-A keeps an in-flight tool bound across kill and records a late forbidden result', async () => {
+  let releaseProvider;
+  let providerStarted;
+  const started = new Promise(resolve => { providerStarted = resolve; });
+  const observer = createPrivateDogfoodObserver();
+  const lateForbiddenResult = delegatedResult();
+  lateForbiddenResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt = {
+    ...lateForbiddenResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt,
+    derivedIndexWritePerformed: true,
+    durableWritePerformed: true,
+    durableWriteScope: 'isolated_derived_index'
+  };
+  const fixture = createRuntimeFixture({
+    dogfoodObserver: observer,
+    async callGovernedTool() {
+      providerStarted();
+      await new Promise(resolve => { releaseProvider = resolve; });
+      return lateForbiddenResult;
+    }
+  });
+  fixture.controller.activate({
+    requestId: 'op_r5a_inflight_guard_activation_001',
+    requestedVisibility: 'project',
+    ttlSeconds: 300,
+    now: NOW
+  });
+  observer.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    activationSnapshot: fixture.controller.snapshot(NOW)
+  });
+  const resolveRequest = requestFixture(
+    fixture.edge,
+    fixture.principal,
+    'resolve_memory_context',
+    { project_alias: 'project-alpha', requested_visibility: 'project' },
+    120
+  );
+  const resolved = await fixture.runtime.handle({
+    request: resolveRequest,
+    relayReceipt: relayReceipt(resolveRequest)
+  });
+  const searchRequest = requestFixture(fixture.edge, fixture.principal, 'search_memory', {
+    project_context_ref: resolved.structured_content.project_context_ref,
+    query: 'bounded project signal',
+    limit: 1
+  }, 121);
+  const pending = fixture.runtime.handle({
+    request: searchRequest,
+    relayReceipt: relayReceipt(searchRequest)
+  });
+  await started;
+  fixture.controller.kill({ reason: 'emergency_stop', now: NOW });
+  observer.syncActivation(fixture.controller.snapshot(NOW));
+  assert.equal(observer.snapshot().last_session.status, 'killed');
+  assert.equal(observer.snapshot().last_session.tool_attempt_in_flight, true);
+  assert.throws(() => observer.prepareActivation(fixture.controller.snapshot(NOW)), {
+    code: 'r5a_dogfood_tool_attempt_in_flight'
+  });
+  releaseProvider();
+  await assert.rejects(pending, { code: 'r5a_dogfood_forbidden_counter_observed' });
+  const observation = observer.snapshot();
+  assert.equal(observation.derived_index_writes, 1);
+  assert.equal(observation.emergency_stop_latched, true);
+  assert.equal(observation.last_session.status, 'emergency_stopped');
+  assert.equal(observation.last_session.tool_attempt_in_flight, false);
 });

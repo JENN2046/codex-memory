@@ -27,6 +27,7 @@ const {
 const { validateProjectRegistry } = require('../../adapters/chatgpt-r4/project-registry');
 const { createGovernanceUdsServer } = require('./governance-uds-server');
 const { createSessionActivationControlServer } = require('./session-activation-control-server');
+const { createPrivateDogfoodObserver } = require('./private-dogfood-observer');
 
 const DEFAULT_PRIVATE_ROOT = '/run/secrets/codex-memory-r4-governance';
 const MAX_PRIVATE_FILE_BYTES = 262_144;
@@ -187,6 +188,12 @@ function governanceBindingPayload(environment) {
       'CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH'
     );
   }
+  if (environment.CODEX_MEMORY_R5_PRIVATE_DOGFOOD_ENABLED !== undefined) {
+    if (!['true', 'false'].includes(environment.CODEX_MEMORY_R5_PRIVATE_DOGFOOD_ENABLED)) {
+      reject('r5a_dogfood_environment_invalid');
+    }
+    payload.r5PrivateDogfoodEnabled = environment.CODEX_MEMORY_R5_PRIVATE_DOGFOOD_ENABLED;
+  }
   return payload;
 }
 
@@ -313,6 +320,16 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
   if (path.dirname(socketPath) !== socketParent) reject('r4_governance_socket_path_invalid');
   let activationController = null;
   let controlServer = null;
+  let controlSocketPath = null;
+  let dogfoodObserver = null;
+  const dogfoodEnabled = environment.CODEX_MEMORY_R5_PRIVATE_DOGFOOD_ENABLED === 'true';
+  if (environment.CODEX_MEMORY_R5_PRIVATE_DOGFOOD_ENABLED !== undefined &&
+      !['true', 'false'].includes(environment.CODEX_MEMORY_R5_PRIVATE_DOGFOOD_ENABLED)) {
+    reject('r5a_dogfood_environment_invalid');
+  }
+  if (dogfoodEnabled && counterMode !== R4_SESSION_SCOPED_LIVE_READ_MODE) {
+    reject('r5a_dogfood_requires_session_mode');
+  }
   if (counterMode === R4_SESSION_SCOPED_LIVE_READ_MODE) {
     const expectedPrincipalFingerprint = normalizeSingleLineSecret(
       readReference('CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT_REFERENCE')
@@ -321,7 +338,7 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
         /^(.)\1+$/u.test(expectedPrincipalFingerprint.slice(7))) {
       reject('r4_governance_operator_fingerprint_invalid');
     }
-    const controlSocketPath = getEnvironment(
+    controlSocketPath = getEnvironment(
       environment,
       'CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH'
     );
@@ -337,11 +354,7 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
       expectedPrincipalFingerprint,
       selectedProjectAlias
     });
-    controlServer = createSessionActivationControlServer({
-      socketPath: controlSocketPath,
-      activationController,
-      statSync
-    });
+    if (dogfoodEnabled) dogfoodObserver = createPrivateDogfoodObserver();
   }
 
   const nativeTargetReference = assertSafeReference(
@@ -422,8 +435,17 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
     callGovernedTool: (toolName, args, requestContext) =>
       app.callTool(toolName, args, requestContext),
     activationController,
+    dogfoodObserver,
     counterMode
   });
+  if (activationController) {
+    controlServer = createSessionActivationControlServer({
+      socketPath: controlSocketPath,
+      activationController,
+      dogfoodObserver,
+      statSync
+    });
+  }
   const udsServer = createGovernanceUdsServer({ socketPath, governanceRuntime, statSync });
 
   return Object.freeze({
@@ -468,6 +490,7 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
         startup_only_binding: true,
         public_write_surface_enabled: false,
         readiness_claimed: false,
+        private_dogfood_enabled: dogfoodEnabled,
         uds: udsServer.snapshot(),
         ...(controlServer ? {
           session_control: controlServer.snapshot(),

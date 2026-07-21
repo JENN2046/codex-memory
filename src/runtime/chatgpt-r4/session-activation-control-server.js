@@ -24,6 +24,7 @@ const MAX_CONTROL_MUTATIONS = 64;
 function createSessionActivationControlServer({
   socketPath,
   activationController,
+  dogfoodObserver = null,
   chmodSync = fs.chmodSync,
   statSync = fs.statSync
 } = {}) {
@@ -32,6 +33,13 @@ function createSessionActivationControlServer({
       typeof activationController.kill !== 'function' ||
       typeof activationController.snapshot !== 'function') {
     reject('r4_session_control_controller_invalid');
+  }
+  if (dogfoodObserver !== null &&
+      (typeof dogfoodObserver.prepareActivation !== 'function' ||
+       typeof dogfoodObserver.beginSession !== 'function' ||
+       typeof dogfoodObserver.syncActivation !== 'function' ||
+       typeof dogfoodObserver.snapshot !== 'function')) {
+    reject('r5a_dogfood_control_observer_invalid');
   }
   let started = false;
   let activeConnections = 0;
@@ -51,6 +59,11 @@ function createSessionActivationControlServer({
 
   function handleControlRequest(request) {
     validateControlRequest(request);
+    const dogfoodRequest = request.schema_version === 2;
+    if (dogfoodRequest && !dogfoodObserver) reject('r5a_dogfood_control_unavailable');
+    if (dogfoodObserver && request.operation === 'activate' && !dogfoodRequest) {
+      reject('r5a_dogfood_observation_required');
+    }
     const requestDigest = digestObject(request);
     const existing = replayReceipts.get(request.request_id);
     if (existing) {
@@ -66,12 +79,24 @@ function createSessionActivationControlServer({
     }
     let response;
     if (request.operation === 'activate') {
+      if (dogfoodRequest) dogfoodObserver.prepareActivation(activationController.snapshot());
       observations.activate_commands += 1;
       response = activationController.activate({
         requestId: request.request_id,
         requestedVisibility: request.requested_visibility,
         ttlSeconds: request.ttl_seconds
       });
+      if (dogfoodRequest) {
+        try {
+          dogfoodObserver.beginSession({
+            observationKind: request.observation_kind,
+            activationSnapshot: activationController.snapshot()
+          });
+        } catch (error) {
+          activationController.kill({ reason: 'emergency_stop' });
+          throw error;
+        }
+      }
     } else if (request.operation === 'kill') {
       observations.kill_commands += 1;
       response = activationController.kill({ reason: request.reason });
@@ -79,10 +104,13 @@ function createSessionActivationControlServer({
       observations.status_commands += 1;
       response = activationController.snapshot();
     }
+    if (dogfoodObserver) dogfoodObserver.syncActivation(activationController.snapshot());
     const projected = projectControlResponse(
       request.operation,
       response,
-      request.operation === 'status' ? response : activationController.snapshot()
+      request.operation === 'status' ? response : activationController.snapshot(),
+      dogfoodRequest ? dogfoodObserver.snapshot(activationController.snapshot()) : null,
+      request.schema_version
     );
     if (request.operation !== 'status') {
       replayReceipts.set(request.request_id, { requestDigest, response: projected });
@@ -176,6 +204,7 @@ function createSessionActivationControlServer({
     async stop() {
       if (!started) return;
       activationController.kill({ reason: 'verification_complete' });
+      dogfoodObserver?.syncActivation(activationController.snapshot());
       for (const socket of openSockets) socket.destroy();
       await new Promise((resolve, rejectStop) => {
         server.close(error => error ? rejectStop(error) : resolve());
@@ -190,7 +219,10 @@ function createSessionActivationControlServer({
         max_concurrent_connections: MAX_CONTROL_CONNECTIONS,
         replay_receipt_count: replayReceipts.size,
         durable_control_state_written: false,
-        activation: activationController.snapshot()
+        activation: activationController.snapshot(),
+        ...(dogfoodObserver ? {
+          private_dogfood_observation: dogfoodObserver.snapshot(activationController.snapshot())
+        } : {})
       });
     },
     handleControlRequest
@@ -202,12 +234,14 @@ function validateControlRequest(request) {
     reject('r4_session_control_request_invalid');
   }
   const operation = request.operation;
-  if (!['activate', 'kill', 'status'].includes(operation) || request.schema_version !== 1 ||
+  if (!['activate', 'kill', 'status'].includes(operation) ||
+      ![1, 2].includes(request.schema_version) ||
       !CONTROL_REQUEST_ID_PATTERN.test(request.request_id || '')) {
     reject('r4_session_control_request_invalid');
   }
   const expected = operation === 'activate'
-    ? ['schema_version', 'operation', 'request_id', 'requested_visibility', 'ttl_seconds']
+    ? ['schema_version', 'operation', 'request_id', 'requested_visibility', 'ttl_seconds',
+        ...(request.schema_version === 2 ? ['observation_kind'] : [])]
     : operation === 'kill'
       ? ['schema_version', 'operation', 'request_id', 'reason']
       : ['schema_version', 'operation', 'request_id'];
@@ -223,6 +257,10 @@ function validateControlRequest(request) {
        request.ttl_seconds > SESSION_ACTIVATION_MAX_TTL_SECONDS)) {
     reject('r4_session_control_activation_invalid');
   }
+  if (request.schema_version === 2 && operation === 'activate' &&
+      request.observation_kind !== 'meaningful_task_unprompted') {
+    reject('r5a_dogfood_control_observation_invalid');
+  }
   if (operation === 'kill' &&
       !['operator_requested', 'emergency_stop', 'verification_complete'].includes(request.reason)) {
     reject('r4_session_control_kill_invalid');
@@ -230,10 +268,16 @@ function validateControlRequest(request) {
   return request;
 }
 
-function projectControlResponse(operation, response, postOperationSnapshot = response) {
+function projectControlResponse(
+  operation,
+  response,
+  postOperationSnapshot = response,
+  dogfoodObservation = null,
+  schemaVersion = 1
+) {
   const snapshot = postOperationSnapshot;
   const value = {
-    schema_version: 1,
+    schema_version: schemaVersion,
     operation,
     accepted: response.accepted !== false,
     activation_status: snapshot?.activation_status || response.status,
@@ -243,8 +287,14 @@ function projectControlResponse(operation, response, postOperationSnapshot = res
     remaining_read_calls: snapshot?.remaining_read_calls ?? response.remaining_read_calls ?? 0,
     default_closed: true,
     durable_state_written: false,
-    receipt_digest: response.receipt_digest
+    receipt_digest: response.receipt_digest,
+    ...(schemaVersion === 2 ? { observation: dogfoodObservation } : {})
   };
+  if (schemaVersion === 2 && (!dogfoodObservation ||
+      dogfoodObservation.durable_observation_state_written !== false ||
+      dogfoodObservation.raw_memory_recorded !== false)) {
+    reject('r5a_dogfood_control_observation_invalid');
+  }
   if (!/^sha256:[a-f0-9]{64}$/u.test(value.receipt_digest || '')) {
     reject('r4_session_control_receipt_invalid');
   }
