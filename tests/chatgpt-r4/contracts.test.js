@@ -171,6 +171,43 @@ test('signed principal and request validate with exact audience and one-time rep
   assert.equal(result.requestDigest, digestObject(request));
   assert.equal(replayGuard.size, 2);
 
+  const boundedSlowRequest = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'s'.repeat(32)}` },
+    now: clock(),
+    ttlSeconds: 60,
+    requestId: 'req_contract_slow_read_bound_0001',
+    nonce: 'request_nonce_slow_bound_0001',
+    signing: signing(edge)
+  });
+  assert.doesNotThrow(() => validateRequestEnvelope(boundedSlowRequest, {
+    now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: principalKeyResolver(SYNTHETIC_ISSUER, principal),
+    resolveRequestPublicKey: keyResolver(edge),
+    consumeReplay: false
+  }));
+  const tooLongRequest = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'t'.repeat(32)}` },
+    now: clock(),
+    ttlSeconds: 61,
+    requestId: 'req_contract_slow_read_reject_001',
+    nonce: 'request_nonce_slow_reject_001',
+    signing: signing(edge)
+  });
+  assert.throws(() => validateRequestEnvelope(tooLongRequest, {
+    now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: principalKeyResolver(SYNTHETIC_ISSUER, principal),
+    resolveRequestPublicKey: keyResolver(edge),
+    consumeReplay: false
+  }), { code: 'request_ttl_exceeded' });
+
   const reusedRequestId = createRequestEnvelope({
     principalAssertion,
     toolName: 'audit_memory',

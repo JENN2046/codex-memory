@@ -37,6 +37,13 @@ mapping, diary, or scope authority is added to the six-tool ChatGPT surface.
 The public Edge and outbound Relay still do not own the project registry,
 mapping, diary ACL, provider authority, or kill-switch state.
 
+The one-shot transport envelope allows at most 60 seconds for a bounded live
+read. A deployment may give the local Governance UDS up to 55 seconds and the
+Edge response wait up to 60 seconds, preserving a bounded completion window
+without extending the 300-second maximum session activation. Values above
+these ceilings fail configuration validation. This transport budget does not
+authorize an additional read, retry, provider call, or durable state.
+
 This follows the Apps SDK separation between MCP tool exposure and local
 application authorization: tool handlers remain read-only and retry-safe at
 the public boundary, while OAuth proves identity and the local Governance
@@ -114,6 +121,8 @@ R4-G uses the existing private R4-F binding plus:
 CODEX_MEMORY_R4_COUNTER_MODE: session_scoped_live_read_v1
 CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT_REFERENCE: file:<owner-only-reference>
 CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH: <owner-only-private-root-path>
+CODEX_MEMORY_R4_REQUEST_TTL_SECONDS: 1..60
+CODEX_MEMORY_R4_RELAY_UDS_TIMEOUT_MS: 10..55000
 ```
 
 The operator fingerprint reference and control socket path are included in the

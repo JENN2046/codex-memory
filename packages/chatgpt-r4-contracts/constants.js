@@ -65,7 +65,7 @@ const GOVERNED_LIVE_READ_COUNTER_MAXIMUMS = Object.freeze({
 const LIMITS = Object.freeze({
   maxAssertionTtlSeconds: 300,
   maxContextTtlSeconds: 300,
-  maxEnvelopeTtlSeconds: 30,
+  maxEnvelopeTtlSeconds: 60,
   maxClockSkewSeconds: 5,
   maxRequestBytes: 32768,
   maxResponseBytes: 65536,

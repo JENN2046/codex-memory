@@ -129,7 +129,7 @@
         "request_or_response_body_logging_allowed": { "const": false },
         "durable_remote_state_allowed": { "const": false },
         "max_in_flight_requests": { "type": "integer", "minimum": 1, "maximum": 64 },
-        "request_ttl_seconds": { "type": "integer", "minimum": 1, "maximum": 30 },
+        "request_ttl_seconds": { "type": "integer", "minimum": 1, "maximum": 60 },
         "restart_behavior": { "const": "fail_closed_and_expire_inflight" }
       }
     },

@@ -21,7 +21,7 @@ function createTransientRequestBroker({
 } = {}) {
   if (typeof verifyRequest !== 'function') reject('edge_request_verifier_missing');
   if (typeof verifyResponse !== 'function') reject('edge_response_verifier_missing');
-  if (!Number.isInteger(claimLeaseMs) || claimLeaseMs < 10 || claimLeaseMs > 30_000) {
+  if (!Number.isInteger(claimLeaseMs) || claimLeaseMs < 10 || claimLeaseMs > 60_000) {
     reject('edge_claim_lease_invalid');
   }
   if (!Number.isInteger(terminalRetentionMs) || terminalRetentionMs < 10 || terminalRetentionMs > 30_000) {
@@ -266,7 +266,7 @@ function createTransientRequestBroker({
   }
 
   function waitForResult(requestId, { signal, timeoutMs = 30_000 } = {}) {
-    if (!Number.isInteger(timeoutMs) || timeoutMs < 10 || timeoutMs > 30_000) {
+    if (!Number.isInteger(timeoutMs) || timeoutMs < 10 || timeoutMs > 60_000) {
       reject('edge_wait_timeout_invalid');
     }
     const record = requireRecord(requestId);

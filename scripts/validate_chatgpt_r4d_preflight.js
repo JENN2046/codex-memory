@@ -22,7 +22,7 @@ const EXAMPLE_PATH = path.join(
   'chatgpt-web-r4d-oauth-runtime-preflight.redacted.example.json'
 );
 const DOC_PATH = path.join(ROOT, 'docs', 'CHATGPT_WEB_R4D_EXTERNAL_RUNTIME_PREFLIGHT.md');
-const EXPECTED_SCHEMA_SHA256 = '3a52ec5d2fb52688c4b8fd5f074809c43826d7c96af8b18477aadfc06b023878';
+const EXPECTED_SCHEMA_SHA256 = '34c86223358e0143913c999188ec57caa54f9da936ec576cd409db561d577520';
 
 const ENV_REFERENCE_NAMES = Object.freeze([
   'CODEX_MEMORY_R4_OPERATOR_REFERENCE',
@@ -50,6 +50,7 @@ function validateSchema(schema) {
   invariant(schema.properties?.oauth?.properties?.pkce_method?.const === 'S256', 'r4d PKCE mismatch');
   invariant(schema.properties?.runtime?.properties?.transport_mode?.const === 'direct_https', 'r4d direct HTTPS mismatch');
   invariant(schema.properties?.runtime?.properties?.adapter_mode?.const === 'none', 'r4d adapter preflight mismatch');
+  invariant(schema.properties?.runtime?.properties?.request_ttl_seconds?.maximum === 60, 'r4d request TTL ceiling mismatch');
   invariant(schema.properties?.activation_boundary?.properties?.real_memory_allowed?.const === false, 'r4d real-memory boundary mismatch');
   const credentialedUrlCases = [
     ['oauth issuer', schema.properties?.oauth?.properties?.issuer?.pattern, 'https://user:pass@tenant.auth0.com/'],

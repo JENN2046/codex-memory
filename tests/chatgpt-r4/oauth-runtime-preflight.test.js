@@ -250,7 +250,7 @@ test('R4-D rejects Tunnel-first runtime, body logs, durable remote state, and un
     ['request_or_response_body_logging_allowed', true, 'r4d_body_logging_forbidden'],
     ['durable_remote_state_allowed', true, 'r4d_durable_remote_state_forbidden'],
     ['max_in_flight_requests', 65, 'r4d_max_in_flight_invalid'],
-    ['request_ttl_seconds', 31, 'r4d_request_ttl_invalid'],
+    ['request_ttl_seconds', 61, 'r4d_request_ttl_invalid'],
     ['restart_behavior', 'restore_from_disk', 'r4d_restart_behavior_invalid']
   ]) {
     const value = candidate();

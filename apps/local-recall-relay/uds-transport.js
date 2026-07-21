@@ -15,7 +15,7 @@ function createUdsForwarder({
   if (typeof socketPath !== 'string' || !socketPath.startsWith('/') || socketPath.includes('\0')) {
     reject('relay_uds_path_invalid');
   }
-  if (!Number.isInteger(timeoutMs) || timeoutMs < 10 || timeoutMs > 30_000) {
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 10 || timeoutMs > 60_000) {
     reject('relay_uds_timeout_invalid');
   }
   if (!Number.isInteger(maxResponseBytes) || maxResponseBytes < 1 || maxResponseBytes > MAX_UDS_RESPONSE_BYTES) {

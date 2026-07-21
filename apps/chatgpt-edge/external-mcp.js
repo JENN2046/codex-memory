@@ -40,11 +40,14 @@ function createExternalMcpHandler({
   if (!edgeSigning || !edgeSigning.privateKey || typeof edgeSigning.keyId !== 'string') {
     reject('edge_signing_invalid');
   }
-  if (!Number.isInteger(requestTtlSeconds) || requestTtlSeconds < 1 || requestTtlSeconds > 30) {
+  if (!Number.isInteger(requestTtlSeconds) || requestTtlSeconds < 1 || requestTtlSeconds > 60) {
     reject('edge_request_ttl_invalid');
   }
-  if (!Number.isInteger(responseTimeoutMs) || responseTimeoutMs < 10 || responseTimeoutMs > 30_000) {
+  if (!Number.isInteger(responseTimeoutMs) || responseTimeoutMs < 10 || responseTimeoutMs > 60_000) {
     reject('edge_response_timeout_invalid');
+  }
+  if (responseTimeoutMs > requestTtlSeconds * 1000) {
+    reject('edge_response_timeout_exceeds_request_ttl');
   }
 
   async function handle(incoming, outgoing, parsedBody, authInfo) {
