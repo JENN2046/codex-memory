@@ -735,7 +735,9 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   let shutdownReceipt = null;
   let shutdownError = null;
   let shuttingDown = false;
-  let hydratedAuthorizationKey = null;
+  let selectedDiaryHydrationAuthorizationKey = null;
+  let selectedDiaryHydrationPromise = null;
+  let selectedDiaryHydrationCompleted = false;
   let selectedDiaryHydrationFailureLatched = false;
   const restoreRuntimeHooks = [];
   const derivedTaskAccountingContext = new AsyncLocalStorage();
@@ -766,40 +768,46 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     if (selectedDiaryHydrationFailureLatched) {
       throw new Error('selected_diary_hydration_failure_latched');
     }
-    if (hydratedAuthorizationKey === null) return;
-    if (selectedDiaryAuthorizationKey(authorization) !== hydratedAuthorizationKey) {
+    const authorizationKey = selectedDiaryAuthorizationKey(authorization);
+    if (selectedDiaryHydrationAuthorizationKey === null) {
+      selectedDiaryHydrationAuthorizationKey = authorizationKey;
+      return;
+    }
+    if (authorizationKey !== selectedDiaryHydrationAuthorizationKey) {
       throw new Error('selected_diary_hydration_scope_change_forbidden');
     }
   }
 
   async function hydrateAuthorizedSelectedDiaries(authorization) {
-    if (!selectedDiaryRuntimeHydrator || hydratedAuthorizationKey !== null) return;
-    const authorizationKey = selectedDiaryAuthorizationKey(authorization);
+    if (!selectedDiaryRuntimeHydrator || selectedDiaryHydrationCompleted) return;
     try {
-      await derivedRuntimeMutationLifecycle.track('hydration', async () => {
-        const receipt = await selectedDiaryRuntimeHydrator({
-          allowedDiaryNames: Object.freeze([...authorization.allowedDiaryNames]),
-          knowledgeBaseManager,
-          knowledgeBaseRootPath,
-          knowledgeBaseStorePath
+      if (selectedDiaryHydrationPromise === null) {
+        selectedDiaryHydrationPromise = derivedRuntimeMutationLifecycle.track('hydration', async () => {
+          const receipt = await selectedDiaryRuntimeHydrator({
+            allowedDiaryNames: Object.freeze([...authorization.allowedDiaryNames]),
+            knowledgeBaseManager,
+            knowledgeBaseRootPath,
+            knowledgeBaseStorePath
+          });
+          if (receipt?.accepted !== true ||
+              receipt.authorizationResolvedBeforeHydration !== true ||
+              receipt.selectedDiaryOnly !== true ||
+              receipt.sourcePartitionMutationPerformed !== false ||
+              receipt.primaryMemoryWritePerformed !== false ||
+              receipt.unauthorizedSourceRowsRead !== false ||
+              receipt.hydratedDiaryCount !== authorization.allowedDiaryCount ||
+              !Number.isInteger(receipt.hydratedFileCount) || receipt.hydratedFileCount < 0 ||
+              !Number.isInteger(receipt.hydratedChunkCount) || receipt.hydratedChunkCount < 0) {
+            throw new Error('selected_diary_hydration_receipt_invalid');
+          }
         });
-        if (receipt?.accepted !== true ||
-            receipt.authorizationResolvedBeforeHydration !== true ||
-            receipt.selectedDiaryOnly !== true ||
-            receipt.sourcePartitionMutationPerformed !== false ||
-            receipt.primaryMemoryWritePerformed !== false ||
-            receipt.unauthorizedSourceRowsRead !== false ||
-            receipt.hydratedDiaryCount !== authorization.allowedDiaryCount ||
-            !Number.isInteger(receipt.hydratedFileCount) || receipt.hydratedFileCount < 0 ||
-            !Number.isInteger(receipt.hydratedChunkCount) || receipt.hydratedChunkCount < 0) {
-          throw new Error('selected_diary_hydration_receipt_invalid');
-        }
-      });
+      }
+      await selectedDiaryHydrationPromise;
     } catch (error) {
       selectedDiaryHydrationFailureLatched = true;
       throw error;
     }
-    hydratedAuthorizationKey = authorizationKey;
+    selectedDiaryHydrationCompleted = true;
   }
 
   function instrumentTagMemoRuntime() {

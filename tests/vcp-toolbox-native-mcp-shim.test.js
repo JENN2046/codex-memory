@@ -209,6 +209,77 @@ test('selected-diary hydrator fails closed on invalid receipts and missing isola
   }), { message: 'selected_diary_runtime_hydrator_isolation_required' });
 });
 
+test('selected-diary hydration reserves scope before provider and shares the in-flight hydration', async () => {
+  let releaseHydration;
+  let hydrationStarted;
+  const hydrationStartedPromise = new Promise(resolve => { hydrationStarted = resolve; });
+  const hydrationReleasePromise = new Promise(resolve => { releaseHydration = resolve; });
+  let embeddingCalls = 0;
+  let hydrationCalls = 0;
+  let searchCalls = 0;
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: {
+      config: { fullScanOnStartup: false },
+      pendingFiles: new Set(),
+      pendingDeletes: new Set(),
+      async initialize() {},
+      async search() {
+        searchCalls += 1;
+        return [];
+      }
+    },
+    embeddingUtils: {
+      async getEmbeddingsBatch() {
+        embeddingCalls += 1;
+        return [[0.1, 0.2]];
+      }
+    },
+    async selectedDiaryRuntimeHydrator() {
+      hydrationCalls += 1;
+      hydrationStarted();
+      await hydrationReleasePromise;
+      return {
+        accepted: true,
+        authorizationResolvedBeforeHydration: true,
+        selectedDiaryOnly: true,
+        sourcePartitionMutationPerformed: false,
+        primaryMemoryWritePerformed: false,
+        unauthorizedSourceRowsRead: false,
+        hydratedDiaryCount: 1,
+        hydratedFileCount: 1,
+        hydratedChunkCount: 1
+      };
+    }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  const firstSearch = adapter.search({ query: 'first scope', limit: 1 }, { authorization });
+  await hydrationStartedPromise;
+  const sameScopeSearch = adapter.search({ query: 'same scope', limit: 1 }, { authorization });
+  await assert.rejects(adapter.search({ query: 'different scope', limit: 1 }, {
+    authorization: {
+      ...authorization,
+      allowedDiaryNames: ['SYNTHETIC_OTHER_PRIVATE']
+    }
+  }), { message: 'selected_diary_hydration_scope_change_forbidden' });
+  assert.equal(embeddingCalls, 2);
+  assert.equal(hydrationCalls, 1);
+  assert.equal(searchCalls, 0);
+
+  releaseHydration();
+  await Promise.all([firstSearch, sameScopeSearch]);
+  assert.equal(embeddingCalls, 2);
+  assert.equal(hydrationCalls, 1);
+  assert.equal(searchCalls, 2);
+});
+
 test('isolated runtime accounts startup, background matrix, shutdown saves, and final drain', async () => {
   const calls = [];
   const tagMemoEngine = {
