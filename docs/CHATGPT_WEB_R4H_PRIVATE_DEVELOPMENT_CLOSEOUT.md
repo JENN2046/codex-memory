@@ -11,6 +11,17 @@ raw memory, and internal runtime paths remain outside Git.
 
 ## Accepted Runtime Result
 
+The preceding R4-E managed canary passed OAuth login, six-tool discovery, the
+bounded scope Widget render, and exactly one zero-memory `memory_overview`
+probe with `status=empty` and `result_count=0`. Its memory-read, memory-write,
+provider, native, fallback, and durable-mutation counters were all zero.
+
+R4-F then proved the separately authorized bounded governed-read path for the
+registered project/workspace scope, including positive recall, negative scope
+controls, mapping/receipt binding, source post-check, zero unrestricted native
+search, and zero live-proof primary-memory writes. R4-G replaced its manual
+runtime switch with ephemeral session authority.
+
 The private single-operator ChatGPT App used the intended sequence:
 
 ```text
