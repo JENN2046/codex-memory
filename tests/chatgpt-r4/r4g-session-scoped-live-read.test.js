@@ -977,6 +977,7 @@ test('R5-A observer records only bounded low-disclosure session outcomes', async
   assert.equal(observation.sessions_with_resolve, 1);
   assert.equal(observation.sessions_with_read, 1);
   assert.equal(observation.resolve_then_read_sessions, 1);
+  assert.equal(observation.emergency_stop_latched, false);
   assert.equal(observation.provider_calls, 1);
   assert.equal(observation.local_fallbacks, 0);
   assert.equal(observation.primary_memory_writes, 0);
@@ -1120,6 +1121,7 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
   assert.equal(observer.snapshot().derived_index_writes, 0);
   assert.equal(observer.snapshot().primary_memory_writes, 0);
   assert.equal(observer.snapshot().last_session.status, 'emergency_stopped');
+  assert.equal(observer.snapshot().emergency_stop_latched, true);
   assert.equal(
     observer.snapshot().last_session.error_code,
     'r5a_dogfood_forbidden_counter_observed'
@@ -1138,4 +1140,11 @@ test('R5-A rejects forbidden derived-index mutation before returning a live-read
     receipt_digest: fixture.controller.snapshot().receipt_digest,
     observation: observer.snapshot()
   }, 'status'));
+  assert.throws(() => observer.prepareActivation(fixture.controller.snapshot()), {
+    code: 'r5a_dogfood_emergency_stop_latched'
+  });
+  assert.throws(() => observer.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    activationSnapshot: { activation_status: 'active' }
+  }), { code: 'r5a_dogfood_emergency_stop_latched' });
 });

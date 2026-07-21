@@ -26,6 +26,7 @@ function createPrivateDogfoodObserver({
   }
 
   const sessions = [];
+  let emergencyStopLatched = false;
   const counters = {
     provider_calls: 0,
     native_invocations: 0,
@@ -61,6 +62,7 @@ function createPrivateDogfoodObserver({
 
   function prepareActivation(activationSnapshot) {
     syncActivation(activationSnapshot);
+    if (emergencyStopLatched) reject('r5a_dogfood_emergency_stop_latched');
     if (currentSession()?.status === 'active') reject('r5a_dogfood_session_already_active');
     if (sessions.length >= maxSessions) reject('r5a_dogfood_session_budget_exhausted');
     if (counters.provider_calls >= maxProviderCalls) reject('r5a_dogfood_provider_budget_exhausted');
@@ -68,6 +70,7 @@ function createPrivateDogfoodObserver({
   }
 
   function beginSession({ observationKind, activationSnapshot } = {}) {
+    if (emergencyStopLatched) reject('r5a_dogfood_emergency_stop_latched');
     if (observationKind !== DOGFOOD_OBSERVATION_KIND ||
         activationSnapshot?.activation_status !== 'active') {
       reject('r5a_dogfood_session_begin_invalid');
@@ -186,6 +189,7 @@ function createPrivateDogfoodObserver({
     session.status = 'emergency_stopped';
     session.error_code = errorCode;
     session.ended_at = now().toISOString();
+    emergencyStopLatched = true;
     return true;
   }
 
@@ -225,6 +229,7 @@ function createPrivateDogfoodObserver({
       sessions_with_read: sessionsWithRead,
       resolve_then_read_sessions: resolveThenRead,
       timeout_count: sessions.filter(session => session.timed_out).length,
+      emergency_stop_latched: emergencyStopLatched,
       provider_calls: counters.provider_calls,
       provider_call_limit: maxProviderCalls,
       native_invocations: counters.native_invocations,

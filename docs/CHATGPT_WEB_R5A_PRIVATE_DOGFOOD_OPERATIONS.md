@@ -87,7 +87,8 @@ verification.
 - primary-memory write, derived-index write, local fallback, or unrestricted
   native search rejects the result and marks the owner-only observation
   `emergency_stopped`, even when the one-read controller has already consumed
-  its lease;
+  its lease; the observer then latches closed for the rest of the process, so
+  only a full Governance restart can permit another R5-A activation;
 - public receipts remain low-disclosure and contain no observation authority;
 - stop/restart clears activation and observation state.
 
