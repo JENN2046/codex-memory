@@ -4,13 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout`.
-Current validation: `CMV-2228`.
-Current fact: private-development session activation, one-context/one-read consumption, kill, TTL, restart, scope isolation, and zero-memory rollback passed.
-The final external session used `resolve_memory_context -> search_memory`, returned one result at relevance `0.5`, and performed no memory write; Governance/Relay are stopped and the Edge is restored to zero-memory.
+Current task: `CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance And Safe-Empty Closeout`.
+Current validation: `CMV-2229`.
+Current fact: isolated derived-runtime lifecycle accounting, false-zero rejection, selected-diary hydration, and final drain passed with six completed events and zero prohibited mutation.
+The bounded read safely returned zero results, so non-empty recall and relevance failed; budgets were exhausted, no retry occurred, all local runtime components are stopped, and the Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance
+
+R5-D permits normal VCP startup, hydration, cache, vector/tag, and matrix
+maintenance only inside an explicitly authorized isolated runtime store. It
+keeps primary memory, source partitions, legacy/ambiguous/unregistered
+partitions, and global search forbidden. Interim receipts cannot claim a final
+zero; shutdown must drain background work and report the actual lifecycle.
+
+The post-merge private run bound exact source/VCP/mapping/registry identities.
+One bounded read used one provider call and one native invocation. Final drain
+reported six completed derived events, zero failed derived events, zero primary
+writes, zero source mutations, and zero unrestricted searches. The result was
+safe empty, so the live non-empty and relevance gates remain failed. The full
+authorized budgets of eight provider calls and twelve authenticated read calls
+were consumed across the retained attempts; no additional retry was made.
+
+Verification-complete shutdown stopped Governance, Relay, and the shim. The
+Edge stayed `zero_memory`, and an immutable owner-only non-Git failure artifact
+preserves the receipt chain. Final verdict:
+`R5_D_RUNTIME_PROOF_FAILED_SAFE_EMPTY`.
 
 ## CM-2143 ChatGPT Web R4-G Runtime Proof And R4-H Closeout
 
