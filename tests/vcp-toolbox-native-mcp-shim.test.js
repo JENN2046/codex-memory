@@ -240,6 +240,89 @@ test('isolated runtime accounts queued matrix task types exactly once', async ()
   await adapter.shutdown();
 });
 
+test('isolated runtime keeps derived accounting enabled for write-capable reads', async () => {
+  const manager = {
+    config: { fullScanOnStartup: false },
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    async initialize() {
+      this._saveIndexToDisk('global_tags');
+    },
+    _saveIndexToDisk() {},
+    async search() {
+      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+    },
+    async shutdown() {}
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    enableWrite: true,
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: { async getEmbeddingsBatch() { return [[0.1, 0.2]]; } }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
+    allowedDiaryCount: 1,
+    mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+    mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+  };
+
+  const result = await adapter.search({ query: 'write capable read', limit: 1 }, {
+    authorization
+  });
+
+  assert.equal(
+    result._nativeRuntimeReceipt.derivedRuntimeMutationPolicy,
+    'isolated_derived_runtime_mutation_v1'
+  );
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationAccountingMode,
+    'lifecycle_event_v1');
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationAuthorized, true);
+  assert.equal(result._nativeRuntimeReceipt.isolatedRuntimeStoreUsed, true);
+  assert.equal(result._nativeRuntimeReceipt.derivedIndexWritePerformed, true);
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 2);
+  assert.deepEqual(result._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
+    ['startup', 'tag']);
+
+  await adapter.shutdown();
+});
+
+test('write-capable primary writes do not initialize or mutate the derived runtime', async t => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), 'vcp-write-capable-primary-'));
+  const isolatedStore = path.join(root, 'isolated-runtime-store');
+  t.after(() => fs.rm(root, { recursive: true, force: true }));
+  let initializeCalls = 0;
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    enableWrite: true,
+    knowledgeBaseRootPath: root,
+    knowledgeBaseStorePath: isolatedStore,
+    knowledgeBaseManager: {
+      config: { fullScanOnStartup: false },
+      async initialize() { initializeCalls += 1; },
+      async shutdown() {}
+    },
+    embeddingUtils: {}
+  });
+
+  const result = await adapter.record({
+    title: 'synthetic primary write',
+    content: 'synthetic fixture only'
+  });
+
+  assert.equal(initializeCalls, 0);
+  assert.equal(result._nativeRuntimeReceipt.nativeRuntimeCalled, false);
+  assert.equal(result._nativeRuntimeReceipt.nativeRuntimeInitialized, false);
+  assert.equal(result._nativeRuntimeReceipt.primaryMemoryStoreWritePerformed, true);
+  assert.equal(result._nativeRuntimeReceipt.derivedIndexWritePerformed, false);
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationPolicy, 'disabled');
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationCumulativeCount, 0);
+  assert.equal(result._nativeRuntimeReceipt.isolatedRuntimeStoreUsed, false);
+  await assert.rejects(fs.lstat(isolatedStore), error => error.code === 'ENOENT');
+
+  await adapter.shutdown();
+});
+
 test('isolated runtime fails closed before an unknown queued derived task executes', async () => {
   let queuedRun = null;
   let operationRan = false;

@@ -704,7 +704,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   const isolatedRuntimeStoreConfigured = Boolean(knowledgeBaseStorePath);
   const primaryWriteOnly = options.primaryWriteOnly === true;
   const derivedRuntimeMutationGovernanceEnabled = isolatedRuntimeStoreConfigured &&
-    !primaryWriteOnly && options.enableWrite !== true;
+    !primaryWriteOnly;
   const derivedRuntimeMutationPolicy = options.derivedRuntimeMutationPolicy ||
     DERIVED_RUNTIME_MUTATION_POLICY;
   if (derivedRuntimeMutationGovernanceEnabled &&
@@ -893,8 +893,7 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
 
   async function ensurePrimaryWriteReady(toolName) {
     if (!primaryWriteOnly) {
-      await ensureReady();
-      return;
+      await fs.mkdir(knowledgeBaseRootPath, { recursive: true });
     }
     const rootStat = await fs.lstat(knowledgeBaseRootPath);
     if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) {
@@ -1074,14 +1073,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       write_shape: 'markdown_dailynote_file',
       raw_path_disclosed: false,
       _nativeRuntimeReceipt: nativeRuntimeReceipt({
-        nativeRuntimeCalled: !primaryWriteOnly,
-        nativeRuntimeInitialized: !primaryWriteOnly,
+        nativeRuntimeCalled: false,
+        nativeRuntimeInitialized: false,
         providerApiCalled: false,
         memoryReadPerformed: false,
         memoryWritePerformed: true,
         durableWritePerformed: true,
         durableWriteScope: 'primary_memory_write',
-        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured && !primaryWriteOnly,
+        isolatedRuntimeStoreUsed: false,
         primaryMemoryStoreWritePerformed: true,
         derivedIndexWritePerformed: false
       })
@@ -1108,14 +1107,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       mutation_tool: toolName,
       raw_path_disclosed: false,
       _nativeRuntimeReceipt: nativeRuntimeReceipt({
-        nativeRuntimeCalled: !primaryWriteOnly,
-        nativeRuntimeInitialized: !primaryWriteOnly,
+        nativeRuntimeCalled: false,
+        nativeRuntimeInitialized: false,
         providerApiCalled: false,
         memoryReadPerformed: false,
         memoryWritePerformed: true,
         durableWritePerformed: true,
         durableWriteScope: 'primary_memory_mutation_marker',
-        isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured && !primaryWriteOnly,
+        isolatedRuntimeStoreUsed: false,
         primaryMemoryStoreWritePerformed: true,
         derivedIndexWritePerformed: false
       })
