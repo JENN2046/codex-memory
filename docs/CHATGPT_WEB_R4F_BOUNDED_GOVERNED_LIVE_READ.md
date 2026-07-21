@@ -75,10 +75,17 @@ provider_calls: 1
 native_invocations: 1
 local_fallbacks: 0
 primary_memory_writes: 0
-derived_index_writes: 1
+derived_index_writes: 64
 other_durable_mutations: 1
 unrestricted_native_searches: 0
 ```
+
+`derived_index_writes` counts isolated derived-runtime lifecycle events, not
+primary-memory writes. R5-D clarified that one cold selected-diary read can
+legitimately emit multiple startup, hydration, cache, vector/tag, or matrix
+events. The limit remains fail-closed: at most 64 events may appear between
+receipt consumptions, while primary-memory writes and source-partition
+mutations remain forbidden.
 
 The response contains only bounded result references, low-disclosure summaries,
 relevance values, counts, and signed receipt digests. It rejects raw memory,

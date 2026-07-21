@@ -2,6 +2,7 @@
 
 const DERIVED_RUNTIME_MUTATION_POLICY = 'isolated_derived_runtime_mutation_v1';
 const DERIVED_RUNTIME_MUTATION_ACCOUNTING_MODE = 'lifecycle_event_v1';
+const MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT = 64;
 const ALLOWED_DERIVED_RUNTIME_MUTATION_TRIGGERS = Object.freeze(new Set([
   'startup',
   'hydration',
@@ -63,10 +64,19 @@ function createDerivedRuntimeMutationLifecycle({
 
   function begin(trigger) {
     if (enabled !== true) return null;
+    if (policyViolation) {
+      throw policyError('derived_runtime_mutation_policy_latched');
+    }
     if (finalized) latch('derived_runtime_mutation_lifecycle_finalized');
     if (!authorizationBound) latch('derived_runtime_mutation_authorization_required');
     if (!ALLOWED_DERIVED_RUNTIME_MUTATION_TRIGGERS.has(trigger)) {
       latch('derived_runtime_mutation_trigger_forbidden');
+    }
+    if (
+      cumulativeCount - receiptCursor >=
+      MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT
+    ) {
+      latch('derived_runtime_mutation_budget_exhausted');
     }
     const handle = Object.freeze({
       id: ++sequence,
@@ -195,5 +205,6 @@ module.exports = {
   ALLOWED_DERIVED_RUNTIME_MUTATION_TRIGGERS,
   DERIVED_RUNTIME_MUTATION_ACCOUNTING_MODE,
   DERIVED_RUNTIME_MUTATION_POLICY,
+  MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT,
   createDerivedRuntimeMutationLifecycle
 };

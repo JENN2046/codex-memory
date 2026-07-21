@@ -4,7 +4,12 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 
 const {
+  MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT: CONTRACT_MAX_DERIVED_MUTATIONS
+} = require('../packages/chatgpt-r4-contracts');
+
+const {
   DERIVED_RUNTIME_MUTATION_POLICY,
+  MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT,
   createDerivedRuntimeMutationLifecycle
 } = require('../src/core/DerivedRuntimeMutationLifecycle');
 
@@ -73,6 +78,43 @@ test('derived runtime lifecycle rejects unknown triggers and premature final rec
   assert.throws(() => second.projection({ final: true }), {
     code: 'derived_runtime_mutation_final_receipt_before_drain'
   });
+});
+
+test('derived runtime lifecycle bounds each receipt interval without forcing a false one-event limit', () => {
+  assert.equal(
+    MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT,
+    CONTRACT_MAX_DERIVED_MUTATIONS
+  );
+  const lifecycle = createDerivedRuntimeMutationLifecycle({
+    enabled: true,
+    isolatedRuntimeStore: true
+  });
+  lifecycle.bindAuthorization(AUTHORIZATION);
+  for (let index = 0; index < MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT; index += 1) {
+    assert.equal(lifecycle.track('cache', () => index), index);
+  }
+  let postBudgetOperationCalled = false;
+  assert.throws(() => lifecycle.track('cache', () => {
+    postBudgetOperationCalled = true;
+  }), {
+    code: 'derived_runtime_mutation_budget_exhausted'
+  });
+  assert.equal(postBudgetOperationCalled, false);
+  const receipt = lifecycle.projection({ consume: true });
+  assert.equal(
+    receipt.derivedRuntimeMutationReceiptDelta,
+    MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT
+  );
+  assert.equal(receipt.derivedRuntimeMutationPolicyViolation, true);
+  assert.throws(() => lifecycle.track('cache', () => {
+    postBudgetOperationCalled = true;
+  }), {
+    code: 'derived_runtime_mutation_policy_latched'
+  });
+  assert.equal(postBudgetOperationCalled, false);
+  const afterRetry = lifecycle.projection();
+  assert.equal(afterRetry.derivedRuntimeMutationCumulativeCount, receipt.derivedRuntimeMutationCumulativeCount);
+  assert.equal(afterRetry.derivedRuntimeMutationReceiptDelta, 0);
 });
 
 test('disabled lifecycle does not claim authorization or mutation', async () => {

@@ -161,10 +161,16 @@ provider_calls: 0..1
 native_invocations: 0..1
 local_fallbacks: 0
 primary_memory_writes: 0
-derived_index_writes: 0..1
+derived_index_writes: 0..64
 other_durable_mutations: 0..1
 unrestricted_native_searches: 0
 ```
+
+The derived counter records isolated runtime lifecycle events rather than
+primary-memory writes. R5-D permits a bounded cold-read batch of startup,
+hydration, cache, vector/tag, and matrix maintenance, with event 65 rejected
+before admission. Primary-memory writes and source-partition mutations remain
+forbidden.
 
 The private receipt chain binds activation authorization, context, Governance,
 bridge, native invocation, and native runtime receipts by digest. Public

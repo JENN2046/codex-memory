@@ -52,12 +52,19 @@ const COUNTER_MODES = Object.freeze({
   sessionScopedLiveReadV1: 'session_scoped_live_read_v1'
 });
 
+// A derived runtime mutation counter represents lifecycle events, not a single
+// primary-memory write. One selected-diary read may legitimately initialize
+// the isolated store, hydrate/cache the diary, recover a vector index, and
+// complete a matrix refresh. Keep that batch bounded without collapsing it to
+// a false boolean/one-write interpretation.
+const MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT = 64;
+
 const GOVERNED_LIVE_READ_COUNTER_MAXIMUMS = Object.freeze({
   provider_calls: 1,
   native_invocations: 1,
   local_fallbacks: 0,
   primary_memory_writes: 0,
-  derived_index_writes: 1,
+  derived_index_writes: MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT,
   other_durable_mutations: 1,
   unrestricted_native_searches: 0
 });
@@ -127,6 +134,7 @@ module.exports = {
   ZERO_MEMORY_COUNTER_KEYS,
   ZERO_MEMORY_COUNTERS,
   COUNTER_MODES,
+  MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT,
   GOVERNED_LIVE_READ_COUNTER_MAXIMUMS,
   LIMITS,
   FORBIDDEN_AUTHORITY_KEYS,

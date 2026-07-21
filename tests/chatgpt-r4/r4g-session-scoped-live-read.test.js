@@ -10,6 +10,7 @@ const test = require('node:test');
 const {
   COUNTER_MODES,
   DATA_TOOL_NAMES,
+  MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT,
   ZERO_MEMORY_COUNTERS,
   createPrincipalAssertion,
   createRequestEnvelope,
@@ -399,6 +400,19 @@ test('R4-G counter mode preserves bounded live-read maxima without changing zero
   assert.doesNotThrow(() => validateCounters(bounded, {
     counterMode: COUNTER_MODES.sessionScopedLiveReadV1
   }));
+  for (const counterMode of [
+    COUNTER_MODES.governedLiveReadV1,
+    COUNTER_MODES.sessionScopedLiveReadV1
+  ]) {
+    assert.doesNotThrow(() => validateCounters({
+      ...bounded,
+      derived_index_writes: MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT
+    }, { counterMode }));
+    assert.throws(() => validateCounters({
+      ...bounded,
+      derived_index_writes: MAX_DERIVED_RUNTIME_MUTATIONS_PER_READ_RECEIPT + 1
+    }, { counterMode }), { code: 'governed_live_read_counter_out_of_bounds' });
+  }
   assert.throws(() => validateCounters(bounded, {
     counterMode: COUNTER_MODES.zeroMemory
   }), { code: 'zero_memory_counter_nonzero' });
@@ -1125,10 +1139,12 @@ test('R5-D permits authorized isolated derived mutation with lifecycle evidence'
     derivedIndexWritePerformed: true,
     durableWritePerformed: true,
     durableWriteScope: 'isolated_derived_index',
-    derivedRuntimeMutationCumulativeCount: 1,
-    derivedRuntimeMutationReceiptDelta: 1,
-    derivedRuntimeMutationCompletedCount: 1,
-    derivedRuntimeMutationTriggerCategories: ['startup']
+    derivedRuntimeMutationCumulativeCount: 5,
+    derivedRuntimeMutationReceiptDelta: 5,
+    derivedRuntimeMutationCompletedCount: 5,
+    derivedRuntimeMutationTriggerCategories: [
+      'startup', 'hydration', 'cache', 'vector', 'matrix'
+    ]
   };
   const fixture = createRuntimeFixture({
     dogfoodObserver: observer,
@@ -1165,7 +1181,8 @@ test('R5-D permits authorized isolated derived mutation with lifecycle evidence'
     relayReceipt: relayReceipt(searchRequest)
   });
   assert.equal(read.status, 'ok');
-  assert.equal(observer.snapshot().derived_index_writes, 1);
+  assert.equal(read.counters.derived_index_writes, 5);
+  assert.equal(observer.snapshot().derived_index_writes, 5);
   assert.equal(observer.snapshot().primary_memory_writes, 0);
   assert.equal(observer.snapshot().derived_runtime_mutation_evidence_count, 1);
   assert.equal(observer.snapshot().derived_runtime_mutation_policy_violations, 0);
