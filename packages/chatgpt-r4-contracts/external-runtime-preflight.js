@@ -247,7 +247,7 @@ function validateRuntime(value) {
   );
   assertBoolean(value.durable_remote_state_allowed, false, 'r4d_durable_remote_state_forbidden');
   assertInteger(value.max_in_flight_requests, 1, 64, 'r4d_max_in_flight_invalid');
-  assertInteger(value.request_ttl_seconds, 1, 30, 'r4d_request_ttl_invalid');
+  assertInteger(value.request_ttl_seconds, 1, 60, 'r4d_request_ttl_invalid');
   assertLiteral(
     value.restart_behavior,
     'fail_closed_and_expire_inflight',

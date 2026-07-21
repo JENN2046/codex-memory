@@ -89,7 +89,7 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
     responseSigning: { privateKey: relayPrivateKey, keyId: relayKeyId },
     counterMode,
     edgeTimeoutMs: integerEnvironment(environment.CODEX_MEMORY_R4_RELAY_EDGE_TIMEOUT_MS || '5000', 10, 30_000),
-    udsTimeoutMs: integerEnvironment(environment.CODEX_MEMORY_R4_RELAY_UDS_TIMEOUT_MS || '2000', 10, 30_000),
+    udsTimeoutMs: integerEnvironment(environment.CODEX_MEMORY_R4_RELAY_UDS_TIMEOUT_MS || '2000', 10, 60_000),
     cancelPollMs: integerEnvironment(environment.CODEX_MEMORY_R4_RELAY_CANCEL_POLL_MS || '250', 1, 1000),
     edgeRequest
   });

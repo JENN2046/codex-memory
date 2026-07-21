@@ -231,9 +231,9 @@ function validateExternalEdgeRuntimeConfig(options) {
   const terminalRetentionMs = options.terminalRetentionMs === undefined ? 5_000 : options.terminalRetentionMs;
   const maxInFlight = options.maxInFlight === undefined ? 32 : options.maxInFlight;
   const maxRecords = options.maxRecords === undefined ? 128 : options.maxRecords;
-  assertInteger(requestTtlSeconds, 1, 30, 'edge_request_ttl_invalid');
-  assertInteger(responseTimeoutMs, 10, 30_000, 'edge_response_timeout_invalid');
-  assertInteger(claimLeaseMs, 10, 30_000, 'edge_claim_lease_invalid');
+  assertInteger(requestTtlSeconds, 1, 60, 'edge_request_ttl_invalid');
+  assertInteger(responseTimeoutMs, 10, 60_000, 'edge_response_timeout_invalid');
+  assertInteger(claimLeaseMs, 10, 60_000, 'edge_claim_lease_invalid');
   if (claimLeaseMs < responseTimeoutMs) reject('edge_claim_lease_too_short');
   assertInteger(terminalRetentionMs, 10, 30_000, 'edge_terminal_retention_invalid');
   assertInteger(maxInFlight, 1, 64, 'edge_inflight_limit_invalid');

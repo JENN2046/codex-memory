@@ -368,6 +368,19 @@ test('external Edge configuration rejects non-public origins, unsafe bind, and n
   };
   const defaults = validateExternalEdgeRuntimeConfig(base);
   assert.equal(defaults.claimLeaseMs, defaults.responseTimeoutMs);
+  const boundedSlowRead = validateExternalEdgeRuntimeConfig({
+    ...base,
+    requestTtlSeconds: 60,
+    responseTimeoutMs: 60_000,
+    claimLeaseMs: 60_000
+  });
+  assert.equal(boundedSlowRead.requestTtlSeconds, 60);
+  assert.equal(boundedSlowRead.responseTimeoutMs, 60_000);
+  assert.equal(boundedSlowRead.claimLeaseMs, 60_000);
+  assert.throws(() => validateExternalEdgeRuntimeConfig({
+    ...base,
+    requestTtlSeconds: 61
+  }), { code: 'edge_request_ttl_invalid' });
   assert.throws(() => validateExternalEdgeRuntimeConfig({
     ...base,
     responseTimeoutMs: 10_000,
