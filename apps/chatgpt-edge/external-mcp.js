@@ -46,6 +46,9 @@ function createExternalMcpHandler({
   if (!Number.isInteger(responseTimeoutMs) || responseTimeoutMs < 10 || responseTimeoutMs > 60_000) {
     reject('edge_response_timeout_invalid');
   }
+  if (responseTimeoutMs > requestTtlSeconds * 1000) {
+    reject('edge_response_timeout_exceeds_request_ttl');
+  }
 
   async function handle(incoming, outgoing, parsedBody, authInfo) {
     const server = createMcpProtocolServer({

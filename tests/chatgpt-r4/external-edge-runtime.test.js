@@ -20,6 +20,7 @@ const {
 const {
   createAuth0TokenVerifier,
   createExternalEdgeRuntime,
+  createExternalMcpHandler,
   validateExternalEdgeRuntimeConfig
 } = require('../../apps/chatgpt-edge');
 
@@ -381,6 +382,24 @@ test('external Edge configuration rejects non-public origins, unsafe bind, and n
     ...base,
     requestTtlSeconds: 61
   }), { code: 'edge_request_ttl_invalid' });
+  assert.throws(() => validateExternalEdgeRuntimeConfig({
+    ...base,
+    responseTimeoutMs: 30_001,
+    claimLeaseMs: 30_001
+  }), { code: 'edge_response_timeout_exceeds_request_ttl' });
+  assert.throws(() => validateExternalEdgeRuntimeConfig({
+    ...base,
+    responseTimeoutMs: 30_000,
+    claimLeaseMs: 30_001
+  }), { code: 'edge_claim_lease_exceeds_request_ttl' });
+  assert.throws(() => createExternalMcpHandler({
+    broker: { submit() {}, waitForResult() {} },
+    issuer: ISSUER,
+    audience: MCP_RESOURCE,
+    edgeSigning: signing(edgeIdentity),
+    requestTtlSeconds: 30,
+    responseTimeoutMs: 60_000
+  }), { code: 'edge_response_timeout_exceeds_request_ttl' });
   assert.throws(() => validateExternalEdgeRuntimeConfig({
     ...base,
     responseTimeoutMs: 10_000,

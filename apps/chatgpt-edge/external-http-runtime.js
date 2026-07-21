@@ -234,6 +234,8 @@ function validateExternalEdgeRuntimeConfig(options) {
   assertInteger(requestTtlSeconds, 1, 60, 'edge_request_ttl_invalid');
   assertInteger(responseTimeoutMs, 10, 60_000, 'edge_response_timeout_invalid');
   assertInteger(claimLeaseMs, 10, 60_000, 'edge_claim_lease_invalid');
+  if (responseTimeoutMs > requestTtlSeconds * 1000) reject('edge_response_timeout_exceeds_request_ttl');
+  if (claimLeaseMs > requestTtlSeconds * 1000) reject('edge_claim_lease_exceeds_request_ttl');
   if (claimLeaseMs < responseTimeoutMs) reject('edge_claim_lease_too_short');
   assertInteger(terminalRetentionMs, 10, 30_000, 'edge_terminal_retention_invalid');
   assertInteger(maxInFlight, 1, 64, 'edge_inflight_limit_invalid');
