@@ -128,10 +128,28 @@ function nativeInvocationReceiptForPayload(payload, overrides = {}) {
       memoryReadPerformed: true,
       memoryWritePerformed: false,
       durableWritePerformed: true,
-      durableWriteScope: 'native_runtime_store',
-      isolatedRuntimeStoreUsed: false,
+      durableWriteScope: 'isolated_derived_index',
+      isolatedRuntimeStoreUsed: true,
       primaryMemoryStoreWritePerformed: false,
       derivedIndexWritePerformed: true,
+      derivedRuntimeMutationPolicy: 'isolated_derived_runtime_mutation_v1',
+      derivedRuntimeMutationAccountingMode: 'lifecycle_event_v1',
+      derivedRuntimeMutationAuthorized: true,
+      derivedRuntimeMutationAccountingFinal: false,
+      derivedRuntimeMutationBackgroundTasksDrained: false,
+      derivedRuntimeMutationCumulativeCount: 1,
+      derivedRuntimeMutationReceiptDelta: 1,
+      derivedRuntimeMutationActiveCount: 0,
+      derivedRuntimeMutationCompletedCount: 1,
+      derivedRuntimeMutationFailedCount: 0,
+      derivedRuntimeMutationTriggerCategories: ['startup'],
+      derivedRuntimeMutationZeroClaimed: false,
+      derivedRuntimeMutationPolicyViolation: false,
+      sourcePartitionMutationPerformed: false,
+      legacyPartitionAccessed: false,
+      ambiguousPartitionAccessed: false,
+      unregisteredPartitionAccessed: false,
+      derivedRuntimeMutationRawDetailsDisclosed: false,
       authorizationResolvedBeforeProvider: true,
       diaryAllowlistEnforcedBeforeIndexLoad: true,
       diaryAllowlistEnforcedBeforeVectorSearch: true,
@@ -596,6 +614,21 @@ test('delegates governed read to native MCP caller and returns only low-disclosu
   assert.equal(result.delegatedResult.receipt.localMemoryResultReturned, false);
   assert.equal(result.delegatedResult.receipt.localMemoryResultCanBeMistakenForVcpNative, false);
   assert.equal(result.delegatedResult.receipt.localMemoryRawContentDisclosed, false);
+  assert.equal(
+    result.delegatedResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt
+      .derivedRuntimeMutationPolicy,
+    'isolated_derived_runtime_mutation_v1'
+  );
+  assert.equal(
+    result.delegatedResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt
+      .derivedRuntimeMutationReceiptDelta,
+    1
+  );
+  assert.deepEqual(
+    result.delegatedResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt
+      .derivedRuntimeMutationTriggerCategories,
+    ['startup']
+  );
   assert.equal(result.delegatedResult.receipt.readWriteAuthoritySource, 'bridge_tool_binding');
   assert.equal(result.delegatedResult.receipt.readWriteAuthorityForbiddenFieldCount, 0);
   assert.equal(result.delegatedResult.receipt.readWriteAuthorityBound, true);
