@@ -4,36 +4,38 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2147 ChatGPT Web R5-G Exact-Head Bounded Retrieval Reliability Window`.
-Current validation: `CMV-2232`.
-Current fact: five fresh exact-head project reads returned one relevant result each with zero timeout, primary/source mutation, and unrestricted search.
-Harness recovery is disclosed; all R5-G runtimes are stopped and Edge remains zero-memory.
+Current task: `CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window`.
+Current validation: `CMV-2233`.
+Current fact: classified owner-only observation now measures resolve/one-read/stop, negative abstention, and post-consumption retries without authorizing a second read.
+Runtime dogfood has not run; no service/provider/memory action occurred and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2147 completed five fresh exact-head project-only reliability sessions.
-Every session returned one result at relevance `>= 0.5`; provider/native and
-authenticated read-only budgets were exactly `5/5` and `16/16`. Inactive,
-consumed replay, expiry, and restart-inactive failed closed. Timeout, fallback,
-primary write, source mutation, excluded access, and global search stayed zero.
+CM-2148 implements the default-closed R5-H dogfood observation contract. The
+owner-only schema-3 control labels three task classes and binds one expected
+read tool only for relevant tasks. Observation v2 measures exact first resolve,
+expected one-read choice, terminal stop, negative abstention, bounded retry
+defects, latency, timeout, result count, and low-disclosure relevance.
 
-Normal VCP cooldown was used. Derived lifecycle accounting is
-`6 completed / 0 failed`. Two private harness projection assertions were
-recovered without repeating a consumed provider call, and both evidence
-segments remain immutable. Verification kill and shutdown drain passed;
-Governance, Relay, and the shim are stopped, and Edge remains `zero_memory`.
-The owner-only R5-G aggregate artifact is outside Git; old R5-C/R5-D/R5-F
-artifacts are unchanged. Deliver the low-disclosure closeout through PR
-CI/review. Continuous activation, new provider/read work, production, release,
-deploy, cutover, and readiness require a separate current scope.
+The previously invisible attempt after a consumed lease is now counted before
+the unchanged fail-closed response, without another provider/native call.
+Focused/default/hardening and strict offline subgates pass; strict health alone
+is unavailable because no service was started. The public six tools/schemas are
+unchanged, runtime dogfood has not run, and Edge remains `zero_memory`.
+
+Next boundary: deliver source through PR CI/review. Then obtain a separate
+exact runtime/provider authorization for 20 fresh private ChatGPT sessions,
+normal startup cooldown, bounded calls, owner-only non-Git artifact, and final
+zero-memory rollback. Do not infer automatic-first-task, production, release,
+deploy, cutover, or readiness.
 
 ## Historical Handoff Context
 
 The entries below are retained as chronology only. They are not current route
-instructions; CM-2147 and the zero-memory-preservation boundary above control.
+instructions; CM-2148 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,

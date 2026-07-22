@@ -8,13 +8,34 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_G_BOUNDED_RETRIEVAL_RELIABILITY_PASS_WITH_HARNESS_RECOVERY` |
-| Current task | `CM-2147 ChatGPT Web R5-G Exact-Head Bounded Retrieval Reliability Window` |
-| Current validation | `CMV-2232` |
-| Current route | Deliver the low-disclosure R5-G reliability closeout while preserving zero-memory and all readiness non-claims |
+| Status | `R5_H_SOURCE_VALIDATED_RUNTIME_DOGFOOD_NOT_RUN` |
+| Current task | `CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window` |
+| Current validation | `CMV-2233` |
+| Current route | Deliver the default-closed R5-H observation contract, then request a separate exact runtime scope for the 20-session private dogfood window |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R5-H Private ChatGPT Dogfood Window
+
+R5-H adds an owner-only classified observation contract for 20 fresh private
+ChatGPT conversations. It distinguishes memory-relevant, memory-irrelevant,
+and scope-missing tasks; measures exact first resolution, expected one-read
+tool choice, terminal stop, negative abstention, and bounded attempts after a
+consumed lease. A post-consumption attempt is observed before the existing
+fail-closed response and cannot authorize another provider or native call.
+
+The public six-tool MCP surface and schemas are unchanged. Source validation
+passed 23 focused tests, the default suite (`5832 pass / 0 fail / 8 skip`), and
+both hardening suites (`97/97 + 6/6`). Strict contract, test, compare, and
+rollback subgates passed; strict health was unavailable because the inactive
+loopback service was not started. No service, provider, memory read/write, or
+runtime activation occurred; the retained Edge remains zero-memory. See
+`docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_WINDOW.md`.
+
+The actual 20-session window requires a separate exact runtime/provider scope.
+Automatic-first-task guarantees, production, release, deploy, cutover, and
+readiness remain false.
 
 ## ChatGPT Web R5-G Bounded Retrieval Reliability Window
 

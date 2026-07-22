@@ -5,7 +5,14 @@ const { reject } = require('../../../packages/chatgpt-r4-contracts');
 const MAX_DOGFOOD_SESSIONS = 20;
 const MAX_DOGFOOD_PROVIDER_CALLS = 25;
 const MAX_DOGFOOD_TOOL_EVENTS_PER_SESSION = 4;
+const MAX_DOGFOOD_POST_TERMINAL_ATTEMPTS_PER_SESSION = 4;
 const DOGFOOD_OBSERVATION_KIND = 'meaningful_task_unprompted';
+const DOGFOOD_OBSERVATION_SCHEMA_VERSION = 2;
+const DOGFOOD_TASK_CLASSES = Object.freeze([
+  'memory_relevant',
+  'memory_irrelevant',
+  'scope_missing'
+]);
 const SAFE_ERROR_CODE_PATTERN = /^[a-z][a-z0-9_]{0,79}$/u;
 const READ_TOOL_NAMES = Object.freeze([
   'memory_overview',
@@ -73,7 +80,12 @@ function createPrivateDogfoodObserver({
     return true;
   }
 
-  function beginSession({ observationKind, activationSnapshot } = {}) {
+  function beginSession({
+    observationKind,
+    taskClass,
+    expectedReadTool = null,
+    activationSnapshot
+  } = {}) {
     if (emergencyStopLatched) reject('r5a_dogfood_emergency_stop_latched');
     if (currentSession()?.tool_attempt_in_flight === true) {
       reject('r5a_dogfood_tool_attempt_in_flight');
@@ -81,6 +93,13 @@ function createPrivateDogfoodObserver({
     if (observationKind !== DOGFOOD_OBSERVATION_KIND ||
         activationSnapshot?.activation_status !== 'active') {
       reject('r5a_dogfood_session_begin_invalid');
+    }
+    const normalizedTaskClass = taskClass === undefined ? 'unclassified' : taskClass;
+    if (![...DOGFOOD_TASK_CLASSES, 'unclassified'].includes(normalizedTaskClass) ||
+        (normalizedTaskClass === 'memory_relevant' && taskClass !== undefined &&
+         !READ_TOOL_NAMES.includes(expectedReadTool)) ||
+        (normalizedTaskClass !== 'memory_relevant' && expectedReadTool !== null)) {
+      reject('r5h_dogfood_session_classification_invalid');
     }
     if (currentSession()?.status === 'active') reject('r5a_dogfood_session_already_active');
     if (sessions.length >= maxSessions) reject('r5a_dogfood_session_budget_exhausted');
@@ -93,7 +112,14 @@ function createPrivateDogfoodObserver({
       status: 'active',
       started_at: startedAt.toISOString(),
       ended_at: null,
+      task_class: normalizedTaskClass,
+      expected_read_tool: expectedReadTool,
       tool_sequence: [],
+      resolve_attempt_count: 0,
+      read_attempt_count: 0,
+      post_terminal_attempt_count: 0,
+      first_resolve_status: null,
+      terminal_read_status: null,
       total_latency_ms: 0,
       result_count: 0,
       max_relevance: null,
@@ -115,8 +141,20 @@ function createPrivateDogfoodObserver({
 
   function beginToolAttempt({ toolName } = {}) {
     const session = currentSession();
-    if (!session || session.status !== 'active') return null;
-    if (!['resolve_memory_context', ...READ_TOOL_NAMES].includes(toolName) ||
+    if (!session) return null;
+    if (!['resolve_memory_context', ...READ_TOOL_NAMES].includes(toolName)) {
+      reject('r5a_dogfood_tool_attempt_invalid');
+    }
+    if (session.status === 'consumed') {
+      if (session.tool_attempt_in_flight === true ||
+          session.post_terminal_attempt_count >= MAX_DOGFOOD_POST_TERMINAL_ATTEMPTS_PER_SESSION) {
+        reject('r5h_dogfood_post_terminal_attempt_budget_exhausted');
+      }
+      session.post_terminal_attempt_count += 1;
+      return null;
+    }
+    if (session.status !== 'active') return null;
+    if (
         session.tool_attempt_in_flight === true ||
         session.tool_sequence.length >= MAX_DOGFOOD_TOOL_EVENTS_PER_SESSION) {
       reject('r5a_dogfood_tool_attempt_invalid');
@@ -137,6 +175,26 @@ function createPrivateDogfoodObserver({
       reject('r5a_dogfood_tool_event_invalid');
     }
     return session;
+  }
+
+  function resultStatusCategory(toolName, status) {
+    const allowed = toolName === 'resolve_memory_context'
+      ? ['resolved', 'missing', 'denied', 'expired', 'unavailable', 'error']
+      : ['found', 'empty', 'available', 'denied', 'expired', 'unavailable', 'error'];
+    return allowed.includes(status) ? status : 'other';
+  }
+
+  function recordToolEvent(session, toolName, status) {
+    session.tool_sequence.push(toolName);
+    if (toolName === 'resolve_memory_context') {
+      session.resolve_attempt_count += 1;
+      if (session.first_resolve_status === null) {
+        session.first_resolve_status = resultStatusCategory(toolName, status);
+      }
+      return;
+    }
+    session.read_attempt_count += 1;
+    session.terminal_read_status = resultStatusCategory(toolName, status);
   }
 
   function validateDerivedRuntimeMutationEvidence(observedCounters, evidence) {
@@ -225,7 +283,7 @@ function createPrivateDogfoodObserver({
       observedCounters,
       derivedRuntimeMutationEvidence
     );
-    session.tool_sequence.push(toolName);
+    recordToolEvent(session, toolName, status);
     session.tool_attempt_in_flight = false;
     session.total_latency_ms += latencyMs;
     session.result_count = resultCount;
@@ -249,7 +307,7 @@ function createPrivateDogfoodObserver({
     const session = assertToolEvent(toolName, latencyMs, sessionOrdinal);
     if (!session) return false;
     if (!SAFE_ERROR_CODE_PATTERN.test(errorCode || '')) reject('r5a_dogfood_error_code_invalid');
-    session.tool_sequence.push(toolName);
+    recordToolEvent(session, toolName, 'error');
     session.tool_attempt_in_flight = false;
     session.total_latency_ms += latencyMs;
     session.error_code = errorCode;
@@ -277,7 +335,15 @@ function createPrivateDogfoodObserver({
     return Object.freeze({
       ordinal: session.ordinal,
       status: session.status,
+      task_class: session.task_class,
+      expected_read_tool: session.expected_read_tool,
       tool_sequence: Object.freeze([...session.tool_sequence]),
+      resolve_attempt_count: session.resolve_attempt_count,
+      read_attempt_count: session.read_attempt_count,
+      post_terminal_attempt_count: session.post_terminal_attempt_count,
+      first_resolve_status: session.first_resolve_status,
+      terminal_read_status: session.terminal_read_status,
+      workflow_outcome: workflowOutcome(session),
       total_latency_ms: session.total_latency_ms,
       result_count: session.result_count,
       max_relevance: session.max_relevance,
@@ -287,6 +353,36 @@ function createPrivateDogfoodObserver({
       provider_calls: session.counters.provider_calls,
       native_invocations: session.counters.native_invocations
     });
+  }
+
+  function isExactResolvedOneRead(session) {
+    return session.tool_sequence.length === 2 &&
+      session.tool_sequence[0] === 'resolve_memory_context' &&
+      READ_TOOL_NAMES.includes(session.tool_sequence[1]) &&
+      session.resolve_attempt_count === 1 && session.read_attempt_count === 1 &&
+      session.first_resolve_status === 'resolved';
+  }
+
+  function expectedReadMatched(session) {
+    return session.task_class === 'memory_relevant' &&
+      isExactResolvedOneRead(session) &&
+      session.tool_sequence[1] === session.expected_read_tool;
+  }
+
+  function workflowOutcome(session) {
+    if (session.tool_sequence.length === 0) {
+      return session.status === 'active' ? 'pending' : 'no_tool_selected';
+    }
+    if (session.tool_sequence[0] !== 'resolve_memory_context') return 'read_without_resolve';
+    if (session.resolve_attempt_count > 1) return 'resolve_retried';
+    if (session.first_resolve_status !== 'resolved') return 'resolve_failed';
+    if (session.read_attempt_count === 0) return 'resolve_only';
+    if (session.read_attempt_count > 1) return 'multiple_reads_before_terminal';
+    if (!isExactResolvedOneRead(session)) return 'invalid_sequence';
+    if (session.post_terminal_attempt_count > 0) return 'post_terminal_retry_attempted';
+    return session.expected_read_tool && session.tool_sequence[1] !== session.expected_read_tool
+      ? 'unexpected_read_tool'
+      : 'resolve_then_one_read';
   }
 
   function snapshot(activationSnapshot) {
@@ -299,15 +395,51 @@ function createPrivateDogfoodObserver({
     const resolveThenRead = sessions.filter(session =>
       session.tool_sequence[0] === 'resolve_memory_context' &&
       READ_TOOL_NAMES.includes(session.tool_sequence[1])).length;
+    const relevantSessions = sessions.filter(session => session.task_class === 'memory_relevant');
+    const negativeSessions = sessions.filter(session =>
+      ['memory_irrelevant', 'scope_missing'].includes(session.task_class));
+    const readToolSelectionCounts = Object.fromEntries(READ_TOOL_NAMES.map(toolName => [
+      toolName,
+      sessions.filter(session => session.tool_sequence.includes(toolName)).length
+    ]));
     return Object.freeze({
-      schema_version: 1,
+      schema_version: DOGFOOD_OBSERVATION_SCHEMA_VERSION,
       observation_kind: DOGFOOD_OBSERVATION_KIND,
       sessions_started: sessions.length,
       session_limit: maxSessions,
+      memory_relevant_sessions: relevantSessions.length,
+      memory_irrelevant_sessions: sessions.filter(session =>
+        session.task_class === 'memory_irrelevant').length,
+      scope_missing_sessions: sessions.filter(session =>
+        session.task_class === 'scope_missing').length,
+      unclassified_sessions: sessions.filter(session =>
+        session.task_class === 'unclassified').length,
       sessions_with_any_memory_tool: sessionsWithAnyTool,
       sessions_with_resolve: sessionsWithResolve,
       sessions_with_read: sessionsWithRead,
       resolve_then_read_sessions: resolveThenRead,
+      exact_first_resolution_successes: relevantSessions.filter(session =>
+        session.tool_sequence[0] === 'resolve_memory_context' &&
+        session.resolve_attempt_count === 1 &&
+        session.first_resolve_status === 'resolved').length,
+      expected_read_tool_matches: relevantSessions.filter(expectedReadMatched).length,
+      terminal_stop_sessions: relevantSessions.filter(session =>
+        expectedReadMatched(session) && session.status === 'consumed' &&
+        session.post_terminal_attempt_count === 0).length,
+      post_terminal_retry_sessions: sessions.filter(session =>
+        session.post_terminal_attempt_count > 0).length,
+      post_terminal_tool_attempts: sessions.reduce((total, session) =>
+        total + session.post_terminal_attempt_count, 0),
+      resolve_retry_sessions: sessions.filter(session =>
+        session.resolve_attempt_count > 1).length,
+      wrong_first_tool_sessions: sessions.filter(session =>
+        session.tool_sequence.length > 0 &&
+        session.tool_sequence[0] !== 'resolve_memory_context').length,
+      negative_abstention_sessions: negativeSessions.filter(session =>
+        session.status !== 'active' && session.tool_sequence.length === 0).length,
+      unexpected_negative_memory_selection_sessions: negativeSessions.filter(session =>
+        session.tool_sequence.length > 0).length,
+      read_tool_selection_counts: Object.freeze(readToolSelectionCounts),
       timeout_count: sessions.filter(session => session.timed_out).length,
       emergency_stop_latched: emergencyStopLatched,
       provider_calls: counters.provider_calls,
@@ -354,8 +486,12 @@ function createPrivateDogfoodObserver({
 
 module.exports = {
   DOGFOOD_OBSERVATION_KIND,
+  DOGFOOD_OBSERVATION_SCHEMA_VERSION,
+  DOGFOOD_TASK_CLASSES,
   MAX_DOGFOOD_PROVIDER_CALLS,
+  MAX_DOGFOOD_POST_TERMINAL_ATTEMPTS_PER_SESSION,
   MAX_DOGFOOD_SESSIONS,
   MAX_DOGFOOD_TOOL_EVENTS_PER_SESSION,
+  READ_TOOL_NAMES,
   createPrivateDogfoodObserver
 };

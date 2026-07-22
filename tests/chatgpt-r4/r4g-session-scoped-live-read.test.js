@@ -1083,6 +1083,56 @@ test('R5-A observer records only bounded low-disclosure session outcomes', async
   });
 });
 
+test('R5-H records a model retry after the one-read lease is consumed without another provider call', async () => {
+  const observer = createPrivateDogfoodObserver();
+  const fixture = createRuntimeFixture({ dogfoodObserver: observer });
+  fixture.controller.activate({
+    requestId: 'op_r5h_post_terminal_activation_001',
+    requestedVisibility: 'project',
+    ttlSeconds: 300,
+    now: NOW
+  });
+  observer.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    taskClass: 'memory_relevant',
+    expectedReadTool: 'search_memory',
+    activationSnapshot: fixture.controller.snapshot(NOW)
+  });
+  const resolveRequest = requestFixture(
+    fixture.edge,
+    fixture.principal,
+    'resolve_memory_context',
+    { project_alias: 'project-alpha', requested_visibility: 'project' },
+    140
+  );
+  const resolved = await fixture.runtime.handle({
+    request: resolveRequest,
+    relayReceipt: relayReceipt(resolveRequest)
+  });
+  const searchRequest = requestFixture(fixture.edge, fixture.principal, 'search_memory', {
+    project_context_ref: resolved.structured_content.project_context_ref,
+    query: 'bounded project signal',
+    limit: 1
+  }, 141);
+  await fixture.runtime.handle({
+    request: searchRequest,
+    relayReceipt: relayReceipt(searchRequest)
+  });
+  const countersAfterRead = fixture.runtime.snapshot().counters;
+  const retryRequest = requestFixture(fixture.edge, fixture.principal, 'memory_overview', {
+    project_context_ref: resolved.structured_content.project_context_ref
+  }, 142);
+  const retry = await fixture.runtime.handle({
+    request: retryRequest,
+    relayReceipt: relayReceipt(retryRequest)
+  });
+  assert.equal(retry.status, 'unavailable');
+  assert.deepEqual(fixture.runtime.snapshot().counters, countersAfterRead);
+  assert.equal(observer.snapshot().post_terminal_retry_sessions, 1);
+  assert.equal(observer.snapshot().post_terminal_tool_attempts, 1);
+  assert.equal(observer.snapshot().last_session.workflow_outcome, 'post_terminal_retry_attempted');
+});
+
 test('R5-A control protocol is operator-only, versioned, and capped at twenty sessions', t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r5a-control-'));
   fs.chmodSync(root, 0o700);

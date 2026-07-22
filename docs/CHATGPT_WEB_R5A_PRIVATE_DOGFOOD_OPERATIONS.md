@@ -34,6 +34,13 @@ node ./src/cli/chatgpt-r5-private-dogfood.js activate --visibility project --ttl
 node ./src/cli/chatgpt-r5-private-dogfood.js kill --reason operator_requested --json
 ```
 
+R5-H retains these operations and adds optional owner-only task classification
+to `activate`. Classified activations use control schema 3 and require an exact
+expected read tool only for `memory_relevant` tasks. Unclassified schema-2
+activation remains available for backward-compatible R5-A diagnostics, but it
+does not count as an R5-H session. See
+[R5-H Private ChatGPT Dogfood Window](CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_WINDOW.md).
+
 `activate` declares one `meaningful_task_unprompted` observation. It is meant
 to be issued immediately before a meaningful ChatGPT task that does not name or
 request a memory tool. That constraint makes the observed tool-selection rate

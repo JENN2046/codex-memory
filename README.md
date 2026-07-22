@@ -40,6 +40,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics](docs/CHATGPT_WEB_R5E_VECTOR_RETRIEVAL_FAIL_CLOSED_DIAGNOSTICS.md)
 - [ChatGPT Web R5-F Exact-Head Vector Retrieval Live Proof](docs/CHATGPT_WEB_R5F_EXACT_HEAD_VECTOR_RETRIEVAL_LIVE_PROOF.md)
 - [ChatGPT Web R5-G Bounded Retrieval Reliability Window](docs/CHATGPT_WEB_R5G_BOUNDED_RETRIEVAL_RELIABILITY_WINDOW.md)
+- [ChatGPT Web R5-H Private ChatGPT Dogfood Window](docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_WINDOW.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
@@ -47,15 +48,14 @@ Long-term goal and boundary documents:
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-R5-G completed five exact-head project-scoped retrieval sessions with five
-non-empty results, minimum relevance `0.5`, no timeout, no primary-memory or
-source-partition mutation, and no unrestricted native search. Inactive,
-consumed-replay, expiry, and restart-inactive paths failed closed. Six isolated
-derived-runtime lifecycle events completed and drained with zero failures.
-The owner-only proof records a disclosed harness recovery without repeating any
-provider call. Governance, Relay, and the isolated shim are stopped; the Edge
-remains zero-memory. See
-`docs/CHATGPT_WEB_R5G_BOUNDED_RETRIEVAL_RELIABILITY_WINDOW.md`.
+R5-H source now provides a default-closed, owner-only observation window for
+measuring whether private ChatGPT selects `resolve_memory_context`, chooses one
+appropriate read tool, and stops after the terminal result. It distinguishes
+memory-relevant, memory-irrelevant, and scope-missing tasks and truthfully
+counts post-consumption attempts without authorizing another read. The public
+six-tool MCP contract is unchanged. Runtime dogfood has not run; no service,
+provider, or memory action occurred and the Edge remains zero-memory. See
+`docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_WINDOW.md`.
 
 ChatGPT Web R4 is closed out with verdict
 `R4_COMPLETE_PRIVATE_DEVELOPMENT_NOT_READY`. The private single-operator route
