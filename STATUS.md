@@ -4,13 +4,31 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance And Safe-Empty Closeout`.
-Current validation: `CMV-2229`.
-Current fact: isolated derived-runtime lifecycle accounting, false-zero rejection, selected-diary hydration, and final drain passed with six completed events and zero prohibited mutation.
-The bounded read safely returned zero results, so non-empty recall and relevance failed; budgets were exhausted, no retry occurred, all local runtime components are stopped, and the Edge remains zero-memory.
+Current task: `CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics`.
+Current validation: `CMV-2230`.
+Current fact: selected-diary query-vector, index-recovery, vector-search, ghost-candidate, and low-disclosure receipt diagnostics are implemented and pass the offline negative matrix.
+No runtime/provider/memory action was performed; the R5-D safe-empty result remains unresolved and the Edge remains zero-memory pending a separately authorized live retry.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics
+
+R5-E stops treating every native empty array as equivalent evidence. Before a
+selected-diary result can be accepted, the shim validates the query vector,
+loads and inspects exactly the authorized indexes, observes whether Vexus
+search actually ran and succeeded, rejects ghost candidates, and binds only
+safe counts and an `empty_index | empty | found` outcome through the receipt
+chain. Missing or contradictory R5-E evidence fails closed in the governed R4
+runtime.
+
+The offline matrix covers malformed/mismatched/non-finite/zero vectors,
+recovery failures, false zero-vector recovery, swallowed search exceptions,
+search bypass, ghost candidates, forged receipts, and valid empty/found paths.
+No VCP core, public MCP tool, or input schema changed. No service, provider,
+real-memory read/write, or derived mutation ran; the retained Edge stays
+`zero_memory`. Final source verdict:
+`R5_E_SOURCE_VALIDATED_RUNTIME_NOT_RUN`.
 
 ## CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance
 

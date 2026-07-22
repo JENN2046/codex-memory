@@ -4,24 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance And Safe-Empty Closeout`.
-Current validation: `CMV-2229`.
-Current fact: isolated derived-runtime accounting and shutdown drain passed with six completed events and zero primary/source/global mutation.
-The bounded read safely returned zero results; non-empty recall and relevance failed, budgets are exhausted, local runtimes are stopped, and Edge remains zero-memory.
+Current task: `CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics`.
+Current validation: `CMV-2230`.
+Current fact: fail-closed selected-diary vector retrieval diagnostics and their low-disclosure receipt chain pass the offline negative matrix.
+No live retry ran; R5-D remains safe-empty, local runtimes are stopped, and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R5-D permits bounded derived maintenance only in the isolated selected-diary runtime store; primary memory and source partitions remain immutable.
-- Accounting: lifecycle receipts cover startup, hydration, cache, vector/tag, and matrix work; interim false-zero claims fail closed and shutdown drains background work.
-- Final attempt: one provider call and one native invocation completed; six derived events completed, none failed, and primary/source/global effects remained zero.
-- Recall verdict: the bounded read safely returned zero results, so non-empty recall and relevance failed.
-- Budget: all eight provider/embedding and twelve authenticated-read calls authorized for R5-D are consumed; no retry remains authorized.
+- Architecture: R5-E instruments only the governed selected-diary shim path; VCP core and the public MCP surface remain unchanged.
+- Diagnostics: query-vector validity, selected-index recovery/vector counts, search execution/success, candidates, ghosts, and valid empty/found outcomes are receipt-bound.
+- Failure policy: invalid vector, index recovery, swallowed search failure, search bypass, ghost, and forged receipt paths fail closed with safe categories.
+- Runtime verdict: source/offline validation only; no live non-empty or relevance proof is claimed.
+- Budget: no provider or authenticated memory-read call was made; a future retry requires a separate exact budget.
 - Host route: Governance, Relay, and the loopback shim are stopped; private-development Edge remains on the retained `zero_memory` binding.
 - Evidence: owner-only non-Git R5-D failure artifact is immutable; the old R5-C artifact is preserved unchanged.
-- Status sync: CM-2144/CMV-2229 record the safe-empty failure and zero-memory rollback; PR CI/review remain delivery gates.
+- Status sync: CM-2145/CMV-2230 record R5-E source/offline diagnostics without overwriting the R5-D runtime failure.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -51,11 +51,10 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Preserve the zero-memory default and owner-only artifacts. Diagnose the empty
-VCP vector-retrieval result offline or with source/test doubles first. Any new
-provider-bound or authenticated live-read retry requires a separate exact
-budget. Production, release, deploy, cutover, readiness, public-write, and
-broader live-memory routes remain closed.
+Complete R5-E PR CI/review while preserving the zero-memory default and
+owner-only artifacts. After merge, any bounded live diagnostic retry still
+requires a separate exact provider/read budget. Production, release, deploy,
+cutover, readiness, public-write, and broader live-memory routes remain closed.
 
 ## Historical Run Notes
 

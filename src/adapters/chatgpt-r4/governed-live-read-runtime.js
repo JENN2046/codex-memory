@@ -234,6 +234,26 @@ function buildRequestContext({ trustedScope, visibility, projectContextRef, nati
   };
 }
 
+function emptyIndexSearchEvidenceComplete(runtime) {
+  return (runtime.indexSearchCalled === false &&
+    runtime.indexSearchSucceeded === false) ||
+    (runtime.indexSearchCalled === true &&
+      runtime.indexSearchSucceeded === true);
+}
+
+function emptyIndexDelegatedResultEvidenceComplete(result) {
+  const evidence = [];
+  if (Array.isArray(result?.results)) evidence.push(result.results.length === 0);
+  if (Array.isArray(result?.items)) evidence.push(result.items.length === 0);
+  if (isPlainObject(result?.overview)) {
+    evidence.push(result.overview.resultCountBucket === 'zero');
+  }
+  if (isPlainObject(result?.audit)) {
+    evidence.push(result.audit.sampledReadResultCountBucket === 'zero');
+  }
+  return evidence.length === 1 && evidence[0] === true;
+}
+
 function nativeEvidence(result, expectedAllowedDiaryCount) {
   const receipt = result?.receipt;
   const invocation = receipt?.nativeInvocationReceipt;
@@ -308,6 +328,37 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       runtime.mappingDigestBound !== true ||
       runtime.allowedDiaryCount !== expectedAllowedDiaryCount ||
       runtime.rawDiaryNamesReturned !== false ||
+      runtime.vectorRetrievalDiagnosticsMode !== 'fail_closed_v1' ||
+      !Number.isSafeInteger(runtime.hydratedChunkCount) ||
+      runtime.hydratedChunkCount < 0 ||
+      !Number.isSafeInteger(runtime.loadedIndexVectorCount) ||
+      runtime.loadedIndexVectorCount < 0 ||
+      runtime.queryVectorShapeValid !== true ||
+      runtime.queryVectorExpectedDimensionKnown !== true ||
+      runtime.queryVectorDimensionMatched !== true ||
+      runtime.queryVectorFinite !== true ||
+      runtime.queryVectorNonzero !== true ||
+      !Number.isSafeInteger(runtime.rawCandidateCount) ||
+      runtime.rawCandidateCount < 0 ||
+      runtime.ghostCandidateCount !== 0 ||
+      !['empty_index', 'empty', 'found'].includes(runtime.vectorRetrievalOutcome) ||
+      runtime.vectorRetrievalRawDetailsDisclosed !== false ||
+      (runtime.loadedIndexVectorCount > 0 && (
+        runtime.indexSearchCalled !== true ||
+        runtime.indexSearchSucceeded !== true ||
+        !['empty', 'found'].includes(runtime.vectorRetrievalOutcome)
+      )) ||
+      (runtime.loadedIndexVectorCount === 0 &&
+        runtime.vectorRetrievalOutcome !== 'empty_index') ||
+      (runtime.vectorRetrievalOutcome === 'empty_index' && (
+        runtime.hydratedChunkCount !== 0 ||
+        runtime.loadedIndexVectorCount !== 0 ||
+        !emptyIndexSearchEvidenceComplete(runtime) ||
+        runtime.rawCandidateCount !== 0 ||
+        !emptyIndexDelegatedResultEvidenceComplete(result)
+      )) ||
+      (runtime.vectorRetrievalOutcome === 'found' &&
+        runtime.rawCandidateCount < 1) ||
       runtime.rawRuntimeOutputDisclosed !== false ||
       runtime.rawMemoryContentDisclosed !== false ||
       runtime.runtimeLocatorDisclosed !== false ||

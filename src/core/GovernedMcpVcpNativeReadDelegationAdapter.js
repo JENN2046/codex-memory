@@ -109,6 +109,16 @@ const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'diary_scope_mapping_missing',
   'native_mutation_tool_unavailable',
   'native_provider_embedding_failed',
+  'native_query_vector_invalid_shape',
+  'native_query_vector_dimension_unavailable',
+  'native_query_vector_dimension_mismatch',
+  'native_query_vector_non_finite',
+  'native_query_vector_zero_norm',
+  'native_selected_diary_index_recovery_failed',
+  'native_selected_diary_index_empty_after_hydration',
+  'native_vector_search_not_executed',
+  'native_vector_search_failed',
+  'native_vector_search_ghost_result',
   'native_runtime_initialization_failed',
   'native_runtime_call_failed',
   'native_diary_search_failed',
@@ -128,6 +138,9 @@ const ALLOWED_FAILURE_CATEGORIES = Object.freeze([
   'scope_authorization_rejected',
   'scope_binding_rejected',
   'provider_embedding_failed',
+  'invalid_query_vector',
+  'index_recovery_failed',
+  'vector_search_failed',
   'native_runtime_initialization_failed',
   'native_scoped_search_failed',
   'result_scope_postcheck_failed',
@@ -141,13 +154,26 @@ const LOCAL_FALLBACK_FORBIDDEN_NATIVE_REASON_CODES = Object.freeze(new Set([
   'native_tool_public_binding_mismatch',
   'native_write_disabled',
   'unsupported_native_tool',
-  'native_result_scope_postcheck_failed'
+  'native_result_scope_postcheck_failed',
+  'native_query_vector_invalid_shape',
+  'native_query_vector_dimension_unavailable',
+  'native_query_vector_dimension_mismatch',
+  'native_query_vector_non_finite',
+  'native_query_vector_zero_norm',
+  'native_selected_diary_index_recovery_failed',
+  'native_selected_diary_index_empty_after_hydration',
+  'native_vector_search_not_executed',
+  'native_vector_search_failed',
+  'native_vector_search_ghost_result'
 ]));
 const LOCAL_FALLBACK_FORBIDDEN_FAILURE_CATEGORIES = Object.freeze(new Set([
   'governance_rejected',
   'scope_authorization_rejected',
   'scope_binding_rejected',
-  'result_scope_postcheck_failed'
+  'result_scope_postcheck_failed',
+  'invalid_query_vector',
+  'index_recovery_failed',
+  'vector_search_failed'
 ]));
 const SCOPE_IDENTIFIER_FIELDS = Object.freeze([
   'project_id',
@@ -695,6 +721,43 @@ function lowDisclosureNativeInvocationReceipt(value, expected = {}) {
             ['project_shared', 'workspace_shared'].includes(value)
           )
         : [],
+      ...(Object.hasOwn(nativeRuntimeReceipt, 'vectorRetrievalDiagnosticsMode') ? {
+        vectorRetrievalDiagnosticsMode: safeEnum(
+          nativeRuntimeReceipt.vectorRetrievalDiagnosticsMode,
+          ['fail_closed_v1', 'not_applicable']
+        ),
+        hydratedChunkCount: Number.isSafeInteger(nativeRuntimeReceipt.hydratedChunkCount) &&
+          nativeRuntimeReceipt.hydratedChunkCount >= 0
+          ? nativeRuntimeReceipt.hydratedChunkCount
+          : 0,
+        loadedIndexVectorCount:
+          Number.isSafeInteger(nativeRuntimeReceipt.loadedIndexVectorCount) &&
+          nativeRuntimeReceipt.loadedIndexVectorCount >= 0
+            ? nativeRuntimeReceipt.loadedIndexVectorCount
+            : 0,
+        queryVectorShapeValid: nativeRuntimeReceipt.queryVectorShapeValid === true,
+        queryVectorExpectedDimensionKnown:
+          nativeRuntimeReceipt.queryVectorExpectedDimensionKnown === true,
+        queryVectorDimensionMatched:
+          nativeRuntimeReceipt.queryVectorDimensionMatched === true,
+        queryVectorFinite: nativeRuntimeReceipt.queryVectorFinite === true,
+        queryVectorNonzero: nativeRuntimeReceipt.queryVectorNonzero === true,
+        indexSearchCalled: nativeRuntimeReceipt.indexSearchCalled === true,
+        indexSearchSucceeded: nativeRuntimeReceipt.indexSearchSucceeded === true,
+        rawCandidateCount: Number.isSafeInteger(nativeRuntimeReceipt.rawCandidateCount) &&
+          nativeRuntimeReceipt.rawCandidateCount >= 0
+          ? nativeRuntimeReceipt.rawCandidateCount
+          : 0,
+        ghostCandidateCount: Number.isSafeInteger(nativeRuntimeReceipt.ghostCandidateCount) &&
+          nativeRuntimeReceipt.ghostCandidateCount >= 0
+          ? nativeRuntimeReceipt.ghostCandidateCount
+          : 0,
+        vectorRetrievalOutcome: safeEnum(
+          nativeRuntimeReceipt.vectorRetrievalOutcome,
+          ['not_attempted', 'empty_index', 'empty', 'found']
+        ),
+        vectorRetrievalRawDetailsDisclosed: false
+      } : {}),
       rawRuntimeOutputDisclosed: nativeRuntimeReceipt.rawRuntimeOutputDisclosed === true,
       rawMemoryContentDisclosed: nativeRuntimeReceipt.rawMemoryContentDisclosed === true,
       runtimeLocatorDisclosed: nativeRuntimeReceipt.runtimeLocatorDisclosed === true,
@@ -1224,6 +1287,30 @@ function projectNativeSearchResults(nativeValue, maxItems = 5) {
   });
 }
 
+function projectNativeResultCountEvidence(toolName, nativeValue) {
+  if (toolName === 'memory_overview') {
+    return {
+      overview: {
+        resultCountBucket: safeEnum(
+          nativeValue?.overview?.resultCountBucket,
+          ['zero', 'bounded', 'over_budget']
+        )
+      }
+    };
+  }
+  if (toolName === 'audit_memory') {
+    return {
+      audit: {
+        sampledReadResultCountBucket: safeEnum(
+          nativeValue?.audit?.sampledReadResultCountBucket,
+          ['zero', 'bounded', 'over_budget']
+        )
+      }
+    };
+  }
+  return {};
+}
+
 function buildReceipt({ toolName, targetReferenceName, gateResult, statusClass, nativeValue, nativeInvocationReceipt }) {
   const request = gateResult.normalizedBridgeRequest;
   const attempted = statusClass !== 'not_consumed';
@@ -1487,7 +1574,7 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
           nativeValue,
           disclosureMaxItemsFromGate(gateResult)
         )
-      } : {}),
+      } : projectNativeResultCountEvidence(toolName, nativeValue)),
       access: buildAccess({
         statusClass: 'success',
         fallbackEligible: false,

@@ -481,6 +481,9 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
   let forbiddenBoundaryReceipt = false;
   let invalidFinalZeroReceipt = false;
   let nonIsolatedLifecycleReceipt = false;
+  let validVectorRetrievalReceipt = false;
+  let falseVectorRetrievalReceipt = false;
+  let probedEmptyIndexReceipt = false;
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
     const nativeRuntimeReceipt = {
@@ -526,6 +529,20 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
       scopeIdFingerprintBound: true,
       scopeIdAffectsDiaryAcl: false,
       scopeIdEnforcementClaimed: false,
+      vectorRetrievalDiagnosticsMode: 'not_applicable',
+      hydratedChunkCount: 0,
+      loadedIndexVectorCount: 0,
+      queryVectorShapeValid: false,
+      queryVectorExpectedDimensionKnown: false,
+      queryVectorDimensionMatched: false,
+      queryVectorFinite: false,
+      queryVectorNonzero: false,
+      indexSearchCalled: false,
+      indexSearchSucceeded: false,
+      rawCandidateCount: 0,
+      ghostCandidateCount: 0,
+      vectorRetrievalOutcome: 'not_attempted',
+      vectorRetrievalRawDetailsDisclosed: false,
       rawRuntimeOutputDisclosed: false,
       rawMemoryContentDisclosed: false,
       runtimeLocatorDisclosed: false,
@@ -571,13 +588,57 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
       nativeRuntimeReceipt.derivedRuntimeMutationAccountingMode = 'lifecycle_event_v1';
       nativeRuntimeReceipt.derivedRuntimeMutationAuthorized = true;
     }
+    if (validVectorRetrievalReceipt || falseVectorRetrievalReceipt) {
+      Object.assign(nativeRuntimeReceipt, {
+        vectorRetrievalDiagnosticsMode: 'fail_closed_v1',
+        hydratedChunkCount: 1,
+        loadedIndexVectorCount: 1,
+        queryVectorShapeValid: true,
+        queryVectorExpectedDimensionKnown: true,
+        queryVectorDimensionMatched: true,
+        queryVectorFinite: true,
+        queryVectorNonzero: true,
+        indexSearchCalled: validVectorRetrievalReceipt,
+        indexSearchSucceeded: validVectorRetrievalReceipt,
+        rawCandidateCount: validVectorRetrievalReceipt ? 1 : 0,
+        ghostCandidateCount: 0,
+        vectorRetrievalOutcome: validVectorRetrievalReceipt ? 'found' : 'empty',
+        vectorRetrievalRawDetailsDisclosed: false
+      });
+    }
+    if (probedEmptyIndexReceipt) {
+      Object.assign(nativeRuntimeReceipt, {
+        vectorRetrievalDiagnosticsMode: 'fail_closed_v1',
+        hydratedChunkCount: 0,
+        loadedIndexVectorCount: 0,
+        queryVectorShapeValid: true,
+        queryVectorExpectedDimensionKnown: true,
+        queryVectorDimensionMatched: true,
+        queryVectorFinite: true,
+        queryVectorNonzero: true,
+        indexSearchCalled: true,
+        indexSearchSucceeded: probedEmptyIndexReceipt === 'valid',
+        rawCandidateCount: 0,
+        ghostCandidateCount: 0,
+        vectorRetrievalOutcome: probedEmptyIndexReceipt === 'misclassified'
+          ? 'empty'
+          : 'empty_index',
+        vectorRetrievalRawDetailsDisclosed: false
+      });
+    }
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({
       jsonrpc: '2.0',
       id: body.id,
       result: {
         structuredContent: {
-          results: [{ content: rawPrivateValue }]
+          results: probedEmptyIndexReceipt &&
+              !['contradictory', 'misclassified'].includes(probedEmptyIndexReceipt)
+            ? []
+            : [{ content: rawPrivateValue }],
+          ...(probedEmptyIndexReceipt === 'mixed'
+            ? { items: [{ content: rawPrivateValue }] }
+            : {})
         },
         _meta: {
           codexMemoryNativeRuntimeReceipt: nativeRuntimeReceipt
@@ -614,6 +675,9 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
     assert.equal(runtimeReceipt.derivedRuntimeMutationPolicy, 'disabled');
     assert.equal(runtimeReceipt.derivedRuntimeMutationCumulativeCount, 0);
     assert.equal(runtimeReceipt.derivedRuntimeMutationZeroClaimed, false);
+    assert.equal(runtimeReceipt.vectorRetrievalDiagnosticsMode, 'not_applicable');
+    assert.equal(runtimeReceipt.vectorRetrievalOutcome, 'not_attempted');
+    assert.equal(runtimeReceipt.vectorRetrievalRawDetailsDisclosed, false);
     assert.equal(runtimeReceipt.rawRuntimeOutputDisclosed, false);
     assert.equal(runtimeReceipt.rawMemoryContentDisclosed, false);
     assert.equal(runtimeReceipt.runtimeLocatorDisclosed, false);
@@ -621,6 +685,86 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
     assert.equal(runtimeReceipt.readinessClaimed, false);
     assert.equal(serializedReceipt.includes(rawPrivateValue), false);
     assert.equal(serializedReceipt.includes(server.url), false);
+
+    validVectorRetrievalReceipt = true;
+    const retrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(retrieval.receipt.nativeRuntimeReceipt.present, true);
+    assert.equal(
+      retrieval.receipt.nativeRuntimeReceipt.vectorRetrievalDiagnosticsMode,
+      'fail_closed_v1'
+    );
+    assert.equal(retrieval.receipt.nativeRuntimeReceipt.loadedIndexVectorCount, 1);
+    assert.equal(retrieval.receipt.nativeRuntimeReceipt.indexSearchSucceeded, true);
+    assert.equal(retrieval.receipt.nativeRuntimeReceipt.rawCandidateCount, 1);
+    validVectorRetrievalReceipt = false;
+
+    probedEmptyIndexReceipt = 'valid';
+    const emptyIndexRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'empty index', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(emptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, true);
+    assert.equal(
+      emptyIndexRetrieval.receipt.nativeRuntimeReceipt.vectorRetrievalOutcome,
+      'empty_index'
+    );
+    assert.equal(emptyIndexRetrieval.receipt.nativeRuntimeReceipt.indexSearchCalled, true);
+    assert.equal(emptyIndexRetrieval.receipt.nativeRuntimeReceipt.indexSearchSucceeded, true);
+    assert.equal(emptyIndexRetrieval.receipt.nativeRuntimeReceipt.rawCandidateCount, 0);
+
+    probedEmptyIndexReceipt = 'mismatch';
+    const mismatchedEmptyIndexRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'mismatched empty index', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(mismatchedEmptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, false);
+
+    probedEmptyIndexReceipt = 'contradictory';
+    const contradictoryEmptyIndexRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'contradictory empty index', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(contradictoryEmptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, false);
+
+    probedEmptyIndexReceipt = 'misclassified';
+    const misclassifiedEmptyIndexRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'misclassified empty index', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(misclassifiedEmptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, false);
+
+    probedEmptyIndexReceipt = 'mixed';
+    const mixedEmptyIndexRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'mixed empty index evidence', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(mixedEmptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, false);
+    probedEmptyIndexReceipt = false;
+
+    falseVectorRetrievalReceipt = true;
+    const falseRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'needle', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(falseRetrieval.receipt.nativeRuntimeReceipt.present, false);
+    falseVectorRetrievalReceipt = false;
 
     omitProviderEvidence = true;
     const incomplete = await result.callToolWithReceipt({
@@ -1099,6 +1243,61 @@ test('HTTP MCP tool caller classifies provider embedding failure without raw err
         return true;
       }
     );
+  } finally {
+    await server.close();
+  }
+});
+
+test('HTTP MCP tool caller preserves R5-E fail-closed reasons as low-disclosure categories', async () => {
+  let activeReasonCode = null;
+  const server = await withJsonRpcServer(async (req, res, body) => {
+    res.writeHead(200, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({
+      jsonrpc: '2.0',
+      id: body.id,
+      error: {
+        code: -32000,
+        message: 'RAW_VECTOR_DETAIL_SHOULD_NOT_ECHO',
+        data: { reasonCode: activeReasonCode }
+      }
+    }));
+  });
+
+  try {
+    const result = createGovernedMcpVcpNativeHttpMcpToolCaller({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      endpoint: server.url,
+      requestTimeoutMs: 1000
+    });
+    for (const [reasonCode, failureCategory] of [
+      ['native_query_vector_invalid_shape', 'invalid_query_vector'],
+      ['native_query_vector_dimension_unavailable', 'invalid_query_vector'],
+      ['native_query_vector_dimension_mismatch', 'invalid_query_vector'],
+      ['native_query_vector_non_finite', 'invalid_query_vector'],
+      ['native_query_vector_zero_norm', 'invalid_query_vector'],
+      ['native_selected_diary_index_recovery_failed', 'index_recovery_failed'],
+      ['native_selected_diary_index_empty_after_hydration', 'index_recovery_failed'],
+      ['native_vector_search_not_executed', 'vector_search_failed'],
+      ['native_vector_search_failed', 'vector_search_failed'],
+      ['native_vector_search_ghost_result', 'vector_search_failed']
+    ]) {
+      activeReasonCode = reasonCode;
+      await assert.rejects(
+        () => result.callToolWithReceipt({
+          targetReferenceName: 'operator-vcp-toolbox-service-ref',
+          toolName: 'search_memory',
+          arguments: {},
+          governanceMeta: validReadGovernanceMeta()
+        }),
+        error => {
+          const serialized = JSON.stringify(error.lowDisclosureReceipt);
+          assert.equal(error.lowDisclosureReceipt.jsonRpcErrorReasonCode, reasonCode);
+          assert.equal(error.lowDisclosureReceipt.failureCategory, failureCategory);
+          assert.equal(serialized.includes('RAW_VECTOR_DETAIL_SHOULD_NOT_ECHO'), false);
+          return true;
+        }
+      );
+    }
   } finally {
     await server.close();
   }

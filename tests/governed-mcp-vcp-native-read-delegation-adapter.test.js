@@ -667,6 +667,32 @@ test('delegates governed read to native MCP caller and returns only low-disclosu
   ]);
   assert.equal(serialized.includes('RAW_MEMORY_ID_SHOULD_NOT_ECHO'), false);
   assert.equal(serialized.includes('RAW_PRIVATE_CONTENT_SHOULD_NOT_ECHO'), false);
+
+  for (const [toolName, nativeValue, projectedEvidence] of [
+    [
+      'memory_overview',
+      { overview: { resultCountBucket: 'zero' } },
+      { overview: { resultCountBucket: 'zero' } }
+    ],
+    [
+      'audit_memory',
+      { audit: { sampledReadResultCountBucket: 'zero' } },
+      { audit: { sampledReadResultCountBucket: 'zero' } }
+    ]
+  ]) {
+    const evidenceResult = await executeGovernedMcpVcpNativeReadDelegation({
+      toolName,
+      args: {},
+      gateResult: gateResult(toolName),
+      callMcpTool: receiptAwareCallMcpTool(async () => nativeValue)
+    });
+    assert.equal(evidenceResult.accepted, true, toolName);
+    assert.deepEqual(
+      evidenceResult.delegatedResult[toolName === 'memory_overview' ? 'overview' : 'audit'],
+      projectedEvidence[toolName === 'memory_overview' ? 'overview' : 'audit'],
+      toolName
+    );
+  }
 });
 
 test('read delegation requires native caller receipt capability before native call', async () => {
@@ -1293,12 +1319,15 @@ test('native read error statusClass is whitelisted before reasonCode projection'
   assert.equal(serialized.includes('PRIVATE_NATIVE_ERROR_MESSAGE_SHOULD_NOT_ECHO'), false);
 });
 
-test('governance failure categories are never eligible for local fallback without reason codes', async () => {
+test('governance and R5-E fail-closed categories are never eligible for local fallback', async () => {
   for (const failureCategory of [
     'governance_rejected',
     'scope_authorization_rejected',
     'scope_binding_rejected',
-    'result_scope_postcheck_failed'
+    'result_scope_postcheck_failed',
+    'invalid_query_vector',
+    'index_recovery_failed',
+    'vector_search_failed'
   ]) {
     const result = await executeGovernedMcpVcpNativeReadDelegation({
       toolName: 'search_memory',

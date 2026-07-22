@@ -4,13 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance And Safe-Empty Closeout`.
-Current validation: `CMV-2229`.
-Current fact: isolated derived-runtime accounting and shutdown drain passed with six completed events and zero primary/source/global mutation.
-The bounded read safely returned zero results; non-empty recall and relevance failed, budgets are exhausted, local runtimes are stopped, and Edge remains zero-memory.
+Current task: `CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics`.
+Current validation: `CMV-2230`.
+Current fact: fail-closed selected-diary vector retrieval diagnostics and their low-disclosure receipt chain pass the offline negative matrix.
+No live retry ran; R5-D remains safe-empty, local runtimes are stopped, and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics
+
+Status: `R5_E_SOURCE_VALIDATED_RUNTIME_NOT_RUN`
+
+- Query vectors fail closed on invalid shape, missing/mismatched dimension,
+  non-finite values, and zero norm.
+- Exactly authorized selected-diary indexes are loaded and inspected after
+  hydration; recovery failures and non-empty hydration followed by zero vectors
+  are distinguishable from a legitimate empty index.
+- Selected-index search execution, success, raw candidate count, and ghost
+  removal are instrumented without changing VCPToolBox core.
+- Native, bridge, and Governance receipts bind low-disclosure diagnostic facts;
+  missing or contradictory R5-E evidence is rejected.
+- Negative tests cover recovery/search failures, search bypass, ghost results,
+  false receipt evidence, legitimate empty paths, and found results.
+- No service, provider, real-memory read/write, derived mutation, public MCP
+  expansion, production, release, deploy, cutover, or readiness action ran.
+
+Validation: `CMV-2230`.
 
 ## CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance
 

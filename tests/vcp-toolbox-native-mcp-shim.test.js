@@ -89,14 +89,24 @@ test('isolated runtime hydrates only the authorized diaries after provider and b
     mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
     mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
   };
+  const selectedDiaryIndex = {
+    stats() { return { totalVectors: 1 }; },
+    search() { return [{ id: 1, score: 0.9 }]; }
+  };
   const manager = {
-    config: { fullScanOnStartup: false },
+    config: { fullScanOnStartup: false, dimension: 2 },
+    diaryIndices: new Map(),
     pendingFiles: new Set(),
     pendingDeletes: new Set(),
     async initialize() { calls.push('initialize'); },
+    async _getOrLoadDiaryIndex(diaryName) {
+      this.diaryIndices.set(diaryName, selectedDiaryIndex);
+      return selectedDiaryIndex;
+    },
     async search(diaryNames) {
       calls.push(['search', diaryNames]);
-      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+      selectedDiaryIndex.search([0.1, 0.2], 1);
+      return [{ chunkId: 1, fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
     }
   };
   const adapter = createVcpToolBoxNativeMemoryAdapter({
@@ -136,9 +146,18 @@ test('isolated runtime hydrates only the authorized diaries after provider and b
     ['hydrate', ['SYNTHETIC_CODEX_PRIVATE']],
     ['search', ['SYNTHETIC_CODEX_PRIVATE']]
   ]);
-  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta, 2);
+  assert.equal(result._nativeRuntimeReceipt.derivedRuntimeMutationReceiptDelta, 3);
   assert.deepEqual(result._nativeRuntimeReceipt.derivedRuntimeMutationTriggerCategories,
     ['hydration', 'startup']);
+  assert.equal(result._nativeRuntimeReceipt.vectorRetrievalDiagnosticsMode, 'fail_closed_v1');
+  assert.equal(result._nativeRuntimeReceipt.hydratedChunkCount, 1);
+  assert.equal(result._nativeRuntimeReceipt.loadedIndexVectorCount, 1);
+  assert.equal(result._nativeRuntimeReceipt.queryVectorDimensionMatched, true);
+  assert.equal(result._nativeRuntimeReceipt.indexSearchCalled, true);
+  assert.equal(result._nativeRuntimeReceipt.indexSearchSucceeded, true);
+  assert.equal(result._nativeRuntimeReceipt.rawCandidateCount, 1);
+  assert.equal(result._nativeRuntimeReceipt.ghostCandidateCount, 0);
+  assert.equal(result._nativeRuntimeReceipt.vectorRetrievalOutcome, 'found');
 
   await adapter.search({ query: 'same scope', limit: 1 }, { authorization });
   assert.equal(calls.filter(value => Array.isArray(value) && value[0] === 'hydrate').length, 1);
@@ -159,7 +178,7 @@ test('selected-diary hydrator fails closed on invalid receipts and missing isola
   const adapter = createVcpToolBoxNativeMemoryAdapter({
     knowledgeBaseStorePath: '/isolated/runtime/store',
     knowledgeBaseManager: {
-      config: { fullScanOnStartup: false },
+      config: { fullScanOnStartup: false, dimension: 2 },
       pendingFiles: new Set(),
       pendingDeletes: new Set(),
       async initialize() {},
@@ -209,6 +228,301 @@ test('selected-diary hydrator fails closed on invalid receipts and missing isola
   }), { message: 'selected_diary_runtime_hydrator_isolation_required' });
 });
 
+function selectedDiaryDiagnosticFixture({
+  vector = [0.1, 0.2],
+  dimension = 2,
+  hydratedChunkCount = 1,
+  loadedIndexVectorCount = 1,
+  recoveryFailure = false,
+  indexSearchFailure = false,
+  propagateIndexSearchFailure = false,
+  callIndexSearch = true,
+  searchEmptyIndex = false,
+  rawCandidates = [{ id: 1, score: 0.9 }],
+  ghostCandidate = false,
+  finalResults = [{ chunkId: 1, fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }]
+} = {}) {
+  const calls = { embedding: 0, hydration: 0, indexLoad: 0, indexSearch: 0 };
+  const index = {
+    stats() { return { totalVectors: loadedIndexVectorCount }; },
+    search() {
+      calls.indexSearch += 1;
+      if (indexSearchFailure) throw new Error('RAW_VEXUS_SEARCH_FAILURE');
+      return rawCandidates;
+    },
+    remove() {}
+  };
+  const manager = {
+    config: { fullScanOnStartup: false, ...(dimension === null ? {} : { dimension }) },
+    diaryIndices: new Map(),
+    pendingFiles: new Set(),
+    pendingDeletes: new Set(),
+    async initialize() {},
+    async _getOrLoadDiaryIndex(diaryName) {
+      calls.indexLoad += 1;
+      if (recoveryFailure) throw new Error('RAW_RECOVERY_FAILURE');
+      this.diaryIndices.set(diaryName, index);
+      return index;
+    },
+    async search() {
+      if (!callIndexSearch || (loadedIndexVectorCount === 0 && !searchEmptyIndex)) {
+        return finalResults;
+      }
+      let candidates;
+      try {
+        candidates = index.search(vector, 1);
+      } catch (error) {
+        if (propagateIndexSearchFailure) throw error;
+        return [];
+      }
+      if (ghostCandidate && candidates.length > 0) {
+        index.remove(candidates[0].id);
+        return [];
+      }
+      return finalResults;
+    }
+  };
+  const adapter = createVcpToolBoxNativeMemoryAdapter({
+    knowledgeBaseStorePath: '/isolated/runtime/store',
+    knowledgeBaseManager: manager,
+    embeddingUtils: {
+      async getEmbeddingsBatch() {
+        calls.embedding += 1;
+        return [vector];
+      }
+    },
+    async selectedDiaryRuntimeHydrator() {
+      calls.hydration += 1;
+      return {
+        accepted: true,
+        authorizationResolvedBeforeHydration: true,
+        selectedDiaryOnly: true,
+        sourcePartitionMutationPerformed: false,
+        primaryMemoryWritePerformed: false,
+        unauthorizedSourceRowsRead: false,
+        hydratedDiaryCount: 1,
+        hydratedFileCount: hydratedChunkCount > 0 ? 1 : 0,
+        hydratedChunkCount
+      };
+    }
+  });
+  return { adapter, calls };
+}
+
+const SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION = Object.freeze({
+  accepted: true,
+  allowedDiaryNames: Object.freeze(['SYNTHETIC_CODEX_PRIVATE']),
+  allowedDiaryCount: 1,
+  mappingReference: SYNTHETIC_MAPPING_BINDING.mappingReference,
+  mappingDigest: SYNTHETIC_MAPPING_BINDING.mappingDigest
+});
+
+test('R5-E rejects invalid provider vector shapes before hydration and search', async () => {
+  for (const [name, fixtureOptions, reasonCode] of [
+    ['invalid shape', { vector: { length: 2 } }, 'native_query_vector_invalid_shape'],
+    ['missing expected dimension', { dimension: null }, 'native_query_vector_dimension_unavailable'],
+    ['dimension mismatch', { vector: [0.1] }, 'native_query_vector_dimension_mismatch'],
+    ['NaN', { vector: [Number.NaN, 0.2] }, 'native_query_vector_non_finite'],
+    ['Infinity', { vector: [Number.POSITIVE_INFINITY, 0.2] }, 'native_query_vector_non_finite'],
+    ['zero norm', { vector: [0, -0] }, 'native_query_vector_zero_norm']
+  ]) {
+    const { adapter, calls } = selectedDiaryDiagnosticFixture(fixtureOptions);
+    await assert.rejects(
+      adapter.search({ query: name, limit: 1 }, {
+        authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+      }),
+      error => error.reasonCode === reasonCode,
+      name
+    );
+    assert.equal(calls.embedding, 1, name);
+    assert.equal(calls.hydration, 0, name);
+    assert.equal(calls.indexLoad, 0, name);
+    assert.equal(calls.indexSearch, 0, name);
+  }
+});
+
+test('R5-E rejects recovery failures and zero recovered vectors after non-empty hydration', async () => {
+  for (const [name, fixtureOptions, reasonCode] of [
+    ['recovery failure', { recoveryFailure: true }, 'native_selected_diary_index_recovery_failed'],
+    [
+      'false empty recovery',
+      { loadedIndexVectorCount: 0, finalResults: [] },
+      'native_selected_diary_index_empty_after_hydration'
+    ]
+  ]) {
+    const { adapter, calls } = selectedDiaryDiagnosticFixture(fixtureOptions);
+    await assert.rejects(
+      adapter.search({ query: name, limit: 1 }, {
+        authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+      }),
+      error => error.reasonCode === reasonCode,
+      name
+    );
+    assert.equal(calls.embedding, 1, name);
+    assert.equal(calls.hydration, 1, name);
+    assert.equal(calls.indexSearch, 0, name);
+  }
+});
+
+test('R5-E rejects swallowed Vexus failures, skipped searches, and ghost candidates', async () => {
+  for (const [name, fixtureOptions, reasonCode] of [
+    ['swallowed search failure', { indexSearchFailure: true }, 'native_vector_search_failed'],
+    [
+      'propagated search failure',
+      { indexSearchFailure: true, propagateIndexSearchFailure: true },
+      'native_vector_search_failed'
+    ],
+    ['search not executed', { callIndexSearch: false, finalResults: [] }, 'native_vector_search_not_executed'],
+    ['ghost candidate', { ghostCandidate: true, finalResults: [] }, 'native_vector_search_ghost_result']
+  ]) {
+    const { adapter, calls } = selectedDiaryDiagnosticFixture(fixtureOptions);
+    await assert.rejects(
+      adapter.search({ query: name, limit: 1 }, {
+        authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+      }),
+      error => error.reasonCode === reasonCode,
+      name
+    );
+    assert.equal(calls.embedding, 1, name);
+    assert.equal(calls.hydration, 1, name);
+  }
+});
+
+test('R5-E distinguishes legitimate empty index and empty vector search receipts', async () => {
+  const emptyIndexFixture = selectedDiaryDiagnosticFixture({
+    hydratedChunkCount: 0,
+    loadedIndexVectorCount: 0,
+    finalResults: []
+  });
+  const emptyIndex = await emptyIndexFixture.adapter.search({ query: 'empty index', limit: 1 }, {
+    authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+  });
+  assert.equal(emptyIndex.results.length, 0);
+  assert.equal(emptyIndex._nativeRuntimeReceipt.vectorRetrievalOutcome, 'empty_index');
+  assert.equal(emptyIndex._nativeRuntimeReceipt.indexSearchCalled, false);
+  assert.equal(emptyIndex._nativeRuntimeReceipt.indexSearchSucceeded, false);
+  assert.equal(emptyIndex._nativeRuntimeReceipt.loadedIndexVectorCount, 0);
+  assert.equal(emptyIndex._nativeRuntimeReceipt.rawCandidateCount, 0);
+
+  const probedEmptyIndexFixture = selectedDiaryDiagnosticFixture({
+    hydratedChunkCount: 0,
+    loadedIndexVectorCount: 0,
+    searchEmptyIndex: true,
+    rawCandidates: [],
+    finalResults: []
+  });
+  const probedEmptyIndex = await probedEmptyIndexFixture.adapter.search({
+    query: 'probed empty index',
+    limit: 1
+  }, {
+    authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+  });
+  assert.equal(probedEmptyIndex.results.length, 0);
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.vectorRetrievalOutcome, 'empty_index');
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.indexSearchCalled, true);
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.indexSearchSucceeded, true);
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.loadedIndexVectorCount, 0);
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.rawCandidateCount, 0);
+
+  const emptySearchFixture = selectedDiaryDiagnosticFixture({
+    rawCandidates: [],
+    finalResults: []
+  });
+  const emptySearch = await emptySearchFixture.adapter.search({ query: 'empty search', limit: 1 }, {
+    authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+  });
+  assert.equal(emptySearch.results.length, 0);
+  assert.equal(emptySearch._nativeRuntimeReceipt.vectorRetrievalOutcome, 'empty');
+  assert.equal(emptySearch._nativeRuntimeReceipt.indexSearchCalled, true);
+  assert.equal(emptySearch._nativeRuntimeReceipt.indexSearchSucceeded, true);
+  assert.equal(emptySearch._nativeRuntimeReceipt.loadedIndexVectorCount, 1);
+  assert.equal(emptySearch._nativeRuntimeReceipt.rawCandidateCount, 0);
+  assert.equal(emptySearch._nativeRuntimeReceipt.ghostCandidateCount, 0);
+  assert.equal(emptySearch._nativeRuntimeReceipt.vectorRetrievalRawDetailsDisclosed, false);
+});
+
+test('R5-E rejects results returned from an empty selected index', async () => {
+  const { adapter, calls } = selectedDiaryDiagnosticFixture({
+    hydratedChunkCount: 0,
+    loadedIndexVectorCount: 0,
+    finalResults: [{
+      fullPath: 'SYNTHETIC_CODEX_PRIVATE/stale-cache.md',
+      score: 0.9
+    }]
+  });
+  await assert.rejects(
+    adapter.search({ query: 'empty index stale fallback', limit: 1 }, {
+      authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+    }),
+    error => error.reasonCode === 'native_vector_search_not_executed' &&
+      error.message === 'native_runtime_stage_failed'
+  );
+  assert.equal(calls.embedding, 1);
+  assert.equal(calls.hydration, 1);
+  assert.equal(calls.indexLoad, 1);
+  assert.equal(calls.indexSearch, 0);
+});
+
+test('R5-E rejects final results not backed by selected-index candidates', async () => {
+  for (const [name, rawCandidates, finalResults] of [
+    [
+      'zero candidate stale fallback',
+      [],
+      [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/stale-cache.md', score: 0.9 }]
+    ],
+    [
+      'result count exceeds candidates',
+      [{ id: 1, score: 0.9 }],
+      [
+        { fullPath: 'SYNTHETIC_CODEX_PRIVATE/first.md', score: 0.9 },
+        { fullPath: 'SYNTHETIC_CODEX_PRIVATE/second.md', score: 0.8 }
+      ]
+    ],
+    [
+      'result identity not in candidates',
+      [{ id: 1, score: 0.9 }],
+      [{ chunkId: 2, fullPath: 'SYNTHETIC_CODEX_PRIVATE/stale-cache.md', score: 0.9 }]
+    ]
+  ]) {
+    const { adapter, calls } = selectedDiaryDiagnosticFixture({
+      rawCandidates,
+      finalResults
+    });
+    await assert.rejects(
+      adapter.search({ query: name, limit: 2 }, {
+        authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+      }),
+      error => error.reasonCode === 'native_vector_search_failed' &&
+        error.message === 'native_runtime_stage_failed',
+      name
+    );
+    assert.equal(calls.embedding, 1, name);
+    assert.equal(calls.hydration, 1, name);
+    assert.equal(calls.indexLoad, 1, name);
+    assert.equal(calls.indexSearch, 1, name);
+  }
+});
+
+test('R5-E preserves valid VCP fullPath-only results when candidate counts bind them', async () => {
+  const { adapter, calls } = selectedDiaryDiagnosticFixture({
+    rawCandidates: [{ id: 1, score: 0.9 }],
+    finalResults: [{
+      fullPath: 'SYNTHETIC_CODEX_PRIVATE/compatible-vcp-result.md',
+      score: 0.9
+    }]
+  });
+  const result = await adapter.search({ query: 'fullPath-only compatibility', limit: 1 }, {
+    authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+  });
+  assert.equal(result.results.length, 1);
+  assert.equal(result._nativeRuntimeReceipt.rawCandidateCount, 1);
+  assert.equal(result._nativeRuntimeReceipt.vectorRetrievalOutcome, 'found');
+  assert.equal(calls.embedding, 1);
+  assert.equal(calls.hydration, 1);
+  assert.equal(calls.indexLoad, 1);
+  assert.equal(calls.indexSearch, 1);
+});
+
 test('selected-diary hydration reserves scope before provider and shares the in-flight hydration', async () => {
   let releaseHydration;
   let hydrationStarted;
@@ -217,15 +531,25 @@ test('selected-diary hydration reserves scope before provider and shares the in-
   let embeddingCalls = 0;
   let hydrationCalls = 0;
   let searchCalls = 0;
+  const selectedDiaryIndex = {
+    stats() { return { totalVectors: 1 }; },
+    search() { return [{ id: 1, score: 0.9 }]; }
+  };
   const adapter = createVcpToolBoxNativeMemoryAdapter({
     knowledgeBaseStorePath: '/isolated/runtime/store',
     knowledgeBaseManager: {
-      config: { fullScanOnStartup: false },
+      config: { fullScanOnStartup: false, dimension: 2 },
+      diaryIndices: new Map(),
       pendingFiles: new Set(),
       pendingDeletes: new Set(),
       async initialize() {},
+      async _getOrLoadDiaryIndex(diaryName) {
+        this.diaryIndices.set(diaryName, selectedDiaryIndex);
+        return selectedDiaryIndex;
+      },
       async search() {
         searchCalls += 1;
+        selectedDiaryIndex.search([0.1, 0.2], 1);
         return [];
       }
     },
@@ -284,15 +608,25 @@ test('selected-diary scope becomes sticky only after successful hydration', asyn
   let embeddingCalls = 0;
   let hydrationCalls = 0;
   const searchedScopes = [];
+  const selectedDiaryIndex = {
+    stats() { return { totalVectors: 1 }; },
+    search() { return [{ id: 1, score: 0.9 }]; }
+  };
   const adapter = createVcpToolBoxNativeMemoryAdapter({
     knowledgeBaseStorePath: '/isolated/runtime/store',
     knowledgeBaseManager: {
-      config: { fullScanOnStartup: false },
+      config: { fullScanOnStartup: false, dimension: 2 },
+      diaryIndices: new Map(),
       pendingFiles: new Set(),
       pendingDeletes: new Set(),
       async initialize() {},
+      async _getOrLoadDiaryIndex(diaryName) {
+        this.diaryIndices.set(diaryName, selectedDiaryIndex);
+        return selectedDiaryIndex;
+      },
       async search(diaryNames) {
         searchedScopes.push([...diaryNames]);
+        selectedDiaryIndex.search([0.1, 0.2], 1);
         return [];
       }
     },
