@@ -8,34 +8,45 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_H_SOURCE_VALIDATED_RUNTIME_DOGFOOD_NOT_RUN` |
-| Current task | `CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window` |
-| Current validation | `CMV-2233` |
-| Current route | Deliver the default-closed R5-H observation contract, then request a separate exact runtime scope for the 20-session private dogfood window |
+| Status | `R5_H_20_SESSION_OBSERVATION_COMPLETE_PLAN_MATRIX_INCOMPLETE` |
+| Current task | `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout` |
+| Current validation | `CMV-2234` |
+| Current route | Preserve the zero-memory rollback and address R5-H behavior/error-semantics findings before any further live window |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
 
 ## ChatGPT Web R5-H Private ChatGPT Dogfood Window
 
-R5-H adds an owner-only classified observation contract for 20 fresh private
-ChatGPT conversations. It distinguishes memory-relevant, memory-irrelevant,
-and scope-missing tasks; measures exact first resolution, expected one-read
-tool choice, terminal stop, negative abstention, and bounded attempts after a
-consumed lease. A post-consumption attempt is observed before the existing
-fail-closed response and cannot authorize another provider or native call.
+R5-H ran 20 fresh private ChatGPT conversations: 10 memory-relevant, 4
+memory-irrelevant, and 6 scope-missing. Eight sessions matched the expected
+one-read tool, seven negative sessions abstained, and the successful set
+exercised search, overview, audit, and task-context selection. Five bounded
+provider/native reads occurred. Primary-memory writes, source-partition
+mutations, fallback, unrestricted search, and derived-policy violations stayed
+zero; six authorized derived-runtime lifecycle events completed.
 
-The public six-tool MCP surface and schemas are unchanged. Source validation
-passed 23 focused tests, the default suite (`5832 pass / 0 fail / 8 skip`), and
-both hardening suites (`97/97 + 6/6`). Strict contract, test, compare, and
-rollback subgates passed; strict health was unavailable because the inactive
-loopback service was not started. No service, provider, memory read/write, or
-runtime activation occurred; the retained Edge remains zero-memory. See
-`docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_WINDOW.md`.
+The frozen plan required 12 memory-relevant and 8 negative sessions. The
+observed `10 / 10` distribution therefore does not close the R5-H acceptance
+matrix. No session was reclassified and no supplement was run after the
+20-session authorization was consumed.
 
-The actual 20-session window requires a separate exact runtime/provider scope.
+The safety boundary held despite behavioral misses. One consumed session made
+two further tool attempts, both rejected without another provider/native call.
+Terminal stop was therefore not universal, model narration proved unsuitable
+as receipt evidence, and alias guessing appeared after resolution failure.
+The ChatGPT `task_start_context` path also remains unavailable under the current
+client-private requirement; no mapping rule was weakened.
+
+Verification-complete kill and shutdown drain passed. Governance, Relay, and
+the isolated shim are stopped; the Edge is verified back in `zero_memory`.
+The owner-only immutable artifact remains outside Git. See
+`docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_CLOSEOUT.md`.
+
 Automatic-first-task guarantees, production, release, deploy, cutover, and
-readiness remain false.
+readiness remain false. R5-I source-only behavior/error-semantics hardening can
+proceed, but R5-H acceptance needs either a separately authorized corrective
+positive-session supplement or an explicitly reviewed protocol amendment.
 
 ## ChatGPT Web R5-G Bounded Retrieval Reliability Window
 

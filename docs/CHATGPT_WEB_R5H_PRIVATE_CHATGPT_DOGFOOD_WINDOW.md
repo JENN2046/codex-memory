@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Source status: `IMPLEMENTED_DEFAULT_CLOSED_RUNTIME_DOGFOOD_NOT_YET_PERFORMED`
+Source status: `20_SESSION_OBSERVATION_COMPLETE_PLAN_MATRIX_INCOMPLETE`
 
 R5-H measures whether the private single-operator ChatGPT App selects and
 stops the governed one-read workflow correctly during meaningful tasks. It
@@ -127,12 +127,57 @@ unrestricted search, missing derived-runtime evidence, receipt mismatch, raw
 disclosure, or cross-scope result latches the observer closed and fails the
 window.
 
+## Completed private-development window
+
+The authorized observation run completed 20 fresh private ChatGPT
+conversations. The
+observed task mix was 10 memory-relevant, 4 memory-irrelevant, and 6
+scope-missing sessions. Eight sessions matched the expected one-read tool,
+seven negative sessions abstained, and one scope-missing session asked for a
+clarification without using a memory tool. Search, overview, audit, and bounded
+task-context paths were all exercised.
+
+This does not satisfy the frozen observation matrix above, which requires 12
+memory-relevant and 8 negative sessions. The run is retained as useful safety
+and behavior evidence, but R5-H matrix acceptance remains incomplete. No
+session is silently reclassified and no extra live session is authorized by
+this document.
+
+Safety remained intact even when model behavior was imperfect:
+
+```yaml
+provider_calls: 5
+native_invocations: 5
+primary_memory_writes: 0
+derived_runtime_lifecycle_events: 6
+derived_runtime_policy_violations: 0
+source_partition_mutations: 0
+local_fallbacks: 0
+unrestricted_native_searches: 0
+```
+
+One consumed session produced two further tool attempts, but the one-read
+lease rejected both without a second provider or native call. The most useful
+behavior findings are that terminal stop is not universal, model narration is
+not authoritative evidence of runtime counters, and resolution failures can
+lead the model to retry or guess aliases. The `task_start_context` path also
+remains unavailable for this ChatGPT principal while the current contract
+requires a client-private partition that is not provisioned for it. That is a
+product/governance decision, not permission to weaken the mapping contract.
+
+The owner-only immutable artifact remains outside Git. Verification-complete
+kill and derived-runtime shutdown drain passed; Governance, Relay, and the
+isolated shim are stopped; the private-development Edge was restored and
+verified in `zero_memory` mode. See
+`CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_CLOSEOUT.md` for the public closeout.
+
 ## Runtime gate and rollback
 
-Actual ChatGPT sessions require a separately exact runtime/provider scope. The
-run must start from exact merged main and current private binding identities,
-use the normal VCP startup cooldown, preserve bounded provider/read budgets,
-and retain an owner-only non-Git artifact.
+The completed ChatGPT window used a separately exact runtime/provider scope,
+started from exact merged main and current private binding identities, used the
+normal VCP startup cooldown, preserved bounded provider/read budgets, and
+retained an owner-only non-Git artifact. Any future window must obtain a new
+bounded runtime/provider scope; this closeout does not keep activation alive.
 
 At completion or failure:
 
