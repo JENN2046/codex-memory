@@ -4,13 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window`.
-Current validation: `CMV-2233`.
-Current fact: classified owner-only observation now measures resolve/one-read/stop, negative abstention, and post-consumption retries without authorizing a second read.
-Runtime dogfood has not run; no service/provider/memory action occurred and Edge remains zero-memory.
+Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
+Current validation: `CMV-2234`.
+Current fact: the 20-session private ChatGPT window completed with intact one-read enforcement and actionable model-behavior findings.
+Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and Edge is restored to zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout
+
+Status: `R5_H_DOGFOOD_COMPLETE_WITH_ACTIONABLE_FINDINGS`
+
+- Twenty fresh private ChatGPT sessions completed: 10 memory-relevant, 4
+  memory-irrelevant, and 6 scope-missing.
+- Expected one-read matches were `8`; negative abstentions were `7`; four
+  successful read sessions stopped at the terminal result.
+- One consumed session generated two further attempts; both were rejected
+  without another provider/native call.
+- Provider/native calls were `5/5`; isolated derived lifecycle events were
+  `6 completed / 0 failed`. Primary/source/fallback/global and derived-policy
+  violation counters stayed zero.
+- Verification kill and shutdown drain passed. Governance, Relay, and shim are
+  stopped; Edge is verified `zero_memory`; owner-only artifact is present.
+- Findings remain for terminal stop, narration-versus-receipt truth, alias
+  guessing, and the unresolved ChatGPT task-start client-private requirement.
+
+Validation: `CMV-2234`.
 
 ## CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window
 

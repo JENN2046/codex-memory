@@ -4,23 +4,23 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window`.
-Current validation: `CMV-2233`.
-Current fact: classified owner-only observation now measures resolve/one-read/stop, negative abstention, and post-consumption retries without authorizing a second read.
-Runtime dogfood has not run; no service/provider/memory action occurred and Edge remains zero-memory.
+Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
+Current validation: `CMV-2234`.
+Current fact: the 20-session private ChatGPT window completed with intact one-read enforcement and actionable model-behavior findings.
+Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and Edge is restored to zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R5-H changes only owner-control observation; the public six-tool ChatGPT surface and R5-B guidance remain unchanged.
-- Source verdict: three classified task modes, expected one-read tool binding, terminal-stop metrics, negative abstention, and post-consumption retry accounting pass locally.
-- Validation: focused `23/23`, default `5832/0/8`, hardening `97/97 + 6/6`; strict offline subgates pass and health remains unavailable because no service was started.
-- Runtime accounting: provider/native/memory/service actions are all zero; the 20-session private ChatGPT dogfood window has not run.
-- Host route: no R5-H runtime was activated; private-development Edge remains on the retained `zero_memory` binding.
-- Evidence: source tests and low-disclosure tracked docs exist; no owner-only runtime artifact is claimed for R5-H.
-- Status sync: CM-2148/CMV-2233 record source completion without claiming model-behavior or readiness proof.
+- Architecture: R5-H preserved the public six-tool ChatGPT surface and kept authorization in local Governance.
+- Runtime verdict: 20 sessions completed; expected tool match `8`, negative abstention `7`, post-terminal attempts `2` in one consumed session.
+- Runtime accounting: provider/native `5/5`; authorized derived lifecycle `6`; primary/source/fallback/global/derived-policy violations all zero.
+- Enforcement: both post-terminal attempts failed closed without another provider/native call; terminal stop remains a usability finding rather than a safety bypass.
+- Host route: verification kill and shutdown drain passed; Governance, Relay, and isolated shim are stopped; Edge is verified `zero_memory`.
+- Evidence: owner-only immutable artifact exists outside Git; tracked docs contain aggregates and non-claims only.
+- Status sync: CM-2149/CMV-2234 record runtime completion with actionable findings, not an automatic-use or readiness guarantee.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -50,10 +50,11 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Deliver R5-H source through normal PR CI/review while preserving the
-zero-memory default. The 20-session runtime dogfood window, provider calls,
-broader dogfood, production, release, deploy, cutover, readiness, public-write,
-or additional provider/read work requires a separate current scope.
+Deliver the low-disclosure R5-H closeout through normal PR CI/review. The next
+safe source slice is R5-I behavior/error-semantics hardening and a separate
+product decision for ChatGPT task-start visibility. Further live/provider/read,
+partition provisioning, production, release, deploy, cutover, readiness, or
+public-write work requires a separate current scope.
 
 ## Historical Run Notes
 

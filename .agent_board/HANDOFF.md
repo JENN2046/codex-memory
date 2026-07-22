@@ -4,33 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window`.
-Current validation: `CMV-2233`.
-Current fact: classified owner-only observation now measures resolve/one-read/stop, negative abstention, and post-consumption retries without authorizing a second read.
-Runtime dogfood has not run; no service/provider/memory action occurred and Edge remains zero-memory.
+Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
+Current validation: `CMV-2234`.
+Current fact: the 20-session private ChatGPT window completed with intact one-read enforcement and actionable model-behavior findings.
+Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and Edge is restored to zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2148 implements the default-closed R5-H dogfood observation contract. The
-owner-only schema-3 control labels three task classes and binds one expected
-read tool only for relevant tasks. Observation v2 measures exact first resolve,
-expected one-read choice, terminal stop, negative abstention, bounded retry
-defects, latency, timeout, result count, and low-disclosure relevance.
+CM-2149 closes the authorized R5-H window after 20 fresh private ChatGPT
+conversations. Expected one-read matches were `8`, negative abstentions `7`,
+and five provider/native reads completed. Six isolated derived-runtime
+lifecycle events were accounted; primary/source/fallback/global and policy
+violation counters remained zero.
 
-The previously invisible attempt after a consumed lease is now counted before
-the unchanged fail-closed response, without another provider/native call.
-Focused/default/hardening and strict offline subgates pass; strict health alone
-is unavailable because no service was started. The public six tools/schemas are
-unchanged, runtime dogfood has not run, and Edge remains `zero_memory`.
+The one-read boundary held when a consumed session generated two extra tool
+attempts: both failed before another provider/native call. Actionable findings
+remain for terminal-stop consistency, model narration versus receipt truth,
+alias guessing after failures, and the ChatGPT task-start client-private
+requirement. Do not weaken mapping rules or provision a new private partition
+without a separate decision.
 
-Next boundary: deliver source through PR CI/review. Then obtain a separate
-exact runtime/provider authorization for 20 fresh private ChatGPT sessions,
-normal startup cooldown, bounded calls, owner-only non-Git artifact, and final
-zero-memory rollback. Do not infer automatic-first-task, production, release,
-deploy, cutover, or readiness.
+Verification kill and drain passed. Governance, Relay, and shim are stopped;
+Edge is verified `zero_memory`; the immutable exact-value artifact remains
+owner-only and outside Git. Next boundary: normal closeout PR, then R5-I
+source-only behavior/error-semantics hardening. Do not infer automatic-first-
+task, production, release, deploy, cutover, or readiness.
 
 ## Historical Handoff Context
 
