@@ -4,13 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
-Current validation: `CMV-2234`.
-Current fact: the 20-session observation completed with intact one-read enforcement, but its 10-positive/10-negative mix did not satisfy the frozen 12/8 matrix.
-Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and the Edge is restored to zero-memory.
+Current task: `CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics`.
+Current validation: `CMV-2235`.
+Current fact: source guidance and receipt/error projection now distinguish governed outcomes from transport failures and require exact alias/visibility plus one terminal read attempt.
+The six public schemas and the R5-H artifact are unchanged; no runtime/provider/memory action occurred and the Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics
+
+R5-I tightens exact alias/visibility selection, duplicate resolve/read
+suppression, one-read stop behavior, and receipt-backed failure semantics.
+Receipt-bound `empty`, `denied`, and `unavailable` are no longer conflated with
+transport timeout/expiry/cancellation, and model-visible terminal guidance
+forbids retry narration that did not occur.
+
+Internal receipts bind a low-disclosure failure category without adding a
+public response field. All six public tool names and exact input/output schema
+digests remain unchanged. Targeted tests pass `47/47`, the default suite passes
+`5842/0/8`, and hardening passes `97/97 + 6/6`.
+
+Strict contract/test/compare/rollback subgates pass; strict overall remains
+non-pass only at inactive loopback health. No service was started.
+
+No service, provider, memory read/write, private binding, or VCP core action ran.
+The R5-H 20-session artifact remains immutable and its incomplete plan matrix
+is not reclassified or backfilled. Final source verdict:
+`R5_I_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_R5_H_MATRIX_UNCHANGED`.
 
 ## CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout
 

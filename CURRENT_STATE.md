@@ -8,13 +8,37 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_H_20_SESSION_OBSERVATION_COMPLETE_PLAN_MATRIX_INCOMPLETE` |
-| Current task | `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout` |
-| Current validation | `CMV-2234` |
-| Current route | Preserve the zero-memory rollback and address R5-H behavior/error-semantics findings before any further live window |
+| Status | `R5_I_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_R5_H_MATRIX_UNCHANGED` |
+| Current task | `CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics` |
+| Current validation | `CMV-2235` |
+| Current route | Complete normal PR/CI/review; any exact-head private runtime verification remains separately authorized |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R5-I Model Behavior And Error Semantics
+
+R5-I separates receipt-bound governed outcomes from transport failures in the
+model-visible projection and binds low-disclosure failure categories into the
+internal receipt chain. It tells the model to use only the exact user-provided
+alias and visibility, never substitute App/connector/URL/client/workspace
+identities, resolve once, choose one read, and stop after the first attempt even
+when it returns an error.
+
+The six public tool names and exact input/output schema digests are unchanged.
+Targeted behavior/negative tests pass `47/47`; the default suite passes
+`5842/0/8`; hardening passes `97/97 + 6/6`. No runtime, provider, memory read or
+write, VCP core, or private configuration action occurred. The Edge remains
+zero-memory. See `docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md`.
+
+The strict offline contract/test/compare/rollback subgates pass. Strict overall
+remains non-pass only because loopback health is
+`UNAVAILABLE_SERVICE_INACTIVE`; no service was started under this source-only
+authorization.
+
+The immutable R5-H 20-session artifact and its incomplete 10/10 versus 12/8
+matrix remain unchanged. R5-I is source hardening, not runtime proof or a
+readiness claim.
 
 ## ChatGPT Web R5-H Private ChatGPT Dogfood Window
 

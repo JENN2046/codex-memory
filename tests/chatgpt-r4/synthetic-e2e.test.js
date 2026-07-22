@@ -98,7 +98,10 @@ test('context resolution returns signed low-disclosure denials without a context
     const request = buildCandidateEdgeRequest({
       principalAssertion: result.internal.principalAssertion,
       toolName: 'resolve_memory_context',
-      toolArguments: { project_alias: projectAlias },
+      toolArguments: {
+        project_alias: projectAlias,
+        requested_visibility: 'project'
+      },
       now: result.internal.clock(),
       requestId: `req_context_${suffix}_0000000001`,
       nonce: `request_nonce_${suffix}_00000001`,
@@ -116,6 +119,34 @@ test('context resolution returns signed low-disclosure denials without a context
       requireZeroCounters: true
     }));
   }
+});
+
+test('missing visibility returns a receipt-bound denial before context issuance', async () => {
+  const result = await runZeroMemorySyntheticE2E();
+  const contextResolutionCount = result.internal.observations.context_resolutions;
+  const request = buildCandidateEdgeRequest({
+    principalAssertion: result.internal.principalAssertion,
+    toolName: 'resolve_memory_context',
+    toolArguments: { project_alias: 'project-alpha' },
+    now: result.internal.clock(),
+    requestId: 'req_missing_visibility_0000001',
+    nonce: 'request_nonce_missing_visibility_01',
+    signing: signing(result.internal.identities.edgeIdentity)
+  });
+
+  const response = await result.internal.relay.handle(request);
+
+  assert.equal(response.status, 'denied');
+  assert.deepEqual(response.structured_content, { context_status: 'denied' });
+  assert.deepEqual(response.counters, ZERO_MEMORY_COUNTERS);
+  assert.equal(result.internal.observations.context_resolutions, contextResolutionCount);
+  assert.equal(result.internal.contextStore.size, 1);
+  assert.doesNotThrow(() => validateResponseEnvelope(response, {
+    now: result.internal.clock(),
+    resolveResponsePublicKey: keyResolver(result.internal.identities.relayIdentity),
+    expectedRequest: request,
+    requireZeroCounters: true
+  }));
 });
 
 test('Relay receipt is exact, request-bound, and proves replay checking without claiming a rejection', () => {

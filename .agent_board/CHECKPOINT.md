@@ -4,13 +4,35 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
-Current validation: `CMV-2234`.
-Current fact: the 20-session observation completed with intact one-read enforcement, but its 10-positive/10-negative mix did not satisfy the frozen 12/8 matrix.
-Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and Edge is restored to zero-memory.
+Current task: `CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics`.
+Current validation: `CMV-2235`.
+Current fact: exact alias/visibility, one-read stop, and receipt-versus-transport semantics are hardened while all six public schemas remain unchanged.
+No runtime/provider/memory action occurred; R5-H evidence remains unchanged and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics
+
+Status: `R5_I_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_R5_H_MATRIX_UNCHANGED`
+
+- Exact `project_alias` and `requested_visibility` are required; App,
+  connector, URL, client, workspace, opaque-ref, and guessed-repository
+  substitutes are explicitly rejected by guidance.
+- Receipt-bound statuses are distinguished from transport failures. Error
+  codes are sanitized before entering model-visible terminal guidance.
+- The first read attempt is terminal. Guidance forbids another resolve, read,
+  tool switch, or invented retry count after any result or transport error.
+- Ten low-disclosure failure categories are bound into internal receipts.
+- Six public names and schemas are digest-identical to the R5-H baseline.
+- Targeted `47/47`, default `5842/0/8`, hardening `97/97 + 6/6` pass.
+- CI-safe gate passes `5941 tests / 5933 pass / 0 fail / 8 skip` with no network, daemon, or provider.
+- Strict contract/test/compare/rollback pass; strict overall is non-pass only
+  because loopback health is `UNAVAILABLE_SERVICE_INACTIVE`.
+- Runtime/provider/memory/VCP-core effects are zero; Edge stays `zero_memory`.
+- The frozen R5-H artifact and incomplete matrix are unchanged.
+
+Validation: `CMV-2235`.
 
 ## CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout
 

@@ -58,7 +58,8 @@ test('R4-C request expiry fails closed before claim or UDS forwarding', async t 
   const harness = await createLocalIntegrationHarness({ terminalRetentionMs: 50 });
   t.after(() => harness.close());
   const request = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   }, { ttlSeconds: 1 });
   await harness.edgeClient.submit(request);
   harness.advance(1_001);
@@ -79,7 +80,8 @@ test('R4-C first stale lookup and snapshot purge untouched records past retentio
   const harness = await createLocalIntegrationHarness({ terminalRetentionMs: 50 });
   t.after(() => harness.close());
   const lookupRecord = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   }, { ttlSeconds: 1 });
   await harness.edgeClient.submit(lookupRecord);
   harness.advance(1_051);
@@ -88,7 +90,8 @@ test('R4-C first stale lookup and snapshot purge untouched records past retentio
   });
 
   const snapshotRecord = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   }, { ttlSeconds: 1 });
   await harness.edgeClient.submit(snapshotRecord);
   harness.advance(1_051);
@@ -116,7 +119,8 @@ test('R4-C event-sink failures cannot corrupt Edge or Relay state transitions', 
   });
   t.after(() => harness.close());
   const request = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   assert.deepEqual(await harness.edgeClient.submit(request), {
     request_id: request.request_id,
@@ -143,7 +147,8 @@ test('R4-C cancellation between claim and acknowledgement returns a cancelled re
   edgeClient = harness.edgeClient;
   t.after(() => harness.close());
   const request = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   await harness.edgeClient.submit(request);
   assert.deepEqual(await harness.relayRuntime.processNext(), {
@@ -172,12 +177,14 @@ test('R4-C submit refreshes and prunes untouched expired records before capacity
   });
   t.after(() => harness.close());
   const expired = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   }, { ttlSeconds: 1 });
   await harness.edgeClient.submit(expired);
   harness.advance(1_051);
   const replacement = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   assert.deepEqual(await harness.edgeClient.submit(replacement), {
     request_id: replacement.request_id,
@@ -196,7 +203,8 @@ test('R4-C reconnect reclaims an unacknowledged request only after the claim lea
   const harness = await createLocalIntegrationHarness({ claimLeaseMs: 50 });
   t.after(() => harness.close());
   const request = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   await harness.edgeClient.submit(request);
   const abandoned = await harness.edgeClient.claim('abandoned-relay');
@@ -219,7 +227,8 @@ test('R4-C never requeues an acknowledged in-flight request after its claim leas
   });
   t.after(() => harness.close());
   const request = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   await harness.edgeClient.submit(request);
   const processing = harness.relayRuntime.processNext();
@@ -237,7 +246,8 @@ test('R4-C rejects duplicate submission and duplicate claim acknowledgement as r
   const harness = await createLocalIntegrationHarness();
   t.after(() => harness.close());
   const request = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   await harness.edgeClient.submit(request);
   await assert.rejects(() => harness.edgeClient.submit(request), { code: 'replay_detected' });
@@ -254,7 +264,8 @@ test('R4-C cancellation aborts an in-flight UDS request before governance invoca
   const harness = await createLocalIntegrationHarness({ governanceDelayMs: 150, cancelPollMs: 2 });
   t.after(() => harness.close());
   const request = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   await harness.edgeClient.submit(request);
   const processing = harness.relayRuntime.processNext();
@@ -274,7 +285,8 @@ test('R4-C completion cannot overwrite cancellation during asynchronous response
   });
   t.after(() => harness.close());
   const request = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   await harness.edgeClient.submit(request);
   const processing = harness.relayRuntime.processNext();
@@ -294,7 +306,8 @@ test('R4-C Relay waits for asynchronous Edge completion beyond the former one-se
   });
   t.after(() => harness.close());
   const request = harness.buildRequest('resolve_memory_context', {
-    project_alias: 'project-alpha'
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   await harness.edgeClient.submit(request);
   const result = await harness.relayRuntime.processNext();

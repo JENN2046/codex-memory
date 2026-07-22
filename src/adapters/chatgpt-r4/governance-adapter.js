@@ -11,6 +11,22 @@ const {
   reject
 } = require('../../../packages/chatgpt-r4-contracts');
 
+const RECEIPT_FAILURE_CATEGORIES = Object.freeze([
+  'context_denied',
+  'context_unavailable',
+  'read_denied',
+  'read_unavailable',
+  'session_inactive',
+  'session_expired',
+  'session_killed',
+  'one_read_already_consumed',
+  'session_authorization_rejected',
+  'response_suppressed_after_activation_recheck'
+]);
+const ACTIVATION_TERMINAL_STATUSES = new Set([
+  'inactive', 'active', 'expired', 'killed', 'consumed'
+]);
+
 function createGovernanceAdapter({
   expectedIssuer,
   expectedAudience,
@@ -76,6 +92,7 @@ function createGovernanceAdapter({
           relayReceipt,
           validation,
           toolName,
+          activationStatus: preauthorization.status,
           activationReceiptDigest: preauthorization.receipt_digest
         });
       }
@@ -91,6 +108,7 @@ function createGovernanceAdapter({
           relayReceipt,
           validation,
           toolName,
+          activationStatus: preauthorization.status,
           activationReceiptDigest: preauthorization.receipt_digest
         });
       }
@@ -125,6 +143,8 @@ function createGovernanceAdapter({
           structuredContent: unavailableStructuredContent(toolName),
           counters: ZERO_MEMORY_COUNTERS,
           authorizationResolvedLocally: false,
+          activationRejected: true,
+          activationStatus: activation.status,
           activationReceiptDigest: activation.receipt_digest
         });
       }
@@ -169,6 +189,7 @@ function createGovernanceAdapter({
         counters: invocation.counters,
         resultScopePostcheckPassed: invocation.result_scope_postcheck_passed,
         authorizationResolvedLocally: true,
+        activationStatus: responseSuppressed ? completion?.status || null : null,
         activationReceiptDigest: completion?.receipt_digest || activation?.receipt_digest || null,
         responseSuppressed: Boolean(responseSuppressed)
       });
@@ -185,10 +206,27 @@ async function handleResolve({
   resolveContextPublicKey
 }) {
   const args = request.tool_request.arguments;
+  if (args.requested_visibility === undefined) {
+    return buildResolveResult({
+      request,
+      relayReceipt,
+      status: 'denied',
+      structuredContent: { context_status: 'denied' },
+      contextReceipt: {
+        schema_version: 1,
+        kind: 'chatgpt_r4_context_receipt',
+        context_status: 'denied',
+        context_issued: false,
+        principal_bound: true,
+        private_partition_access: false,
+        legacy_partition_access: false
+      }
+    });
+  }
   const issued = await issueProjectContext({
     principalFingerprint,
     safeProjectAlias: args.project_alias,
-    requestedVisibility: args.requested_visibility || 'task_start_context',
+    requestedVisibility: args.requested_visibility,
     now
   });
   if (issued && typeof issued === 'object' && !Array.isArray(issued) &&
@@ -230,7 +268,7 @@ async function handleResolve({
     resolvePublicKey: resolveContextPublicKey,
     expectedPrincipalFingerprint: principalFingerprint
   });
-  const requestedVisibility = args.requested_visibility || 'task_start_context';
+  const requestedVisibility = args.requested_visibility;
   if (!issued.claim.visibility_allowlist.includes(requestedVisibility)) {
     reject('context_issue_visibility_mismatch');
   }
@@ -275,6 +313,7 @@ function buildPreclaimUnavailableReadResult({
   relayReceipt,
   validation,
   toolName,
+  activationStatus,
   activationReceiptDigest
 }) {
   if (!/^sha256:[a-f0-9]{64}$/u.test(activationReceiptDigest || '')) {
@@ -282,6 +321,12 @@ function buildPreclaimUnavailableReadResult({
   }
   const structuredContent = unavailableStructuredContent(toolName);
   validatePublicStructuredContent(structuredContent);
+  const failureCategory = classifyReceiptFailure({
+    toolName,
+    status: 'unavailable',
+    activationRejected: true,
+    activationStatus
+  });
   const contextReceipt = {
     schema_version: 1,
     kind: 'chatgpt_r4_context_receipt',
@@ -290,6 +335,7 @@ function buildPreclaimUnavailableReadResult({
     principal_bound: true,
     private_partition_access: false,
     legacy_partition_access: false,
+    failure_category: failureCategory,
     activation_receipt_digest: activationReceiptDigest
   };
   const governanceReceipt = {
@@ -303,6 +349,7 @@ function buildPreclaimUnavailableReadResult({
     tool_arguments_used_as_diary_acl: false,
     result_scope_postcheck_passed: true,
     response_suppressed_after_activation_recheck: false,
+    failure_category: failureCategory,
     counters_digest: digestObject(ZERO_MEMORY_COUNTERS),
     activation_receipt_digest: activationReceiptDigest
   };
@@ -327,6 +374,8 @@ function buildReadResult({
   counters,
   resultScopePostcheckPassed = true,
   authorizationResolvedLocally,
+  activationRejected = false,
+  activationStatus = null,
   activationReceiptDigest = null,
   responseSuppressed = false
 }) {
@@ -339,6 +388,13 @@ function buildReadResult({
       !/^sha256:[a-f0-9]{64}$/u.test(activationReceiptDigest)) {
     reject('session_activation_receipt_invalid');
   }
+  const failureCategory = classifyReceiptFailure({
+    toolName,
+    status,
+    activationRejected,
+    activationStatus,
+    responseSuppressed
+  });
   const contextReceipt = {
     schema_version: 1,
     kind: 'chatgpt_r4_context_receipt',
@@ -353,6 +409,7 @@ function buildReadResult({
     mapping_digest_bound: true,
     private_partition_access: false,
     legacy_partition_access: false,
+    ...(failureCategory ? { failure_category: failureCategory } : {}),
     ...(activationReceiptDigest ? { activation_receipt_digest: activationReceiptDigest } : {})
   };
   const governanceReceipt = {
@@ -366,6 +423,7 @@ function buildReadResult({
     tool_arguments_used_as_diary_acl: false,
     result_scope_postcheck_passed: resultScopePostcheckPassed,
     response_suppressed_after_activation_recheck: responseSuppressed,
+    ...(failureCategory ? { failure_category: failureCategory } : {}),
     counters_digest: digestObject(counters),
     ...(activationReceiptDigest ? { activation_receipt_digest: activationReceiptDigest } : {})
   };
@@ -395,16 +453,24 @@ function unavailableStructuredContent(toolName) {
 
 function buildResolveResult({ request, relayReceipt, status, structuredContent, contextReceipt }) {
   validatePublicStructuredContent(structuredContent);
+  const failureCategory = classifyReceiptFailure({
+    toolName: 'resolve_memory_context',
+    status
+  });
+  const boundContextReceipt = failureCategory
+    ? { ...contextReceipt, failure_category: failureCategory }
+    : contextReceipt;
   const governanceReceipt = {
     schema_version: 1,
     kind: 'chatgpt_r4_governance_receipt',
     request_digest: digestObject(request),
     relay_receipt_digest: digestObject(relayReceipt),
-    context_receipt_digest: digestObject(contextReceipt),
+    context_receipt_digest: digestObject(boundContextReceipt),
     tool_name: 'resolve_memory_context',
     authorization_resolved_locally: status !== 'unavailable',
     tool_arguments_used_as_diary_acl: false,
     result_scope_postcheck_passed: true,
+    ...(failureCategory ? { failure_category: failureCategory } : {}),
     counters_digest: digestObject(ZERO_MEMORY_COUNTERS)
   };
   return {
@@ -413,9 +479,44 @@ function buildResolveResult({ request, relayReceipt, status, structuredContent, 
     counters: { ...ZERO_MEMORY_COUNTERS },
     receipt_digests: {
       governance: digestObject(governanceReceipt),
-      context: digestObject(contextReceipt)
+      context: digestObject(boundContextReceipt)
     }
   };
+}
+
+function classifyReceiptFailure({
+  toolName,
+  status,
+  activationRejected = false,
+  activationStatus = null,
+  responseSuppressed = false
+} = {}) {
+  const resolveOperation = toolName === 'resolve_memory_context';
+  const readOperation = [
+    'memory_overview',
+    'search_memory',
+    'audit_memory',
+    'prepare_memory_context'
+  ].includes(toolName);
+  const activationStatusValid = ACTIVATION_TERMINAL_STATUSES.has(activationStatus);
+  if ((!resolveOperation && !readOperation) ||
+      !['ok', 'denied', 'unavailable'].includes(status) ||
+      typeof activationRejected !== 'boolean' ||
+      typeof responseSuppressed !== 'boolean' ||
+      ((activationRejected || responseSuppressed) && !activationStatusValid) ||
+      (activationStatus !== null && !activationStatusValid)) {
+    reject('governance_failure_projection_invalid');
+  }
+  if (status === 'ok' && responseSuppressed !== true) return null;
+  if (responseSuppressed) return 'response_suppressed_after_activation_recheck';
+  if (status === 'denied') return resolveOperation ? 'context_denied' : 'read_denied';
+  if (!activationRejected) return resolveOperation ? 'context_unavailable' : 'read_unavailable';
+  if (activationStatus === 'inactive') return 'session_inactive';
+  if (activationStatus === 'expired') return 'session_expired';
+  if (activationStatus === 'killed') return 'session_killed';
+  if (activationStatus === 'consumed') return 'one_read_already_consumed';
+  if (activationStatus === 'active') return 'session_authorization_rejected';
+  return resolveOperation ? 'context_unavailable' : 'read_unavailable';
 }
 
 function validateRelayReceipt(receipt, expectedRequestDigest) {
@@ -465,6 +566,8 @@ function validateGovernanceInvocation(invocation, { counterMode = COUNTER_MODES.
 }
 
 module.exports = {
+  RECEIPT_FAILURE_CATEGORIES,
+  classifyReceiptFailure,
   createGovernanceAdapter,
   validateRelayReceipt,
   validateGovernanceInvocation

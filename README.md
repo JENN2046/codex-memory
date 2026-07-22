@@ -42,12 +42,20 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-G Bounded Retrieval Reliability Window](docs/CHATGPT_WEB_R5G_BOUNDED_RETRIEVAL_RELIABILITY_WINDOW.md)
 - [ChatGPT Web R5-H Private ChatGPT Dogfood Window](docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_WINDOW.md)
 - [ChatGPT Web R5-H Private ChatGPT Dogfood Closeout](docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_CLOSEOUT.md)
+- [ChatGPT Web R5-I Model Behavior And Error Semantics](docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
 ## Current Status
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
+
+R5-I now distinguishes receipt-bound governed results from transport failures,
+requires exact user-provided alias and visibility, and makes the first read
+attempt terminal. The public six-tool names and schemas are unchanged. This is
+source hardening only: no runtime, provider, or memory action ran, and the
+existing R5-H 20-session artifact and incomplete matrix remain unchanged. See
+`docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md`.
 
 R5-H ran 20 fresh private single-operator ChatGPT conversations. Eight
 sessions selected the expected one-read tool and seven negative sessions
