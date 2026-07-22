@@ -4,13 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2147 ChatGPT Web R5-G Exact-Head Bounded Retrieval Reliability Window`.
-Current validation: `CMV-2232`.
-Current fact: five fresh project-scoped sessions returned one relevant result each with positive selected-index evidence, zero timeout, zero primary/source mutation, and zero unrestricted search.
-Harness recovery is disclosed; Governance/Relay/shim are stopped and the Edge remains zero-memory.
+Current task: `CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window`.
+Current validation: `CMV-2233`.
+Current fact: the owner-only classified observer can now measure exact resolve/one-read/stop behavior, negative abstention, and post-consumption retries without authorizing another read.
+Runtime dogfood has not run; no service/provider/memory action occurred and the Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window
+
+R5-H retains the existing six public read-only tools and adds only owner-control
+classification and low-disclosure observation. Schema-3 activation labels a
+session `memory_relevant`, `memory_irrelevant`, or `scope_missing`; relevant
+tasks bind one expected read tool. Observation schema v2 measures exact first
+resolution, expected tool choice, terminal stop, negative abstention, retries,
+latency, timeout, result count, and low-disclosure relevance.
+
+The observer now records a model attempt made after the one-read lease is
+consumed, while the runtime still rejects it before any second provider/native
+call. Focused, default, and hardening tests pass. Strict offline contract/test/
+compare/rollback gates pass; only health is unavailable because no local
+service was started. Final source verdict:
+`R5_H_SOURCE_VALIDATED_RUNTIME_DOGFOOD_NOT_RUN`.
 
 ## CM-2147 ChatGPT Web R5-G Bounded Retrieval Reliability Window
 

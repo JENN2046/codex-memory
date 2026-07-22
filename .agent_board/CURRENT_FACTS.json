@@ -328,6 +328,21 @@
     "chatgptWebR5gVcpCoreChanged": false,
     "chatgptWebR5gVerificationCompleteKillPassed": true,
     "chatgptWebR5gZeroMemoryRollbackPassed": true,
+    "chatgptWebR5hAutomaticFirstTaskGuaranteeClaimed": false,
+    "chatgptWebR5hClassifiedControlSchemaVersion": 3,
+    "chatgptWebR5hDogfoodWindowPerformed": false,
+    "chatgptWebR5hFinalVerdict": "R5_H_SOURCE_VALIDATED_RUNTIME_DOGFOOD_NOT_RUN",
+    "chatgptWebR5hMemoryReads": 0,
+    "chatgptWebR5hMemoryWrites": 0,
+    "chatgptWebR5hObservationSchemaVersion": 2,
+    "chatgptWebR5hPostTerminalRetryAccountingImplemented": true,
+    "chatgptWebR5hProviderCalls": 0,
+    "chatgptWebR5hPublicMcpSchemaExpanded": false,
+    "chatgptWebR5hRuntimeActivated": false,
+    "chatgptWebR5hSourceImplemented": true,
+    "chatgptWebR5hTaskClassCount": 3,
+    "chatgptWebR5hTargetSessionCount": 20,
+    "chatgptWebR5hZeroMemoryPreserved": true,
     "cm2115CanonicalSnapshotPrepared": true,
     "cm2115FullPlanApplicationApplied": false,
     "cm2115FullPlanApplicationAuthorized": false,
@@ -818,8 +833,9 @@
     "freshGitRequiredBeforeRuntimeAction": true,
     "originHeadCommitted": false
   },
-  "notValidated": [
-    "ChatGPT Web R4 automatic-first-task-call guarantee",
+    "notValidated": [
+      "ChatGPT Web R5-H 20-session private dogfood window",
+      "ChatGPT Web R4 automatic-first-task-call guarantee",
     "independent tag push authorization",
     "broad live client acceptance beyond CM-1539 no-bearer proof",
     "provider smoke or benchmark",
@@ -944,12 +960,17 @@
     "notReleaseReady": true,
     "project": "NOT_READY_BLOCKED",
     "rc": "RC_NOT_READY_BLOCKED",
-    "scope": "chatgpt_web_r5g_bounded_retrieval_reliability_pass_with_harness_recovery_zero_memory"
+    "scope": "chatgpt_web_r5h_source_validated_runtime_dogfood_not_run_zero_memory"
   },
-  "taskId": "CM-2147",
+  "taskId": "CM-2148",
   "updatedAt": "2026-07-22",
-  "validationId": "CMV-2232",
+  "validationId": "CMV-2233",
   "validationSummary": [
+    {
+      "id": "CMV-2233",
+      "scope": "CM-2148 ChatGPT Web R5-H private ChatGPT dogfood window source contract",
+      "status": "COMPLETED_R5H_SOURCE_VALIDATED_RUNTIME_DOGFOOD_NOT_RUN_ZERO_MEMORY"
+    },
     {
       "id": "CMV-2232",
       "scope": "CM-2147 ChatGPT Web R5-G exact-head bounded retrieval reliability window",

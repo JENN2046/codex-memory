@@ -14,6 +14,11 @@ const {
   SESSION_ACTIVATION_MIN_TTL_SECONDS
 } = require('../../adapters/chatgpt-r4/session-read-activation');
 const { validateSocketAuthority } = require('./governance-uds-server');
+const {
+  DOGFOOD_OBSERVATION_KIND,
+  DOGFOOD_TASK_CLASSES,
+  READ_TOOL_NAMES
+} = require('./private-dogfood-observer');
 
 const MAX_CONTROL_REQUEST_BYTES = 4096;
 const MAX_CONTROL_RESPONSE_BYTES = 8192;
@@ -59,7 +64,7 @@ function createSessionActivationControlServer({
 
   function handleControlRequest(request) {
     validateControlRequest(request);
-    const dogfoodRequest = request.schema_version === 2;
+    const dogfoodRequest = request.schema_version >= 2;
     if (dogfoodRequest && !dogfoodObserver) reject('r5a_dogfood_control_unavailable');
     if (dogfoodObserver && request.operation === 'activate' && !dogfoodRequest) {
       reject('r5a_dogfood_observation_required');
@@ -90,6 +95,10 @@ function createSessionActivationControlServer({
         try {
           dogfoodObserver.beginSession({
             observationKind: request.observation_kind,
+            ...(request.schema_version >= 3 ? {
+              taskClass: request.task_class,
+              expectedReadTool: request.expected_read_tool || null
+            } : {}),
             activationSnapshot: activationController.snapshot()
           });
         } catch (error) {
@@ -235,13 +244,17 @@ function validateControlRequest(request) {
   }
   const operation = request.operation;
   if (!['activate', 'kill', 'status'].includes(operation) ||
-      ![1, 2].includes(request.schema_version) ||
+      ![1, 2, 3].includes(request.schema_version) ||
       !CONTROL_REQUEST_ID_PATTERN.test(request.request_id || '')) {
     reject('r4_session_control_request_invalid');
   }
   const expected = operation === 'activate'
     ? ['schema_version', 'operation', 'request_id', 'requested_visibility', 'ttl_seconds',
-        ...(request.schema_version === 2 ? ['observation_kind'] : [])]
+        ...(request.schema_version >= 2 ? ['observation_kind'] : []),
+        ...(request.schema_version >= 3 ? [
+          'task_class',
+          ...(request.task_class === 'memory_relevant' ? ['expected_read_tool'] : [])
+        ] : [])]
     : operation === 'kill'
       ? ['schema_version', 'operation', 'request_id', 'reason']
       : ['schema_version', 'operation', 'request_id'];
@@ -257,9 +270,17 @@ function validateControlRequest(request) {
        request.ttl_seconds > SESSION_ACTIVATION_MAX_TTL_SECONDS)) {
     reject('r4_session_control_activation_invalid');
   }
-  if (request.schema_version === 2 && operation === 'activate' &&
-      request.observation_kind !== 'meaningful_task_unprompted') {
+  if (request.schema_version >= 2 && operation === 'activate' &&
+      request.observation_kind !== DOGFOOD_OBSERVATION_KIND) {
     reject('r5a_dogfood_control_observation_invalid');
+  }
+  if (request.schema_version >= 3 && operation === 'activate' &&
+      (!DOGFOOD_TASK_CLASSES.includes(request.task_class) ||
+       (request.task_class === 'memory_relevant' &&
+        !READ_TOOL_NAMES.includes(request.expected_read_tool)) ||
+       (request.task_class !== 'memory_relevant' &&
+        request.expected_read_tool !== undefined))) {
+    reject('r5h_dogfood_control_task_class_invalid');
   }
   if (operation === 'kill' &&
       !['operator_requested', 'emergency_stop', 'verification_complete'].includes(request.reason)) {
@@ -288,9 +309,9 @@ function projectControlResponse(
     default_closed: true,
     durable_state_written: false,
     receipt_digest: response.receipt_digest,
-    ...(schemaVersion === 2 ? { observation: dogfoodObservation } : {})
+    ...(schemaVersion >= 2 ? { observation: dogfoodObservation } : {})
   };
-  if (schemaVersion === 2 && (!dogfoodObservation ||
+  if (schemaVersion >= 2 && (!dogfoodObservation ||
       dogfoodObservation.durable_observation_state_written !== false ||
       dogfoodObservation.raw_memory_recorded !== false)) {
     reject('r5a_dogfood_control_observation_invalid');

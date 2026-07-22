@@ -12,8 +12,11 @@ const {
 const { callControlSocket } = require('./chatgpt-r4-session-activation');
 const {
   DOGFOOD_OBSERVATION_KIND,
+  DOGFOOD_OBSERVATION_SCHEMA_VERSION,
+  DOGFOOD_TASK_CLASSES,
   MAX_DOGFOOD_PROVIDER_CALLS,
-  MAX_DOGFOOD_SESSIONS
+  MAX_DOGFOOD_SESSIONS,
+  READ_TOOL_NAMES
 } = require('../runtime/chatgpt-r4/private-dogfood-observer');
 
 const RESPONSE_KEYS = Object.freeze([
@@ -46,13 +49,25 @@ function parseArguments(argv) {
     index += 1;
   }
   const allowed = operation === 'activate'
-    ? ['json', 'ttl-seconds', 'visibility']
+    ? ['expected-read-tool', 'json', 'task-class', 'ttl-seconds', 'visibility']
     : operation === 'kill' ? ['json', 'reason'] : ['json'];
   if (Object.keys(options).some(name => !allowed.includes(name))) {
     reject('r5a_dogfood_cli_argument_invalid');
   }
+  const taskClass = options['task-class'];
+  const expectedReadTool = options['expected-read-tool'];
+  if ((taskClass === undefined) !== (expectedReadTool === undefined) &&
+      taskClass !== 'memory_irrelevant' && taskClass !== 'scope_missing') {
+    reject('r5h_dogfood_cli_task_class_invalid');
+  }
+  if (taskClass !== undefined &&
+      (!DOGFOOD_TASK_CLASSES.includes(taskClass) ||
+       (taskClass === 'memory_relevant' && !READ_TOOL_NAMES.includes(expectedReadTool)) ||
+       (taskClass !== 'memory_relevant' && expectedReadTool !== undefined))) {
+    reject('r5h_dogfood_cli_task_class_invalid');
+  }
   const request = {
-    schema_version: 2,
+    schema_version: taskClass === undefined ? 2 : 3,
     operation,
     request_id: `op_${crypto.randomBytes(24).toString('base64url')}`
   };
@@ -69,6 +84,10 @@ function parseArguments(argv) {
     request.ttl_seconds = ttlSeconds;
     request.requested_visibility = visibility;
     request.observation_kind = DOGFOOD_OBSERVATION_KIND;
+    if (taskClass !== undefined) {
+      request.task_class = taskClass;
+      if (expectedReadTool !== undefined) request.expected_read_tool = expectedReadTool;
+    }
   } else if (operation === 'kill') {
     request.reason = options.reason || 'operator_requested';
     if (!['operator_requested', 'emergency_stop', 'verification_complete'].includes(request.reason)) {
@@ -81,8 +100,15 @@ function parseArguments(argv) {
 function validateObservation(observation) {
   const exactKeys = [
     'schema_version', 'observation_kind', 'sessions_started', 'session_limit',
+    'memory_relevant_sessions', 'memory_irrelevant_sessions', 'scope_missing_sessions',
+    'unclassified_sessions',
     'sessions_with_any_memory_tool', 'sessions_with_resolve', 'sessions_with_read',
-    'resolve_then_read_sessions', 'timeout_count', 'emergency_stop_latched', 'provider_calls',
+    'resolve_then_read_sessions', 'exact_first_resolution_successes',
+    'expected_read_tool_matches', 'terminal_stop_sessions',
+    'post_terminal_retry_sessions', 'post_terminal_tool_attempts',
+    'resolve_retry_sessions', 'wrong_first_tool_sessions',
+    'negative_abstention_sessions', 'unexpected_negative_memory_selection_sessions',
+    'read_tool_selection_counts', 'timeout_count', 'emergency_stop_latched', 'provider_calls',
     'provider_call_limit', 'native_invocations', 'local_fallbacks',
     'primary_memory_writes', 'derived_index_writes', 'other_durable_mutations',
     'derived_runtime_mutation_policy', 'derived_runtime_mutation_evidence_count',
@@ -92,8 +118,15 @@ function validateObservation(observation) {
     'response_bodies_logged', 'raw_memory_recorded', 'last_session'
   ].sort();
   const countKeys = [
+    'memory_relevant_sessions', 'memory_irrelevant_sessions', 'scope_missing_sessions',
+    'unclassified_sessions',
     'sessions_started', 'sessions_with_any_memory_tool', 'sessions_with_resolve',
-    'sessions_with_read', 'resolve_then_read_sessions', 'timeout_count',
+    'sessions_with_read', 'resolve_then_read_sessions',
+    'exact_first_resolution_successes', 'expected_read_tool_matches',
+    'terminal_stop_sessions', 'post_terminal_retry_sessions',
+    'post_terminal_tool_attempts', 'resolve_retry_sessions',
+    'wrong_first_tool_sessions', 'negative_abstention_sessions',
+    'unexpected_negative_memory_selection_sessions', 'timeout_count',
     'provider_calls', 'native_invocations', 'local_fallbacks',
     'primary_memory_writes', 'derived_index_writes', 'other_durable_mutations',
     'derived_runtime_mutation_evidence_count', 'derived_runtime_mutation_policy_violations',
@@ -101,7 +134,8 @@ function validateObservation(observation) {
   ];
   if (!observation || typeof observation !== 'object' || Array.isArray(observation) ||
       Object.keys(observation).sort().some((key, index) => key !== exactKeys[index]) ||
-      Object.keys(observation).length !== exactKeys.length || observation.schema_version !== 1 ||
+      Object.keys(observation).length !== exactKeys.length ||
+      observation.schema_version !== DOGFOOD_OBSERVATION_SCHEMA_VERSION ||
       observation.observation_kind !== DOGFOOD_OBSERVATION_KIND ||
       observation.session_limit !== MAX_DOGFOOD_SESSIONS ||
       observation.provider_call_limit !== MAX_DOGFOOD_PROVIDER_CALLS ||
@@ -114,7 +148,28 @@ function validateObservation(observation) {
       observation.sessions_with_resolve > observation.sessions_started ||
       observation.sessions_with_read > observation.sessions_started ||
       observation.resolve_then_read_sessions > observation.sessions_started ||
+      observation.memory_relevant_sessions + observation.memory_irrelevant_sessions +
+        observation.scope_missing_sessions + observation.unclassified_sessions !==
+        observation.sessions_started ||
+      observation.exact_first_resolution_successes > observation.memory_relevant_sessions ||
+      observation.expected_read_tool_matches > observation.exact_first_resolution_successes ||
+      observation.terminal_stop_sessions > observation.expected_read_tool_matches ||
+      observation.post_terminal_retry_sessions > observation.sessions_started ||
+      observation.resolve_retry_sessions > observation.sessions_started ||
+      observation.wrong_first_tool_sessions > observation.sessions_started ||
+      observation.negative_abstention_sessions >
+        observation.memory_irrelevant_sessions + observation.scope_missing_sessions ||
+      observation.unexpected_negative_memory_selection_sessions >
+        observation.memory_irrelevant_sessions + observation.scope_missing_sessions ||
       observation.timeout_count > observation.sessions_started ||
+      !observation.read_tool_selection_counts ||
+      typeof observation.read_tool_selection_counts !== 'object' ||
+      Array.isArray(observation.read_tool_selection_counts) ||
+      Object.keys(observation.read_tool_selection_counts).length !== READ_TOOL_NAMES.length ||
+      READ_TOOL_NAMES.some(toolName =>
+        !Number.isInteger(observation.read_tool_selection_counts[toolName]) ||
+        observation.read_tool_selection_counts[toolName] < 0 ||
+        observation.read_tool_selection_counts[toolName] > observation.sessions_started) ||
       observation.derived_runtime_mutation_evidence_count > observation.native_invocations ||
       (observation.derived_index_writes > 0 &&
        observation.derived_runtime_mutation_evidence_count === 0) ||
@@ -143,7 +198,10 @@ function validateLastSession(lastSession, sessionsStarted) {
     return null;
   }
   const keys = [
-    'ordinal', 'status', 'tool_sequence', 'total_latency_ms', 'result_count',
+    'ordinal', 'status', 'task_class', 'expected_read_tool', 'tool_sequence',
+    'resolve_attempt_count', 'read_attempt_count', 'post_terminal_attempt_count',
+    'first_resolve_status', 'terminal_read_status', 'workflow_outcome',
+    'total_latency_ms', 'result_count',
     'max_relevance', 'timed_out', 'error_code', 'tool_attempt_in_flight',
     'provider_calls', 'native_invocations'
   ].sort();
@@ -153,11 +211,37 @@ function validateLastSession(lastSession, sessionsStarted) {
       lastSession.ordinal !== sessionsStarted ||
       !['active', 'inactive', 'consumed', 'killed', 'expired',
         'emergency_stopped'].includes(lastSession.status) ||
+      ![...DOGFOOD_TASK_CLASSES, 'unclassified'].includes(lastSession.task_class) ||
+      (lastSession.expected_read_tool !== null &&
+       !READ_TOOL_NAMES.includes(lastSession.expected_read_tool)) ||
+      (lastSession.task_class === 'memory_relevant') !==
+        (lastSession.expected_read_tool !== null) ||
       !Array.isArray(lastSession.tool_sequence) || lastSession.tool_sequence.length > 4 ||
       lastSession.tool_sequence.some(toolName => ![
         'resolve_memory_context', 'memory_overview', 'search_memory',
         'audit_memory', 'prepare_memory_context'
       ].includes(toolName)) ||
+      !Number.isInteger(lastSession.resolve_attempt_count) ||
+      lastSession.resolve_attempt_count < 0 || lastSession.resolve_attempt_count > 4 ||
+      !Number.isInteger(lastSession.read_attempt_count) ||
+      lastSession.read_attempt_count < 0 || lastSession.read_attempt_count > 4 ||
+      lastSession.resolve_attempt_count + lastSession.read_attempt_count !==
+        lastSession.tool_sequence.length ||
+      !Number.isInteger(lastSession.post_terminal_attempt_count) ||
+      lastSession.post_terminal_attempt_count < 0 ||
+      lastSession.post_terminal_attempt_count > 4 ||
+      (lastSession.first_resolve_status !== null && ![
+        'resolved', 'missing', 'denied', 'expired', 'unavailable', 'error', 'other'
+      ].includes(lastSession.first_resolve_status)) ||
+      (lastSession.terminal_read_status !== null && ![
+        'found', 'empty', 'available', 'denied', 'expired', 'unavailable', 'error', 'other'
+      ].includes(lastSession.terminal_read_status)) ||
+      ![
+        'pending', 'no_tool_selected', 'read_without_resolve', 'resolve_retried',
+        'resolve_failed', 'resolve_only', 'multiple_reads_before_terminal',
+        'invalid_sequence', 'post_terminal_retry_attempted', 'unexpected_read_tool',
+        'resolve_then_one_read'
+      ].includes(lastSession.workflow_outcome) ||
       !Number.isInteger(lastSession.total_latency_ms) || lastSession.total_latency_ms < 0 ||
       lastSession.total_latency_ms > 240_000 ||
       !Number.isInteger(lastSession.result_count) || lastSession.result_count < 0 ||
@@ -183,7 +267,7 @@ function validateResponse(response, operation) {
   const actual = Object.keys(response).sort();
   if (actual.length !== RESPONSE_KEYS.length ||
       actual.some((key, index) => key !== RESPONSE_KEYS[index]) ||
-      response.schema_version !== 2 || response.operation !== operation ||
+      ![2, 3].includes(response.schema_version) || response.operation !== operation ||
       response.accepted !== true || response.default_closed !== true ||
       response.durable_state_written !== false ||
       !/^sha256:[a-f0-9]{64}$/u.test(response.receipt_digest || '')) {
