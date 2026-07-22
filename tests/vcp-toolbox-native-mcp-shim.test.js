@@ -411,6 +411,28 @@ test('R5-E distinguishes legitimate empty index and empty vector search receipts
   assert.equal(emptySearch._nativeRuntimeReceipt.vectorRetrievalRawDetailsDisclosed, false);
 });
 
+test('R5-E rejects results returned from an empty selected index', async () => {
+  const { adapter, calls } = selectedDiaryDiagnosticFixture({
+    hydratedChunkCount: 0,
+    loadedIndexVectorCount: 0,
+    finalResults: [{
+      fullPath: 'SYNTHETIC_CODEX_PRIVATE/stale-cache.md',
+      score: 0.9
+    }]
+  });
+  await assert.rejects(
+    adapter.search({ query: 'empty index stale fallback', limit: 1 }, {
+      authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+    }),
+    error => error.reasonCode === 'native_vector_search_not_executed' &&
+      error.message === 'native_runtime_stage_failed'
+  );
+  assert.equal(calls.embedding, 1);
+  assert.equal(calls.hydration, 1);
+  assert.equal(calls.indexLoad, 1);
+  assert.equal(calls.indexSearch, 0);
+});
+
 test('selected-diary hydration reserves scope before provider and shares the in-flight hydration', async () => {
   let releaseHydration;
   let hydrationStarted;

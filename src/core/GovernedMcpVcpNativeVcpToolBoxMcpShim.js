@@ -1285,6 +1285,15 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
           vectorSearchAccounting.indexSearchCallCount === 0) {
         throw nativeRuntimeStageError('native_vector_search_not_executed');
       }
+      const rawResultCount = Array.isArray(results) ? results.length : 0;
+      if (indexDiagnostics.enforced &&
+          indexDiagnostics.loadedIndexVectorCount === 0 && (
+            rawResultCount > 0 ||
+            vectorSearchAccounting.indexSearchCallCount > 0 ||
+            vectorSearchAccounting.rawCandidateCount > 0
+          )) {
+        throw nativeRuntimeStageError('native_vector_search_not_executed');
+      }
       const postcheck = postCheckNativeDiaryResults(results, authorization.allowedDiaryNames);
       if (!postcheck.accepted) {
         throw nativeRuntimeStageError(
@@ -1292,7 +1301,6 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
           postcheck.reasonCode
         );
       }
-      const rawResultCount = Array.isArray(results) ? results.length : 0;
       const vectorRetrievalDiagnostics = {
         vectorRetrievalDiagnosticsMode: indexDiagnostics.enforced
           ? VECTOR_RETRIEVAL_DIAGNOSTICS_MODE
