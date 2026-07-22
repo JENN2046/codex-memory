@@ -100,6 +100,8 @@ The offline matrix covers:
 - selected-index recovery exceptions and invalid stats;
 - non-empty hydration followed by a false zero-vector recovery;
 - an empty authorized index followed by stale-cache or fallback results;
+- final results not backed by enough selected-index vector candidates or by
+  the same internal candidate identities;
 - a Vexus search exception swallowed by the VCP manager;
 - a loaded non-empty index whose search method was never invoked;
 - ghost candidates removed during search;

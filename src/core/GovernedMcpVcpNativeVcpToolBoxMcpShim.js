@@ -953,7 +953,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
           return Promise.resolve(result).then(value => {
             if (accounting) {
               accounting.indexSearchSuccessCount += 1;
-              accounting.rawCandidateCount += Array.isArray(value) ? value.length : 0;
+              const candidates = Array.isArray(value) ? value : [];
+              accounting.rawCandidateCount += candidates.length;
+              for (const candidate of candidates) {
+                const chunkId = Number(candidate?.id);
+                if (Number.isSafeInteger(chunkId) && chunkId >= 0) {
+                  accounting.candidateChunkIds.add(chunkId);
+                }
+              }
             }
             return value;
           }, error => {
@@ -963,7 +970,14 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
         }
         if (accounting) {
           accounting.indexSearchSuccessCount += 1;
-          accounting.rawCandidateCount += Array.isArray(result) ? result.length : 0;
+          const candidates = Array.isArray(result) ? result : [];
+          accounting.rawCandidateCount += candidates.length;
+          for (const candidate of candidates) {
+            const chunkId = Number(candidate?.id);
+            if (Number.isSafeInteger(chunkId) && chunkId >= 0) {
+              accounting.candidateChunkIds.add(chunkId);
+            }
+          }
         }
         return result;
       } catch (error) {
@@ -1255,7 +1269,8 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
         indexSearchSuccessCount: 0,
         indexSearchFailureCount: 0,
         rawCandidateCount: 0,
-        ghostCandidateCount: 0
+        ghostCandidateCount: 0,
+        candidateChunkIds: new Set()
       };
       let results;
       try {
@@ -1293,6 +1308,17 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
             vectorSearchAccounting.rawCandidateCount > 0
           )) {
         throw nativeRuntimeStageError('native_vector_search_not_executed');
+      }
+      if (indexDiagnostics.enforced &&
+          rawResultCount > vectorSearchAccounting.rawCandidateCount) {
+        throw nativeRuntimeStageError('native_vector_search_failed');
+      }
+      if (indexDiagnostics.enforced && rawResultCount > 0 && results.some(result => {
+        const chunkId = Number(result?.chunkId);
+        return !Number.isSafeInteger(chunkId) || chunkId < 0 ||
+          !vectorSearchAccounting.candidateChunkIds.has(chunkId);
+      })) {
+        throw nativeRuntimeStageError('native_vector_search_failed');
       }
       const postcheck = postCheckNativeDiaryResults(results, authorization.allowedDiaryNames);
       if (!postcheck.accepted) {

@@ -106,7 +106,7 @@ test('isolated runtime hydrates only the authorized diaries after provider and b
     async search(diaryNames) {
       calls.push(['search', diaryNames]);
       selectedDiaryIndex.search([0.1, 0.2], 1);
-      return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
+      return [{ chunkId: 1, fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
     }
   };
   const adapter = createVcpToolBoxNativeMemoryAdapter({
@@ -238,7 +238,7 @@ function selectedDiaryDiagnosticFixture({
   callIndexSearch = true,
   rawCandidates = [{ id: 1, score: 0.9 }],
   ghostCandidate = false,
-  finalResults = [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }]
+  finalResults = [{ chunkId: 1, fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }]
 } = {}) {
   const calls = { embedding: 0, hydration: 0, indexLoad: 0, indexSearch: 0 };
   const index = {
@@ -431,6 +431,46 @@ test('R5-E rejects results returned from an empty selected index', async () => {
   assert.equal(calls.hydration, 1);
   assert.equal(calls.indexLoad, 1);
   assert.equal(calls.indexSearch, 0);
+});
+
+test('R5-E rejects final results not backed by selected-index candidates', async () => {
+  for (const [name, rawCandidates, finalResults] of [
+    [
+      'zero candidate stale fallback',
+      [],
+      [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/stale-cache.md', score: 0.9 }]
+    ],
+    [
+      'result count exceeds candidates',
+      [{ id: 1, score: 0.9 }],
+      [
+        { fullPath: 'SYNTHETIC_CODEX_PRIVATE/first.md', score: 0.9 },
+        { fullPath: 'SYNTHETIC_CODEX_PRIVATE/second.md', score: 0.8 }
+      ]
+    ],
+    [
+      'result identity not in candidates',
+      [{ id: 1, score: 0.9 }],
+      [{ chunkId: 2, fullPath: 'SYNTHETIC_CODEX_PRIVATE/stale-cache.md', score: 0.9 }]
+    ]
+  ]) {
+    const { adapter, calls } = selectedDiaryDiagnosticFixture({
+      rawCandidates,
+      finalResults
+    });
+    await assert.rejects(
+      adapter.search({ query: name, limit: 2 }, {
+        authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+      }),
+      error => error.reasonCode === 'native_vector_search_failed' &&
+        error.message === 'native_runtime_stage_failed',
+      name
+    );
+    assert.equal(calls.embedding, 1, name);
+    assert.equal(calls.hydration, 1, name);
+    assert.equal(calls.indexLoad, 1, name);
+    assert.equal(calls.indexSearch, 1, name);
+  }
 });
 
 test('selected-diary hydration reserves scope before provider and shares the in-flight hydration', async () => {
