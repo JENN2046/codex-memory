@@ -4,28 +4,28 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof`.
-Current validation: `CMV-2231`.
-Current fact: one exact-head selected-diary vector result passed relevance and receipt-chain checks with zero primary/source/global mutation.
-All R5-F runtimes are stopped and Edge remains zero-memory.
+Current task: `CM-2147 ChatGPT Web R5-G Exact-Head Bounded Retrieval Reliability Window`.
+Current validation: `CMV-2232`.
+Current fact: five fresh exact-head project reads returned one relevant result each with zero timeout, primary/source mutation, and unrestricted search.
+Harness recovery is disclosed; all R5-G runtimes are stopped and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2146 completed the exact-head selected-diary live proof that R5-E prepared.
-Three isolated attempts consumed the full `3 provider / 6 authenticated read`
-budget. The first two failed closed while a proof-only one-second derived
-startup cooldown overlapped the read. Restoring VCP's normal cooldown produced
-one relevant result with positive index/candidate evidence, successful scoped
-search, zero ghosts, zero fallback, and zero unrestricted search.
+CM-2147 completed five fresh exact-head project-only reliability sessions.
+Every session returned one result at relevance `>= 0.5`; provider/native and
+authenticated read-only budgets were exactly `5/5` and `16/16`. Inactive,
+consumed replay, expiry, and restart-inactive failed closed. Timeout, fallback,
+primary write, source mutation, excluded access, and global search stayed zero.
 
-All-attempt derived lifecycle accounting is `17 completed / 0 failed` with zero
-primary-memory writes, source-partition mutations, and
-legacy/ambiguous/unregistered access. Verification kill and shutdown drain
-passed; Governance, Relay, and the shim are stopped, and Edge remains
-`zero_memory`. The owner-only R5-F artifact is outside Git; old R5-C/R5-D
+Normal VCP cooldown was used. Derived lifecycle accounting is
+`6 completed / 0 failed`. Two private harness projection assertions were
+recovered without repeating a consumed provider call, and both evidence
+segments remain immutable. Verification kill and shutdown drain passed;
+Governance, Relay, and the shim are stopped, and Edge remains `zero_memory`.
+The owner-only R5-G aggregate artifact is outside Git; old R5-C/R5-D/R5-F
 artifacts are unchanged. Deliver the low-disclosure closeout through PR
 CI/review. Continuous activation, new provider/read work, production, release,
 deploy, cutover, and readiness require a separate current scope.
@@ -33,7 +33,7 @@ deploy, cutover, and readiness require a separate current scope.
 ## Historical Handoff Context
 
 The entries below are retained as chronology only. They are not current route
-instructions; CM-2146 and the zero-memory-preservation boundary above control.
+instructions; CM-2147 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,

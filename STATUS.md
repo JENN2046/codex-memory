@@ -4,13 +4,32 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof`.
-Current validation: `CMV-2231`.
-Current fact: exact-head selected-diary retrieval returned one relevant result with positive index/candidate evidence, successful scoped vector search, zero ghosts, zero fallback, and zero unrestricted search.
-All three isolated attempts are accounted; Governance/Relay/shim are stopped and the Edge remains zero-memory.
+Current task: `CM-2147 ChatGPT Web R5-G Exact-Head Bounded Retrieval Reliability Window`.
+Current validation: `CMV-2232`.
+Current fact: five fresh project-scoped sessions returned one relevant result each with positive selected-index evidence, zero timeout, zero primary/source mutation, and zero unrestricted search.
+Harness recovery is disclosed; Governance/Relay/shim are stopped and the Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2147 ChatGPT Web R5-G Bounded Retrieval Reliability Window
+
+R5-G used exact merged source and VCP's normal startup cooldown. Five fresh
+`resolve_memory_context -> search_memory(limit=1)` sessions returned one result
+each and met relevance `>= 0.5`. Provider/native usage was `5/5`; authenticated
+read-only MCP usage was `16/16`. Timeout, fallback, primary write,
+source-partition mutation, excluded-partition access, and unrestricted native
+search counters remained zero.
+
+Inactive, consumed-replay, expiry, and restart-inactive paths failed closed.
+Final drain reported six completed isolated derived lifecycle events and zero
+failures. Two private proof-harness assertions were recovered without
+repeating an already consumed provider call; both evidence segments remain
+preserved and are aggregated by an immutable owner-only artifact.
+
+Verification-complete kill passed. Governance, Relay, and the loopback shim are
+stopped; the Edge remains `zero_memory`. Final verdict:
+`R5_G_BOUNDED_RETRIEVAL_RELIABILITY_PASS_WITH_HARNESS_RECOVERY`.
 
 ## CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof
 

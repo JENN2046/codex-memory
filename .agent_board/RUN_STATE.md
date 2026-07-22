@@ -4,23 +4,24 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof`.
-Current validation: `CMV-2231`.
-Current fact: one exact-head selected-diary vector result passed relevance and receipt-chain checks with zero primary/source/global mutation.
-All R5-F runtimes are stopped and Edge remains zero-memory.
+Current task: `CM-2147 ChatGPT Web R5-G Exact-Head Bounded Retrieval Reliability Window`.
+Current validation: `CMV-2232`.
+Current fact: five fresh exact-head project reads returned one relevant result each with zero timeout, primary/source mutation, and unrestricted search.
+Harness recovery is disclosed; all R5-G runtimes are stopped and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R5-E diagnostics remained unchanged; R5-F exercised only the governed selected-diary path without VCP core or public MCP changes.
-- Runtime verdict: one bounded exact-head result passed relevance, selected-index search, candidate, ghost, post-check, receipt-chain, and isolation gates.
-- Attempt accounting: three fresh isolated attempts; provider budget `3/3`, authenticated read-call budget `6/6`, two fail-closed and one pass.
-- Derived accounting: 17 aggregate isolated lifecycle events completed, zero failed; primary-memory/source-partition/global-search effects stayed zero.
+- Architecture: R5-E diagnostics remained unchanged; R5-G exercised only the governed selected-diary path without VCP core or public MCP changes.
+- Runtime verdict: five bounded exact-head sessions passed non-empty, relevance, selected-index search, post-check, receipt-chain, and isolation gates.
+- Budget accounting: provider/native `5/5`; authenticated read-only MCP `16/16`; no repeated consumed provider call during harness recovery.
+- Negative accounting: inactive, four consumed replays, expiry, and restart-inactive failed closed; timeout count zero.
+- Derived accounting: six isolated lifecycle events completed, zero failed; primary-memory/source-partition/global-search effects stayed zero.
 - Host route: Governance, Relay, and the loopback shim are stopped; private-development Edge remains on the retained `zero_memory` binding.
-- Evidence: the owner-only R5-F artifact exists; old R5-C and R5-D artifacts are preserved unchanged.
-- Status sync: CM-2146/CMV-2231 record the R5-F runtime pass without creating a readiness claim.
+- Evidence: the owner-only R5-G aggregate artifact exists; harness recovery is disclosed and old R5-C/R5-D/R5-F artifacts are preserved unchanged.
+- Status sync: CM-2147/CMV-2232 record the R5-G reliability pass without creating a readiness claim.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -50,7 +51,7 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Deliver R5-F closeout through normal PR CI/review while preserving the
+Deliver R5-G closeout through normal PR CI/review while preserving the
 zero-memory default and owner-only artifacts. Any continuous activation,
 broader dogfood, production, release, deploy, cutover, readiness, public-write,
 or additional provider/read work requires a separate current scope.

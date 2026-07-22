@@ -8,13 +8,36 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_F_BOUNDED_VECTOR_RETRIEVAL_PASS` |
-| Current task | `CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof` |
-| Current validation | `CMV-2231` |
-| Current route | Deliver the low-disclosure R5-F closeout while preserving zero-memory and all readiness non-claims |
+| Status | `R5_G_BOUNDED_RETRIEVAL_RELIABILITY_PASS_WITH_HARNESS_RECOVERY` |
+| Current task | `CM-2147 ChatGPT Web R5-G Exact-Head Bounded Retrieval Reliability Window` |
+| Current validation | `CMV-2232` |
+| Current route | Deliver the low-disclosure R5-G reliability closeout while preserving zero-memory and all readiness non-claims |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R5-G Bounded Retrieval Reliability Window
+
+R5-G completed five fresh exact-head project-only sessions using
+`resolve_memory_context -> search_memory(limit=1)`. All five returned one
+result at relevance `>= 0.5`; no timeout, fallback, primary-memory write,
+source-partition mutation, excluded-partition access, or unrestricted native
+search occurred. Inactive, consumed replay, expiry, and restart-inactive paths
+failed closed.
+
+The isolated VCP runtime used its normal five-minute startup cooldown. Six
+authorized derived-runtime lifecycle events completed with zero failures and
+shutdown drain passed. Two private harness projection assertions were repaired
+without repeating an already consumed provider call; the immutable owner-only
+artifact aggregates both preserved default-closed Governance segments and
+marks that recovery explicitly.
+
+Governance, outbound Relay, and the isolated shim are stopped. The Edge remains
+zero-memory. See
+`docs/CHATGPT_WEB_R5G_BOUNDED_RETRIEVAL_RELIABILITY_WINDOW.md`.
+
+Production, release, deploy, cutover, continuous activation, readiness, and
+automatic-first-task guarantees remain false.
 
 ## ChatGPT Web R5-F Exact-Head Vector Retrieval Live Proof
 
