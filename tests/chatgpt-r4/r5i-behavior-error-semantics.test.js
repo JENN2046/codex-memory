@@ -62,10 +62,10 @@ test('R5-I preserves all six public tool names and exact input/output schema dig
   }
 });
 
-test('R5-I fails closed when exact visibility is absent without changing the public schema', () => {
-  assert.throws(() => validateToolArguments('resolve_memory_context', {
+test('R5-I keeps the frozen public schema and request validator compatible', () => {
+  assert.doesNotThrow(() => validateToolArguments('resolve_memory_context', {
     project_alias: 'project-alpha'
-  }), { code: 'tool_arguments_shape_invalid' });
+  }));
   assert.doesNotThrow(() => validateToolArguments('resolve_memory_context', {
     project_alias: 'project-alpha',
     requested_visibility: 'project'

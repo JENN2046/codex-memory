@@ -22,8 +22,8 @@ forbids retry narration that did not occur.
 
 Internal receipts bind a low-disclosure failure category without adding a
 public response field. All six public tool names and exact input/output schema
-digests remain unchanged. Targeted tests pass `46/46`, the default suite passes
-`5841/0/8`, and hardening passes `97/97 + 6/6`.
+digests remain unchanged. Targeted tests pass `47/47`, the default suite passes
+`5842/0/8`, and hardening passes `97/97 + 6/6`.
 
 Strict contract/test/compare/rollback subgates pass; strict overall remains
 non-pass only at inactive loopback health. No service was started.

@@ -240,6 +240,7 @@ async function runZeroMemorySyntheticE2E() {
       principalAssertion,
       identities: { principalIdentity, edgeIdentity, contextIdentity, relayIdentity },
       contextStore,
+      observations,
       clock
     }
   };

@@ -206,6 +206,23 @@ async function handleResolve({
   resolveContextPublicKey
 }) {
   const args = request.tool_request.arguments;
+  if (args.requested_visibility === undefined) {
+    return buildResolveResult({
+      request,
+      relayReceipt,
+      status: 'denied',
+      structuredContent: { context_status: 'denied' },
+      contextReceipt: {
+        schema_version: 1,
+        kind: 'chatgpt_r4_context_receipt',
+        context_status: 'denied',
+        context_issued: false,
+        principal_bound: true,
+        private_partition_access: false,
+        legacy_partition_access: false
+      }
+    });
+  }
   const issued = await issueProjectContext({
     principalFingerprint,
     safeProjectAlias: args.project_alias,

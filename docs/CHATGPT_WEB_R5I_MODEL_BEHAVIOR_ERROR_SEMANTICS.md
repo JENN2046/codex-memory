@@ -23,9 +23,10 @@ The model-visible workflow now makes five decisions explicit:
 
 1. `project_alias` and `requested_visibility` must be copied exactly from the
    user-provided task context.
-   The frozen public input schema remains unchanged, while the signed request
-   validator now fails closed before context issuance when
-   `requested_visibility` is absent; no default visibility is inferred.
+   The frozen public input schema remains unchanged. A schema-compatible
+   request that omits `requested_visibility` receives a receipt-backed
+   `denied` result before the context issuer is called; no default visibility
+   is inferred.
 2. App names, connector names, URLs, OAuth client identifiers, opaque context
    references, workspace names, and guessed repository names are not aliases.
 3. A missing alias or visibility produces one concise clarification, not
@@ -80,14 +81,14 @@ The R5-I negative matrix covers:
 - duplicate resolve/read suppression and terminal one-read stop guidance;
 - low-disclosure projection.
 
-Targeted tests pass `46/46`, the default suite passes `5841/0/8`, and
+Targeted tests pass `47/47`, the default suite passes `5842/0/8`, and
 hardening passes `97/97 + 6/6`. `gate:mainline:strict` passes its offline
-contract (`112/112`), test (`5841/0`), compare (`43/43`), and rollback
+contract (`112/112`), test (`5842/0`), compare (`43/43`), and rollback
 (`43/43`) subgates. Its overall result is intentionally not reported as PASS:
 health is `UNAVAILABLE_SERVICE_INACTIVE` because this source-only stage did not
 start the loopback service.
 
-The CI-safe gate passes `5940 tests / 5932 pass / 0 fail / 8 skip` with `noNetwork`, `noDaemon`, and
+The CI-safe gate passes `5941 tests / 5933 pass / 0 fail / 8 skip` with `noNetwork`, `noDaemon`, and
 `noProvider` all true.
 
 ## Preserved Evidence And Non-Claims

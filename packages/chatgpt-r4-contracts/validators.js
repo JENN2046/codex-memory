@@ -248,7 +248,7 @@ function validateToolArguments(name, args) {
   assertNoNormalizedKeys(args, FORBIDDEN_AUTHORITY_KEYS, 'tool_authority_argument_forbidden');
 
   const definitions = {
-    resolve_memory_context: { required: ['project_alias', 'requested_visibility'], optional: [] },
+    resolve_memory_context: { required: ['project_alias'], optional: ['requested_visibility'] },
     memory_overview: { required: ['project_context_ref'], optional: [] },
     search_memory: { required: ['project_context_ref', 'query'], optional: ['limit'] },
     audit_memory: { required: ['project_context_ref'], optional: ['event_limit'] },

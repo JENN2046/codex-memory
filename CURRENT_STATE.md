@@ -26,8 +26,8 @@ identities, resolve once, choose one read, and stop after the first attempt even
 when it returns an error.
 
 The six public tool names and exact input/output schema digests are unchanged.
-Targeted behavior/negative tests pass `46/46`; the default suite passes
-`5841/0/8`; hardening passes `97/97 + 6/6`. No runtime, provider, memory read or
+Targeted behavior/negative tests pass `47/47`; the default suite passes
+`5842/0/8`; hardening passes `97/97 + 6/6`. No runtime, provider, memory read or
 write, VCP core, or private configuration action occurred. The Edge remains
 zero-memory. See `docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md`.
 

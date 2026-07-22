@@ -17,8 +17,8 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 - Architecture: R5-I preserves the public six-tool ChatGPT surface and local Governance authorization boundary.
 - Source verdict: exact alias/visibility selection, receipt-versus-transport projection, duplicate suppression, and terminal one-read guidance are implemented.
 - Receipt integrity: ten low-disclosure failure categories are bound into internal context/Governance receipt digests; public schemas remain unchanged.
-- Validation: targeted `46/46`, default `5841/0/8`, and hardening `97/97 + 6/6` pass.
-- CI-safe gate: `5940 tests / 5932 pass / 0 fail / 8 skip`, no network/daemon/provider.
+- Validation: targeted `47/47`, default `5842/0/8`, and hardening `97/97 + 6/6` pass.
+- CI-safe gate: `5941 tests / 5933 pass / 0 fail / 8 skip`, no network/daemon/provider.
 - Strict gate: contract/test/compare/rollback pass; overall is non-pass only at
   inactive loopback health, and no service was started.
 - Runtime accounting: no service, provider, memory read/write, private config, or VCP core action occurred.
