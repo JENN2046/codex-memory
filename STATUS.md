@@ -4,13 +4,35 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics`.
-Current validation: `CMV-2230`.
-Current fact: selected-diary query-vector, index-recovery, vector-search, ghost-candidate, and low-disclosure receipt diagnostics are implemented and pass the offline negative matrix.
-No runtime/provider/memory action was performed; the R5-D safe-empty result remains unresolved and the Edge remains zero-memory pending a separately authorized live retry.
+Current task: `CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof`.
+Current validation: `CMV-2231`.
+Current fact: exact-head selected-diary retrieval returned one relevant result with positive index/candidate evidence, successful scoped vector search, zero ghosts, zero fallback, and zero unrestricted search.
+All three isolated attempts are accounted; Governance/Relay/shim are stopped and the Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof
+
+R5-F bound merged source, frozen VCP source, private mapping/registry, runtime
+authority, and rollback references before provider use. The successful
+`resolve_memory_context -> search_memory(limit=1)` sequence returned one result
+and passed the relevance threshold. Its receipt chain records a loaded selected
+index, one or more raw candidates, an executed and successful index search,
+zero ghost candidates, zero fallback, and zero unrestricted native search.
+
+The full authorized window used three conservative provider attempts and six
+authenticated read calls. Two attempts failed closed while a private
+proof-harness override compressed VCP's normal derived startup cooldown to one
+second. Restoring the normal five-minute cooldown removed the overlap and the
+third attempt passed. Across all attempts, 17 isolated derived-runtime events
+completed with zero failures, primary-memory writes, source-partition
+mutations, or legacy/ambiguous/unregistered access.
+
+Verification-complete kill and shutdown drain passed. Governance, Relay, and
+the loopback shim are stopped; the retained Edge remains `zero_memory`.
+Owner-only evidence stays outside Git. Final verdict:
+`R5_F_BOUNDED_VECTOR_RETRIEVAL_PASS`.
 
 ## CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics
 

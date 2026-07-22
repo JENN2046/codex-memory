@@ -38,6 +38,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-B One-Read Model Guidance](docs/CHATGPT_WEB_R5B_ONE_READ_MODEL_GUIDANCE.md)
 - [ChatGPT Web R5-D Derived Runtime Mutation Governance](docs/CHATGPT_WEB_R5D_DERIVED_RUNTIME_MUTATION_GOVERNANCE.md)
 - [ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics](docs/CHATGPT_WEB_R5E_VECTOR_RETRIEVAL_FAIL_CLOSED_DIAGNOSTICS.md)
+- [ChatGPT Web R5-F Exact-Head Vector Retrieval Live Proof](docs/CHATGPT_WEB_R5F_EXACT_HEAD_VECTOR_RETRIEVAL_LIVE_PROOF.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
@@ -226,6 +227,19 @@ and binds only low-disclosure counts/outcomes into the receipt chain. A valid
 empty index, a successful no-match search, and a found result are now distinct.
 This source/offline work does not modify VCPToolBox core, call a provider, read
 real memory, or prove a live retry. The private Edge remains `zero_memory`.
+
+R5-F then completed the separately authorized exact-head live retry. Three
+fresh isolated attempts used the full bounded budget of three conservative
+provider attempts and six authenticated read calls. The first two failed
+closed while a proof-only one-second derived startup cooldown overlapped the
+read. Restoring VCP's normal five-minute cooldown produced one selected-index
+result with relevance at least `0.5`; the read receipt bound positive index and
+candidate counts, successful vector search, zero ghosts, zero fallback, and
+zero unrestricted search. Across all attempts, 17 isolated derived lifecycle
+events completed with zero failures, primary-memory writes, source-partition
+mutations, or legacy/ambiguous/unregistered access. Governance, Relay, and the
+shim are stopped, the Edge remains `zero_memory`, and the owner-only artifact
+stays outside Git. See [R5-F live proof](docs/CHATGPT_WEB_R5F_EXACT_HEAD_VECTOR_RETRIEVAL_LIVE_PROOF.md).
 
 Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
 only when the native target exposes shape-compatible tools for those public

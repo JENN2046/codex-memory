@@ -8,13 +8,39 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_E_SOURCE_VALIDATED_RUNTIME_NOT_RUN` |
-| Current task | `CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics` |
-| Current validation | `CMV-2230` |
-| Current route | Deliver and review R5-E source diagnostics; preserve zero-memory until a separately authorized bounded live retry |
+| Status | `R5_F_BOUNDED_VECTOR_RETRIEVAL_PASS` |
+| Current task | `CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof` |
+| Current validation | `CMV-2231` |
+| Current route | Deliver the low-disclosure R5-F closeout while preserving zero-memory and all readiness non-claims |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R5-F Exact-Head Vector Retrieval Live Proof
+
+R5-F completed the authorized exact-head selected-diary retry from merged
+`main`. The successful session used exactly
+`resolve_memory_context -> search_memory(limit=1)`, returned one result, passed
+the relevance threshold, and bound positive selected-index/candidate evidence,
+successful vector search, zero ghosts, result-source post-check, zero fallback,
+and zero unrestricted native search through the native/bridge/Governance
+receipt chain.
+
+Three fresh isolated attempts used the full bounded budget of three
+conservative provider attempts and six authenticated read calls. The first two
+failed closed while a proof-only one-second derived startup cooldown overlapped
+the read. Restoring VCP's normal five-minute cooldown was the only runtime
+control change before the successful attempt. Across all attempts, 17 isolated
+derived lifecycle events completed with zero failures, primary-memory writes,
+source-partition mutations, or legacy/ambiguous/unregistered access.
+
+Verification-complete kill ran; Governance, Relay, and the shim are stopped.
+The retained Edge stayed `zero_memory`. An owner-only non-Git artifact exists,
+and the earlier R5-C/R5-D artifacts remain unchanged. See
+`docs/CHATGPT_WEB_R5F_EXACT_HEAD_VECTOR_RETRIEVAL_LIVE_PROOF.md`.
+
+Production, release, deploy, cutover, continuous activation, and readiness
+remain false.
 
 ## ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics
 

@@ -4,34 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics`.
-Current validation: `CMV-2230`.
-Current fact: fail-closed selected-diary vector retrieval diagnostics and their low-disclosure receipt chain pass the offline negative matrix.
-No live retry ran; R5-D remains safe-empty, local runtimes are stopped, and Edge remains zero-memory.
+Current task: `CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof`.
+Current validation: `CMV-2231`.
+Current fact: one exact-head selected-diary vector result passed relevance and receipt-chain checks with zero primary/source/global mutation.
+All R5-F runtimes are stopped and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2145 implements the offline/source-level diagnosis required by the R5-D safe
-empty result. The governed shim now distinguishes invalid embeddings, selected
-index recovery failure, a valid empty index, a successful no-match search,
-swallowed Vexus search failure, search bypass, ghost candidates, and a found
-result. Low-disclosure evidence is carried through the native, bridge, and R4
-Governance receipt chain; raw vectors, diary names, paths, provider responses,
-and private mapping values are excluded.
+CM-2146 completed the exact-head selected-diary live proof that R5-E prepared.
+Three isolated attempts consumed the full `3 provider / 6 authenticated read`
+budget. The first two failed closed while a proof-only one-second derived
+startup cooldown overlapped the read. Restoring VCP's normal cooldown produced
+one relevant result with positive index/candidate evidence, successful scoped
+search, zero ghosts, zero fallback, and zero unrestricted search.
 
-The immutable owner-only R5-D failure artifact remains outside Git and is not
-rewritten. Governance, Relay, and the shim remain stopped; Edge remains
-`zero_memory`. R5-E is source/offline validated only. Complete its PR CI/review,
-then obtain a separate exact provider/read budget before any live retry. No
-production/release/deploy/cutover/readiness conclusion follows.
+All-attempt derived lifecycle accounting is `17 completed / 0 failed` with zero
+primary-memory writes, source-partition mutations, and
+legacy/ambiguous/unregistered access. Verification kill and shutdown drain
+passed; Governance, Relay, and the shim are stopped, and Edge remains
+`zero_memory`. The owner-only R5-F artifact is outside Git; old R5-C/R5-D
+artifacts are unchanged. Deliver the low-disclosure closeout through PR
+CI/review. Continuous activation, new provider/read work, production, release,
+deploy, cutover, and readiness require a separate current scope.
 
 ## Historical Handoff Context
 
 The entries below are retained as chronology only. They are not current route
-instructions; CM-2145 and the zero-memory-preservation boundary above control.
+instructions; CM-2146 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,
