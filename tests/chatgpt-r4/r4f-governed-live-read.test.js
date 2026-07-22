@@ -513,6 +513,18 @@ test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async
         rawCandidateCount: 0,
         vectorRetrievalOutcome: 'empty_index'
       });
+    },
+    result => {
+      result.results = [];
+      result.items = [{ memoryContextProjection: { lowDisclosure: true, statement: 'mixed' } }];
+      Object.assign(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt, {
+        hydratedChunkCount: 0,
+        loadedIndexVectorCount: 0,
+        indexSearchCalled: true,
+        indexSearchSucceeded: true,
+        rawCandidateCount: 0,
+        vectorRetrievalOutcome: 'empty_index'
+      });
     }
   ];
   for (const mutate of mutations) {

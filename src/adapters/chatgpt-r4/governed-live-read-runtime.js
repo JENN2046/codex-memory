@@ -244,6 +244,7 @@ function emptyIndexSearchEvidenceComplete(runtime) {
 function emptyIndexDelegatedResultEvidenceComplete(result) {
   const evidence = [];
   if (Array.isArray(result?.results)) evidence.push(result.results.length === 0);
+  if (Array.isArray(result?.items)) evidence.push(result.items.length === 0);
   if (isPlainObject(result?.overview)) {
     evidence.push(result.overview.resultCountBucket === 'zero');
   }

@@ -415,16 +415,24 @@ function nativeRuntimeReceiptEvidenceComplete(receipt) {
 function emptyIndexResultEvidenceComplete(value) {
   if (Array.isArray(value)) return value.length === 0;
   if (!isPlainObject(value)) return false;
+  const evidence = [];
   if (Object.hasOwn(value, 'results')) {
-    return Array.isArray(value.results) && value.results.length === 0;
+    evidence.push(Array.isArray(value.results) && value.results.length === 0);
+  }
+  if (Object.hasOwn(value, 'items')) {
+    evidence.push(Array.isArray(value.items) && value.items.length === 0);
   }
   if (Object.hasOwn(value, 'overview')) {
-    return isPlainObject(value.overview) && value.overview.resultCountBucket === 'zero';
+    evidence.push(
+      isPlainObject(value.overview) && value.overview.resultCountBucket === 'zero'
+    );
   }
   if (Object.hasOwn(value, 'audit')) {
-    return isPlainObject(value.audit) && value.audit.sampledReadResultCountBucket === 'zero';
+    evidence.push(
+      isPlainObject(value.audit) && value.audit.sampledReadResultCountBucket === 'zero'
+    );
   }
-  return false;
+  return evidence.length === 1 && evidence[0] === true;
 }
 
 function lowDisclosureNativeRuntimeReceipt(receipt = null, value = undefined) {

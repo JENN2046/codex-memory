@@ -635,7 +635,10 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
           results: probedEmptyIndexReceipt &&
               !['contradictory', 'misclassified'].includes(probedEmptyIndexReceipt)
             ? []
-            : [{ content: rawPrivateValue }]
+            : [{ content: rawPrivateValue }],
+          ...(probedEmptyIndexReceipt === 'mixed'
+            ? { items: [{ content: rawPrivateValue }] }
+            : {})
         },
         _meta: {
           codexMemoryNativeRuntimeReceipt: nativeRuntimeReceipt
@@ -742,6 +745,15 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
       governanceMeta: validReadGovernanceMeta()
     });
     assert.equal(misclassifiedEmptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, false);
+
+    probedEmptyIndexReceipt = 'mixed';
+    const mixedEmptyIndexRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'mixed empty index evidence', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(mixedEmptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, false);
     probedEmptyIndexReceipt = false;
 
     falseVectorRetrievalReceipt = true;
