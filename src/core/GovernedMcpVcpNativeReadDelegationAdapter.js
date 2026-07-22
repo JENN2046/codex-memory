@@ -1287,6 +1287,30 @@ function projectNativeSearchResults(nativeValue, maxItems = 5) {
   });
 }
 
+function projectNativeResultCountEvidence(toolName, nativeValue) {
+  if (toolName === 'memory_overview') {
+    return {
+      overview: {
+        resultCountBucket: safeEnum(
+          nativeValue?.overview?.resultCountBucket,
+          ['zero', 'bounded', 'over_budget']
+        )
+      }
+    };
+  }
+  if (toolName === 'audit_memory') {
+    return {
+      audit: {
+        sampledReadResultCountBucket: safeEnum(
+          nativeValue?.audit?.sampledReadResultCountBucket,
+          ['zero', 'bounded', 'over_budget']
+        )
+      }
+    };
+  }
+  return {};
+}
+
 function buildReceipt({ toolName, targetReferenceName, gateResult, statusClass, nativeValue, nativeInvocationReceipt }) {
   const request = gateResult.normalizedBridgeRequest;
   const attempted = statusClass !== 'not_consumed';
@@ -1550,7 +1574,7 @@ async function executeGovernedMcpVcpNativeReadDelegation(input = {}) {
           nativeValue,
           disclosureMaxItemsFromGate(gateResult)
         )
-      } : {}),
+      } : projectNativeResultCountEvidence(toolName, nativeValue)),
       access: buildAccess({
         statusClass: 'success',
         fallbackEligible: false,

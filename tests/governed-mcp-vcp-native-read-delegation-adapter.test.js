@@ -667,6 +667,32 @@ test('delegates governed read to native MCP caller and returns only low-disclosu
   ]);
   assert.equal(serialized.includes('RAW_MEMORY_ID_SHOULD_NOT_ECHO'), false);
   assert.equal(serialized.includes('RAW_PRIVATE_CONTENT_SHOULD_NOT_ECHO'), false);
+
+  for (const [toolName, nativeValue, projectedEvidence] of [
+    [
+      'memory_overview',
+      { overview: { resultCountBucket: 'zero' } },
+      { overview: { resultCountBucket: 'zero' } }
+    ],
+    [
+      'audit_memory',
+      { audit: { sampledReadResultCountBucket: 'zero' } },
+      { audit: { sampledReadResultCountBucket: 'zero' } }
+    ]
+  ]) {
+    const evidenceResult = await executeGovernedMcpVcpNativeReadDelegation({
+      toolName,
+      args: {},
+      gateResult: gateResult(toolName),
+      callMcpTool: receiptAwareCallMcpTool(async () => nativeValue)
+    });
+    assert.equal(evidenceResult.accepted, true, toolName);
+    assert.deepEqual(
+      evidenceResult.delegatedResult[toolName === 'memory_overview' ? 'overview' : 'audit'],
+      projectedEvidence[toolName === 'memory_overview' ? 'overview' : 'audit'],
+      toolName
+    );
+  }
 });
 
 test('read delegation requires native caller receipt capability before native call', async () => {

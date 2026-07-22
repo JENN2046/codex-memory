@@ -342,6 +342,25 @@ test('R4-F validates bounded projections for every governed read tool', async ()
           }
         );
       }
+      if (nativeToolName === 'memory_overview' || nativeToolName === 'audit_memory') {
+        delete delegated.results;
+        Object.assign(
+          delegated.receipt.nativeInvocationReceipt.nativeRuntimeReceipt,
+          {
+            hydratedChunkCount: 0,
+            loadedIndexVectorCount: 0,
+            indexSearchCalled: true,
+            indexSearchSucceeded: true,
+            rawCandidateCount: 0,
+            vectorRetrievalOutcome: 'empty_index'
+          }
+        );
+        if (nativeToolName === 'memory_overview') {
+          delegated.overview = { resultCountBucket: 'zero' };
+        } else {
+          delegated.audit = { sampledReadResultCountBucket: 'zero' };
+        }
+      }
       return delegated;
     }
   });
@@ -440,6 +459,42 @@ test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async
       });
     },
     result => {
+      Object.assign(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt, {
+        hydratedChunkCount: 0,
+        loadedIndexVectorCount: 0,
+        indexSearchCalled: true,
+        indexSearchSucceeded: true,
+        rawCandidateCount: 0,
+        vectorRetrievalOutcome: 'empty_index'
+      });
+    },
+    result => {
+      delete result.results;
+      result.overview = { resultCountBucket: 'bounded' };
+      Object.assign(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt, {
+        hydratedChunkCount: 0,
+        loadedIndexVectorCount: 0,
+        indexSearchCalled: true,
+        indexSearchSucceeded: true,
+        rawCandidateCount: 0,
+        vectorRetrievalOutcome: 'empty_index'
+      });
+    },
+    result => {
+      delete result.results;
+      result.audit = { sampledReadResultCountBucket: 'bounded' };
+      Object.assign(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt, {
+        hydratedChunkCount: 0,
+        loadedIndexVectorCount: 0,
+        indexSearchCalled: true,
+        indexSearchSucceeded: true,
+        rawCandidateCount: 0,
+        vectorRetrievalOutcome: 'empty_index'
+      });
+    },
+    result => {
+      result.results = [];
+      result.overview = { resultCountBucket: 'zero' };
       Object.assign(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt, {
         hydratedChunkCount: 0,
         loadedIndexVectorCount: 0,

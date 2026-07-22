@@ -1285,6 +1285,9 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
           )
         );
       } catch {
+        if (vectorSearchAccounting.indexSearchFailureCount > 0) {
+          throw nativeRuntimeStageError('native_vector_search_failed');
+        }
         throw nativeRuntimeStageError('native_diary_search_failed');
       }
       if (vectorSearchAccounting.indexSearchFailureCount > 0 ||

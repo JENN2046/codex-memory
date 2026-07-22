@@ -241,6 +241,18 @@ function emptyIndexSearchEvidenceComplete(runtime) {
       runtime.indexSearchSucceeded === true);
 }
 
+function emptyIndexDelegatedResultEvidenceComplete(result) {
+  const evidence = [];
+  if (Array.isArray(result?.results)) evidence.push(result.results.length === 0);
+  if (isPlainObject(result?.overview)) {
+    evidence.push(result.overview.resultCountBucket === 'zero');
+  }
+  if (isPlainObject(result?.audit)) {
+    evidence.push(result.audit.sampledReadResultCountBucket === 'zero');
+  }
+  return evidence.length === 1 && evidence[0] === true;
+}
+
 function nativeEvidence(result, expectedAllowedDiaryCount) {
   const receipt = result?.receipt;
   const invocation = receipt?.nativeInvocationReceipt;
@@ -340,7 +352,7 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
         runtime.loadedIndexVectorCount !== 0 ||
         !emptyIndexSearchEvidenceComplete(runtime) ||
         runtime.rawCandidateCount !== 0 ||
-        (Array.isArray(result?.results) && result.results.length !== 0)
+        !emptyIndexDelegatedResultEvidenceComplete(result)
       )) ||
       (runtime.vectorRetrievalOutcome === 'found' &&
         runtime.rawCandidateCount < 1) ||

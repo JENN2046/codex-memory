@@ -235,6 +235,7 @@ function selectedDiaryDiagnosticFixture({
   loadedIndexVectorCount = 1,
   recoveryFailure = false,
   indexSearchFailure = false,
+  propagateIndexSearchFailure = false,
   callIndexSearch = true,
   searchEmptyIndex = false,
   rawCandidates = [{ id: 1, score: 0.9 }],
@@ -270,7 +271,8 @@ function selectedDiaryDiagnosticFixture({
       let candidates;
       try {
         candidates = index.search(vector, 1);
-      } catch {
+      } catch (error) {
+        if (propagateIndexSearchFailure) throw error;
         return [];
       }
       if (ghostCandidate && candidates.length > 0) {
@@ -365,6 +367,11 @@ test('R5-E rejects recovery failures and zero recovered vectors after non-empty 
 test('R5-E rejects swallowed Vexus failures, skipped searches, and ghost candidates', async () => {
   for (const [name, fixtureOptions, reasonCode] of [
     ['swallowed search failure', { indexSearchFailure: true }, 'native_vector_search_failed'],
+    [
+      'propagated search failure',
+      { indexSearchFailure: true, propagateIndexSearchFailure: true },
+      'native_vector_search_failed'
+    ],
     ['search not executed', { callIndexSearch: false, finalResults: [] }, 'native_vector_search_not_executed'],
     ['ghost candidate', { ghostCandidate: true, finalResults: [] }, 'native_vector_search_ghost_result']
   ]) {
