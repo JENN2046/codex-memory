@@ -483,6 +483,7 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
   let nonIsolatedLifecycleReceipt = false;
   let validVectorRetrievalReceipt = false;
   let falseVectorRetrievalReceipt = false;
+  let probedEmptyIndexReceipt = false;
   const server = await withJsonRpcServer(async (req, res, body) => {
     assert.equal(body.method, 'tools/call');
     const nativeRuntimeReceipt = {
@@ -605,13 +606,31 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
         vectorRetrievalRawDetailsDisclosed: false
       });
     }
+    if (probedEmptyIndexReceipt) {
+      Object.assign(nativeRuntimeReceipt, {
+        vectorRetrievalDiagnosticsMode: 'fail_closed_v1',
+        hydratedChunkCount: 0,
+        loadedIndexVectorCount: 0,
+        queryVectorShapeValid: true,
+        queryVectorExpectedDimensionKnown: true,
+        queryVectorDimensionMatched: true,
+        queryVectorFinite: true,
+        queryVectorNonzero: true,
+        indexSearchCalled: true,
+        indexSearchSucceeded: probedEmptyIndexReceipt === 'valid',
+        rawCandidateCount: 0,
+        ghostCandidateCount: 0,
+        vectorRetrievalOutcome: 'empty_index',
+        vectorRetrievalRawDetailsDisclosed: false
+      });
+    }
     res.writeHead(200, { 'content-type': 'application/json' });
     res.end(JSON.stringify({
       jsonrpc: '2.0',
       id: body.id,
       result: {
         structuredContent: {
-          results: [{ content: rawPrivateValue }]
+          results: probedEmptyIndexReceipt ? [] : [{ content: rawPrivateValue }]
         },
         _meta: {
           codexMemoryNativeRuntimeReceipt: nativeRuntimeReceipt
@@ -675,6 +694,32 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
     assert.equal(retrieval.receipt.nativeRuntimeReceipt.indexSearchSucceeded, true);
     assert.equal(retrieval.receipt.nativeRuntimeReceipt.rawCandidateCount, 1);
     validVectorRetrievalReceipt = false;
+
+    probedEmptyIndexReceipt = 'valid';
+    const emptyIndexRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'empty index', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(emptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, true);
+    assert.equal(
+      emptyIndexRetrieval.receipt.nativeRuntimeReceipt.vectorRetrievalOutcome,
+      'empty_index'
+    );
+    assert.equal(emptyIndexRetrieval.receipt.nativeRuntimeReceipt.indexSearchCalled, true);
+    assert.equal(emptyIndexRetrieval.receipt.nativeRuntimeReceipt.indexSearchSucceeded, true);
+    assert.equal(emptyIndexRetrieval.receipt.nativeRuntimeReceipt.rawCandidateCount, 0);
+
+    probedEmptyIndexReceipt = 'mismatch';
+    const mismatchedEmptyIndexRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'mismatched empty index', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(mismatchedEmptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, false);
+    probedEmptyIndexReceipt = false;
 
     falseVectorRetrievalReceipt = true;
     const falseRetrieval = await result.callToolWithReceipt({

@@ -327,7 +327,22 @@ test('R4-F validates bounded projections for every governed read tool', async ()
     resolveDiaryRead: resolveRead,
     async callGovernedTool(nativeToolName, args, requestContext) {
       calls.push({ nativeToolName, args, requestContext });
-      return delegatedResult();
+      const delegated = delegatedResult();
+      if (args.query === 'probed empty index') {
+        delegated.results = [];
+        Object.assign(
+          delegated.receipt.nativeInvocationReceipt.nativeRuntimeReceipt,
+          {
+            hydratedChunkCount: 0,
+            loadedIndexVectorCount: 0,
+            indexSearchCalled: true,
+            indexSearchSucceeded: true,
+            rawCandidateCount: 0,
+            vectorRetrievalOutcome: 'empty_index'
+          }
+        );
+      }
+      return delegated;
     }
   });
   const trustedScope = {
@@ -340,6 +355,7 @@ test('R4-F validates bounded projections for every governed read tool', async ()
   };
   const cases = [
     ['search_memory', { query: 'bounded', limit: 1 }, 'found'],
+    ['search_memory', { query: 'probed empty index', limit: 1 }, 'empty'],
     ['prepare_memory_context', { task_summary: 'bounded task' }, 'found'],
     ['memory_overview', {}, 'available'],
     ['audit_memory', { event_limit: 1 }, 'available']
@@ -359,7 +375,7 @@ test('R4-F validates bounded projections for every governed read tool', async ()
       { status: result.status }
     ));
   }
-  assert.equal(calls.length, 4);
+  assert.equal(calls.length, 5);
   assert.equal(calls.every(call => call.requestContext.executionContext.clientId === 'Codex'), true);
 });
 
@@ -412,7 +428,17 @@ test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.vectorRetrievalDiagnosticsMode; },
     result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.ghostCandidateCount = 1; },
     result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.indexSearchSucceeded = false; },
-    result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.rawCandidateCount = 0; }
+    result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.rawCandidateCount = 0; },
+    result => {
+      Object.assign(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt, {
+        hydratedChunkCount: 0,
+        loadedIndexVectorCount: 0,
+        indexSearchCalled: true,
+        indexSearchSucceeded: false,
+        rawCandidateCount: 0,
+        vectorRetrievalOutcome: 'empty_index'
+      });
+    }
   ];
   for (const mutate of mutations) {
     const malformed = delegatedResult();

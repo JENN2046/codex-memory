@@ -242,6 +242,13 @@ const REQUIRED_NATIVE_RUNTIME_EVIDENCE_BOOLEAN_FIELDS = Object.freeze([
   'readinessClaimed'
 ]);
 
+function emptyIndexSearchEvidenceComplete(receipt) {
+  return (receipt.indexSearchCalled === false &&
+    receipt.indexSearchSucceeded === false) ||
+    (receipt.indexSearchCalled === true &&
+      receipt.indexSearchSucceeded === true);
+}
+
 function nativeRuntimeReceiptEvidenceComplete(receipt) {
   if (!isPlainObject(receipt) ||
     !REQUIRED_NATIVE_RUNTIME_EVIDENCE_BOOLEAN_FIELDS.every(field =>
@@ -391,8 +398,7 @@ function nativeRuntimeReceiptEvidenceComplete(receipt) {
       if (receipt.vectorRetrievalOutcome === 'empty_index' && (
         receipt.hydratedChunkCount !== 0 ||
         receipt.loadedIndexVectorCount !== 0 ||
-        receipt.indexSearchCalled !== false ||
-        receipt.indexSearchSucceeded !== false ||
+        !emptyIndexSearchEvidenceComplete(receipt) ||
         receipt.rawCandidateCount !== 0
       )) return false;
       if (receipt.vectorRetrievalOutcome === 'found' &&

@@ -234,6 +234,13 @@ function buildRequestContext({ trustedScope, visibility, projectContextRef, nati
   };
 }
 
+function emptyIndexSearchEvidenceComplete(runtime) {
+  return (runtime.indexSearchCalled === false &&
+    runtime.indexSearchSucceeded === false) ||
+    (runtime.indexSearchCalled === true &&
+      runtime.indexSearchSucceeded === true);
+}
+
 function nativeEvidence(result, expectedAllowedDiaryCount) {
   const receipt = result?.receipt;
   const invocation = receipt?.nativeInvocationReceipt;
@@ -331,8 +338,7 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       (runtime.vectorRetrievalOutcome === 'empty_index' && (
         runtime.hydratedChunkCount !== 0 ||
         runtime.loadedIndexVectorCount !== 0 ||
-        runtime.indexSearchCalled !== false ||
-        runtime.indexSearchSucceeded !== false ||
+        !emptyIndexSearchEvidenceComplete(runtime) ||
         runtime.rawCandidateCount !== 0
       )) ||
       (runtime.vectorRetrievalOutcome === 'found' &&
