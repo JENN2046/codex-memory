@@ -8,13 +8,31 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_D_RUNTIME_PROOF_FAILED_SAFE_EMPTY` |
-| Current task | `CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance And Safe-Empty Closeout` |
-| Current validation | `CMV-2229` |
-| Current route | Diagnose the bounded vector-search empty result under a separately authorized provider/read budget; preserve zero-memory default |
+| Status | `R5_E_SOURCE_VALIDATED_RUNTIME_NOT_RUN` |
+| Current task | `CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics` |
+| Current validation | `CMV-2230` |
+| Current route | Deliver and review R5-E source diagnostics; preserve zero-memory until a separately authorized bounded live retry |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics
+
+R5-E distinguishes the lower-level causes that VCP's fail-soft vector path can
+otherwise collapse into the same safe empty result. The governed shim now
+validates query-vector shape, dimension, finiteness, and nonzero content;
+explicitly loads and inspects only authorized selected-diary indexes; detects
+index recovery failures, swallowed Vexus search failures, search bypass, and
+ghost candidates; and binds low-disclosure counts and outcomes into the
+native/bridge/Governance receipt chain.
+
+The offline negative matrix covers invalid vectors, recovery and search
+failures, false zero-vector recovery, missing/forged receipt evidence, valid
+empty-index and empty-search paths, and a found path. VCPToolBox core and the
+public MCP schemas are unchanged. No service, provider, real-memory, or runtime
+mutation action was performed; the Edge remains `zero_memory`. A live retry
+requires a separate exact provider/read budget. See
+`docs/CHATGPT_WEB_R5E_VECTOR_RETRIEVAL_FAIL_CLOSED_DIAGNOSTICS.md`.
 
 ## ChatGPT Web R5-D Derived Runtime Mutation Governance
 
@@ -22,8 +40,6 @@ R5-D replaced the incorrect “all derived writes must be zero” interpretation
 with bounded lifecycle accounting for an isolated selected-diary runtime. The
 source contract, false-zero rejection, shutdown drain, counter budget, and
 selected-diary hydration seam passed local tests and strict mainline gates.
-The current runtime-failure closeout PR still treats its own CI and exact-head
-review as pending delivery gates.
 
 The private-development run completed one bounded read with provider/native
 counts `1/1`. Final drain recorded six completed derived lifecycle events and

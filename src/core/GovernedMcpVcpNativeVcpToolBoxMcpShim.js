@@ -86,9 +86,107 @@ function jsonRpcError(id, code, message, data = undefined) {
 const NATIVE_RUNTIME_FAILURE_REASON_CODES = Object.freeze(new Set([
   'native_runtime_initialization_failed',
   'native_provider_embedding_failed',
+  'native_query_vector_invalid_shape',
+  'native_query_vector_dimension_unavailable',
+  'native_query_vector_dimension_mismatch',
+  'native_query_vector_non_finite',
+  'native_query_vector_zero_norm',
+  'native_selected_diary_index_recovery_failed',
+  'native_selected_diary_index_empty_after_hydration',
+  'native_vector_search_not_executed',
+  'native_vector_search_failed',
+  'native_vector_search_ghost_result',
   'native_diary_search_failed',
   'native_result_scope_postcheck_failed'
 ]));
+
+const VECTOR_RETRIEVAL_DIAGNOSTICS_MODE = 'fail_closed_v1';
+const VECTOR_RETRIEVAL_OUTCOMES = Object.freeze(new Set([
+  'not_attempted',
+  'empty_index',
+  'empty',
+  'found'
+]));
+
+function nonNegativeInteger(value, fallback = 0) {
+  return Number.isSafeInteger(value) && value >= 0 ? value : fallback;
+}
+
+function nativeVectorRetrievalDiagnostics(overrides = {}) {
+  const enabled = overrides.vectorRetrievalDiagnosticsMode ===
+    VECTOR_RETRIEVAL_DIAGNOSTICS_MODE;
+  return {
+    vectorRetrievalDiagnosticsMode: enabled
+      ? VECTOR_RETRIEVAL_DIAGNOSTICS_MODE
+      : 'not_applicable',
+    hydratedChunkCount: enabled
+      ? nonNegativeInteger(overrides.hydratedChunkCount)
+      : 0,
+    loadedIndexVectorCount: enabled
+      ? nonNegativeInteger(overrides.loadedIndexVectorCount)
+      : 0,
+    queryVectorShapeValid: enabled && overrides.queryVectorShapeValid === true,
+    queryVectorExpectedDimensionKnown:
+      enabled && overrides.queryVectorExpectedDimensionKnown === true,
+    queryVectorDimensionMatched:
+      enabled && overrides.queryVectorDimensionMatched === true,
+    queryVectorFinite: enabled && overrides.queryVectorFinite === true,
+    queryVectorNonzero: enabled && overrides.queryVectorNonzero === true,
+    indexSearchCalled: enabled && overrides.indexSearchCalled === true,
+    indexSearchSucceeded: enabled && overrides.indexSearchSucceeded === true,
+    rawCandidateCount: enabled
+      ? nonNegativeInteger(overrides.rawCandidateCount)
+      : 0,
+    ghostCandidateCount: enabled
+      ? nonNegativeInteger(overrides.ghostCandidateCount)
+      : 0,
+    vectorRetrievalOutcome: enabled && VECTOR_RETRIEVAL_OUTCOMES.has(
+      overrides.vectorRetrievalOutcome
+    )
+      ? overrides.vectorRetrievalOutcome
+      : 'not_attempted',
+    vectorRetrievalRawDetailsDisclosed: false
+  };
+}
+
+function isSupportedNumericVector(value) {
+  return Array.isArray(value) || (
+    ArrayBuffer.isView(value) &&
+    !(value instanceof DataView) &&
+    !Buffer.isBuffer(value)
+  );
+}
+
+function validateNativeQueryVector(vector, expectedDimension, { requireExpectedDimension = false } = {}) {
+  if (!isSupportedNumericVector(vector) || vector.length < 1) {
+    throw nativeRuntimeStageError('native_query_vector_invalid_shape');
+  }
+  const expectedDimensionKnown = Number.isSafeInteger(expectedDimension) &&
+    expectedDimension > 0;
+  if (requireExpectedDimension && !expectedDimensionKnown) {
+    throw nativeRuntimeStageError('native_query_vector_dimension_unavailable');
+  }
+  if (expectedDimensionKnown && vector.length !== expectedDimension) {
+    throw nativeRuntimeStageError('native_query_vector_dimension_mismatch');
+  }
+  let nonzero = false;
+  for (const value of vector) {
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      throw nativeRuntimeStageError('native_query_vector_non_finite');
+    }
+    if (value !== 0) nonzero = true;
+  }
+  if (!nonzero) {
+    throw nativeRuntimeStageError('native_query_vector_zero_norm');
+  }
+  return {
+    queryVectorShapeValid: true,
+    queryVectorExpectedDimensionKnown: expectedDimensionKnown,
+    queryVectorDimensionMatched: expectedDimensionKnown,
+    queryVectorFinite: true,
+    queryVectorNonzero: true
+  };
+}
 
 function nativeRuntimeStageError(reasonCode, internalMessage = 'native_runtime_stage_failed') {
   const safeInternalMessage = /^native_result_[a-z0-9_]+$/.test(internalMessage)
@@ -197,6 +295,7 @@ function nativeRuntimeReceipt(overrides = {}) {
           ['project_shared', 'workspace_shared'].includes(value)
         )
       : [],
+    ...nativeVectorRetrievalDiagnostics(overrides),
     actualMappingReference: typeof overrides.actualMappingReference === 'string'
       ? overrides.actualMappingReference
       : null,
@@ -567,7 +666,8 @@ function defaultReadRuntimeReceipt({
   isolatedRuntimeStoreUsed = false,
   authorization = null,
   resultScopePostcheckPassed = false,
-  derivedRuntimeMutation = null
+  derivedRuntimeMutation = null,
+  vectorRetrievalDiagnostics = null
 } = {}) {
   const derivedMutationObserved =
     derivedRuntimeMutation?.derivedRuntimeMutationCumulativeCount > 0;
@@ -595,6 +695,7 @@ function defaultReadRuntimeReceipt({
     scopeIdAudited: authorization?.scopeIdAudited === true,
     scopeIdFingerprintBound: authorization?.scopeIdFingerprintBound === true,
     omittedPartitionCategories: authorization?.omittedCategories,
+    ...(isPlainObject(vectorRetrievalDiagnostics) ? vectorRetrievalDiagnostics : {}),
     actualMappingReference: authorization?.mappingReference,
     actualMappingDigest: authorization?.mappingDigest
   });
@@ -741,8 +842,11 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
   let selectedDiaryHydrationPromise = null;
   let selectedDiaryHydrationCompleted = false;
   let selectedDiaryHydrationFailureLatched = false;
+  let selectedDiaryHydrationReceipt = null;
   const restoreRuntimeHooks = [];
   const derivedTaskAccountingContext = new AsyncLocalStorage();
+  const vectorSearchAccountingContext = new AsyncLocalStorage();
+  const instrumentedSelectedDiaryIndexes = new WeakSet();
 
   function bindDerivedMutationAuthorization(authorization) {
     derivedRuntimeMutationLifecycle.bindAuthorization({
@@ -815,6 +919,11 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
               !Number.isInteger(receipt.hydratedChunkCount) || receipt.hydratedChunkCount < 0) {
             throw new Error('selected_diary_hydration_receipt_invalid');
           }
+          selectedDiaryHydrationReceipt = Object.freeze({
+            hydratedDiaryCount: receipt.hydratedDiaryCount,
+            hydratedFileCount: receipt.hydratedFileCount,
+            hydratedChunkCount: receipt.hydratedChunkCount
+          });
         });
       }
       await selectedDiaryHydrationPromise;
@@ -824,6 +933,100 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
     }
     selectedDiaryHydrationAuthorizationKey = selectedDiaryAuthorizationKey(authorization);
     selectedDiaryHydrationCompleted = true;
+  }
+
+  function instrumentSelectedDiaryIndex(index) {
+    if (!index || (typeof index !== 'object' && typeof index !== 'function')) {
+      throw nativeRuntimeStageError('native_selected_diary_index_recovery_failed');
+    }
+    if (instrumentedSelectedDiaryIndexes.has(index)) return;
+    if (typeof index.search !== 'function') {
+      throw nativeRuntimeStageError('native_selected_diary_index_recovery_failed');
+    }
+    const originalSearch = index.search;
+    index.search = function governedSelectedDiaryVectorSearch(...args) {
+      const accounting = vectorSearchAccountingContext.getStore();
+      if (accounting) accounting.indexSearchCallCount += 1;
+      try {
+        const result = originalSearch.apply(this, args);
+        if (result && typeof result.then === 'function') {
+          return Promise.resolve(result).then(value => {
+            if (accounting) {
+              accounting.indexSearchSuccessCount += 1;
+              accounting.rawCandidateCount += Array.isArray(value) ? value.length : 0;
+            }
+            return value;
+          }, error => {
+            if (accounting) accounting.indexSearchFailureCount += 1;
+            throw error;
+          });
+        }
+        if (accounting) {
+          accounting.indexSearchSuccessCount += 1;
+          accounting.rawCandidateCount += Array.isArray(result) ? result.length : 0;
+        }
+        return result;
+      } catch (error) {
+        if (accounting) accounting.indexSearchFailureCount += 1;
+        throw error;
+      }
+    };
+    restoreRuntimeHooks.push(() => { index.search = originalSearch; });
+
+    if (typeof index.remove === 'function') {
+      const originalRemove = index.remove;
+      index.remove = function governedSelectedDiaryGhostRemoval(...args) {
+        const accounting = vectorSearchAccountingContext.getStore();
+        if (accounting) accounting.ghostCandidateCount += 1;
+        return originalRemove.apply(this, args);
+      };
+      restoreRuntimeHooks.push(() => { index.remove = originalRemove; });
+    }
+    instrumentedSelectedDiaryIndexes.add(index);
+  }
+
+  async function inspectAuthorizedSelectedDiaryIndexes(authorization) {
+    if (!selectedDiaryRuntimeHydrator) {
+      return {
+        enforced: false,
+        hydratedChunkCount: 0,
+        loadedIndexVectorCount: 0
+      };
+    }
+    if (!selectedDiaryHydrationReceipt ||
+        typeof knowledgeBaseManager?._getOrLoadDiaryIndex !== 'function') {
+      throw nativeRuntimeStageError('native_selected_diary_index_recovery_failed');
+    }
+    let loadedIndexVectorCount = 0;
+    try {
+      for (const diaryName of authorization.allowedDiaryNames) {
+        const index = await knowledgeBaseManager._getOrLoadDiaryIndex(diaryName);
+        instrumentSelectedDiaryIndex(index);
+        if (typeof index.stats !== 'function') {
+          throw new Error('selected_diary_index_stats_unavailable');
+        }
+        const stats = await index.stats();
+        if (!Number.isSafeInteger(stats?.totalVectors) || stats.totalVectors < 0) {
+          throw new Error('selected_diary_index_stats_invalid');
+        }
+        loadedIndexVectorCount += stats.totalVectors;
+        if (!Number.isSafeInteger(loadedIndexVectorCount)) {
+          throw new Error('selected_diary_index_vector_count_invalid');
+        }
+      }
+    } catch (error) {
+      if (error?.reasonCode) throw error;
+      throw nativeRuntimeStageError('native_selected_diary_index_recovery_failed');
+    }
+    const hydratedChunkCount = selectedDiaryHydrationReceipt.hydratedChunkCount;
+    if (hydratedChunkCount > 0 && loadedIndexVectorCount === 0) {
+      throw nativeRuntimeStageError('native_selected_diary_index_empty_after_hydration');
+    }
+    return {
+      enforced: true,
+      hydratedChunkCount,
+      loadedIndexVectorCount
+    };
   }
 
   function instrumentTagMemoRuntime() {
@@ -1036,22 +1239,51 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       if (!vector) {
         throw nativeRuntimeStageError('native_provider_embedding_failed');
       }
+      const queryVectorDiagnostics = validateNativeQueryVector(
+        vector,
+        knowledgeBaseManager?.config?.dimension,
+        { requireExpectedDimension: selectedDiaryRuntimeHydrator !== null }
+      );
       try {
         await hydrateAuthorizedSelectedDiaries(authorization);
       } catch {
         throw nativeRuntimeStageError('native_selected_diary_hydration_failed');
       }
+      const indexDiagnostics = await inspectAuthorizedSelectedDiaryIndexes(authorization);
+      const vectorSearchAccounting = {
+        indexSearchCallCount: 0,
+        indexSearchSuccessCount: 0,
+        indexSearchFailureCount: 0,
+        rawCandidateCount: 0,
+        ghostCandidateCount: 0
+      };
       let results;
       try {
-        results = await knowledgeBaseManager.search(
-          authorization.allowedDiaryNames,
-          vector,
-          limit,
-          0,
-          []
+        results = await vectorSearchAccountingContext.run(
+          vectorSearchAccounting,
+          () => knowledgeBaseManager.search(
+            authorization.allowedDiaryNames,
+            vector,
+            limit,
+            0,
+            []
+          )
         );
       } catch {
         throw nativeRuntimeStageError('native_diary_search_failed');
+      }
+      if (vectorSearchAccounting.indexSearchFailureCount > 0 ||
+          vectorSearchAccounting.indexSearchSuccessCount !==
+            vectorSearchAccounting.indexSearchCallCount) {
+        throw nativeRuntimeStageError('native_vector_search_failed');
+      }
+      if (vectorSearchAccounting.ghostCandidateCount > 0) {
+        throw nativeRuntimeStageError('native_vector_search_ghost_result');
+      }
+      if (indexDiagnostics.enforced &&
+          indexDiagnostics.loadedIndexVectorCount > 0 &&
+          vectorSearchAccounting.indexSearchCallCount === 0) {
+        throw nativeRuntimeStageError('native_vector_search_not_executed');
       }
       const postcheck = postCheckNativeDiaryResults(results, authorization.allowedDiaryNames);
       if (!postcheck.accepted) {
@@ -1060,9 +1292,31 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
           postcheck.reasonCode
         );
       }
+      const rawResultCount = Array.isArray(results) ? results.length : 0;
+      const vectorRetrievalDiagnostics = {
+        vectorRetrievalDiagnosticsMode: indexDiagnostics.enforced
+          ? VECTOR_RETRIEVAL_DIAGNOSTICS_MODE
+          : 'not_applicable',
+        ...queryVectorDiagnostics,
+        hydratedChunkCount: indexDiagnostics.hydratedChunkCount,
+        loadedIndexVectorCount: indexDiagnostics.loadedIndexVectorCount,
+        indexSearchCalled: vectorSearchAccounting.indexSearchCallCount > 0,
+        indexSearchSucceeded: vectorSearchAccounting.indexSearchCallCount > 0 &&
+          vectorSearchAccounting.indexSearchFailureCount === 0 &&
+          vectorSearchAccounting.indexSearchSuccessCount ===
+            vectorSearchAccounting.indexSearchCallCount,
+        rawCandidateCount: vectorSearchAccounting.rawCandidateCount,
+        ghostCandidateCount: vectorSearchAccounting.ghostCandidateCount,
+        vectorRetrievalOutcome: indexDiagnostics.enforced &&
+          indexDiagnostics.loadedIndexVectorCount === 0
+          ? 'empty_index'
+          : rawResultCount > 0
+            ? 'found'
+            : 'empty'
+      };
       return {
         results: projectReadResults(results),
-        rawResultCount: Array.isArray(results) ? results.length : 0,
+        rawResultCount,
         runtimeReceipt: defaultReadRuntimeReceipt({
           nativeRuntimeInitialized: true,
           providerApiCalled: true,
@@ -1070,7 +1324,8 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
           isolatedRuntimeStoreUsed: isolatedRuntimeStoreConfigured,
           authorization,
           resultScopePostcheckPassed: true,
-          derivedRuntimeMutation: takeDerivedMutationReceipt()
+          derivedRuntimeMutation: takeDerivedMutationReceipt(),
+          vectorRetrievalDiagnostics
         })
       };
     } finally {

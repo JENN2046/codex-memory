@@ -308,6 +308,35 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       runtime.mappingDigestBound !== true ||
       runtime.allowedDiaryCount !== expectedAllowedDiaryCount ||
       runtime.rawDiaryNamesReturned !== false ||
+      runtime.vectorRetrievalDiagnosticsMode !== 'fail_closed_v1' ||
+      !Number.isSafeInteger(runtime.hydratedChunkCount) ||
+      runtime.hydratedChunkCount < 0 ||
+      !Number.isSafeInteger(runtime.loadedIndexVectorCount) ||
+      runtime.loadedIndexVectorCount < 0 ||
+      runtime.queryVectorShapeValid !== true ||
+      runtime.queryVectorExpectedDimensionKnown !== true ||
+      runtime.queryVectorDimensionMatched !== true ||
+      runtime.queryVectorFinite !== true ||
+      runtime.queryVectorNonzero !== true ||
+      !Number.isSafeInteger(runtime.rawCandidateCount) ||
+      runtime.rawCandidateCount < 0 ||
+      runtime.ghostCandidateCount !== 0 ||
+      !['empty_index', 'empty', 'found'].includes(runtime.vectorRetrievalOutcome) ||
+      runtime.vectorRetrievalRawDetailsDisclosed !== false ||
+      (runtime.loadedIndexVectorCount > 0 && (
+        runtime.indexSearchCalled !== true ||
+        runtime.indexSearchSucceeded !== true ||
+        !['empty', 'found'].includes(runtime.vectorRetrievalOutcome)
+      )) ||
+      (runtime.vectorRetrievalOutcome === 'empty_index' && (
+        runtime.hydratedChunkCount !== 0 ||
+        runtime.loadedIndexVectorCount !== 0 ||
+        runtime.indexSearchCalled !== false ||
+        runtime.indexSearchSucceeded !== false ||
+        runtime.rawCandidateCount !== 0
+      )) ||
+      (runtime.vectorRetrievalOutcome === 'found' &&
+        runtime.rawCandidateCount < 1) ||
       runtime.rawRuntimeOutputDisclosed !== false ||
       runtime.rawMemoryContentDisclosed !== false ||
       runtime.runtimeLocatorDisclosed !== false ||

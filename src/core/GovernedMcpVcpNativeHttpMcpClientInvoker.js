@@ -37,6 +37,9 @@ const ALLOWED_FAILURE_CATEGORIES = Object.freeze([
   'scope_authorization_rejected',
   'scope_binding_rejected',
   'provider_embedding_failed',
+  'invalid_query_vector',
+  'index_recovery_failed',
+  'vector_search_failed',
   'native_runtime_initialization_failed',
   'native_scoped_search_failed',
   'result_scope_postcheck_failed',
@@ -67,6 +70,16 @@ const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'diary_scope_mapping_missing',
   'native_mutation_tool_unavailable',
   'native_provider_embedding_failed',
+  'native_query_vector_invalid_shape',
+  'native_query_vector_dimension_unavailable',
+  'native_query_vector_dimension_mismatch',
+  'native_query_vector_non_finite',
+  'native_query_vector_zero_norm',
+  'native_selected_diary_index_recovery_failed',
+  'native_selected_diary_index_empty_after_hydration',
+  'native_vector_search_not_executed',
+  'native_vector_search_failed',
+  'native_vector_search_ghost_result',
   'native_runtime_initialization_failed',
   'native_runtime_call_failed',
   'native_diary_search_failed',
@@ -334,6 +347,60 @@ function nativeRuntimeReceiptEvidenceComplete(receipt) {
         receipt.derivedRuntimeMutationAccountingFinal ||
       (receipt.derivedRuntimeMutationAccountingFinal === true &&
         receipt.derivedRuntimeMutationActiveCount !== 0)) return false;
+  if (Object.hasOwn(receipt, 'vectorRetrievalDiagnosticsMode')) {
+    const retrievalBooleanFields = [
+      'queryVectorShapeValid',
+      'queryVectorExpectedDimensionKnown',
+      'queryVectorDimensionMatched',
+      'queryVectorFinite',
+      'queryVectorNonzero',
+      'indexSearchCalled',
+      'indexSearchSucceeded',
+      'vectorRetrievalRawDetailsDisclosed'
+    ];
+    const retrievalIntegerFields = [
+      'hydratedChunkCount',
+      'loadedIndexVectorCount',
+      'rawCandidateCount',
+      'ghostCandidateCount'
+    ];
+    if (retrievalBooleanFields.some(field => typeof receipt[field] !== 'boolean') ||
+        retrievalIntegerFields.some(field =>
+          !Number.isSafeInteger(receipt[field]) || receipt[field] < 0
+        ) ||
+        !['not_attempted', 'empty_index', 'empty', 'found']
+          .includes(receipt.vectorRetrievalOutcome) ||
+        receipt.vectorRetrievalRawDetailsDisclosed !== false) return false;
+    if (receipt.vectorRetrievalDiagnosticsMode === 'not_applicable') {
+      if (retrievalBooleanFields.some(field =>
+        field !== 'vectorRetrievalRawDetailsDisclosed' && receipt[field] !== false
+      ) || retrievalIntegerFields.some(field => receipt[field] !== 0) ||
+          receipt.vectorRetrievalOutcome !== 'not_attempted') return false;
+    } else if (receipt.vectorRetrievalDiagnosticsMode === 'fail_closed_v1') {
+      if (receipt.queryVectorShapeValid !== true ||
+          receipt.queryVectorExpectedDimensionKnown !== true ||
+          receipt.queryVectorDimensionMatched !== true ||
+          receipt.queryVectorFinite !== true ||
+          receipt.queryVectorNonzero !== true ||
+          receipt.ghostCandidateCount !== 0) return false;
+      if (receipt.loadedIndexVectorCount > 0 && (
+        receipt.indexSearchCalled !== true ||
+        receipt.indexSearchSucceeded !== true ||
+        !['empty', 'found'].includes(receipt.vectorRetrievalOutcome)
+      )) return false;
+      if (receipt.vectorRetrievalOutcome === 'empty_index' && (
+        receipt.hydratedChunkCount !== 0 ||
+        receipt.loadedIndexVectorCount !== 0 ||
+        receipt.indexSearchCalled !== false ||
+        receipt.indexSearchSucceeded !== false ||
+        receipt.rawCandidateCount !== 0
+      )) return false;
+      if (receipt.vectorRetrievalOutcome === 'found' &&
+          receipt.rawCandidateCount < 1) return false;
+    } else {
+      return false;
+    }
+  }
   return true;
 }
 
@@ -384,6 +451,20 @@ function lowDisclosureNativeRuntimeReceipt(receipt = null) {
       scopeIdAffectsDiaryAcl: false,
       scopeIdEnforcementClaimed: false,
       omittedPartitionCategories: [],
+      vectorRetrievalDiagnosticsMode: null,
+      hydratedChunkCount: 0,
+      loadedIndexVectorCount: 0,
+      queryVectorShapeValid: false,
+      queryVectorExpectedDimensionKnown: false,
+      queryVectorDimensionMatched: false,
+      queryVectorFinite: false,
+      queryVectorNonzero: false,
+      indexSearchCalled: false,
+      indexSearchSucceeded: false,
+      rawCandidateCount: 0,
+      ghostCandidateCount: 0,
+      vectorRetrievalOutcome: null,
+      vectorRetrievalRawDetailsDisclosed: false,
       rawRuntimeOutputDisclosed: false,
       rawMemoryContentDisclosed: false,
       runtimeLocatorDisclosed: false,
@@ -477,6 +558,33 @@ function lowDisclosureNativeRuntimeReceipt(receipt = null) {
           ['project_shared', 'workspace_shared'].includes(value)
         )
       : [],
+    ...(Object.hasOwn(receipt, 'vectorRetrievalDiagnosticsMode') ? {
+      vectorRetrievalDiagnosticsMode: ['fail_closed_v1', 'not_applicable']
+        .includes(receipt.vectorRetrievalDiagnosticsMode)
+        ? receipt.vectorRetrievalDiagnosticsMode
+        : null,
+      hydratedChunkCount: Number.isSafeInteger(receipt.hydratedChunkCount) &&
+        receipt.hydratedChunkCount >= 0 ? receipt.hydratedChunkCount : 0,
+      loadedIndexVectorCount: Number.isSafeInteger(receipt.loadedIndexVectorCount) &&
+        receipt.loadedIndexVectorCount >= 0 ? receipt.loadedIndexVectorCount : 0,
+      queryVectorShapeValid: receipt.queryVectorShapeValid === true,
+      queryVectorExpectedDimensionKnown:
+        receipt.queryVectorExpectedDimensionKnown === true,
+      queryVectorDimensionMatched: receipt.queryVectorDimensionMatched === true,
+      queryVectorFinite: receipt.queryVectorFinite === true,
+      queryVectorNonzero: receipt.queryVectorNonzero === true,
+      indexSearchCalled: receipt.indexSearchCalled === true,
+      indexSearchSucceeded: receipt.indexSearchSucceeded === true,
+      rawCandidateCount: Number.isSafeInteger(receipt.rawCandidateCount) &&
+        receipt.rawCandidateCount >= 0 ? receipt.rawCandidateCount : 0,
+      ghostCandidateCount: Number.isSafeInteger(receipt.ghostCandidateCount) &&
+        receipt.ghostCandidateCount >= 0 ? receipt.ghostCandidateCount : 0,
+      vectorRetrievalOutcome: ['not_attempted', 'empty_index', 'empty', 'found']
+        .includes(receipt.vectorRetrievalOutcome)
+        ? receipt.vectorRetrievalOutcome
+        : null,
+      vectorRetrievalRawDetailsDisclosed: false
+    } : {}),
     rawRuntimeOutputDisclosed: receipt.rawRuntimeOutputDisclosed === true,
     rawMemoryContentDisclosed: receipt.rawMemoryContentDisclosed === true,
     runtimeLocatorDisclosed: receipt.runtimeLocatorDisclosed === true,
@@ -706,6 +814,9 @@ function jsonRpcErrorReasonCode(jsonRpcResponse = {}) {
 
 function failureCategoryFromJsonRpcReasonCode(reasonCode) {
   if (reasonCode === 'native_provider_embedding_failed') return 'provider_embedding_failed';
+  if (reasonCode?.startsWith('native_query_vector_')) return 'invalid_query_vector';
+  if (reasonCode?.startsWith('native_selected_diary_index_')) return 'index_recovery_failed';
+  if (reasonCode?.startsWith('native_vector_search_')) return 'vector_search_failed';
   if (reasonCode === 'native_runtime_initialization_failed') return 'native_runtime_initialization_failed';
   if (reasonCode === 'native_diary_search_failed') return 'native_scoped_search_failed';
   if (reasonCode === 'native_result_scope_postcheck_failed') return 'result_scope_postcheck_failed';

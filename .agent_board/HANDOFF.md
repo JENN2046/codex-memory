@@ -4,35 +4,34 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2144 ChatGPT Web R5-D Derived Runtime Mutation Governance And Safe-Empty Closeout`.
-Current validation: `CMV-2229`.
-Current fact: isolated derived-runtime accounting and shutdown drain passed with six completed events and zero primary/source/global mutation.
-The bounded read safely returned zero results; non-empty recall and relevance failed, budgets are exhausted, local runtimes are stopped, and Edge remains zero-memory.
+Current task: `CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics`.
+Current validation: `CMV-2230`.
+Current fact: fail-closed selected-diary vector retrieval diagnostics and their low-disclosure receipt chain pass the offline negative matrix.
+No live retry ran; R5-D remains safe-empty, local runtimes are stopped, and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2144 closes the authorized R5-D attempt truthfully. Isolated VCP startup,
-hydration, cache, vector/tag, and matrix maintenance now have bounded lifecycle
-accounting, false-zero rejection, and shutdown drain. The final bounded read
-used one provider call and one native invocation; drain recorded six completed
-derived events with zero failed events, primary writes, source-partition
-mutations, or unrestricted searches. The read returned zero results, so
-non-empty recall and relevance remain failed. The full provider/read budgets
-are exhausted and must not be retried under this authorization.
+CM-2145 implements the offline/source-level diagnosis required by the R5-D safe
+empty result. The governed shim now distinguishes invalid embeddings, selected
+index recovery failure, a valid empty index, a successful no-match search,
+swallowed Vexus search failure, search bypass, ghost candidates, and a found
+result. Low-disclosure evidence is carried through the native, bridge, and R4
+Governance receipt chain; raw vectors, diary names, paths, provider responses,
+and private mapping values are excluded.
 
-The immutable owner-only R5-D failure artifact remains outside Git, and the old
-R5-C artifact remains unchanged. Governance, Relay, and the shim are stopped;
-the Edge remains `zero_memory`. The next safe route is an offline/source-level
-vector-retrieval diagnosis. Any provider-bound retry needs a new exact budget.
-No production/release/deploy/cutover/readiness conclusion follows.
+The immutable owner-only R5-D failure artifact remains outside Git and is not
+rewritten. Governance, Relay, and the shim remain stopped; Edge remains
+`zero_memory`. R5-E is source/offline validated only. Complete its PR CI/review,
+then obtain a separate exact provider/read budget before any live retry. No
+production/release/deploy/cutover/readiness conclusion follows.
 
 ## Historical Handoff Context
 
 The entries below are retained as chronology only. They are not current route
-instructions; CM-2144 and the zero-memory-preservation boundary above control.
+instructions; CM-2145 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,

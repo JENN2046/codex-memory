@@ -183,6 +183,20 @@ function delegatedResult({
           mappingDigestBound: true,
           allowedDiaryCount: 1,
           rawDiaryNamesReturned: false,
+          vectorRetrievalDiagnosticsMode: 'fail_closed_v1',
+          hydratedChunkCount: 1,
+          loadedIndexVectorCount: 1,
+          queryVectorShapeValid: true,
+          queryVectorExpectedDimensionKnown: true,
+          queryVectorDimensionMatched: true,
+          queryVectorFinite: true,
+          queryVectorNonzero: true,
+          indexSearchCalled: true,
+          indexSearchSucceeded: true,
+          rawCandidateCount: 1,
+          ghostCandidateCount: 0,
+          vectorRetrievalOutcome: 'found',
+          vectorRetrievalRawDetailsDisclosed: false,
           rawRuntimeOutputDisclosed: false,
           rawMemoryContentDisclosed: false,
           runtimeLocatorDisclosed: false,
@@ -394,7 +408,11 @@ test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async
     result => { delete result.receipt.nativeInvocationReceipt.tokenMaterialDisclosed; },
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.providerApiCalled; },
     result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.durableWritePerformed; },
-    result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.derivedIndexWritePerformed; }
+    result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.derivedIndexWritePerformed; },
+    result => { delete result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.vectorRetrievalDiagnosticsMode; },
+    result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.ghostCandidateCount = 1; },
+    result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.indexSearchSucceeded = false; },
+    result => { result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.rawCandidateCount = 0; }
   ];
   for (const mutate of mutations) {
     const malformed = delegatedResult();

@@ -37,6 +37,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-A Private Dogfood Operations](docs/CHATGPT_WEB_R5A_PRIVATE_DOGFOOD_OPERATIONS.md)
 - [ChatGPT Web R5-B One-Read Model Guidance](docs/CHATGPT_WEB_R5B_ONE_READ_MODEL_GUIDANCE.md)
 - [ChatGPT Web R5-D Derived Runtime Mutation Governance](docs/CHATGPT_WEB_R5D_DERIVED_RUNTIME_MUTATION_GOVERNANCE.md)
+- [ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics](docs/CHATGPT_WEB_R5E_VECTOR_RETRIEVAL_FAIL_CLOSED_DIAGNOSTICS.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
@@ -217,6 +218,14 @@ The first post-merge private R5-D run truthfully accounted six completed
 derived lifecycle events with zero primary/source/global mutation, but its
 bounded read returned a safe empty result. Non-empty recall and relevance did
 not pass, so runtime verification and readiness remain false.
+
+R5-E adds fail-closed diagnostics around the selected-diary vector boundary.
+It validates query-vector shape and dimension, explicitly inspects authorized
+index recovery, detects swallowed vector-search failures and ghost candidates,
+and binds only low-disclosure counts/outcomes into the receipt chain. A valid
+empty index, a successful no-match search, and a found result are now distinct.
+This source/offline work does not modify VCPToolBox core, call a provider, read
+real memory, or prove a live retry. The private Edge remains `zero_memory`.
 
 Read acceptance covers `search_memory` / `memory_overview` / `audit_memory`
 only when the native target exposes shape-compatible tools for those public

@@ -1293,12 +1293,15 @@ test('native read error statusClass is whitelisted before reasonCode projection'
   assert.equal(serialized.includes('PRIVATE_NATIVE_ERROR_MESSAGE_SHOULD_NOT_ECHO'), false);
 });
 
-test('governance failure categories are never eligible for local fallback without reason codes', async () => {
+test('governance and R5-E fail-closed categories are never eligible for local fallback', async () => {
   for (const failureCategory of [
     'governance_rejected',
     'scope_authorization_rejected',
     'scope_binding_rejected',
-    'result_scope_postcheck_failed'
+    'result_scope_postcheck_failed',
+    'invalid_query_vector',
+    'index_recovery_failed',
+    'vector_search_failed'
   ]) {
     const result = await executeGovernedMcpVcpNativeReadDelegation({
       toolName: 'search_memory',
