@@ -473,6 +473,26 @@ test('R5-E rejects final results not backed by selected-index candidates', async
   }
 });
 
+test('R5-E preserves valid VCP fullPath-only results when candidate counts bind them', async () => {
+  const { adapter, calls } = selectedDiaryDiagnosticFixture({
+    rawCandidates: [{ id: 1, score: 0.9 }],
+    finalResults: [{
+      fullPath: 'SYNTHETIC_CODEX_PRIVATE/compatible-vcp-result.md',
+      score: 0.9
+    }]
+  });
+  const result = await adapter.search({ query: 'fullPath-only compatibility', limit: 1 }, {
+    authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+  });
+  assert.equal(result.results.length, 1);
+  assert.equal(result._nativeRuntimeReceipt.rawCandidateCount, 1);
+  assert.equal(result._nativeRuntimeReceipt.vectorRetrievalOutcome, 'found');
+  assert.equal(calls.embedding, 1);
+  assert.equal(calls.hydration, 1);
+  assert.equal(calls.indexLoad, 1);
+  assert.equal(calls.indexSearch, 1);
+});
+
 test('selected-diary hydration reserves scope before provider and shares the in-flight hydration', async () => {
   let releaseHydration;
   let hydrationStarted;

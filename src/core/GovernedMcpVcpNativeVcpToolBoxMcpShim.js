@@ -1314,7 +1314,8 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
         throw nativeRuntimeStageError('native_vector_search_failed');
       }
       if (indexDiagnostics.enforced && rawResultCount > 0 && results.some(result => {
-        const chunkId = Number(result?.chunkId);
+        if (!isPlainObject(result) || !Object.hasOwn(result, 'chunkId')) return false;
+        const chunkId = Number(result.chunkId);
         return !Number.isSafeInteger(chunkId) || chunkId < 0 ||
           !vectorSearchAccounting.candidateChunkIds.has(chunkId);
       })) {
