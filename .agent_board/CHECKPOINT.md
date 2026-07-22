@@ -4,13 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics`.
-Current validation: `CMV-2230`.
-Current fact: fail-closed selected-diary vector retrieval diagnostics and their low-disclosure receipt chain pass the offline negative matrix.
-No live retry ran; R5-D remains safe-empty, local runtimes are stopped, and Edge remains zero-memory.
+Current task: `CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof`.
+Current validation: `CMV-2231`.
+Current fact: one exact-head selected-diary vector result passed relevance and receipt-chain checks with zero primary/source/global mutation.
+All R5-F runtimes are stopped and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof
+
+Status: `R5_F_BOUNDED_VECTOR_RETRIEVAL_PASS`
+
+- Exact merged `codex-memory` and frozen VCP identities, private
+  mapping/registry bindings, and rollback references matched before provider use.
+- The successful sequence was
+  `resolve_memory_context -> search_memory(limit=1)` and returned one relevant
+  result with a loaded selected index, positive candidate evidence, successful
+  index search, zero ghosts, zero fallback, and zero unrestricted search.
+- Three fresh isolated attempts used provider/read budgets `3/3` and `6/6`.
+  The first two failed closed during a proof-only one-second startup cooldown;
+  the third passed after restoring VCP's normal cooldown.
+- Aggregate isolated derived lifecycle accounting was `17 completed / 0 failed`.
+  Primary-memory writes, source-partition mutations, and
+  legacy/ambiguous/unregistered accesses remained zero.
+- Verification-complete kill and shutdown drain passed. Governance, Relay, and
+  the shim are stopped; Edge remains `zero_memory`.
+- Owner-only R5-F evidence remains outside Git; old R5-C/R5-D artifacts are
+  unchanged. Production/release/deploy/cutover/readiness remain false.
+
+Validation: `CMV-2231`.
 
 ## CM-2145 ChatGPT Web R5-E Vector Retrieval Fail-Closed Diagnostics
 
