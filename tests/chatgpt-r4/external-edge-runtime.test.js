@@ -353,6 +353,9 @@ test('external Edge fails closed on proxy, OAuth, relay signature, and nonzero c
   assert.equal(timedOut.statusCode, 200);
   assert.equal(timedOut.body.error.code, -32603);
   assert.match(timedOut.body.error.message, /edge_response_timeout/u);
+  assert.match(timedOut.body.error.message, /transport_timeout/u);
+  assert.match(timedOut.body.error.message, /No receipt-bound memory result was returned/u);
+  assert.match(timedOut.body.error.message, /do not call another memory read or resolve again/u);
 });
 
 test('external Edge configuration rejects non-public origins, unsafe bind, and non-Ed25519 signing', () => {

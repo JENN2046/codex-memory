@@ -4,24 +4,27 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
-Current validation: `CMV-2234`.
-Current fact: the 20-session observation completed with intact one-read enforcement, but its 10-positive/10-negative mix did not satisfy the frozen 12/8 matrix.
-Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and Edge is restored to zero-memory.
+Current task: `CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics`.
+Current validation: `CMV-2235`.
+Current fact: exact alias/visibility, one-read stop, and receipt-versus-transport semantics are hardened while all six public schemas remain unchanged.
+No runtime/provider/memory action occurred; R5-H evidence remains unchanged and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R5-H preserved the public six-tool ChatGPT surface and kept authorization in local Governance.
-- Runtime verdict: 20 observations completed; expected tool match `8`, negative abstention `7`, post-terminal attempts `2` in one consumed session.
-- Matrix verdict: observed relevant/negative `10/10` does not satisfy planned `12/8`; R5-H acceptance remains incomplete.
-- Runtime accounting: provider/native `5/5`; authorized derived lifecycle `6`; primary/source/fallback/global/derived-policy violations all zero.
-- Enforcement: both post-terminal attempts failed closed without another provider/native call; terminal stop remains a usability finding rather than a safety bypass.
-- Host route: verification kill and shutdown drain passed; Governance, Relay, and isolated shim are stopped; Edge is verified `zero_memory`.
-- Evidence: owner-only immutable artifact exists outside Git; tracked docs contain aggregates and non-claims only.
-- Status sync: CM-2149/CMV-2234 retain the run as evidence while rejecting R5-H matrix completion and any automatic-use/readiness guarantee.
+- Architecture: R5-I preserves the public six-tool ChatGPT surface and local Governance authorization boundary.
+- Source verdict: exact alias/visibility selection, receipt-versus-transport projection, duplicate suppression, and terminal one-read guidance are implemented.
+- Receipt integrity: ten low-disclosure failure categories are bound into internal context/Governance receipt digests; public schemas remain unchanged.
+- Validation: targeted `35/35`, default `5840/0/8`, and hardening `97/97 + 6/6` pass.
+- CI-safe gate: `5931/0/9`, no network/daemon/provider.
+- Strict gate: contract/test/compare/rollback pass; overall is non-pass only at
+  inactive loopback health, and no service was started.
+- Runtime accounting: no service, provider, memory read/write, private config, or VCP core action occurred.
+- Host route: Governance/Relay/shim remain stopped; Edge remains `zero_memory`.
+- Evidence: the immutable R5-H artifact is untouched; its 10/10 versus 12/8 matrix remains incomplete.
+- Status sync: CM-2150/CMV-2235 record source hardening only and do not claim automatic-use or runtime proof.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -51,12 +54,10 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Deliver the low-disclosure R5-H observation closeout through normal PR
-CI/review. R5-I source hardening can proceed independently. R5-H acceptance
-needs either a separately authorized corrective positive-session supplement or
-an explicitly reviewed protocol amendment. Further live/provider/read,
-partition provisioning, production, release, deploy, cutover, readiness, or
-public-write work requires a separate current scope.
+Deliver R5-I through normal PR CI/review. Exact-head private ChatGPT runtime
+behavior verification, any R5-H corrective supplement or protocol amendment,
+and all further live/provider/read, production, release, deploy, cutover,
+readiness, or public-write work require a separate current scope.
 
 ## Historical Run Notes
 

@@ -26,6 +26,7 @@ VCPToolBox 仍然是 native memory behavior 的 owner。本仓库默认不修改
 - [ChatGPT Web R4 威胁模型](docs/CHATGPT_WEB_R4_THREAT_MODEL.md)
 - [ChatGPT Web R4 实施任务书](docs/CHATGPT_WEB_R4_IMPLEMENTATION_TASKBOOK.md)
 - [ChatGPT Web R4-B 契约与合成验证](docs/CHATGPT_WEB_R4B_CONTRACTS_SYNTHETIC.md)
+- [ChatGPT Web R5-I 模型行为与错误语义](docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 

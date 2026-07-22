@@ -151,9 +151,9 @@ function createMcpProtocolServer({
       ttlSeconds: requestTtlSeconds,
       signing: edgeSigning
     });
-    await broker.submit(envelope);
     let response;
     try {
+      await broker.submit(envelope);
       response = await broker.waitForResult(envelope.request_id, {
         signal: extra.signal,
         timeoutMs: responseTimeoutMs
@@ -213,27 +213,47 @@ function resultCount(content) {
 function modelVisibleResultText(name, response) {
   if (name === 'resolve_memory_context') {
     if (response.status === 'ok') {
-      return 'Governed project context resolved. Use the returned project_context_ref for exactly one read tool chosen by the user intent; do not resolve again.';
+      return 'Receipt-bound governed project context status: resolved. Use the returned project_context_ref for exactly one read tool chosen by the user intent; do not resolve again.';
     }
-    return `Governed resolve_memory_context returned ${response.status}. Stop this workflow and ask the user or operator for a new exact context; do not retry alternative aliases or visibilities.`;
+    return `Receipt-bound governed resolve_memory_context returned ${response.status}; status: ${response.status}. This is not a transport timeout. Stop this workflow and ask the user or operator for a new exact project_alias and requested_visibility; do not retry alternative aliases or visibilities; do not retry the same value or probe alternative aliases or visibilities.`;
   }
   if (response.status === 'ok') {
-    return `Governed ${name} completed with ${resultCount(response.structured_content)} item(s). This is the terminal result for the current one-read workflow; answer the user and do not call another memory read or resolve again.`;
+    const boundedStatus = response.structured_content?.status || 'completed';
+    return `Receipt-bound governed ${name} status: ${boundedStatus}; ${resultCount(response.structured_content)} item(s). This is the terminal result for the current one-read workflow; answer the user and do not call another memory read or resolve again; do not switch read tools. Report exactly this one result and do not invent retries.`;
   }
-  return `Governed ${name} returned ${response.status}. This is the terminal result for the current one-read workflow; answer with the bounded status and do not call another memory read or resolve again.`;
+  return `Receipt-bound governed ${name} status: ${response.status}. This is not a transport timeout. This is the terminal result for the current one-read workflow; answer with exactly this bounded status and do not call another memory read or resolve again; do not switch read tools. Do not invent retries.`;
+}
+
+function modelVisibleErrorText(errorCode) {
+  const safeErrorCode = typeof errorCode === 'string' && /^[a-z][a-z0-9_]{0,79}$/u.test(errorCode)
+    ? errorCode
+    : 'edge_governed_read_unavailable';
+  const category = transportFailureCategory(safeErrorCode);
+  return `Governed memory transport status: ${category} (${safeErrorCode}). No receipt-bound memory result was returned. This transport failure is terminal for the current one-read workflow; do not call another memory read or resolve again; do not switch read tools. Do not describe it as an empty, denied, or unavailable memory result, and do not invent retries.`;
+}
+
+function transportFailureCategory(errorCode) {
+  if (errorCode === 'edge_response_timeout') return 'transport_timeout';
+  if (errorCode === 'edge_request_expired' || errorCode === 'edge_claim_expired') {
+    return 'transport_expired';
+  }
+  if (errorCode === 'edge_request_cancelled') return 'transport_cancelled';
+  return 'transport_unavailable';
 }
 
 function safeMcpError(error, fallback) {
   const code = typeof error?.code === 'string' && /^[a-z][a-z0-9_]{0,79}$/u.test(error.code)
     ? error.code
     : fallback;
-  return Object.assign(new Error(code), { code });
+  return Object.assign(new Error(modelVisibleErrorText(code)), { code });
 }
 
 module.exports = {
   createExternalMcpHandler,
   createMcpProtocolServer,
+  modelVisibleErrorText,
   modelVisibleResultText,
   renderScopeTool,
-  requireAuthInfo
+  requireAuthInfo,
+  transportFailureCategory
 };

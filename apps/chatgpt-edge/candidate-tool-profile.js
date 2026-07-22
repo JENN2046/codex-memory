@@ -27,9 +27,12 @@ const MODEL_WORKFLOW_INSTRUCTIONS = [
   'Read-only project-aware memory tools use a one-context/one-read workflow.',
   'Before reading, call resolve_memory_context exactly once.',
   'Copy project_alias and requested_visibility exactly from the user-provided task context; never invent, normalize, suffix, enumerate, or probe alternatives.',
+  'A connector or App display name, URL, OAuth client identifier, opaque context reference, workspace name, or guessed repository name is not a project_alias.',
   'If either value is missing, ask one concise clarification and do not call a memory tool.',
   'After a resolved context, choose exactly one read tool: memory_overview for counts or status; search_memory for one specific semantic fact; audit_memory for bounded access or receipt categories; prepare_memory_context for a task-start context package.',
-  'The first read attempt ends this workflow. After any read result, including empty, denied, unavailable, or error, answer the user and do not call another read tool or resolve again.',
+  'The first read attempt consumes this workflow, even when it returns empty, denied, unavailable, or a transport error.',
+  'After any read result or transport error, answer the user and do not call another read tool or resolve again; do not switch read tools.',
+  'Report only the receipt-backed result category or the single transport failure actually returned; never invent retry counts or claim another attempt occurred.',
   'Use render_memory_scope only when the user asks to see scope status.',
   'Never infer that memory was loaded without a tool result.'
 ].join(' ');
@@ -58,7 +61,7 @@ function descriptor({ title, description, inputSchema, outputSchema, render = fa
 const toolDescriptors = deepFreeze({
   resolve_memory_context: descriptor({
     title: 'Resolve memory project context',
-    description: 'Use this when the user has provided both an exact registered project alias and an exact visibility, and a short-lived governed context reference is required before one memory read. Copy both values verbatim, call once, and never guess or probe alternative aliases or visibilities; if either value is missing, ask the user instead.',
+    description: 'Use this when the user has provided both an exact registered project alias and an exact visibility, and a short-lived governed context reference is required before one memory read. Copy both values verbatim and call once. Never treat an App name, connector name, URL, client identifier, workspace name, opaque reference, or guessed repository name as a project alias; never guess or probe alternative aliases or visibilities. If either exact value is missing, ask the user instead. A denied, unavailable, or error result is terminal and must not be retried.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -72,13 +75,13 @@ const toolDescriptors = deepFreeze({
   }),
   memory_overview: descriptor({
     title: 'View memory overview',
-    description: 'Use this when a valid project_context_ref exists and the user needs only a bounded low-disclosure count or status overview. Choose this as the sole read tool for the task; after any result, answer the user and do not call another memory read or resolve again.',
+    description: 'Use this when a valid project_context_ref exists and the user needs only a bounded low-disclosure count or status overview. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
     inputSchema: contextInputSchema(),
     outputSchema: boundedStatusSchema('overview')
   }),
   search_memory: descriptor({
     title: 'Search governed project memory',
-    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware semantic fact. Choose this as the sole read tool for the task; after any result, answer the user and do not call another memory read or resolve again.',
+    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware semantic fact. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -115,7 +118,7 @@ const toolDescriptors = deepFreeze({
   }),
   audit_memory: descriptor({
     title: 'Audit governed memory access',
-    description: 'Use this when a valid project_context_ref exists and the user needs only bounded low-disclosure access or receipt categories. Choose this as the sole read tool for the task; after any result, answer the user and do not call another memory read or resolve again.',
+    description: 'Use this when a valid project_context_ref exists and the user needs only bounded low-disclosure access or receipt categories. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -129,7 +132,7 @@ const toolDescriptors = deepFreeze({
   }),
   prepare_memory_context: descriptor({
     title: 'Prepare governed task context',
-    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware task-start context package. Choose this as the sole read tool for the task; after any result, answer the user and do not call another memory read or resolve again.',
+    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware task-start context package. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,

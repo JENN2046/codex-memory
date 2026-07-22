@@ -4,44 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
-Current validation: `CMV-2234`.
-Current fact: the 20-session observation completed with intact one-read enforcement, but its 10-positive/10-negative mix did not satisfy the frozen 12/8 matrix.
-Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and Edge is restored to zero-memory.
+Current task: `CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics`.
+Current validation: `CMV-2235`.
+Current fact: exact alias/visibility, one-read stop, and receipt-versus-transport semantics are hardened while all six public schemas remain unchanged.
+No runtime/provider/memory action occurred; R5-H evidence remains unchanged and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2149 records the authorized R5-H run after 20 fresh private ChatGPT
-conversations. Expected one-read matches were `8`, negative abstentions `7`,
-and five provider/native reads completed. Six isolated derived-runtime
-lifecycle events were accounted; primary/source/fallback/global and policy
-violation counters remained zero.
+CM-2150 implements R5-I source hardening. Model-visible guidance now requires
+exact user-provided alias and visibility, distinguishes receipt-bound outcomes
+from transport failures, sanitizes error codes, and treats the first read
+attempt as terminal. Internal receipt digests bind ten low-disclosure failure
+categories without changing any public schema.
 
-The observed task distribution was 10 memory-relevant and 10 negative, not the
-frozen 12/8 matrix. R5-H acceptance therefore remains incomplete. Do not
-reclassify sessions; a corrective supplement or protocol amendment requires a
-new explicit boundary.
+Targeted, default, and hardening suites pass. No service, provider, real-memory,
+private binding, or VCP core action ran; Edge remains `zero_memory`. Deliver
+through normal PR CI/review. An exact-head private runtime behavior check is a
+separate authorization boundary.
 
-The one-read boundary held when a consumed session generated two extra tool
-attempts: both failed before another provider/native call. Actionable findings
-remain for terminal-stop consistency, model narration versus receipt truth,
-alias guessing after failures, and the ChatGPT task-start client-private
-requirement. Do not weaken mapping rules or provision a new private partition
-without a separate decision.
-
-Verification kill and drain passed. Governance, Relay, and shim are stopped;
-Edge is verified `zero_memory`; the immutable exact-value artifact remains
-owner-only and outside Git. Next boundary: normal observation-closeout PR;
-R5-I source hardening may follow independently. Do not infer R5-H acceptance,
-automatic-first-task, production, release, deploy, cutover, or readiness.
+The prior CM-2149/R5-H artifact remains immutable. Its observed 10/10 task mix
+still does not satisfy the frozen 12/8 matrix; no session was reclassified or
+backfilled. Do not infer R5-H acceptance, automatic-first-task, production,
+release, deploy, cutover, or readiness.
 
 ## Historical Handoff Context
 
 The entries below are retained as chronology only. They are not current route
-instructions; CM-2148 and the zero-memory-preservation boundary above control.
+instructions; CM-2150 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,
