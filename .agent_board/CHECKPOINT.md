@@ -25,8 +25,8 @@ Status: `R5_I_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_R5_H_MATRIX_UNCHANGED`
   tool switch, or invented retry count after any result or transport error.
 - Ten low-disclosure failure categories are bound into internal receipts.
 - Six public names and schemas are digest-identical to the R5-H baseline.
-- Targeted `35/35`, default `5840/0/8`, hardening `97/97 + 6/6` pass.
-- CI-safe gate passes `5931/0/9` with no network, daemon, or provider.
+- Targeted `46/46`, default `5841/0/8`, hardening `97/97 + 6/6` pass.
+- CI-safe gate passes `5940 tests / 5932 pass / 0 fail / 8 skip` with no network, daemon, or provider.
 - Strict contract/test/compare/rollback pass; strict overall is non-pass only
   because loopback health is `UNAVAILABLE_SERVICE_INACTIVE`.
 - Runtime/provider/memory/VCP-core effects are zero; Edge stays `zero_memory`.

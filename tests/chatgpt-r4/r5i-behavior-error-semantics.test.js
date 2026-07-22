@@ -3,7 +3,10 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
-const { digestObject } = require('../../packages/chatgpt-r4-contracts');
+const {
+  digestObject,
+  validateToolArguments
+} = require('../../packages/chatgpt-r4-contracts');
 const {
   MODEL_WORKFLOW_INSTRUCTIONS,
   modelVisibleErrorText,
@@ -57,6 +60,17 @@ test('R5-I preserves all six public tool names and exact input/output schema dig
       outputSchema: descriptor.outputSchema
     }), PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN[name], name);
   }
+});
+
+test('R5-I fails closed when exact visibility is absent without changing the public schema', () => {
+  assert.throws(() => validateToolArguments('resolve_memory_context', {
+    project_alias: 'project-alpha'
+  }), { code: 'tool_arguments_shape_invalid' });
+  assert.doesNotThrow(() => validateToolArguments('resolve_memory_context', {
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
+  }));
+  assert.deepEqual(toolDescriptors.resolve_memory_context.inputSchema.required, ['project_alias']);
 });
 
 test('R5-I projects verified governed outcomes separately from transport failures', () => {

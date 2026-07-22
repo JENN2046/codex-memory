@@ -98,7 +98,10 @@ test('context resolution returns signed low-disclosure denials without a context
     const request = buildCandidateEdgeRequest({
       principalAssertion: result.internal.principalAssertion,
       toolName: 'resolve_memory_context',
-      toolArguments: { project_alias: projectAlias },
+      toolArguments: {
+        project_alias: projectAlias,
+        requested_visibility: 'project'
+      },
       now: result.internal.clock(),
       requestId: `req_context_${suffix}_0000000001`,
       nonce: `request_nonce_${suffix}_00000001`,

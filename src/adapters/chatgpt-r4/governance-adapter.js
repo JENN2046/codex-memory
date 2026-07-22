@@ -209,7 +209,7 @@ async function handleResolve({
   const issued = await issueProjectContext({
     principalFingerprint,
     safeProjectAlias: args.project_alias,
-    requestedVisibility: args.requested_visibility || 'task_start_context',
+    requestedVisibility: args.requested_visibility,
     now
   });
   if (issued && typeof issued === 'object' && !Array.isArray(issued) &&
@@ -251,7 +251,7 @@ async function handleResolve({
     resolvePublicKey: resolveContextPublicKey,
     expectedPrincipalFingerprint: principalFingerprint
   });
-  const requestedVisibility = args.requested_visibility || 'task_start_context';
+  const requestedVisibility = args.requested_visibility;
   if (!issued.claim.visibility_allowlist.includes(requestedVisibility)) {
     reject('context_issue_visibility_mismatch');
   }

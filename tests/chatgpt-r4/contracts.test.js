@@ -583,7 +583,10 @@ test('response binds request, counters, receipts, and relay signature', () => {
   const deniedContextRequest = createRequestEnvelope({
     principalAssertion,
     toolName: 'resolve_memory_context',
-    toolArguments: { project_alias: 'unregistered-project' },
+    toolArguments: {
+      project_alias: 'unregistered-project',
+      requested_visibility: 'project'
+    },
     now: clock(),
     requestId: 'req_denied_context_response_0001',
     nonce: 'request_nonce_denied_context_01',
