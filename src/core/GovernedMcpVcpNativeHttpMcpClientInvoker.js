@@ -395,6 +395,8 @@ function nativeRuntimeReceiptEvidenceComplete(receipt) {
         receipt.indexSearchSucceeded !== true ||
         !['empty', 'found'].includes(receipt.vectorRetrievalOutcome)
       )) return false;
+      if (receipt.loadedIndexVectorCount === 0 &&
+          receipt.vectorRetrievalOutcome !== 'empty_index') return false;
       if (receipt.vectorRetrievalOutcome === 'empty_index' && (
         receipt.hydratedChunkCount !== 0 ||
         receipt.loadedIndexVectorCount !== 0 ||

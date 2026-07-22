@@ -620,7 +620,9 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
         indexSearchSucceeded: probedEmptyIndexReceipt === 'valid',
         rawCandidateCount: 0,
         ghostCandidateCount: 0,
-        vectorRetrievalOutcome: 'empty_index',
+        vectorRetrievalOutcome: probedEmptyIndexReceipt === 'misclassified'
+          ? 'empty'
+          : 'empty_index',
         vectorRetrievalRawDetailsDisclosed: false
       });
     }
@@ -630,7 +632,8 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
       id: body.id,
       result: {
         structuredContent: {
-          results: probedEmptyIndexReceipt && probedEmptyIndexReceipt !== 'contradictory'
+          results: probedEmptyIndexReceipt &&
+              !['contradictory', 'misclassified'].includes(probedEmptyIndexReceipt)
             ? []
             : [{ content: rawPrivateValue }]
         },
@@ -730,6 +733,15 @@ test('HTTP MCP tool caller projects native runtime receipt without raw disclosur
       governanceMeta: validReadGovernanceMeta()
     });
     assert.equal(contradictoryEmptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, false);
+
+    probedEmptyIndexReceipt = 'misclassified';
+    const misclassifiedEmptyIndexRetrieval = await result.callToolWithReceipt({
+      targetReferenceName: 'operator-vcp-toolbox-service-ref',
+      toolName: 'search_memory',
+      arguments: { query: 'misclassified empty index', include_content: false },
+      governanceMeta: validReadGovernanceMeta()
+    });
+    assert.equal(misclassifiedEmptyIndexRetrieval.receipt.nativeRuntimeReceipt.present, false);
     probedEmptyIndexReceipt = false;
 
     falseVectorRetrievalReceipt = true;

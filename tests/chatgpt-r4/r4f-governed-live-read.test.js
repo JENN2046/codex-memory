@@ -453,6 +453,16 @@ test('R4-F rejects missing no-write, no-raw, and counter-source evidence', async
         hydratedChunkCount: 0,
         loadedIndexVectorCount: 0,
         indexSearchCalled: true,
+        indexSearchSucceeded: true,
+        rawCandidateCount: 0,
+        vectorRetrievalOutcome: 'empty'
+      });
+    },
+    result => {
+      Object.assign(result.receipt.nativeInvocationReceipt.nativeRuntimeReceipt, {
+        hydratedChunkCount: 0,
+        loadedIndexVectorCount: 0,
+        indexSearchCalled: true,
         indexSearchSucceeded: false,
         rawCandidateCount: 0,
         vectorRetrievalOutcome: 'empty_index'
