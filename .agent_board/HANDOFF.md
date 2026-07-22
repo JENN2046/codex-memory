@@ -6,7 +6,7 @@ Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
 Current validation: `CMV-2234`.
-Current fact: the 20-session private ChatGPT window completed with intact one-read enforcement and actionable model-behavior findings.
+Current fact: the 20-session observation completed with intact one-read enforcement, but its 10-positive/10-negative mix did not satisfy the frozen 12/8 matrix.
 Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and Edge is restored to zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
@@ -14,11 +14,16 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Active Handoff
 
-CM-2149 closes the authorized R5-H window after 20 fresh private ChatGPT
+CM-2149 records the authorized R5-H run after 20 fresh private ChatGPT
 conversations. Expected one-read matches were `8`, negative abstentions `7`,
 and five provider/native reads completed. Six isolated derived-runtime
 lifecycle events were accounted; primary/source/fallback/global and policy
 violation counters remained zero.
+
+The observed task distribution was 10 memory-relevant and 10 negative, not the
+frozen 12/8 matrix. R5-H acceptance therefore remains incomplete. Do not
+reclassify sessions; a corrective supplement or protocol amendment requires a
+new explicit boundary.
 
 The one-read boundary held when a consumed session generated two extra tool
 attempts: both failed before another provider/native call. Actionable findings
@@ -29,9 +34,9 @@ without a separate decision.
 
 Verification kill and drain passed. Governance, Relay, and shim are stopped;
 Edge is verified `zero_memory`; the immutable exact-value artifact remains
-owner-only and outside Git. Next boundary: normal closeout PR, then R5-I
-source-only behavior/error-semantics hardening. Do not infer automatic-first-
-task, production, release, deploy, cutover, or readiness.
+owner-only and outside Git. Next boundary: normal observation-closeout PR;
+R5-I source hardening may follow independently. Do not infer R5-H acceptance,
+automatic-first-task, production, release, deploy, cutover, or readiness.
 
 ## Historical Handoff Context
 

@@ -6,7 +6,7 @@ Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
 Current validation: `CMV-2234`.
-Current fact: the 20-session private ChatGPT window completed with intact one-read enforcement and actionable model-behavior findings.
+Current fact: the 20-session observation completed with intact one-read enforcement, but its 10-positive/10-negative mix did not satisfy the frozen 12/8 matrix.
 Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and the Edge is restored to zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
@@ -14,12 +14,17 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout
 
-Twenty fresh private ChatGPT conversations completed. Eight matched the
+Twenty fresh private ChatGPT observations completed. Eight matched the
 expected one-read tool and seven negative sessions abstained. The window used
 five provider calls and five native invocations; six authorized isolated
 derived-runtime lifecycle events completed. Primary-memory writes,
 source-partition mutations, fallback, unrestricted search, and derived-policy
 violations remained zero.
+
+The frozen matrix required 12 memory-relevant and 8 negative sessions; the
+observed run contained 10 and 10. It is retained as evidence but does not close
+R5-H acceptance. No session was reclassified or added after the 20-session
+authorization was consumed.
 
 The runtime enforced one-read even when the model did not stop: one consumed
 session generated two further attempts, both rejected before provider/native
@@ -29,7 +34,7 @@ ChatGPT task-start client-private requirement.
 
 Verification kill and shutdown drain passed. Governance, Relay, and shim are
 stopped; the private-development Edge is verified in `zero_memory`. Final
-verdict: `R5_H_DOGFOOD_COMPLETE_WITH_ACTIONABLE_FINDINGS`.
+verdict: `R5_H_20_SESSION_OBSERVATION_COMPLETE_PLAN_MATRIX_INCOMPLETE`.
 
 ## CM-2148 ChatGPT Web R5-H Private ChatGPT Dogfood Window
 

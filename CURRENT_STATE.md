@@ -8,7 +8,7 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_H_DOGFOOD_COMPLETE_WITH_ACTIONABLE_FINDINGS` |
+| Status | `R5_H_20_SESSION_OBSERVATION_COMPLETE_PLAN_MATRIX_INCOMPLETE` |
 | Current task | `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout` |
 | Current validation | `CMV-2234` |
 | Current route | Preserve the zero-memory rollback and address R5-H behavior/error-semantics findings before any further live window |
@@ -18,13 +18,18 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 ## ChatGPT Web R5-H Private ChatGPT Dogfood Window
 
-R5-H completed 20 fresh private ChatGPT conversations: 10 memory-relevant, 4
+R5-H ran 20 fresh private ChatGPT conversations: 10 memory-relevant, 4
 memory-irrelevant, and 6 scope-missing. Eight sessions matched the expected
 one-read tool, seven negative sessions abstained, and the successful set
 exercised search, overview, audit, and task-context selection. Five bounded
 provider/native reads occurred. Primary-memory writes, source-partition
 mutations, fallback, unrestricted search, and derived-policy violations stayed
 zero; six authorized derived-runtime lifecycle events completed.
+
+The frozen plan required 12 memory-relevant and 8 negative sessions. The
+observed `10 / 10` distribution therefore does not close the R5-H acceptance
+matrix. No session was reclassified and no supplement was run after the
+20-session authorization was consumed.
 
 The safety boundary held despite behavioral misses. One consumed session made
 two further tool attempts, both rejected without another provider/native call.
@@ -39,8 +44,9 @@ The owner-only immutable artifact remains outside Git. See
 `docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_CLOSEOUT.md`.
 
 Automatic-first-task guarantees, production, release, deploy, cutover, and
-readiness remain false. The next safe route is R5-I behavior/error-semantics
-hardening plus an explicit product decision for ChatGPT task-start visibility.
+readiness remain false. R5-I source-only behavior/error-semantics hardening can
+proceed, but R5-H acceptance needs either a separately authorized corrective
+positive-session supplement or an explicitly reviewed protocol amendment.
 
 ## ChatGPT Web R5-G Bounded Retrieval Reliability Window
 

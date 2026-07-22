@@ -6,7 +6,7 @@ Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
 Current validation: `CMV-2234`.
-Current fact: the 20-session private ChatGPT window completed with intact one-read enforcement and actionable model-behavior findings.
+Current fact: the 20-session observation completed with intact one-read enforcement, but its 10-positive/10-negative mix did not satisfy the frozen 12/8 matrix.
 Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and Edge is restored to zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
@@ -15,12 +15,13 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 ## Current Run State
 
 - Architecture: R5-H preserved the public six-tool ChatGPT surface and kept authorization in local Governance.
-- Runtime verdict: 20 sessions completed; expected tool match `8`, negative abstention `7`, post-terminal attempts `2` in one consumed session.
+- Runtime verdict: 20 observations completed; expected tool match `8`, negative abstention `7`, post-terminal attempts `2` in one consumed session.
+- Matrix verdict: observed relevant/negative `10/10` does not satisfy planned `12/8`; R5-H acceptance remains incomplete.
 - Runtime accounting: provider/native `5/5`; authorized derived lifecycle `6`; primary/source/fallback/global/derived-policy violations all zero.
 - Enforcement: both post-terminal attempts failed closed without another provider/native call; terminal stop remains a usability finding rather than a safety bypass.
 - Host route: verification kill and shutdown drain passed; Governance, Relay, and isolated shim are stopped; Edge is verified `zero_memory`.
 - Evidence: owner-only immutable artifact exists outside Git; tracked docs contain aggregates and non-claims only.
-- Status sync: CM-2149/CMV-2234 record runtime completion with actionable findings, not an automatic-use or readiness guarantee.
+- Status sync: CM-2149/CMV-2234 retain the run as evidence while rejecting R5-H matrix completion and any automatic-use/readiness guarantee.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -50,9 +51,10 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Deliver the low-disclosure R5-H closeout through normal PR CI/review. The next
-safe source slice is R5-I behavior/error-semantics hardening and a separate
-product decision for ChatGPT task-start visibility. Further live/provider/read,
+Deliver the low-disclosure R5-H observation closeout through normal PR
+CI/review. R5-I source hardening can proceed independently. R5-H acceptance
+needs either a separately authorized corrective positive-session supplement or
+an explicitly reviewed protocol amendment. Further live/provider/read,
 partition provisioning, production, release, deploy, cutover, readiness, or
 public-write work requires a separate current scope.
 

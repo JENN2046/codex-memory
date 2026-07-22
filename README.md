@@ -49,14 +49,15 @@ Long-term goal and boundary documents:
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-R5-H completed 20 fresh private single-operator ChatGPT conversations. Eight
+R5-H ran 20 fresh private single-operator ChatGPT conversations. Eight
 sessions selected the expected one-read tool and seven negative sessions
 abstained. Five bounded provider/native reads occurred; primary-memory writes,
 source-partition mutations, fallback, and unrestricted search remained zero.
 The one-read lease rejected two post-terminal attempts without another native
-read. The window closed with actionable model-behavior findings, not a
-readiness claim. Governance, Relay, and the isolated shim are stopped and the
-Edge is verified back in zero-memory mode. See
+read. The observed `10 relevant / 10 negative` mix did not satisfy the frozen
+`12 / 8` matrix, so R5-H acceptance remains incomplete. Governance, Relay, and
+the isolated shim are stopped and the Edge is verified back in zero-memory
+mode. See
 `docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_CLOSEOUT.md`.
 
 ChatGPT Web R4 is closed out with verdict

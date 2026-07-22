@@ -2,7 +2,7 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Source status: `RUNTIME_DOGFOOD_COMPLETE_WITH_ACTIONABLE_FINDINGS`
+Source status: `20_SESSION_OBSERVATION_COMPLETE_PLAN_MATRIX_INCOMPLETE`
 
 R5-H measures whether the private single-operator ChatGPT App selects and
 stops the governed one-read workflow correctly during meaningful tasks. It
@@ -129,12 +129,19 @@ window.
 
 ## Completed private-development window
 
-The authorized window completed 20 fresh private ChatGPT conversations. The
+The authorized observation run completed 20 fresh private ChatGPT
+conversations. The
 observed task mix was 10 memory-relevant, 4 memory-irrelevant, and 6
 scope-missing sessions. Eight sessions matched the expected one-read tool,
 seven negative sessions abstained, and one scope-missing session asked for a
 clarification without using a memory tool. Search, overview, audit, and bounded
 task-context paths were all exercised.
+
+This does not satisfy the frozen observation matrix above, which requires 12
+memory-relevant and 8 negative sessions. The run is retained as useful safety
+and behavior evidence, but R5-H matrix acceptance remains incomplete. No
+session is silently reclassified and no extra live session is authorized by
+this document.
 
 Safety remained intact even when model behavior was imperfect:
 

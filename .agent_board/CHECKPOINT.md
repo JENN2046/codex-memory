@@ -6,7 +6,7 @@ Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current task: `CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout`.
 Current validation: `CMV-2234`.
-Current fact: the 20-session private ChatGPT window completed with intact one-read enforcement and actionable model-behavior findings.
+Current fact: the 20-session observation completed with intact one-read enforcement, but its 10-positive/10-negative mix did not satisfy the frozen 12/8 matrix.
 Five bounded provider/native reads occurred, primary writes and unrestricted searches remained zero, and Edge is restored to zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
@@ -14,10 +14,12 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## CM-2149 ChatGPT Web R5-H Runtime Dogfood Closeout
 
-Status: `R5_H_DOGFOOD_COMPLETE_WITH_ACTIONABLE_FINDINGS`
+Status: `R5_H_20_SESSION_OBSERVATION_COMPLETE_PLAN_MATRIX_INCOMPLETE`
 
 - Twenty fresh private ChatGPT sessions completed: 10 memory-relevant, 4
   memory-irrelevant, and 6 scope-missing.
+- The frozen matrix requires 12 memory-relevant and 8 negative sessions; the
+  observed 10/10 mix leaves R5-H acceptance incomplete.
 - Expected one-read matches were `8`; negative abstentions were `7`; four
   successful read sessions stopped at the terminal result.
 - One consumed session generated two further attempts; both were rejected

@@ -2,15 +2,19 @@
 
 Architecture reference: `codex-memory-chatgpt-web-r4-v1`
 
-Final verdict: `R5_H_DOGFOOD_COMPLETE_WITH_ACTIONABLE_FINDINGS`
+Final verdict: `R5_H_20_SESSION_OBSERVATION_COMPLETE_PLAN_MATRIX_INCOMPLETE`
 
 ## Result
 
-The private single-operator dogfood window completed 20 fresh ChatGPT
+The private single-operator observation run completed 20 fresh ChatGPT
 conversations. It demonstrated that the model can select the governed
 resolve-plus-one-read workflow for meaningful project tasks and can also
 abstain or ask for missing scope. It did not demonstrate deterministic
-automatic tool selection or universal terminal stop.
+automatic tool selection or universal terminal stop. It also did not satisfy
+the frozen R5-H task distribution: the plan required 12 memory-relevant and 8
+negative sessions, while the observed run contained 10 memory-relevant and 10
+negative sessions. The run is evidence, but it is not accepted as completion
+of the planned R5-H matrix.
 
 The observed task mix and low-disclosure outcomes were:
 
@@ -20,6 +24,9 @@ The observed task mix and low-disclosure outcomes were:
 | Memory-relevant sessions | 10 |
 | Memory-irrelevant sessions | 4 |
 | Scope-missing sessions | 6 |
+| Planned memory-relevant sessions | 12 |
+| Planned negative sessions | 8 |
+| Planned matrix satisfied | no |
 | Expected read-tool matches | 8 |
 | Negative abstentions | 7 |
 | Sessions with a post-terminal retry | 1 |
@@ -94,7 +101,15 @@ or general model reliability.
 
 ## Next gate
 
-The next useful slice is R5-I behavior and error-semantics hardening:
+Before R5-H can be accepted, choose one explicit route:
+
+- authorize a corrective positive-session supplement after deriving the exact
+  missing per-tool targets from owner-control evidence; or
+- amend the frozen task matrix, explain why the changed distribution is valid,
+  and subject the amended contract to review.
+
+Neither route is inferred from this closeout. R5-I behavior and error-semantics
+hardening can still proceed independently:
 
 - make receipt-backed failure categories clearer to the model;
 - reduce alias guessing and redundant resolution attempts;
@@ -102,6 +117,6 @@ The next useful slice is R5-I behavior and error-semantics hardening:
 - make an explicit product decision for ChatGPT task-start visibility before
   provisioning any new private partition or changing the mapping contract.
 
-That next slice requires no immediate runtime activation. Any further live
-window, provider use, memory access, new partition, production action, release,
-deploy, cutover, or readiness claim remains separately bounded.
+Source-only hardening requires no immediate runtime activation. Any corrective
+live window, provider use, memory access, new partition, production action,
+release, deploy, cutover, or readiness claim remains separately bounded.
