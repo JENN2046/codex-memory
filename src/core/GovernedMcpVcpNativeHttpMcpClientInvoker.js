@@ -410,8 +410,25 @@ function nativeRuntimeReceiptEvidenceComplete(receipt) {
   return true;
 }
 
-function lowDisclosureNativeRuntimeReceipt(receipt = null) {
-  if (!nativeRuntimeReceiptEvidenceComplete(receipt)) {
+function emptyIndexResultEvidenceComplete(value) {
+  if (Array.isArray(value)) return value.length === 0;
+  if (!isPlainObject(value)) return false;
+  if (Object.hasOwn(value, 'results')) {
+    return Array.isArray(value.results) && value.results.length === 0;
+  }
+  if (Object.hasOwn(value, 'overview')) {
+    return isPlainObject(value.overview) && value.overview.resultCountBucket === 'zero';
+  }
+  if (Object.hasOwn(value, 'audit')) {
+    return isPlainObject(value.audit) && value.audit.sampledReadResultCountBucket === 'zero';
+  }
+  return false;
+}
+
+function lowDisclosureNativeRuntimeReceipt(receipt = null, value = undefined) {
+  if (!nativeRuntimeReceiptEvidenceComplete(receipt) ||
+      (receipt?.vectorRetrievalOutcome === 'empty_index' &&
+        !emptyIndexResultEvidenceComplete(value))) {
     return {
       present: false,
       nativeRuntimeCalled: false,
@@ -776,7 +793,10 @@ function httpStatusClass(status) {
 
 function buildLowDisclosureInvocationReceipt(input = {}) {
   const governanceMetadataSent = input.governanceMetadataSent === true;
-  const nativeRuntimeReceipt = lowDisclosureNativeRuntimeReceipt(input.nativeRuntimeReceipt);
+  const nativeRuntimeReceipt = lowDisclosureNativeRuntimeReceipt(
+    input.nativeRuntimeReceipt,
+    input.value
+  );
   return {
     targetReferenceName: isSafeReferenceName(input.targetReferenceName)
       ? input.targetReferenceName

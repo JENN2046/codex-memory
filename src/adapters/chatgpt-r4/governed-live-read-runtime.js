@@ -339,7 +339,8 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
         runtime.hydratedChunkCount !== 0 ||
         runtime.loadedIndexVectorCount !== 0 ||
         !emptyIndexSearchEvidenceComplete(runtime) ||
-        runtime.rawCandidateCount !== 0
+        runtime.rawCandidateCount !== 0 ||
+        (Array.isArray(result?.results) && result.results.length !== 0)
       )) ||
       (runtime.vectorRetrievalOutcome === 'found' &&
         runtime.rawCandidateCount < 1) ||
