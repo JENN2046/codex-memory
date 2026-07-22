@@ -4,13 +4,33 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof`.
-Current validation: `CMV-2231`.
-Current fact: one exact-head selected-diary vector result passed relevance and receipt-chain checks with zero primary/source/global mutation.
-All R5-F runtimes are stopped and Edge remains zero-memory.
+Current task: `CM-2147 ChatGPT Web R5-G Exact-Head Bounded Retrieval Reliability Window`.
+Current validation: `CMV-2232`.
+Current fact: five fresh exact-head project reads returned one relevant result each with zero timeout, primary/source mutation, and unrestricted search.
+Harness recovery is disclosed; all R5-G runtimes are stopped and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2147 ChatGPT Web R5-G Bounded Retrieval Reliability Window
+
+Status: `R5_G_BOUNDED_RETRIEVAL_RELIABILITY_PASS_WITH_HARNESS_RECOVERY`
+
+- Five fresh project-only sessions completed with `5/5` non-empty results and
+  minimum relevance `0.5`.
+- Provider/native and authenticated read-only budgets were exactly `5/5` and
+  `16/16`; timeout, fallback, primary write, source mutation, excluded access,
+  and unrestricted search remained zero.
+- Inactive, four consumed-replay attempts, expiry, and restart-inactive failed
+  closed. Verification-complete kill and shutdown drain passed.
+- Normal VCP cooldown was used. Derived lifecycle accounting finished at
+  `6 completed / 0 failed`.
+- Two private harness projection defects were recovered without repeating a
+  consumed provider call; both snapshots remain preserved and the owner-only
+  aggregate artifact discloses the recovery.
+- Governance, Relay, and the shim are stopped; Edge remains `zero_memory`.
+
+Validation: `CMV-2232`.
 
 ## CM-2146 ChatGPT Web R5-F Exact-Head Bounded Vector Retrieval Live Proof
 
