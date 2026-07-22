@@ -1304,7 +1304,6 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
       if (indexDiagnostics.enforced &&
           indexDiagnostics.loadedIndexVectorCount === 0 && (
             rawResultCount > 0 ||
-            vectorSearchAccounting.indexSearchCallCount > 0 ||
             vectorSearchAccounting.rawCandidateCount > 0
           )) {
         throw nativeRuntimeStageError('native_vector_search_not_executed');

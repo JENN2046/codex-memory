@@ -236,6 +236,7 @@ function selectedDiaryDiagnosticFixture({
   recoveryFailure = false,
   indexSearchFailure = false,
   callIndexSearch = true,
+  searchEmptyIndex = false,
   rawCandidates = [{ id: 1, score: 0.9 }],
   ghostCandidate = false,
   finalResults = [{ chunkId: 1, fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }]
@@ -263,7 +264,9 @@ function selectedDiaryDiagnosticFixture({
       return index;
     },
     async search() {
-      if (!callIndexSearch || loadedIndexVectorCount === 0) return finalResults;
+      if (!callIndexSearch || (loadedIndexVectorCount === 0 && !searchEmptyIndex)) {
+        return finalResults;
+      }
       let candidates;
       try {
         candidates = index.search(vector, 1);
@@ -393,6 +396,26 @@ test('R5-E distinguishes legitimate empty index and empty vector search receipts
   assert.equal(emptyIndex._nativeRuntimeReceipt.indexSearchSucceeded, false);
   assert.equal(emptyIndex._nativeRuntimeReceipt.loadedIndexVectorCount, 0);
   assert.equal(emptyIndex._nativeRuntimeReceipt.rawCandidateCount, 0);
+
+  const probedEmptyIndexFixture = selectedDiaryDiagnosticFixture({
+    hydratedChunkCount: 0,
+    loadedIndexVectorCount: 0,
+    searchEmptyIndex: true,
+    rawCandidates: [],
+    finalResults: []
+  });
+  const probedEmptyIndex = await probedEmptyIndexFixture.adapter.search({
+    query: 'probed empty index',
+    limit: 1
+  }, {
+    authorization: SELECTED_DIARY_DIAGNOSTIC_AUTHORIZATION
+  });
+  assert.equal(probedEmptyIndex.results.length, 0);
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.vectorRetrievalOutcome, 'empty_index');
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.indexSearchCalled, true);
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.indexSearchSucceeded, true);
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.loadedIndexVectorCount, 0);
+  assert.equal(probedEmptyIndex._nativeRuntimeReceipt.rawCandidateCount, 0);
 
   const emptySearchFixture = selectedDiaryDiagnosticFixture({
     rawCandidates: [],
