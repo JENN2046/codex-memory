@@ -8,13 +8,41 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_I_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_R5_H_MATRIX_UNCHANGED` |
-| Current task | `CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics` |
-| Current validation | `CMV-2235` |
+| Status | `R5_K_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_R5_H_UNCHANGED` |
+| Current task | `CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure` |
+| Current validation | `CMV-2236` |
 | Current route | Complete normal PR/CI/review; any exact-head private runtime verification remains separately authorized |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R5-K Scope, Receipt, And Terminal Closure
+
+R5-K closes five R5-J behavior/presentation findings without changing the six
+public tool names or input/output schemas. The first 512 instruction
+characters require exact alias and visibility, clarify missing scope, and make
+memory-irrelevant tasks abstain. `render_memory_scope` is app-only, while the
+versioned scope Widget is attached directly to `resolve_memory_context`.
+
+The Widget distinguishes a receipt-bound governed result from whether a
+context reference was issued. Receipt-bound outcomes and transport failures
+are explicit and terminal, with no model-visible raw receipt values. Formal
+private runtime preparation now derives the native endpoint from an observed
+loopback, write-disabled isolated-shim target, replaces stale target data, and
+recomputes the Governance binding digest.
+
+Targeted tests pass `19/19`; all ChatGPT R4/R5 contracts pass `112/112`;
+the default suite passes `5849/0/8`; hardening passes `97/97 + 6/6`. No runtime,
+provider, memory read/write, private configuration, or VCP core action
+occurred. The R5-H artifact is unchanged and the Edge remains zero-memory. See
+`docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md`.
+
+The fixture-only CI-safe gate passes `5940/5948` with zero failures across 701
+files and no network, daemon, or provider.
+
+Strict contract/test/compare/rollback subgates pass
+`112 + 5849 + 43 + 43`. Strict overall remains non-pass only at
+`UNAVAILABLE_SERVICE_INACTIVE`; no service was started.
 
 ## ChatGPT Web R5-I Model Behavior And Error Semantics
 

@@ -245,6 +245,32 @@ artifact remains outside Git. Public closeout evidence is recorded in
 No optional transport adapter is needed for the accepted private-development
 route. Direct managed HTTPS remains canonical; Tunnel stays non-canonical.
 
+## R5-K — Scope, Receipt, Terminal Stop, And Private Runtime Preparation
+
+R5-K is a source-only behavior and presentation closure after the R5-J canary.
+It does not reopen R4 runtime acceptance.
+
+Required source gates:
+
+1. the first 512 MCP instruction characters require exact project alias and
+   visibility, ask for clarification when either is missing, and abstain from
+   memory-irrelevant tasks;
+2. `task_start_context`, `current`, App names, URLs, clients, workspaces, and
+   inferred repositories are never guessed scope;
+3. `render_memory_scope` is component-only and hidden from model selection;
+4. the resolve result directly mounts a versioned scope Widget;
+5. the Widget distinguishes result-receipt binding from context-reference
+   issuance using Widget-only low-disclosure metadata;
+6. any read result or transport failure is terminal for memory-tool selection;
+7. governed failure and transport failure semantics remain distinct;
+8. formal private runtime preparation replaces stale native target data only
+   from an observed loopback, write-disabled isolated shim and recomputes the
+   Governance binding digest;
+9. the six public tool names and exact input/output schemas remain frozen.
+
+R5-K source completion is not a runtime proof, automatic-selection guarantee,
+release, deploy, cutover, or readiness claim.
+
 ## Rollback
 
 Rollback never changes memory content:

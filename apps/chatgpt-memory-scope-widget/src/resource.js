@@ -11,7 +11,7 @@ const widgetResource = Object.freeze({
       prefersBorder: true,
       csp: Object.freeze({ connectDomains: [], resourceDomains: [] })
     }),
-    'openai/widgetDescription': 'Shows only the safe project alias, context expiry, permitted visibility labels, and receipt binding status. It never displays raw memory or controls diary authorization.'
+    'openai/widgetDescription': 'Shows only the safe project alias, context status and expiry, permitted visibility labels, governed-result receipt status, and whether a usable context reference was issued. It never displays raw memory or controls diary authorization.'
   })
 });
 

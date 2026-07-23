@@ -36,8 +36,12 @@ test('R4-B candidate profile is non-default, non-activated, read-only, and has n
     });
     assert.ok(descriptor.outputSchema, `${name} output schema`);
     assert.deepEqual(descriptor._meta.securitySchemes, descriptor.securitySchemes);
-    if (name === 'render_memory_scope') {
+    if (name === 'resolve_memory_context') {
       assert.equal(descriptor._meta.ui.resourceUri, WIDGET_RESOURCE_URI);
+      assert.deepEqual(descriptor._meta.ui.visibility, ['model', 'app']);
+    } else if (name === 'render_memory_scope') {
+      assert.equal(descriptor._meta.ui.resourceUri, WIDGET_RESOURCE_URI);
+      assert.deepEqual(descriptor._meta.ui.visibility, ['app']);
     } else {
       assert.equal(descriptor._meta.ui, undefined);
     }
@@ -62,6 +66,8 @@ test('widget resource uses MCP Apps MIME, empty CSP domains, and no authorizatio
   assert.deepEqual(widgetResource._meta.ui.csp, { connectDomains: [], resourceDomains: [] });
   assert.match(widgetResource._meta['openai/widgetDescription'], /never displays raw memory/u);
   assert.match(MEMORY_SCOPE_WIDGET_HTML, /Memory scope/u);
+  assert.match(MEMORY_SCOPE_WIDGET_HTML, /Result receipt/u);
+  assert.match(MEMORY_SCOPE_WIDGET_HTML, /Context reference/u);
   assert.doesNotMatch(MEMORY_SCOPE_WIDGET_HTML, /diary|mapping_digest|raw memory/iu);
 });
 

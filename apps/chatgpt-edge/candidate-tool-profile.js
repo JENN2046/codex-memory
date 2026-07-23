@@ -24,20 +24,31 @@ const IDEMPOTENT_READ_ONLY_ANNOTATIONS = deepFreeze({
 });
 const SECURITY_SCHEMES = deepFreeze([{ type: 'oauth2', scopes: ['memory.read'] }]);
 const MODEL_WORKFLOW_INSTRUCTIONS = [
-  'Read-only project-aware memory tools use a one-context/one-read workflow.',
-  'Before reading, call resolve_memory_context exactly once.',
-  'Copy project_alias and requested_visibility exactly from the user-provided task context; never invent, normalize, suffix, enumerate, or probe alternatives.',
+  'Use these tools only for an explicit project-memory request. Do not call any codex-memory tool for rewriting, translation, scheduling, general advice, or another memory-irrelevant task.',
+  'A memory workflow requires an exact registered project_alias and one exact requested_visibility supplied by the user or trusted task context. If either value is missing, ask one concise clarification and call no tool.',
+  'Never use current, default, this-project, an App or connector name, a URL, a client identifier, a workspace name, or a guessed repository name as project_alias.',
+  'Never choose task_start_context as a default or describe it as minimal disclosure.',
+  'Before one read, call resolve_memory_context exactly once. Copy project_alias and requested_visibility exactly from the user-provided task context; never invent, normalize, suffix, enumerate, or probe alternatives.',
   'A connector or App display name, URL, OAuth client identifier, opaque context reference, workspace name, or guessed repository name is not a project_alias.',
-  'If either value is missing, ask one concise clarification and do not call a memory tool.',
   'After a resolved context, choose exactly one read tool: memory_overview for counts or status; search_memory for one specific semantic fact; audit_memory for bounded access or receipt categories; prepare_memory_context for a task-start context package.',
   'The first read attempt consumes this workflow, even when it returns empty, denied, unavailable, or a transport error.',
-  'After any read result or transport error, answer the user and do not call another read tool or resolve again; do not switch read tools.',
+  'After any read result or transport error, stop all codex-memory tool use immediately and answer the user; do not call another read tool or resolve again, and do not call render_memory_scope.',
   'Report only the receipt-backed result category or the single transport failure actually returned; never invent retry counts or claim another attempt occurred.',
-  'Use render_memory_scope only when the user asks to see scope status.',
+  'Receipt-bound denied or unavailable means a governed result receipt exists even when no usable project context was issued; it is not a transport failure.',
+  'render_memory_scope is component-only and unavailable to the model.',
   'Never infer that memory was loaded without a tool result.'
 ].join(' ');
 
-function descriptor({ title, description, inputSchema, outputSchema, render = false, idempotent = false }) {
+function descriptor({
+  title,
+  description,
+  inputSchema,
+  outputSchema,
+  widget = false,
+  widgetVisibility = ['model', 'app'],
+  invocationText = null,
+  idempotent = false
+}) {
   const value = {
     title,
     description,
@@ -47,12 +58,14 @@ function descriptor({ title, description, inputSchema, outputSchema, render = fa
     annotations: idempotent ? IDEMPOTENT_READ_ONLY_ANNOTATIONS : READ_ONLY_ANNOTATIONS,
     _meta: { securitySchemes: SECURITY_SCHEMES }
   };
-  if (render) {
+  if (widget) {
+    const invoking = invocationText?.invoking || 'Preparing memory scope…';
+    const invoked = invocationText?.invoked || 'Memory scope ready';
     Object.assign(value._meta, {
-      ui: { resourceUri: RESOURCE_URI, visibility: ['model', 'app'] },
+      ui: { resourceUri: RESOURCE_URI, visibility: widgetVisibility },
       'openai/outputTemplate': RESOURCE_URI,
-      'openai/toolInvocation/invoking': 'Preparing memory scope…',
-      'openai/toolInvocation/invoked': 'Memory scope ready'
+      'openai/toolInvocation/invoking': invoking,
+      'openai/toolInvocation/invoked': invoked
     });
   }
   return deepFreeze(value);
@@ -61,7 +74,7 @@ function descriptor({ title, description, inputSchema, outputSchema, render = fa
 const toolDescriptors = deepFreeze({
   resolve_memory_context: descriptor({
     title: 'Resolve memory project context',
-    description: 'Use this when the user has provided both an exact registered project alias and an exact visibility, and a short-lived governed context reference is required before one memory read. Copy both values verbatim and call once. Never treat an App name, connector name, URL, client identifier, workspace name, opaque reference, or guessed repository name as a project alias; never guess or probe alternative aliases or visibilities. If either exact value is missing, ask the user instead. A denied, unavailable, or error result is terminal and must not be retried.',
+    description: 'Use this when an explicit project-memory request includes both an exact registered project alias and an exact visibility, and a short-lived governed context reference is required before one memory read. Copy both values verbatim and call once. Never use current, default, this-project, or another sentinel as the alias. Never treat an App name, connector name, URL, client identifier, workspace name, opaque reference, or guessed repository name as a project alias; never guess or probe alternative aliases or visibilities. Never infer task_start_context as a default or call this tool to discover missing scope. If either exact value is missing, ask one concise clarification and call no tool. A denied, unavailable, or error result is terminal and must not be retried.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -71,7 +84,12 @@ const toolDescriptors = deepFreeze({
         requested_visibility: { enum: CONTEXT_VISIBILITIES }
       }
     },
-    outputSchema: contextResolutionOutputSchema()
+    outputSchema: contextResolutionOutputSchema(),
+    widget: true,
+    invocationText: {
+      invoking: 'Resolving memory scope…',
+      invoked: 'Memory scope resolved'
+    }
   }),
   memory_overview: descriptor({
     title: 'View memory overview',
@@ -146,7 +164,7 @@ const toolDescriptors = deepFreeze({
   }),
   render_memory_scope: descriptor({
     title: 'Render memory scope status',
-    description: 'Use this when resolve_memory_context has completed and the user explicitly asks to see the safe project alias, context expiry, visibility labels, and receipt status. This display is not a memory read and must not be used as a fallback or trigger another read.',
+    description: 'Use this when the mounted codex-memory component needs to re-render an already validated memory-scope DTO. Component-only: the model must never call this tool, including for memory-irrelevant tasks, after a terminal read result, or as a fallback. This display does not authorize or perform a memory read.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -159,7 +177,8 @@ const toolDescriptors = deepFreeze({
       required: ['scope'],
       properties: { scope: WIDGET_DTO_SCHEMA }
     },
-    render: true,
+    widget: true,
+    widgetVisibility: ['app'],
     idempotent: true
   })
 });

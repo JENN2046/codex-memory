@@ -4,13 +4,43 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics`.
-Current validation: `CMV-2235`.
-Current fact: source guidance and receipt/error projection now distinguish governed outcomes from transport failures and require exact alias/visibility plus one terminal read attempt.
+Current task: `CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure`.
+Current validation: `CMV-2236`.
+Current fact: missing scope now clarifies, render is app-only, result receipt and context issuance are distinct, terminal stop is explicit, and private runtime preparation binds only an observed isolated shim target.
 The six public schemas and the R5-H artifact are unchanged; no runtime/provider/memory action occurred and the Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure
+
+R5-K moves the exact alias/visibility clarification boundary and negative
+abstention into the first 512 MCP instruction characters. It prevents
+`task_start_context` and identities such as `current`, App names, URLs, client
+names, workspace names, and inferred repositories from becoming guessed
+scope.
+
+`render_memory_scope` is app-only and the versioned Widget is attached directly
+to `resolve_memory_context`. Widget-only metadata distinguishes a bound result
+receipt from context issuance without exposing a receipt value or private
+digest. Every read outcome and transport failure is terminal.
+
+Formal private runtime preparation accepts only an observed, loopback,
+write-disabled isolated-shim target, replaces stale target data, and recomputes
+the Governance binding digest. Targeted tests pass `19/19`, all R4/R5 contracts
+pass `112/112`, the default suite passes `5849/0/8`, and hardening passes
+`97/97 + 6/6`.
+
+The fixture-only CI-safe gate passes `5940/5948` with zero failures, no network,
+no daemon, and no provider.
+
+No service, provider, memory read/write, private config, or VCP core action ran.
+The R5-H artifact remains immutable. Final source verdict:
+`R5_K_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_R5_H_UNCHANGED`.
+
+Strict contract/test/compare/rollback subgates pass. Strict overall remains
+non-pass only because loopback health is `UNAVAILABLE_SERVICE_INACTIVE`; no
+service was started.
 
 ## CM-2150 ChatGPT Web R5-I Model Behavior And Error Semantics
 

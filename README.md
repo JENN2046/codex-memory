@@ -43,6 +43,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-H Private ChatGPT Dogfood Window](docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_WINDOW.md)
 - [ChatGPT Web R5-H Private ChatGPT Dogfood Closeout](docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_CLOSEOUT.md)
 - [ChatGPT Web R5-I Model Behavior And Error Semantics](docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md)
+- [ChatGPT Web R5-K Scope, Receipt, And Terminal Closure](docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
@@ -50,12 +51,15 @@ Long-term goal and boundary documents:
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-R5-I now distinguishes receipt-bound governed results from transport failures,
-requires exact user-provided alias and visibility, and makes the first read
-attempt terminal. The public six-tool names and schemas are unchanged. This is
-source hardening only: no runtime, provider, or memory action ran, and the
-existing R5-H 20-session artifact and incomplete matrix remain unchanged. See
-`docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md`.
+R5-K now makes missing alias/visibility a clarification boundary, removes the
+render-only helper from model selection, presents governed result receipts
+separately from context issuance, and makes every read result or transport
+failure terminal. Formal private runtime preparation now replaces stale native
+target data only from an observed loopback, write-disabled isolated shim and
+recomputes the Governance binding digest. The public six-tool names and schemas
+are unchanged. This is source hardening only: no runtime, provider, or memory
+action ran, and the existing R5-H artifact remains unchanged. See
+`docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md`.
 
 R5-H ran 20 fresh private single-operator ChatGPT conversations. Eight
 sessions selected the expected one-read tool and seven negative sessions

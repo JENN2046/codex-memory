@@ -24,34 +24,59 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
       <dt>Status</dt><dd id="status">Missing</dd>
       <dt>Visibility</dt><dd id="visibility">None</dd>
       <dt>Expires</dt><dd id="expires">Not available</dd>
-      <dt>Receipt</dt><dd id="receipt">Not available</dd>
+      <dt>Result receipt</dt><dd id="receipt">Not available</dd>
+      <dt>Context reference</dt><dd id="context-reference">Not issued</dd>
     </dl>
   </main>
   <script>
     (() => {
       const allowedStatuses = new Set(['resolved', 'missing', 'expired', 'denied', 'unavailable']);
       const safeText = (value, fallback) => typeof value === 'string' && value.length <= 160 ? value : fallback;
-      const render = input => {
+      const render = (input, toolInput, metadata) => {
         const scope = input && typeof input === 'object' ? (input.scope || input) : null;
         if (!scope || !allowedStatuses.has(scope.context_status)) return;
+        const presentation = metadata && typeof metadata === 'object'
+          ? metadata['codex-memory/receiptPresentation']
+          : null;
         const root = document.querySelector('main');
         root.dataset.state = scope.context_status;
-        document.querySelector('#project').textContent = safeText(scope.safe_project_alias, 'Not selected');
+        document.querySelector('#project').textContent = safeText(
+          scope.safe_project_alias,
+          safeText(toolInput && toolInput.project_alias, 'Not selected')
+        );
         document.querySelector('#status').textContent = scope.context_status;
         document.querySelector('#visibility').textContent = Array.isArray(scope.visibility_labels)
           ? scope.visibility_labels.filter(value => typeof value === 'string').slice(0, 4).join(', ') || 'None'
           : 'None';
         document.querySelector('#expires').textContent = safeText(scope.expires_at, 'Not available');
-        document.querySelector('#receipt').textContent = safeText(scope.receipt_status, 'Not available');
+        document.querySelector('#receipt').textContent = safeText(
+          presentation && presentation.result_receipt_status,
+          safeText(scope.receipt_status, 'Not available')
+        );
+        document.querySelector('#context-reference').textContent = safeText(
+          presentation && presentation.context_reference_status,
+          scope.context_status === 'resolved' ? 'issued' : 'not issued'
+        );
       };
       window.addEventListener('message', event => {
         if (event.source !== window.parent) return;
         const message = event.data;
         if (message && message.jsonrpc === '2.0' && message.method === 'ui/notifications/tool-result') {
-          render(message.params && message.params.structuredContent);
+          render(
+            message.params && message.params.structuredContent,
+            window.openai && window.openai.toolInput,
+            (message.params && message.params._meta) ||
+              (window.openai && window.openai.toolResponseMetadata)
+          );
         }
       });
-      if (window.openai && window.openai.toolOutput) render(window.openai.toolOutput);
+      if (window.openai && window.openai.toolOutput) {
+        render(
+          window.openai.toolOutput,
+          window.openai.toolInput,
+          window.openai.toolResponseMetadata
+        );
+      }
     })();
   </script>
 </body>
