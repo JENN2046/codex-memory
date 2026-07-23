@@ -100,6 +100,8 @@ async function preparePrivateRuntimeEnvironment({
       capability_preflight_completed: capability.accepted,
       transport_authorization_supplied:
         capability.transport_authorization_supplied,
+      transport_authorization_enforced:
+        capability.transport_authorization_enforced,
       initialize_capability_verified: capability.initialize_capability_verified,
       tools_list_capability_verified: capability.tools_list_capability_verified,
       diary_scope_mapping_loaded: capability.diary_scope_mapping_loaded,
@@ -164,6 +166,11 @@ async function probeIsolatedShimCapabilities({
     fetchImpl,
     timeoutMs
   });
+  await verifyCapabilityTransportAuthorization({
+    endpoint: validatedEndpoint,
+    fetchImpl,
+    timeoutMs
+  });
   const initializeResult = initialize.result;
   const toolsListResult = toolsList.result;
   const initializeMeta = initializeResult?._meta;
@@ -196,6 +203,7 @@ async function probeIsolatedShimCapabilities({
     accepted: true,
     low_disclosure: true,
     transport_authorization_supplied: true,
+    transport_authorization_enforced: true,
     initialize_capability_verified: true,
     tools_list_capability_verified: true,
     diary_scope_mapping_loaded: true,
@@ -224,26 +232,94 @@ async function postCapabilityJsonRpc({
   fetchImpl,
   timeoutMs
 }) {
+  const { response, body } = await exchangeCapabilityJsonRpc({
+    endpoint,
+    method,
+    id,
+    bearerToken,
+    fetchImpl,
+    timeoutMs,
+    timeoutCode: 'r5n_capability_probe_timeout',
+    transportCode: 'r5n_capability_probe_transport_unavailable',
+    invalidJsonCode: 'r5n_capability_probe_invalid_json'
+  });
+  if (response.ok !== true) {
+    reject('r5n_capability_probe_http_rejected');
+  }
+  if (!isPlainObject(body) ||
+      body.jsonrpc !== '2.0' ||
+      body.id !== id ||
+      Object.hasOwn(body, 'error') ||
+      !isPlainObject(body.result)) {
+    reject('r5n_capability_probe_jsonrpc_rejected');
+  }
+  return body;
+}
+
+async function verifyCapabilityTransportAuthorization({
+  endpoint,
+  fetchImpl,
+  timeoutMs
+}) {
+  const { response, body } = await exchangeCapabilityJsonRpc({
+    endpoint,
+    method: 'initialize',
+    id: 'codex-memory-r5n-capability-unauthenticated',
+    bearerToken: null,
+    fetchImpl,
+    timeoutMs,
+    timeoutCode: 'r5n_capability_authorization_probe_timeout',
+    transportCode: 'r5n_capability_authorization_probe_transport_unavailable',
+    invalidJsonCode: 'r5n_capability_authorization_probe_invalid_json'
+  });
+  if (response.ok !== false ||
+      response.status !== 401 ||
+      !isPlainObject(body) ||
+      body.jsonrpc !== '2.0' ||
+      body.id !== null ||
+      Object.hasOwn(body, 'result') ||
+      !isPlainObject(body.error) ||
+      body.error.code !== -32001 ||
+      body.error.data?.reasonCode !== 'transport_authorization_rejected' ||
+      body.error.data?.lowDisclosure !== true) {
+    reject('r5n_capability_transport_authorization_not_enforced');
+  }
+}
+
+async function exchangeCapabilityJsonRpc({
+  endpoint,
+  method,
+  id,
+  bearerToken,
+  fetchImpl,
+  timeoutMs,
+  timeoutCode,
+  transportCode,
+  invalidJsonCode
+}) {
   const controller = new AbortController();
   let timeout;
   const timeoutPromise = new Promise((_resolve, rejectPromise) => {
     timeout = setTimeout(() => {
       controller.abort();
       rejectPromise(new R4ContractError(
-        'r5n_capability_probe_timeout',
-        'r5n_capability_probe_timeout'
+        timeoutCode,
+        timeoutCode
       ));
     }, timeoutMs);
   });
   const operation = async () => {
     let response;
     try {
+      const headers = {
+        'content-type': 'application/json'
+      };
+      if (bearerToken !== null) {
+        headers.authorization = `Bearer ${bearerToken}`;
+      }
       response = await fetchImpl(endpoint, {
         method: 'POST',
-        headers: {
-          authorization: `Bearer ${bearerToken}`,
-          'content-type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({
           jsonrpc: '2.0',
           id,
@@ -253,27 +329,20 @@ async function postCapabilityJsonRpc({
         signal: controller.signal
       });
     } catch (error) {
-      if (error?.name === 'AbortError') reject('r5n_capability_probe_timeout');
-      reject('r5n_capability_probe_transport_unavailable');
+      if (error?.name === 'AbortError') reject(timeoutCode);
+      reject(transportCode);
     }
-    if (!response || response.ok !== true || typeof response.json !== 'function') {
-      reject('r5n_capability_probe_http_rejected');
+    if (!response || typeof response.json !== 'function') {
+      reject(transportCode);
     }
     let body;
     try {
       body = await response.json();
     } catch (error) {
-      if (error?.name === 'AbortError') reject('r5n_capability_probe_timeout');
-      reject('r5n_capability_probe_invalid_json');
+      if (error?.name === 'AbortError') reject(timeoutCode);
+      reject(invalidJsonCode);
     }
-    if (!isPlainObject(body) ||
-        body.jsonrpc !== '2.0' ||
-        body.id !== id ||
-        Object.hasOwn(body, 'error') ||
-        !isPlainObject(body.result)) {
-      reject('r5n_capability_probe_jsonrpc_rejected');
-    }
-    return body;
+    return { response, body };
   };
   try {
     return await Promise.race([operation(), timeoutPromise]);

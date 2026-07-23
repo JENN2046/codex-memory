@@ -49,7 +49,11 @@ The preflight requires:
 Missing mapping, binding mismatch, write enablement, missing tools, extra tools,
 or governance-metadata drift fail closed before the target is bound.
 
-The capability response is private loopback control-plane data. The resulting
+The capability response is private loopback control-plane data. Before binding,
+preparation also sends one unauthenticated `initialize` probe and requires the
+exact low-disclosure HTTP 401 transport-authorization rejection. The shipped
+shim CLI requires `CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` and passes it only as the
+server-side expected Bearer value. The resulting
 low-disclosure preparation receipt records only categorical pass/fail facts;
 it does not return the endpoint, target reference, mapping reference, mapping
 digest, mapping fingerprint, Bearer value, raw tool list, or raw response.
@@ -149,6 +153,7 @@ The source matrix covers:
   non-disclosure;
 - transport, HTTP, JSON-RPC, and capability failure separation;
 - timeout coverage through stalled response-body parsing;
+- server-side Bearer enforcement and unauthenticated-shim rejection;
 - deterministic receipt-backed `unavailable` projection for all four governed
   read tools;
 - rejected-invocation accounting and internal receipt-chain retention;

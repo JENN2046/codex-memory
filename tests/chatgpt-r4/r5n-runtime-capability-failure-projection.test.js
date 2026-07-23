@@ -66,11 +66,16 @@ test('R5-N probes initialize and tools/list before binding an exact mapping-capa
     fetchImpl: capabilityFetch({ environment, calls })
   });
 
-  assert.deepEqual(calls, ['initialize', 'tools/list']);
+  assert.deepEqual(calls, [
+    'initialize',
+    'tools/list',
+    'initialize:unauthenticated'
+  ]);
   assert.equal(prepared.receipt.schema_version, 2);
   assert.equal(prepared.receipt.stage, 'R5-N');
   assert.equal(prepared.receipt.capability_preflight_completed, true);
   assert.equal(prepared.receipt.transport_authorization_supplied, true);
+  assert.equal(prepared.receipt.transport_authorization_enforced, true);
   assert.equal(prepared.receipt.diary_scope_mapping_loaded, true);
   assert.equal(prepared.receipt.mapping_binding_fingerprint_matched, true);
   assert.equal(prepared.receipt.selected_diary_search_supported, true);
@@ -129,6 +134,16 @@ test('R5-N rejects missing, mismatched, writable, and malformed shim capabilitie
       fetchImpl: capabilityFetch({ environment, ...options })
     }), { code });
   }
+  await assert.rejects(() => probeIsolatedShimCapabilities({
+    endpoint,
+    expectedMappingReference: environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE,
+    expectedMappingDigest: environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST,
+    bearerToken: 'synthetic-r5n-capability-token',
+    fetchImpl: capabilityFetch({
+      environment,
+      authorizationRequired: false
+    })
+  }), { code: 'r5n_capability_transport_authorization_not_enforced' });
 });
 
 test('R5-N binds the shim fingerprint to both mapping reference and digest', () => {
@@ -294,7 +309,11 @@ test('R5-N capability preflight keeps transport, HTTP, and JSON-RPC failures dis
       expectedBearerToken: base.bearerToken
     })
   });
-  assert.deepEqual(authorizedCalls, ['initialize', 'tools/list']);
+  assert.deepEqual(authorizedCalls, [
+    'initialize',
+    'tools/list',
+    'initialize:unauthenticated'
+  ]);
   assert.equal(capability.transport_authorization_supplied, true);
   assert.doesNotMatch(JSON.stringify(capability), new RegExp(base.bearerToken, 'u'));
   await assert.rejects(() => probeIsolatedShimCapabilities({
@@ -416,12 +435,37 @@ function capabilityFetch({
   enableWrite = false,
   calls = [],
   expectedBearerToken = 'synthetic-r5n-capability-token',
+  authorizationRequired = true,
   mutate = () => {}
 }) {
   return async (_endpoint, request) => {
-    assert.equal(request.headers.authorization, `Bearer ${expectedBearerToken}`);
     const body = JSON.parse(request.body);
-    calls.push(body.method);
+    if (request.headers.authorization === undefined) {
+      calls.push(`${body.method}:unauthenticated`);
+      if (authorizationRequired) {
+        return {
+          ok: false,
+          status: 401,
+          async json() {
+            return {
+              jsonrpc: '2.0',
+              id: null,
+              error: {
+                code: -32001,
+                message: 'Unauthorized',
+                data: {
+                  reasonCode: 'transport_authorization_rejected',
+                  lowDisclosure: true
+                }
+              }
+            };
+          }
+        };
+      }
+    } else {
+      assert.equal(request.headers.authorization, `Bearer ${expectedBearerToken}`);
+      calls.push(body.method);
+    }
     const raw = body.method === 'initialize'
       ? initializeResult(enableWrite, mappingState)
       : toolsListResult(enableWrite, mappingState);
@@ -429,6 +473,7 @@ function capabilityFetch({
     mutate(body.method, result);
     return {
       ok: true,
+      status: 200,
       async json() {
         return { jsonrpc: '2.0', id: body.id, result };
       }

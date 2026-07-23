@@ -16,6 +16,7 @@ function parseArgs(argv = [], env = process.env) {
     knowledgeBaseRootPath: env.KNOWLEDGEBASE_ROOT_PATH || '',
     knowledgeBaseStorePath: env.KNOWLEDGEBASE_STORE_PATH || '',
     diaryScopeMappingPath: env.CODEX_MEMORY_DIARY_SCOPE_MAPPING_PATH || '',
+    expectedBearerToken: env.CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN || '',
     derivedRuntimeMutationPolicy: env.CODEX_MEMORY_DERIVED_RUNTIME_MUTATION_POLICY ||
       DERIVED_RUNTIME_MUTATION_POLICY,
     enableWrite: false
@@ -68,6 +69,7 @@ function normalizePort(value, fallback) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2), process.env);
+  options.expectedBearerToken = requireExpectedBearerToken(options.expectedBearerToken);
   const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options);
   await new Promise((resolve, reject) => {
     server.once('error', reject);
@@ -135,7 +137,19 @@ if (require.main === module) {
   });
 }
 
+function requireExpectedBearerToken(value) {
+  if (typeof value !== 'string' ||
+      value.length < 1 ||
+      value.length > 4096 ||
+      value.trim() !== value ||
+      /[\r\n\u0000]/u.test(value)) {
+    throw new Error('vcp_native_mcp_shim_bearer_token_required');
+  }
+  return value;
+}
+
 module.exports = {
   normalizePort,
-  parseArgs
+  parseArgs,
+  requireExpectedBearerToken
 };

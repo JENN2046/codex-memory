@@ -186,6 +186,7 @@ test('R5-K formal private preparation replaces stale target data from the observ
   );
   assert.equal(prepared.receipt.previous_target_replaced, true);
   assert.equal(prepared.receipt.listener_observed_before_preparation, true);
+  assert.equal(prepared.receipt.transport_authorization_enforced, true);
   assert.equal(prepared.receipt.endpoint_disclosed, false);
   assert.equal(prepared.receipt.secret_values_returned, false);
   assert.equal(Object.isFrozen(prepared.private_environment), true);
@@ -228,11 +229,32 @@ function capabilityFetch(environment) {
   };
   return async (_endpoint, request) => {
     const body = JSON.parse(request.body);
+    if (request.headers.authorization === undefined) {
+      return {
+        ok: false,
+        status: 401,
+        async json() {
+          return {
+            jsonrpc: '2.0',
+            id: null,
+            error: {
+              code: -32001,
+              message: 'Unauthorized',
+              data: {
+                reasonCode: 'transport_authorization_rejected',
+                lowDisclosure: true
+              }
+            }
+          };
+        }
+      };
+    }
     const result = body.method === 'initialize'
       ? initializeResult(false, mappingState)
       : toolsListResult(false, mappingState);
     return {
       ok: true,
+      status: 200,
       async json() {
         return { jsonrpc: '2.0', id: body.id, result };
       }
