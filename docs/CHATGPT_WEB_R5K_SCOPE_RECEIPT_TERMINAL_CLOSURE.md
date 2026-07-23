@@ -138,18 +138,18 @@ The source validation matrix covers:
 Current focused and contract results:
 
 ```text
-R5-B/R5-I/R5-K targeted: 19/19
-all ChatGPT R4/R5 contracts: 112/112
-default: 5849 pass / 0 fail / 8 skip
+R5-B/R5-I/R5-K targeted: 20/20
+all ChatGPT R4/R5 contracts: 113/113
+default: 5850 pass / 0 fail / 8 skip
 hardening: 97/97 + 6/6
-CI-safe: 5940/5948 pass / 0 fail (701 files; reported skipped count 9)
+CI-safe: 5941/5949 pass / 0 fail (701 files; reported skipped count 9)
 ```
 
 The default, CI-safe, strict-offline, documentation, current-facts, ledger, and
 diff checks are recorded in `CMV-2236`.
 
 Strict contract/test/compare/rollback subgates pass
-`112 + 5849 + 43 + 43`. Strict overall remains non-pass only because the
+`112 + 5850 + 43 + 43`. Strict overall remains non-pass only because the
 source-only stage did not start the inactive loopback health service at
 `127.0.0.1:7605`.
 

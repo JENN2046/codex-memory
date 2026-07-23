@@ -16,6 +16,7 @@ const {
 } = require('../../apps/chatgpt-edge');
 const {
   MEMORY_SCOPE_WIDGET_HTML,
+  receiptPresentationFromMetadata,
   widgetResource
 } = require('../../apps/chatgpt-memory-scope-widget');
 const {
@@ -137,6 +138,26 @@ test('R5-K projects only low-disclosure receipt presentation metadata to the wid
     MEMORY_SCOPE_WIDGET_HTML,
     /receiptChainDigest|mapping[_ -]?digest|diary[_ -]?name|sha256:[a-f0-9]{64}/iu
   );
+});
+
+test('R5-K unwraps direct and ChatGPT bridge envelope receipt metadata', () => {
+  const presentation = {
+    result_receipt_status: 'bound',
+    context_reference_status: 'not_issued',
+    raw_receipt_values_returned: false
+  };
+  for (const metadata of [
+    { 'codex-memory/receiptPresentation': presentation },
+    { _meta: { 'codex-memory/receiptPresentation': presentation } },
+    { mcp_tool_result: { _meta: { 'codex-memory/receiptPresentation': presentation } } },
+    { call_tool_result: { _meta: { 'codex-memory/receiptPresentation': presentation } } }
+  ]) {
+    assert.equal(receiptPresentationFromMetadata(metadata), presentation);
+  }
+  assert.equal(receiptPresentationFromMetadata(null), null);
+  assert.equal(receiptPresentationFromMetadata({ mcp_tool_result: {} }), null);
+  assert.match(MEMORY_SCOPE_WIDGET_HTML, /mcp_tool_result\?\._meta/u);
+  assert.match(MEMORY_SCOPE_WIDGET_HTML, /call_tool_result\?\._meta/u);
 });
 
 test('R5-K formal private preparation replaces stale target data from the observed isolated shim', () => {

@@ -31,17 +31,17 @@ private runtime preparation now derives the native endpoint from an observed
 loopback, write-disabled isolated-shim target, replaces stale target data, and
 recomputes the Governance binding digest.
 
-Targeted tests pass `19/19`; all ChatGPT R4/R5 contracts pass `112/112`;
-the default suite passes `5849/0/8`; hardening passes `97/97 + 6/6`. No runtime,
+Targeted tests pass `20/20`; all ChatGPT R4/R5 contracts pass `113/113`;
+the default suite passes `5850/0/8`; hardening passes `97/97 + 6/6`. No runtime,
 provider, memory read/write, private configuration, or VCP core action
 occurred. The R5-H artifact is unchanged and the Edge remains zero-memory. See
 `docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md`.
 
-The fixture-only CI-safe gate passes `5940/5948` with zero failures across 701
+The fixture-only CI-safe gate passes `5941/5949` with zero failures across 701
 files and no network, daemon, or provider.
 
 Strict contract/test/compare/rollback subgates pass
-`112 + 5849 + 43 + 43`. Strict overall remains non-pass only at
+`112 + 5850 + 43 + 43`. Strict overall remains non-pass only at
 `UNAVAILABLE_SERVICE_INACTIVE`; no service was started.
 
 ## ChatGPT Web R5-I Model Behavior And Error Semantics

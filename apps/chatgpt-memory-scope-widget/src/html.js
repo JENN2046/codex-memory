@@ -1,5 +1,25 @@
 'use strict';
 
+function receiptPresentationFromMetadata(metadata) {
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) return null;
+  const candidates = [
+    metadata,
+    metadata._meta,
+    metadata.mcp_tool_result?._meta,
+    metadata.call_tool_result?._meta
+  ];
+  for (const candidate of candidates) {
+    const presentation =
+      candidate && typeof candidate === 'object' && !Array.isArray(candidate)
+        ? candidate['codex-memory/receiptPresentation']
+        : null;
+    if (presentation && typeof presentation === 'object' && !Array.isArray(presentation)) {
+      return presentation;
+    }
+  }
+  return null;
+}
+
 const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
 <html lang="en">
 <head>
@@ -32,12 +52,11 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
     (() => {
       const allowedStatuses = new Set(['resolved', 'missing', 'expired', 'denied', 'unavailable']);
       const safeText = (value, fallback) => typeof value === 'string' && value.length <= 160 ? value : fallback;
+      const receiptPresentationFromMetadata = ${receiptPresentationFromMetadata.toString()};
       const render = (input, toolInput, metadata) => {
         const scope = input && typeof input === 'object' ? (input.scope || input) : null;
         if (!scope || !allowedStatuses.has(scope.context_status)) return;
-        const presentation = metadata && typeof metadata === 'object'
-          ? metadata['codex-memory/receiptPresentation']
-          : null;
+        const presentation = receiptPresentationFromMetadata(metadata);
         const root = document.querySelector('main');
         root.dataset.state = scope.context_status;
         document.querySelector('#project').textContent = safeText(
@@ -82,4 +101,7 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
 </body>
 </html>`;
 
-module.exports = { MEMORY_SCOPE_WIDGET_HTML };
+module.exports = {
+  MEMORY_SCOPE_WIDGET_HTML,
+  receiptPresentationFromMetadata
+};

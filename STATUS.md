@@ -27,11 +27,11 @@ digest. Every read outcome and transport failure is terminal.
 
 Formal private runtime preparation accepts only an observed, loopback,
 write-disabled isolated-shim target, replaces stale target data, and recomputes
-the Governance binding digest. Targeted tests pass `19/19`, all R4/R5 contracts
-pass `112/112`, the default suite passes `5849/0/8`, and hardening passes
+the Governance binding digest. Targeted tests pass `20/20`, all R4/R5 contracts
+pass `113/113`, the default suite passes `5850/0/8`, and hardening passes
 `97/97 + 6/6`.
 
-The fixture-only CI-safe gate passes `5940/5948` with zero failures, no network,
+The fixture-only CI-safe gate passes `5941/5949` with zero failures, no network,
 no daemon, and no provider.
 
 No service, provider, memory read/write, private config, or VCP core action ran.

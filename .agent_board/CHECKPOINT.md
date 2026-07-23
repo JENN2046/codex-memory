@@ -27,11 +27,11 @@ Status: `R5_K_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_R5_H_UNCHANGED`
 - Formal private preparation binds only an observed loopback, write-disabled
   isolated-shim target, replaces stale target data, and recomputes the binding
   digest.
-- Targeted `19/19`, all R4/R5 `112/112`, default `5849/0/8`, and hardening
+- Targeted `20/20`, all R4/R5 `113/113`, default `5850/0/8`, and hardening
   `97/97 + 6/6` pass.
-- CI-safe passes `5940/5948` with zero failures across 701 files and no
+- CI-safe passes `5941/5949` with zero failures across 701 files and no
   network/daemon/provider.
-- Strict contract/test/compare/rollback pass `112 + 5849 + 43 + 43`; overall
+- Strict contract/test/compare/rollback pass `112 + 5850 + 43 + 43`; overall
   is non-pass only at inactive loopback health.
 - Public six names/schemas and R5-H artifact are unchanged.
 - Runtime/provider/memory/private-config/VCP-core effects are zero; Edge stays
