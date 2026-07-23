@@ -58,7 +58,9 @@ single generated bearer value to `CODEX_MEMORY_HTTP_TOKEN` for the Codex MCP
 server, `CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` for the shim server, and
 `CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN` for the Codex MCP outbound native
 client in the two child-process environments. It does not generate, print, or
-persist a second token. The resulting
+persist a second token. The built-in live-read proof uses a separate ephemeral
+per-run bearer, passing the same value only to its managed shim server and
+acceptance client without returning it in proof output. The resulting
 low-disclosure preparation receipt records only categorical pass/fail facts;
 it does not return the endpoint, target reference, mapping reference, mapping
 digest, mapping fingerprint, Bearer value, raw tool list, or raw response.

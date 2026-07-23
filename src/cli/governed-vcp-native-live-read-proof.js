@@ -3,6 +3,7 @@
 
 const fs = require('node:fs/promises');
 const { constants: fsConstants } = require('node:fs');
+const crypto = require('node:crypto');
 const http = require('node:http');
 const os = require('node:os');
 const path = require('node:path');
@@ -366,6 +367,14 @@ async function verifyAcceptanceEvidenceArtifact(evidenceOutputPath = '', verifie
 }
 
 async function defaultStartShim(options = {}) {
+  const bearerToken = typeof options.bearerToken === 'string'
+    ? options.bearerToken
+    : '';
+  if (!bearerToken ||
+      bearerToken.trim() !== bearerToken ||
+      /[\r\n\u0000]/u.test(bearerToken)) {
+    throw new Error('live_read_proof_bearer_token_required');
+  }
   const shimPath = path.join(__dirname, 'vcp-toolbox-native-mcp-shim.js');
   const args = [
     shimPath,
@@ -392,6 +401,7 @@ async function defaultStartShim(options = {}) {
       ...(options.providerEnvPatch || {}),
       VCPTOOLBOX_ROOT: options.vcpToolBoxRoot,
       KNOWLEDGEBASE_STORE_PATH: options.knowledgeBaseStorePath,
+      CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN: bearerToken,
       ...(options.knowledgeBaseRootPath ? { KNOWLEDGEBASE_ROOT_PATH: options.knowledgeBaseRootPath } : {})
     },
     stdio: ['ignore', 'pipe', 'pipe'],
@@ -1595,6 +1605,7 @@ async function runGovernedVcpNativeLiveReadProof(rawOptions = {}, deps = {}) {
     lowDisclosureAcceptanceEvidenceArtifactVerification({
       requested: Boolean(options.evidenceOutputPath)
     });
+  const shimBearerToken = crypto.randomBytes(32).toString('hex');
   if (productionProviderProofGate.failFast === true) {
     return buildResult({
       acceptance: null,
@@ -1625,7 +1636,8 @@ async function runGovernedVcpNativeLiveReadProof(rawOptions = {}, deps = {}) {
       ...options,
       knowledgeBaseStorePath: dirs.knowledgeBaseStorePath,
       knowledgeBaseRootPath: dirs.knowledgeBaseRootPath || options.knowledgeBaseRootPath,
-      providerEnvPatch
+      providerEnvPatch,
+      bearerToken: shimBearerToken
     });
     const acceptance = await runAcceptance({
       includeReadSuite: options.includeReadSuite,
@@ -1643,7 +1655,8 @@ async function runGovernedVcpNativeLiveReadProof(rawOptions = {}, deps = {}) {
       visibility: options.visibility,
       query: options.query,
       limit: options.limit,
-      evidenceOutputPath: options.evidenceOutputPath
+      evidenceOutputPath: options.evidenceOutputPath,
+      bearerToken: shimBearerToken
     });
     acceptanceEvidenceArtifactVerification = await verifyAcceptanceEvidenceArtifact(
       options.evidenceOutputPath,
