@@ -121,6 +121,7 @@ start_service() {
       CODEX_MEMORY_LOGS_DIR="$log_dir" \
       CODEX_MEMORY_VCP_NATIVE_RUNTIME_PROFILE=wsl-newapi-prod \
       CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT="http://$shim_host:$shim_port/mcp/vcp-native" \
+      CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN="$CODEX_MEMORY_HTTP_TOKEN" \
       CODEX_MEMORY_PROJECT_ID="${CODEX_MEMORY_PROJECT_ID:-codex-memory}" \
       CODEX_MEMORY_WORKSPACE_ID="${CODEX_MEMORY_WORKSPACE_ID:-workspace-alpha}" \
       CODEX_MEMORY_SCOPE_ID="${CODEX_MEMORY_SCOPE_ID:-scope-alpha}" \

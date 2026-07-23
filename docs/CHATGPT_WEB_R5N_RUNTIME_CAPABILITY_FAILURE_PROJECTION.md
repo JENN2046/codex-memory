@@ -54,9 +54,11 @@ preparation also sends one unauthenticated `initialize` probe and requires the
 exact low-disclosure HTTP 401 transport-authorization rejection. The shipped
 shim CLI requires `CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` and passes it only as the
 server-side expected Bearer value. The managed WSL NewAPI launcher maps its
-single generated bearer value to both `CODEX_MEMORY_HTTP_TOKEN` and
-`CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` in the two child-process environments;
-it does not generate, print, or persist a second token. The resulting
+single generated bearer value to `CODEX_MEMORY_HTTP_TOKEN` for the Codex MCP
+server, `CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` for the shim server, and
+`CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN` for the Codex MCP outbound native
+client in the two child-process environments. It does not generate, print, or
+persist a second token. The resulting
 low-disclosure preparation receipt records only categorical pass/fail facts;
 it does not return the endpoint, target reference, mapping reference, mapping
 digest, mapping fingerprint, Bearer value, raw tool list, or raw response.
