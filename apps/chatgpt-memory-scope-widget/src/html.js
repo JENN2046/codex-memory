@@ -52,6 +52,13 @@ function receiptPresentationFromToolResult(primary, fallback) {
     receiptPresentationFromMetadata(fallback);
 }
 
+function openAiGlobalsFromEvent(event) {
+  const globals = event?.detail?.globals;
+  return globals && typeof globals === 'object' && !Array.isArray(globals)
+    ? globals
+    : null;
+}
+
 const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
 <html lang="en">
 <head>
@@ -87,6 +94,7 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
       const receiptPresentationFromMetadata = ${receiptPresentationFromMetadata.toString()};
       const structuredContentFromToolResult = ${structuredContentFromToolResult.toString()};
       const receiptPresentationFromToolResult = ${receiptPresentationFromToolResult.toString()};
+      const openAiGlobalsFromEvent = ${openAiGlobalsFromEvent.toString()};
       const render = (input, toolInput, metadata, fallbackMetadata) => {
         const structured = structuredContentFromToolResult(input);
         const scope = structured && typeof structured === 'object'
@@ -114,6 +122,30 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
           scope.context_status === 'resolved' ? 'issued' : 'not issued'
         );
       };
+      const renderGlobals = globals => {
+        const current = window.openai && typeof window.openai === 'object'
+          ? window.openai
+          : {};
+        const updated = globals && typeof globals === 'object' ? globals : {};
+        const hasOwn = key => Object.prototype.hasOwnProperty.call(updated, key);
+        const toolOutput = hasOwn('toolOutput') ? updated.toolOutput : current.toolOutput;
+        const toolInput = hasOwn('toolInput') ? updated.toolInput : current.toolInput;
+        const metadata = hasOwn('toolResponseMetadata')
+          ? updated.toolResponseMetadata
+          : current.toolResponseMetadata;
+        if (hasOwn('toolOutput') || hasOwn('toolInput') || hasOwn('toolResponseMetadata')) {
+          render(
+            toolOutput || metadata,
+            toolInput,
+            metadata,
+            hasOwn('toolResponseMetadata') ? null : current.toolResponseMetadata
+          );
+        }
+      };
+      window.addEventListener('openai:set_globals', event => {
+        const globals = openAiGlobalsFromEvent(event);
+        if (globals) renderGlobals(globals);
+      }, { passive: true });
       window.addEventListener('message', event => {
         if (event.source !== window.parent) return;
         const message = event.data;
@@ -127,11 +159,7 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
         }
       });
       if (window.openai && (window.openai.toolOutput || window.openai.toolResponseMetadata)) {
-        render(
-          window.openai.toolOutput || window.openai.toolResponseMetadata,
-          window.openai.toolInput,
-          window.openai.toolResponseMetadata
-        );
+        renderGlobals(window.openai);
       }
     })();
   </script>
@@ -140,6 +168,7 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
 
 module.exports = {
   MEMORY_SCOPE_WIDGET_HTML,
+  openAiGlobalsFromEvent,
   receiptPresentationFromMetadata,
   receiptPresentationFromToolResult,
   structuredContentFromToolResult

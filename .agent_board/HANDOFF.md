@@ -4,22 +4,25 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2152 ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection`.
-Current validation: `CMV-2237`.
-Current fact: explicit labelled aliases are accepted verbatim, active scope mismatches are denied, unscored candidates fail closed, and Widget receipt projection unwraps canonical ChatGPT result envelopes.
-No runtime/provider/memory action occurred; the six public schemas and prior owner-only artifacts remain unchanged and Edge remains zero-memory.
+Current task: `CM-2153 ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection`.
+Current validation: `CMV-2238`.
+Current fact: private runtime preparation proves exact mapping-bound, read-only selected-diary shim capabilities before binding; verified pre-provider mapping failure no longer masquerades as transport timeout.
+No runtime/provider/private-config/memory action occurred; the six public schemas and prior owner-only artifacts remain unchanged and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2152 implements R5-M source hardening. Explicit values labelled as
-`project_alias` are accepted verbatim without turning unlabelled display names
-into aliases. Active scope mismatches project `denied`; lifecycle and service
-states remain `unavailable`. Invalid native scores fail closed, exact `0.5` is
-low-confidence, and the Widget unwraps canonical ChatGPT result envelopes
-before showing structured scope and categorical receipt metadata.
+CM-2153 implements R5-N source hardening. Private runtime preparation probes
+`initialize` and `tools/list` before binding, verifies exact read-only
+selected-diary capabilities and a full mapping reference-plus-digest
+fingerprint, and rejects missing/mismatched/writable/drifted targets.
+
+Only fully evidenced pre-provider mapping failures project receipt-bound
+`unavailable`; unsafe evidence remains fail-closed and genuine transport
+failures stay terminal. The Widget consumes both ChatGPT host globals and MCP
+Apps tool-result notifications.
 
 Targeted, all R4/R5, default, hardening, and CI-safe gates pass. Strict
 contract/test/compare/rollback pass; strict overall remains non-pass only
@@ -36,7 +39,7 @@ release, deploy, cutover, or readiness.
 ## Historical Handoff Context
 
 The entries below are retained as chronology only. They are not current route
-instructions; CM-2152 and the zero-memory-preservation boundary above control.
+instructions; CM-2153 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,

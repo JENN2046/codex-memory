@@ -8,13 +8,44 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_M_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_PRIOR_ARTIFACTS_UNCHANGED` |
-| Current task | `CM-2152 ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection` |
-| Current validation | `CMV-2237` |
+| Status | `R5_N_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_PRIOR_ARTIFACTS_UNCHANGED` |
+| Current task | `CM-2153 ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection` |
+| Current validation | `CMV-2238` |
 | Current route | Complete normal PR/CI/review; any exact-head private runtime verification remains separately authorized |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection
+
+R5-N makes private runtime preparation prove the actual shim capability before
+changing the in-memory Governance binding. It performs zero-read `initialize`
+and `tools/list` probes, verifies the exact governed shim/protocol identity,
+read-only selected-diary tools, `diary_allowlist_v1`, and a domain-separated
+fingerprint bound to both the expected mapping reference and digest.
+
+Missing or mismatched mapping, write enablement, missing/extra tools, and
+governance-metadata drift now fail before binding. A native mapping rejection
+projects as receipt-bound `unavailable` only when complete low-disclosure
+evidence proves that provider/native/read/write/derived/source/global-search
+effects were zero. Unsafe or incomplete evidence remains fail-closed; genuine
+transport failures stay terminal transport failures.
+
+The Widget now consumes the ChatGPT host `openai:set_globals` path in addition
+to the MCP Apps tool-result notification path. Public structured content and
+Widget-only categorical receipt presentation remain separate.
+
+The six public tool names and exact schemas are unchanged. R5-K/R5-N targeted
+tests pass `16/16`, all ChatGPT R4/R5 contracts pass `126/126`, the default suite passes
+`5863/0/8`, hardening passes `97/97 + 6/6`, and CI-safe passes `5954/5962`
+with zero failures across 703 files. No runtime, provider, memory read/write,
+private configuration, or VCP core action occurred. Prior owner-only artifacts
+remain unchanged. See
+`docs/CHATGPT_WEB_R5N_RUNTIME_CAPABILITY_FAILURE_PROJECTION.md`.
+
+Strict contract/test/compare/rollback subgates pass
+`112 + 5863 + 43 + 43`. Strict overall remains non-pass only at
+`UNAVAILABLE_SERVICE_INACTIVE`; no service was started.
 
 ## ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection
 

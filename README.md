@@ -45,12 +45,20 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-I Model Behavior And Error Semantics](docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md)
 - [ChatGPT Web R5-K Scope, Receipt, And Terminal Closure](docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md)
 - [ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection](docs/CHATGPT_WEB_R5M_ALIAS_RECEIPT_SEMANTICS.md)
+- [ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection](docs/CHATGPT_WEB_R5N_RUNTIME_CAPABILITY_FAILURE_PROJECTION.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
 ## Current Status
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
+
+R5-N requires an exact zero-read shim capability preflight before private
+runtime binding, deterministically projects only fully evidenced pre-provider
+mapping failures, and updates the scope Widget through the ChatGPT host globals
+path without changing the six public schemas. This is source-only hardening:
+no runtime, provider, private configuration, or memory action ran. See
+`docs/CHATGPT_WEB_R5N_RUNTIME_CAPABILITY_FAILURE_PROJECTION.md`.
 
 R5-M accepts a value explicitly labelled as `project_alias` even when it
 matches an App, connector, or repository name, while still refusing unlabelled

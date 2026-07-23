@@ -293,6 +293,33 @@ R5-M does not activate the private runtime, re-run R5-L, change VCPToolBox core,
 read or write memory, or claim automatic selection, production, release,
 deploy, cutover, or readiness.
 
+## R5-N — Runtime Capability Preflight And Deterministic Failure Projection
+
+R5-N is a source-only correction stage after the R5-M exact-head behavioral
+verification:
+
+1. probe the exact observed loopback shim with `initialize` and `tools/list`
+   before changing the private Governance binding;
+2. require the exact governed shim/protocol identity, read-only mode,
+   `diary_allowlist_v1`, and the three selected-diary read capabilities;
+3. bind the complete expected mapping reference and digest through a
+   domain-separated capability fingerprint without returning either private
+   value;
+4. reject missing mapping, mapping mismatch, write enablement, tool drift, or
+   governance-metadata drift before binding;
+5. project only fully evidenced pre-provider mapping failure as receipt-bound
+   `unavailable`;
+6. keep unsafe, incomplete, network, HTTP, JSON-RPC, expiry, and timeout
+   failures distinct and fail closed;
+7. apply the deterministic projection to all four governed read tools;
+8. consume both `ui/notifications/tool-result` and `openai:set_globals` Widget
+   updates;
+9. keep all six public tool names and exact input/output schemas frozen.
+
+R5-N does not activate the private runtime, call a provider, read or write
+memory, modify private configuration, change VCPToolBox core, or claim
+automatic selection, production, release, deploy, cutover, or readiness.
+
 ## Rollback
 
 Rollback never changes memory content:

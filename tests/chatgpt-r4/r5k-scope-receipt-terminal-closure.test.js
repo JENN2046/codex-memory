@@ -23,6 +23,10 @@ const {
   computeGovernanceRuntimeBindingDigest
 } = require('../../src/runtime/chatgpt-r4/governance-runtime-authority');
 const {
+  initializeResult,
+  toolsListResult
+} = require('../../src/core/GovernedMcpVcpNativeVcpToolBoxMcpShim');
+const {
   preparePrivateRuntimeEnvironment
 } = require('../../src/runtime/chatgpt-r4/private-runtime-preparation');
 
@@ -160,11 +164,13 @@ test('R5-K unwraps direct and ChatGPT bridge envelope receipt metadata', () => {
   assert.match(MEMORY_SCOPE_WIDGET_HTML, /'call_tool_result'/u);
 });
 
-test('R5-K formal private preparation replaces stale target data from the observed isolated shim', () => {
+test('R5-K formal private preparation replaces stale target data from the observed isolated shim', async () => {
   const baseEnvironment = privateEnvironmentFixture();
-  const prepared = preparePrivateRuntimeEnvironment({
+  const prepared = await preparePrivateRuntimeEnvironment({
     baseEnvironment,
-    isolatedShimTarget: isolatedTarget()
+    isolatedShimTarget: isolatedTarget(),
+    capabilityBearerToken: 'synthetic-r5k-capability-token',
+    fetchImpl: capabilityFetch(baseEnvironment)
   });
   assert.equal(
     prepared.private_environment.CODEX_MEMORY_R4_NATIVE_TARGET_REFERENCE,
@@ -188,7 +194,7 @@ test('R5-K formal private preparation replaces stale target data from the observ
   assert.doesNotMatch(receipt, /7615|7635|vcp-native|r5k-isolated-shim-target/u);
 });
 
-test('R5-K private preparation rejects unobserved, writable, non-loopback, and malformed targets', () => {
+test('R5-K private preparation rejects unobserved, writable, non-loopback, and malformed targets', async () => {
   const baseEnvironment = privateEnvironmentFixture();
   for (const [patch, code] of [
     [{ listener_observed: false }, 'r5k_isolated_shim_target_untrusted'],
@@ -198,16 +204,41 @@ test('R5-K private preparation rejects unobserved, writable, non-loopback, and m
     [{ mcp_path: '/mcp' }, 'r5k_isolated_shim_listener_invalid'],
     [{ target_reference: 'example-target' }, 'r5k_isolated_shim_target_reference_invalid']
   ]) {
-    assert.throws(() => preparePrivateRuntimeEnvironment({
+    await assert.rejects(() => preparePrivateRuntimeEnvironment({
       baseEnvironment,
-      isolatedShimTarget: { ...isolatedTarget(), ...patch }
+      isolatedShimTarget: { ...isolatedTarget(), ...patch },
+      capabilityBearerToken: 'synthetic-r5k-capability-token',
+      fetchImpl: capabilityFetch(baseEnvironment)
     }), { code });
   }
-  assert.throws(() => preparePrivateRuntimeEnvironment({
+  await assert.rejects(() => preparePrivateRuntimeEnvironment({
     baseEnvironment,
-    isolatedShimTarget: { ...isolatedTarget(), unexpected: true }
+    isolatedShimTarget: { ...isolatedTarget(), unexpected: true },
+    capabilityBearerToken: 'synthetic-r5k-capability-token',
+    fetchImpl: capabilityFetch(baseEnvironment)
   }), { code: 'r5k_isolated_shim_target_shape_invalid' });
 });
+
+function capabilityFetch(environment) {
+  const mappingState = {
+    accepted: true,
+    configured: true,
+    mappingReference: environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE,
+    mappingDigest: environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST
+  };
+  return async (_endpoint, request) => {
+    const body = JSON.parse(request.body);
+    const result = body.method === 'initialize'
+      ? initializeResult(false, mappingState)
+      : toolsListResult(false, mappingState);
+    return {
+      ok: true,
+      async json() {
+        return { jsonrpc: '2.0', id: body.id, result };
+      }
+    };
+  };
+}
 
 function isolatedTarget() {
   return {
