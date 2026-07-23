@@ -409,6 +409,9 @@ function receiptBackedNativePreflightFailure(result) {
       receipt.localAuditReceipt?.appended !== true ||
       receipt.localAuditReceipt?.lowDisclosure !== true ||
       !isPlainObject(invocation) ||
+      invocation.invocationBindingMatched !== true ||
+      invocation.governanceMetadataSent !== true ||
+      invocation.jsonRpcResponseIdMatched !== true ||
       invocation.statusClass !== 'client_error' ||
       invocation.failureCategory !== 'scope_binding_rejected' ||
       invocation.jsonRpcErrorPresent !== true ||

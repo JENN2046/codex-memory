@@ -78,6 +78,8 @@ following:
 
 - the rejected native JSON-RPC request occurred before provider and native
   search-runtime invocation;
+- invocation binding, governance metadata transmission, and JSON-RPC response
+  ID binding are all positively proven;
 - the failure category is exact mapping missing or mapping binding mismatch;
 - no memory read or write occurred;
 - no derived-index or source-partition mutation occurred;
@@ -150,6 +152,7 @@ The source matrix covers:
 - deterministic receipt-backed `unavailable` projection for all four governed
   read tools;
 - rejected-invocation accounting and internal receipt-chain retention;
+- false or missing invocation-binding evidence rejection;
 - refusal to downgrade unsafe or incomplete failure evidence;
 - terminal transport-failure preservation;
 - Widget `openai:set_globals` and tool-result update paths;

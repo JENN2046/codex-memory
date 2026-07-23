@@ -357,7 +357,19 @@ test('R5-N refuses to downgrade unsafe or unproven native rejection evidence', a
     }),
     mutateClone(nativeScopeBindingRejectedResult(), value => {
       value.receipt.localAuditReceipt.appended = false;
-    })
+    }),
+    ...[
+      'invocationBindingMatched',
+      'governanceMetadataSent',
+      'jsonRpcResponseIdMatched'
+    ].flatMap(field => [
+      mutateClone(nativeScopeBindingRejectedResult(), value => {
+        value.receipt.nativeInvocationReceipt[field] = false;
+      }),
+      mutateClone(nativeScopeBindingRejectedResult(), value => {
+        delete value.receipt.nativeInvocationReceipt[field];
+      })
+    ])
   ]) {
     assert.equal(receiptBackedNativePreflightFailure(unsafe), null);
     const invoke = createGovernedLiveReadInvoker({
@@ -523,6 +535,9 @@ function nativeScopeBindingRejectedResult() {
         lowDisclosure: true
       },
       nativeInvocationReceipt: {
+        invocationBindingMatched: true,
+        governanceMetadataSent: true,
+        jsonRpcResponseIdMatched: true,
         statusClass: 'client_error',
         failureCategory: 'scope_binding_rejected',
         jsonRpcErrorPresent: true,
