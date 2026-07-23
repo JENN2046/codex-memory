@@ -156,8 +156,8 @@ test('R5-K unwraps direct and ChatGPT bridge envelope receipt metadata', () => {
   }
   assert.equal(receiptPresentationFromMetadata(null), null);
   assert.equal(receiptPresentationFromMetadata({ mcp_tool_result: {} }), null);
-  assert.match(MEMORY_SCOPE_WIDGET_HTML, /mcp_tool_result\?\._meta/u);
-  assert.match(MEMORY_SCOPE_WIDGET_HTML, /call_tool_result\?\._meta/u);
+  assert.match(MEMORY_SCOPE_WIDGET_HTML, /'mcp_tool_result'/u);
+  assert.match(MEMORY_SCOPE_WIDGET_HTML, /'call_tool_result'/u);
 });
 
 test('R5-K formal private preparation replaces stale target data from the observed isolated shim', () => {

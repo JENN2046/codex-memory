@@ -26,14 +26,15 @@ const SECURITY_SCHEMES = deepFreeze([{ type: 'oauth2', scopes: ['memory.read'] }
 const MODEL_WORKFLOW_INSTRUCTIONS = [
   'Use these tools only for an explicit project-memory request. Do not call any codex-memory tool for rewriting, translation, scheduling, general advice, or another memory-irrelevant task.',
   'A memory workflow requires an exact registered project_alias and one exact requested_visibility supplied by the user or trusted task context. If either value is missing, ask one concise clarification and call no tool.',
-  'Never use current, default, this-project, an App or connector name, a URL, a client identifier, a workspace name, or a guessed repository name as project_alias.',
+  'When the user or trusted task context explicitly labels a value as project_alias, copy it verbatim even if it matches an App, connector, or repository name.',
+  'An unlabelled App display name, connector name, URL, client identifier, workspace name, or repository name is not a project_alias. Never use current, default, this-project, or another sentinel as an alias.',
   'Never choose task_start_context as a default or describe it as minimal disclosure.',
   'Before one read, call resolve_memory_context exactly once. Copy project_alias and requested_visibility exactly from the user-provided task context; never invent, normalize, suffix, enumerate, or probe alternatives.',
-  'A connector or App display name, URL, OAuth client identifier, opaque context reference, workspace name, or guessed repository name is not a project_alias.',
   'After a resolved context, choose exactly one read tool: memory_overview for counts or status; search_memory for one specific semantic fact; audit_memory for bounded access or receipt categories; prepare_memory_context for a task-start context package.',
   'The first read attempt consumes this workflow, even when it returns empty, denied, unavailable, or a transport error.',
   'After any read result or transport error, stop all codex-memory tool use immediately and answer the user; do not call another read tool or resolve again, and do not call render_memory_scope.',
   'Report only the receipt-backed result category or the single transport failure actually returned; never invent retry counts or claim another attempt occurred.',
+  'A found search result is a retrieval candidate, not proof by itself. Treat relevance 0.5 as low-confidence and inconclusive unless the returned summary explicitly supports the requested fact.',
   'Receipt-bound denied or unavailable means a governed result receipt exists even when no usable project context was issued; it is not a transport failure.',
   'render_memory_scope is component-only and unavailable to the model.',
   'Never infer that memory was loaded without a tool result.'
@@ -74,7 +75,7 @@ function descriptor({
 const toolDescriptors = deepFreeze({
   resolve_memory_context: descriptor({
     title: 'Resolve memory project context',
-    description: 'Use this when an explicit project-memory request includes both an exact registered project alias and an exact visibility, and a short-lived governed context reference is required before one memory read. Copy both values verbatim and call once. Never use current, default, this-project, or another sentinel as the alias. Never treat an App name, connector name, URL, client identifier, workspace name, opaque reference, or guessed repository name as a project alias; never guess or probe alternative aliases or visibilities. Never infer task_start_context as a default or call this tool to discover missing scope. If either exact value is missing, ask one concise clarification and call no tool. A denied, unavailable, or error result is terminal and must not be retried.',
+    description: 'Use this when an explicit project-memory request includes both an exact registered project alias and an exact visibility, and a short-lived governed context reference is required before one memory read. Copy both values verbatim and call once. If the user or trusted task context explicitly labels a value as project_alias, accept it verbatim even when it matches an App, connector, or repository name. An unlabelled App name, connector name, URL, client identifier, workspace name, opaque reference, or repository name is not a project alias. Never use current, default, this-project, or another sentinel; never guess or probe alternative aliases or visibilities. Never infer task_start_context as a default or call this tool to discover missing scope. If either exact value is missing, ask one concise clarification and call no tool. A denied, unavailable, or error result is terminal and must not be retried.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,

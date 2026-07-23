@@ -28,8 +28,17 @@ VCPToolBox 仍然是 native memory behavior 的 owner。本仓库默认不修改
 - [ChatGPT Web R4-B 契约与合成验证](docs/CHATGPT_WEB_R4B_CONTRACTS_SYNTHETIC.md)
 - [ChatGPT Web R5-I 模型行为与错误语义](docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md)
 - [ChatGPT Web R5-K 范围澄清、回执展示与终止闭环](docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md)
+- [ChatGPT Web R5-M alias、结果语义与 Widget 回执投影](docs/CHATGPT_WEB_R5M_ALIAS_RECEIPT_SEMANTICS.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
+
+R5-M 允许模型直接采用用户明确标注为 `project_alias` 的值，即使它恰好
+与 App、connector 或仓库名相同；没有明确标注时仍禁止猜测。active lease
+的 alias、principal 或 visibility 不匹配现在返回 receipt-bound `denied`，
+生命周期或服务状态继续使用 `unavailable`。没有有效数值 score 的候选不再
+被伪造为 relevance `0.5`，Widget 也能解包 ChatGPT canonical result
+envelope，并在真正结果到达前显示等待状态。公共六工具和 schema 未改变；
+本阶段没有启动 runtime、调用 provider 或读写 memory。
 
 R5-K 已将缺失项目别名或 visibility 的行为收紧为先澄清且不调用工具，
 把 `render_memory_scope` 限定为 App 组件调用，并分别展示受治理结果回执

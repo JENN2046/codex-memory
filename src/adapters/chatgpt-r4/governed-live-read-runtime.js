@@ -20,6 +20,7 @@ const MAX_CONTEXTS = 1024;
 const MAX_AUTHORIZED_TOOL_CALLS = 20;
 const MAX_R5A_AUTHORIZED_TOOL_CALLS = 40;
 const MAX_INACTIVE_REQUEST_ATTEMPTS = 128;
+const MIN_PUBLIC_RELEVANCE = 0.5;
 const R5A_POST_CALL_SAFETY_ERROR_CODES = new Set([
   'r4_live_read_native_delegation_rejected',
   'r4_live_read_native_receipt_invalid',
@@ -84,7 +85,7 @@ function createContextAuthority({
       });
       if (preauthorization && preauthorization.accepted !== true) {
         return {
-          status: 'unavailable',
+          status: preauthorization.governed_status || 'unavailable',
           activation_receipt_digest: preauthorization.receipt_digest
         };
       }
@@ -95,7 +96,7 @@ function createContextAuthority({
       );
       if (!project || project.projectId !== selectedProject.projectId) {
         return activationController ? {
-          status: 'unavailable',
+          status: 'denied',
           activation_receipt_digest: preauthorization.receipt_digest
         } : { status: 'denied' };
       }
@@ -116,7 +117,7 @@ function createContextAuthority({
       });
       if (activation && activation.accepted !== true) {
         return {
-          status: 'unavailable',
+          status: activation.governed_status || 'unavailable',
           activation_receipt_digest: activation.receipt_digest
         };
       }
@@ -409,8 +410,10 @@ function searchProjection(result, projectContextRef) {
     const projection = item?.memoryContextProjection;
     if (!isPlainObject(projection) || projection.lowDisclosure !== true ||
         typeof projection.statement !== 'string' || !projection.statement.trim()) return [];
-    const numeric = Number(item.score);
-    const relevance = Number.isFinite(numeric) ? Math.max(0, Math.min(1, numeric)) : 0.5;
+    const numeric = item.score;
+    if (typeof numeric !== 'number' || !Number.isFinite(numeric)) return [];
+    const relevance = Math.max(0, Math.min(1, numeric));
+    if (relevance < MIN_PUBLIC_RELEVANCE) return [];
     return [{
       result_ref: `mref_${digestObject({ projectContextRef, index, projection }).slice(7, 31)}`,
       summary: projection.statement,
