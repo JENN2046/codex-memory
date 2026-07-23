@@ -4,13 +4,37 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure`.
-Current validation: `CMV-2236`.
-Current fact: missing scope clarifies, render is app-only, receipt/context presentation is accurate, terminal stop is explicit, and formal private preparation binds only an observed isolated shim.
-No runtime/provider/memory action occurred; the six public schemas and R5-H evidence remain unchanged and Edge remains zero-memory.
+Current task: `CM-2152 ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection`.
+Current validation: `CMV-2237`.
+Current fact: explicit labelled aliases are accepted verbatim, active scope mismatches are denied, unscored candidates fail closed, and Widget receipt projection unwraps canonical ChatGPT result envelopes.
+No runtime/provider/memory action occurred; the six public schemas and prior owner-only artifacts remain unchanged and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2152 ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection
+
+Status: `R5_M_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_PRIOR_ARTIFACTS_UNCHANGED`
+
+- Explicit values labelled as `project_alias` are accepted verbatim, while
+  unlabelled display identities, sentinels, guesses, and probing remain invalid.
+- Active alias/principal/visibility mismatch is receipt-bound `denied`;
+  lifecycle and service failures remain `unavailable`.
+- Native candidates require an explicit finite numeric score and meet the
+  existing `0.5` floor; exact `0.5` is low-confidence, not proof.
+- The Widget unwraps canonical tool-result envelopes and waits neutrally before
+  real structured result and receipt metadata arrive.
+- Targeted `47/47`, all R4/R5 `118/118`, default `5855/0/8`, and hardening
+  `97/97 + 6/6` pass.
+- CI-safe passes `5946/5954` with zero failures across 702 files and no
+  network/daemon/provider.
+- Strict contract/test/compare/rollback pass `112 + 5855 + 43 + 43`; overall
+  is non-pass only at inactive loopback health.
+- Public six names/schemas and prior owner-only artifacts are unchanged.
+- Runtime/provider/memory/private-config/VCP-core effects are zero; Edge stays
+  `zero_memory`.
+
+Validation: `CMV-2237`.
 
 ## CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure
 

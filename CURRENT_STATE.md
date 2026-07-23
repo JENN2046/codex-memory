@@ -8,13 +8,38 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_K_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_R5_H_UNCHANGED` |
-| Current task | `CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure` |
-| Current validation | `CMV-2236` |
+| Status | `R5_M_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_PRIOR_ARTIFACTS_UNCHANGED` |
+| Current task | `CM-2152 ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection` |
+| Current validation | `CMV-2237` |
 | Current route | Complete normal PR/CI/review; any exact-head private runtime verification remains separately authorized |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection
+
+R5-M closes four R5-L findings without changing the six public tool names or
+input/output schemas. An explicitly labelled `project_alias` is copied
+verbatim even when it resembles an App, connector, or repository name;
+unlabelled identities and guessed aliases remain forbidden.
+
+An active lease with an alias, principal, or visibility mismatch now projects
+receipt-bound `denied`. Inactive, expired, killed, consumed, duplicate, and
+capacity states remain `unavailable`. Native candidates must have an explicit
+finite numeric score and meet the existing `0.5` floor; missing scores are no
+longer fabricated as `0.5`. Boundary relevance `0.5` is described as
+low-confidence rather than proof.
+
+The Widget now unwraps bounded canonical ChatGPT tool-result envelopes and
+extracts both structured scope data and Widget-only receipt presentation.
+Before a real governed result arrives it shows a neutral waiting state, not a
+false `Missing / not issued` result.
+
+Targeted affected contracts pass `47/47`; all ChatGPT R4/R5 contracts pass
+`118/118`; the default suite passes `5855/0/8`; hardening passes
+`97/97 + 6/6`. No runtime, provider, memory read/write, private configuration,
+or VCP core action occurred. Prior owner-only artifacts are unchanged. See
+`docs/CHATGPT_WEB_R5M_ALIAS_RECEIPT_SEMANTICS.md`.
 
 ## ChatGPT Web R5-K Scope, Receipt, And Terminal Closure
 

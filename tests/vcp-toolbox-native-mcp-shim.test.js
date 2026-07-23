@@ -78,6 +78,8 @@ test('native read initializes the selected-diary runtime before provider and sco
   assert.equal(result._nativeRuntimeReceipt.derivedIndexWritePerformed, false);
   assert.equal(result._nativeRuntimeReceipt.durableWritePerformed, false);
   assert.equal(result._nativeRuntimeReceipt.unscopedNativeSearchUsed, false);
+  assert.equal(result.results[0].scorePresent, true);
+  assert.equal(result.results[0].score, 0.9);
 });
 
 test('isolated runtime hydrates only the authorized diaries after provider and before search', async () => {

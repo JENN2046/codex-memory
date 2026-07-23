@@ -4,29 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure`.
-Current validation: `CMV-2236`.
-Current fact: missing scope clarifies, render is app-only, receipt/context presentation is accurate, terminal stop is explicit, and formal private preparation binds only an observed isolated shim.
-No runtime/provider/memory action occurred; the six public schemas and R5-H evidence remain unchanged and Edge remains zero-memory.
+Current task: `CM-2152 ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection`.
+Current validation: `CMV-2237`.
+Current fact: explicit labelled aliases are accepted verbatim, active scope mismatches are denied, unscored candidates fail closed, and Widget receipt projection unwraps canonical ChatGPT result envelopes.
+No runtime/provider/memory action occurred; the six public schemas and prior owner-only artifacts remain unchanged and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R5-K preserves the public six-tool ChatGPT surface and local Governance authorization boundary.
-- Source verdict: exact scope clarification, app-only render selection, receipt/context presentation, terminal outcomes, and formal isolated-shim preparation are implemented.
-- Receipt integrity: Widget-only categorical metadata distinguishes result-receipt binding from context issuance; public schemas remain unchanged.
-- Validation: targeted `20/20`, all R4/R5 `113/113`, default `5850/0/8`,
+- Architecture: R5-M preserves the public six-tool ChatGPT surface and local Governance authorization boundary.
+- Source verdict: explicit alias recognition, denied/unavailable separation, fail-closed candidate scoring, and canonical Widget envelope projection are implemented.
+- Receipt integrity: Widget-only categorical metadata is unwrapped from bounded canonical result envelopes; public schemas remain unchanged.
+- Validation: targeted `47/47`, all R4/R5 `118/118`, default `5855/0/8`,
   and hardening `97/97 + 6/6` pass.
-- CI-safe gate: `5941/5949` pass with zero failures, no network, no daemon,
+- CI-safe gate: `5946/5954` pass with zero failures, no network, no daemon,
   and no provider.
 - Strict gate: contract/test/compare/rollback pass; overall is non-pass only at
   inactive loopback health, and no service was started.
 - Runtime accounting: no service, provider, memory read/write, private config, or VCP core action occurred.
 - Host route: Governance/Relay/shim remain stopped; Edge remains `zero_memory`.
-- Evidence: the immutable R5-H artifact is untouched; its 10/10 versus 12/8 matrix remains incomplete.
-- Status sync: CM-2151/CMV-2236 record source hardening only and do not claim automatic-use or runtime proof.
+- Evidence: prior owner-only artifacts are untouched.
+- Status sync: CM-2152/CMV-2237 record source hardening only and do not claim automatic-use or runtime proof.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -56,8 +56,8 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Deliver R5-K through normal PR CI/review. Exact-head private ChatGPT runtime
-behavior verification, any R5-H corrective supplement or protocol amendment,
+Deliver R5-M through normal PR CI/review. Exact-head private ChatGPT runtime
+behavior verification, any prior-artifact supplement or protocol amendment,
 and all further live/provider/read, production, release, deploy, cutover,
 readiness, or public-write work require a separate current scope.
 

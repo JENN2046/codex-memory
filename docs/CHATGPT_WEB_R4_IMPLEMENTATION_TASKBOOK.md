@@ -271,6 +271,28 @@ Required source gates:
 R5-K source completion is not a runtime proof, automatic-selection guarantee,
 release, deploy, cutover, or readiness claim.
 
+## R5-M — Alias, Result Semantics, And Widget Receipt Projection
+
+R5-M is a source-only correction stage after the R5-L private canary:
+
+1. accept a value explicitly labelled as `project_alias` verbatim, even when it
+   resembles an App, connector, or repository name;
+2. keep unlabelled display identities, sentinels, guesses, normalization,
+   enumeration, and probing invalid;
+3. classify active principal/alias/visibility mismatch as receipt-bound
+   `denied`, while lifecycle and service states remain `unavailable`;
+4. require an explicit finite numeric native score and exclude candidates below
+   relevance `0.5`;
+5. describe exact relevance `0.5` as low-confidence and not proof;
+6. unwrap bounded canonical ChatGPT result envelopes before projecting Widget
+   scope and receipt state;
+7. show a neutral waiting state before a governed result exists;
+8. keep all six public tool names and exact input/output schemas frozen.
+
+R5-M does not activate the private runtime, re-run R5-L, change VCPToolBox core,
+read or write memory, or claim automatic selection, production, release,
+deploy, cutover, or readiness.
+
 ## Rollback
 
 Rollback never changes memory content:

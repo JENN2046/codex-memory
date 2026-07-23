@@ -172,8 +172,11 @@ function createSessionReadActivationController({
     }
     if (principalFingerprint !== expectedPrincipalFingerprint ||
         safeProjectAlias !== selectedProjectAlias ||
-        requestedVisibility !== lease.requestedVisibility ||
-        lease.contextReservation || lease.contextRefDigest || lease.readConsumed) {
+        requestedVisibility !== lease.requestedVisibility) {
+      observations.denied_operation_count += 1;
+      return unavailable('resolve_memory_context', checkedAt, 'denied');
+    }
+    if (lease.contextReservation || lease.contextRefDigest || lease.readConsumed) {
       observations.denied_operation_count += 1;
       return unavailable('resolve_memory_context', checkedAt);
     }
@@ -341,10 +344,14 @@ function createSessionReadActivationController({
     });
   }
 
-  function unavailable(operation, now) {
+  function unavailable(operation, now, governedStatus = 'unavailable') {
+    if (!['denied', 'unavailable'].includes(governedStatus)) {
+      reject('r4_session_governed_status_invalid');
+    }
     return Object.freeze({
       accepted: false,
       status: lease?.status || 'inactive',
+      governed_status: governedStatus,
       receipt_digest: receiptDigest(`deny_${operation || 'unknown'}`, now)
     });
   }

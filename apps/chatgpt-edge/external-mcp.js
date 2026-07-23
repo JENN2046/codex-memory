@@ -220,7 +220,10 @@ function modelVisibleResultText(name, response) {
   }
   if (response.status === 'ok') {
     const boundedStatus = response.structured_content?.status || 'completed';
-    return `Receipt-bound governed ${name} status: ${boundedStatus}; ${resultCount(response.structured_content)} item(s). TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. Answer the user now and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Report exactly this one result and do not invent retries or attempts.`;
+    const candidateGuidance = name === 'search_memory' && boundedStatus === 'found'
+      ? ' Search results are retrieval candidates, not proof by themselves; relevance 0.5 is low-confidence and inconclusive unless the returned summary explicitly supports the requested fact.'
+      : '';
+    return `Receipt-bound governed ${name} status: ${boundedStatus}; ${resultCount(response.structured_content)} item(s).${candidateGuidance} TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. Answer the user now and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Report exactly this one result and do not invent retries or attempts.`;
   }
   return `Receipt-bound governed ${name} status: ${response.status}. TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. This is not a transport timeout or another transport failure. Answer with exactly this bounded status and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Do not invent retries or attempts.`;
 }

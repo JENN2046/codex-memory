@@ -4,28 +4,29 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure`.
-Current validation: `CMV-2236`.
-Current fact: missing scope clarifies, render is app-only, receipt/context presentation is accurate, terminal stop is explicit, and formal private preparation binds only an observed isolated shim.
-No runtime/provider/memory action occurred; the six public schemas and R5-H evidence remain unchanged and Edge remains zero-memory.
+Current task: `CM-2152 ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection`.
+Current validation: `CMV-2237`.
+Current fact: explicit labelled aliases are accepted verbatim, active scope mismatches are denied, unscored candidates fail closed, and Widget receipt projection unwraps canonical ChatGPT result envelopes.
+No runtime/provider/memory action occurred; the six public schemas and prior owner-only artifacts remain unchanged and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2151 implements R5-K source closure. Missing alias/visibility now asks one
-clarification without a tool call; memory-irrelevant work abstains; render is
-app-only; resolve mounts Widget v2; result-receipt binding and context issuance
-are separate low-disclosure fields; every result or transport failure is
-terminal.
+CM-2152 implements R5-M source hardening. Explicit values labelled as
+`project_alias` are accepted verbatim without turning unlabelled display names
+into aliases. Active scope mismatches project `denied`; lifecycle and service
+states remain `unavailable`. Invalid native scores fail closed, exact `0.5` is
+low-confidence, and the Widget unwraps canonical ChatGPT result envelopes
+before showing structured scope and categorical receipt metadata.
 
-Formal private runtime preparation now accepts only observed loopback,
-write-disabled isolated-shim facts, replaces stale target data, and recomputes
-the Governance binding digest. Targeted, all R4/R5, and hardening suites pass.
-No service, provider, real-memory, private-config, or VCP core action ran; Edge
-remains `zero_memory`. Deliver through normal PR CI/review. An exact-head
-private runtime behavior check is a separate authorization boundary.
+Targeted, all R4/R5, default, hardening, and CI-safe gates pass. Strict
+contract/test/compare/rollback pass; strict overall remains non-pass only
+because the inactive loopback health service was not started. No service,
+provider, real-memory, private-config, or VCP core action ran; Edge remains
+`zero_memory`. Deliver through normal PR CI/review. An exact-head private
+runtime behavior check is a separate authorization boundary.
 
 The prior CM-2149/R5-H artifact remains immutable. Its observed 10/10 task mix
 still does not satisfy the frozen 12/8 matrix; no session was reclassified or
@@ -35,7 +36,7 @@ release, deploy, cutover, or readiness.
 ## Historical Handoff Context
 
 The entries below are retained as chronology only. They are not current route
-instructions; CM-2151 and the zero-memory-preservation boundary above control.
+instructions; CM-2152 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,

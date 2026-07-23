@@ -4,13 +4,39 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure`.
-Current validation: `CMV-2236`.
-Current fact: missing scope now clarifies, render is app-only, result receipt and context issuance are distinct, terminal stop is explicit, and private runtime preparation binds only an observed isolated shim target.
-The six public schemas and the R5-H artifact are unchanged; no runtime/provider/memory action occurred and the Edge remains zero-memory.
+Current task: `CM-2152 ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection`.
+Current validation: `CMV-2237`.
+Current fact: explicit labelled aliases are accepted verbatim, active scope mismatches are denied, unscored candidates fail closed, and Widget receipt projection unwraps canonical ChatGPT result envelopes.
+The six public schemas and prior owner-only artifacts are unchanged; no runtime/provider/memory action occurred and the Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2152 ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection
+
+R5-M corrects the over-broad alias prohibition: a value explicitly labelled by
+the user or trusted task context as `project_alias` is copied verbatim, even
+when it matches an App, connector, or repository name. Unlabelled display
+identities, sentinels, guessing, normalization, enumeration, and probing remain
+forbidden.
+
+The session controller now separates lifecycle status from governed result
+classification. Active principal/alias/visibility mismatches return
+receipt-bound `denied`; inactive and other lifecycle/service states remain
+`unavailable`.
+
+Bounded search projection rejects candidates without an explicit finite
+numeric score and candidates below relevance `0.5`. A boundary score of `0.5`
+remains compatible but is explicitly low-confidence and not proof. The Widget
+now unwraps nested canonical ChatGPT result envelopes and shows a neutral
+waiting state until real structured scope and receipt metadata arrive.
+
+Targeted affected contracts pass `47/47`, all ChatGPT R4/R5 contracts pass
+`118/118`, the default suite passes `5855/0/8`, and hardening passes
+`97/97 + 6/6`. No runtime/provider/memory/private-config/VCP-core action ran.
+The public six tool names and schemas and prior owner-only artifacts are
+unchanged. Final source verdict:
+`R5_M_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_PRIOR_ARTIFACTS_UNCHANGED`.
 
 ## CM-2151 ChatGPT Web R5-K Scope, Receipt, And Terminal Closure
 

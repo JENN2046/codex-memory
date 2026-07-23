@@ -44,12 +44,23 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-H Private ChatGPT Dogfood Closeout](docs/CHATGPT_WEB_R5H_PRIVATE_CHATGPT_DOGFOOD_CLOSEOUT.md)
 - [ChatGPT Web R5-I Model Behavior And Error Semantics](docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md)
 - [ChatGPT Web R5-K Scope, Receipt, And Terminal Closure](docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md)
+- [ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection](docs/CHATGPT_WEB_R5M_ALIAS_RECEIPT_SEMANTICS.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
 ## Current Status
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
+
+R5-M accepts a value explicitly labelled as `project_alias` even when it
+matches an App, connector, or repository name, while still refusing unlabelled
+display identities and guessed aliases. Active alias/principal/visibility
+mismatches now project receipt-bound `denied`; lifecycle and service states
+remain `unavailable`. Unscored native candidates are no longer assigned a
+fabricated `0.5`, and the Widget unwraps canonical ChatGPT result envelopes
+before presenting scope and receipt state. The six public names and schemas are
+unchanged. This is source-only hardening: no runtime, provider, or memory action
+ran. See `docs/CHATGPT_WEB_R5M_ALIAS_RECEIPT_SEMANTICS.md`.
 
 R5-K now makes missing alias/visibility a clarification boundary, removes the
 render-only helper from model selection, presents governed result receipts
