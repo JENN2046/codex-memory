@@ -27,8 +27,16 @@ VCPToolBox 仍然是 native memory behavior 的 owner。本仓库默认不修改
 - [ChatGPT Web R4 实施任务书](docs/CHATGPT_WEB_R4_IMPLEMENTATION_TASKBOOK.md)
 - [ChatGPT Web R4-B 契约与合成验证](docs/CHATGPT_WEB_R4B_CONTRACTS_SYNTHETIC.md)
 - [ChatGPT Web R5-I 模型行为与错误语义](docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md)
+- [ChatGPT Web R5-K 范围澄清、回执展示与终止闭环](docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
+
+R5-K 已将缺失项目别名或 visibility 的行为收紧为先澄清且不调用工具，
+把 `render_memory_scope` 限定为 App 组件调用，并分别展示受治理结果回执
+与 context 是否签发。任何 read 结果或 transport failure 都是终止结果。
+正式私有 runtime preparation 只接受已观测的 loopback、write-disabled
+隔离 shim target，并重算 Governance binding digest。公共六工具名称和
+schema 均未改变，本阶段没有启动服务、调用 provider 或读写 memory。
 
 R4 将目标结构冻结为稳定 HTTPS ChatGPT Edge、本地主动出站 Recall
 Relay、UDS 治理内核和显式多项目上下文。旧 R3/M5 Secure MCP Tunnel

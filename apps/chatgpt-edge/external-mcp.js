@@ -169,6 +169,7 @@ function createMcpProtocolServer({
       structuredContent: response.structured_content,
       _meta: {
         'codex-memory/receiptChainDigest': digestObject(response.receipt_chain),
+        'codex-memory/receiptPresentation': receiptPresentation(name, response),
         'codex-memory/counters': { ...response.counters }
       }
     };
@@ -213,15 +214,15 @@ function resultCount(content) {
 function modelVisibleResultText(name, response) {
   if (name === 'resolve_memory_context') {
     if (response.status === 'ok') {
-      return 'Receipt-bound governed project context status: resolved. Use the returned project_context_ref for exactly one read tool chosen by the user intent; do not resolve again.';
+      return 'Receipt-bound governed project context status: resolved. GOVERNED RESULT RECEIPT: bound. Project context reference: issued. Use it for exactly one read tool chosen by the user intent; do not resolve again.';
     }
-    return `Receipt-bound governed resolve_memory_context returned ${response.status}; status: ${response.status}. This is not a transport timeout. Stop this workflow and ask the user or operator for a new exact project_alias and requested_visibility; do not retry alternative aliases or visibilities; do not retry the same value or probe alternative aliases or visibilities.`;
+    return `Receipt-bound governed resolve_memory_context returned ${response.status}; status: ${response.status}. TERMINAL GOVERNED RESULT. Result receipt: bound; project context reference: not issued. This is not a transport timeout or another transport failure. Answer now and call no codex-memory tool. Ask for one exact project_alias and one exact requested_visibility only when either was missing; do not retry alternative aliases or visibilities; do not retry the same value or probe alternative aliases or visibilities; never guess or use current/default.`;
   }
   if (response.status === 'ok') {
     const boundedStatus = response.structured_content?.status || 'completed';
-    return `Receipt-bound governed ${name} status: ${boundedStatus}; ${resultCount(response.structured_content)} item(s). This is the terminal result for the current one-read workflow; answer the user and do not call another memory read or resolve again; do not switch read tools. Report exactly this one result and do not invent retries.`;
+    return `Receipt-bound governed ${name} status: ${boundedStatus}; ${resultCount(response.structured_content)} item(s). TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. Answer the user now and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Report exactly this one result and do not invent retries or attempts.`;
   }
-  return `Receipt-bound governed ${name} status: ${response.status}. This is not a transport timeout. This is the terminal result for the current one-read workflow; answer with exactly this bounded status and do not call another memory read or resolve again; do not switch read tools. Do not invent retries.`;
+  return `Receipt-bound governed ${name} status: ${response.status}. TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. This is not a transport timeout or another transport failure. Answer with exactly this bounded status and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Do not invent retries or attempts.`;
 }
 
 function modelVisibleErrorText(errorCode) {
@@ -229,7 +230,18 @@ function modelVisibleErrorText(errorCode) {
     ? errorCode
     : 'edge_governed_read_unavailable';
   const category = transportFailureCategory(safeErrorCode);
-  return `Governed memory transport status: ${category} (${safeErrorCode}). No receipt-bound memory result was returned. This transport failure is terminal for the current one-read workflow; do not call another memory read or resolve again; do not switch read tools. Do not describe it as an empty, denied, or unavailable memory result, and do not invent retries.`;
+  return `TERMINAL TRANSPORT FAILURE. Governed memory transport status: ${category} (${safeErrorCode}). No receipt-bound memory result was returned. This transport failure is terminal for the current one-read workflow. Answer now and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Do not describe it as an empty, denied, or unavailable memory result; do not invent retries; do not invent attempts.`;
+}
+
+function receiptPresentation(name, response) {
+  const contextReferenceStatus = name === 'resolve_memory_context'
+    ? (response.status === 'ok' ? 'issued' : 'not_issued')
+    : 'not_applicable';
+  return {
+    result_receipt_status: 'bound',
+    context_reference_status: contextReferenceStatus,
+    raw_receipt_values_returned: false
+  };
 }
 
 function transportFailureCategory(errorCode) {
@@ -253,6 +265,7 @@ module.exports = {
   createMcpProtocolServer,
   modelVisibleErrorText,
   modelVisibleResultText,
+  receiptPresentation,
   renderScopeTool,
   requireAuthInfo,
   transportFailureCategory
