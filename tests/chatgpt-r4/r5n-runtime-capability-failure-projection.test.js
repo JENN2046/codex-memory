@@ -32,6 +32,10 @@ const {
   preparePrivateRuntimeEnvironment,
   probeIsolatedShimCapabilities
 } = require('../../src/runtime/chatgpt-r4/private-runtime-preparation');
+const {
+  DOGFOOD_OBSERVATION_KIND,
+  createPrivateDogfoodObserver
+} = require('../../src/runtime/chatgpt-r4/private-dogfood-observer');
 
 const PUBLIC_SCHEMA_DIGESTS_FROM_R5M_MAIN = Object.freeze({
   resolve_memory_context: 'sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6',
@@ -152,13 +156,18 @@ test('R5-N projects a proven pre-provider scope-binding rejection as receipt-bac
   assert.equal(classification.status, 'unavailable');
   assert.deepEqual(classification.counters, {
     provider_calls: 0,
-    native_invocations: 0,
+    native_invocations: 1,
     local_fallbacks: 0,
     primary_memory_writes: 0,
     derived_index_writes: 0,
     other_durable_mutations: 1,
-      unrestricted_native_searches: 0
+    unrestricted_native_searches: 0
   });
+  assert.equal(
+    classification.receipt_digests.native_runtime,
+    digestObject(rejected.receipt.nativeInvocationReceipt.nativeRuntimeReceipt)
+  );
+  assert.equal(classification.derived_runtime_mutation.kind, 'pre_provider_native_rejection');
   for (const [toolName, argumentsValue, expectedStructuredContent] of [
     [
       'search_memory',
@@ -181,6 +190,7 @@ test('R5-N projects a proven pre-provider scope-binding rejection as receipt-bac
       { status: 'unavailable', kind: 'context', item_count: 0 }
     ]
   ]) {
+    const observations = [];
     const invoke = createGovernedLiveReadInvoker({
       mappingState,
       resolveDiaryRead() {
@@ -188,6 +198,9 @@ test('R5-N projects a proven pre-provider scope-binding rejection as receipt-bac
       },
       async callGovernedTool() {
         return rejected;
+      },
+      observeNativeEvidence(evidence) {
+        observations.push(evidence);
       }
     });
     const invocation = await invoke({
@@ -208,7 +221,7 @@ test('R5-N projects a proven pre-provider scope-binding rejection as receipt-bac
       structured_content: expectedStructuredContent,
       counters: {
         provider_calls: 0,
-        native_invocations: 0,
+        native_invocations: 1,
         local_fallbacks: 0,
         primary_memory_writes: 0,
         derived_index_writes: 0,
@@ -217,6 +230,16 @@ test('R5-N projects a proven pre-provider scope-binding rejection as receipt-bac
       },
       result_scope_postcheck_passed: true
     });
+    assert.equal(observations.length, 1);
+    assert.equal(observations[0].tool_name, toolName);
+    assert.equal(
+      observations[0].native_invocation_receipt_digest,
+      classification.receipt_digests.native_invocation
+    );
+    assert.equal(
+      observations[0].derived_runtime_mutation.kind,
+      'pre_provider_native_rejection'
+    );
     assert.doesNotThrow(() => validateGovernanceInvocation(invocation, {
       counterMode: COUNTER_MODES.sessionScopedLiveReadV1
     }));
@@ -225,6 +248,26 @@ test('R5-N projects a proven pre-provider scope-binding rejection as receipt-bac
     assert.match(text, /not a transport timeout or another transport failure/u);
     assert.doesNotMatch(text, /TERMINAL TRANSPORT FAILURE/u);
   }
+  const observer = createPrivateDogfoodObserver();
+  observer.beginSession({
+    observationKind: DOGFOOD_OBSERVATION_KIND,
+    activationSnapshot: { activation_status: 'active' }
+  });
+  const sessionOrdinal = observer.beginToolAttempt({ toolName: 'search_memory' });
+  assert.equal(observer.observeToolResult({
+    toolName: 'search_memory',
+    latencyMs: 1,
+    status: 'unavailable',
+    resultCount: 0,
+    counters: classification.counters,
+    derivedRuntimeMutationEvidence: classification.derived_runtime_mutation,
+    activationSnapshot: { activation_status: 'consumed' },
+    sessionOrdinal
+  }), true);
+  assert.equal(observer.snapshot().native_invocations, 1);
+  assert.equal(observer.snapshot().other_durable_mutations, 1);
+  assert.equal(observer.snapshot().derived_runtime_mutation_evidence_count, 0);
+  assert.equal(observer.snapshot().emergency_stop_latched, false);
 });
 
 test('R5-N capability preflight keeps transport, HTTP, and JSON-RPC failures distinct', async () => {
@@ -267,6 +310,16 @@ test('R5-N capability preflight keeps transport, HTTP, and JSON-RPC failures dis
       request.signal.addEventListener('abort', () => {
         rejectPromise(Object.assign(new Error('synthetic timeout'), { name: 'AbortError' }));
       }, { once: true });
+    })
+  }), { code: 'r5n_capability_probe_timeout' });
+  await assert.rejects(() => probeIsolatedShimCapabilities({
+    ...base,
+    timeoutMs: 100,
+    fetchImpl: async () => ({
+      ok: true,
+      async json() {
+        return new Promise(() => {});
+      }
     })
   }), { code: 'r5n_capability_probe_timeout' });
   await assert.rejects(() => probeIsolatedShimCapabilities({

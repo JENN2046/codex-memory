@@ -4,7 +4,10 @@ const {
   computeGovernanceRuntimeBindingDigest,
   validateLoopbackEndpoint
 } = require('./governance-runtime-authority');
-const { reject } = require('../../../packages/chatgpt-r4-contracts');
+const {
+  R4ContractError,
+  reject
+} = require('../../../packages/chatgpt-r4-contracts');
 const {
   diaryScopeMappingBindingFingerprint
 } = require('../../core/DiaryScopeMappingBindingFingerprint');
@@ -222,46 +225,61 @@ async function postCapabilityJsonRpc({
   timeoutMs
 }) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-  let response;
+  let timeout;
+  const timeoutPromise = new Promise((_resolve, rejectPromise) => {
+    timeout = setTimeout(() => {
+      controller.abort();
+      rejectPromise(new R4ContractError(
+        'r5n_capability_probe_timeout',
+        'r5n_capability_probe_timeout'
+      ));
+    }, timeoutMs);
+  });
+  const operation = async () => {
+    let response;
+    try {
+      response = await fetchImpl(endpoint, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id,
+          method,
+          params: {}
+        }),
+        signal: controller.signal
+      });
+    } catch (error) {
+      if (error?.name === 'AbortError') reject('r5n_capability_probe_timeout');
+      reject('r5n_capability_probe_transport_unavailable');
+    }
+    if (!response || response.ok !== true || typeof response.json !== 'function') {
+      reject('r5n_capability_probe_http_rejected');
+    }
+    let body;
+    try {
+      body = await response.json();
+    } catch (error) {
+      if (error?.name === 'AbortError') reject('r5n_capability_probe_timeout');
+      reject('r5n_capability_probe_invalid_json');
+    }
+    if (!isPlainObject(body) ||
+        body.jsonrpc !== '2.0' ||
+        body.id !== id ||
+        Object.hasOwn(body, 'error') ||
+        !isPlainObject(body.result)) {
+      reject('r5n_capability_probe_jsonrpc_rejected');
+    }
+    return body;
+  };
   try {
-    response = await fetchImpl(endpoint, {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${bearerToken}`,
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id,
-        method,
-        params: {}
-      }),
-      signal: controller.signal
-    });
-  } catch (error) {
-    if (error?.name === 'AbortError') reject('r5n_capability_probe_timeout');
-    reject('r5n_capability_probe_transport_unavailable');
+    return await Promise.race([operation(), timeoutPromise]);
   } finally {
     clearTimeout(timeout);
   }
-  if (!response || response.ok !== true || typeof response.json !== 'function') {
-    reject('r5n_capability_probe_http_rejected');
-  }
-  let body;
-  try {
-    body = await response.json();
-  } catch {
-    reject('r5n_capability_probe_invalid_json');
-  }
-  if (!isPlainObject(body) ||
-      body.jsonrpc !== '2.0' ||
-      body.id !== id ||
-      Object.hasOwn(body, 'error') ||
-      !isPlainObject(body.result)) {
-    reject('r5n_capability_probe_jsonrpc_rejected');
-  }
-  return body;
 }
 
 function validCapabilityMetadata(metadata, expectedFingerprint) {

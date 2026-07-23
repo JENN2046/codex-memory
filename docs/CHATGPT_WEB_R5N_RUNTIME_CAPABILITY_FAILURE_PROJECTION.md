@@ -53,6 +53,8 @@ The capability response is private loopback control-plane data. The resulting
 low-disclosure preparation receipt records only categorical pass/fail facts;
 it does not return the endpoint, target reference, mapping reference, mapping
 digest, mapping fingerprint, Bearer value, raw tool list, or raw response.
+The same bounded timeout covers both response headers and response-body
+parsing.
 
 ## Exact Mapping Binding Fingerprint
 
@@ -74,7 +76,8 @@ A native delegation rejection is projected as receipt-backed
 `unavailable` only when the complete low-disclosure evidence proves all of the
 following:
 
-- the rejection occurred before provider and native invocation;
+- the rejected native JSON-RPC request occurred before provider and native
+  search-runtime invocation;
 - the failure category is exact mapping missing or mapping binding mismatch;
 - no memory read or write occurred;
 - no derived-index or source-partition mutation occurred;
@@ -86,6 +89,12 @@ following:
 
 The same deterministic projection applies to `search_memory`,
 `memory_overview`, `audit_memory`, and `prepare_memory_context`.
+
+The rejected native JSON-RPC attempt is counted as one native invocation even
+though its receipt proves that the provider and native search runtime were not
+called. Its bridge, invocation, and absent-runtime receipt digests remain in
+the internal receipt chain; the single low-disclosure audit append remains an
+`other_durable_mutation`.
 
 If any required receipt fact is missing, contradictory, or unsafe, the
 Governance runtime still fails closed. Genuine network, HTTP, JSON-RPC, expiry,
@@ -137,8 +146,10 @@ The source matrix covers:
 - missing or malformed injected transport authorization rejection and
   non-disclosure;
 - transport, HTTP, JSON-RPC, and capability failure separation;
+- timeout coverage through stalled response-body parsing;
 - deterministic receipt-backed `unavailable` projection for all four governed
   read tools;
+- rejected-invocation accounting and internal receipt-chain retention;
 - refusal to downgrade unsafe or incomplete failure evidence;
 - terminal transport-failure preservation;
 - Widget `openai:set_globals` and tool-result update paths;

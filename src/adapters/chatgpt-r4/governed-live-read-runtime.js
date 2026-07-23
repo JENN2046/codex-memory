@@ -444,7 +444,33 @@ function receiptBackedNativePreflightFailure(result) {
     status: 'unavailable',
     counters: Object.freeze({
       ...ZERO_MEMORY_COUNTERS,
+      native_invocations: 1,
       other_durable_mutations: 1
+    }),
+    receipt_digests: Object.freeze({
+      native_runtime: digestObject(runtime),
+      native_invocation: digestObject(invocation),
+      bridge: digestObject(receipt)
+    }),
+    derived_runtime_mutation: Object.freeze({
+      kind: 'pre_provider_native_rejection',
+      policy: 'isolated_derived_runtime_mutation_v1',
+      authorized: false,
+      isolated_runtime_store: false,
+      accounting_final: true,
+      cumulative_count: 0,
+      receipt_delta: 0,
+      active_count: 0,
+      completed_count: 0,
+      failed_count: 0,
+      trigger_categories: Object.freeze([]),
+      policy_violation: false,
+      source_partition_mutation: false,
+      legacy_partition_accessed: false,
+      ambiguous_partition_accessed: false,
+      unregistered_partition_accessed: false,
+      unrestricted_native_search: false,
+      raw_details_disclosed: false
     })
   });
 }
@@ -571,6 +597,18 @@ function createGovernedLiveReadInvoker({
         const structuredContent = unavailableReadProjection(toolName);
         assertNoMappingDisclosure(structuredContent, mappingState);
         validatePublicStructuredContent(structuredContent);
+        observeNativeEvidence(Object.freeze({
+          project_context_ref_digest: digestObject(projectContextRef),
+          tool_name: toolName,
+          native_runtime_receipt_digest: failure.receipt_digests.native_runtime,
+          native_invocation_receipt_digest: failure.receipt_digests.native_invocation,
+          bridge_receipt_digest: failure.receipt_digests.bridge,
+          activation_receipt_digest: activationReceiptDigest,
+          allowed_diary_count: resolution.allowedDiaryCount,
+          result_count: 0,
+          counters: Object.freeze({ ...failure.counters }),
+          derived_runtime_mutation: failure.derived_runtime_mutation
+        }));
         return {
           status: failure.status,
           structured_content: structuredContent,
