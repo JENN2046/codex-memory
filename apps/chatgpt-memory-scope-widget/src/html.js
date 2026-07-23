@@ -47,6 +47,11 @@ function structuredContentFromToolResult(value) {
   return null;
 }
 
+function receiptPresentationFromToolResult(primary, fallback) {
+  return receiptPresentationFromMetadata(primary) ||
+    receiptPresentationFromMetadata(fallback);
+}
+
 const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
 <html lang="en">
 <head>
@@ -81,13 +86,14 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
       const safeText = (value, fallback) => typeof value === 'string' && value.length <= 160 ? value : fallback;
       const receiptPresentationFromMetadata = ${receiptPresentationFromMetadata.toString()};
       const structuredContentFromToolResult = ${structuredContentFromToolResult.toString()};
-      const render = (input, toolInput, metadata) => {
+      const receiptPresentationFromToolResult = ${receiptPresentationFromToolResult.toString()};
+      const render = (input, toolInput, metadata, fallbackMetadata) => {
         const structured = structuredContentFromToolResult(input);
         const scope = structured && typeof structured === 'object'
           ? (structured.scope || structured)
           : null;
         if (!scope || !allowedStatuses.has(scope.context_status)) return;
-        const presentation = receiptPresentationFromMetadata(metadata);
+        const presentation = receiptPresentationFromToolResult(metadata, fallbackMetadata);
         const root = document.querySelector('main');
         root.dataset.state = scope.context_status;
         document.querySelector('#project').textContent = safeText(
@@ -115,7 +121,8 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
           render(
             message.params,
             window.openai && window.openai.toolInput,
-            message.params || (window.openai && window.openai.toolResponseMetadata)
+            message.params,
+            window.openai && window.openai.toolResponseMetadata
           );
         }
       });
@@ -134,5 +141,6 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
 module.exports = {
   MEMORY_SCOPE_WIDGET_HTML,
   receiptPresentationFromMetadata,
+  receiptPresentationFromToolResult,
   structuredContentFromToolResult
 };

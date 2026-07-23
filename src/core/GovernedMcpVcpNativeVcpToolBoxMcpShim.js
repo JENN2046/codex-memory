@@ -703,19 +703,23 @@ function defaultReadRuntimeReceipt({
 
 function projectReadResults(results = []) {
   if (!Array.isArray(results)) return [];
-  return results.slice(0, 5).map((item, index) => ({
-    sourceFilePresent: typeof item?.sourceFile === 'string' && item.sourceFile.length > 0,
-    scorePresent: typeof item?.score === 'number',
-    tagCountBucket: Array.isArray(item?.matchedTags)
-      ? item.matchedTags.length === 0
-        ? 'zero'
-        : item.matchedTags.length <= 5
-          ? 'bounded'
-          : 'over_budget'
-      : 'unknown',
-    sourceKinds: ['vcp_native'],
-    memoryContextProjection: buildMemoryContextLowDisclosureProjection(item, index)
-  }));
+  return results.slice(0, 5).map((item, index) => {
+    const scorePresent = typeof item?.score === 'number' && Number.isFinite(item.score);
+    return {
+      sourceFilePresent: typeof item?.sourceFile === 'string' && item.sourceFile.length > 0,
+      scorePresent,
+      ...(scorePresent ? { score: Math.max(0, Math.min(1, item.score)) } : {}),
+      tagCountBucket: Array.isArray(item?.matchedTags)
+        ? item.matchedTags.length === 0
+          ? 'zero'
+          : item.matchedTags.length <= 5
+            ? 'bounded'
+            : 'over_budget'
+        : 'unknown',
+      sourceKinds: ['vcp_native'],
+      memoryContextProjection: buildMemoryContextLowDisclosureProjection(item, index)
+    };
+  });
 }
 
 function safeFilenamePart(value) {

@@ -17,6 +17,7 @@ const {
   MEMORY_SCOPE_WIDGET_HTML,
   parseToolResultNotification,
   receiptPresentationFromMetadata,
+  receiptPresentationFromToolResult,
   structuredContentFromToolResult
 } = require('../../apps/chatgpt-memory-scope-widget');
 const {
@@ -188,12 +189,17 @@ test('R5-M unwraps canonical ChatGPT result envelopes for Widget data and receip
 
   assert.deepEqual(structuredContentFromToolResult(envelope), { scope: dto });
   assert.equal(receiptPresentationFromMetadata(envelope), presentation);
+  assert.equal(receiptPresentationFromToolResult(
+    { structuredContent: { scope: dto } },
+    { 'codex-memory/receiptPresentation': presentation }
+  ), presentation);
   assert.deepEqual(parseToolResultNotification({
     jsonrpc: '2.0',
     method: 'ui/notifications/tool-result',
     params: envelope
   }), dto);
   assert.match(MEMORY_SCOPE_WIDGET_HTML, /Waiting for governed result/u);
+  assert.match(MEMORY_SCOPE_WIDGET_HTML, /fallbackMetadata/u);
   assert.match(MEMORY_SCOPE_WIDGET_HTML, /structuredContentFromToolResult/u);
   assert.doesNotMatch(MEMORY_SCOPE_WIDGET_HTML, /<dd id="status">Missing<\/dd>/u);
 });
