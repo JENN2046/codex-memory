@@ -96,6 +96,7 @@ start_service() {
     setsid env \
       SHIM_HOST="$shim_host" \
       SHIM_PORT="$shim_port" \
+      CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN="$CODEX_MEMORY_HTTP_TOKEN" \
       WSL_NEWAPI_HOST="${WSL_NEWAPI_HOST:-127.0.0.1}" \
       SUPERVISOR_RESTART_DELAY_SECONDS=2 \
       bash "$repo_root/scripts/run-managed-loop.sh" \

@@ -57,3 +57,26 @@ test('managed WSL NewAPI service exports shim endpoint under createConfig key', 
     false
   );
 });
+
+test('managed WSL NewAPI service binds one managed bearer token to both HTTP layers', () => {
+  assert.equal(
+    wslNewApiServiceScript.includes(
+      'CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN="$CODEX_MEMORY_HTTP_TOKEN"'
+    ),
+    true
+  );
+  assert.equal(
+    wslNewApiServiceScript.includes(
+      'CODEX_MEMORY_HTTP_TOKEN="$CODEX_MEMORY_HTTP_TOKEN"'
+    ),
+    true
+  );
+  assert.equal(
+    wslNewApiServiceScript.includes('echo "$CODEX_MEMORY_HTTP_TOKEN"'),
+    false
+  );
+  assert.equal(
+    wslNewApiServiceScript.includes('echo "$CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN"'),
+    false
+  );
+});
