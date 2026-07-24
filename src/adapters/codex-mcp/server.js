@@ -31,6 +31,28 @@ const { isSafeReferenceName } = require('../../core/VcpToolBoxSafeReference');
 const {
   GOVERNED_NATIVE_VISIBILITIES
 } = require('../../core/MemoryAccessContract');
+const {
+  getChatGptWebProfileForRequest
+} = require('../../core/ChatGptWebProfile');
+const {
+  buildChatGptWebProfileErrorData,
+  buildChatGptWebTrustedExecutionContext,
+  findChatGptWebModelOverrideInParams,
+  projectChatGptWebGovernedMetadata,
+  projectChatGptWebOutputValue,
+  projectChatGptWebToolDefinition
+} = require('../../core/ChatGptWebTrustedExecutionContext');
+const {
+  CHATGPT_WEB_TOOL_CONTRACT_DIGEST,
+  CHATGPT_WEB_TOOL_CONTRACT_VERSION,
+  buildChatGptWebToolDefinition,
+  getChatGptWebToolContract,
+  validateChatGptWebStructuredContent,
+  validateChatGptWebToolInput
+} = require('../../core/ChatGptWebToolContract');
+const {
+  buildChatGptWebToolSnapshot
+} = require('../../core/ChatGptWebToolSnapshot');
 
 function jsonRpcSuccess(id, result) {
   return { jsonrpc: '2.0', id, result };
@@ -75,8 +97,11 @@ function projectGovernedMcpOutputValue(value) {
   return projected;
 }
 
-function formatToolResult(payload, isError = false) {
-  const projectedPayload = projectGovernedMcpOutputValue(payload);
+function formatToolResult(payload, isError = false, chatgptWebProfile = null) {
+  const governedProjection = projectGovernedMcpOutputValue(payload);
+  const projectedPayload = chatgptWebProfile
+    ? projectChatGptWebOutputValue(governedProjection, chatgptWebProfile)
+    : governedProjection;
   return {
     content: [
       {
@@ -333,12 +358,12 @@ const GOVERNED_METADATA_EXACT_APPROVAL_RUNTIME_TARGET_KEYS = new Set([
   'approved_runtime_target'
 ].map(normalizeGovernedMetadataKey));
 
-function buildGovernedMcpToolMetadata(toolName, config = {}) {
+function buildGovernedMcpToolMetadata(toolName, config = {}, chatgptWebProfile = null) {
   const nativeRead = GOVERNED_NATIVE_READ_TOOLS.has(toolName);
   const nativeWrite = GOVERNED_NATIVE_WRITE_TOOLS.has(toolName);
   const nativeBridgeEligible = nativeRead || nativeWrite;
 
-  return {
+  const metadata = {
     schemaVersion: 'codex_memory_governed_bridge_tool_meta_v1',
     productGoal: {
       primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
@@ -605,6 +630,10 @@ function buildGovernedMcpToolMetadata(toolName, config = {}) {
       nativeFieldNamesReturned: false
     }
   };
+
+  return chatgptWebProfile
+    ? projectChatGptWebGovernedMetadata(metadata, chatgptWebProfile)
+    : metadata;
 }
 
 function normalizePublicToolNameSet(values = []) {
@@ -615,14 +644,23 @@ function normalizePublicToolNameSet(values = []) {
   );
 }
 
-function getPublicToolNameSet(config = {}) {
+function applyChatGptWebToolCeiling(toolNames, chatgptWebProfile = null) {
+  if (!chatgptWebProfile) return toolNames;
+  const ceiling = normalizePublicToolNameSet(chatgptWebProfile.exposedToolNames);
+  return new Set([...toolNames].filter(toolName => ceiling.has(toolName)));
+}
+
+function getPublicToolNameSet(config = {}, chatgptWebProfile = null) {
   if (String(config.securityProfile || '').trim().toLowerCase() === 'hardened') {
-    return new Set(DEFAULT_PUBLIC_MCP_READ_TOOLS);
+    return applyChatGptWebToolCeiling(
+      new Set(DEFAULT_PUBLIC_MCP_READ_TOOLS),
+      chatgptWebProfile
+    );
   }
 
   const explicitTools = normalizePublicToolNameSet(config.mcpPublicToolNames);
   if (explicitTools.size > 0) {
-    return explicitTools;
+    return applyChatGptWebToolCeiling(explicitTools, chatgptWebProfile);
   }
 
   const toolNames = new Set(DEFAULT_PUBLIC_MCP_READ_TOOLS);
@@ -645,16 +683,20 @@ function getPublicToolNameSet(config = {}) {
       toolNames.add(toolName);
     }
   }
-  return toolNames;
+  return applyChatGptWebToolCeiling(toolNames, chatgptWebProfile);
 }
 
-function getPublicToolDefinitions(config = {}) {
-  const publicToolNames = getPublicToolNameSet(config);
-  return TOOL_DEFINITIONS.filter(tool => publicToolNames.has(tool.name));
+function getPublicToolDefinitions(config = {}, chatgptWebProfile = null) {
+  const publicToolNames = getPublicToolNameSet(config, chatgptWebProfile);
+  const definitions = TOOL_DEFINITIONS.filter(tool => publicToolNames.has(tool.name));
+  if (!chatgptWebProfile) return definitions;
+  return definitions
+    .map(tool => buildChatGptWebToolDefinition(tool.name))
+    .filter(Boolean);
 }
 
-function isPublicMcpToolExposed(toolName, config = {}) {
-  return getPublicToolNameSet(config).has(toolName);
+function isPublicMcpToolExposed(toolName, config = {}, chatgptWebProfile = null) {
+  return getPublicToolNameSet(config, chatgptWebProfile).has(toolName);
 }
 
 function buildMcpToolNotExposedErrorData(toolName) {
@@ -667,8 +709,11 @@ function buildMcpToolNotExposedErrorData(toolName) {
   };
 }
 
-function buildInstructions(config = {}) {
-  const exposedTools = getPublicToolDefinitions(config).map(tool => tool.name);
+function buildInstructions(config = {}, chatgptWebProfile = null) {
+  const exposedTools = getPublicToolDefinitions(config, chatgptWebProfile).map(tool => tool.name);
+  if (chatgptWebProfile) {
+    return `This ChatGPT web profile exposes only ${exposedTools.join(', ') || 'no tools'}. Scope and client identity are fixed by the server profile; tool arguments and governance metadata cannot override them. prepare_memory_context remains hidden until its governed composite-read gate is implemented.`;
+  }
   const exposesOnlyReadTools = exposedTools.every(toolName => DEFAULT_PUBLIC_MCP_READ_TOOLS.includes(toolName));
   if (exposesOnlyReadTools) {
     return 'Current MCP surface is read-only plus proposal-only by default. Use prepare_memory_context at task start, propose_memory_delta for proposal-only task-end memory deltas, search_memory for bounded recall, memory_overview for bridge observability, and audit_memory for readonly bounded audit explanations. Governed native-memory calls carry trusted execution context and disclosure budget through params._meta.codexMemoryGovernance, never through tool arguments. Controlled mutation or write tools are hidden and adapter-blocked unless an operator profile explicitly exposes them.';
@@ -676,8 +721,8 @@ function buildInstructions(config = {}) {
   return 'Use exposed tools according to the configured MCP surface. Governed native-memory calls carry exact approval, rollback posture, audit receipt, and trusted execution context through params._meta.codexMemoryGovernance, never through tool arguments. Hidden tools are adapter-blocked even if the core application still supports them internally.';
 }
 
-function buildGovernedMcpServerMetadata(config = {}) {
-  return {
+function buildGovernedMcpServerMetadata(config = {}, chatgptWebProfile = null) {
+  const metadata = {
     schemaVersion: 'codex_memory_governed_bridge_server_meta_v1',
     productGoal: {
       primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
@@ -846,14 +891,50 @@ function buildGovernedMcpServerMetadata(config = {}) {
       locatorReturned: false
     }
   };
+
+  return chatgptWebProfile
+    ? projectChatGptWebGovernedMetadata(metadata, chatgptWebProfile)
+    : metadata;
 }
 
-function buildToolDefinitionForList(toolDefinition, config = {}) {
+function buildToolDefinitionForList(
+  toolDefinition,
+  config = {},
+  chatgptWebProfile = null,
+  chatgptWebToolSnapshot = null
+) {
+  const projectedToolDefinition = chatgptWebProfile
+    ? projectChatGptWebToolDefinition(toolDefinition)
+    : toolDefinition;
+  const chatgptWebToolContract = chatgptWebProfile
+    ? getChatGptWebToolContract(toolDefinition.name)
+    : null;
   return {
-    ...toolDefinition,
+    ...projectedToolDefinition,
     _meta: {
-      ...(isPlainObject(toolDefinition._meta) ? toolDefinition._meta : {}),
-      codexMemoryGovernedBridge: buildGovernedMcpToolMetadata(toolDefinition.name, config)
+      ...(isPlainObject(projectedToolDefinition._meta) ? projectedToolDefinition._meta : {}),
+      codexMemoryGovernedBridge: buildGovernedMcpToolMetadata(
+        toolDefinition.name,
+        config,
+        chatgptWebProfile
+      ),
+      ...(chatgptWebProfile
+        ? {
+            codexMemoryChatgptWeb: {
+              contractVersion: CHATGPT_WEB_TOOL_CONTRACT_VERSION,
+              contractPackDigest: CHATGPT_WEB_TOOL_CONTRACT_DIGEST,
+              profileId: chatgptWebProfile.profileId,
+              profileGeneration: Array.isArray(chatgptWebToolContract?.profileGeneration)
+                ? [...chatgptWebToolContract.profileGeneration]
+                : [],
+              serverFixedContext: true,
+              outputBudgetBytes: Number.isInteger(chatgptWebToolContract?.outputBudgetBytes)
+                ? chatgptWebToolContract.outputBudgetBytes
+                : null,
+              manifestDigest: chatgptWebToolSnapshot?.digest || null
+            }
+          }
+        : {})
     }
   };
 }
@@ -1676,7 +1757,14 @@ class CodexMemoryMcpServer {
     return sessionId;
   }
 
-  _handleInternalError(id, toolName, error, code = -32603, message = 'Internal error') {
+  _handleInternalError(
+    id,
+    toolName,
+    error,
+    code = -32603,
+    message = 'Internal error',
+    chatgptWebProfile = null
+  ) {
     const requestId = `cm-${crypto.randomUUID().slice(0, 8)}`;
     appendToolErrorLog(this.app, toolName || 'unknown', error);
 
@@ -1687,8 +1775,16 @@ class CodexMemoryMcpServer {
       }
     }
 
+    const projectedData = chatgptWebProfile
+      ? projectChatGptWebOutputValue(data, chatgptWebProfile)
+      : data;
     return {
-      response: jsonRpcError(id, code, message, data)
+      response: jsonRpcError(
+        id,
+        code,
+        chatgptWebProfile ? 'Tool error' : message,
+        projectedData
+      )
     };
   }
 
@@ -1699,25 +1795,63 @@ class CodexMemoryMcpServer {
       return { response: jsonRpcError(id, -32600, 'Invalid Request', 'method must be a non-empty string') };
     }
 
+    const chatgptWebProfileRequest = getChatGptWebProfileForRequest(
+      this.app.config,
+      requestContext
+    );
+    if (chatgptWebProfileRequest.isChatGptWebRequest &&
+        chatgptWebProfileRequest.accepted !== true) {
+      return {
+        response: jsonRpcError(
+          id,
+          -32001,
+          'Forbidden',
+          buildChatGptWebProfileErrorData(chatgptWebProfileRequest.reasonCode)
+        )
+      };
+    }
+    const chatgptWebProfile = chatgptWebProfileRequest.profile;
+
     if (method === 'initialize') {
       const sessionId = this.createSession(requestContext.sessionId || null);
       const protocolVersion = negotiateProtocolVersion(params?.protocolVersion);
+      const toolDefinitions = getPublicToolDefinitions(this.app.config, chatgptWebProfile);
+      const chatgptWebToolSnapshot = chatgptWebProfile
+        ? buildChatGptWebToolSnapshot(chatgptWebProfile, toolDefinitions)
+        : null;
       return {
         sessionId,
         response: jsonRpcSuccess(id, {
           protocolVersion,
-          capabilities: {
-            tools: { listChanged: true },
-            resources: { subscribe: false, listChanged: true }
-          },
+          capabilities: chatgptWebProfile
+            ? { tools: { listChanged: false } }
+            : {
+                tools: { listChanged: true },
+                resources: { subscribe: false, listChanged: true }
+              },
           serverInfo: {
             name: SERVER_NAME,
             version: this.app.config.serverVersion
           },
           _meta: {
-            codexMemoryGovernedBridge: buildGovernedMcpServerMetadata(this.app.config)
+            codexMemoryGovernedBridge: buildGovernedMcpServerMetadata(
+              this.app.config,
+              chatgptWebProfile
+            ),
+            ...(chatgptWebToolSnapshot
+              ? {
+                  codexMemoryChatgptWeb: {
+                    contractVersion: CHATGPT_WEB_TOOL_CONTRACT_VERSION,
+                    contractPackDigest: CHATGPT_WEB_TOOL_CONTRACT_DIGEST,
+                    profileId: chatgptWebProfile.profileId,
+                    manifestDigest: chatgptWebToolSnapshot.digest,
+                    canonicalization: chatgptWebToolSnapshot.canonicalization,
+                    snapshotCoverage: 'unverified'
+                  }
+                }
+              : {})
           },
-          instructions: buildInstructions(this.app.config)
+          instructions: buildInstructions(this.app.config, chatgptWebProfile)
         })
       };
     }
@@ -1731,15 +1865,27 @@ class CodexMemoryMcpServer {
     }
 
     if (method === 'tools/list') {
+      const toolDefinitions = getPublicToolDefinitions(this.app.config, chatgptWebProfile);
+      const chatgptWebToolSnapshot = chatgptWebProfile
+        ? buildChatGptWebToolSnapshot(chatgptWebProfile, toolDefinitions)
+        : null;
       return {
         response: jsonRpcSuccess(id, {
-          tools: getPublicToolDefinitions(this.app.config)
-            .map(tool => buildToolDefinitionForList(tool, this.app.config))
+          tools: toolDefinitions
+            .map(tool => buildToolDefinitionForList(
+              tool,
+              this.app.config,
+              chatgptWebProfile,
+              chatgptWebToolSnapshot
+            ))
         })
       };
     }
 
     if (method === 'resources/list') {
+      if (chatgptWebProfile) {
+        return { response: jsonRpcError(id, -32601, 'Method not found', method) };
+      }
       return {
         response: jsonRpcSuccess(id, {
           resources: []
@@ -1748,6 +1894,9 @@ class CodexMemoryMcpServer {
     }
 
     if (method === 'resources/templates/list') {
+      if (chatgptWebProfile) {
+        return { response: jsonRpcError(id, -32601, 'Method not found', method) };
+      }
       return {
         response: jsonRpcSuccess(id, {
           resourceTemplates: []
@@ -1760,9 +1909,23 @@ class CodexMemoryMcpServer {
         return { response: jsonRpcError(id, -32602, 'Invalid params', 'tools/call requires a tool name') };
       }
 
-      if (!isPublicMcpToolExposed(params.name, this.app.config)) {
+      if (!isPublicMcpToolExposed(params.name, this.app.config, chatgptWebProfile)) {
         return {
           response: jsonRpcError(id, -32001, 'Forbidden', buildMcpToolNotExposedErrorData(params.name))
+        };
+      }
+
+      const chatgptWebModelOverride = chatgptWebProfile
+        ? findChatGptWebModelOverrideInParams(params)
+        : null;
+      if (chatgptWebModelOverride) {
+        return {
+          response: jsonRpcError(
+            id,
+            -32602,
+            'Invalid params',
+            buildChatGptWebProfileErrorData(chatgptWebModelOverride)
+          )
         };
       }
 
@@ -1771,8 +1934,44 @@ class CodexMemoryMcpServer {
         return { response: jsonRpcError(id, -32602, 'Invalid params', 'tools/call arguments must be an object') };
       }
 
+      if (chatgptWebProfile) {
+        try {
+          validateChatGptWebToolInput(params.name, args);
+        } catch (error) {
+          if (error instanceof ToolArgumentValidationError) {
+            return {
+              response: jsonRpcError(id, -32602, 'Invalid params', {
+                ...buildChatGptWebProfileErrorData('tool_input_schema_rejected'),
+                contractCode: 'TOOL_INPUT_SCHEMA_REJECTED'
+              })
+            };
+          }
+          return this._handleInternalError(
+            id,
+            params.name,
+            error,
+            -32603,
+            'Internal error',
+            chatgptWebProfile
+          );
+        }
+      }
+
+      if (chatgptWebProfile && chatgptWebProfile.runtimeInvocationAllowed !== true) {
+        return {
+          response: jsonRpcError(
+            id,
+            -32001,
+            'Forbidden',
+            buildChatGptWebProfileErrorData('chatgpt_web_runtime_not_bound')
+          )
+        };
+      }
+
       try {
-        validateToolArguments(params.name, args);
+        if (!chatgptWebProfile) {
+          validateToolArguments(params.name, args);
+        }
         const governedRequestContext = buildGovernedMcpRequestContextFromParams(params);
         if (governedRequestContext.accepted !== true) {
           return {
@@ -1782,8 +1981,24 @@ class CodexMemoryMcpServer {
             })
           };
         }
+        const transportRequestContext = chatgptWebProfile
+          ? buildChatGptWebTrustedExecutionContext(chatgptWebProfile)
+          : {
+              accepted: true,
+              requestContext
+            };
+        if (transportRequestContext.accepted !== true) {
+          return {
+            response: jsonRpcError(
+              id,
+              -32001,
+              'Forbidden',
+              buildChatGptWebProfileErrorData(transportRequestContext.reasonCode)
+            )
+          };
+        }
         const effectiveRequestContext = buildGovernedMcpEffectiveRequestContext(
-          requestContext,
+          transportRequestContext.requestContext,
           governedRequestContext.requestContext
         );
         if (effectiveRequestContext.accepted !== true) {
@@ -1796,8 +2011,24 @@ class CodexMemoryMcpServer {
         }
         const payload = await this.app.callTool(params.name, args, effectiveRequestContext.requestContext);
         const isError = payload?.decision === 'rejected';
+        const toolResult = formatToolResult(payload, isError, chatgptWebProfile);
+        if (chatgptWebProfile) {
+          try {
+            validateChatGptWebStructuredContent(params.name, toolResult.structuredContent);
+          } catch (error) {
+            if (error instanceof ToolArgumentValidationError) {
+              return {
+                response: jsonRpcError(id, -32603, 'Tool error', {
+                  ...buildChatGptWebProfileErrorData('tool_output_schema_mismatch'),
+                  contractCode: 'TOOL_OUTPUT_SCHEMA_MISMATCH'
+                })
+              };
+            }
+            throw error;
+          }
+        }
         return {
-          response: jsonRpcSuccess(id, formatToolResult(payload, isError))
+          response: jsonRpcSuccess(id, toolResult)
         };
       } catch (error) {
         if (error instanceof ToolArgumentValidationError) {
@@ -1806,9 +2037,23 @@ class CodexMemoryMcpServer {
           };
         }
         if (Number.isInteger(error?.jsonRpcCode)) {
-          return this._handleInternalError(id, params.name, error, error.jsonRpcCode, error.jsonRpcMessage || 'Tool error');
+          return this._handleInternalError(
+            id,
+            params.name,
+            error,
+            error.jsonRpcCode,
+            error.jsonRpcMessage || 'Tool error',
+            chatgptWebProfile
+          );
         }
-        return this._handleInternalError(id, params.name, error);
+        return this._handleInternalError(
+          id,
+          params.name,
+          error,
+          -32603,
+          'Internal error',
+          chatgptWebProfile
+        );
       }
     }
 

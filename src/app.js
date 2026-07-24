@@ -20,6 +20,7 @@ const {
   MemoryContextPackageService
 } = require('./core/MemoryContextPackageService');
 const { GovernedRecallGateway } = require('./core/GovernedRecallGateway');
+const { GovernedReadFacade } = require('./core/GovernedReadFacade');
 const { TaskStartMemoryContextWorkflow } = require('./core/TaskStartMemoryContextWorkflow');
 const { MemoryDeltaProposalService } = require('./core/MemoryDeltaProposalService');
 const {
@@ -108,7 +109,7 @@ const {
   buildGovernedNativeBridgeAuditMemoryDecisionProvider
 } = require('./core/GovernedNativeBridgeAuditMemoryProjection');
 const {
-  GOVERNED_NATIVE_CLIENTS,
+  GOVERNED_NATIVE_READ_CLIENTS,
   GOVERNED_NATIVE_VISIBILITIES
 } = require('./core/MemoryAccessContract');
 
@@ -728,6 +729,21 @@ function buildGovernedMcpVcpNativeWriteDelegationRequiredRejection() {
   });
 }
 
+function buildChatGptWebReadOnlyDelegationRequiredRejection() {
+  const blockers = ['chatgpt_web_requires_strict_primary_native_read_delegation'];
+  return buildGovernedMcpVcpNativeBridgeRejectedToolResult({
+    accepted: false,
+    blockers,
+    lowDisclosureRejection: {
+      reason: 'chatgpt_web_read_only_principal_not_bound',
+      code: 'chatgpt_web_strict_primary_native_read_required',
+      lowDisclosure: true,
+      blockers,
+      direction: 'read'
+    }
+  });
+}
+
 function buildGovernedMcpVcpNativeReadShapeProbeInvokerRegistry(config = {}, overrides = {}) {
   const registry = new Map();
   const configuredTarget = config.governedMcpVcpNativeRuntimeTarget || {};
@@ -1033,7 +1049,7 @@ function safeBridgeRollbackApplyPolicy(value) {
 }
 
 function safeBridgeClientId(value) {
-  return GOVERNED_NATIVE_CLIENTS.includes(value) ? value : null;
+  return GOVERNED_NATIVE_READ_CLIENTS.includes(value) ? value : null;
 }
 
 function safeBridgeVisibility(value) {
@@ -1225,7 +1241,7 @@ function projectGovernedNativeBridgeObservationSummary(observation = {}) {
     rawScopePersisted: false,
     rawScopeValueReturned: false,
     clientIdentitySource: GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE,
-    clientIdentityBound: GOVERNED_NATIVE_CLIENTS.includes(request.client_id),
+    clientIdentityBound: GOVERNED_NATIVE_READ_CLIENTS.includes(request.client_id),
     clientIdentityToolArgumentsMayOverride: false,
     clientIdentityGovernanceMetadataMayOverride: false,
     scopeBoundarySource: GOVERNED_MCP_VCP_NATIVE_CONTEXT_SOURCE,
@@ -1633,7 +1649,7 @@ function governedMcpVcpNativeFallbackScope(gateResult = {}) {
       projected[key] = scope[key];
     }
   }
-  if (GOVERNED_NATIVE_CLIENTS.includes(scope.client_id)) {
+  if (GOVERNED_NATIVE_READ_CLIENTS.includes(scope.client_id)) {
     projected.client_id = scope.client_id;
   }
   if (GOVERNED_MCP_VCP_NATIVE_FALLBACK_VISIBILITIES.includes(scope.visibility)) {
@@ -2663,11 +2679,18 @@ function createCodexMemoryApplication(overrides = {}) {
       return application.callTool('search_memory', searchArgs, searchRequestContext);
     }
   });
+  const governedReadFacade = new GovernedReadFacade({
+    nativeRecall: (searchArgs, searchRequestContext) =>
+      governedRecallGateway.search(searchArgs, searchRequestContext),
+    governanceOverview: overviewArgs => overviewService.getAuthenticatedBoundedOverview(overviewArgs),
+    governanceAudit: auditArgs => auditMemoryReadonlyService.run(auditArgs)
+  });
   const memoryContextPackageService = new MemoryContextPackageService({
     searchMemory: (searchArgs, searchRequestContext) =>
       governedRecallGateway.search(searchArgs, searchRequestContext),
     overviewService,
-    auditMemoryReadonlyService
+    auditMemoryReadonlyService,
+    governedReadFacade
   });
   const taskStartMemoryContextWorkflow = new TaskStartMemoryContextWorkflow({
     prepareMemoryContext: (prepareArgs, prepareRequestContext) =>
@@ -2702,6 +2725,7 @@ function createCodexMemoryApplication(overrides = {}) {
       memoryDeltaProposalService,
       auditMemoryReadonlyService,
       governedRecallGateway,
+      governedReadFacade,
       governedNativeBridgeObservationStore
     },
     adapters: {
@@ -2820,10 +2844,31 @@ function createCodexMemoryApplication(overrides = {}) {
       let governedNativeReadFallbackContext = null;
       let governedNativeReadFallbackAuditReceipt = null;
       let governedNativeReadFallbackArgs = null;
+      if (
+        toolName === 'memory_overview' &&
+        args !== null &&
+        typeof args === 'object' &&
+        Object.prototype.hasOwnProperty.call(args, 'probe_nonce')
+      ) {
+        return overviewService.getChatGptWebTransportProbe({
+          probeNonce: args.probe_nonce,
+          requestContext: effectiveRequestContext
+        });
+      }
       if (toolName === 'memory_overview' && requestContext.noTokenReadOnly === true) {
         return overviewService.getNoTokenSelectedOverview({
           auditWindow: args?.auditWindow
         });
+      }
+      if (
+        effectiveRequestContext.channelIdentity === 'chatgpt_web' &&
+        isGovernedMcpVcpNativeReadDelegationTool(toolName) &&
+        (
+          config.governedMcpVcpNativeBridgeGateMode === 'off' ||
+          config.governedMcpVcpNativeReadDelegationMode !== 'primary'
+        )
+      ) {
+        return buildChatGptWebReadOnlyDelegationRequiredRejection();
       }
       if (
         (
@@ -3082,6 +3127,15 @@ function createCodexMemoryApplication(overrides = {}) {
       }
 
       if (toolName === 'prepare_memory_context') {
+        if (requestContext.channelIdentity === 'chatgpt_web') {
+          const trustedCompositeRequest =
+            requestContext.chatgptWebProfileId === 'chatgpt_web_context_v2' &&
+            requestContext.executionContext?.requestSource === 'chatgpt_web_mcp' &&
+            config.chatgptWebProfile?.enabled === true &&
+            config.chatgptWebProfile?.compositeReadGatePassed === true;
+          if (!trustedCompositeRequest) throw new Error('VCP_COMPOSITE_READ_NOT_READY');
+          return memoryContextPackageService.prepareChatGptWeb(args, requestContext);
+        }
         return memoryContextPackageService.prepare(args, requestContext);
       }
 

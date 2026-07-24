@@ -96,6 +96,41 @@ function gateInput(overrides = {}) {
   };
 }
 
+function chatGptWebTrustedContext(overrides = {}) {
+  return {
+    accepted: true,
+    executionContext: {
+      agentAlias: 'chatgpt_web',
+      clientId: 'chatgpt_web',
+      projectId: 'codex-memory',
+      workspaceId: 'workspace-alpha',
+      scopeId: 'chatgpt-web-fixed-scope',
+      visibility: 'project',
+      ...overrides
+    }
+  };
+}
+
+function chatGptWebReadGateInput({ visibility = 'project', trustedContext } = {}) {
+  return gateInput({
+    bridge_request: {
+      client_id: 'chatgpt_web',
+      scope: {
+        project_id: 'codex-memory',
+        workspace_id: 'workspace-alpha',
+        scope_id: 'chatgpt-web-fixed-scope',
+        client_id: 'chatgpt_web',
+        visibility
+      }
+    },
+    extra: {
+      trusted_execution_context: trustedContext === undefined
+        ? chatGptWebTrustedContext({ visibility })
+        : trustedContext
+    }
+  });
+}
+
 function exactWriteApproval(overrides = {}) {
   return {
     accepted: true,
@@ -162,6 +197,85 @@ test('accepts Codex governed MCP read-only access to VCPToolBox native memory', 
   assert.equal(result.localMemoryReadPerformed, false);
   assert.equal(result.publicMcpExpanded, false);
   assert.equal(result.readinessClaimed, false);
+});
+
+test('accepts chatgpt_web only as a server-bound project/workspace read principal', () => {
+  for (const visibility of ['project', 'workspace']) {
+    const result = validateGovernedMcpVcpNativeBridgeGate(
+      chatGptWebReadGateInput({ visibility })
+    );
+
+    assert.equal(result.accepted, true, result.blockers.join(', '));
+    assert.equal(result.normalizedBridgeRequest.client_id, 'chatgpt_web');
+    assert.equal(result.normalizedBridgeRequest.principal_capability, 'governed_read_only_channel');
+    assert.equal(result.normalizedBridgeRequest.write_eligible, false);
+    assert.equal(result.normalizedBridgeRequest.read_allowed, true);
+    assert.equal(result.normalizedBridgeRequest.write_allowed, false);
+    assert.equal(result.normalizedBridgeRequest.trusted_execution_context_supplied, true);
+    assert.equal(result.normalizedBridgeRequest.trusted_execution_context_accepted, true);
+    assert.equal(result.normalizedBridgeRequest.trusted_execution_context_scope_matched, true);
+  }
+});
+
+test('rejects chatgpt_web private/shared scope and missing or mismatched trusted context', () => {
+  for (const visibility of ['private', 'shared']) {
+    const result = validateGovernedMcpVcpNativeBridgeGate(
+      chatGptWebReadGateInput({ visibility })
+    );
+    assert.equal(result.accepted, false);
+    assert.ok(result.blockers.includes('chatgpt_web_visibility_must_be_project_or_workspace'));
+  }
+
+  const missing = validateGovernedMcpVcpNativeBridgeGate(
+    chatGptWebReadGateInput({ trustedContext: null })
+  );
+  assert.equal(missing.accepted, false);
+  assert.ok(missing.blockers.includes('chatgpt_web_requires_accepted_server_trusted_execution_context'));
+
+  const mismatched = validateGovernedMcpVcpNativeBridgeGate(
+    chatGptWebReadGateInput({
+      trustedContext: chatGptWebTrustedContext({ projectId: 'another-project' })
+    })
+  );
+  assert.equal(mismatched.accepted, false);
+  assert.ok(mismatched.blockers.includes('chatgpt_web_trusted_execution_context_must_match_fixed_scope'));
+});
+
+test('rejects chatgpt_web native write even with an otherwise accepted exact approval shape', () => {
+  const input = chatGptWebReadGateInput();
+  input.bridge_request.invocation_profile = {
+    transport: 'mcp',
+    profile: 'governed_bounded_write',
+    tool_name: 'record_memory'
+  };
+  input.bridge_request.read_write_authority = {
+    read: false,
+    write: true,
+    write_policy: 'exact_approval'
+  };
+  input.bridge_request.output_disclosure_budget = {
+    level: 'receipt_only', low_disclosure: true, raw_output: false,
+    max_items: 0, max_bytes: 1024
+  };
+  input.bridge_request.audit_receipt = {
+    required: true, low_disclosure: true, receipt_id: 'chatgpt-web-write-receipt'
+  };
+  input.bridge_request.rollback_posture = {
+    mode: 'bounded_rollback_plan', rollback_plan_ref: 'chatgpt-web-write-rollback'
+  };
+  input.exact_approval_result = exactWriteApproval({
+    allowedScope: {
+      project_id: 'codex-memory', workspace_id: 'workspace-alpha',
+      scope_id: 'chatgpt-web-fixed-scope', client_id: 'chatgpt_web', visibility: 'project'
+    },
+    rollbackPlanRef: 'chatgpt-web-write-rollback'
+  });
+
+  const result = validateGovernedMcpVcpNativeBridgeGate(input);
+  assert.equal(result.accepted, false);
+  assert.ok(result.blockers.includes('client_id_not_eligible_for_governed_native_write'));
+  assert.equal(result.normalizedBridgeRequest.write_eligible, false);
+  assert.equal(result.memoryWritePerformed, false);
 });
 
 test('accepts the frozen governed visibility contract and rejects public visibility', () => {

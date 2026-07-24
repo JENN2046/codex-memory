@@ -1,7 +1,17 @@
+const crypto = require('node:crypto');
 const path = require('node:path');
 
 const { DEFAULT_AUDIT_WINDOW } = require('../storage/AuditLogStore');
-const { KNOWLEDGE_DIARY_NAME, PROCESS_DIARY_NAME } = require('./constants');
+const {
+  CHATGPT_WEB_CHANNEL_ID,
+  CHATGPT_WEB_PROBE_NONCE_MAX_LENGTH,
+  CHATGPT_WEB_PROBE_NONCE_MIN_LENGTH,
+  CHATGPT_WEB_PROBE_NONCE_TTL_MS,
+  KNOWLEDGE_DIARY_NAME,
+  PROCESS_DIARY_NAME
+} = require('./constants');
+const { CHATGPT_WEB_PROFILE_IDS } = require('./ChatGptWebProfile');
+const { CHATGPT_WEB_TOOL_CONTRACT_VERSION } = require('./ChatGptWebToolContract');
 const { buildNormalizedScopeAudit } = require('../recall/RecallAuditService');
 
 const DEFAULT_LIST_LIMIT = 10;
@@ -509,8 +519,74 @@ function buildRuntimePosture(config = {}, access = null) {
   };
 }
 
+function isChatGptWebTransportProbeRequest(requestContext = {}) {
+  return requestContext && typeof requestContext === 'object' &&
+    requestContext.channelIdentity === CHATGPT_WEB_CHANNEL_ID &&
+    requestContext.chatgptWebProfileId === CHATGPT_WEB_PROFILE_IDS.TRANSPORT_PROBE_V0;
+}
+
+function normalizeChatGptWebProbeNonce(value) {
+  if (typeof value !== 'string') return null;
+  if (value.length < CHATGPT_WEB_PROBE_NONCE_MIN_LENGTH ||
+      value.length > CHATGPT_WEB_PROBE_NONCE_MAX_LENGTH) {
+    return null;
+  }
+  return value;
+}
+
+function buildChatGptWebProbePayload({
+  status,
+  probeNonceDigest = null,
+  serverCorrelationId = null
+} = {}) {
+  const payload = {
+    schemaVersion: 'chatgpt_memory_overview_v1',
+    status: status === 'success' ? 'success' : 'rejected',
+    mode: 'probe',
+    toolContractVersion: CHATGPT_WEB_TOOL_CONTRACT_VERSION,
+    sourceRuntime: 'none',
+    access: {
+      mode: 'chatgpt_web_transport_probe_v0',
+      lowDisclosure: true,
+      rawMemoryReturned: false,
+      rawPathsReturned: false,
+      tokenMaterialReturned: false
+    },
+    auditReceipt: {
+      operationalAuditWriteCount: 0,
+      durableMemoryMutationCount: 0,
+      rawAuditReturned: false
+    }
+  };
+
+  if (typeof probeNonceDigest === 'string' && probeNonceDigest &&
+      typeof serverCorrelationId === 'string' && serverCorrelationId) {
+    payload.probe = {
+      probeNonceDigest,
+      serverCorrelationId,
+      localMemoryReadPerformed: false,
+      nativeMemoryCallPerformed: false,
+      durableMemoryMutationCount: 0,
+      operationalAuditWriteCount: 0,
+      nonceStatePersistence: 'memory_only'
+    };
+  }
+
+  return payload;
+}
+
 class MemoryOverviewService {
-  constructor({ config, auditLogStore, diaryStore, shadowStore, vectorStore, candidateCacheStore = null, chatHistoryIndexStore = null }) {
+  constructor({
+    config,
+    auditLogStore,
+    diaryStore,
+    shadowStore,
+    vectorStore,
+    candidateCacheStore = null,
+    chatHistoryIndexStore = null,
+    probeClock = () => Date.now(),
+    probeCorrelationIdFactory = () => crypto.randomUUID()
+  }) {
     this.config = config;
     this.auditLogStore = auditLogStore;
     this.diaryStore = diaryStore;
@@ -518,6 +594,69 @@ class MemoryOverviewService {
     this.vectorStore = vectorStore;
     this.candidateCacheStore = candidateCacheStore;
     this.chatHistoryIndexStore = chatHistoryIndexStore;
+    this.probeClock = typeof probeClock === 'function' ? probeClock : () => Date.now();
+    this.probeCorrelationIdFactory = typeof probeCorrelationIdFactory === 'function'
+      ? probeCorrelationIdFactory
+      : () => crypto.randomUUID();
+    this.probeNonceExpiryByDigest = new Map();
+  }
+
+  _probeNow() {
+    const timestamp = this.probeClock();
+    return Number.isFinite(timestamp) ? timestamp : Date.now();
+  }
+
+  _createProbeCorrelationId() {
+    const candidate = this.probeCorrelationIdFactory();
+    return typeof candidate === 'string' && candidate
+      ? candidate
+      : crypto.randomUUID();
+  }
+
+  _pruneExpiredProbeNonces(now) {
+    for (const [digest, expiresAt] of this.probeNonceExpiryByDigest.entries()) {
+      if (!Number.isFinite(expiresAt) || expiresAt <= now) {
+        this.probeNonceExpiryByDigest.delete(digest);
+      }
+    }
+  }
+
+  async getChatGptWebTransportProbe({ probeNonce, requestContext } = {}) {
+    if (!isChatGptWebTransportProbeRequest(requestContext)) {
+      return buildChatGptWebProbePayload({ status: 'rejected' });
+    }
+
+    const normalizedNonce = normalizeChatGptWebProbeNonce(probeNonce);
+    if (!normalizedNonce) {
+      return buildChatGptWebProbePayload({ status: 'rejected' });
+    }
+
+    const now = this._probeNow();
+    this._pruneExpiredProbeNonces(now);
+    const probeNonceDigest = crypto
+      .createHash('sha256')
+      .update(normalizedNonce, 'utf8')
+      .digest('hex');
+    const serverCorrelationId = this._createProbeCorrelationId();
+    const expiresAt = this.probeNonceExpiryByDigest.get(probeNonceDigest);
+
+    if (Number.isFinite(expiresAt) && expiresAt > now) {
+      return buildChatGptWebProbePayload({
+        status: 'rejected',
+        probeNonceDigest,
+        serverCorrelationId
+      });
+    }
+
+    this.probeNonceExpiryByDigest.set(
+      probeNonceDigest,
+      now + CHATGPT_WEB_PROBE_NONCE_TTL_MS
+    );
+    return buildChatGptWebProbePayload({
+      status: 'success',
+      probeNonceDigest,
+      serverCorrelationId
+    });
   }
 
   async getOverview({ auditWindow = DEFAULT_AUDIT_WINDOW, limit = DEFAULT_LIST_LIMIT } = {}) {
@@ -667,6 +806,8 @@ class MemoryOverviewService {
 }
 
 module.exports = {
+  buildChatGptWebProbePayload,
   buildRuntimePosture,
+  isChatGptWebTransportProbeRequest,
   MemoryOverviewService
 };

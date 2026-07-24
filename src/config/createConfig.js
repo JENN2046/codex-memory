@@ -21,6 +21,13 @@ const {
   attachGovernedMcpVcpNativeHttpMcpTargetPrivateConfig,
   normalizeGovernedMcpVcpNativeHttpMcpTargetConfig
 } = require('../core/GovernedMcpVcpNativeHttpMcpTargetConfig');
+const {
+  buildChatGptWebProfileConfig
+} = require('../core/ChatGptWebProfile');
+const {
+  attachChatGptWebUdsPrivateConfig,
+  normalizeChatGptWebUdsConfig
+} = require('../core/ChatGptWebUdsConfig');
 
 function toBoolean(value, fallback = false) {
   if (typeof value === 'boolean') return value;
@@ -752,6 +759,158 @@ function createConfig(overrides = {}) {
       ''
     )
   );
+  const chatgptWebProfileOverrides = getNestedPlainObject(overrides, 'chatgptWebProfile');
+  const chatgptWebServerFixedScopeOverrides = getNestedPlainObject(
+    overrides,
+    'chatgptWebServerFixedScope'
+  );
+  const chatgptWebProfileScopeOverrides = getNestedPlainObject(
+    chatgptWebProfileOverrides,
+    'serverFixedScope'
+  );
+  const chatgptWebProfile = buildChatGptWebProfileConfig({
+    profileId: pickFirstNonEmpty(
+      overrides.chatgptWebProfileId,
+      chatgptWebProfileOverrides.profileId,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_PROFILE,
+      'off'
+    ),
+    enabled: _resolveBool(
+      pickFirstNonEmpty(
+        overrides.chatgptWebProfileEnabled,
+        chatgptWebProfileOverrides.enabled
+      ),
+      'CODEX_MEMORY_CHATGPT_WEB_PROFILE_ENABLED',
+      false
+    ),
+    compositeReadGatePassed: _resolveBool(
+      pickFirstNonEmpty(
+        overrides.chatgptWebCompositeReadGatePassed,
+        chatgptWebProfileOverrides.compositeReadGatePassed
+      ),
+      'CODEX_MEMORY_CHATGPT_WEB_COMPOSITE_READ_GATE_PASSED',
+      false
+    ),
+    runtimeProbeBindingPassed: _resolveBool(
+      pickFirstNonEmpty(
+        overrides.chatgptWebRuntimeProbeBindingPassed,
+        chatgptWebProfileOverrides.runtimeProbeBindingPassed
+      ),
+      'CODEX_MEMORY_CHATGPT_WEB_RUNTIME_PROBE_BINDING_PASSED',
+      false
+    ),
+    serverFixedScope: {
+      projectId: pickFirstNonEmpty(
+        overrides.chatgptWebProjectId,
+        chatgptWebServerFixedScopeOverrides.projectId,
+        chatgptWebServerFixedScopeOverrides.project_id,
+        chatgptWebProfileScopeOverrides.projectId,
+        chatgptWebProfileScopeOverrides.project_id,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_PROJECT_ID
+      ),
+      workspaceId: pickFirstNonEmpty(
+        overrides.chatgptWebWorkspaceId,
+        chatgptWebServerFixedScopeOverrides.workspaceId,
+        chatgptWebServerFixedScopeOverrides.workspace_id,
+        chatgptWebProfileScopeOverrides.workspaceId,
+        chatgptWebProfileScopeOverrides.workspace_id,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_WORKSPACE_ID
+      ),
+      scopeId: pickFirstNonEmpty(
+        overrides.chatgptWebScopeId,
+        chatgptWebServerFixedScopeOverrides.scopeId,
+        chatgptWebServerFixedScopeOverrides.scope_id,
+        chatgptWebProfileScopeOverrides.scopeId,
+        chatgptWebProfileScopeOverrides.scope_id,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_SCOPE_ID
+      ),
+      visibility: pickFirstNonEmpty(
+        overrides.chatgptWebVisibility,
+        chatgptWebServerFixedScopeOverrides.visibility,
+        chatgptWebServerFixedScopeOverrides.visibility_policy,
+        chatgptWebProfileScopeOverrides.visibility,
+        chatgptWebProfileScopeOverrides.visibility_policy,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_VISIBILITY
+      )
+    }
+  });
+  const chatgptWebUdsOverrides = getNestedPlainObject(overrides, 'chatgptWebUds');
+  const chatgptWebUdsConfig = normalizeChatGptWebUdsConfig({
+    basePath,
+    enabled: _resolveBool(
+      pickFirstNonEmpty(
+        overrides.chatgptWebUdsEnabled,
+        chatgptWebUdsOverrides.enabled
+      ),
+      'CODEX_MEMORY_CHATGPT_WEB_UDS_ENABLED',
+      false
+    ),
+    socketDirectory: pickFirstNonEmpty(
+      overrides.chatgptWebUdsSocketDirectory,
+      chatgptWebUdsOverrides.socketDirectory,
+      chatgptWebUdsOverrides.socket_directory,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_UDS_SOCKET_DIR
+    ),
+    socketName: pickFirstNonEmpty(
+      overrides.chatgptWebUdsSocketName,
+      chatgptWebUdsOverrides.socketName,
+      chatgptWebUdsOverrides.socket_name,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_UDS_SOCKET_NAME
+    ),
+    bridgeAuthSecretFile: pickFirstNonEmpty(
+      overrides.chatgptWebBridgeAuthSecretFile,
+      chatgptWebUdsOverrides.bridgeAuthSecretFile,
+      chatgptWebUdsOverrides.bridge_auth_secret_file,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_BRIDGE_AUTH_FILE
+    ),
+    allowedOrigins: pickFirstNonEmpty(
+      overrides.chatgptWebUdsAllowedOrigins,
+      chatgptWebUdsOverrides.allowedOrigins,
+      chatgptWebUdsOverrides.allowed_origins,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_UDS_ALLOWED_ORIGINS,
+      []
+    ),
+    enabledProfileIds: pickFirstNonEmpty(
+      overrides.chatgptWebUdsProfileIds,
+      chatgptWebUdsOverrides.enabledProfileIds,
+      chatgptWebUdsOverrides.enabled_profile_ids,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_UDS_PROFILES,
+      []
+    ),
+    tcpLoopbackFallbackEnabled: _resolveBool(
+      pickFirstNonEmpty(
+        overrides.chatgptWebTcpFallbackEnabled,
+        chatgptWebUdsOverrides.tcpLoopbackFallback,
+        chatgptWebUdsOverrides.tcp_loopback_fallback
+      ),
+      'CODEX_MEMORY_CHATGPT_WEB_TCP_FALLBACK_ENABLED',
+      false
+    ),
+    tcpLoopbackHost: pickFirstNonEmpty(
+      overrides.chatgptWebTcpFallbackHost,
+      chatgptWebUdsOverrides.tcpLoopbackHost,
+      chatgptWebUdsOverrides.tcp_loopback_host,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_TCP_FALLBACK_HOST,
+      '127.0.0.1'
+    ),
+    tcpLoopbackPort: parsePositiveInteger(
+      pickFirstNonEmpty(
+        overrides.chatgptWebTcpFallbackPort,
+        chatgptWebUdsOverrides.tcpLoopbackPort,
+        chatgptWebUdsOverrides.tcp_loopback_port,
+        process.env.CODEX_MEMORY_CHATGPT_WEB_TCP_FALLBACK_PORT,
+        '17605'
+      ),
+      17605
+    ),
+    transportAuthSecretFile: pickFirstNonEmpty(
+      overrides.chatgptWebTransportAuthSecretFile,
+      chatgptWebUdsOverrides.transportAuthSecretFile,
+      chatgptWebUdsOverrides.transport_auth_secret_file,
+      process.env.CODEX_MEMORY_CHATGPT_WEB_TRANSPORT_AUTH_FILE
+    ),
+    fallbackProfileId: chatgptWebProfile.profileId
+  });
   const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);
   const vectorIndexPath = resolveAbsolutePath(
     basePath,
@@ -815,6 +974,8 @@ function createConfig(overrides = {}) {
     mcpPublicToolNames: isHardened ? [] : requestedMcpPublicToolNames,
     exposeControlledMutationMcpTools: isHardened ? false : exposeControlledMutationMcpTools,
     exposeWriteMcpTools: isHardened ? false : exposeWriteMcpTools,
+    chatgptWebProfile,
+    chatgptWebUds: chatgptWebUdsConfig.publicConfig,
     embedDimensions: inferredEmbedDimensions,
     embeddingFingerprint,
     embeddingProfileVersion,
@@ -939,9 +1100,12 @@ function createConfig(overrides = {}) {
     baseConfig,
     ragProfileConfig
   );
-  return attachGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(
-    finalConfig,
-    governedMcpVcpNativeHttpMcpTarget.privateConfig
+  return attachChatGptWebUdsPrivateConfig(
+    attachGovernedMcpVcpNativeHttpMcpTargetPrivateConfig(
+      finalConfig,
+      governedMcpVcpNativeHttpMcpTarget.privateConfig
+    ),
+    chatgptWebUdsConfig.privateConfig
   );
 }
 

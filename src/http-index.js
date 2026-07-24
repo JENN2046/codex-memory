@@ -5,8 +5,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { createCodexMemoryApplication } = require('./app');
-const { createStreamableHttpServer } = require('./adapters/codex-mcp/http');
+const {
+  createChatGptWebUdsHttpServer,
+  createStreamableHttpServer
+} = require('./adapters/codex-mcp/http');
 const { computeRuntimeSourceFingerprint } = require('./core/RuntimeFreshness');
+const {
+  getChatGptWebUdsPrivateConfig
+} = require('./core/ChatGptWebUdsConfig');
 
 function appendLogLine(logPath, level, message) {
   const line = `[${new Date().toISOString()}] ${level.toUpperCase()} ${message}\n`;
@@ -27,7 +33,11 @@ function appendLogLine(logPath, level, message) {
 
 async function main() {
   const app = createCodexMemoryApplication();
-  await app.initialize();
+  const chatgptWebUdsEnabled = app.config.chatgptWebUds?.enabled === true;
+  const appInitialized = !chatgptWebUdsEnabled;
+  if (appInitialized) {
+    await app.initialize();
+  }
 
   const logger = {
     info(message) {
@@ -38,23 +48,47 @@ async function main() {
     }
   };
 
-  const httpServer = createStreamableHttpServer({
-    app,
-    host: app.config.httpHost,
-    port: app.config.httpPort,
-    mcpPath: app.config.httpMcpPath,
-    bearerToken: app.config.httpBearerToken,
-    runtimeFreshness: {
-      ...computeRuntimeSourceFingerprint(),
-      startedAt: new Date().toISOString()
-    }
-  });
+  const runtimeFreshness = {
+    ...computeRuntimeSourceFingerprint(),
+    startedAt: new Date().toISOString()
+  };
+  const chatgptWebUdsPrivateConfig = getChatGptWebUdsPrivateConfig(app.config);
+  const httpServer = chatgptWebUdsEnabled
+    ? createChatGptWebUdsHttpServer({
+        app,
+        socketDirectory: chatgptWebUdsPrivateConfig.socketDirectory,
+        socketName: chatgptWebUdsPrivateConfig.socketName,
+        bridgeAuthSecretFile: chatgptWebUdsPrivateConfig.bridgeAuthSecretFile,
+        allowedOrigins: chatgptWebUdsPrivateConfig.allowedOrigins,
+        enabledProfileIds: app.config.chatgptWebUds.enabledProfileIds,
+        tcpLoopbackFallback: chatgptWebUdsPrivateConfig.tcpLoopbackFallback,
+        transportAuthSecretFile: chatgptWebUdsPrivateConfig.transportAuthSecretFile,
+        host: chatgptWebUdsPrivateConfig.tcpLoopbackFallback
+          ? chatgptWebUdsPrivateConfig.tcpLoopbackHost
+          : undefined,
+        port: chatgptWebUdsPrivateConfig.tcpLoopbackFallback
+          ? chatgptWebUdsPrivateConfig.tcpLoopbackPort
+          : undefined,
+        runtimeFreshness
+      })
+    : createStreamableHttpServer({
+        app,
+        host: app.config.httpHost,
+        port: app.config.httpPort,
+        mcpPath: app.config.httpMcpPath,
+        bearerToken: app.config.httpBearerToken,
+        runtimeFreshness
+      });
 
   const address = await httpServer.listen();
   if (httpServer.authWarning) {
     logger.info(httpServer.authWarning);
   }
-  logger.info(`vcp_codex_memory HTTP MCP listening on ${address.url}`);
+  if (chatgptWebUdsEnabled) {
+    logger.info(`vcp_codex_memory ChatGPT web private MCP listening via ${address.transport} on ${address.logicalEndpoints.join(', ')}`);
+  } else {
+    logger.info(`vcp_codex_memory HTTP MCP listening on ${address.url}`);
+  }
 
   let shuttingDown = false;
   async function shutdown(signal) {
@@ -64,7 +98,9 @@ async function main() {
 
     try {
       await httpServer.close();
-      await app.close();
+      if (appInitialized) {
+        await app.close();
+      }
     } catch (error) {
       logger.error(error.stack || error.message || String(error));
       process.exitCode = 1;
