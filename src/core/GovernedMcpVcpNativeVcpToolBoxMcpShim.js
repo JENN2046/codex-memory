@@ -28,6 +28,9 @@ const {
   DERIVED_RUNTIME_MUTATION_POLICY,
   createDerivedRuntimeMutationLifecycle
 } = require('./DerivedRuntimeMutationLifecycle');
+const {
+  diaryScopeMappingBindingFingerprint
+} = require('./DiaryScopeMappingBindingFingerprint');
 
 const GOVERNANCE_METADATA_PATH = 'params._meta.codexMemoryGovernance';
 const PUBLIC_TOOL_TO_NATIVE_TOOLS = Object.freeze({
@@ -326,6 +329,12 @@ function jsonRpcResult(id, structuredContent, runtimeReceipt = null) {
 }
 
 function lowDisclosureShimMeta(enableWrite = false, mappingState = null) {
+  const mappingBindingFingerprint = mappingState?.accepted === true
+    ? diaryScopeMappingBindingFingerprint(
+        mappingState.mappingReference,
+        mappingState.mappingDigest
+      )
+    : null;
   return {
     bridge: 'codex-memory-governed-vcp-toolbox-native-memory',
     primaryRuntime: REQUIRED_PRIMARY_RUNTIME,
@@ -344,6 +353,8 @@ function lowDisclosureShimMeta(enableWrite = false, mappingState = null) {
     mappingConfigured: mappingState?.configured === true,
     mappingReferenceBound: mappingState?.accepted === true,
     mappingDigestBound: mappingState?.accepted === true,
+    mappingBindingFingerprint,
+    mappingBindingFingerprintDisclosed: mappingBindingFingerprint !== null,
     exactMappingReferenceDisclosed: false,
     exactMappingDigestDisclosed: false,
     readinessClaimed: false

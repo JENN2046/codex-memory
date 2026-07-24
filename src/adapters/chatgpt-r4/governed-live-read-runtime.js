@@ -383,6 +383,114 @@ function countersFromEvidence(evidence) {
   };
 }
 
+function receiptBackedNativePreflightFailure(result) {
+  const receipt = result?.receipt;
+  const invocation = receipt?.nativeInvocationReceipt;
+  const runtime = invocation?.nativeRuntimeReceipt;
+  if (result?.status !== 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_REJECTED' ||
+      result?.accepted !== false ||
+      result?.decision !== 'rejected' ||
+      result?.reasonCode !== 'native_read_delegation_client_error' ||
+      result?.access?.lowDisclosure !== true ||
+      result?.access?.rawOutputReturned !== false ||
+      result?.access?.rawMemoryReturned !== false ||
+      result?.access?.tokenMaterialReturned !== false ||
+      result?.access?.memoryReadPerformed !== false ||
+      result?.access?.localMemoryFallbackEligible !== false ||
+      result?.access?.localMemoryFallbackUsed !== false ||
+      result?.access?.delegationStatusClass !== 'client_error' ||
+      result?.access?.delegationReasonCode !== 'native_read_delegation_client_error' ||
+      !isPlainObject(receipt) ||
+      receipt.statusClass !== 'client_error' ||
+      receipt.memoryWritten !== false ||
+      receipt.rawResponseBodyPersisted !== false ||
+      receipt.rawResponseBodyPrinted !== false ||
+      receipt.tokenMaterialDisclosed !== false ||
+      receipt.localAuditReceipt?.appended !== true ||
+      receipt.localAuditReceipt?.lowDisclosure !== true ||
+      !isPlainObject(invocation) ||
+      invocation.invocationBindingMatched !== true ||
+      invocation.governanceMetadataSent !== true ||
+      invocation.jsonRpcResponseIdMatched !== true ||
+      invocation.statusClass !== 'client_error' ||
+      invocation.failureCategory !== 'scope_binding_rejected' ||
+      invocation.jsonRpcErrorPresent !== true ||
+      ![
+        'diary_scope_mapping_missing',
+        'diary_scope_mapping_binding_mismatch'
+      ].includes(invocation.jsonRpcErrorReasonCode) ||
+      invocation.endpointDisclosed !== false ||
+      invocation.tokenMaterialDisclosed !== false ||
+      invocation.rawRequestBodyDisclosed !== false ||
+      invocation.rawResponseBodyDisclosed !== false ||
+      !isPlainObject(runtime) ||
+      runtime.present !== false ||
+      runtime.nativeRuntimeCalled !== false ||
+      runtime.providerApiCalled !== false ||
+      runtime.memoryReadPerformed !== false ||
+      runtime.memoryWritePerformed !== false ||
+      runtime.durableWritePerformed !== false ||
+      runtime.primaryMemoryStoreWritePerformed !== false ||
+      runtime.derivedIndexWritePerformed !== false ||
+      runtime.sourcePartitionMutationPerformed !== false ||
+      runtime.legacyPartitionAccessed !== false ||
+      runtime.ambiguousPartitionAccessed !== false ||
+      runtime.unregisteredPartitionAccessed !== false ||
+      runtime.unscopedNativeSearchUsed !== false ||
+      runtime.rawRuntimeOutputDisclosed !== false ||
+      runtime.rawMemoryContentDisclosed !== false ||
+      runtime.runtimeLocatorDisclosed !== false ||
+      runtime.tokenMaterialDisclosed !== false) {
+    return null;
+  }
+  return Object.freeze({
+    status: 'unavailable',
+    counters: Object.freeze({
+      ...ZERO_MEMORY_COUNTERS,
+      native_invocations: 1,
+      other_durable_mutations: 1
+    }),
+    receipt_digests: Object.freeze({
+      native_runtime: digestObject(runtime),
+      native_invocation: digestObject(invocation),
+      bridge: digestObject(receipt)
+    }),
+    derived_runtime_mutation: Object.freeze({
+      kind: 'pre_provider_native_rejection',
+      policy: 'isolated_derived_runtime_mutation_v1',
+      authorized: false,
+      isolated_runtime_store: false,
+      accounting_final: true,
+      cumulative_count: 0,
+      receipt_delta: 0,
+      active_count: 0,
+      completed_count: 0,
+      failed_count: 0,
+      trigger_categories: Object.freeze([]),
+      policy_violation: false,
+      source_partition_mutation: false,
+      legacy_partition_accessed: false,
+      ambiguous_partition_accessed: false,
+      unregistered_partition_accessed: false,
+      unrestricted_native_search: false,
+      raw_details_disclosed: false
+    })
+  });
+}
+
+function unavailableReadProjection(toolName) {
+  if (toolName === 'search_memory') {
+    return { status: 'unavailable', result_count: 0, results: [] };
+  }
+  const kind = {
+    memory_overview: 'overview',
+    audit_memory: 'audit',
+    prepare_memory_context: 'context'
+  }[toolName];
+  if (!kind) reject('r4_live_read_tool_invalid');
+  return { status: 'unavailable', kind, item_count: 0 };
+}
+
 function assertNoMappingDisclosure(value, mappingState) {
   const forbidden = [
     mappingState.mappingReference,
@@ -487,6 +595,30 @@ function createGovernedLiveReadInvoker({
       })
     );
     if (result?.status !== 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED' || result?.accepted !== true) {
+      const failure = receiptBackedNativePreflightFailure(result);
+      if (failure) {
+        const structuredContent = unavailableReadProjection(toolName);
+        assertNoMappingDisclosure(structuredContent, mappingState);
+        validatePublicStructuredContent(structuredContent);
+        observeNativeEvidence(Object.freeze({
+          project_context_ref_digest: digestObject(projectContextRef),
+          tool_name: toolName,
+          native_runtime_receipt_digest: failure.receipt_digests.native_runtime,
+          native_invocation_receipt_digest: failure.receipt_digests.native_invocation,
+          bridge_receipt_digest: failure.receipt_digests.bridge,
+          activation_receipt_digest: activationReceiptDigest,
+          allowed_diary_count: resolution.allowedDiaryCount,
+          result_count: 0,
+          counters: Object.freeze({ ...failure.counters }),
+          derived_runtime_mutation: failure.derived_runtime_mutation
+        }));
+        return {
+          status: failure.status,
+          structured_content: structuredContent,
+          counters: { ...failure.counters },
+          result_scope_postcheck_passed: true
+        };
+      }
       reject('r4_live_read_native_delegation_rejected');
     }
     const evidence = nativeEvidence(result, resolution.allowedDiaryCount);
@@ -789,6 +921,7 @@ module.exports = {
   createGovernedLiveReadInvoker,
   createR4GovernanceRuntime,
   effectiveVisibility,
+  receiptBackedNativePreflightFailure,
   searchProjection,
   visibilityLabels
 };

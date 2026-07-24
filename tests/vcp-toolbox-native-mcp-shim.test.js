@@ -18,7 +18,8 @@ const {
   runGovernedVcpNativeAcceptance
 } = require('../src/cli/governed-vcp-native-acceptance');
 const {
-  parseArgs
+  parseArgs,
+  requireExpectedBearerToken
 } = require('../src/cli/vcp-toolbox-native-mcp-shim');
 const { validateMapping } = require('../src/core/DiaryScopeMapping');
 
@@ -1267,13 +1268,26 @@ test('VCPToolBox native MCP shim CLI accepts isolated knowledge-base store path 
     '--diary-scope-mapping',
     '/PRIVATE/codex-memory-diary-scope-mapping.json',
     '--enable-write'
-  ], {});
+  ], {
+    CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN: 'synthetic-cli-transport-token'
+  });
 
   assert.equal(options.vcpToolBoxRoot, '/PRIVATE/VCPToolBox');
   assert.equal(options.knowledgeBaseRootPath, '/PRIVATE/VCPToolBox/dailynote');
   assert.equal(options.knowledgeBaseStorePath, '/PRIVATE/codex-memory-isolated-vector-store');
   assert.equal(options.diaryScopeMappingPath, '/PRIVATE/codex-memory-diary-scope-mapping.json');
+  assert.equal(options.expectedBearerToken, 'synthetic-cli-transport-token');
   assert.equal(options.enableWrite, true);
+  assert.equal(
+    requireExpectedBearerToken(options.expectedBearerToken),
+    'synthetic-cli-transport-token'
+  );
+  for (const value of [undefined, '', ' leading', 'trailing ', 'line\nbreak']) {
+    assert.throws(
+      () => requireExpectedBearerToken(value),
+      /vcp_native_mcp_shim_bearer_token_required/u
+    );
+  }
 });
 
 function governanceMeta(toolName = 'search_memory') {

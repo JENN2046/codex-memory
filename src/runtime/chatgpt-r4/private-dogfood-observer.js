@@ -204,6 +204,32 @@ function createPrivateDogfoodObserver({
         ? null
         : 'r5d_derived_runtime_mutation_evidence_invalid';
     }
+    if (evidence?.kind === 'pre_provider_native_rejection') {
+      return observedCounters.native_invocations === 1 &&
+        observedCounters.provider_calls === 0 &&
+        observedCounters.derived_index_writes === 0 &&
+        observedCounters.other_durable_mutations === 1 &&
+        evidence.policy === 'isolated_derived_runtime_mutation_v1' &&
+        evidence.authorized === false &&
+        evidence.isolated_runtime_store === false &&
+        evidence.accounting_final === true &&
+        evidence.cumulative_count === 0 &&
+        evidence.receipt_delta === 0 &&
+        evidence.active_count === 0 &&
+        evidence.completed_count === 0 &&
+        evidence.failed_count === 0 &&
+        Array.isArray(evidence.trigger_categories) &&
+        evidence.trigger_categories.length === 0 &&
+        evidence.policy_violation === false &&
+        evidence.source_partition_mutation === false &&
+        evidence.legacy_partition_accessed === false &&
+        evidence.ambiguous_partition_accessed === false &&
+        evidence.unregistered_partition_accessed === false &&
+        evidence.unrestricted_native_search === false &&
+        evidence.raw_details_disclosed === false
+        ? null
+        : 'r5d_derived_runtime_mutation_evidence_invalid';
+    }
     const allowedTriggers = ['startup', 'hydration', 'cache', 'vector', 'tag', 'matrix'];
     if (!evidence || typeof evidence !== 'object' || Array.isArray(evidence) ||
         evidence.policy !== 'isolated_derived_runtime_mutation_v1' ||

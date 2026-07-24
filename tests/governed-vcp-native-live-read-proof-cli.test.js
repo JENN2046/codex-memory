@@ -9,6 +9,7 @@ const {
   buildOperatorApprovedRealRootWriteProofGate,
   buildProductionProviderProofGate,
   buildRuntimePreconditionOperatorPacket,
+  defaultStartShim,
   diagnoseVcpToolBoxNativePreconditions,
   parseArgs,
   parseConfigEnvSubset,
@@ -17,6 +18,13 @@ const {
   runGovernedVcpNativeLiveReadProof,
   startFixtureEmbeddingProvider
 } = require('../src/cli/governed-vcp-native-live-read-proof');
+
+test('default live-read proof shim fails closed without its ephemeral bearer', async () => {
+  await assert.rejects(
+    () => defaultStartShim({}),
+    /live_read_proof_bearer_token_required/u
+  );
+});
 
 function completeGovernanceEvidenceMatrix() {
   return {
@@ -38,6 +46,8 @@ test('governed VCP native live read proof starts isolated shim and returns low-d
   const privateKbStore = '/PRIVATE/codex-memory-isolated-vcp-store';
   let stopCalled = false;
   let acceptanceEndpoint = null;
+  let shimBearerToken = null;
+  let acceptanceBearerToken = null;
 
   const result = await runGovernedVcpNativeLiveReadProof({
     vcpToolBoxRoot: privateVcpRoot,
@@ -54,6 +64,7 @@ test('governed VCP native live read proof starts isolated shim and returns low-d
     startShim: async options => {
       assert.equal(options.vcpToolBoxRoot, privateVcpRoot);
       assert.equal(options.knowledgeBaseStorePath, privateKbStore);
+      shimBearerToken = options.bearerToken;
       return {
         endpoint: privateEndpoint,
         isolatedRuntimeStoreConfigured: true,
@@ -64,6 +75,7 @@ test('governed VCP native live read proof starts isolated shim and returns low-d
     },
     runAcceptance: async options => {
       acceptanceEndpoint = options.endpoint;
+      acceptanceBearerToken = options.bearerToken;
       return {
         accepted: true,
         status: 'accepted',
@@ -120,6 +132,9 @@ test('governed VCP native live read proof starts isolated shim and returns low-d
   assert.equal(result.runtimePreconditionOperatorPacket.operatorActionRequired, false);
   assert.equal(stopCalled, true);
   assert.equal(acceptanceEndpoint, privateEndpoint);
+  assert.match(shimBearerToken, /^[a-f0-9]{64}$/u);
+  assert.equal(acceptanceBearerToken, shimBearerToken);
+  assert.equal(serialized.includes(shimBearerToken), false);
   assert.equal(serialized.includes(privateEndpoint), false);
   assert.equal(serialized.includes(privateVcpRoot), false);
   assert.equal(serialized.includes(privateKbStore), false);
