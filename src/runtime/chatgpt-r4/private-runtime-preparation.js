@@ -150,6 +150,11 @@ async function probeIsolatedShimCapabilities({
     reject('r5n_capability_probe_invalid');
   }
 
+  await verifyCapabilityTransportAuthorization({
+    endpoint: validatedEndpoint,
+    fetchImpl,
+    timeoutMs
+  });
   const initialize = await postCapabilityJsonRpc({
     endpoint: validatedEndpoint,
     method: 'initialize',
@@ -166,11 +171,6 @@ async function probeIsolatedShimCapabilities({
     fetchImpl,
     timeoutMs
   });
-  await verifyCapabilityTransportAuthorization({
-    endpoint: validatedEndpoint,
-    fetchImpl,
-    timeoutMs
-  });
   const initializeResult = initialize.result;
   const toolsListResult = toolsList.result;
   const initializeMeta = initializeResult?._meta;
@@ -184,6 +184,7 @@ async function probeIsolatedShimCapabilities({
   }
   if (!isPlainObject(toolsListResult) ||
       !Array.isArray(toolsListResult.tools) ||
+      Object.hasOwn(toolsListResult, 'nextCursor') ||
       !validCapabilityMetadata(toolsListMeta, expectedFingerprint)) {
     reject('r5n_shim_tools_list_capability_rejected');
   }

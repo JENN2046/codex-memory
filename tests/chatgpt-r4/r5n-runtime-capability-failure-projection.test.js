@@ -67,9 +67,9 @@ test('R5-N probes initialize and tools/list before binding an exact mapping-capa
   });
 
   assert.deepEqual(calls, [
+    'initialize:unauthenticated',
     'initialize',
-    'tools/list',
-    'initialize:unauthenticated'
+    'tools/list'
   ]);
   assert.equal(prepared.receipt.schema_version, 2);
   assert.equal(prepared.receipt.stage, 'R5-N');
@@ -124,7 +124,14 @@ test('R5-N rejects missing, mismatched, writable, and malformed shim capabilitie
           result.tools[0].inputSchema._meta.governanceMetadataPath = 'params._meta.untrusted';
         }
       }
-    }, 'r5n_selected_diary_read_capability_rejected']
+    }, 'r5n_selected_diary_read_capability_rejected'],
+    [{
+      mutate(method, result) {
+        if (method === 'tools/list') {
+          result.nextCursor = 'synthetic-hidden-capability-page';
+        }
+      }
+    }, 'r5n_shim_tools_list_capability_rejected']
   ]) {
     await assert.rejects(() => probeIsolatedShimCapabilities({
       endpoint,
@@ -134,6 +141,7 @@ test('R5-N rejects missing, mismatched, writable, and malformed shim capabilitie
       fetchImpl: capabilityFetch({ environment, ...options })
     }), { code });
   }
+  const unsecuredCalls = [];
   await assert.rejects(() => probeIsolatedShimCapabilities({
     endpoint,
     expectedMappingReference: environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE,
@@ -141,9 +149,11 @@ test('R5-N rejects missing, mismatched, writable, and malformed shim capabilitie
     bearerToken: 'synthetic-r5n-capability-token',
     fetchImpl: capabilityFetch({
       environment,
+      calls: unsecuredCalls,
       authorizationRequired: false
     })
   }), { code: 'r5n_capability_transport_authorization_not_enforced' });
+  assert.deepEqual(unsecuredCalls, ['initialize:unauthenticated']);
 });
 
 test('R5-N binds the shim fingerprint to both mapping reference and digest', () => {
@@ -310,18 +320,22 @@ test('R5-N capability preflight keeps transport, HTTP, and JSON-RPC failures dis
     })
   });
   assert.deepEqual(authorizedCalls, [
+    'initialize:unauthenticated',
     'initialize',
-    'tools/list',
-    'initialize:unauthenticated'
+    'tools/list'
   ]);
   assert.equal(capability.transport_authorization_supplied, true);
   assert.doesNotMatch(JSON.stringify(capability), new RegExp(base.bearerToken, 'u'));
+  const preAuthorizationHeaders = [];
   await assert.rejects(() => probeIsolatedShimCapabilities({
     ...base,
-    fetchImpl: async () => {
+    fetchImpl: async (_endpoint, request) => {
+      preAuthorizationHeaders.push(request.headers);
       throw new Error('synthetic transport failure');
     }
-  }), { code: 'r5n_capability_probe_transport_unavailable' });
+  }), { code: 'r5n_capability_authorization_probe_transport_unavailable' });
+  assert.equal(preAuthorizationHeaders.length, 1);
+  assert.equal(preAuthorizationHeaders[0].authorization, undefined);
   await assert.rejects(() => probeIsolatedShimCapabilities({
     ...base,
     timeoutMs: 100,
@@ -330,29 +344,29 @@ test('R5-N capability preflight keeps transport, HTTP, and JSON-RPC failures dis
         rejectPromise(Object.assign(new Error('synthetic timeout'), { name: 'AbortError' }));
       }, { once: true });
     })
-  }), { code: 'r5n_capability_probe_timeout' });
+  }), { code: 'r5n_capability_authorization_probe_timeout' });
   await assert.rejects(() => probeIsolatedShimCapabilities({
     ...base,
     timeoutMs: 100,
-    fetchImpl: async () => ({
+    fetchImpl: authorizationGateThen(async () => ({
       ok: true,
       async json() {
         return new Promise(() => {});
       }
-    })
+    }))
   }), { code: 'r5n_capability_probe_timeout' });
   await assert.rejects(() => probeIsolatedShimCapabilities({
     ...base,
-    fetchImpl: async () => ({
+    fetchImpl: authorizationGateThen(async () => ({
       ok: false,
       async json() {
         return {};
       }
-    })
+    }))
   }), { code: 'r5n_capability_probe_http_rejected' });
   await assert.rejects(() => probeIsolatedShimCapabilities({
     ...base,
-    fetchImpl: async (_endpoint, request) => ({
+    fetchImpl: authorizationGateThen(async (_endpoint, request) => ({
       ok: true,
       async json() {
         return {
@@ -361,7 +375,7 @@ test('R5-N capability preflight keeps transport, HTTP, and JSON-RPC failures dis
           error: { code: -32000, message: 'Capability unavailable' }
         };
       }
-    })
+    }))
   }), { code: 'r5n_capability_probe_jsonrpc_rejected' });
 });
 
@@ -443,24 +457,7 @@ function capabilityFetch({
     if (request.headers.authorization === undefined) {
       calls.push(`${body.method}:unauthenticated`);
       if (authorizationRequired) {
-        return {
-          ok: false,
-          status: 401,
-          async json() {
-            return {
-              jsonrpc: '2.0',
-              id: null,
-              error: {
-                code: -32001,
-                message: 'Unauthorized',
-                data: {
-                  reasonCode: 'transport_authorization_rejected',
-                  lowDisclosure: true
-                }
-              }
-            };
-          }
-        };
+        return authorizationRejectedResponse();
       }
     } else {
       assert.equal(request.headers.authorization, `Bearer ${expectedBearerToken}`);
@@ -478,6 +475,36 @@ function capabilityFetch({
         return { jsonrpc: '2.0', id: body.id, result };
       }
     };
+  };
+}
+
+function authorizationGateThen(authenticatedFetch) {
+  return async (endpoint, request) => {
+    if (request.headers.authorization === undefined) {
+      return authorizationRejectedResponse();
+    }
+    return authenticatedFetch(endpoint, request);
+  };
+}
+
+function authorizationRejectedResponse() {
+  return {
+    ok: false,
+    status: 401,
+    async json() {
+      return {
+        jsonrpc: '2.0',
+        id: null,
+        error: {
+          code: -32001,
+          message: 'Unauthorized',
+          data: {
+            reasonCode: 'transport_authorization_rejected',
+            lowDisclosure: true
+          }
+        }
+      };
+    }
   };
 }
 

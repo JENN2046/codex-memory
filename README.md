@@ -54,10 +54,12 @@ Long-term goal and boundary documents:
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 R5-N requires an exact zero-read shim capability preflight before private
-runtime binding, deterministically projects only fully evidenced pre-provider
-mapping failures, and updates the scope Widget through the ChatGPT host globals
-path without changing the six public schemas. This is source-only hardening:
-no runtime, provider, private configuration, or memory action ran. See
+runtime binding. It proves unauthenticated enforcement before sending a private
+Bearer, rejects paginated tool surfaces, deterministically projects only fully
+evidenced pre-provider mapping failures, and updates the scope Widget through
+the ChatGPT host globals path without changing the six public schemas. This is
+source-only hardening: no runtime, provider, private configuration, or memory
+action ran. See
 `docs/CHATGPT_WEB_R5N_RUNTIME_CAPABILITY_FAILURE_PROJECTION.md`.
 
 R5-M accepts a value explicitly labelled as `project_alias` even when it

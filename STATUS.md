@@ -14,17 +14,19 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## CM-2153 ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection
 
-Private runtime preparation now performs zero-read `initialize` and
-`tools/list` probes before changing the Governance binding. It requires the
-exact governed shim/protocol identity, read-only selected-diary capabilities,
-`diary_allowlist_v1`, and a domain-separated fingerprint jointly bound to the
-trusted mapping reference and digest.
+Private runtime preparation now proves the exact low-disclosure
+unauthenticated rejection before sending a private Bearer, then performs
+zero-read authenticated `initialize` and unpaginated `tools/list` probes before
+changing the Governance binding. It requires the exact governed shim/protocol
+identity, read-only selected-diary capabilities, `diary_allowlist_v1`, and a
+domain-separated fingerprint jointly bound to the trusted mapping reference
+and digest.
 
-Missing/mismatched mapping, write enablement, tool drift, and governance
-metadata drift fail before binding. Only complete low-disclosure evidence of a
-pre-provider mapping rejection becomes receipt-bound `unavailable`; unsafe or
-incomplete evidence still fails closed and genuine transport failures remain
-terminal transport failures.
+Missing/mismatched mapping, write enablement, tool drift, pagination, and
+governance metadata drift fail before binding. Only complete low-disclosure
+evidence of a pre-provider mapping rejection becomes receipt-bound
+`unavailable`; unsafe or incomplete evidence still fails closed and genuine
+transport failures remain terminal transport failures.
 
 The scope Widget now handles `openai:set_globals` as well as the MCP Apps
 tool-result notification path. Public structured content remains separate from
@@ -32,13 +34,13 @@ Widget-only categorical receipt presentation. All six public tool names and
 exact schemas are unchanged.
 
 R5-K/R5-N targeted tests pass `16/16`, all ChatGPT R4/R5 contracts pass `126/126`, the
-default suite passes `5863/0/8`, hardening passes `97/97 + 6/6`, and CI-safe
-passes `5954/5962` with zero failures across 703 files. No runtime, provider,
+default suite passes `5865/0/8`, hardening passes `97/97 + 6/6`, and CI-safe
+passes `5956/5964` with zero failures across 703 files. No runtime, provider,
 memory read/write, private-config, or VCP-core action ran. Prior owner-only
 artifacts are unchanged and the Edge remains `zero_memory`. Final source verdict:
 `R5_N_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_PRIOR_ARTIFACTS_UNCHANGED`.
 
-Strict contract/test/compare/rollback pass `112 + 5863 + 43 + 43`; strict
+Strict contract/test/compare/rollback pass `112 + 5865 + 43 + 43`; strict
 overall remains non-pass only because the loopback health service is inactive.
 No service was started.
 

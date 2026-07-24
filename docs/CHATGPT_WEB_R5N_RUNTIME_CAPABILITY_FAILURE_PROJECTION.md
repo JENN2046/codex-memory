@@ -27,8 +27,10 @@ calls against the exact observed loopback target before it changes the
 in-memory Governance binding:
 
 ```text
-initialize
-→ tools/list
+unauthenticated initialize
+→ require the exact low-disclosure 401 authorization rejection
+→ authenticated initialize
+→ authenticated tools/list
 → validate exact capability fingerprint
 → recompute Governance binding digest
 ```
@@ -37,25 +39,30 @@ The preflight requires:
 
 - an owner-only caller-injected existing Bearer value, used only in request
   memory and never returned in the preparation receipt;
+- the exact unauthenticated authorization rejection before any request carries
+  that Bearer value;
 - the exact governed shim server and protocol identity;
 - `diary_allowlist_v1`;
 - a loaded mapping whose reference and digest jointly match the trusted
   expected binding fingerprint;
 - read-only mode;
 - exactly `knowledge_base.search`, `memory_overview`, and `audit_memory`;
+- one complete, unpaginated `tools/list` response with no continuation cursor;
 - exact governance metadata for each selected-diary read capability;
 - no provider call, native invocation, memory write, or unrestricted search.
 
 Missing mapping, binding mismatch, write enablement, missing tools, extra tools,
-or governance-metadata drift fail closed before the target is bound.
+pagination, or governance-metadata drift fail closed before the target is
+bound.
 
-The capability response is private loopback control-plane data. Before binding,
-preparation also sends one unauthenticated `initialize` probe and requires the
-exact low-disclosure HTTP 401 transport-authorization rejection. The shipped
-shim CLI requires `CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` and passes it only as the
-server-side expected Bearer value. The managed WSL NewAPI launcher maps its
-single generated bearer value to `CODEX_MEMORY_HTTP_TOKEN` for the Codex MCP
-server, `CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` for the shim server, and
+The capability response is private loopback control-plane data. The
+unauthenticated probe runs first and must prove the exact low-disclosure HTTP
+401 transport-authorization rejection; failure stops before the private Bearer
+is sent. The shipped shim CLI requires
+`CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` and passes it only as the server-side
+expected Bearer value. The managed WSL NewAPI launcher maps its single
+generated bearer value to `CODEX_MEMORY_HTTP_TOKEN` for the Codex MCP server,
+`CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` for the shim server, and
 `CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN` for the Codex MCP outbound native
 client in the two child-process environments. It does not generate, print, or
 persist a second token. The built-in live-read proof uses a separate ephemeral
@@ -152,10 +159,11 @@ No public MCP tool, input field, output field, or schema is added.
 The source matrix covers:
 
 - exact six-tool schema digest preservation;
-- `initialize` then `tools/list` ordering before binding;
+- unauthenticated authorization enforcement before any Bearer-bearing request;
+- authenticated `initialize` then `tools/list` ordering before binding;
 - exact mapping reference-plus-digest fingerprint binding;
-- missing, mismatched, writable, missing-tool, extra-tool, and metadata-drift
-  rejection;
+- missing, mismatched, writable, missing-tool, extra-tool, pagination, and
+  metadata-drift rejection;
 - missing or malformed injected transport authorization rejection and
   non-disclosure;
 - transport, HTTP, JSON-RPC, and capability failure separation;
@@ -175,10 +183,10 @@ Current local results:
 ```text
 R5-K/R5-N targeted: 16/16
 all ChatGPT R4/R5 contracts: 126/126
-default: 5863 pass / 0 fail / 8 skip
+default: 5865 pass / 0 fail / 8 skip
 hardening: 97/97 + 6/6
-CI-safe: 5954/5962 pass / 0 fail / 703 files
-strict offline: 112 + 5863 + 43 + 43 pass
+CI-safe: 5956/5964 pass / 0 fail / 703 files
+strict offline: 112 + 5865 + 43 + 43 pass
 strict health: UNAVAILABLE_SERVICE_INACTIVE
 ```
 
