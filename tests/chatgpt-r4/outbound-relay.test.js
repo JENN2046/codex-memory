@@ -22,6 +22,10 @@ const {
   createOutboundRelayRuntime,
   loadOutboundRelayRuntimeFromEnvironment
 } = require('../../apps/local-recall-relay');
+const {
+  createOutboundRelayService,
+  isAvailabilityError
+} = require('../../apps/local-recall-relay/outbound-main');
 
 const ISSUER = 'https://tenant.jenn.dev/';
 const ORIGIN = 'https://memory.jenn.dev';
@@ -156,6 +160,41 @@ test('R4-D D2B outbound client rejects unsafe origins and Edge-incompatible toke
   }
 });
 
+test('R4-D D2B retries a non-JSON 5xx gateway response but keeps malformed success replies fail-closed', async () => {
+  const unavailableClient = createOutboundEdgeClient(ORIGIN, {
+    authToken: TOKEN,
+    request: createFakeHttpsRequest(() => ({ statusCode: 503, rawBody: '<gateway-temporarily-unavailable>' }))
+  });
+  await assert.rejects(unavailableClient.claim('local-relay-r4d-test'), {
+    code: 'relay_edge_unavailable'
+  });
+
+  const malformedSuccessClient = createOutboundEdgeClient(ORIGIN, {
+    authToken: TOKEN,
+    request: createFakeHttpsRequest(() => ({ statusCode: 200, rawBody: '<unexpected-success-body>' }))
+  });
+  await assert.rejects(malformedSuccessClient.claim('local-relay-r4d-test'), {
+    code: 'relay_edge_response_invalid'
+  });
+
+  assert.equal(isAvailabilityError('relay_edge_unavailable'), true);
+  let attempts = 0;
+  let service;
+  const runtime = {
+    async processNext() {
+      attempts += 1;
+      if (attempts === 1) {
+        throw Object.assign(new Error('relay_edge_unavailable'), { code: 'relay_edge_unavailable' });
+      }
+      service.stop();
+      return { status: 'idle' };
+    }
+  };
+  service = createOutboundRelayService({ runtime, idlePollMs: 10, unavailableBackoffMs: 10 });
+  await service.run();
+  assert.equal(attempts, 2);
+});
+
 test('R4-D D2B runtime authority requires owner-only files and distinct Ed25519 authorities', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4d-d2b-authority-'));
   fs.chmodSync(root, 0o700);
@@ -270,9 +309,10 @@ function createFakeHttpsRequest(handler) {
         try {
           body = JSON.parse(Buffer.from(encoded).toString('utf8'));
           const result = handler({ options, body });
-          const incoming = Readable.from(
-            result.statusCode === 204 ? [] : [Buffer.from(JSON.stringify(result.body), 'utf8')]
-          );
+          const encodedResponse = Object.prototype.hasOwnProperty.call(result, 'rawBody')
+            ? result.rawBody
+            : JSON.stringify(result.body);
+          const incoming = Readable.from(result.statusCode === 204 ? [] : [Buffer.from(encodedResponse, 'utf8')]);
           incoming.statusCode = result.statusCode;
           callback(incoming);
         } catch (error) {
