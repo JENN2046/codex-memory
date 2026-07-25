@@ -112,6 +112,11 @@ function requestJson({ baseUrl, pathname, body, authToken, timeoutMs, request })
       });
       incoming.on('end', () => {
         if (settled) return;
+        const statusCode = incoming.statusCode || 500;
+        if (statusCode >= 500) {
+          fail('relay_edge_unavailable');
+          return;
+        }
         let parsed;
         try {
           parsed = JSON.parse(Buffer.concat(chunks).toString('utf8'));
@@ -119,7 +124,7 @@ function requestJson({ baseUrl, pathname, body, authToken, timeoutMs, request })
           fail('relay_edge_response_invalid');
           return;
         }
-        if ((incoming.statusCode || 500) < 200 || (incoming.statusCode || 500) >= 300) {
+        if (statusCode < 200 || statusCode >= 300) {
           const code = typeof parsed?.error === 'string' ? parsed.error : 'relay_edge_rejected';
           fail(/^[a-z][a-z0-9_]{0,79}$/u.test(code) ? code : 'relay_edge_rejected');
           return;
