@@ -24,7 +24,7 @@ test('R5-B instructions require exact first context selection and one terminal r
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /both exact project_alias and requested_visibility/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Copy an explicitly labelled project_alias and requested_visibility exactly/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /ask once for the missing value/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Choose one read by primary intent/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Choose one read by requested output/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call the chosen read exactly once, then answer/u);
 
   const resolveDescription = toolDescriptors.resolve_memory_context.description;

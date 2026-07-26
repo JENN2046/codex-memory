@@ -25,7 +25,7 @@ const IDEMPOTENT_READ_ONLY_ANNOTATIONS = deepFreeze({
 const SECURITY_SCHEMES = deepFreeze([{ type: 'oauth2', scopes: ['memory.read'] }]);
 const MODEL_WORKFLOW_INSTRUCTIONS = [
   'Use codex-memory only to retrieve stored project memory when both exact project_alias and requested_visibility are provided; otherwise answer directly or ask once for the missing value.',
-  'Choose one read by primary intent: audit_memory for access, receipt, scope, or visibility, including mixed overview requests; search_memory for one fact, decision, event, or historical record; prepare_memory_context for a named task-start package; otherwise memory_overview for counts, status, or availability.',
+  'Choose one read by requested output: audit_memory for access, receipt, scope, or visibility, including mixed overview requests; search_memory for one fact, decision, event, or historical record; prepare_memory_context for a named task-start package; otherwise memory_overview for counts, status, or availability. Resolve arguments alone leave selection to the requested output.',
   'Transform or summarize only user-supplied text without tools. Summarizing stored project memory follows the retrieval routes above.',
   'Call resolve_memory_context exactly once, wait for a resolved project_context_ref, call the chosen read exactly once, then answer. If resolve or read returns denied, unavailable, empty, low-confidence, or an error, answer from that result and call no further tool.',
   'Copy an explicitly labelled project_alias and requested_visibility exactly. The alias may match an App, connector, or repository name; an unlabelled name is not an alias. Never invent scope or use current, default, this-project, or task_start_context as a default.',
@@ -87,7 +87,7 @@ const toolDescriptors = deepFreeze({
   }),
   memory_overview: descriptor({
     title: 'Get memory counts and status',
-    description: 'Use this after resolve for counts, status, or availability. When the request also includes access, receipts, scope, or visibility, choose audit_memory instead. Call once with the returned project_context_ref and answer from the first result.',
+    description: 'Use this after resolve when the requested output is counts, status, or availability. When the requested output also includes access, receipts, scope, or visibility, choose audit_memory instead. Call once with the returned project_context_ref and answer from the first result.',
     inputSchema: contextInputSchema(),
     outputSchema: boundedStatusSchema('overview')
   }),
@@ -130,7 +130,7 @@ const toolDescriptors = deepFreeze({
   }),
   audit_memory: descriptor({
     title: 'Audit memory access and receipts',
-    description: 'Use this after resolve for access authorization, receipts, audit, scope, or visibility. Choose it over memory_overview when a request mixes those categories with counts, status, or availability. Call once with the returned project_context_ref and answer from the first result using only returned audit fields.',
+    description: 'Use this after resolve when the requested output includes access authorization, receipts, audit, scope, or visibility. Choose it over memory_overview when a request mixes those outputs with counts, status, or availability. Resolve arguments alone do not select this tool. Call once with the returned project_context_ref and answer from the first result using only returned audit fields.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,

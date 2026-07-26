@@ -43,7 +43,7 @@ test('R5-K puts scope and positive read selection in the first 512 instruction c
   const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
   assert.match(leading, /retrieve stored project memory/u);
   assert.match(leading, /both exact project_alias and requested_visibility/u);
-  assert.match(leading, /Choose one read by primary intent/u);
+  assert.match(leading, /Choose one read by requested output/u);
   assert.match(leading, /audit_memory for access, receipt, scope, or visibility/u);
   assert.match(leading, /search_memory for one fact, decision, event, or historical record/u);
   assert.match(leading, /prepare_memory_context for a named task-start package/u);
@@ -122,11 +122,15 @@ test('R5-K makes governed result receipts and transport failures unambiguous and
 test('R5-K routes mixed access and overview requests to audit and keeps terminal closure', () => {
   assert.match(
     toolDescriptors.audit_memory.description,
-    /Choose it over memory_overview when a request mixes those categories/u
+    /Choose it over memory_overview when a request mixes those outputs/u
+  );
+  assert.match(
+    toolDescriptors.audit_memory.description,
+    /Resolve arguments alone do not select this tool/u
   );
   assert.match(
     toolDescriptors.memory_overview.description,
-    /request also includes access, receipts, scope, or visibility, choose audit_memory instead/u
+    /requested output also includes access, receipts, scope, or visibility, choose audit_memory instead/u
   );
   const audit = modelVisibleResultText('audit_memory', {
     status: 'ok',

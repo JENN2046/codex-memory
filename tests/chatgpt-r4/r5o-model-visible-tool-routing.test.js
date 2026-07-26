@@ -22,7 +22,7 @@ test('R5-O puts the positive intent routes in the leading model instructions', (
   const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
   assert.match(leading, /retrieve stored project memory/u);
   assert.match(leading, /both exact project_alias and requested_visibility/u);
-  assert.match(leading, /Choose one read by primary intent/u);
+  assert.match(leading, /Choose one read by requested output/u);
   assert.match(leading, /audit_memory for access, receipt, scope, or visibility/u);
   assert.match(leading, /including mixed overview requests/u);
   assert.match(leading, /search_memory for one fact, decision, event, or historical record/u);
@@ -50,7 +50,11 @@ test('R5-O distinguishes user-supplied summaries from stored-memory summaries', 
 test('R5-O requires successful resolve before exactly one intent-matched read', () => {
   assert.match(
     MODEL_WORKFLOW_INSTRUCTIONS,
-    /Choose one read by primary intent/u
+    /Choose one read by requested output/u
+  );
+  assert.match(
+    MODEL_WORKFLOW_INSTRUCTIONS,
+    /Resolve arguments alone leave selection to the requested output/u
   );
   assert.match(
     MODEL_WORKFLOW_INSTRUCTIONS,
@@ -81,7 +85,7 @@ test('R5-O gives audit priority over overview and keeps the other read intents d
   );
   assert.match(
     toolDescriptors.memory_overview.description,
-    /request also includes access, receipts, scope, or visibility, choose audit_memory instead/u
+    /requested output also includes access, receipts, scope, or visibility, choose audit_memory instead/u
   );
   assert.match(
     toolDescriptors.search_memory.description,
@@ -93,7 +97,11 @@ test('R5-O gives audit priority over overview and keeps the other read intents d
   );
   assert.match(
     toolDescriptors.audit_memory.description,
-    /Choose it over memory_overview when a request mixes those categories/u
+    /Choose it over memory_overview when a request mixes those outputs/u
+  );
+  assert.match(
+    toolDescriptors.audit_memory.description,
+    /Resolve arguments alone do not select this tool/u
   );
   assert.match(
     toolDescriptors.prepare_memory_context.description,
