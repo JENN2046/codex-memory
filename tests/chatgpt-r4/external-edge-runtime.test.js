@@ -267,8 +267,8 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
     kind: 'overview',
     item_count: 0
   });
-  assert.match(toolResult.body.result.content[0].text, /terminal result for the current one-read workflow/u);
-  assert.match(toolResult.body.result.content[0].text, /do not call another memory read or resolve again/u);
+  assert.match(toolResult.body.result.content[0].text, /workflow is consumed/u);
+  assert.match(toolResult.body.result.content[0].text, /Omit every category not returned here/u);
   assert.deepEqual(toolResult.body.result._meta['codex-memory/counters'], ZERO_MEMORY_COUNTERS);
   assert.match(toolResult.body.result._meta['codex-memory/receiptChainDigest'], /^sha256:[a-f0-9]{64}$/u);
 
@@ -355,7 +355,7 @@ test('external Edge fails closed on proxy, OAuth, relay signature, and nonzero c
   assert.match(timedOut.body.error.message, /edge_response_timeout/u);
   assert.match(timedOut.body.error.message, /transport_timeout/u);
   assert.match(timedOut.body.error.message, /No receipt-bound memory result was returned/u);
-  assert.match(timedOut.body.error.message, /do not call another memory read or resolve again/u);
+  assert.match(timedOut.body.error.message, /Do not call any tool to retry, verify, supplement, expand, or fill a table/u);
 });
 
 test('external Edge configuration rejects non-public origins, unsafe bind, and non-Ed25519 signing', () => {

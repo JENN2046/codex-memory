@@ -269,7 +269,7 @@ test('R5-N projects a proven pre-provider scope-binding rejection as receipt-bac
       counterMode: COUNTER_MODES.sessionScopedLiveReadV1
     }));
     const text = modelVisibleResultText(toolName, invocation);
-    assert.match(text, new RegExp(`Receipt-bound governed ${toolName} status: unavailable`, 'u'));
+    assert.match(text, new RegExp(`tool=${toolName}; receipt=bound; status=unavailable`, 'u'));
     assert.match(text, /not a transport timeout or another transport failure/u);
     assert.doesNotMatch(text, /TERMINAL TRANSPORT FAILURE/u);
   }

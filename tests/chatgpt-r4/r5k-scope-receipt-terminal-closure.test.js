@@ -41,14 +41,16 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5I_MAIN = Object.freeze({
 
 test('R5-K puts scope clarification and negative abstention in the first 512 instruction characters', () => {
   const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
-  assert.match(leading, /only for an explicit project-memory request/u);
-  assert.match(leading, /memory-irrelevant task/u);
-  assert.match(leading, /single-read workflow/u);
-  assert.match(leading, /stop all codex-memory tool use immediately/u);
-  assert.match(leading, /If either value is missing, ask one concise clarification and call no tool/u);
+  assert.match(leading, /Project-memory requests only/u);
+  assert.match(leading, /irrelevant tasks/u);
+  assert.match(leading, /one ordered workflow/iu);
+  assert.match(leading, /workflow is consumed/u);
+  assert.match(leading, /Omit missing categories/u);
+  assert.match(leading, /Never report an uncalled tool unavailable/u);
+  assert.match(leading, /If either is missing, ask one clarification and call no tool/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never use current, default, this-project/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never choose task_start_context as a default/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /stop all codex-memory tool use immediately/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call no tool again/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /render_memory_scope is component-only/u);
 });
 
@@ -110,16 +112,36 @@ test('R5-K makes governed result receipts and transport failures unambiguous and
     status: 'ok',
     structured_content: { status: 'found', result_count: 1, results: [] }
   });
-  assert.match(found, /^FINAL CODEX-MEMORY RESULT — STOP TOOL USE NOW/u);
-  assert.match(found, /TERMINAL RECEIPT-BOUND GOVERNED READ/u);
-  assert.match(found, /call no codex-memory tool again/u);
-  assert.match(found, /resolve_memory_context or render_memory_scope/u);
+  assert.match(found, /^FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS/u);
+  assert.match(found, /workflow is consumed/u);
+  assert.match(found, /Never infer or report the status or availability of an uncalled tool/u);
+  assert.match(found, /resolve_memory_context, render_memory_scope, or another read/u);
   assert.match(found, /Do not dereference result_ref or run a follow-up search/u);
 
   const timeout = modelVisibleErrorText('edge_response_timeout');
-  assert.match(timeout, /^TERMINAL TRANSPORT FAILURE — STOP TOOL USE NOW/u);
-  assert.match(timeout, /No receipt-bound memory result was returned/u);
-  assert.match(timeout, /do not invent attempts/u);
+  assert.match(timeout, /^TERMINAL TRANSPORT FAILURE — NO MORE TOOL CALLS/u);
+  assert.match(timeout, /receipt_bound_result=false/u);
+  assert.match(timeout, /END OF TOOL WORKFLOW — RESPOND TO THE USER NOW/u);
+});
+
+test('R5-K audit result forbids overview supplementation and unreturned categories', () => {
+  assert.match(
+    toolDescriptors.audit_memory.description,
+    /never label memory_overview or another uncalled tool unavailable/u
+  );
+  assert.match(
+    toolDescriptors.audit_memory.description,
+    /fill a table with another codex-memory call/u
+  );
+  const audit = modelVisibleResultText('audit_memory', {
+    status: 'ok',
+    structured_content: { status: 'available', kind: 'audit', item_count: 1 }
+  });
+  assert.match(audit, /tool=audit_memory/u);
+  assert.match(audit, /item_count=1/u);
+  assert.match(audit, /Omit every category not returned here/u);
+  assert.match(audit, /Never infer or report the status or availability of an uncalled tool/u);
+  assert.match(audit, /Do not call any tool to verify, supplement, expand, or fill a table/u);
 });
 
 test('R5-K projects only low-disclosure receipt presentation metadata to the widget', () => {

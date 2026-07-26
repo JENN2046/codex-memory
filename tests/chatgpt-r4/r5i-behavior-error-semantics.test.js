@@ -31,7 +31,7 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN = Object.freeze({
 test('R5-I selects only exact user-provided alias and visibility without probing identities', () => {
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /project_alias and requested_visibility exactly/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /App display name.+is not a project_alias/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either value is missing, ask one concise clarification/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either is missing, ask one clarification/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /never invent retry counts/u);
 
   const description = toolDescriptors.resolve_memory_context.description;
@@ -101,9 +101,10 @@ test('R5-I projects verified governed outcomes separately from transport failure
         results: []
       }
     });
-    assert.match(result, new RegExp(`Receipt-bound.+status: ${status}`, 'u'));
-    assert.match(result, /terminal result for the current one-read workflow/u);
-    assert.match(result, /Report exactly this one result and do not invent retries/u);
+    assert.match(result, new RegExp(`receipt=bound; status=${status}`, 'u'));
+    assert.match(result, /workflow is consumed/u);
+    assert.match(result, /Omit every category not returned here/u);
+    assert.match(result, /Never infer or report the status or availability of an uncalled tool/u);
   }
 
   for (const status of ['denied', 'unavailable']) {
@@ -111,9 +112,9 @@ test('R5-I projects verified governed outcomes separately from transport failure
       status,
       structured_content: { status, result_count: 0, results: [] }
     });
-    assert.match(result, new RegExp(`Receipt-bound.+status: ${status}`, 'u'));
+    assert.match(result, new RegExp(`receipt=bound; status=${status}`, 'u'));
     assert.match(result, /not a transport timeout/u);
-    assert.match(result, /do not call another memory read or resolve again/u);
+    assert.match(result, /workflow is consumed/u);
   }
 });
 
@@ -132,10 +133,10 @@ test('R5-I transport projection is terminal and never masquerades as a memory re
   ]) {
     const text = modelVisibleErrorText(code);
     assert.match(text, /No receipt-bound memory result was returned/u, code);
-    assert.match(text, /terminal for the current one-read workflow/u, code);
-    assert.match(text, /do not call another memory read or resolve again/u, code);
+    assert.match(text, /consumed the workflow/u, code);
+    assert.match(text, /Do not call any tool to retry, verify, supplement, expand, or fill a table/u, code);
     assert.match(text, /Do not describe it as an empty, denied, or unavailable memory result/u, code);
-    assert.match(text, /do not invent retries/u, code);
+    assert.match(text, /Do not invent retries/u, code);
   }
 
   const unsafeCode = modelVisibleErrorText('token=do-not-project');

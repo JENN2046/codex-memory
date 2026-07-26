@@ -23,11 +23,12 @@ test('R5-B instructions require exact first context selection and one terminal r
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /resolve_memory_context exactly once/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Copy project_alias and requested_visibility exactly/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /never invent, normalize, suffix, enumerate, or probe alternatives/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either value is missing, ask one concise clarification/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either is missing, ask one clarification/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /choose exactly one read tool/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /single-read workflow.+Never call resolve_memory_context/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /single-read workflow/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /stop all codex-memory tool use immediately/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /one ordered workflow/iu);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /workflow is consumed/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /Omit missing categories/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /Never report an uncalled tool unavailable/u);
 
   const resolveDescription = toolDescriptors.resolve_memory_context.description;
   assert.match(resolveDescription, /both an exact registered project alias and an exact visibility/u);
@@ -91,8 +92,10 @@ test('R5-B model-visible results stop retries while preserving bounded status', 
         ? { status: 'found', result_count: 1, results: [] }
         : { status, result_count: 0, results: [] }
     });
-    assert.match(text, /^FINAL CODEX-MEMORY RESULT — STOP TOOL USE NOW/u, status);
-    assert.match(text, /terminal result for the current one-read workflow/u, status);
-    assert.match(text, /do not call another memory read or resolve again/u, status);
+    assert.match(text, /^FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS/u, status);
+    assert.match(text, /workflow is consumed/u, status);
+    assert.match(text, /Omit every category not returned here/u, status);
+    assert.match(text, /Never infer or report the status or availability of an uncalled tool/u, status);
+    assert.match(text, /END OF TOOL WORKFLOW — RESPOND TO THE USER NOW/u, status);
   }
 });

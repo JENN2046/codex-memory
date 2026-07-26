@@ -24,11 +24,12 @@ const IDEMPOTENT_READ_ONLY_ANNOTATIONS = deepFreeze({
 });
 const SECURITY_SCHEMES = deepFreeze([{ type: 'oauth2', scopes: ['memory.read'] }]);
 const MODEL_WORKFLOW_INSTRUCTIONS = [
-  'Use only for an explicit project-memory request; never for a memory-irrelevant task.',
-  'This is a single-read workflow: after the first read result/error, stop all codex-memory tool use immediately and answer.',
-  'Never call resolve_memory_context, reads, or render_memory_scope again.',
-  'Exact project_alias and requested_visibility are required. If either value is missing, ask one concise clarification and call no tool.',
-  'If the user or trusted context explicitly labels a value as project_alias, copy it verbatim.',
+  'Project-memory requests only; never use for irrelevant tasks.',
+  'Require exact project_alias and requested_visibility. If either is missing, ask one clarification and call no tool.',
+  'Copy an explicitly labelled project_alias verbatim.',
+  'One ordered workflow: resolve once, one intent-matched read once, then answer.',
+  'After the read result/error, the workflow is consumed: call no tool again.',
+  'Use only returned fields. Omit missing categories. Never report an uncalled tool unavailable or call tools to verify, supplement, or fill a table.',
   'That labelled value remains exact even if it matches an App, connector, or repository name.',
   'An unlabelled App display name, connector name, URL, client identifier, workspace name, or repository name is not a project_alias. Never use current, default, this-project, or another sentinel as an alias.',
   'Never choose task_start_context as a default or describe it as minimal disclosure.',
@@ -140,7 +141,7 @@ const toolDescriptors = deepFreeze({
   }),
   audit_memory: descriptor({
     title: 'Audit governed memory access',
-    description: 'Use this when a valid project_context_ref exists and the user needs only bounded low-disclosure access or receipt categories. Choose this as the sole read tool for the task and call it exactly once. Its first result or error is final: answer the user immediately. Never refine, verify, expand, or supplement it with another codex-memory call. Do not call another memory read or resolve again; do not switch read tools.',
+    description: 'Use this when a valid project_context_ref exists and the user needs only bounded low-disclosure access or receipt categories. Choose this as the sole read tool for the task and call it exactly once. Its first result or error is final: answer the user immediately using only returned audit fields. Omit unreturned categories; never label memory_overview or another uncalled tool unavailable. Never refine, verify, expand, or supplement it with another codex-memory call. Never fill a table with another codex-memory call. Do not call another memory read or resolve again; do not switch read tools.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,

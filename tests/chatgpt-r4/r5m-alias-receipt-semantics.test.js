@@ -37,7 +37,7 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5K_MAIN = Object.freeze({
 
 test('R5-M accepts an explicitly labelled alias even when it resembles the App or repository name', () => {
   const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
-  assert.match(leading, /explicitly labels a value as project_alias, copy it verbatim/u);
+  assert.match(leading, /Copy an explicitly labelled project_alias verbatim/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /An unlabelled App display name.+is not a project_alias/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never use current, default, this-project/u);
   assert.match(
@@ -158,7 +158,8 @@ test('R5-M excludes unscored and below-floor candidates instead of fabricating r
   });
   assert.match(text, /retrieval candidates, not proof/u);
   assert.match(text, /relevance 0\.5 is low-confidence and inconclusive/u);
-  assert.match(text, /TERMINAL RECEIPT-BOUND GOVERNED READ/u);
+  assert.match(text, /workflow is consumed/u);
+  assert.match(text, /Never infer or report the status or availability of an uncalled tool/u);
 });
 
 test('R5-M unwraps canonical ChatGPT result envelopes for Widget data and receipt metadata', () => {
