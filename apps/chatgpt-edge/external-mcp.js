@@ -221,11 +221,11 @@ function modelVisibleResultText(name, response) {
   if (response.status === 'ok') {
     const boundedStatus = response.structured_content?.status || 'completed';
     const candidateGuidance = name === 'search_memory' && boundedStatus === 'found'
-      ? ' Search results are retrieval candidates, not proof by themselves; relevance 0.5 is low-confidence and inconclusive unless the returned summary explicitly supports the requested fact.'
+      ? ' Search results are retrieval candidates, not proof by themselves; relevance 0.5 is low-confidence and inconclusive unless the returned summary explicitly supports the requested fact. Do not dereference result_ref or run a follow-up search.'
       : '';
-    return `Receipt-bound governed ${name} status: ${boundedStatus}; ${resultCount(response.structured_content)} item(s).${candidateGuidance} TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. Answer the user now and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Report exactly this one result and do not invent retries or attempts.`;
+    return `FINAL CODEX-MEMORY RESULT — STOP TOOL USE NOW. Answer the user from this one result and call no codex-memory tool again in this response. Receipt-bound governed ${name} status: ${boundedStatus}; ${resultCount(response.structured_content)} item(s).${candidateGuidance} TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow, so do not call another memory read or resolve again; do not call resolve_memory_context or render_memory_scope; do not retry, refine, verify, expand, supplement, or switch read tools. Report exactly this one result and do not invent retries; do not invent attempts.`;
   }
-  return `Receipt-bound governed ${name} status: ${response.status}. TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. This is not a transport timeout or another transport failure. Answer with exactly this bounded status and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Do not invent retries or attempts.`;
+  return `FINAL CODEX-MEMORY RESULT — STOP TOOL USE NOW. Answer the user from this one bounded status and call no codex-memory tool again in this response. Receipt-bound governed ${name} status: ${response.status}. TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. This is not a transport timeout or another transport failure, so do not call another memory read or resolve again; do not call resolve_memory_context or render_memory_scope; do not retry, refine, verify, expand, supplement, or switch read tools. Do not invent retries; do not invent attempts.`;
 }
 
 function modelVisibleErrorText(errorCode) {
@@ -233,7 +233,7 @@ function modelVisibleErrorText(errorCode) {
     ? errorCode
     : 'edge_governed_read_unavailable';
   const category = transportFailureCategory(safeErrorCode);
-  return `TERMINAL TRANSPORT FAILURE. Governed memory transport status: ${category} (${safeErrorCode}). No receipt-bound memory result was returned. This transport failure is terminal for the current one-read workflow. Answer now and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Do not describe it as an empty, denied, or unavailable memory result; do not invent retries; do not invent attempts.`;
+  return `TERMINAL TRANSPORT FAILURE — STOP TOOL USE NOW. Answer the user from this one failure and call no codex-memory tool again in this response. Governed memory transport status: ${category} (${safeErrorCode}). No receipt-bound memory result was returned. This transport failure is terminal for the current one-read workflow, so do not call another memory read or resolve again; do not call resolve_memory_context or render_memory_scope; do not retry, refine, verify, expand, supplement, or switch read tools. Do not describe it as an empty, denied, or unavailable memory result; do not invent retries; do not invent attempts.`;
 }
 
 function receiptPresentation(name, response) {

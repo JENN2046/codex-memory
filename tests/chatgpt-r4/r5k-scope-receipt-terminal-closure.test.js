@@ -43,6 +43,8 @@ test('R5-K puts scope clarification and negative abstention in the first 512 ins
   const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
   assert.match(leading, /only for an explicit project-memory request/u);
   assert.match(leading, /memory-irrelevant task/u);
+  assert.match(leading, /single-read workflow/u);
+  assert.match(leading, /stop all codex-memory tool use immediately/u);
   assert.match(leading, /If either value is missing, ask one concise clarification and call no tool/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never use current, default, this-project/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never choose task_start_context as a default/u);
@@ -108,12 +110,14 @@ test('R5-K makes governed result receipts and transport failures unambiguous and
     status: 'ok',
     structured_content: { status: 'found', result_count: 1, results: [] }
   });
+  assert.match(found, /^FINAL CODEX-MEMORY RESULT — STOP TOOL USE NOW/u);
   assert.match(found, /TERMINAL RECEIPT-BOUND GOVERNED READ/u);
   assert.match(found, /call no codex-memory tool again/u);
-  assert.match(found, /including render_memory_scope/u);
+  assert.match(found, /resolve_memory_context or render_memory_scope/u);
+  assert.match(found, /Do not dereference result_ref or run a follow-up search/u);
 
   const timeout = modelVisibleErrorText('edge_response_timeout');
-  assert.match(timeout, /^TERMINAL TRANSPORT FAILURE/u);
+  assert.match(timeout, /^TERMINAL TRANSPORT FAILURE — STOP TOOL USE NOW/u);
   assert.match(timeout, /No receipt-bound memory result was returned/u);
   assert.match(timeout, /do not invent attempts/u);
 });

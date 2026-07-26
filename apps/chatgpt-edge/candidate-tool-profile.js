@@ -24,15 +24,18 @@ const IDEMPOTENT_READ_ONLY_ANNOTATIONS = deepFreeze({
 });
 const SECURITY_SCHEMES = deepFreeze([{ type: 'oauth2', scopes: ['memory.read'] }]);
 const MODEL_WORKFLOW_INSTRUCTIONS = [
-  'Use these tools only for an explicit project-memory request. Do not call any codex-memory tool for rewriting, translation, scheduling, general advice, or another memory-irrelevant task.',
-  'A memory workflow requires an exact registered project_alias and one exact requested_visibility supplied by the user or trusted task context. If either value is missing, ask one concise clarification and call no tool.',
-  'When the user or trusted task context explicitly labels a value as project_alias, copy it verbatim even if it matches an App, connector, or repository name.',
+  'Use only for an explicit project-memory request; never for a memory-irrelevant task.',
+  'This is a single-read workflow: after the first read result/error, stop all codex-memory tool use immediately and answer.',
+  'Never call resolve_memory_context, reads, or render_memory_scope again.',
+  'Exact project_alias and requested_visibility are required. If either value is missing, ask one concise clarification and call no tool.',
+  'If the user or trusted context explicitly labels a value as project_alias, copy it verbatim.',
+  'That labelled value remains exact even if it matches an App, connector, or repository name.',
   'An unlabelled App display name, connector name, URL, client identifier, workspace name, or repository name is not a project_alias. Never use current, default, this-project, or another sentinel as an alias.',
   'Never choose task_start_context as a default or describe it as minimal disclosure.',
   'Before one read, call resolve_memory_context exactly once. Copy project_alias and requested_visibility exactly from the user-provided task context; never invent, normalize, suffix, enumerate, or probe alternatives.',
   'After a resolved context, choose exactly one read tool: memory_overview for counts or status; search_memory for one specific semantic fact; audit_memory for bounded access or receipt categories; prepare_memory_context for a task-start context package.',
   'The first read attempt consumes this workflow, even when it returns empty, denied, unavailable, or a transport error.',
-  'After any read result or transport error, stop all codex-memory tool use immediately and answer the user; do not call another read tool or resolve again, and do not call render_memory_scope.',
+  'A read result is final even when it is found, empty, denied, unavailable, low-confidence, or incomplete for the user’s broader question. Do not refine, verify, expand, or dereference it with another codex-memory call.',
   'Report only the receipt-backed result category or the single transport failure actually returned; never invent retry counts or claim another attempt occurred.',
   'A found search result is a retrieval candidate, not proof by itself. Treat relevance 0.5 as low-confidence and inconclusive unless the returned summary explicitly supports the requested fact.',
   'Receipt-bound denied or unavailable means a governed result receipt exists even when no usable project context was issued; it is not a transport failure.',
@@ -94,13 +97,13 @@ const toolDescriptors = deepFreeze({
   }),
   memory_overview: descriptor({
     title: 'View memory overview',
-    description: 'Use this when a valid project_context_ref exists and the user needs only a bounded low-disclosure count or status overview. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
+    description: 'Use this when a valid project_context_ref exists and the user needs only a bounded low-disclosure count or status overview. Choose this as the sole read tool for the task and call it exactly once. Its first result or error is final: answer the user immediately. Never refine, verify, expand, or supplement it with another codex-memory call. Do not call another memory read or resolve again; do not switch read tools.',
     inputSchema: contextInputSchema(),
     outputSchema: boundedStatusSchema('overview')
   }),
   search_memory: descriptor({
     title: 'Search governed project memory',
-    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware semantic fact. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
+    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware semantic fact. Choose this as the sole read tool for the task and call it exactly once. Its first result or error is final: answer the user immediately. Never refine, verify, expand, or supplement it with another codex-memory call; never dereference a result_ref. Do not call another memory read or resolve again; do not switch read tools.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -137,7 +140,7 @@ const toolDescriptors = deepFreeze({
   }),
   audit_memory: descriptor({
     title: 'Audit governed memory access',
-    description: 'Use this when a valid project_context_ref exists and the user needs only bounded low-disclosure access or receipt categories. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
+    description: 'Use this when a valid project_context_ref exists and the user needs only bounded low-disclosure access or receipt categories. Choose this as the sole read tool for the task and call it exactly once. Its first result or error is final: answer the user immediately. Never refine, verify, expand, or supplement it with another codex-memory call. Do not call another memory read or resolve again; do not switch read tools.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -151,7 +154,7 @@ const toolDescriptors = deepFreeze({
   }),
   prepare_memory_context: descriptor({
     title: 'Prepare governed task context',
-    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware task-start context package. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
+    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware task-start context package. Choose this as the sole read tool for the task and call it exactly once. Its first result or error is final: answer the user immediately. Never refine, verify, expand, or supplement it with another codex-memory call. Do not call another memory read or resolve again; do not switch read tools.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,

@@ -25,7 +25,9 @@ test('R5-B instructions require exact first context selection and one terminal r
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /never invent, normalize, suffix, enumerate, or probe alternatives/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either value is missing, ask one concise clarification/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /choose exactly one read tool/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /After any read result.+do not call another read tool or resolve again/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /single-read workflow.+Never call resolve_memory_context/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /single-read workflow/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /stop all codex-memory tool use immediately/u);
 
   const resolveDescription = toolDescriptors.resolve_memory_context.description;
   assert.match(resolveDescription, /both an exact registered project alias and an exact visibility/u);
@@ -39,8 +41,10 @@ test('R5-B instructions require exact first context selection and one terminal r
     'prepare_memory_context'
   ]) {
     assert.match(toolDescriptors[toolName].description, /sole read tool/u, toolName);
-    assert.match(toolDescriptors[toolName].description, /do not call another memory read or resolve again/u, toolName);
+    assert.match(toolDescriptors[toolName].description, /call it exactly once/u, toolName);
+    assert.match(toolDescriptors[toolName].description, /Never refine, verify, expand, or supplement/u, toolName);
   }
+  assert.match(toolDescriptors.search_memory.description, /never dereference a result_ref/u);
 
   const publicGuidance = JSON.stringify({
     instructions: MODEL_WORKFLOW_INSTRUCTIONS,
@@ -87,6 +91,7 @@ test('R5-B model-visible results stop retries while preserving bounded status', 
         ? { status: 'found', result_count: 1, results: [] }
         : { status, result_count: 0, results: [] }
     });
+    assert.match(text, /^FINAL CODEX-MEMORY RESULT — STOP TOOL USE NOW/u, status);
     assert.match(text, /terminal result for the current one-read workflow/u, status);
     assert.match(text, /do not call another memory read or resolve again/u, status);
   }
