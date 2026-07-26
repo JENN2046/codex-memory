@@ -27,13 +27,7 @@ test('R4-B candidate profile is non-default, non-activated, read-only, and has n
   assert.deepEqual(candidateToolProfile.writeTools, []);
   assert.deepEqual(candidateToolProfile.proposalTools, []);
   for (const [name, descriptor] of Object.entries(candidateToolProfile.toolDescriptors)) {
-    if (name === 'resolve_memory_context') {
-      assert.match(descriptor.description, /^ROUTING GATE:/u, name);
-    } else if (name === 'render_memory_scope') {
-      assert.match(descriptor.description, /^Use this when/u, name);
-    } else {
-      assert.match(descriptor.description, /^AFTER RESOLVE ONLY:/u, name);
-    }
+    assert.match(descriptor.description, /^Use this/u, name);
     assert.deepEqual(descriptor.annotations, {
       readOnlyHint: true,
       destructiveHint: false,

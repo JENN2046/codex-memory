@@ -21,19 +21,16 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_MAIN = Object.freeze({
 
 test('R5-B instructions require exact first context selection and one terminal read', () => {
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /resolve_memory_context exactly once/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Copy project_alias and requested_visibility exactly/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /never invent, normalize, suffix, enumerate, or probe alternatives/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either is missing, ask one clarification/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /choose exactly one read tool/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /one ordered workflow/iu);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /workflow is consumed/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /Omit missing categories/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512), /Never report an uncalled tool unavailable/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /both exact project_alias and requested_visibility/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Copy an explicitly labelled project_alias and requested_visibility exactly/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /ask once for the missing value/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Choose one read by primary intent/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call the chosen read exactly once, then answer/u);
 
   const resolveDescription = toolDescriptors.resolve_memory_context.description;
-  assert.match(resolveDescription, /both an exact registered project alias and an exact visibility/u);
-  assert.match(resolveDescription, /Copy both values verbatim/u);
-  assert.match(resolveDescription, /never guess or probe alternative aliases or visibilities/u);
+  assert.match(resolveDescription, /exact project_alias and requested_visibility/u);
+  assert.match(resolveDescription, /Copy them exactly and call once/u);
+  assert.match(resolveDescription, /If either value is missing, ask once without calling a tool/u);
 
   for (const toolName of [
     'memory_overview',
@@ -41,11 +38,11 @@ test('R5-B instructions require exact first context selection and one terminal r
     'audit_memory',
     'prepare_memory_context'
   ]) {
-    assert.match(toolDescriptors[toolName].description, /sole read tool/u, toolName);
-    assert.match(toolDescriptors[toolName].description, /call it exactly once/u, toolName);
-    assert.match(toolDescriptors[toolName].description, /Never refine, verify, expand, or supplement/u, toolName);
+    assert.match(toolDescriptors[toolName].description, /^Use this after resolve/u, toolName);
+    assert.match(toolDescriptors[toolName].description, /Call once/u, toolName);
+    assert.match(toolDescriptors[toolName].description, /first result/u, toolName);
   }
-  assert.match(toolDescriptors.search_memory.description, /never dereference a result_ref/u);
+  assert.match(toolDescriptors.search_memory.description, /without dereferencing result_ref/u);
 
   const publicGuidance = JSON.stringify({
     instructions: MODEL_WORKFLOW_INSTRUCTIONS,

@@ -29,15 +29,15 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN = Object.freeze({
 });
 
 test('R5-I selects only exact user-provided alias and visibility without probing identities', () => {
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /project_alias and requested_visibility exactly/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /App display name.+is not a project_alias/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either is missing, ask one clarification/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /never invent retry counts/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /both exact project_alias and requested_visibility/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /alias may match an App, connector, or repository name/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /an unlabelled name is not an alias/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /ask once for the missing value/u);
 
   const description = toolDescriptors.resolve_memory_context.description;
-  assert.match(description, /App name, connector name, URL, client identifier/u);
-  assert.match(description, /never guess or probe alternative aliases or visibilities/u);
-  assert.match(description, /denied, unavailable, or error result is terminal/u);
+  assert.match(description, /has supplied exact project_alias and requested_visibility/u);
+  assert.match(description, /Copy them exactly and call once/u);
+  assert.match(description, /If either value is missing, ask once without calling a tool/u);
 
   const publicGuidance = JSON.stringify({
     instructions: MODEL_WORKFLOW_INSTRUCTIONS,

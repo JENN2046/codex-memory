@@ -36,17 +36,21 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5K_MAIN = Object.freeze({
 });
 
 test('R5-M accepts an explicitly labelled alias even when it resembles the App or repository name', () => {
-  const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
-  assert.match(leading, /Copy an explicitly labelled project_alias verbatim/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /An unlabelled App display name.+is not a project_alias/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never use current, default, this-project/u);
   assert.match(
-    toolDescriptors.resolve_memory_context.description,
-    /explicitly labels a value as project_alias, accept it verbatim/u
+    MODEL_WORKFLOW_INSTRUCTIONS,
+    /Copy an explicitly labelled project_alias and requested_visibility exactly/u
+  );
+  assert.match(
+    MODEL_WORKFLOW_INSTRUCTIONS,
+    /alias may match an App, connector, or repository name; an unlabelled name is not an alias/u
+  );
+  assert.match(
+    MODEL_WORKFLOW_INSTRUCTIONS,
+    /current, default, this-project, or task_start_context as a default/u
   );
   assert.match(
     toolDescriptors.resolve_memory_context.description,
-    /An unlabelled App name, connector name/u
+    /Copy them exactly and call once/u
   );
 });
 

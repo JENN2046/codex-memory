@@ -39,18 +39,17 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5I_MAIN = Object.freeze({
   render_memory_scope: 'sha256:07308f75e3ed7ecc950bf97c0496a598a0582194527d43a1df093223bc626a1a'
 });
 
-test('R5-K puts scope clarification and negative abstention in the first 512 instruction characters', () => {
+test('R5-K puts scope and positive read selection in the first 512 instruction characters', () => {
   const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
-  assert.match(leading, /Project-memory requests only/u);
-  assert.match(leading, /irrelevant tasks/u);
-  assert.match(leading, /one ordered workflow/iu);
-  assert.match(leading, /workflow is consumed/u);
-  assert.match(leading, /Omit missing categories/u);
-  assert.match(leading, /Never report an uncalled tool unavailable/u);
-  assert.match(leading, /If either is missing, ask one clarification and call no tool/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never use current, default, this-project/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never choose task_start_context as a default/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call no tool again/u);
+  assert.match(leading, /retrieve stored project memory/u);
+  assert.match(leading, /both exact project_alias and requested_visibility/u);
+  assert.match(leading, /Choose one read by primary intent/u);
+  assert.match(leading, /audit_memory for access, receipt, scope, or visibility/u);
+  assert.match(leading, /search_memory for one fact, decision, event, or historical record/u);
+  assert.match(leading, /prepare_memory_context for a named task-start package/u);
+  assert.match(leading, /memory_overview for counts, status, or availability/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /current, default, this-project, or task_start_context as a default/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call no further tool/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /render_memory_scope is component-only/u);
 });
 
@@ -70,11 +69,7 @@ test('R5-K hides the render-only tool from the model and attaches the scope widg
   );
   assert.match(
     toolDescriptors.resolve_memory_context.description,
-    /Never use current, default, this-project/u
-  );
-  assert.match(
-    toolDescriptors.resolve_memory_context.description,
-    /Never infer task_start_context as a default/u
+    /exact project_alias and requested_visibility/u
   );
 });
 
@@ -124,14 +119,14 @@ test('R5-K makes governed result receipts and transport failures unambiguous and
   assert.match(timeout, /END OF TOOL WORKFLOW — RESPOND TO THE USER NOW/u);
 });
 
-test('R5-K audit result forbids overview supplementation and unreturned categories', () => {
+test('R5-K routes mixed access and overview requests to audit and keeps terminal closure', () => {
   assert.match(
     toolDescriptors.audit_memory.description,
-    /never label memory_overview or another uncalled tool unavailable/u
+    /Choose it over memory_overview when a request mixes those categories/u
   );
   assert.match(
-    toolDescriptors.audit_memory.description,
-    /fill a table with another codex-memory call/u
+    toolDescriptors.memory_overview.description,
+    /request also includes access, receipts, scope, or visibility, choose audit_memory instead/u
   );
   const audit = modelVisibleResultText('audit_memory', {
     status: 'ok',
