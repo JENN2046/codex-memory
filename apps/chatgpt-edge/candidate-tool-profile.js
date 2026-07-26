@@ -71,7 +71,7 @@ const toolDescriptors = deepFreeze({
     inputSchema: {
       type: 'object',
       additionalProperties: false,
-      required: ['project_alias'],
+      required: ['project_alias', 'requested_visibility'],
       properties: {
         project_alias: { type: 'string', minLength: 1, maxLength: 80, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' },
         requested_visibility: { enum: CONTEXT_VISIBILITIES }

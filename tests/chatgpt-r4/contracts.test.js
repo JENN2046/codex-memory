@@ -78,6 +78,12 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.deepEqual(requestVariants.map(variant => variant.properties.name.const), DATA_TOOL_NAMES);
   assert.equal(requestVariants.every(variant => variant.additionalProperties === false), true);
   assert.equal(requestVariants.every(variant => variant.properties.arguments.additionalProperties === false), true);
+  const resolveRequest = requestVariants.find(variant =>
+    variant.properties.name.const === 'resolve_memory_context');
+  assert.deepEqual(
+    resolveRequest.properties.arguments.required,
+    ['project_alias', 'requested_visibility']
+  );
   const searchRequest = requestVariants.find(variant => variant.properties.name.const === 'search_memory');
   assert.deepEqual(searchRequest.properties.arguments.required, ['project_context_ref', 'query']);
   assert.equal(

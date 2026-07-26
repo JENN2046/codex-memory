@@ -19,8 +19,8 @@ const {
   classifyReceiptFailure
 } = require('../../src/adapters/chatgpt-r4');
 
-const PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN = Object.freeze({
-  resolve_memory_context: 'sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6',
+const EXPECTED_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
+  resolve_memory_context: 'sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf',
   memory_overview: 'sha256:a9314eb1604641ae76d95132bf73ed28c3136afe5c9a8352fb2474b695f372d1',
   search_memory: 'sha256:c301306bf253377183d8dc4d660dd09d527db4c361d8aba96137c72234f8f324',
   audit_memory: 'sha256:498956aa48b7e2c8ef30c2e1dd622fbc7df0c359786bcfc74b958d37ea2eab9f',
@@ -53,24 +53,27 @@ test('R5-I selects only exact user-provided alias and visibility without probing
 });
 
 test('R5-I preserves all six public tool names and exact input/output schema digests', () => {
-  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN));
+  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(EXPECTED_PUBLIC_SCHEMA_DIGESTS));
   for (const [name, descriptor] of Object.entries(toolDescriptors)) {
     assert.equal(digestObject({
       inputSchema: descriptor.inputSchema,
       outputSchema: descriptor.outputSchema
-    }), PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN[name], name);
+    }), EXPECTED_PUBLIC_SCHEMA_DIGESTS[name], name);
   }
 });
 
-test('R5-I keeps the frozen public schema and request validator compatible', () => {
-  assert.doesNotThrow(() => validateToolArguments('resolve_memory_context', {
+test('R5-I requires exact visibility in the public schema and request validator', () => {
+  assert.throws(() => validateToolArguments('resolve_memory_context', {
     project_alias: 'project-alpha'
-  }));
+  }), { code: 'tool_arguments_shape_invalid' });
   assert.doesNotThrow(() => validateToolArguments('resolve_memory_context', {
     project_alias: 'project-alpha',
     requested_visibility: 'project'
   }));
-  assert.deepEqual(toolDescriptors.resolve_memory_context.inputSchema.required, ['project_alias']);
+  assert.deepEqual(
+    toolDescriptors.resolve_memory_context.inputSchema.required,
+    ['project_alias', 'requested_visibility']
+  );
 });
 
 test('R5-I projects verified governed outcomes separately from transport failures', () => {

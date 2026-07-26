@@ -10,7 +10,7 @@ const {
 } = require('../../apps/chatgpt-edge');
 
 const FROZEN_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
-  resolve_memory_context: 'sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6',
+  resolve_memory_context: 'sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf',
   memory_overview: 'sha256:a9314eb1604641ae76d95132bf73ed28c3136afe5c9a8352fb2474b695f372d1',
   search_memory: 'sha256:c301306bf253377183d8dc4d660dd09d527db4c361d8aba96137c72234f8f324',
   audit_memory: 'sha256:498956aa48b7e2c8ef30c2e1dd622fbc7df0c359786bcfc74b958d37ea2eab9f',
@@ -141,6 +141,6 @@ test('R5-O keeps routing guidance concise and preserves the frozen public schema
   }
   assert.deepEqual(
     toolDescriptors.resolve_memory_context.inputSchema.required,
-    ['project_alias']
+    ['project_alias', 'requested_visibility']
   );
 });

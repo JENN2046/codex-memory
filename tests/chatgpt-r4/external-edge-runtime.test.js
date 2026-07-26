@@ -212,6 +212,8 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
     'render_memory_scope'
   ]);
   assert.equal(tools.body.result.tools.every(tool => tool.annotations.readOnlyHint === true), true);
+  const resolveTool = tools.body.result.tools.find(tool => tool.name === 'resolve_memory_context');
+  assert.deepEqual(resolveTool.inputSchema.required, ['project_alias', 'requested_visibility']);
 
   const resources = await mcpRequest(address, rpcRequest(6, 'resources/list'), ACCESS_TOKEN);
   assert.equal(resources.statusCode, 200);

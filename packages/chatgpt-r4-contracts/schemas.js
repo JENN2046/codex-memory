@@ -43,7 +43,7 @@ function toolRequest(name, argumentsSchema) {
 
 const toolRequestVariants = [
   toolRequest('resolve_memory_context', exactArguments({
-    required: ['project_alias'],
+    required: ['project_alias', 'requested_visibility'],
     properties: {
       project_alias: {
         type: 'string',
