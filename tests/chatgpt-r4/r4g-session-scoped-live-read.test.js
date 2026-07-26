@@ -1347,6 +1347,10 @@ test('R5-A latches closed when native safety receipts fail before counters exist
     assert.equal(observation.emergency_stop_latched, true);
     assert.equal(observation.last_session.status, 'emergency_stopped');
     assert.equal(observation.last_session.error_code, 'r4_live_read_native_receipt_invalid');
+    assert.match(
+      observation.last_session.error_detail_code,
+      /^r4_live_read_receipt_[a-z0-9_]+$/
+    );
     assert.deepEqual(observation.last_session.tool_sequence, [
       'resolve_memory_context',
       'search_memory'

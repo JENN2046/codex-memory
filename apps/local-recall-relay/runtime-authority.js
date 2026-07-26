@@ -12,6 +12,7 @@ const {
   reject
 } = require('../../packages/chatgpt-r4-contracts');
 const { createOutboundRelayRuntime } = require('./outbound-runtime');
+const { DEFAULT_UDS_TIMEOUT_MS } = require('./uds-transport');
 
 const DEFAULT_RELAY_SECRET_ROOT = '/run/secrets/codex-memory-r4-relay';
 
@@ -20,7 +21,8 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
   readFileSync = fs.readFileSync,
   statSync = fs.statSync,
   realpathSync = fs.realpathSync,
-  edgeRequest
+  edgeRequest,
+  eventSink
 } = {}) {
   validateBindingEnvironment(environment);
   const counterMode = validateCounterMode(
@@ -89,9 +91,14 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
     responseSigning: { privateKey: relayPrivateKey, keyId: relayKeyId },
     counterMode,
     edgeTimeoutMs: integerEnvironment(environment.CODEX_MEMORY_R4_RELAY_EDGE_TIMEOUT_MS || '5000', 10, 30_000),
-    udsTimeoutMs: integerEnvironment(environment.CODEX_MEMORY_R4_RELAY_UDS_TIMEOUT_MS || '2000', 10, 55_000),
+    udsTimeoutMs: integerEnvironment(
+      environment.CODEX_MEMORY_R4_RELAY_UDS_TIMEOUT_MS || String(DEFAULT_UDS_TIMEOUT_MS),
+      10,
+      55_000
+    ),
     cancelPollMs: integerEnvironment(environment.CODEX_MEMORY_R4_RELAY_CANCEL_POLL_MS || '250', 1, 1000),
-    edgeRequest
+    edgeRequest,
+    eventSink
   });
 }
 

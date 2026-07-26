@@ -20,17 +20,26 @@ const {
 const {
   createOutboundEdgeClient,
   createOutboundRelayRuntime,
+  createLowDisclosureRelayObserver,
+  createRelayRuntime,
   loadOutboundRelayRuntimeFromEnvironment
 } = require('../../apps/local-recall-relay');
 const {
   createOutboundRelayService,
   isAvailabilityError
 } = require('../../apps/local-recall-relay/outbound-main');
+const {
+  DEFAULT_UDS_TIMEOUT_MS
+} = require('../../apps/local-recall-relay/uds-transport');
 
 const ISSUER = 'https://tenant.jenn.dev/';
 const ORIGIN = 'https://memory.jenn.dev';
 const MCP_RESOURCE = `${ORIGIN}/mcp`;
 const TOKEN = 'r'.repeat(48);
+
+test('R4-D Relay default UDS budget covers governed provider reads', () => {
+  assert.equal(DEFAULT_UDS_TIMEOUT_MS, 15_000);
+});
 
 test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes signed zero-counter UDS work', async t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4d-d2b-'));
@@ -55,6 +64,7 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
     now,
     requestId: 'req_d2b_outbound_relay_0000000001',
     nonce: 'd2b_request_nonce_0000001',
+    ttlSeconds: 30,
     signing: { privateKey: edge.privateKey, keyId: edgeKeyId }
   });
   const claim = {
@@ -102,6 +112,7 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   });
 
   const events = [];
+  const observer = createLowDisclosureRelayObserver();
   const runtime = createOutboundRelayRuntime({
     edgeOrigin: ORIGIN,
     relayAuthToken: TOKEN,
@@ -116,7 +127,10 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
     clock: () => new Date(now),
     cancelPollMs: 1,
     edgeRequest: fakeRequest,
-    eventSink: event => events.push(event)
+    eventSink(event) {
+      events.push(event);
+      observer.observe(event);
+    }
   });
   const result = await runtime.processNext();
   assert.equal(result.status, 'completed');
@@ -126,6 +140,10 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   assert.equal(requests.some(item => item.path === '/v1/relay/ack'), true);
   assert.equal(requests.some(item => item.path === '/v1/relay/complete'), true);
   assert.ok(completedResponse);
+  assert.equal(
+    Date.parse(completedResponse.expires_at) - Date.parse(completedResponse.issued_at),
+    30_000
+  );
   assert.doesNotThrow(() => validateResponseEnvelope(completedResponse, {
     now,
     resolveResponsePublicKey: keyId => keyId === relayKeyId ? relay.publicKey : null,
@@ -135,6 +153,122 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   const eventText = JSON.stringify(events);
   for (const forbidden of [TOKEN, claim.claim_token, requestEnvelope.nonce, 'project_context_ref']) {
     assert.equal(eventText.includes(forbidden), false, forbidden);
+  }
+  assert.deepEqual(observer.snapshot(), {
+    schema_version: 1,
+    component: 'outbound_relay',
+    claims_received: 1,
+    claims_acknowledged: 1,
+    uds_forwards_started: 1,
+    uds_forwards_completed: 1,
+    responses_prepared: 1,
+    edge_completions_started: 1,
+    edge_completions_accepted: 1,
+    requests_failed: 0,
+    requests_cancelled: 0,
+    requests_expired: 0,
+    last_failure_stage: null,
+    last_error_code: null,
+    completion_state: 'edge_accepted',
+    request_identifiers_retained: false,
+    response_bodies_retained: false,
+    raw_memory_retained: false,
+    secret_values_retained: false
+  });
+});
+
+test('R4-D Relay observer distinguishes Edge completion failure without retaining identifiers', async () => {
+  const edge = crypto.generateKeyPairSync('ed25519');
+  const relay = crypto.generateKeyPairSync('ed25519');
+  const edgeKeyId = 'edge-r4d-completion-observer';
+  const relayKeyId = 'relay-r4d-completion-observer';
+  const now = new Date('2026-07-26T08:00:00.000Z');
+  const principal = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: MCP_RESOURCE,
+    subjectFingerprint: sha256('completion-observer-operator'),
+    now,
+    nonce: 'completion_observer_principal_nonce',
+    signing: { privateKey: edge.privateKey, keyId: edgeKeyId }
+  });
+  const request = createRequestEnvelope({
+    principalAssertion: principal,
+    toolName: 'prepare_memory_context',
+    toolArguments: { project_context_ref: `pctx_${'z'.repeat(32)}` },
+    now,
+    requestId: 'req_completion_observer_000000001',
+    nonce: 'completion_observer_request_nonce',
+    ttlSeconds: 30,
+    signing: { privateKey: edge.privateKey, keyId: edgeKeyId }
+  });
+  const claim = {
+    request_id: request.request_id,
+    claim_token: 'completion-observer-claim-token',
+    attempt: 1,
+    request
+  };
+  let claimed = false;
+  const observer = createLowDisclosureRelayObserver();
+  const runtime = createRelayRuntime({
+    edgeClient: {
+      async claim() {
+        if (claimed) return null;
+        claimed = true;
+        return claim;
+      },
+      async acknowledge() {
+        return { status: 'acked' };
+      },
+      async complete() {
+        throw Object.assign(new Error('relay_edge_timeout'), {
+          code: 'relay_edge_timeout'
+        });
+      },
+      async state() {
+        return { status: 'claimed' };
+      }
+    },
+    async forwardToUds() {
+      return {
+        status: 'ok',
+        structured_content: { status: 'completed', kind: 'context', item_count: 1 },
+        counters: ZERO_MEMORY_COUNTERS,
+        receipt_digests: {
+          governance: sha256('completion-observer-governance'),
+          context: sha256('completion-observer-context')
+        }
+      };
+    },
+    relayId: 'local-relay-completion-observer',
+    expectedIssuer: ISSUER,
+    expectedAudience: MCP_RESOURCE,
+    resolveRequestPublicKey: keyId => keyId === edgeKeyId ? edge.publicKey : null,
+    resolvePrincipalPublicKey: value =>
+      value?.issuer === ISSUER && value?.key_id === edgeKeyId ? edge.publicKey : null,
+    responseSigning: { privateKey: relay.privateKey, keyId: relayKeyId },
+    clock: () => new Date(now),
+    cancelPollMs: 1,
+    eventSink: observer.observe
+  });
+
+  await assert.rejects(runtime.processNext(), { code: 'relay_edge_timeout' });
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.completion_state, 'edge_complete_failed');
+  assert.equal(snapshot.uds_forwards_completed, 1);
+  assert.equal(snapshot.responses_prepared, 1);
+  assert.equal(snapshot.edge_completions_started, 1);
+  assert.equal(snapshot.edge_completions_accepted, 0);
+  assert.equal(snapshot.requests_failed, 1);
+  assert.equal(snapshot.last_failure_stage, 'complete');
+  assert.equal(snapshot.last_error_code, 'relay_edge_timeout');
+  const serialized = JSON.stringify(snapshot);
+  for (const forbidden of [
+    request.request_id,
+    claim.claim_token,
+    request.nonce,
+    request.tool_request.arguments.project_context_ref
+  ]) {
+    assert.equal(serialized.includes(forbidden), false, forbidden);
   }
 });
 
@@ -178,6 +312,7 @@ test('R4-D D2B retries a non-JSON 5xx gateway response but keeps malformed succe
   });
 
   assert.equal(isAvailabilityError('relay_edge_unavailable'), true);
+  assert.equal(isAvailabilityError('relay_uds_response_incomplete'), true);
   let attempts = 0;
   let service;
   const runtime = {

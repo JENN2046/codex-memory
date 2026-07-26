@@ -6,10 +6,11 @@ const { LIMITS, reject } = require('../../packages/chatgpt-r4-contracts');
 
 const MAX_UDS_REQUEST_BYTES = LIMITS.maxRequestBytes + 8192;
 const MAX_UDS_RESPONSE_BYTES = LIMITS.maxResponseBytes;
+const DEFAULT_UDS_TIMEOUT_MS = 15_000;
 
 function createUdsForwarder({
   socketPath,
-  timeoutMs = 2_000,
+  timeoutMs = DEFAULT_UDS_TIMEOUT_MS,
   maxResponseBytes = MAX_UDS_RESPONSE_BYTES
 } = {}) {
   if (typeof socketPath !== 'string' || !socketPath.startsWith('/') || socketPath.includes('\0')) {
@@ -98,6 +99,7 @@ function createUdsForwarder({
 }
 
 module.exports = {
+  DEFAULT_UDS_TIMEOUT_MS,
   MAX_UDS_REQUEST_BYTES,
   MAX_UDS_RESPONSE_BYTES,
   createUdsForwarder

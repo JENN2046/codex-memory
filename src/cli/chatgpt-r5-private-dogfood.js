@@ -202,7 +202,8 @@ function validateLastSession(lastSession, sessionsStarted) {
     'resolve_attempt_count', 'read_attempt_count', 'post_terminal_attempt_count',
     'first_resolve_status', 'terminal_read_status', 'workflow_outcome',
     'total_latency_ms', 'result_count',
-    'max_relevance', 'timed_out', 'error_code', 'tool_attempt_in_flight',
+    'max_relevance', 'timed_out', 'error_code', 'error_detail_code',
+    'tool_attempt_in_flight',
     'provider_calls', 'native_invocations'
   ].sort();
   if (!lastSession || typeof lastSession !== 'object' || Array.isArray(lastSession) ||
@@ -252,6 +253,8 @@ function validateLastSession(lastSession, sessionsStarted) {
       typeof lastSession.timed_out !== 'boolean' ||
       (lastSession.error_code !== null &&
        !/^[a-z][a-z0-9_]{0,79}$/u.test(lastSession.error_code)) ||
+      (lastSession.error_detail_code !== null &&
+       !/^r4_live_read_receipt_[a-z0-9_]{1,55}$/u.test(lastSession.error_detail_code)) ||
       typeof lastSession.tool_attempt_in_flight !== 'boolean' ||
       !Number.isInteger(lastSession.provider_calls) || lastSession.provider_calls < 0 ||
       !Number.isInteger(lastSession.native_invocations) || lastSession.native_invocations < 0) {

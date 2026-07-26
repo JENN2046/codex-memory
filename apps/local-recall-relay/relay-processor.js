@@ -2,6 +2,7 @@
 
 const {
   COUNTER_MODES,
+  LIMITS,
   createResponseEnvelope,
   digestObject,
   validateCounters,
@@ -39,6 +40,9 @@ function createRelayProcessor({
       });
       const requestId = request.request_id;
       const toolName = request.tool_request.name;
+      const requestTtlSeconds = (
+        Date.parse(request.expires_at) - Date.parse(request.issued_at)
+      ) / 1000;
       const forwardedRequest = deepFreeze(structuredClone(request));
       const relayReceipt = Object.freeze({
         schema_version: 1,
@@ -70,6 +74,7 @@ function createRelayProcessor({
         counters: invocation.counters,
         receiptChain,
         now: responseNow,
+        ttlSeconds: Math.min(LIMITS.maxEnvelopeTtlSeconds, requestTtlSeconds),
         signing: responseSigning
       });
     }
