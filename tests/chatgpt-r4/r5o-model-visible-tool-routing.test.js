@@ -18,51 +18,46 @@ const FROZEN_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
   render_memory_scope: 'sha256:07308f75e3ed7ecc950bf97c0496a598a0582194527d43a1df093223bc626a1a'
 });
 
-test('R5-O puts the positive intent routes in the leading model instructions', () => {
+test('R5-O puts no-tool and exact-scope gates before read selection', () => {
   const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
-  assert.match(leading, /retrieve stored project memory/u);
-  assert.match(leading, /both exact project_alias and requested_visibility/u);
-  assert.match(leading, /Choose one read by requested output/u);
-  assert.match(leading, /audit_memory for access, receipt, scope, or visibility/u);
-  assert.match(leading, /including mixed overview requests/u);
-  assert.match(leading, /search_memory for one fact, decision, event, or historical record/u);
-  assert.match(leading, /prepare_memory_context for a named task-start package/u);
-  assert.match(leading, /memory_overview for counts, status, or availability/u);
+  assert.match(leading, /^No tool for rewriting, translation, formatting, math, checklists/u);
+  assert.match(leading, /summaries of user text/u);
+  assert.match(leading, /explicitly labelled project_alias and requested_visibility/u);
+  assert.match(leading, /If either is missing, ask only for missing values; call no tool/u);
+  assert.match(leading, /past fact\/decision\/event\/record → search_memory/u);
+  assert.match(leading, /current access\/receipt\/scope\/visibility or mixed count\/status → audit_memory/u);
+  assert.match(leading, /count\/status\/availability only → memory_overview/u);
+  assert.match(leading, /named task-start → prepare_memory_context/u);
 });
 
 test('R5-O distinguishes user-supplied summaries from stored-memory summaries', () => {
   assert.match(
     MODEL_WORKFLOW_INSTRUCTIONS,
-    /Transform or summarize only user-supplied text without tools/u
-  );
-  assert.match(
-    MODEL_WORKFLOW_INSTRUCTIONS,
-    /Summarizing stored project memory follows the retrieval routes above/u
+    /No tool for .+ summaries of user text/u
   );
 
   const description = toolDescriptors.resolve_memory_context.description;
-  assert.match(description, /^Use this first/u);
-  assert.match(description, /summarizing only user-supplied text/u);
-  assert.match(description, /A request to summarize stored project memory does use this workflow/u);
-  assert.match(description, /If either value is missing, ask once without calling a tool/u);
+  assert.match(description, /^Use this when/u);
+  assert.match(description, /stored-memory retrieval/u);
+  assert.match(description, /If either value is absent, ask for it and call no tool/u);
+  assert.match(
+    toolDescriptors.prepare_memory_context.description,
+    /A stored-memory summary follows the search, audit, or overview route instead/u
+  );
 });
 
 test('R5-O requires successful resolve before exactly one intent-matched read', () => {
   assert.match(
     MODEL_WORKFLOW_INSTRUCTIONS,
-    /Choose one read by requested output/u
+    /Select one read/u
   );
   assert.match(
     MODEL_WORKFLOW_INSTRUCTIONS,
-    /Resolve arguments alone leave selection to the requested output/u
+    /call resolve_memory_context once/u
   );
   assert.match(
     MODEL_WORKFLOW_INSTRUCTIONS,
-    /Call resolve_memory_context exactly once/u
-  );
-  assert.match(
-    MODEL_WORKFLOW_INSTRUCTIONS,
-    /wait for a resolved project_context_ref, call the chosen read exactly once, then answer/u
+    /wait for project_context_ref, call the chosen read once, then answer/u
   );
 
   for (const name of [
@@ -72,50 +67,62 @@ test('R5-O requires successful resolve before exactly one intent-matched read', 
     'prepare_memory_context'
   ]) {
     const descriptor = toolDescriptors[name];
-    assert.match(descriptor.description, /^Use this after resolve/u, name);
+    assert.match(
+      descriptor.description,
+      /^Use this when resolve_memory_context just returned project_context_ref/u,
+      name
+    );
     assert.match(descriptor.description, /Call once/u, name);
-    assert.match(descriptor.description, /returned project_context_ref/u, name);
+    assert.match(descriptor.description, /first result/u, name);
   }
 });
 
-test('R5-O gives audit priority over overview and keeps the other read intents distinct', () => {
+test('R5-O routes by requested output instead of subject keywords', () => {
   assert.match(
     toolDescriptors.memory_overview.description,
-    /counts, status, or availability/u
+    /requested output is only counts, status, or availability/u
   );
   assert.match(
     toolDescriptors.memory_overview.description,
-    /requested output also includes access, receipts, scope, or visibility, choose audit_memory instead/u
+    /Current access, receipts, scope, or visibility, including a mixed request, belongs to audit_memory/u
   );
   assert.match(
     toolDescriptors.search_memory.description,
-    /one specific stored fact, decision, event, or historical record/u
+    /one stored past fact, decision, event, or record/u
+  );
+  assert.match(
+    toolDescriptors.search_memory.description,
+    /subject contains audit, receipt, or canary/u
   );
   assert.match(
     toolDescriptors.audit_memory.description,
-    /access authorization, receipts, audit, scope, or visibility/u
+    /requested output asks for current access, receipts, scope, or visibility/u
   );
   assert.match(
     toolDescriptors.audit_memory.description,
-    /Choose it over memory_overview when a request mixes those outputs/u
+    /handles mixed counts, status, or availability/u
   );
   assert.match(
     toolDescriptors.audit_memory.description,
-    /Resolve arguments alone do not select this tool/u
+    /Resolve arguments alone do not select it/u
+  );
+  assert.match(
+    toolDescriptors.audit_memory.description,
+    /historical audit or receipt records use search_memory/u
   );
   assert.match(
     toolDescriptors.prepare_memory_context.description,
-    /explicitly asks to prepare or assemble a bounded task-start context package for a named task/u
+    /explicitly requests a bounded task-start context package for a named task/u
   );
   assert.match(
     toolDescriptors.prepare_memory_context.description,
-    /request to summarize stored project memory, select search_memory, audit_memory, or memory_overview/u
+    /stored-memory summary follows the search, audit, or overview route/u
   );
 });
 
 test('R5-O keeps routing guidance concise and preserves the frozen public schemas', () => {
-  assert.ok(MODEL_WORKFLOW_INSTRUCTIONS.length < 1400);
-  assert.ok(toolDescriptors.resolve_memory_context.description.length < 600);
+  assert.ok(MODEL_WORKFLOW_INSTRUCTIONS.length < 1250);
+  assert.ok(toolDescriptors.resolve_memory_context.description.length < 350);
   for (const name of [
     'memory_overview',
     'search_memory',

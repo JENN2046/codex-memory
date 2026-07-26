@@ -20,17 +20,16 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_MAIN = Object.freeze({
 });
 
 test('R5-B instructions require exact first context selection and one terminal read', () => {
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /resolve_memory_context exactly once/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /both exact project_alias and requested_visibility/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Copy an explicitly labelled project_alias and requested_visibility exactly/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /ask once for the missing value/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Choose one read by requested output/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call the chosen read exactly once, then answer/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call resolve_memory_context once/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /explicitly labelled project_alias and requested_visibility/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either is missing, ask only for missing values; call no tool/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Select one read/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call the chosen read once, then answer/u);
 
   const resolveDescription = toolDescriptors.resolve_memory_context.description;
-  assert.match(resolveDescription, /exact project_alias and requested_visibility/u);
-  assert.match(resolveDescription, /Copy them exactly and call once/u);
-  assert.match(resolveDescription, /If either value is missing, ask once without calling a tool/u);
+  assert.match(resolveDescription, /both exact project_alias and requested_visibility/u);
+  assert.match(resolveDescription, /Copy both values exactly and call once/u);
+  assert.match(resolveDescription, /If either value is absent, ask for it and call no tool/u);
 
   for (const toolName of [
     'memory_overview',
@@ -38,11 +37,18 @@ test('R5-B instructions require exact first context selection and one terminal r
     'audit_memory',
     'prepare_memory_context'
   ]) {
-    assert.match(toolDescriptors[toolName].description, /^Use this after resolve/u, toolName);
+    assert.match(
+      toolDescriptors[toolName].description,
+      /^Use this when resolve_memory_context just returned project_context_ref/u,
+      toolName
+    );
     assert.match(toolDescriptors[toolName].description, /Call once/u, toolName);
     assert.match(toolDescriptors[toolName].description, /first result/u, toolName);
   }
-  assert.match(toolDescriptors.search_memory.description, /without dereferencing result_ref/u);
+  assert.match(
+    toolDescriptors.search_memory.description,
+    /Historical records still use this tool when their subject contains audit, receipt, or canary/u
+  );
 
   const publicGuidance = JSON.stringify({
     instructions: MODEL_WORKFLOW_INSTRUCTIONS,

@@ -38,19 +38,19 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5K_MAIN = Object.freeze({
 test('R5-M accepts an explicitly labelled alias even when it resembles the App or repository name', () => {
   assert.match(
     MODEL_WORKFLOW_INSTRUCTIONS,
-    /Copy an explicitly labelled project_alias and requested_visibility exactly/u
+    /explicitly labelled project_alias and requested_visibility/u
   );
   assert.match(
     MODEL_WORKFLOW_INSTRUCTIONS,
-    /alias may match an App, connector, or repository name; an unlabelled name is not an alias/u
+    /unlabelled App or repository names as absent; a labelled alias may match those names/u
   );
   assert.match(
     MODEL_WORKFLOW_INSTRUCTIONS,
-    /current, default, this-project, or task_start_context as a default/u
+    /current, default, this project/u
   );
   assert.match(
     toolDescriptors.resolve_memory_context.description,
-    /Copy them exactly and call once/u
+    /Copy both values exactly and call once/u
   );
 });
 

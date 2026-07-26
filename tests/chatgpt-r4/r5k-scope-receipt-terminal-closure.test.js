@@ -41,15 +41,17 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5I_MAIN = Object.freeze({
 
 test('R5-K puts scope and positive read selection in the first 512 instruction characters', () => {
   const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
-  assert.match(leading, /retrieve stored project memory/u);
-  assert.match(leading, /both exact project_alias and requested_visibility/u);
-  assert.match(leading, /Choose one read by requested output/u);
-  assert.match(leading, /audit_memory for access, receipt, scope, or visibility/u);
-  assert.match(leading, /search_memory for one fact, decision, event, or historical record/u);
-  assert.match(leading, /prepare_memory_context for a named task-start package/u);
-  assert.match(leading, /memory_overview for counts, status, or availability/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /current, default, this-project, or task_start_context as a default/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call no further tool/u);
+  assert.match(leading, /No tool for rewriting, translation, formatting, math, checklists/u);
+  assert.match(leading, /explicitly labelled project_alias and requested_visibility/u);
+  assert.match(leading, /If either is missing, ask only for missing values; call no tool/u);
+  assert.match(leading, /past fact\/decision\/event\/record → search_memory/u);
+  assert.match(leading, /even about audit\/receipt\/canary/u);
+  assert.match(leading, /current access\/receipt\/scope\/visibility or mixed count\/status → audit_memory/u);
+  assert.match(leading, /count\/status\/availability only → memory_overview/u);
+  assert.match(leading, /named task-start → prepare_memory_context/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Treat current, default, this project/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /unlabelled App or repository names as absent/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /error result is terminal/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /render_memory_scope is component-only/u);
 });
 
@@ -122,15 +124,19 @@ test('R5-K makes governed result receipts and transport failures unambiguous and
 test('R5-K routes mixed access and overview requests to audit and keeps terminal closure', () => {
   assert.match(
     toolDescriptors.audit_memory.description,
-    /Choose it over memory_overview when a request mixes those outputs/u
+    /It also handles mixed counts, status, or availability/u
   );
   assert.match(
     toolDescriptors.audit_memory.description,
-    /Resolve arguments alone do not select this tool/u
+    /Resolve arguments alone do not select it/u
+  );
+  assert.match(
+    toolDescriptors.audit_memory.description,
+    /historical audit or receipt records use search_memory/u
   );
   assert.match(
     toolDescriptors.memory_overview.description,
-    /requested output also includes access, receipts, scope, or visibility, choose audit_memory instead/u
+    /Current access, receipts, scope, or visibility, including a mixed request, belongs to audit_memory/u
   );
   const audit = modelVisibleResultText('audit_memory', {
     status: 'ok',
