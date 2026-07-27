@@ -196,6 +196,95 @@ test('schema v5 closeout coverage follows lastCompleted with an empty active que
     ratio: 1
   });
 
+  const currentFactsPath = path.join(boardDir, 'CURRENT_FACTS.json');
+  const taskQueuePath = path.join(boardDir, 'TASK_QUEUE.md');
+  fs.writeFileSync(currentFactsPath, JSON.stringify({
+    schemaVersion: 5,
+    lastCompleted: {
+      taskId: 'CM-3001',
+      validationId: 'CMV-3002'
+    }
+  }));
+  const missingActiveTask =
+    collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  const missingActiveTaskController =
+    collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
+  assert.equal(missingActiveTask.status, 'warn');
+  assert.equal(missingActiveTask.latest_goal, 'CM-3001');
+  assert.equal(
+    missingActiveTask.stop_reason,
+    'current_task_queue_binding_incomplete'
+  );
+  assert.equal(missingActiveTaskController.status, 'warn');
+  assert.equal(
+    missingActiveTaskController.stop_reason,
+    'current_task_queue_binding_incomplete'
+  );
+
+  fs.writeFileSync(currentFactsPath, JSON.stringify({
+    schemaVersion: 5,
+    activeTask: null,
+    lastCompleted: {
+      taskId: 'CM-3001',
+      validationId: 'CMV-3002'
+    }
+  }));
+  fs.writeFileSync(taskQueuePath, [
+    '| ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |',
+    '|---|---:|---|---|---|---|---|---|---|---|---|',
+    '| CM-3005 | 3005 | todo | P6 | Green | docs | selected | tests | none | no | active |'
+  ].join('\n'));
+  const nullBesideQueue =
+    collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  const nullBesideQueueController =
+    collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
+  assert.equal(nullBesideQueue.status, 'warn');
+  assert.equal(nullBesideQueue.latest_goal, 'CM-3001');
+  assert.equal(nullBesideQueue.next_safe_task, 'none_local_queue_empty');
+  assert.equal(
+    nullBesideQueue.stop_reason,
+    'current_task_queue_binding_incomplete'
+  );
+  assert.equal(nullBesideQueueController.status, 'warn');
+  assert.equal(nullBesideQueueController.next_safe_task, 'none_local_queue_empty');
+  assert.equal(
+    nullBesideQueueController.stop_reason,
+    'current_task_queue_binding_incomplete'
+  );
+
+  fs.writeFileSync(currentFactsPath, JSON.stringify({
+    schemaVersion: 5,
+    activeTask: 'CM-3005',
+    lastCompleted: {
+      taskId: 'CM-3001',
+      validationId: 'CMV-3002'
+    }
+  }));
+  const selectedActiveTask =
+    collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  const selectedActiveTaskController =
+    collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
+  assert.equal(selectedActiveTask.status, 'ok');
+  assert.equal(selectedActiveTask.latest_goal, 'CM-3001');
+  assert.equal(selectedActiveTask.next_safe_task, 'CM-3005');
+  assert.equal(selectedActiveTask.stop_reason, 'none');
+  assert.equal(selectedActiveTaskController.status, 'ok');
+  assert.equal(selectedActiveTaskController.next_safe_task, 'CM-3005');
+  assert.equal(selectedActiveTaskController.stop_reason, 'none');
+
+  fs.writeFileSync(currentFactsPath, JSON.stringify({
+    schemaVersion: 5,
+    activeTask: null,
+    lastCompleted: {
+      taskId: 'CM-3001',
+      validationId: 'CMV-3002'
+    }
+  }));
+  fs.writeFileSync(taskQueuePath, [
+    '| ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |',
+    '|---|---:|---|---|---|---|---|---|---|---|---|'
+  ].join('\n'));
+
   fs.appendFileSync(
     path.join(boardDir, 'VALIDATION_LOG.md'),
     '\n| `CMV-3003` | stale | P6 | CM-3004 stale closeout | COMPLETED_VALIDATED | stale | none | 2026-07-28 |'

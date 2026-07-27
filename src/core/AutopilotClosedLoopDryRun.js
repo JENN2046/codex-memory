@@ -282,6 +282,31 @@ function resolveCurrentQueueTasks(currentFacts, parsedTasks, tableInspection) {
   return parsedTasks;
 }
 
+function currentQueueBindingIsValid(
+  currentFacts,
+  parsedTasks,
+  resolvedTasks,
+  tableInspection
+) {
+  if (!currentFacts.exists) return false;
+  const facts = currentFacts.value;
+  if (facts && facts.schemaVersion === 4) return true;
+  if (!facts || facts.schemaVersion !== CURRENT_FACTS_SCHEMA_VERSION) return false;
+  if (facts.activeTask === null) {
+    return tableInspection.shapeValid &&
+      tableInspection.rawDataRowCount === 0 &&
+      parsedTasks.length === 0 &&
+      resolvedTasks.length === 0;
+  }
+  return CM_ID_RE.test(facts.activeTask || '') &&
+    tableInspection.shapeValid &&
+    tableInspection.rawDataRowCount === 1 &&
+    parsedTasks.length === 1 &&
+    resolvedTasks.length === 1 &&
+    resolvedTasks[0].id === facts.activeTask &&
+    ['todo', 'in_progress'].includes(resolvedTasks[0].status);
+}
+
 function taskHasValidation(task, validationRows, tableInspection) {
   if (task.invalid) return false;
   if (task.validationId) {
@@ -369,11 +394,18 @@ function collectAutopilotClosedLoopSummary(options = {}) {
   const ledgerTableInspection =
     inspectActiveTable(ledgerText, ACTIVE_TABLE_HEADERS.ledger);
   const parsedTasks = parseTaskQueue(taskQueueText);
-  const tasks = resolveCurrentQueueTasks(
+  const resolvedQueueTasks = resolveCurrentQueueTasks(
     currentFacts,
     parsedTasks,
     queueTableInspection
-  ).filter(isCurrentAutopilotTask);
+  );
+  const tasks = resolvedQueueTasks.filter(isCurrentAutopilotTask);
+  const currentQueueBindingValid = currentQueueBindingIsValid(
+    currentFacts,
+    parsedTasks,
+    tasks,
+    queueTableInspection
+  );
   const validationRows = parseValidationRows(validationLogText);
   const ledgerRows = parseLedgerRows(ledgerText);
   const currentCloseout = resolveCurrentCloseout(currentFacts);
@@ -424,9 +456,15 @@ function collectAutopilotClosedLoopSummary(options = {}) {
     && schemas.includes('autopilot_failure_recovery_matrix.schema.yaml')
     && examples.includes('autopilot_closed_loop_state.example.json')
     && examples.includes('autopilot_failure_recovery_matrix.example.json');
-  const status = surfacesComplete && currentCloseoutCovered ? 'ok' : 'warn';
+  const status = surfacesComplete &&
+    currentCloseoutCovered &&
+    currentQueueBindingValid
+    ? 'ok'
+    : 'warn';
   const stopReason = !currentCloseoutCovered
     ? 'current_closeout_coverage_incomplete'
+    : !currentQueueBindingValid
+      ? 'current_task_queue_binding_incomplete'
     : !surfacesComplete
       ? 'autopilot_closed_loop_surface_incomplete'
       : 'none';
