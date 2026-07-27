@@ -42,8 +42,8 @@ future task.
 
 ## Next Safe Action
 
-Jenn selects a new product goal. Until then, keep `activeTask: null`, keep the
-active queue empty, and do not infer work from historical task rows, roadmap
+Jenn selects a new product goal. Until then, keep the active queue empty and do
+not infer work from historical task rows, roadmap
 text, plans, checkpoints, handoffs, status archives, or prior conversation.
 
 ## Authority Boundaries

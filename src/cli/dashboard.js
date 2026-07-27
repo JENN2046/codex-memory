@@ -13,11 +13,15 @@ const {
   parseReceiptMarkdown
 } = require('../core/SmartStandingAuthorizationV3ReceiptParser');
 const {
+  ACTIVE_TABLE_HEADERS,
   COMPLETED_RESULT,
   isCanonicalCompletedResult
 } = require('../core/AutopilotCloseoutContract');
 const {
-  collectAutopilotClosedLoopSummary
+  collectAutopilotClosedLoopSummary,
+  inspectActiveTable,
+  parseLedgerRows,
+  parseValidationRows
 } = require('../core/AutopilotClosedLoopDryRun');
 const {
   collectAutopilotControllerSummary
@@ -701,8 +705,8 @@ function collectSmartStandingAuthorizationV3(options = {}) {
   }
 }
 
-function collectAutopilotKernel() {
-  const workspaceRoot = process.cwd();
+function collectAutopilotKernel(options = {}) {
+  const workspaceRoot = options.workspaceRoot || process.cwd();
   const profilePath = path.join(workspaceRoot, 'docs', 'AUTOPILOT_PROJECT_PROFILE.md');
   const runtimePath = path.join(workspaceRoot, 'docs', 'AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md');
   const ledgerPath = path.join(workspaceRoot, '.agent_board', 'AUTOPILOT_LEDGER.md');
@@ -758,7 +762,9 @@ function collectAutopilotKernel() {
   const missingRequiredExamples = requiredExamples.filter(name => !exampleFileSet.has(name));
   const profileExists = fs.existsSync(profilePath);
   const runtimeExists = fs.existsSync(runtimePath);
-  const ledgerExists = fs.existsSync(ledgerPath);
+  const ledgerTextOverridden = typeof options.ledgerText === 'string';
+  const validationLogTextOverridden = typeof options.validationLogText === 'string';
+  const ledgerExists = ledgerTextOverridden || fs.existsSync(ledgerPath);
   const validators = {
     governance_kernel: fs.existsSync(governanceValidatorPath),
     goal_compiler: fs.existsSync(goalCompilerValidatorPath),
@@ -773,34 +779,43 @@ function collectAutopilotKernel() {
     green_file_write_executor_contract: fs.existsSync(greenFileWriteExecutorContractValidatorPath)
   };
 
-  const ledgerLines = countLinesIfExists(ledgerPath, 0);
-  const latestLedgerRow = [...ledgerLines].reverse().find(line => /^\| CM-\d+ /.test(line)) || '';
-  const latestLedgerCells = latestLedgerRow
-    ? latestLedgerRow.split('|').slice(1, -1).map(cell => cell.trim())
-    : [];
+  const ledgerText = ledgerTextOverridden
+    ? options.ledgerText
+    : readFileSafe(ledgerPath);
+  const validationLog = validationLogTextOverridden
+    ? options.validationLogText
+    : readFileSafe(validationLogPath);
+  const ledgerRows = parseLedgerRows(ledgerText);
+  const validationRows = parseValidationRows(validationLog);
+  const ledgerInspection = inspectActiveTable(
+    ledgerText,
+    ACTIVE_TABLE_HEADERS.ledger
+  );
+  const validationInspection = inspectActiveTable(
+    validationLog,
+    ACTIVE_TABLE_HEADERS.validationLog
+  );
+  const latestLedger = ledgerInspection.shapeValid
+    && ledgerInspection.rawDataRowCount === 1
+    && ledgerRows.length === 1
+    ? ledgerRows[0]
+    : null;
   const blockedRedCount = (() => {
     if (!ledgerExists) return 0;
-    const text = readFileSafe(ledgerPath);
-    const blockedSection = text.split('## Blocked Red Lane Items')[1] || '';
+    const blockedSection = ledgerText.split('## Blocked Red Lane Items')[1] || '';
     return blockedSection.split(/\r?\n/).filter(line => line.trim().startsWith('- ')).length;
   })();
-  const validationLog = readFileSafe(validationLogPath);
-  const latestValidationRow = validationLog
-    .split(/\r?\n/)
-    .map(line => line.trim())
-    .find(line => {
-      if (!/^\| CMV-\d{4} /.test(line)) return false;
-      const cells = line.split('|').slice(1, -1).map(cell => cell.trim());
-      return isCanonicalCompletedResult(cells[4]);
-    });
-  const latestValidationCells = latestValidationRow
-    ? latestValidationRow.split('|').slice(1, -1).map(cell => cell.trim())
-    : [];
-  const latestValidationId = latestValidationRow
-    ? (latestValidationRow.match(/\| (CMV-\d{4}) /) || [])[1] || 'not_recorded'
+  const latestValidation = validationInspection.shapeValid
+    && validationInspection.rawDataRowCount === 1
+    && validationRows.length === 1
+    && isCanonicalCompletedResult(validationRows[0].result)
+    ? validationRows[0]
+    : null;
+  const latestValidationId = latestValidation
+    ? latestValidation.id
     : 'not_recorded';
-  const validationStatus = latestValidationId !== 'not_recorded'
-    ? String(latestValidationCells[4] || '')
+  const validationStatus = latestValidation
+    ? latestValidation.result
     : 'not_recorded';
 
   const status = profileExists
@@ -810,7 +825,8 @@ function collectAutopilotKernel() {
     && missingRequiredExamples.length === 0
     && validators.governance_kernel
     && validators.goal_compiler
-    && isCanonicalCompletedResult(latestLedgerCells[9])
+    && latestLedger
+    && isCanonicalCompletedResult(latestLedger.result)
     && validationStatus === COMPLETED_RESULT
       ? 'ok'
       : 'warn';
@@ -825,8 +841,8 @@ function collectAutopilotKernel() {
     schema_count: schemaFiles.length,
     example_count: exampleFiles.length,
     validators,
-    latest_ledger_goal: latestLedgerCells[0] || 'not_recorded',
-    latest_ledger_result: latestLedgerCells[9] || 'not_recorded',
+    latest_ledger_goal: latestLedger ? latestLedger.id : 'not_recorded',
+    latest_ledger_result: latestLedger ? latestLedger.result : 'not_recorded',
     blocked_red_count: blockedRedCount,
     latest_validation_id: latestValidationId,
     validation_status: validationStatus,
@@ -2175,7 +2191,13 @@ async function main() {
   if (status === 'error') process.exitCode = 1;
 }
 
-main().catch(err => {
-  process.stderr.write(`dashboard: ${err.message}\n`);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(err => {
+    process.stderr.write(`dashboard: ${err.message}\n`);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  collectAutopilotKernel
+};

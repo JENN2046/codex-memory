@@ -375,9 +375,21 @@ function validateAuthoritySurfaces(root, facts, failures) {
     failures.push("CURRENT_STATE status must match CURRENT_FACTS");
   }
 
-  const stateTaskMatch = active.match(/activeTask:\s*`?(null|CM-\d{4})/);
-  const stateActiveTask = stateTaskMatch && stateTaskMatch[1] !== "null" ? stateTaskMatch[1] : null;
-  if (!stateTaskMatch) failures.push("CURRENT_STATE must declare activeTask");
+  const stateTaskDeclarationLines = active
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) =>
+      !line.startsWith("<!--") && /\bactiveTask\s*:/i.test(line)
+    );
+  const stateTaskMatch = stateTaskDeclarationLines.length === 1
+    ? stateTaskDeclarationLines[0].match(/^(`?)activeTask:\s*(null|CM-\d{4})\1$/)
+    : null;
+  const stateActiveTask = stateTaskMatch && stateTaskMatch[2] !== "null"
+    ? stateTaskMatch[2]
+    : null;
+  if (!stateTaskMatch) {
+    failures.push("CURRENT_STATE must declare exactly one canonical activeTask");
+  }
   if (stateTaskMatch && stateActiveTask !== facts.activeTask) {
     failures.push("CURRENT_STATE activeTask must match CURRENT_FACTS.activeTask");
   }

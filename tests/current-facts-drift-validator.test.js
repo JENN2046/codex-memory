@@ -732,6 +732,60 @@ test("current facts validator rejects active task disagreement", () => {
   assert.match(result.failures.join("\n"), /single active queue row/);
 });
 
+test("current facts validator rejects an activeTask prefix near-collision", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.activeTask = "CM-3001";
+  writeFacts(root, changed);
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState("CM-3001").replace("activeTask: CM-3001", "activeTask: CM-30010")
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | in_progress | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+
+  const result = validateCurrentFactsDrift(root);
+
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /exactly one canonical activeTask/);
+});
+
+test("current facts validator rejects a canonical activeTask beside a prefix declaration", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState().replace(
+      "activeTask: null",
+      "activeTask: null\nactiveTask: CM-30010"
+    )
+  );
+
+  const result = validateCurrentFactsDrift(root);
+
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /exactly one canonical activeTask/);
+});
+
+test("current facts validator rejects a canonical activeTask beside an unpaired declaration", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState().replace(
+      "activeTask: null",
+      "activeTask: null\n`activeTask: CM-3001"
+    )
+  );
+
+  const result = validateCurrentFactsDrift(root);
+
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /exactly one canonical activeTask/);
+});
+
 test("current facts validator rejects missing lastCompleted validation and ledger receipts", () => {
   const root = workspace();
   writeFile(root, ".agent_board/VALIDATION_LOG.md", validationLog([]));
