@@ -6,6 +6,8 @@ evidence, provider output, secrets, or historical status bodies.
 
 ## Fixed Baseline
 
+- Governance reset task: `CM-2155`
+- Governance reset validation: `CMV-2240`
 - Pre-compaction baseline:
   `ef62d4819ece3d93cb90e2d55fa84973cf43b7d1`
 - Accepted product PR: `#61`

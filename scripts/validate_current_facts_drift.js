@@ -4,15 +4,16 @@
 const childProcess = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { parseMarkdownTable } = require("./validate_autopilot_ledger_consistency");
+const {
+  containsExactIdToken,
+  parseMarkdownTable
+} = require("./validate_autopilot_ledger_consistency");
 
 const ACTIVE_START = "<!-- CURRENT-FACTS-ACTIVE-START -->";
 const ACTIVE_END = "<!-- CURRENT-FACTS-ACTIVE-END -->";
 const FACTS_PATH = ".agent_board/CURRENT_FACTS.json";
 const SCHEMA_VERSION = 5;
 const FACTS_MODE = "committed_status_snapshot";
-const LAST_COMPLETED_TASK = "CM-2155";
-const LAST_COMPLETED_VALIDATION = "CMV-2240";
 const ACCEPTED_BASELINE = Object.freeze({
   prNumber: 61,
   reviewedHead: "4680b4c198a71bb9e61d7bc1f21c0b77a1769fd9",
@@ -69,6 +70,10 @@ const REQUIRED_DOC_REFERENCES = Object.freeze([
 
 const REQUIRED_ACTIVE_FILES = ACTIVE_SURFACE_FILES;
 const HISTORY_INDEX_PATH = "docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md";
+const HISTORY_RESET_CLOSEOUT = Object.freeze({
+  taskId: "CM-2155",
+  validationId: "CMV-2240"
+});
 const HISTORY_RECOVERY_PATHS = Object.freeze([
   "CURRENT_STATE.md",
   ".agent_board/TASK_QUEUE.md",
@@ -213,15 +218,20 @@ function validateCurrentFactsSchema(facts, root, failures) {
   }
 
   const lastCompleted = facts.lastCompleted;
-  if (!lastCompleted || lastCompleted.taskId !== LAST_COMPLETED_TASK ||
-      lastCompleted.validationId !== LAST_COMPLETED_VALIDATION) {
-    failures.push(`lastCompleted must bind ${LAST_COMPLETED_TASK} / ${LAST_COMPLETED_VALIDATION}`);
+  if (!lastCompleted || typeof lastCompleted !== "object" || Array.isArray(lastCompleted)) {
+    failures.push("lastCompleted must be an object");
   } else {
+    if (!CM_RE.test(String(lastCompleted.taskId || ""))) {
+      failures.push("lastCompleted.taskId must be a CM id");
+    }
+    if (!CMV_RE.test(String(lastCompleted.validationId || ""))) {
+      failures.push("lastCompleted.validationId must be a CMV id");
+    }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(lastCompleted.completedAt || ""))) {
       failures.push("lastCompleted.completedAt must use YYYY-MM-DD");
     }
-    if (lastCompleted.scope !== "governance_surface_reset") {
-      failures.push("lastCompleted.scope must be governance_surface_reset");
+    if (typeof lastCompleted.scope !== "string" || !lastCompleted.scope.trim()) {
+      failures.push("lastCompleted.scope must be a non-empty string");
     }
   }
 
@@ -337,6 +347,17 @@ function validateAuthoritySurfaces(root, facts, failures) {
     failures.push("CURRENT_STATE activeTask must match CURRENT_FACTS.activeTask");
   }
 
+  const stateCloseoutMatch = active.match(
+    /Last completed:\s*`?(CM-\d{4})\s*\/\s*(CMV-\d{4})`?(?:[.\s]|$)/
+  );
+  if (!stateCloseoutMatch) {
+    failures.push("CURRENT_STATE must declare the last completed CM / CMV pair");
+  } else if (!facts.lastCompleted ||
+      stateCloseoutMatch[1] !== facts.lastCompleted.taskId ||
+      stateCloseoutMatch[2] !== facts.lastCompleted.validationId) {
+    failures.push("CURRENT_STATE last completed pair must match CURRENT_FACTS.lastCompleted");
+  }
+
   for (const relativePath of POINTER_FILES) {
     const text = readText(root, relativePath, failures);
     if (!text.includes("CURRENT_STATE.md")) {
@@ -394,11 +415,11 @@ function validateQueueAndReceipts(root, facts, failures) {
     String(row.ID || "").replace(/`/g, "").trim() === expectedTask
   );
   if (validationRows.length !== 1 || validationMatches.length !== 1 ||
-      !String(validationMatches[0] && validationMatches[0].Scope || "").includes(expectedTask)) {
+      !containsExactIdToken(validationMatches[0] && validationMatches[0].Scope, expectedTask)) {
     failures.push(`${expectedTask} / ${expectedValidation} must have one bound VALIDATION_LOG row`);
   }
   if (ledgerRows.length !== 1 || ledgerMatches.length !== 1 ||
-      !String(ledgerMatches[0] && ledgerMatches[0].Validation || "").includes(expectedValidation)) {
+      !containsExactIdToken(ledgerMatches[0] && ledgerMatches[0].Validation, expectedValidation)) {
     failures.push(`${expectedTask} / ${expectedValidation} must have one bound AUTOPILOT_LEDGER receipt`);
   }
 }
@@ -434,10 +455,12 @@ function defaultGitRunner(root, args) {
 function validateHistory(root, facts, failures, options) {
   const index = readText(root, HISTORY_INDEX_PATH, failures);
   if (!index.includes(ACCEPTED_BASELINE.mergeCommit) ||
+      !index.includes(`Governance reset task: \`${HISTORY_RESET_CLOSEOUT.taskId}\``) ||
+      !index.includes(`Governance reset validation: \`${HISTORY_RESET_CLOSEOUT.validationId}\``) ||
       !index.includes(`git show ${ACCEPTED_BASELINE.mergeCommit}:CURRENT_STATE.md`) ||
       !index.includes("git log --follow") ||
       !index.includes("git blame")) {
-    failures.push("history index must contain the fixed baseline and recovery commands");
+    failures.push("history index must contain the fixed reset closeout, baseline, and recovery commands");
   }
 
   const gitRunner = options.gitRunner || defaultGitRunner;
@@ -497,6 +520,7 @@ module.exports = {
   FACTS_PATH,
   HISTORY_INDEX_PATH,
   HISTORY_RECOVERY_PATHS,
+  HISTORY_RESET_CLOSEOUT,
   POINTER_FILES,
   REQUIRED_ACTIVE_FILES,
   REQUIRED_DOC_REFERENCES,

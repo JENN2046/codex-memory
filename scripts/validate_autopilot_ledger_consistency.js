@@ -75,6 +75,11 @@ function normalizedId(value) {
   return String(value || "").replace(/`/g, "").trim();
 }
 
+function containsExactIdToken(value, expectedId) {
+  const tokens = String(value || "").match(/\b(?:CM|CMV)-\d{4}\b/g) || [];
+  return tokens.includes(expectedId);
+}
+
 function validateAutopilotLedgerConsistency(root = process.cwd()) {
   const failures = [];
   const facts = readFacts(root, failures);
@@ -118,7 +123,7 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
 
   const validationRow = currentValidationRows[0];
   if (validationRow) {
-    if (!String(validationRow.Scope || "").includes(taskId)) {
+    if (!containsExactIdToken(validationRow.Scope, taskId)) {
       failures.push(`${validationId} scope must bind ${taskId}`);
     }
     if (!COMPLETED_RESULT_RE.test(String(validationRow.Result || ""))) {
@@ -128,7 +133,7 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
 
   const ledgerRow = currentLedgerRows[0];
   if (ledgerRow) {
-    if (!String(ledgerRow.Validation || "").includes(validationId)) {
+    if (!containsExactIdToken(ledgerRow.Validation, validationId)) {
       failures.push(`${taskId} ledger receipt must reference ${validationId}`);
     }
     if (!COMPLETED_RESULT_RE.test(String(ledgerRow.Result || ""))) {
@@ -179,6 +184,7 @@ if (require.main === module) {
 
 module.exports = {
   FACTS_PATH,
+  containsExactIdToken,
   parseMarkdownTable,
   validateAutopilotLedgerConsistency
 };

@@ -49,8 +49,12 @@ test('v3 receipt parser core extracts latest local receipt summary', () => {
   assert.equal(summary.next_auto_step_allowed, true);
 });
 
-test('CMV-2240 compact validation row remains parser-compatible', () => {
+test('current compact validation row remains parser-compatible after closeout id rotation', () => {
   const repoRoot = path.resolve(__dirname, '..');
+  const facts = JSON.parse(fs.readFileSync(
+    path.join(repoRoot, '.agent_board', 'CURRENT_FACTS.json'),
+    'utf8'
+  ));
   const markdown = fs.readFileSync(
     path.join(repoRoot, '.agent_board', 'VALIDATION_LOG.md'),
     'utf8'
@@ -62,13 +66,10 @@ test('CMV-2240 compact validation row remains parser-compatible', () => {
 
   assert.equal(summary.source_row_count, 1);
   assert.equal(summary.v3_row_count, 1);
-  assert.equal(summary.latest_v3_task_id, 'CM-2155');
-  assert.equal(summary.latest_validation_id, 'CMV-2240');
-  assert.equal(summary.latest_lane, 'Green');
-  assert.equal(
-    summary.latest_receipt_status,
-    'not_required_no_amber_external_or_write_action'
-  );
+  assert.equal(summary.latest_v3_task_id, facts.lastCompleted.taskId);
+  assert.equal(summary.latest_validation_id, facts.lastCompleted.validationId);
+  assert.match(summary.latest_lane, /^(Green|Amber|Red)$/);
+  assert.notEqual(summary.latest_receipt_status, 'not_recorded');
   assert.equal(summary.latest_parser_status, 'parser_ok');
 });
 

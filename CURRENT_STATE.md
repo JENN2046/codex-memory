@@ -61,7 +61,7 @@ text, plans, checkpoints, handoffs, status archives, or prior conversation.
 
 ## Evidence And History
 
-- Last governance closeout: `CM-2155 / CMV-2240`.
+- Last completed: `CM-2155 / CMV-2240`.
 - Compact machine snapshot: `.agent_board/CURRENT_FACTS.json`.
 - Historical recovery index:
   `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`.

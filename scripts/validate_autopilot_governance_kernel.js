@@ -3,6 +3,9 @@
 
 const fs = require("fs");
 const path = require("path");
+const {
+  validateAutopilotLedgerConsistency
+} = require("./validate_autopilot_ledger_consistency");
 
 const root = process.cwd();
 const failures = [];
@@ -671,10 +674,13 @@ if (greenFileWriteExecutorContract) {
 }
 
 requireIncludes(".agent_board/AUTOPILOT_LEDGER.md", [
-  "CM-2155",
   "Blocked Red Lane Items",
   "push / PR / tag / release / deploy",
 ]);
+const ledgerConsistency = validateAutopilotLedgerConsistency(root);
+for (const failure of ledgerConsistency.failures) {
+  failures.push(`autopilot ledger consistency: ${failure}`);
+}
 
 requireIncludes("AGENTS.md", [
   "Smart Standing Authorization v3",
