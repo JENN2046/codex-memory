@@ -105,6 +105,13 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
   if (doneRows.length > 0) {
     failures.push("TASK_QUEUE must not contain historical done rows");
   }
+  const allowedActiveStatuses = new Set(["todo", "in_progress"]);
+  const invalidStatusRows = taskQueue.filter((row) =>
+    !allowedActiveStatuses.has(String(row.Status || "").trim().toLowerCase())
+  );
+  if (invalidStatusRows.length > 0) {
+    failures.push("TASK_QUEUE rows must use only todo or in_progress status");
+  }
 
   const currentValidationRows = validationLog.filter((row) => normalizedId(row.ID) === validationId);
   const currentLedgerRows = ledger.filter((row) => normalizedId(row.ID) === taskId);
@@ -142,14 +149,18 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
   }
 
   const activeQueueRows = taskQueue.filter((row) =>
-    ["todo", "in_progress"].includes(String(row.Status || "").trim().toLowerCase())
+    allowedActiveStatuses.has(String(row.Status || "").trim().toLowerCase())
   );
   const activeTask = facts && facts.activeTask;
-  if (activeTask === null && activeQueueRows.length !== 0) {
+  const validActiveTask = activeTask === null ||
+    (typeof activeTask === "string" && /^CM-\d{4}$/.test(activeTask));
+  if (!validActiveTask) {
+    failures.push("CURRENT_FACTS.activeTask must be null or a CM id");
+  } else if (activeTask === null && taskQueue.length !== 0) {
     failures.push("activeTask null requires an empty active queue");
-  } else if (typeof activeTask === "string") {
+  } else if (activeTask !== null) {
     const activeIds = activeQueueRows.map((row) => normalizedId(row.ID));
-    if (activeIds.length !== 1 || activeIds[0] !== activeTask) {
+    if (taskQueue.length !== 1 || activeIds.length !== 1 || activeIds[0] !== activeTask) {
       failures.push("CURRENT_FACTS.activeTask must match the single active queue row");
     }
   }

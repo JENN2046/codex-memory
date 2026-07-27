@@ -395,14 +395,21 @@ function validateQueueAndReceipts(root, facts, failures) {
   if (doneRows.length > 0) failures.push("TASK_QUEUE must not contain done rows");
   if (queueText.includes("CM-1422")) failures.push("TASK_QUEUE must not restore stale CM-1422");
 
+  const allowedActiveStatuses = new Set(["todo", "in_progress"]);
+  const invalidStatusRows = queueRows.filter((row) =>
+    !allowedActiveStatuses.has(String(row.Status || "").trim().toLowerCase())
+  );
+  if (invalidStatusRows.length > 0) {
+    failures.push("TASK_QUEUE rows must use only todo or in_progress status");
+  }
   const activeRows = queueRows.filter((row) =>
-    ["todo", "in_progress"].includes(String(row.Status || "").trim().toLowerCase())
+    allowedActiveStatuses.has(String(row.Status || "").trim().toLowerCase())
   );
   const activeIds = activeRows.map((row) => String(row.ID || "").replace(/`/g, "").trim());
-  if (facts.activeTask === null && activeRows.length !== 0) {
+  if (facts.activeTask === null && queueRows.length !== 0) {
     failures.push("CURRENT_FACTS activeTask null requires an empty active queue");
   } else if (typeof facts.activeTask === "string" &&
-      (activeIds.length !== 1 || activeIds[0] !== facts.activeTask)) {
+      (queueRows.length !== 1 || activeIds.length !== 1 || activeIds[0] !== facts.activeTask)) {
     failures.push("CURRENT_FACTS activeTask must match the single active queue row");
   }
 

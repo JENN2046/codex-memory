@@ -358,6 +358,47 @@ test("current facts validator rejects done rows and stale CM-1422", () => {
   assert.match(result.failures.join("\n"), /must not restore stale CM-1422/);
 });
 
+test("current facts validator rejects every queue row when activeTask is null", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | blocked | P6 | Green | docs | blocked row | tests | none | no | blocked |",
+    "| CM-3002 | 3002 | skipped | P6 | Green | docs | skipped row | tests | none | no | skipped |",
+    "| CM-3003 | 3003 | typo | P6 | Green | docs | malformed row | tests | none | no | malformed |"
+  ]));
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /activeTask null requires an empty active queue/);
+  assert.match(result.failures.join("\n"), /only todo or in_progress status/);
+});
+
+test("current facts validator accepts exactly one selected active queue row", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.activeTask = "CM-3001";
+  writeFacts(root, changed);
+  writeFile(root, "CURRENT_STATE.md", currentState("CM-3001"));
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | todo | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects extra queue rows beside activeTask", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.activeTask = "CM-3001";
+  writeFacts(root, changed);
+  writeFile(root, "CURRENT_STATE.md", currentState("CM-3001"));
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | in_progress | P6 | Green | docs | selected row | tests | none | no | active |",
+    "| CM-3002 | 3002 | todo | P6 | Green | docs | extra row | tests | none | no | extra |"
+  ]));
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /must match the single active queue row/);
+});
+
 test("current facts validator rejects active task disagreement", () => {
   const root = workspace();
   const changed = facts();

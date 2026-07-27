@@ -189,6 +189,59 @@ test("ledger validator rejects reintroduced historical done rows", () => {
   assert.match(result.failures.join("\n"), /must not contain historical done rows/);
 });
 
+test("ledger validator rejects every queue row when activeTask is null", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | blocked | P6 | Green | docs | blocked row | tests | none | no | blocked |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /activeTask null requires an empty active queue/);
+  assert.match(result.failures.join("\n"), /only todo or in_progress status/);
+});
+
+test("ledger validator rejects a non-null non-CM activeTask", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts(7), null, 2)}\n`
+  );
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /activeTask must be null or a CM id/);
+});
+
+test("ledger validator accepts exactly one selected active queue row", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts("CM-3001"), null, 2)}\n`
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | in_progress | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("ledger validator rejects extra queue rows beside activeTask", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts("CM-3001"), null, 2)}\n`
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | todo | P6 | Green | docs | selected row | tests | none | no | active |",
+    "| CM-3002 | 3002 | todo | P6 | Green | docs | extra row | tests | none | no | extra |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /must match the single active queue row/);
+});
+
 test("ledger validator rejects active task and queue disagreement", () => {
   const root = workspace();
   writeFile(
