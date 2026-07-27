@@ -29,8 +29,27 @@ VCPToolBox 仍然是 native memory behavior 的 owner。本仓库默认不修改
 - [ChatGPT Web R5-I 模型行为与错误语义](docs/CHATGPT_WEB_R5I_MODEL_BEHAVIOR_ERROR_SEMANTICS.md)
 - [ChatGPT Web R5-K 范围澄清、回执展示与终止闭环](docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md)
 - [ChatGPT Web R5-M alias、结果语义与 Widget 回执投影](docs/CHATGPT_WEB_R5M_ALIAS_RECEIPT_SEMANTICS.md)
+- [ChatGPT Web R5-N runtime capability preflight 与确定性失败投影](docs/CHATGPT_WEB_R5N_RUNTIME_CAPABILITY_FAILURE_PROJECTION.md)
+- [ChatGPT Web R5-O Relay completion、工具路由与显式 visibility](docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md)
+- [ChatGPT Web R5-O public contract 独立 review](docs/CHATGPT_WEB_R5O_PUBLIC_CONTRACT_INDEPENDENT_REVIEW.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
+
+R5-O 将 Relay response expiry 限制在已接受 request 的 expiry 以内，把默认 UDS
+读取预算提高到 15 秒；不完整 UDS response 会保持 daemon 可用并进入
+backoff，但不会 replay 已 acknowledge 的一次性 read request。新增的
+low-disclosure observer library 能处理 mixed lifecycle sequence，不过
+canonical service 尚未接线或暴露它。模型可见路由只承诺各 public output
+schema 实际返回的字段。公共工具名称仍是六个，但
+`resolve_memory_context` 的 public input schema 已有意收紧为必须提供
+`requested_visibility`，因此 schema digest 也发生变化。本阶段没有运行
+live runtime、调用 provider、修改 private config 或读写 memory。
+
+R5-N 在 private runtime binding 前增加 zero-read capability preflight：
+先证明未认证请求被拒绝，再验证 mapping-bound、read-only 的 selected-diary
+shim 能力，并只把证据完整的 pre-provider mapping failure 投影为
+receipt-bound `unavailable`。本阶段没有运行 live runtime、调用 provider
+或读写 memory。
 
 R5-M 允许模型直接采用用户明确标注为 `project_alias` 的值，即使它恰好
 与 App、connector 或仓库名相同；没有明确标注时仍禁止猜测。active lease

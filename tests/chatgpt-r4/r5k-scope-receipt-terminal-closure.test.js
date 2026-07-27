@@ -44,11 +44,10 @@ test('R5-K puts scope and positive read selection in the first 512 instruction c
   assert.match(leading, /No tool for rewriting, translation, formatting, math, checklists/u);
   assert.match(leading, /explicitly labelled project_alias and requested_visibility/u);
   assert.match(leading, /If either is missing, ask only for missing values; call no tool/u);
-  assert.match(leading, /past fact\/decision\/event\/record → search_memory/u);
-  assert.match(leading, /even about audit\/receipt\/canary/u);
-  assert.match(leading, /current access\/receipt\/scope\/visibility or mixed count\/status → audit_memory/u);
-  assert.match(leading, /count\/status\/availability only → memory_overview/u);
-  assert.match(leading, /named task-start → prepare_memory_context/u);
+  assert.match(leading, /stored fact\/record\/content → search_memory/u);
+  assert.match(leading, /overview status\/item_count → memory_overview/u);
+  assert.match(leading, /audit status\/item_count → audit_memory/u);
+  assert.match(leading, /named task-start status\/item_count → prepare_memory_context/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Treat current, default, this project/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /unlabelled App or repository names as absent/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /error result is terminal/u);
@@ -75,7 +74,7 @@ test('R5-K hides the render-only tool from the model and attaches the scope widg
   );
 });
 
-test('R5-K preserves the six public tool names and exact input/output schemas', () => {
+test('current profile keeps six tool names and matches the R5-O schema digests', () => {
   assert.deepEqual(Object.keys(toolDescriptors), Object.keys(EXPECTED_PUBLIC_SCHEMA_DIGESTS));
   for (const [name, descriptor] of Object.entries(toolDescriptors)) {
     assert.equal(digestObject({
@@ -121,22 +120,22 @@ test('R5-K makes governed result receipts and transport failures unambiguous and
   assert.match(timeout, /END OF TOOL WORKFLOW — RESPOND TO THE USER NOW/u);
 });
 
-test('R5-K routes mixed access and overview requests to audit and keeps terminal closure', () => {
+test('R5-O capability-honest bounded status routing keeps terminal closure', () => {
   assert.match(
     toolDescriptors.audit_memory.description,
-    /It also handles mixed counts, status, or availability/u
+    /bounded audit response status and item_count/u
   );
   assert.match(
     toolDescriptors.audit_memory.description,
-    /Resolve arguments alone do not select it/u
+    /does not return access, receipt, scope, visibility, or event details/u
   );
   assert.match(
     toolDescriptors.audit_memory.description,
-    /historical audit or receipt records use search_memory/u
+    /Historical audit or receipt records use search_memory/u
   );
   assert.match(
     toolDescriptors.memory_overview.description,
-    /Current access, receipts, scope, or visibility, including a mixed request, belongs to audit_memory/u
+    /does not return memory-category counts, access, receipts, scope, or visibility details/u
   );
   const audit = modelVisibleResultText('audit_memory', {
     status: 'ok',

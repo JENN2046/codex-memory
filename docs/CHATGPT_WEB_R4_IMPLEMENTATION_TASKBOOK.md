@@ -320,6 +320,61 @@ R5-N does not activate the private runtime, call a provider, read or write
 memory, modify private configuration, change VCPToolBox core, or claim
 automatic selection, production, release, deploy, cutover, or readiness.
 
+## R5-O — Relay Completion, Capability-True Routing, And Explicit Visibility Contract
+
+R5-O is an independent public-contract exception and source-hardening stage.
+It supersedes only the prior requirement that all six exact schemas remain
+unchanged; the six public tool names and the no-write boundary remain frozen.
+
+Required contract gates:
+
+1. `resolve_memory_context.inputSchema.required` changes from
+   `["project_alias"]` to `["project_alias", "requested_visibility"]`;
+2. the resolve schema digest changes from
+   `sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6`
+   to
+   `sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf`;
+3. omitted visibility is rejected by public request-schema validation before
+   context issuance or a governed result receipt;
+4. callers must migrate by supplying an explicit allowed visibility; no
+   default, inference, or dual-acceptance window is permitted;
+5. rollback restores the prior `required` list and digest and requires no
+   memory/data migration;
+6. the six public tool names and all other public input/output schemas remain
+   unchanged;
+7. model routing may promise only fields present in the selected public output
+   schema; only `search_memory` returns stored summary content;
+8. `SCHEMA_VERSION` remains `1` as an intentional breaking policy exception:
+   the signed envelope shape is unchanged, but the accepted v1 argument set is
+   narrower and omission is not backward compatible;
+9. tests must bind the prior-to-current resolve digest transition explicitly,
+   exercise both signed-v1 omission rejection and explicit-visibility
+   acceptance, and not relabel the changed digest as an unchanged frozen
+   baseline;
+10. rollout is Edge first, Relay last; rollback is Relay first, Edge last, so
+    the stricter validator never receives an omission-capable peer request;
+11. independent public-contract review and normal PR checks must complete
+    before a separate merge decision.
+
+Relay closure gates:
+
+1. response TTL uses only the accepted request's remaining lifetime,
+   `response.expires_at` never exceeds `request.expires_at`, and a request that
+   expires during processing is classified terminally as `expired`;
+2. the default UDS read budget is `15000 ms`;
+3. incomplete UDS input keeps the daemon available but does not replay the
+   already acknowledged one-read request;
+4. injectable low-disclosure observation distinguishes the latest request
+   progress across mixed success, failure, cancellation, and expiry sequences;
+5. an unobserved complete response is reported as locally unconfirmed, not as
+   proof that the Edge rejected it;
+6. operational observer telemetry is not claimed until the canonical service
+   explicitly wires and exposes a governed snapshot surface.
+
+R5-O does not authorize or perform runtime activation, provider calls, memory
+reads/writes, private configuration mutation, release, deploy, cutover, or
+merge.
+
 ## Rollback
 
 Rollback never changes memory content:

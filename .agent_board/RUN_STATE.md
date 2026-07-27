@@ -4,30 +4,36 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2153 ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection`.
-Current validation: `CMV-2238`.
-Current fact: private runtime preparation proves exact mapping-bound, read-only selected-diary shim capabilities before binding; verified pre-provider mapping failure no longer masquerades as transport timeout.
-No runtime/provider/private-config/memory action occurred; the six public schemas and prior owner-only artifacts remain unchanged and Edge remains zero-memory.
+Current task: `CM-2154 ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility Contract`.
+Current validation: `CMV-2239`.
+Current fact: Relay response expiry is capped by request expiry, incomplete input keeps the daemon available without replay, routing matches actual output fields, and signed schema-v1 now requires explicit visibility.
+No runtime/provider/private-config/memory action occurred; the six public tool names remain unchanged, one public input schema is intentionally tightened without tool expansion, and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Current Run State
 
-- Architecture: R5-N preserves the public six-tool ChatGPT surface and local Governance authorization boundary.
-- Source verdict: exact zero-read shim capability preflight and deterministic receipt-backed mapping-failure projection are implemented.
-- Receipt integrity: exact mapping values stay private; only a private loopback capability fingerprint and categorical receipts are used.
-- Widget: both `openai:set_globals` and MCP Apps tool-result updates are handled without moving Widget metadata into public content.
-- Validation: R5-K/R5-N targeted `16/16`, all R4/R5 `126/126`, default `5863/0/8`,
-  and hardening `97/97 + 6/6` pass.
-- CI-safe gate: `5954/5962` pass with zero failures across 703 files, no
-  network, daemon, or provider.
-- Strict gate: contract/test/compare/rollback pass; overall is non-pass only at
-  inactive loopback health, and no service was started.
+- Architecture: R5-O preserves the six public tool names and local Governance authorization boundary.
+- Relay: response expiry is capped by request expiry; UDS budget is `15000 ms`; incomplete
+  input keeps the daemon alive/backing off and does not replay the acknowledged
+  one-read request.
+- Observer: the injectable library handles latest mixed lifecycle state and
+  local completion uncertainty; canonical service telemetry remains unwired.
+- Routing: only `search_memory` returns stored content; bounded-status tools
+  promise only status, kind, and response `item_count`.
+- Public contract: `resolve_memory_context.requested_visibility` is required,
+  changing its digest from
+  `sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6`
+  to
+  `sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf`.
+- Versioning: signed schema-v1 intentionally accepts a narrower argument set;
+  rollout is Edge first/Relay last and rollback is Relay first/Edge last.
+- Validation: R5-O `6/6`, R5-K `9/9`, and observer/availability filtered tests pass.
 - Runtime accounting: no service, provider, memory read/write, private config, or VCP core action occurred.
 - Host route: Governance/Relay/shim remain stopped; Edge remains `zero_memory`.
 - Evidence: prior owner-only artifacts are untouched.
-- Status sync: CM-2153/CMV-2238 record source hardening only and do not claim automatic-use or runtime proof.
+- Status sync: CM-2154/CMV-2239 record source/contract hardening only and do not claim automatic-use or runtime proof.
 - Readiness: all aliases false.
 - Production/release/deploy/cutover: not performed or claimed.
 
@@ -57,10 +63,11 @@ Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 ## Next Safe Action
 
-Deliver R5-N through normal PR CI/review. Exact-head private ChatGPT runtime
-behavior verification, any prior-artifact supplement or protocol amendment,
-and all further live/provider/read, production, release, deploy, cutover,
-readiness, or public-write work require a separate current scope.
+Deliver R5-O through normal PR CI/review; merge remains a separate Jenn
+decision. Exact-head private ChatGPT runtime behavior verification, canonical
+observer telemetry wiring, a future tool-contract version, and all further
+live/provider/read, production, release, deploy, cutover, readiness, or
+public-write work require a separate current scope.
 
 ## Historical Run Notes
 

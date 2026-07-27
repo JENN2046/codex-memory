@@ -164,7 +164,8 @@ function validateEdgeClient(value) {
 function classifyEdgeInterruption(error) {
   if (error?.code === 'edge_request_cancelled') return 'cancelled';
   if (error?.code === 'edge_request_expired' || error?.code === 'edge_claim_expired' ||
-      error?.code === 'edge_request_not_found') return 'expired';
+      error?.code === 'edge_request_not_found' ||
+      error?.code === 'relay_request_expired_before_response') return 'expired';
   return null;
 }
 

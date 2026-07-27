@@ -54,7 +54,7 @@ test('R5-M accepts an explicitly labelled alias even when it resembles the App o
   );
 });
 
-test('R5-M keeps all six public tool names and exact input/output schemas frozen', () => {
+test('current profile keeps six tool names and matches the R5-O schema digests', () => {
   assert.deepEqual(Object.keys(toolDescriptors), Object.keys(EXPECTED_PUBLIC_SCHEMA_DIGESTS));
   for (const [name, descriptor] of Object.entries(toolDescriptors)) {
     assert.equal(digestObject({

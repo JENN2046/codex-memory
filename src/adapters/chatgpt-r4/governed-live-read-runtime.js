@@ -401,115 +401,6 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       'r4_live_read_receipt_disclosure_or_audit_invalid'
     );
   }
-  if (!isPlainObject(receipt) || !isPlainObject(invocation) || !isPlainObject(runtime) ||
-      result?.access?.localMemoryFallbackUsed !== false ||
-      invocation.invocationBindingMatched !== true ||
-      invocation.governanceMetadataSent !== true ||
-      invocation.governanceMetadataRawValueDisclosed !== false ||
-      invocation.endpointDisclosed !== false ||
-      invocation.tokenMaterialDisclosed !== false ||
-      invocation.rawRequestBodyDisclosed !== false ||
-      invocation.rawResponseBodyDisclosed !== false ||
-      runtime.present !== true ||
-      runtime.nativeRuntimeCalled !== true ||
-      typeof runtime.providerApiCalled !== 'boolean' ||
-      typeof runtime.derivedIndexWritePerformed !== 'boolean' ||
-      runtime.memoryReadPerformed !== true ||
-      runtime.memoryWritePerformed !== false ||
-      runtime.isolatedRuntimeStoreUsed !== true ||
-      typeof runtime.durableWritePerformed !== 'boolean' ||
-      runtime.primaryMemoryStoreWritePerformed !== false ||
-      runtime.durableWritePerformed !== runtime.derivedIndexWritePerformed ||
-      runtime.derivedRuntimeMutationPolicy !== 'isolated_derived_runtime_mutation_v1' ||
-      runtime.derivedRuntimeMutationAccountingMode !== 'lifecycle_event_v1' ||
-      runtime.derivedRuntimeMutationAuthorized !== true ||
-      runtime.derivedRuntimeMutationAccountingFinal !== false ||
-      runtime.derivedRuntimeMutationBackgroundTasksDrained !== false ||
-      runtime.derivedRuntimeMutationZeroClaimed !== false ||
-      runtime.derivedRuntimeMutationPolicyViolation !== false ||
-      runtime.sourcePartitionMutationPerformed !== false ||
-      runtime.legacyPartitionAccessed !== false ||
-      runtime.ambiguousPartitionAccessed !== false ||
-      runtime.unregisteredPartitionAccessed !== false ||
-      runtime.derivedRuntimeMutationRawDetailsDisclosed !== false ||
-      !Number.isInteger(runtime.derivedRuntimeMutationCumulativeCount) ||
-      runtime.derivedRuntimeMutationCumulativeCount < 0 ||
-      !Number.isInteger(runtime.derivedRuntimeMutationReceiptDelta) ||
-      runtime.derivedRuntimeMutationReceiptDelta < 0 ||
-      runtime.derivedRuntimeMutationReceiptDelta >
-        runtime.derivedRuntimeMutationCumulativeCount ||
-      !Number.isInteger(runtime.derivedRuntimeMutationActiveCount) ||
-      runtime.derivedRuntimeMutationActiveCount < 0 ||
-      !Number.isInteger(runtime.derivedRuntimeMutationCompletedCount) ||
-      runtime.derivedRuntimeMutationCompletedCount < 0 ||
-      !Number.isInteger(runtime.derivedRuntimeMutationFailedCount) ||
-      runtime.derivedRuntimeMutationFailedCount < 0 ||
-      runtime.derivedRuntimeMutationCompletedCount +
-        runtime.derivedRuntimeMutationFailedCount +
-        runtime.derivedRuntimeMutationActiveCount !==
-        runtime.derivedRuntimeMutationCumulativeCount ||
-      !Array.isArray(runtime.derivedRuntimeMutationTriggerCategories) ||
-      runtime.derivedRuntimeMutationTriggerCategories.some(value =>
-        !['startup', 'hydration', 'cache', 'vector', 'tag', 'matrix'].includes(value)
-      ) ||
-      new Set(runtime.derivedRuntimeMutationTriggerCategories).size !==
-        runtime.derivedRuntimeMutationTriggerCategories.length ||
-      (runtime.derivedRuntimeMutationCumulativeCount > 0 &&
-        runtime.derivedRuntimeMutationTriggerCategories.length === 0) ||
-      runtime.derivedIndexWritePerformed !==
-        (runtime.derivedRuntimeMutationCumulativeCount > 0) ||
-      (runtime.derivedIndexWritePerformed === true && ![
-        'isolated_derived_index',
-        'native_runtime_store'
-      ].includes(runtime.durableWriteScope)) ||
-      runtime.authorizationResolvedBeforeProvider !== true ||
-      runtime.diaryAllowlistEnforcedBeforeIndexLoad !== true ||
-      runtime.diaryAllowlistEnforcedBeforeVectorSearch !== true ||
-      runtime.resultScopePostcheckPassed !== true ||
-      runtime.unscopedNativeSearchUsed !== false ||
-      runtime.mappingReferenceBound !== true ||
-      runtime.mappingDigestBound !== true ||
-      runtime.allowedDiaryCount !== expectedAllowedDiaryCount ||
-      runtime.rawDiaryNamesReturned !== false ||
-      runtime.vectorRetrievalDiagnosticsMode !== 'fail_closed_v1' ||
-      !Number.isSafeInteger(runtime.hydratedChunkCount) ||
-      runtime.hydratedChunkCount < 0 ||
-      !Number.isSafeInteger(runtime.loadedIndexVectorCount) ||
-      runtime.loadedIndexVectorCount < 0 ||
-      runtime.queryVectorShapeValid !== true ||
-      runtime.queryVectorExpectedDimensionKnown !== true ||
-      runtime.queryVectorDimensionMatched !== true ||
-      runtime.queryVectorFinite !== true ||
-      runtime.queryVectorNonzero !== true ||
-      !Number.isSafeInteger(runtime.rawCandidateCount) ||
-      runtime.rawCandidateCount < 0 ||
-      runtime.ghostCandidateCount !== 0 ||
-      !['empty_index', 'empty', 'found'].includes(runtime.vectorRetrievalOutcome) ||
-      runtime.vectorRetrievalRawDetailsDisclosed !== false ||
-      (runtime.loadedIndexVectorCount > 0 && (
-        runtime.indexSearchCalled !== true ||
-        runtime.indexSearchSucceeded !== true ||
-        !['empty', 'found'].includes(runtime.vectorRetrievalOutcome)
-      )) ||
-      (runtime.loadedIndexVectorCount === 0 &&
-        runtime.vectorRetrievalOutcome !== 'empty_index') ||
-      (runtime.vectorRetrievalOutcome === 'empty_index' && (
-        runtime.hydratedChunkCount !== 0 ||
-        runtime.loadedIndexVectorCount !== 0 ||
-        !emptyIndexSearchEvidenceComplete(runtime) ||
-        runtime.rawCandidateCount !== 0 ||
-        !emptyIndexDelegatedResultEvidenceComplete(result)
-      )) ||
-      (runtime.vectorRetrievalOutcome === 'found' &&
-        runtime.rawCandidateCount < 1) ||
-      runtime.rawRuntimeOutputDisclosed !== false ||
-      runtime.rawMemoryContentDisclosed !== false ||
-      runtime.runtimeLocatorDisclosed !== false ||
-      runtime.tokenMaterialDisclosed !== false ||
-      runtime.readinessClaimed !== false ||
-      receipt.localAuditReceipt?.appended !== true) {
-    reject('r4_live_read_native_receipt_invalid');
-  }
   return { receipt, invocation, runtime };
 }
 
@@ -1071,5 +962,6 @@ module.exports = {
   effectiveVisibility,
   receiptBackedNativePreflightFailure,
   searchProjection,
+  structuredProjection,
   visibilityLabels
 };

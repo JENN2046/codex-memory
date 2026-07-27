@@ -177,6 +177,13 @@ The frozen future profile separates data tools from rendering:
 There are no ChatGPT write or proposal tools in R4. The current repository's
 five-tool default surface is not changed by this freeze. Future public schema
 changes require their own contract implementation, tests, and authorization.
+R5-O is the first recorded exception: it keeps the six public tool names but
+requires `requested_visibility` in `resolve_memory_context`. The exact
+prior/current digests, breaking compatibility posture, rollback, and
+schema-version-domain decision are recorded in
+`docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md` and the R5-O section
+of `docs/CHATGPT_WEB_R4_IMPLEMENTATION_TASKBOOK.md`. Acceptance remains subject
+to normal PR review and a separate merge decision.
 
 The standard MCP `search`/`fetch` compatibility profile is deferred. It may be
 added later as a separate adapter if its result/provenance contract can preserve

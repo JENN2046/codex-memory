@@ -4,13 +4,41 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2153 ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection`.
-Current validation: `CMV-2238`.
-Current fact: private runtime preparation proves exact mapping-bound, read-only selected-diary shim capabilities before binding; verified pre-provider mapping failure no longer masquerades as transport timeout.
-No runtime/provider/private-config/memory action occurred; the six public schemas and prior owner-only artifacts remain unchanged and Edge remains zero-memory.
+Current task: `CM-2154 ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility Contract`.
+Current validation: `CMV-2239`.
+Current fact: the outbound Relay now correlates asynchronous UDS completion to the originating request, model routing is explicit, and `resolve_memory_context.requested_visibility` is a required public input.
+No runtime/provider/private-config/memory action occurred; the six public tool names remain unchanged, one public input schema is intentionally tightened without tool expansion, and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
+
+## CM-2154 ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility Contract
+
+Status: `R5_O_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_PUBLIC_SCHEMA_TIGHTENED`
+
+- Relay response expiry is capped by request expiry and the UDS budget is
+  `15000 ms`.
+  Incomplete UDS input keeps the daemon alive/backing off but does not replay
+  the acknowledged one-read request.
+- The injectable observer library classifies latest mixed lifecycle state and
+  completion uncertainty; canonical service telemetry remains unwired.
+- Routing is limited to fields present in the selected public output schema.
+- The six public tool names remain unchanged.
+- `resolve_memory_context.inputSchema.required` changes from
+  `["project_alias"]` to `["project_alias", "requested_visibility"]`.
+- The schema digest changes from
+  `sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6`
+  to
+  `sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf`.
+- Calls that omit `requested_visibility` are now rejected at public schema
+  validation before context issuance; this is an intentional compatibility
+  tightening, not a tool/schema expansion.
+- Signed schema-v1 accepts a narrower argument set as an explicit exception;
+  rollout is Edge first/Relay last and rollback is Relay first/Edge last.
+- Runtime/provider/memory/private-config/VCP-core effects are zero; Edge stays
+  `zero_memory`.
+
+Validation: `CMV-2239`.
 
 ## CM-2153 ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection
 

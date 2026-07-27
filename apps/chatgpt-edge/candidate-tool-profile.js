@@ -24,9 +24,10 @@ const IDEMPOTENT_READ_ONLY_ANNOTATIONS = deepFreeze({
 });
 const SECURITY_SCHEMES = deepFreeze([{ type: 'oauth2', scopes: ['memory.read'] }]);
 const MODEL_WORKFLOW_INSTRUCTIONS = [
-  'No tool for rewriting, translation, formatting, math, checklists, or summaries of user text.',
+  'No tool for rewriting, translation, formatting, math, checklists, summaries of user text, or echoing supplied scope.',
   'Memory retrieval needs explicitly labelled project_alias and requested_visibility. If either is missing, ask only for missing values; call no tool.',
-  'Select one read: past fact/decision/event/record → search_memory, even about audit/receipt/canary; current access/receipt/scope/visibility or mixed count/status → audit_memory; count/status/availability only → memory_overview; named task-start → prepare_memory_context.',
+  'Select one read: stored fact/record/content → search_memory; overview status/item_count → memory_overview; audit status/item_count → audit_memory; named task-start status/item_count → prepare_memory_context.',
+  'Read tools do not return access, receipt, scope, or visibility details. Overview, audit, and task-start outputs contain only bounded status, kind, and response item_count.',
   'With both values present, call resolve_memory_context once, wait for project_context_ref, call the chosen read once, then answer. A denied, unavailable, empty, low-confidence, or error result is terminal.',
   'Treat current, default, this project, and unlabelled App or repository names as absent; a labelled alias may match those names. Copy both labelled values exactly. Use only returned fields; never infer another tool status or loaded memory.',
   'render_memory_scope is component-only and unavailable to the model.',
@@ -85,8 +86,8 @@ const toolDescriptors = deepFreeze({
     }
   }),
   memory_overview: descriptor({
-    title: 'Get aggregate memory status only',
-    description: 'Use this when resolve_memory_context just returned project_context_ref and the requested output is only counts, status, or availability. Current access, receipts, scope, or visibility, including a mixed request, belongs to audit_memory. Call once and answer from the first result.',
+    title: 'Get overview availability and item count',
+    description: 'Use this when resolve_memory_context just returned project_context_ref and the requested output is only the overview response status and item_count. It does not return memory-category counts, access, receipts, scope, or visibility details. Call once and answer from the first result.',
     inputSchema: contextInputSchema(),
     outputSchema: boundedStatusSchema('overview')
   }),
@@ -128,8 +129,8 @@ const toolDescriptors = deepFreeze({
     }
   }),
   audit_memory: descriptor({
-    title: 'Get current access and receipt report',
-    description: 'Use this when resolve_memory_context just returned project_context_ref and the requested output asks for current access, receipts, scope, or visibility. It also handles mixed counts, status, or availability. Resolve arguments alone do not select it; historical audit or receipt records use search_memory. Call once and answer from the first result.',
+    title: 'Get audit availability and item count',
+    description: 'Use this when resolve_memory_context just returned project_context_ref and the requested output is only the bounded audit response status and item_count. It does not return access, receipt, scope, visibility, or event details. Historical audit or receipt records use search_memory. Call once and answer from the first result.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -142,8 +143,8 @@ const toolDescriptors = deepFreeze({
     outputSchema: boundedStatusSchema('audit')
   }),
   prepare_memory_context: descriptor({
-    title: 'Prepare named task-start context',
-    description: 'Use this when resolve_memory_context just returned project_context_ref and the user explicitly requests a bounded task-start context package for a named task. Call once with the task summary and answer from the first result. A stored-memory summary follows the search, audit, or overview route instead.',
+    title: 'Check named task-start context availability',
+    description: 'Use this when resolve_memory_context just returned project_context_ref and the requested output is only the bounded task-start response status and item_count for a named task. It does not return context content. A stored-memory summary or fact uses search_memory instead. Call once and answer from the first result.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,

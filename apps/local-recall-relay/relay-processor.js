@@ -40,9 +40,6 @@ function createRelayProcessor({
       });
       const requestId = request.request_id;
       const toolName = request.tool_request.name;
-      const requestTtlSeconds = (
-        Date.parse(request.expires_at) - Date.parse(request.issued_at)
-      ) / 1000;
       const forwardedRequest = deepFreeze(structuredClone(request));
       const relayReceipt = Object.freeze({
         schema_version: 1,
@@ -56,6 +53,11 @@ function createRelayProcessor({
       });
       const invocation = await forwardToUds({ request: forwardedRequest, relayReceipt });
       const responseNow = clock();
+      const remainingRequestTtlMs =
+        Date.parse(request.expires_at) - responseNow.getTime();
+      if (!Number.isFinite(remainingRequestTtlMs) || remainingRequestTtlMs <= 0) {
+        reject('relay_request_expired_before_response');
+      }
       validateInvocation(invocation, toolName, { counterMode });
       const receiptChain = {
         edge_request: validation.requestDigest,
@@ -74,7 +76,10 @@ function createRelayProcessor({
         counters: invocation.counters,
         receiptChain,
         now: responseNow,
-        ttlSeconds: Math.min(LIMITS.maxEnvelopeTtlSeconds, requestTtlSeconds),
+        ttlSeconds: Math.min(
+          LIMITS.maxEnvelopeTtlSeconds,
+          remainingRequestTtlMs / 1000
+        ),
         signing: responseSigning
       });
     }

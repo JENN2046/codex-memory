@@ -8,13 +8,51 @@ Live branch, `HEAD`, `origin/main`, ahead/behind, and dirty-worktree facts are n
 
 | Field | Value |
 |---|---|
-| Status | `R5_N_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_PRIOR_ARTIFACTS_UNCHANGED` |
-| Current task | `CM-2153 ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection` |
-| Current validation | `CMV-2238` |
-| Current route | Complete normal PR/CI/review; any exact-head private runtime verification remains separately authorized |
+| Status | `R5_O_SOURCE_HARDENING_VALIDATED_RUNTIME_NOT_RUN_PUBLIC_SCHEMA_TIGHTENED` |
+| Current task | `CM-2154 ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility Contract` |
+| Current validation | `CMV-2239` |
+| Current route | Complete public-contract review and PR CI; merge remains a separate Jenn decision |
 | Machine snapshot | `.agent_board/CURRENT_FACTS.json` |
 | Intake contract | `docs/CONTEXT_INTAKE_CONTRACT.md` |
 | Archive index | `docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md` |
+
+## ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility Contract
+
+R5-O closes the gap between a locally completed governed read and Edge receipt
+acceptance. Relay response expiry cannot exceed accepted request expiry, the default UDS
+budget is 15 seconds, and incomplete UDS input keeps the daemon available
+without replaying the acknowledged one-read request. An injectable
+low-disclosure observer library handles mixed request lifecycles without
+retaining identifiers, bodies, raw memory, or secrets. The canonical service
+does not yet wire or expose it, so operational telemetry is not claimed.
+
+The model-visible workflow now requires exact `project_alias` and
+`requested_visibility`, preselects one read from the requested output, resolves
+once, calls that read once, and stops on every result or transport error.
+Stored record/content routes to `search_memory`; overview response status and
+`item_count` route to `memory_overview`; audit response status and `item_count`
+route to `audit_memory`; named task-start response status and `item_count`
+route to `prepare_memory_context`. The bounded-status tools do not return
+category counts or access/receipt/scope/visibility/event/context details.
+
+All six public tool names remain unchanged. The public input schema is not
+unchanged: `resolve_memory_context.required` is tightened from
+`["project_alias"]` to
+`["project_alias", "requested_visibility"]`, with the schema digest changing
+from
+`sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6`
+to
+`sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf`.
+Omitted visibility now fails request validation before context issuance.
+
+R5-O passes `6/6`, R5-K current-contract tests pass `9/9`, all R5 plus
+synthetic E2E pass `8/8` files, the base contract passes `9/9`, and selected
+remaining-TTL, expiry-race, observer, and availability Relay tests pass.
+Restricted local listener creation is blocked by sandbox `EPERM`; exact-head
+PR CI must rerun after review remediation. No live runtime, provider, memory
+read/write, private configuration, public tool expansion, or VCP core action
+occurred. See
+`docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md`.
 
 ## ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection
 

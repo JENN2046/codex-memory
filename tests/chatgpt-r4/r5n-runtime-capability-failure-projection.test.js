@@ -46,7 +46,7 @@ const EXPECTED_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
   render_memory_scope: 'sha256:07308f75e3ed7ecc950bf97c0496a598a0582194527d43a1df093223bc626a1a'
 });
 
-test('R5-N keeps all six public tool names and exact schemas frozen', () => {
+test('current profile keeps six tool names and matches the R5-O schema digests', () => {
   assert.deepEqual(Object.keys(toolDescriptors), Object.keys(EXPECTED_PUBLIC_SCHEMA_DIGESTS));
   for (const [name, descriptor] of Object.entries(toolDescriptors)) {
     assert.equal(digestObject({
