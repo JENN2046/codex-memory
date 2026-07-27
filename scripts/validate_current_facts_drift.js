@@ -386,11 +386,18 @@ function validateQueueAndReceipts(root, facts, failures) {
   const queueText = readText(root, ".agent_board/TASK_QUEUE.md", failures);
   const validationText = readText(root, ".agent_board/VALIDATION_LOG.md", failures);
   const ledgerText = readText(root, ".agent_board/AUTOPILOT_LEDGER.md", failures);
-  const queueRows = parseMarkdownTable(queueText);
+  const malformedQueueRows = [];
+  const queueRows = parseMarkdownTable(queueText, {
+    malformedRows: malformedQueueRows,
+    trackedRowPattern: /\bCM-\d{4}\b/
+  });
   const validationRows = parseMarkdownTable(validationText);
   const ledgerRows = parseMarkdownTable(ledgerText);
 
   if (queueRows.length > 30) failures.push("TASK_QUEUE active row budget exceeded");
+  if (malformedQueueRows.length > 0) {
+    failures.push("TASK_QUEUE must not contain malformed CM data rows");
+  }
   const doneRows = queueRows.filter((row) => String(row.Status || "").trim().toLowerCase() === "done");
   if (doneRows.length > 0) failures.push("TASK_QUEUE must not contain done rows");
   if (queueText.includes("CM-1422")) failures.push("TASK_QUEUE must not restore stale CM-1422");

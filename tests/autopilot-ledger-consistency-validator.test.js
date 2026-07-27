@@ -200,6 +200,17 @@ test("ledger validator rejects every queue row when activeTask is null", () => {
   assert.match(result.failures.join("\n"), /only todo or in_progress status/);
 });
 
+test("ledger validator rejects malformed CM queue rows before empty-queue selection", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | todo | P6 | Green | docs | unescaped | pipe | tests | none | no | active |",
+    "| CM-3002 | 3002 | todo | P6 | Green | docs | missing notes | tests | none | no |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /must not contain malformed CM data rows/);
+});
+
 test("ledger validator rejects a non-null non-CM activeTask", () => {
   const root = workspace();
   writeFile(

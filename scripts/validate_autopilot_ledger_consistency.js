@@ -28,44 +28,57 @@ function readFacts(root, failures) {
   }
 }
 
-function parseMarkdownTable(text) {
-  const lines = String(text)
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith("|") && line.endsWith("|"));
-
+function parseMarkdownTable(text, options = {}) {
+  const lines = String(text).split(/\r?\n/);
+  const malformedRows = Array.isArray(options.malformedRows) ? options.malformedRows : null;
+  const trackedRowPattern = options.trackedRowPattern instanceof RegExp
+    ? options.trackedRowPattern
+    : null;
   let header = null;
   const rows = [];
 
-  for (const line of lines) {
-    const body = line.slice(1, -1);
-    const cells = [];
-    let current = "";
-    let inCode = false;
-    for (let index = 0; index < body.length; index += 1) {
-      const char = body[index];
-      if (char === "`") {
-        inCode = !inCode;
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+    const line = lines[lineIndex].trim();
+    let acceptedDataRow = false;
+
+    if (line.startsWith("|") && line.endsWith("|")) {
+      const body = line.slice(1, -1);
+      const cells = [];
+      let current = "";
+      let inCode = false;
+      for (let index = 0; index < body.length; index += 1) {
+        const char = body[index];
+        if (char === "`") {
+          inCode = !inCode;
+          current += char;
+          continue;
+        }
+        if (char === "|" && !inCode && body[index - 1] !== "\\") {
+          cells.push(current.trim());
+          current = "";
+          continue;
+        }
         current += char;
+      }
+      cells.push(current.trim());
+
+      if (!header) {
+        header = cells;
         continue;
       }
-      if (char === "|" && !inCode && body[index - 1] !== "\\") {
-        cells.push(current.trim());
-        current = "";
-        continue;
+      if (cells.every((cell) => /^:?-{3,}:?$/.test(cell))) continue;
+      if (cells.length === header.length) {
+        rows.push(Object.fromEntries(header.map((name, index) => [name, cells[index]])));
+        acceptedDataRow = true;
       }
-      current += char;
     }
-    cells.push(current.trim());
 
-    if (!header) {
-      header = cells;
-      continue;
+    if (!acceptedDataRow && header && malformedRows && trackedRowPattern) {
+      trackedRowPattern.lastIndex = 0;
+      if (trackedRowPattern.test(line)) {
+        malformedRows.push({ line: lineIndex + 1 });
+      }
     }
-    if (cells.every((cell) => /^:?-{3,}:?$/.test(cell))) continue;
-    if (cells.length !== header.length) continue;
-
-    rows.push(Object.fromEntries(header.map((name, index) => [name, cells[index]])));
   }
 
   return rows;
@@ -83,7 +96,14 @@ function containsExactIdToken(value, expectedId) {
 function validateAutopilotLedgerConsistency(root = process.cwd()) {
   const failures = [];
   const facts = readFacts(root, failures);
-  const taskQueue = parseMarkdownTable(readText(root, ".agent_board/TASK_QUEUE.md", failures));
+  const malformedTaskRows = [];
+  const taskQueue = parseMarkdownTable(
+    readText(root, ".agent_board/TASK_QUEUE.md", failures),
+    {
+      malformedRows: malformedTaskRows,
+      trackedRowPattern: /\bCM-\d{4}\b/
+    }
+  );
   const validationLog = parseMarkdownTable(readText(root, ".agent_board/VALIDATION_LOG.md", failures));
   const ledger = parseMarkdownTable(readText(root, ".agent_board/AUTOPILOT_LEDGER.md", failures));
 
@@ -104,6 +124,9 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
   const doneRows = taskQueue.filter((row) => String(row.Status || "").trim().toLowerCase() === "done");
   if (doneRows.length > 0) {
     failures.push("TASK_QUEUE must not contain historical done rows");
+  }
+  if (malformedTaskRows.length > 0) {
+    failures.push("TASK_QUEUE must not contain malformed CM data rows");
   }
   const allowedActiveStatuses = new Set(["todo", "in_progress"]);
   const invalidStatusRows = taskQueue.filter((row) =>

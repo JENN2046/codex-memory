@@ -371,6 +371,17 @@ test("current facts validator rejects every queue row when activeTask is null", 
   assert.match(result.failures.join("\n"), /only todo or in_progress status/);
 });
 
+test("current facts validator rejects malformed CM queue rows before empty-queue selection", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | todo | P6 | Green | docs | unescaped | pipe | tests | none | no | active |",
+    "| CM-3002 | 3002 | todo | P6 | Green | docs | missing notes | tests | none | no |"
+  ]));
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /must not contain malformed CM data rows/);
+});
+
 test("current facts validator accepts exactly one selected active queue row", () => {
   const root = workspace();
   const changed = facts();
