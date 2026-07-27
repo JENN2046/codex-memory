@@ -74,7 +74,8 @@ function repositoryRoot() {
 function requireDescriptorPlatform(fsImpl = fs, platform = process.platform) {
   if (platform !== 'linux' ||
       !Number.isInteger(fsImpl.constants.O_NOFOLLOW) ||
-      !Number.isInteger(fsImpl.constants.O_DIRECTORY)) {
+      !Number.isInteger(fsImpl.constants.O_DIRECTORY) ||
+      !Number.isInteger(fsImpl.constants.O_NONBLOCK)) {
     reject('owner_mapping_descriptor_platform_unsupported');
   }
 }
@@ -377,7 +378,9 @@ function readOwnerOnlyPath(filePath, {
     }
     fd = fsImpl.openSync(
       descriptorEntryPath(parentFd, path.basename(absolute)),
-      fsImpl.constants.O_RDONLY | fsImpl.constants.O_NOFOLLOW
+      fsImpl.constants.O_RDONLY |
+        fsImpl.constants.O_NOFOLLOW |
+        fsImpl.constants.O_NONBLOCK
     );
     const descriptorStat = fsImpl.fstatSync(fd);
     assertOwnerOnlyFileStat(descriptorStat, {
@@ -526,7 +529,9 @@ function readDescriptorFile(directoryFd, fileName, {
     const entryPath = descriptorEntryPath(directoryFd, fileName);
     fd = fsImpl.openSync(
       entryPath,
-      fsImpl.constants.O_RDONLY | fsImpl.constants.O_NOFOLLOW
+      fsImpl.constants.O_RDONLY |
+        fsImpl.constants.O_NOFOLLOW |
+        fsImpl.constants.O_NONBLOCK
     );
     const stat = fsImpl.fstatSync(fd);
     assertOwnerOnlyFileStat(stat, { maxBytes, code });

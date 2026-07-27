@@ -52,11 +52,11 @@ function cleanup(base) {
   fs.rmSync(base, { recursive: true, force: true });
 }
 
-function runCli(args) {
+function runCli(args, { timeout = 30_000 } = {}) {
   return spawnSync(process.execPath, [cliPath, ...args], {
     cwd: workspaceRoot,
     encoding: 'utf8',
-    timeout: 30_000
+    timeout
   });
 }
 
@@ -140,6 +140,53 @@ test('CLI rejects command-specific argument drift and documents authority bounda
     assert.match(help.stdout, /plan validates without writing/);
     assert.match(help.stdout, /apply performs an explicit private-configuration write/);
     assert.match(help.stdout, /does not grant an agent authorization/);
+  } finally {
+    cleanup(fixture.base);
+  }
+});
+
+test('check rejects FIFO package entries without blocking', (t) => {
+  const fixture = makeFixture();
+  try {
+    const applied = runCli([
+      'apply',
+      ...commonArgs(fixture),
+      '--confirm-private-config-write'
+    ]);
+    assert.equal(applied.status, 0, applied.stderr);
+
+    const mappingPath = path.join(
+      fixture.privateRoot,
+      fixture.packageName,
+      'diary-scope-mapping.json'
+    );
+    fs.unlinkSync(mappingPath);
+    const mkfifo = spawnSync('mkfifo', [mappingPath], {
+      cwd: workspaceRoot,
+      encoding: 'utf8',
+      timeout: 5_000
+    });
+    if (mkfifo.status !== 0) {
+      t.skip('mkfifo is unavailable on this platform');
+      return;
+    }
+    fs.chmodSync(mappingPath, 0o600);
+
+    const checked = runCli([
+      'check',
+      '--private-root', fixture.privateRoot,
+      '--package-name', fixture.packageName,
+      '--json'
+    ], {
+      timeout: 5_000
+    });
+    assert.equal(checked.error, undefined, checked.error?.message);
+    assert.equal(checked.status, 1, checked.stderr);
+    assert.equal(
+      JSON.parse(checked.stdout).code,
+      'owner_mapping_package_mapping_invalid'
+    );
+    assertLowDisclosure(checked.stdout, fixture);
   } finally {
     cleanup(fixture.base);
   }

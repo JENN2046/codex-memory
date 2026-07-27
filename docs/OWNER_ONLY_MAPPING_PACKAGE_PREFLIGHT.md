@@ -98,7 +98,9 @@ configuration.
 
 ## Filesystem And Receipt Semantics
 
-- Source, root, package, and package files are opened with `O_NOFOLLOW`.
+- Source, root, package, and package files are opened with `O_NOFOLLOW`;
+  expected regular files also use `O_NONBLOCK` before type validation so FIFO
+  or device replacement fails closed instead of hanging.
 - Source and root directories are pinned by descriptors and checked with
   `fstat` identity.
 - Writes use an exclusive owner-only staging directory and exclusive files.
