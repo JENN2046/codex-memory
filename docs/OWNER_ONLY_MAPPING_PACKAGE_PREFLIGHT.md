@@ -52,6 +52,14 @@ private-runtime-configuration boundary.
 - Linux/WSL descriptor semantics are required.
 - `apply` requires `/usr/bin/python3` and a libc exposing Linux `renameat2`;
   missing no-replace support fails closed.
+- `plan` performs a write-free same-entry `RENAME_NOREPLACE` call through a
+  pinned parent descriptor. A missing libc symbol, rejected kernel flag, or a
+  private root mounted separately from its parent fails closed before mapping
+  input is read or staging state is created.
+- The write-free probe does not claim that every final filesystem rename can
+  be predicted without mutation. The final no-replace commit remains
+  authoritative; an unsupported commit fails and cleans only verified staging
+  state or reports reconciliation when safe cleanup cannot be proven.
 - The mapping source must be a regular owner-owned file beneath an owner-only
   canonical directory.
 - The existing complete private root must be a canonical owner-only directory.
@@ -74,7 +82,8 @@ The committed package contains exactly:
 └── mapping-binding.env
 ```
 
-The directory is mode `0700`; files are mode `0600`.
+The directory must remain exactly mode `0700`; files must remain exactly mode
+`0600`.
 
 The helper does not set a Linux immutable attribute. The owner can still alter
 or remove files outside this utility; `check` fails closed when the package

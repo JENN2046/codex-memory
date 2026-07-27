@@ -131,24 +131,33 @@ function sameSecurityIdentity(left, right) {
 
 function assertOwnerOnlyDirectoryStat(stat, {
   code,
-  requireWrite = false
+  requireWrite = false,
+  exactMode = null
 } = {}) {
   const ownerMode = stat.mode & 0o700;
   if (!stat.isDirectory() ||
       stat.isSymbolicLink?.() === true ||
       stat.uid !== currentUid() ||
       (stat.mode & 0o077) !== 0 ||
+      (stat.mode & 0o7000) !== 0 ||
+      (exactMode !== null && (stat.mode & 0o7777) !== exactMode) ||
       (ownerMode & 0o500) !== 0o500 ||
       (requireWrite && (ownerMode & 0o300) !== 0o300)) {
     reject(code);
   }
 }
 
-function assertOwnerOnlyFileStat(stat, { maxBytes, code } = {}) {
+function assertOwnerOnlyFileStat(stat, {
+  maxBytes,
+  code,
+  exactMode = null
+} = {}) {
   if (!stat.isFile() ||
       stat.isSymbolicLink?.() === true ||
       stat.uid !== currentUid() ||
       (stat.mode & 0o077) !== 0 ||
+      (stat.mode & 0o7000) !== 0 ||
+      (exactMode !== null && (stat.mode & 0o7777) !== exactMode) ||
       stat.size < 1 ||
       stat.size > maxBytes) {
     reject(code);
@@ -271,6 +280,38 @@ function closeDescriptor(fd, fsImpl = fs) {
   try {
     fsImpl.closeSync(fd);
   } catch {}
+}
+
+function openProbeParentDirectory(root, fsImpl = fs) {
+  const parentPath = path.dirname(root.path);
+  const rootName = path.basename(root.path);
+  let fd = null;
+  try {
+    fd = fsImpl.openSync(
+      parentPath,
+      fsImpl.constants.O_RDONLY |
+        fsImpl.constants.O_DIRECTORY |
+        fsImpl.constants.O_NOFOLLOW
+    );
+    const parentStat = fsImpl.fstatSync(fd);
+    const namedRootStat = fsImpl.lstatSync(
+      descriptorEntryPath(fd, rootName)
+    );
+    if (!parentStat.isDirectory() ||
+        parentStat.dev !== root.stat.dev ||
+        namedRootStat.isSymbolicLink() ||
+        !sameSecurityIdentity(root.stat, namedRootStat)) {
+      reject('owner_mapping_noreplace_primitive_unavailable');
+    }
+    return Object.freeze({
+      fd,
+      rootName
+    });
+  } catch (error) {
+    closeDescriptor(fd, fsImpl);
+    if (error?.code?.startsWith?.('owner_mapping_')) throw error;
+    reject('owner_mapping_noreplace_primitive_unavailable');
+  }
 }
 
 function assertOpenRootIdentity(root, fsImpl = fs) {
@@ -534,7 +575,11 @@ function readDescriptorFile(directoryFd, fileName, {
         fsImpl.constants.O_NONBLOCK
     );
     const stat = fsImpl.fstatSync(fd);
-    assertOwnerOnlyFileStat(stat, { maxBytes, code });
+    assertOwnerOnlyFileStat(stat, {
+      maxBytes,
+      code,
+      exactMode: 0o600
+    });
     const bytes = readExactDescriptor(fd, stat, {
       fsImpl,
       code,
@@ -574,7 +619,8 @@ function openPackageDirectory(root, packageName, {
     );
     const stat = fsImpl.fstatSync(fd);
     assertOwnerOnlyDirectoryStat(stat, {
-      code: 'owner_mapping_package_directory_security_invalid'
+      code: 'owner_mapping_package_directory_security_invalid',
+      exactMode: 0o700
     });
     const postOpenStat = fsImpl.lstatSync(entryPath);
     if (!sameStableStat(pathStat, stat) ||
@@ -605,7 +651,8 @@ function assertOpenPackageIdentity(root, packageName, packageDirectory, fsImpl =
 function assertNamedOwnerDirectoryIdentity(directoryFd, entryName, expectedStat, {
   fsImpl = fs,
   code,
-  requireWrite = false
+  requireWrite = false,
+  exactMode = null
 } = {}) {
   let observed;
   try {
@@ -615,7 +662,8 @@ function assertNamedOwnerDirectoryIdentity(directoryFd, entryName, expectedStat,
   }
   assertOwnerOnlyDirectoryStat(observed, {
     code,
-    requireWrite
+    requireWrite,
+    exactMode
   });
   if (observed.isSymbolicLink() || !sameStableStat(expectedStat, observed)) {
     reject(code);
@@ -627,7 +675,8 @@ function verifyPackageDescriptor(packageFd, packagePath, {
 } = {}) {
   const initialDirectoryStat = fsImpl.fstatSync(packageFd);
   assertOwnerOnlyDirectoryStat(initialDirectoryStat, {
-    code: 'owner_mapping_package_directory_security_invalid'
+    code: 'owner_mapping_package_directory_security_invalid',
+    exactMode: 0o700
   });
   let entries;
   try {
@@ -758,6 +807,7 @@ function assertNoReplaceHelper(fsImpl = fs) {
 function runNoReplaceHelper(rootFd, arguments_, {
   fsImpl = fs,
   platform = process.platform,
+  probeParentFd = null,
   spawnSyncImpl = childProcess.spawnSync
 } = {}) {
   requireDescriptorPlatform(fsImpl, platform);
@@ -765,6 +815,8 @@ function runNoReplaceHelper(rootFd, arguments_, {
 
   let result;
   try {
+    const stdio = ['ignore', 'ignore', 'ignore', rootFd];
+    if (probeParentFd !== null) stdio.push(probeParentFd);
     result = spawnSyncImpl(
       PYTHON_EXECUTABLE,
       ['-I', NO_REPLACE_HELPER_PATH, ...arguments_],
@@ -773,7 +825,7 @@ function runNoReplaceHelper(rootFd, arguments_, {
           LANG: 'C',
           LC_ALL: 'C'
         },
-        stdio: ['ignore', 'ignore', 'ignore', rootFd],
+        stdio,
         timeout: 30_000,
         windowsHide: true
       }
@@ -784,18 +836,24 @@ function runNoReplaceHelper(rootFd, arguments_, {
   return result;
 }
 
-function probeNoReplacePrimitive(rootFd, {
+function probeNoReplacePrimitive(root, {
   fsImpl = fs,
   platform = process.platform,
   spawnSyncImpl = childProcess.spawnSync
 } = {}) {
-  const result = runNoReplaceHelper(rootFd, ['--probe'], {
-    fsImpl,
-    platform,
-    spawnSyncImpl
-  });
-  if (result?.status === 0 && !result.error && result.signal === null) return;
-  reject('owner_mapping_noreplace_primitive_unavailable');
+  const parent = openProbeParentDirectory(root, fsImpl);
+  try {
+    const result = runNoReplaceHelper(root.fd, ['--probe', parent.rootName], {
+      fsImpl,
+      platform,
+      probeParentFd: parent.fd,
+      spawnSyncImpl
+    });
+    if (result?.status === 0 && !result.error && result.signal === null) return;
+    reject('owner_mapping_noreplace_primitive_unavailable');
+  } finally {
+    closeDescriptor(parent.fd, fsImpl);
+  }
 }
 
 function renameDirectoryNoReplace(rootFd, sourceName, targetName, {
@@ -846,7 +904,8 @@ function planMappingPackage({
   packageName,
   fsImpl = fs,
   repoRoot = repositoryRoot(),
-  platform = process.platform
+  platform = process.platform,
+  spawnSyncImpl = childProcess.spawnSync
 } = {}) {
   const name = validatePackageName(packageName);
   const root = openVerifiedOwnerDirectory(privateRoot, {
@@ -858,7 +917,11 @@ function planMappingPackage({
   try {
     inspectTargetAbsent(root.fd, name, fsImpl);
     inspectStagingAbsent(root.fd, name, fsImpl);
-    probeNoReplacePrimitive(root.fd, { fsImpl, platform });
+    probeNoReplacePrimitive(root, {
+      fsImpl,
+      platform,
+      spawnSyncImpl
+    });
     const state = parseMappingBytes(readOwnerOnlyPath(mappingSource, {
       fsImpl,
       repoRoot,
@@ -1079,7 +1142,7 @@ function applyMappingPackage({
   try {
     inspectTargetAbsent(root.fd, name, fsImpl);
     inspectStagingAbsent(root.fd, name, fsImpl);
-    probeNoReplacePrimitive(root.fd, { fsImpl, platform });
+    probeNoReplacePrimitive(root, { fsImpl, platform });
     const state = parseMappingBytes(readOwnerOnlyPath(mappingSource, {
       fsImpl,
       repoRoot,
@@ -1134,7 +1197,8 @@ function applyMappingPackage({
     const committedStat = fsImpl.fstatSync(staging.fd);
     assertNamedOwnerDirectoryIdentity(root.fd, name, committedStat, {
       fsImpl,
-      code: 'owner_mapping_package_identity_changed'
+      code: 'owner_mapping_package_identity_changed',
+      exactMode: 0o700
     });
     assertOpenRootIdentity(root, fsImpl);
     closeDescriptor(staging.fd, fsImpl);

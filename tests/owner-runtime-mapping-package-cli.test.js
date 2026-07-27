@@ -192,6 +192,61 @@ test('check rejects FIFO package entries without blocking', (t) => {
   }
 });
 
+test('no-replace helper rejects an ENOSYS probe result', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'owner-mapping-probe-'));
+  fs.chmodSync(base, 0o700);
+  const privateRoot = path.join(base, 'private-root');
+  fs.mkdirSync(privateRoot, { mode: 0o700 });
+  fs.chmodSync(privateRoot, 0o700);
+  const helperPath = path.join(
+    workspaceRoot,
+    'scripts',
+    'owner-mapping-rename-noreplace.py'
+  );
+  let rootFd = null;
+  let parentFd = null;
+  try {
+    rootFd = fs.openSync(
+      privateRoot,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY
+    );
+    parentFd = fs.openSync(
+      base,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY
+    );
+    const script = [
+      'import ctypes, errno, importlib.util, sys',
+      'spec = importlib.util.spec_from_file_location("owner_mapping_helper", sys.argv[1])',
+      'helper = importlib.util.module_from_spec(spec)',
+      'spec.loader.exec_module(helper)',
+      'def unsupported(*_arguments):',
+      '    ctypes.set_errno(errno.ENOSYS)',
+      '    return -1',
+      'def supported(*_arguments):',
+      '    ctypes.set_errno(errno.EEXIST)',
+      '    return -1',
+      'assert not helper.probe_renameat2(unsupported, "private-root")',
+      'assert helper.probe_renameat2(supported, "private-root")'
+    ].join('\n');
+    const probe = spawnSync(
+      '/usr/bin/python3',
+      ['-I', '-B', '-c', script, helperPath],
+      {
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe', rootFd, parentFd],
+        timeout: 5_000
+      }
+    );
+    assert.equal(probe.error, undefined, probe.error?.message);
+    assert.equal(probe.status, 0, probe.stderr);
+    assert.equal(probe.stdout, '');
+  } finally {
+    if (parentFd !== null) fs.closeSync(parentFd);
+    if (rootFd !== null) fs.closeSync(rootFd);
+    cleanup(base);
+  }
+});
+
 test('desktop launchers are repository-relative and WSL distribution is configurable', () => {
   const linuxPath = path.join(
     workspaceRoot,
@@ -227,6 +282,8 @@ test('desktop launchers are repository-relative and WSL distribution is configur
 
   assert.equal(fs.statSync(noReplaceHelperPath).mode & 0o777, 0o755);
   assert.match(noReplaceHelper, /RENAME_NOREPLACE = 1/);
+  assert.match(noReplaceHelper, /def probe_renameat2/);
+  assert.match(noReplaceHelper, /ctypes\.get_errno\(\) == errno\.EEXIST/);
   assert.match(noReplaceHelper, /\.renameat2/);
   assert.doesNotMatch(noReplaceHelper, /\bprint\s*\(/);
 });

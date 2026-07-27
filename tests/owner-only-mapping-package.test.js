@@ -131,6 +131,49 @@ test('plan fails closed before mapping read when no-replace primitive is unavail
   }
 });
 
+test('plan fails closed when the no-replace syscall probe reports unavailable', () => {
+  const fixture = makeFixture();
+  try {
+    let mappingOpened = false;
+    let observedArguments = null;
+    const trackingFs = new Proxy(fs, {
+      get(target, property, receiver) {
+        if (property === 'openSync') {
+          return (targetPath, ...args) => {
+            if (String(targetPath).endsWith('/mapping.json')) {
+              mappingOpened = true;
+            }
+            return fs.openSync(targetPath, ...args);
+          };
+        }
+        return Reflect.get(target, property, receiver);
+      }
+    });
+    const unsupportedProbe = (_executable, arguments_) => {
+      observedArguments = arguments_;
+      return {
+        error: undefined,
+        signal: null,
+        status: 78
+      };
+    };
+
+    expectCode(
+      () => planMappingPackage({
+        ...fixture,
+        fsImpl: trackingFs,
+        spawnSyncImpl: unsupportedProbe
+      }),
+      'owner_mapping_noreplace_primitive_unavailable'
+    );
+    assert.equal(observedArguments.includes('--probe'), true);
+    assert.equal(mappingOpened, false);
+    assert.deepEqual(fs.readdirSync(fixture.privateRoot), []);
+  } finally {
+    cleanup(fixture.base);
+  }
+});
+
 test('apply requires explicit private-config confirmation and leaves no files when absent', () => {
   const fixture = makeFixture();
   try {
@@ -233,6 +276,47 @@ test('descriptor-bound reads reject source and package-file symlinks', () => {
       );
     } finally {
       cleanup(fixture.base);
+    }
+  }
+});
+
+test('package verification rejects directory or file permission drift', () => {
+  for (const mode of [0o400, 0o700, 0o4600]) {
+    const fixture = makeFixture();
+    try {
+      applyMappingPackage({ ...fixture, confirmed: true });
+      const mappingPath = path.join(
+        fixture.privateRoot,
+        fixture.packageName,
+        MAPPING_FILE_NAME
+      );
+      fs.chmodSync(mappingPath, mode);
+
+      expectCode(
+        () => checkMappingPackage(fixture),
+        'owner_mapping_package_mapping_invalid'
+      );
+    } finally {
+      cleanup(fixture.base);
+    }
+  }
+
+  for (const mode of [0o500, 0o1700]) {
+    const directoryFixture = makeFixture();
+    const packageRoot = path.join(
+      directoryFixture.privateRoot,
+      directoryFixture.packageName
+    );
+    try {
+      applyMappingPackage({ ...directoryFixture, confirmed: true });
+      fs.chmodSync(packageRoot, mode);
+      expectCode(
+        () => checkMappingPackage(directoryFixture),
+        'owner_mapping_package_directory_security_invalid'
+      );
+    } finally {
+      if (fs.existsSync(packageRoot)) fs.chmodSync(packageRoot, 0o700);
+      cleanup(directoryFixture.base);
     }
   }
 });
