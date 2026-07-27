@@ -8,7 +8,7 @@
 - Machine companion: `.agent_board/CURRENT_FACTS.json`
 - Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`
 - Active task: `null`
-- Last completed governance task: `CM-2155 / CMV-2240`
+- Last completed source/security task: `CM-2156 / CMV-2241`
 - Accepted product baseline: PR `#61`, reviewed head `4680b4c1…`, merge
   `ef62d481…`, main CI run `30238902177`
 
@@ -20,6 +20,9 @@ task-context relevance is unproven.
 
 Jenn must select the next product goal. This file does not select or reactivate
 a task.
+
+The last completed delivery is source-only and has not written real private
+configuration or verified a private runtime.
 
 ## Live Facts
 

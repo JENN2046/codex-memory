@@ -3,22 +3,26 @@
 > Non-authoritative checkpoint pointer. Current authority is
 > `CURRENT_STATE.md`.
 
-## CM-2155 Governance Surface Reset
+## CM-2156 Owner-Only Mapping Package Preflight
 
 Status: `COMPLETED_VALIDATED`
 
-- Validation: `CMV-2240`
+- Validation: `CMV-2241`
 - Active task after closeout: `null`
 - Active queue after closeout: empty
-- Snapshot schema: `5`
+- Package shape: mapping-only child of an existing complete private root
+- Filesystem boundary: Linux/WSL owner-only descriptor semantics
+- Apply boundary: explicit private-config write; no agent authorization implied
 - Accepted product baseline: PR `#61`
 - Reviewed product head: `4680b4c1…`
 - Product merge baseline: `ef62d481…`
 - Accepted main CI run: `30238902177`
 - Historical baseline: `ef62d481…`
 
-The reset removes duplicated active history from the default work path while
-preserving recovery through Git. It does not remove `docs/` history, change
+The source-only utility replaces the abandoned incomplete-root prototype with
+bounded `plan` / `apply` / `check` operations, mapping-only bindings, atomic
+owner-only package creation, low-disclosure receipts, and synthetic negative
+tests. It was not applied to real private configuration and does not change
 runtime/provider behavior, expand public MCP schemas, change dependencies or
 CI, perform memory operations, or authorize readiness.
 

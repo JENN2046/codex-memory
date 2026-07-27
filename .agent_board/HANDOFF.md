@@ -10,11 +10,15 @@ task:
 
 - status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`;
 - active task: `null`;
-- last completed governance task: `CM-2155 / CMV-2240`;
+- last completed source/security task: `CM-2156 / CMV-2241`;
 - accepted product baseline: PR `#61`, reviewed head `4680b4c1…`, merge
   `ef62d481…`, main CI run `30238902177`;
 - private dogfood observation schema: `3`;
 - active queue: empty.
+
+The completed delivery adds a source-only owner-only mapping package preflight
+under an existing complete private root. It has not been applied to real
+private configuration and is not private-runtime verification.
 
 ## Remaining Product Blockers
 
@@ -32,7 +36,7 @@ before treating it as active.
 
 ## Safety Boundary
 
-No runtime/provider/private-config/memory action, public MCP expansion,
+No real runtime/provider/private-config/memory action, public MCP expansion,
 dependency or CI workflow change, production/release/deploy/cutover operation,
 or readiness claim is authorized by this handoff.
 
