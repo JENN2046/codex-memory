@@ -2,6 +2,10 @@
 
 更新时间：2026-05-31
 
+Current authority rule: normal work starts only from `CURRENT_STATE.md`.
+Everything else in this document is a navigation, machine-validation, or
+historical surface and must not independently select an active task.
+
 ## 目的
 
 `codex-memory` 已从阶段推进进入维护期。维护期最大风险不是缺少文档，而是当前状态、历史记录、任务队列和运行证据混在一起。
@@ -14,9 +18,10 @@
 
 当前上下文治理入口：
 
-- [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md)：短人类当前态入口。
+- [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md)：唯一默认当前态与工作入口。
 - [docs/CONTEXT_INTAKE_CONTRACT.md](/A:/codex-memory/docs/CONTEXT_INTAKE_CONTRACT.md)：每轮默认上下文合同。
 - [docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md](/A:/codex-memory/docs/archive/CM1420_CONTEXT_SURFACE_COMPRESSION_INDEX.md)：CM-1420 压缩状态面的历史索引。
+- [docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md](/A:/codex-memory/docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md)：schema v5 硬收口前历史恢复索引。
 
 第一阶段只做文档面瘦身：
 
@@ -28,10 +33,10 @@
 
 瘦身后的恢复路径应尽量只依赖少数入口：
 
-1. [README.md](/A:/codex-memory/README.md)：操作地图和能力/命令入口。
-2. [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md)：短人类当前态和下一安全动作。
-3. [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json)：提交到仓库的当前状态/验证快照；live Git facts 必须来自 fresh Git 命令。
-4. [STATUS.md](/A:/codex-memory/STATUS.md)：当前事实的人类摘要，不承载完整历史，也不重复完整当前 commit hash。
+1. [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md)：唯一默认当前态和下一安全动作。
+2. [README.md](/A:/codex-memory/README.md)：操作地图和能力/命令入口。
+3. [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json)：提交到仓库的 schema v5 机器快照；live Git facts 必须来自 fresh Git 命令。
+4. [STATUS.md](/A:/codex-memory/STATUS.md)：非权威短摘要。
 5. [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md)：当前后续路线。
 6. [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) 与 [.agent_board/VALIDATION_LOG.md](/A:/codex-memory/.agent_board/VALIDATION_LOG.md)：短当前任务和验证 ledger；历史通过 archive index / Git history 引用。
 
@@ -40,9 +45,9 @@
 | 文件 | 职责 | 更新频率 |
 |---|---|---|
 | [README.md](/A:/codex-memory/README.md) | operation map：能力入口、架构入口、命令入口、接入入口 | 低频 |
-| [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md) | 短人类当前态入口；不提交 live `HEAD` / `origin/main` / ahead-behind | 每批任务 |
-| [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json) | 当前状态/验证快照；不提交 live `HEAD` / `origin/main`，branch/head/origin/ahead-behind 必须由 fresh Git 命令采集 | 每批任务 |
-| [STATUS.md](/A:/codex-memory/STATUS.md) | 当前事实的人类摘要；active block 必须引用 `.agent_board/CURRENT_FACTS.json` | 中频 |
+| [CURRENT_STATE.md](/A:/codex-memory/CURRENT_STATE.md) | 唯一默认当前态入口；不提交 live `HEAD` / `origin/main` / ahead-behind | 每批任务 |
+| [.agent_board/CURRENT_FACTS.json](/A:/codex-memory/.agent_board/CURRENT_FACTS.json) | schema v5 机器伴随快照；不提交 live branch/head/origin/ahead-behind/当前 PR/CI | 每批任务 |
+| [STATUS.md](/A:/codex-memory/STATUS.md) | 非权威短指针/摘要 | 中频 |
 | [CODEX_MEMORY_NEXT_PHASE_PLAN.md](/A:/codex-memory/CODEX_MEMORY_NEXT_PHASE_PLAN.md) | 当前后续路线和阶段顺序，不承担详细任务队列 | 低频 |
 | [PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md](/A:/codex-memory/PHASE_G_MEMORY_GOVERNANCE_RUNTIME_BOUNDARY_PLAN.md) | 当前 Phase G 阶段执行入口；由 `CODEX_MEMORY_NEXT_PHASE_PLAN.md` 链接，不替代 `STATUS.md` 或 `.agent_board` | 低频 |
 | [.agent_board/TASK_QUEUE.md](/A:/codex-memory/.agent_board/TASK_QUEUE.md) | 当前 active/local task queue | 每批任务 |
@@ -57,15 +62,14 @@
 
 默认上下文只带：
 
-- fresh Git facts
 - `CURRENT_STATE.md`
-- `.agent_board/CURRENT_FACTS.json`
-- 当前 changed files
-- 当前 validation output
-- boundary declaration
-- requested decision
+- Jenn 当前请求直接需要的文件
 
-不要默认灌入完整 checkpoint、handoff、validation log、task queue、历史 STATUS 正文或 raw memory/audit/store 内容。历史证据先用 task id、validation id、commit id、evidence path、archive index 引用；只有当前判断需要精确历史文字时才打开全文。
+Fresh Git/GitHub facts、`.agent_board/CURRENT_FACTS.json`、changed files 和
+validation output 只在当前判断需要时按需读取。不要默认灌入完整
+checkpoint、handoff、validation log、task queue、历史 STATUS 正文或 raw
+memory/audit/store 内容。历史证据先用 task id、validation id、commit id、
+evidence path、archive index 引用；只有当前判断需要精确历史文字时才打开全文。
 
 ## README 规则
 
@@ -93,23 +97,24 @@ README 不应该继续堆：
 
 STATUS 只表达当前事实，不堆长历史。
 
-STATUS 应该说明：
+STATUS 作为非权威短摘要可以说明：
 
 - 当前主线是否可用
 - 最新远端基线和最新本地验证锚点
 - 当前 health / compare / rollback 结论
 - 当前重要接入状态，例如 Claude MCP
 - 下一阶段入口
-- 当前 active block 引用 `.agent_board/CURRENT_FACTS.json`
+- `CURRENT_STATE.md` 权威指针
 
 STATUS 不应该重复整条 Phase D/E 历史。历史细节进入 [PHASE_E_CHECKPOINT_INDEX.md](/A:/codex-memory/PHASE_E_CHECKPOINT_INDEX.md)。
 
-STATUS、`.agent_board/RUN_STATE.md`、`.agent_board/HANDOFF.md`、`.agent_board/CHECKPOINT.md`、`.agent_board/TASK_QUEUE.md`、`.agent_board/VALIDATION_LOG.md` 和 `.agent_board/AUTOPILOT_LEDGER.md` 的 active block 必须：
-
-- 包含 `<!-- CURRENT-FACTS-ACTIVE-START -->` / `<!-- CURRENT-FACTS-ACTIVE-END -->`
-- 引用 `.agent_board/CURRENT_FACTS.json`
-- 包含当前 facts 的 `taskId` 和 `validationId`
-- 不写完整 40 位 commit hash
+只有 `CURRENT_STATE.md` 拥有
+`<!-- CURRENT-FACTS-ACTIVE-START -->` /
+`<!-- CURRENT-FACTS-ACTIVE-END -->` active block。`STATUS.md`、
+`.agent_board/RUN_STATE.md`、`.agent_board/HANDOFF.md`、
+`.agent_board/CHECKPOINT.md`、`.agent_board/TASK_QUEUE.md`、
+`.agent_board/VALIDATION_LOG.md` 和 `.agent_board/AUTOPILOT_LEDGER.md`
+必须是非权威指针或结构化单条记录，不得维护独立 active block。
 
 完整当前 commit hash 不应作为 live facts 提交到 `.agent_board/CURRENT_FACTS.json`；需要时用 fresh Git 命令采集，历史归档区可以保留历史 target-bound hash。
 
@@ -209,7 +214,7 @@ Tier 3 — Runtime / Red Lane
 
 - Tier 0：不需要 `.agent_board` 或 validation log；如果回答包含需要证明的状态结论，引用 fresh command output。
 - Tier 1：通常不需要 `.agent_board` 或 validation log；最终报告说明 diff inspection 和任何 targeted validation。
-- Tier 2：当改动影响 route、status、phase plan、validation policy、current-facts schema、AGENTS、docs governance 或 sustained task state 时，必须更新 `.agent_board/CURRENT_FACTS.json`、active blocks、task queue、validation log 和 ledger，使 `scripts/validate_current_facts_drift.js` 与 `scripts/validate_autopilot_ledger_consistency.js` 继续通过。
+- Tier 2：当改动影响 route、status、phase plan、validation policy、current-facts schema、AGENTS、docs governance 或 sustained task state 时，必须更新 `.agent_board/CURRENT_FACTS.json`、`CURRENT_STATE.md` 中唯一的 active block、active-only task queue、validation log 和 ledger，使 `scripts/validate_current_facts_drift.js` 与 `scripts/validate_autopilot_ledger_consistency.js` 继续通过。
 - Tier 3：必须保留 exact approval 或 Smart Standing Authorization v3 Amber receipt、validation、blocker、rollback / cleanup 记录；不得把 docs-only、fixture-only、no-apply 或 committed current-facts snapshot 解释成 runtime readiness。
 
 最低 tier 规则：

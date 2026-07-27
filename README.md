@@ -2,6 +2,10 @@
 
 Primary manual: [中文使用说明书](README.zh-CN.md)
 
+Default work entrypoint: [CURRENT_STATE.md](CURRENT_STATE.md). It is the only
+default current-work authority; board files, status summaries, plans, and
+roadmaps are loaded only when the current task requires them.
+
 `codex-memory` is the governed MCP bridge that lets Codex and Claude access
 VCPToolBox native memory without making `codex-memory` the memory-intelligence
 owner.
@@ -51,7 +55,11 @@ Long-term goal and boundary documents:
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
-## Current Status
+## Product Baseline Background (Non-Authoritative)
+
+The material below describes product capabilities and the accepted product
+baseline. It does not select active work. Use [CURRENT_STATE.md](CURRENT_STATE.md)
+for current status, blockers, and the next safe action.
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 

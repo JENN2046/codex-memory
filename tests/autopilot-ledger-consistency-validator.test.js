@@ -1,84 +1,423 @@
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const os = require('node:os');
-const path = require('node:path');
+"use strict";
+
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
+const test = require("node:test");
+
 const {
+  containsExactIdToken,
   parseMarkdownTable,
   validateAutopilotLedgerConsistency
-} = require('../scripts/validate_autopilot_ledger_consistency');
+} = require("../scripts/validate_autopilot_ledger_consistency");
 
-function writeBoard(root, { latestLedgerId = 'CM-0705', latestTaskId = 'CM-0705', latestValidationScope = 'CM-0705' } = {}) {
-  const board = path.join(root, '.agent_board');
-  fs.mkdirSync(board, { recursive: true });
-  fs.writeFileSync(path.join(board, 'TASK_QUEUE.md'), [
-    '| ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |',
-    '|---|---:|---|---|---|---|---|---|---|---|---|',
-    `| ${latestTaskId} | 705 | done | P6-docs-drift | A1 | \`.agent_board/*\` | latest task | docs validation | none | no | completed |`,
-    '| CM-0704 | 704 | done | P0-mainline-health | A2 | `tests/*` | previous task | tests | none | no | completed |'
-  ].join('\n'));
-  fs.writeFileSync(path.join(board, 'VALIDATION_LOG.md'), [
-    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
-    '|---|---|---|---|---|---|---|---|',
-    `| CMV-0824 | docs validation | P6-docs-drift | ${latestValidationScope} latest validation | COMPLETED_VALIDATED | ok | none | 2026-05-21 |`,
-    '| CMV-0823 | tests | P0-mainline-health | CM-0704 previous validation | COMPLETED_VALIDATED | ok | none | 2026-05-21 |'
-  ].join('\n'));
-  fs.writeFileSync(path.join(board, 'AUTOPILOT_LEDGER.md'), [
-    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
-    '|---|---|---|---|---|---|---|---|---:|---|---|',
-    `| ${latestLedgerId} | latest ledger | Green | \`default_autonomy_envelope\` | action | receipt | \`CMV-0824\` docs validation passed | provider=0 | 0 | completed_validated | 2026-05-21 |`,
-    '| CM-0704 | previous ledger | Green | `default_autonomy_envelope` | action | receipt | `CMV-0823` tests passed | provider=0 | 0 | completed_validated | 2026-05-21 |'
-  ].join('\n'));
+const FIXTURE_TASK_ID = "CM-2991";
+const FIXTURE_VALIDATION_ID = "CMV-2992";
+
+function writeFile(root, relativePath, text) {
+  const fullPath = path.join(root, relativePath);
+  fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+  fs.writeFileSync(fullPath, text);
 }
 
-function tempRoot() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-ledger-validator-'));
+function baseFacts(activeTask = null) {
+  return {
+    schemaVersion: 5,
+    activeTask,
+    lastCompleted: {
+      taskId: FIXTURE_TASK_ID,
+      validationId: FIXTURE_VALIDATION_ID
+    }
+  };
 }
 
-test('parseMarkdownTable returns row objects from a simple markdown table', () => {
-  const rows = parseMarkdownTable([
-    '| ID | Status |',
-    '|---|---|',
-    '| CM-0705 | done |'
-  ].join('\n'));
-  assert.deepEqual(rows, [{ ID: 'CM-0705', Status: 'done' }]);
-});
+function queue(rows = []) {
+  return [
+    "| ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |",
+    "|---|---:|---|---|---|---|---|---|---|---|---|",
+    ...rows
+  ].join("\n");
+}
 
-test('parseMarkdownTable preserves pipes inside inline code cells', () => {
+function validation(rows = null) {
+  return [
+    "| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |",
+    "|---|---|---|---|---|---|---|---|",
+    ...(rows || [
+      `| ${FIXTURE_VALIDATION_ID} | tests | P6 | ${FIXTURE_TASK_ID} synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |`
+    ])
+  ].join("\n");
+}
+
+function ledger(rows = null) {
+  return [
+    "| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |",
+    "|---|---|---|---|---|---|---|---|---:|---|---|",
+    ...(rows || [
+      `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
+    ])
+  ].join("\n");
+}
+
+function workspace() {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ledger-v5-"));
+  writeFile(root, ".agent_board/CURRENT_FACTS.json", `${JSON.stringify(baseFacts(), null, 2)}\n`);
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue());
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation());
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger());
+  return root;
+}
+
+test("parseMarkdownTable preserves pipes inside inline code cells", () => {
   const rows = parseMarkdownTable([
-    '| ID | Command / Check | Scope | Result |',
-    '|---|---|---|---|',
-    '| CMV-0827 | `rg -n "Chinese Task Summary Closeout|任务总结" AGENTS.md` | CM-0708 parser validation | COMPLETED_VALIDATED |'
-  ].join('\n'));
+    "| ID | Command / Check | Scope | Result |",
+    "|---|---|---|---|",
+    `| ${FIXTURE_VALIDATION_ID} | \`rg -n "Closeout|任务总结" AGENTS.md\` | ${FIXTURE_TASK_ID} synthetic | COMPLETED_VALIDATED |`
+  ].join("\n"));
 
   assert.equal(rows.length, 1);
-  assert.equal(rows[0].ID, 'CMV-0827');
-  assert.match(rows[0]['Command / Check'], /Closeout\|任务总结/);
-  assert.match(rows[0].Scope, /CM-0708/);
+  assert.equal(rows[0].ID, FIXTURE_VALIDATION_ID);
+  assert.match(rows[0]["Command / Check"], /Closeout\|任务总结/);
 });
 
-test('validator accepts matching latest task, validation scope, and ledger row', () => {
-  const root = tempRoot();
-  writeBoard(root);
+test("containsExactIdToken rejects prefix and suffix near-collisions", () => {
+  assert.equal(containsExactIdToken("scope CM-3001 complete", "CM-3001"), true);
+  assert.equal(containsExactIdToken("scope (`CM-3001`) complete", "CM-3001"), true);
+  assert.equal(containsExactIdToken("scope CM-30010 complete", "CM-3001"), false);
+  assert.equal(containsExactIdToken("scope CM-3001-extra complete", "CM-3001"), false);
+  assert.equal(containsExactIdToken("scope CM-3001_extra complete", "CM-3001"), false);
+  assert.equal(containsExactIdToken("validation CMV-30020", "CMV-3002"), false);
+  assert.equal(containsExactIdToken("validation CMV-3002-extra", "CMV-3002"), false);
+  assert.equal(containsExactIdToken("validation CMV-3002_extra", "CMV-3002"), false);
+  assert.equal(containsExactIdToken("xCM-3001", "CM-3001"), false);
+  assert.equal(containsExactIdToken("_CM-3001", "CM-3001"), false);
+});
+
+test("ledger validator accepts an empty active queue as a terminal state", () => {
+  const root = workspace();
   const result = validateAutopilotLedgerConsistency(root);
-  assert.equal(result.ok, true);
-  assert.equal(result.latestTask, 'CM-0705');
-  assert.equal(result.latestLedger, 'CM-0705');
-  assert.equal(result.latestValidationScope, 'CM-0705');
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.activeTask, null);
+  assert.equal(result.activeQueueCount, 0);
+  assert.equal(result.lastCompletedTask, FIXTURE_TASK_ID);
+  assert.equal(result.lastCompletedValidation, FIXTURE_VALIDATION_ID);
 });
 
-test('validator rejects missing latest ledger row', () => {
-  const root = tempRoot();
-  writeBoard(root, { latestLedgerId: 'CM-0704' });
+test("ledger validator accepts a future lastCompleted id pair when receipts rotate together", () => {
+  const root = workspace();
+  const changed = baseFacts();
+  changed.lastCompleted = {
+    taskId: "CM-3001",
+    validationId: "CMV-3002"
+  };
+  writeFile(root, ".agent_board/CURRENT_FACTS.json", `${JSON.stringify(changed, null, 2)}\n`);
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([
+    "| CMV-3002 | tests | P6 | CM-3001 selected goal | COMPLETED_VALIDATED | ok | none | 2026-07-28 |"
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    "| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |"
+  ]));
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+  assert.equal(result.lastCompletedTask, "CM-3001");
+  assert.equal(result.lastCompletedValidation, "CMV-3002");
+});
+
+test("ledger validator rejects near-collision receipt bindings", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([
+    `| ${FIXTURE_VALIDATION_ID} | tests | P6 | ${FIXTURE_TASK_ID}0 synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |`
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID}0 | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
+  ]));
+
   const result = validateAutopilotLedgerConsistency(root);
   assert.equal(result.ok, false);
-  assert.match(result.failures.join('\n'), /Latest ledger row CM-0704 does not match latest done task CM-0705/);
+  assert.match(result.failures.join("\n"), new RegExp(`${FIXTURE_VALIDATION_ID} scope must bind ${FIXTURE_TASK_ID}`));
+  assert.match(result.failures.join("\n"), new RegExp(`${FIXTURE_TASK_ID} ledger receipt must reference ${FIXTURE_VALIDATION_ID}`));
 });
 
-test('validator rejects stale latest validation scope', () => {
-  const root = tempRoot();
-  writeBoard(root, { latestValidationScope: 'CM-0704' });
+test("governance kernel delegates rotating receipt binding without pinning the reset id", () => {
+  const source = fs.readFileSync(
+    path.resolve(__dirname, "..", "scripts", "validate_autopilot_governance_kernel.js"),
+    "utf8"
+  );
+  assert.match(source, /validateAutopilotLedgerConsistency/);
+  assert.doesNotMatch(source, /CM-2155|CMV-2240/);
+});
+
+test("ledger validator rejects a missing current validation row", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([]));
   const result = validateAutopilotLedgerConsistency(root);
   assert.equal(result.ok, false);
-  assert.match(result.failures.join('\n'), /Latest validation scope CM-0704 does not match latest done task CM-0705/);
+  assert.match(result.failures.join("\n"), new RegExp(`exactly one ${FIXTURE_VALIDATION_ID} row`));
+});
+
+test("ledger validator rejects a missing current ledger receipt", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), new RegExp(`exactly one ${FIXTURE_TASK_ID} receipt row`));
+});
+
+test("ledger validator rejects duplicate current receipts", () => {
+  const root = workspace();
+  const row = `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`;
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([row, row]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), new RegExp(`exactly one ${FIXTURE_TASK_ID} receipt row`));
+  assert.match(result.failures.join("\n"), /retain only the current lastCompleted receipt row/);
+});
+
+test("ledger validator rejects duplicate current validation rows", () => {
+  const root = workspace();
+  const row = `| ${FIXTURE_VALIDATION_ID} | tests | P6 | ${FIXTURE_TASK_ID} synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |`;
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([row, row]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), new RegExp(`exactly one ${FIXTURE_VALIDATION_ID} row`));
+  assert.match(result.failures.join("\n"), /retain only the current lastCompleted validation row/);
+});
+
+test("ledger validator rejects reintroduced historical done rows", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-2154 | 2154 | done | P6 | Green | docs | historical | tests | none | no | stale |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /must not contain historical done rows/);
+});
+
+test("ledger validator rejects every queue row when activeTask is null", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | blocked | P6 | Green | docs | blocked row | tests | none | no | blocked |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /activeTask null requires an empty active queue/);
+  assert.match(result.failures.join("\n"), /only todo or in_progress status/);
+});
+
+test("ledger validator rejects malformed CM queue rows before empty-queue selection", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | todo | P6 | Green | docs | unescaped | pipe | tests | none | no | active |",
+    "| CM-3002 | 3002 | todo | P6 | Green | docs | missing notes | tests | none | no |",
+    "CM-3006X | 3006 | todo | P6 | Green | docs | missing boundaries | tests | none | no | stale"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /must not contain malformed CM data rows/);
+});
+
+test("ledger validator rejects malformed validation and ledger rows beside current receipts", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([
+    `| ${FIXTURE_VALIDATION_ID} | tests | P6 | ${FIXTURE_TASK_ID} synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |`,
+    "| CMV-3003 | tests | P6 | CM-3004 unescaped | scope | COMPLETED_VALIDATED | extra | none | 2026-07-28 |",
+    "CMV-3003X | tests | P6 | CM-3004X missing boundaries | COMPLETED_VALIDATED | extra | none | 2026-07-28"
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`,
+    "| CM-3004 | extra | Yellow | closeout | complete | receipt | with | pipe | CMV-3003 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |",
+    "CM-3004X | extra | Yellow | closeout | complete | receipt | CMV-3003X | zero | 0 | COMPLETED_VALIDATED | 2026-07-28"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG must not contain malformed CM\/CMV data rows/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must not contain malformed CM\/CMV data rows/);
+});
+
+test("ledger validator rejects changed active-table headers", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/TASK_QUEUE.md",
+    queue().replace("| ID | Priority | Status |", "| ID | Priority | State |")
+  );
+  writeFile(
+    root,
+    ".agent_board/VALIDATION_LOG.md",
+    validation().replace("| ID | Command / Check | Area | Scope |", "| ID | Command / Check | Area | Target |")
+  );
+  writeFile(
+    root,
+    ".agent_board/AUTOPILOT_LEDGER.md",
+    ledger().replace("| ID | Goal | Lane |", "| ID | Objective | Lane |")
+  );
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /TASK_QUEUE must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must retain its exact table header and separator/);
+});
+
+test("ledger validator rejects duplicate active-table separators", () => {
+  const root = workspace();
+  const queueSeparator = "|---|---:|---|---|---|---|---|---|---|---|---|";
+  const validationSeparator = "|---|---|---|---|---|---|---|---|";
+  const ledgerSeparator = "|---|---|---|---|---|---|---|---|---:|---|---|";
+  writeFile(
+    root,
+    ".agent_board/TASK_QUEUE.md",
+    queue().replace(queueSeparator, `${queueSeparator}\n${queueSeparator}`)
+  );
+  writeFile(
+    root,
+    ".agent_board/VALIDATION_LOG.md",
+    validation().replace(validationSeparator, `${validationSeparator}\n${validationSeparator}`)
+  );
+  writeFile(
+    root,
+    ".agent_board/AUTOPILOT_LEDGER.md",
+    ledger().replace(ledgerSeparator, `${ledgerSeparator}\n${ledgerSeparator}`)
+  );
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /TASK_QUEUE must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must retain its exact table header and separator/);
+});
+
+test("ledger validator rejects a non-null non-CM activeTask", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts(7), null, 2)}\n`
+  );
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /activeTask must be null or a CM id/);
+});
+
+test("ledger validator accepts exactly one selected active queue row", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts("CM-3001"), null, 2)}\n`
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | in_progress | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("ledger validator rejects inline-code IDs that downstream parsers would drop", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts("CM-3001"), null, 2)}\n`
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| `CM-3001` | 3001 | todo | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([
+    `| \`${FIXTURE_VALIDATION_ID}\` | tests | P6 | ${FIXTURE_TASK_ID} synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |`
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| \`${FIXTURE_TASK_ID}\` | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
+  ]));
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /TASK_QUEUE IDs must use raw canonical CM format/);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG IDs must use raw canonical CMV format/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER IDs must use raw canonical CM format/);
+  assert.match(result.failures.join("\n"), /activeTask must match the single active queue row/);
+});
+
+test("ledger validator rejects noncanonical active status casing", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts("CM-3001"), null, 2)}\n`
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | TODO | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /only todo or in_progress status/);
+  assert.match(result.failures.join("\n"), /activeTask must match the single active queue row/);
+});
+
+test("ledger validator rejects noncanonical completed-family results", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([
+    `| ${FIXTURE_VALIDATION_ID} | tests | P6 | ${FIXTURE_TASK_ID} synthetic closeout | COMPLETED_VALIDATED_EXTRA | ok | none | 2026-07-27 |`
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | completed_validated | 2026-07-27 |`
+  ]));
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(
+    result.failures.join("\n"),
+    new RegExp(`${FIXTURE_VALIDATION_ID} result must be exactly COMPLETED_VALIDATED`)
+  );
+  assert.match(
+    result.failures.join("\n"),
+    new RegExp(`${FIXTURE_TASK_ID} ledger result must be exactly COMPLETED_VALIDATED`)
+  );
+});
+
+test("ledger validator rejects an empty current receipt", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete |  | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
+  ]));
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(
+    result.failures.join("\n"),
+    new RegExp(`${FIXTURE_TASK_ID} ledger receipt must be non-empty`)
+  );
+});
+
+test("ledger validator rejects extra queue rows beside activeTask", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts("CM-3001"), null, 2)}\n`
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | todo | P6 | Green | docs | selected row | tests | none | no | active |",
+    "| CM-3002 | 3002 | todo | P6 | Green | docs | extra row | tests | none | no | extra |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /must match the single active queue row/);
+});
+
+test("ledger validator rejects active task and queue disagreement", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts("CM-9999"), null, 2)}\n`
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-9998 | 9998 | todo | P6 | Green | docs | wrong task | tests | none | no | active |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /must match the single active queue row/);
 });

@@ -4,6 +4,9 @@ const { spawn } = require('node:child_process');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+const {
+  collectAutopilotKernel
+} = require('../src/cli/dashboard');
 
 const REPO_ASSERTION_RECORD_PATH = path.join(
   process.cwd(),
@@ -120,6 +123,132 @@ function formatFailure(result) {
 function assertKeySet(value, expected, label) {
   assert.deepEqual(Object.keys(value).sort(), expected, `${label} keys`);
 }
+
+function currentCloseoutFacts(taskId = 'CM-2991', validationId = 'CMV-2992') {
+  return {
+    schemaVersion: 5,
+    lastCompleted: {
+      taskId,
+      validationId
+    }
+  };
+}
+
+test('dashboard autopilot kernel preserves escaped and inline-code pipes', () => {
+  const ledgerText = [
+    '# AUTOPILOT_LEDGER',
+    '',
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-2991 | synthetic | Yellow | closeout | complete | escaped \\| pipe; `rg -n "a|b" file` | CMV-2992 bound validation | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |'
+  ].join('\n');
+  const validationLogText = [
+    '# VALIDATION_LOG',
+    '',
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-2992 | `rg -n "a|b" file` | P6 | CM-2991 synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |'
+  ].join('\n');
+
+  const result = collectAutopilotKernel({
+    workspaceRoot: process.cwd(),
+    currentFacts: currentCloseoutFacts(),
+    ledgerText,
+    validationLogText
+  });
+
+  assert.equal(result.status, 'ok');
+  assert.equal(result.latest_ledger_goal, 'CM-2991');
+  assert.equal(result.latest_ledger_result, 'COMPLETED_VALIDATED');
+  assert.equal(result.latest_validation_id, 'CMV-2992');
+  assert.equal(result.validation_status, 'COMPLETED_VALIDATED');
+});
+
+test('dashboard autopilot kernel fails closed on an extra malformed ledger row', () => {
+  const ledgerText = [
+    '# AUTOPILOT_LEDGER',
+    '',
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-2991 | synthetic | Yellow | closeout | complete | receipt | CMV-2992 bound validation | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |',
+    '| CM-3001 | malformed | extra |'
+  ].join('\n');
+  const validationLogText = [
+    '# VALIDATION_LOG',
+    '',
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-2992 | tests | P6 | CM-2991 synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |'
+  ].join('\n');
+
+  const result = collectAutopilotKernel({
+    workspaceRoot: process.cwd(),
+    currentFacts: currentCloseoutFacts(),
+    ledgerText,
+    validationLogText
+  });
+
+  assert.equal(result.status, 'warn');
+  assert.equal(result.latest_ledger_goal, 'not_recorded');
+  assert.equal(result.latest_ledger_result, 'not_recorded');
+});
+
+test('dashboard autopilot kernel requires a non-empty current receipt', () => {
+  const ledgerText = [
+    '# AUTOPILOT_LEDGER',
+    '',
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-2991 | synthetic | Yellow | closeout | complete |  | CMV-2992 bound validation | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |'
+  ].join('\n');
+  const validationLogText = [
+    '# VALIDATION_LOG',
+    '',
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-2992 | tests | P6 | CM-2991 synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |'
+  ].join('\n');
+
+  const result = collectAutopilotKernel({
+    workspaceRoot: process.cwd(),
+    currentFacts: currentCloseoutFacts(),
+    ledgerText,
+    validationLogText
+  });
+
+  assert.equal(result.status, 'warn');
+  assert.equal(result.latest_ledger_goal, 'not_recorded');
+  assert.equal(result.latest_ledger_result, 'not_recorded');
+});
+
+test('dashboard autopilot kernel binds both rows to CURRENT_FACTS.lastCompleted', () => {
+  const ledgerText = [
+    '# AUTOPILOT_LEDGER',
+    '',
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-2991 | synthetic | Yellow | closeout | complete | receipt | CMV-2992-extra wrong validation | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |'
+  ].join('\n');
+  const validationLogText = [
+    '# VALIDATION_LOG',
+    '',
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-2992 | tests | P6 | CM-2991_extra wrong task | COMPLETED_VALIDATED | ok | none | 2026-07-27 |'
+  ].join('\n');
+
+  const result = collectAutopilotKernel({
+    workspaceRoot: process.cwd(),
+    currentFacts: currentCloseoutFacts(),
+    ledgerText,
+    validationLogText
+  });
+
+  assert.equal(result.status, 'warn');
+  assert.equal(result.latest_ledger_goal, 'not_recorded');
+  assert.equal(result.latest_validation_id, 'not_recorded');
+  assert.equal(result.validation_status, 'not_recorded');
+});
 
 test('dashboard CLI should report all sections in json mode', async () => {
   const result = await runDashboard({ args: ['--json'] });
@@ -517,7 +646,7 @@ test('dashboard CLI should report all sections in json mode', async () => {
   assert.equal(payload.autopilotKernel.validators.green_file_write_boundary, true);
   assert.equal(payload.autopilotKernel.validators.green_file_write_executor_contract, true);
   assert.match(payload.autopilotKernel.latest_ledger_goal, /^CM-\d{4}$/);
-  assert.match(payload.autopilotKernel.latest_ledger_result, /^completed/);
+  assert.equal(payload.autopilotKernel.latest_ledger_result, 'COMPLETED_VALIDATED');
   assert.match(payload.autopilotKernel.latest_validation_id, /^CMV-\d{4}$/);
   assert.equal(payload.autopilotKernel.readiness_claim_allowed, false);
   assert.equal(payload.autopilotLoop.status, 'ok');
@@ -847,7 +976,7 @@ test('dashboard CLI should support --json --summary-only', async (t) => {
   assert.equal(payload.autopilotKernel.example_count >= 14, true);
   assert.equal(payload.autopilotKernel.blocked_red_count >= 1, true);
   assert.match(payload.autopilotKernel.latest_validation_id, /^CMV-\d{4}$/);
-  assert.match(payload.autopilotKernel.validation_status, /^completed/);
+  assert.equal(payload.autopilotKernel.validation_status, 'COMPLETED_VALIDATED');
   assert.equal(payload.autopilotKernel.readiness_claim_allowed, false);
   assertKeySet(payload.autopilotLoop, [
     'blocked_red_count',

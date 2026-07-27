@@ -1,69 +1,64 @@
 # Context Intake Contract
 
-Purpose: keep Codex work on `codex-memory` fast, current, and auditable without loading long historical state into every turn.
+Purpose: keep `codex-memory` work current, bounded, and auditable without
+reloading historical status chains.
 
-This contract controls the default context packet for project work. It does not weaken `AGENTS.md`, `.agent_board/CURRENT_FACTS.json` schema v3, Red Lane approvals, validation gates, or source/test authority.
+## Sole Default Entry
 
-## Default Intake Packet
+For normal repository work, load `CURRENT_STATE.md` first and treat it as the
+only default work entry. Then load only files directly required by Jenn's
+current request.
 
-For normal repository work, load only:
+Do not select work from `.agent_board/`, `STATUS.md`, `ROADMAP.md`,
+`CODEX_MEMORY_NEXT_PHASE_PLAN.md`, historical docs, prior conversation, or
+recalled context.
 
-- fresh Git facts from `git status --short --branch`, `git log --oneline --decorate -n 5`, and `git diff --stat`
-- current task, status, route, validation, and next action from `CURRENT_STATE.md`
-- machine-readable status snapshot from `.agent_board/CURRENT_FACTS.json`
-- changed files or files directly relevant to the requested decision
-- validation output relevant to the current decision
-- explicit boundary declaration for side effects and hard stops
-- the requested decision or implementation target
+## On-Demand Facts
 
-Do not default-load full historical checkpoint, handoff, validation, task, status, or audit logs.
+Collect these only when the current decision needs them:
 
-## Historical Evidence Rule
+- fresh Git branch, HEAD, worktree, upstream, and ahead/behind facts;
+- fresh GitHub PR, review, and CI facts;
+- `.agent_board/CURRENT_FACTS.json` for machine validation;
+- changed source/tests/docs and relevant validation output;
+- exact historical artifacts referenced by the current decision.
 
-Historical evidence enters context by reference first:
-
-- task id
-- validation id
-- commit id when target-bound
-- evidence document path
-- archive index path
-
-Only open the full historical artifact when the current decision depends on its exact wording or proof details.
+Live Git/GitHub facts are never copied into committed current-state fields.
 
 ## Authority Order
 
-When context conflicts, use this order:
-
-1. Fresh Git output and observed command output.
-2. Current source and tests.
+1. Jenn's current instruction and higher-priority safety rules.
+2. Fresh repository, Git, GitHub, command, source, and test evidence.
 3. `CURRENT_STATE.md`.
-4. `.agent_board/CURRENT_FACTS.json`.
-5. Active blocks in `.agent_board`.
-6. Archive indexes and historical evidence docs.
-7. Prior conversation or memory.
+4. `.agent_board/CURRENT_FACTS.json` as its machine companion.
+5. Referenced historical evidence.
 
-Historical state is advisory until rechecked against repository reality.
+Pointer surfaces are not independent current authority.
+
+## Historical Evidence
+
+Enter history by bounded reference first: task id, validation id, commit id,
+path, or archive index. Open exact historical content only when the current
+decision depends on it.
+
+Use `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md` to recover
+pre-compaction status surfaces from Git.
 
 ## Forbidden Default Context
 
-Do not paste or default-load:
+Do not default-load raw memory, private stores, raw audit/log/JSONL/SQLite,
+provider responses, secrets, tokens, credentials, full historical checkpoints,
+handoffs, queues, validation logs, or status archives.
 
-- full `.agent_board/CHECKPOINT.md`
-- full `.agent_board/HANDOFF.md`
-- full `.agent_board/VALIDATION_LOG.md`
-- full `.agent_board/TASK_QUEUE.md`
-- full `STATUS.md` historical archive
-- raw memory, raw audit, raw `.jsonl`, raw SQLite, secrets, tokens, provider keys, or private store content
+## Closeout
 
-## Closeout Rule
+A meaningful task closeout updates:
 
-Every meaningful local work slice should leave:
+- `CURRENT_STATE.md`;
+- `.agent_board/CURRENT_FACTS.json`;
+- the active-only queue;
+- the single current validation and ledger receipt;
+- short pointer summaries only when they materially changed.
 
-- `CURRENT_STATE.md` updated with the short current state
-- `.agent_board/CURRENT_FACTS.json` updated as a committed status/validation snapshot when the task changes
-- active `.agent_board` files updated as short current ledgers, not long history dumps
-- archive index references for any compressed historical material
-
-Validation evidence should state what was run and what was not run. Docs-only, fixture-only, read-only, and live-runtime evidence must not be mixed.
-
-Routine post-push `npm run gate:mainline` evidence should use [Post-Push Gate Compact Mode](POST_PUSH_GATE_COMPACT_MODE.md): update the active status surfaces and validation ledger without adding a new receipt document unless the gate is unusual, approval-bound, source/runtime-sensitive, phase-closing, or explicitly requested as a standalone receipt.
+Historical auditability is retained through Git and the history index, not by
+copying old rows back into active surfaces.

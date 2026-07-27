@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const childProcess = require('node:child_process');
+const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 const {
@@ -46,6 +47,30 @@ test('v3 receipt parser core extracts latest local receipt summary', () => {
   assert.equal(summary.budget_used.mcp_tool, 0);
   assert.equal(summary.budget_used.memory_writes, 0);
   assert.equal(summary.next_auto_step_allowed, true);
+});
+
+test('current compact validation row remains parser-compatible after closeout id rotation', () => {
+  const repoRoot = path.resolve(__dirname, '..');
+  const facts = JSON.parse(fs.readFileSync(
+    path.join(repoRoot, '.agent_board', 'CURRENT_FACTS.json'),
+    'utf8'
+  ));
+  const markdown = fs.readFileSync(
+    path.join(repoRoot, '.agent_board', 'VALIDATION_LOG.md'),
+    'utf8'
+  );
+  const summary = parseReceiptMarkdown(markdown, {
+    sourcePath: '.agent_board/VALIDATION_LOG.md',
+    workspaceRoot: repoRoot
+  });
+
+  assert.equal(summary.source_row_count, 1);
+  assert.equal(summary.v3_row_count, 1);
+  assert.equal(summary.latest_v3_task_id, facts.lastCompleted.taskId);
+  assert.equal(summary.latest_validation_id, facts.lastCompleted.validationId);
+  assert.match(summary.latest_lane, /^(Green|Amber|Red)$/);
+  assert.notEqual(summary.latest_receipt_status, 'not_recorded');
+  assert.equal(summary.latest_parser_status, 'parser_ok');
 });
 
 test('v3 receipt parser core keeps pipes inside inline code cells', () => {

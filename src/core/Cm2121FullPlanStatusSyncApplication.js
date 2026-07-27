@@ -93,6 +93,13 @@ function insertTableRow(text, row, label) {
 function projectCurrentFacts(beforeBytes, projection = {}) {
   const historical = projection.historicalFrozenStatusSync === true;
   const facts = JSON.parse(beforeBytes.toString('utf8'));
+  // The byte-bound CM-2121 baseline uses schema v2 and the final
+  // pre-compaction current snapshot uses schema v4. Both are immutable legacy
+  // inputs. Schema v5 is the compact current authority and must never be
+  // expanded by this historical status-sync applicator.
+  if (![2, 4].includes(facts.schemaVersion)) {
+    throw new Error(`cm2121_current_facts_schema_unsupported:${facts.schemaVersion}`);
+  }
   facts.updatedAt = '2026-07-12';
   facts.taskId = TASK_ID;
   facts.validationId = VALIDATION_ID;

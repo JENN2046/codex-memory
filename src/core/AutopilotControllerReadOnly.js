@@ -3,7 +3,6 @@ const path = require('node:path');
 const {
   collectAutopilotClosedLoopSummary,
   isCurrentAutopilotTask,
-  parseLedgerRows,
   parseTaskQueue,
   parseValidationRows
 } = require('./AutopilotClosedLoopDryRun');
@@ -136,7 +135,6 @@ function buildReceiptRequirement(laneDecision) {
 function collectAutopilotControllerSummary(options = {}) {
   const workspaceRoot = options.workspaceRoot || process.cwd();
   const taskQueueText = readFileSafe(path.join(workspaceRoot, '.agent_board', 'TASK_QUEUE.md'));
-  const ledgerText = readFileSafe(path.join(workspaceRoot, '.agent_board', 'AUTOPILOT_LEDGER.md'));
   const validationLogText = readFileSafe(path.join(workspaceRoot, '.agent_board', 'VALIDATION_LOG.md'));
   const statusText = readFileSafe(path.join(workspaceRoot, 'STATUS.md'));
   const closedLoop = collectAutopilotClosedLoopSummary({ workspaceRoot });
@@ -146,10 +144,13 @@ function collectAutopilotControllerSummary(options = {}) {
   });
 
   const tasks = parseTaskQueue(taskQueueText).filter(isCurrentAutopilotTask);
-  const ledgerRows = parseLedgerRows(ledgerText);
   const validationRows = parseValidationRows(validationLogText);
-  const selectedTask = tasks.find(task => task.status === 'todo' || task.status === 'in_progress') || null;
-  const latestLedger = ledgerRows[ledgerRows.length - 1] || null;
+  const parsedSelectedTask =
+    tasks.find(task => task.status === 'todo' || task.status === 'in_progress') || null;
+  const selectedTask = parsedSelectedTask &&
+    closedLoop.next_safe_task === parsedSelectedTask.id
+    ? parsedSelectedTask
+    : null;
   const latestValidation = validationRows[0] || null;
   const laneDecision = inferLaneDecision(selectedTask);
   const validationPlan = buildValidationPlan(selectedTask);
@@ -162,15 +163,23 @@ function collectAutopilotControllerSummary(options = {}) {
     && exists(workspaceRoot, path.join('scripts', 'validate_autopilot_controller.js'));
   const validationRecorded = validationRows.some(row => row.scope.includes('CM-0692') && row.result === 'COMPLETED_VALIDATED');
   const noReadyClaim = statusText.includes('NOT_READY_BLOCKED') && !statusText.includes('RC_READY claim allowed');
-  const status = controllerFilesPresent && noReadyClaim ? 'ok' : 'warn';
+  const controllerSurfacesComplete = controllerFilesPresent && noReadyClaim;
+  const status = controllerSurfacesComplete && closedLoop.status === 'ok'
+    ? 'ok'
+    : 'warn';
+  const stopReason = !controllerSurfacesComplete
+    ? 'autopilot_controller_surface_incomplete'
+    : closedLoop.status !== 'ok'
+      ? closedLoop.stop_reason
+      : 'none';
 
   return {
     mode: 'autopilot-controller-v0-read-only-noop',
     status,
     decision: 'NOT_READY_BLOCKED',
     evidenceClass: 'read_only_local_filesystem_summary',
-    goal_id: latestLedger ? latestLedger.id : closedLoop.latest_goal,
-    controller_cycle_id: `CTRL-${latestLedger ? latestLedger.id : closedLoop.latest_goal}-READONLY-001`,
+    goal_id: closedLoop.latest_goal,
+    controller_cycle_id: `CTRL-${closedLoop.latest_goal}-READONLY-001`,
     current_state: closedLoop.next_safe_task === 'none_local_queue_empty' ? 'continued_or_stopped' : 'task_selected',
     next_safe_task: selectedTask ? selectedTask.id : closedLoop.next_safe_task,
     lane_decision: laneDecision,
@@ -240,7 +249,7 @@ function collectAutopilotControllerSummary(options = {}) {
     runtime_probe_performed: false,
     remote_actions_performed: false,
     controller_validation_recorded: validationRecorded,
-    stop_reason: status === 'ok' ? 'none' : 'autopilot_controller_surface_incomplete'
+    stop_reason: stopReason
   };
 }
 

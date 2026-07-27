@@ -1,22 +1,61 @@
 #!/usr/bin/env node
 "use strict";
 
+const childProcess = require("child_process");
 const fs = require("fs");
 const path = require("path");
-const { parseMarkdownTable } = require("./validate_autopilot_ledger_consistency");
+const {
+  ACTIVE_ROW_CANDIDATE_RE,
+  COMPLETED_RESULT,
+  TABLE_HEADERS,
+  containsExactIdToken,
+  hasNonEmptyReceipt,
+  hasExactTableShape,
+  isCanonicalCompletedResult,
+  parseMarkdownTable
+} = require("./validate_autopilot_ledger_consistency");
 
-const SHA40_RE = /^[0-9a-f]{40}$/;
-const SHA40_SCAN_RE = /\b[0-9a-f]{40}\b/gi;
-const CM_RE = /^CM-\d{4}$/;
-const CMV_RE = /^CMV-\d{4}$/;
-const SCHEMA_VERSION = 4;
-const FACTS_MODE = "committed_status_snapshot";
-const GIT_FACTS_SOURCE = "fresh_git_commands";
 const ACTIVE_START = "<!-- CURRENT-FACTS-ACTIVE-START -->";
 const ACTIVE_END = "<!-- CURRENT-FACTS-ACTIVE-END -->";
 const FACTS_PATH = ".agent_board/CURRENT_FACTS.json";
+const SCHEMA_VERSION = 5;
+const FACTS_MODE = "committed_status_snapshot";
+const HISTORY_BASELINE_COMMIT = "ef62d4819ece3d93cb90e2d55fa84973cf43b7d1";
+const SHA40_RE = /^[0-9a-f]{40}$/;
+const CM_RE = /^CM-\d{4}$/;
+const CMV_RE = /^CMV-\d{4}$/;
+const BLOCKER_ID_RE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
+const BLOCKER_STATUS_RE = /^[a-z][a-z0-9_]*$/;
 
-const REQUIRED_ACTIVE_FILES = [
+const EXPECTED_TOP_LEVEL_KEYS = Object.freeze([
+  "schemaVersion",
+  "factsMode",
+  "updatedAt",
+  "baseBranch",
+  "status",
+  "activeTask",
+  "lastCompleted",
+  "acceptedProductBaseline",
+  "contracts",
+  "blockers",
+  "history",
+  "liveGitFactsPolicy"
+]);
+
+const POINTER_FILES = Object.freeze([
+  "STATUS.md",
+  ".agent_board/RUN_STATE.md",
+  ".agent_board/HANDOFF.md",
+  ".agent_board/CHECKPOINT.md",
+  ".agent_board/TASK_QUEUE.md",
+  ".agent_board/VALIDATION_LOG.md",
+  ".agent_board/AUTOPILOT_LEDGER.md",
+  "ROADMAP.md",
+  "CODEX_MEMORY_NEXT_PHASE_PLAN.md"
+]);
+
+const ACTIVE_SURFACE_FILES = Object.freeze([
+  "CURRENT_STATE.md",
   "STATUS.md",
   ".agent_board/RUN_STATE.md",
   ".agent_board/HANDOFF.md",
@@ -24,12 +63,42 @@ const REQUIRED_ACTIVE_FILES = [
   ".agent_board/TASK_QUEUE.md",
   ".agent_board/VALIDATION_LOG.md",
   ".agent_board/AUTOPILOT_LEDGER.md"
-];
+]);
 
-const REQUIRED_DOC_REFERENCES = [
+const REQUIRED_DOC_REFERENCES = Object.freeze([
   "README.md",
-  "DOCS_GOVERNANCE.md"
-];
+  "AGENTS.md",
+  "docs/CONTEXT_INTAKE_CONTRACT.md"
+]);
+
+const REQUIRED_ACTIVE_FILES = ACTIVE_SURFACE_FILES;
+const HISTORY_INDEX_PATH = "docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md";
+const HISTORY_RESET_CLOSEOUT = Object.freeze({
+  taskId: "CM-2155",
+  validationId: "CMV-2240"
+});
+const HISTORY_RECOVERY_PATHS = Object.freeze([
+  "CURRENT_STATE.md",
+  ".agent_board/TASK_QUEUE.md",
+  ".agent_board/CURRENT_FACTS.json",
+  "STATUS.md"
+]);
+const STALE_ACTIVE_PHRASES = Object.freeze([
+  "CI must rerun",
+  "merge remains separate",
+  "next exact-head CI pending"
+]);
+const POINTER_SELF_AUTHORITY_RE =
+  /\b(?:this (?:file|document|surface|pointer) (?:is|serves as) (?:the )?(?:sole |only )?current(?: work)? authority|current authority\s*:\s*(?:this (?:file|document|surface|pointer)|self))\b/i;
+const SIZE_BUDGETS = Object.freeze({
+  "CURRENT_STATE.md": { kind: "lines", maximum: 120 },
+  [FACTS_PATH]: { kind: "bytes", maximum: 20 * 1024 },
+  ".agent_board/HANDOFF.md": { kind: "lines", maximum: 200 },
+  ".agent_board/CHECKPOINT.md": { kind: "lines", maximum: 200 },
+  "STATUS.md": { kind: "lines", maximum: 120 },
+  ".agent_board/RUN_STATE.md": { kind: "lines", maximum: 80 },
+  [HISTORY_INDEX_PATH]: { kind: "lines", maximum: 120 }
+});
 
 function readText(root, relativePath, failures) {
   const fullPath = path.join(root, relativePath);
@@ -45,314 +114,647 @@ function readJson(root, relativePath, failures) {
   if (!text) return null;
   try {
     return JSON.parse(text);
-  } catch (error) {
-    failures.push(`Invalid JSON in ${relativePath}: ${error.message}`);
+  } catch {
+    failures.push(`Invalid JSON in ${relativePath}`);
     return null;
   }
 }
 
+function countOccurrences(text, needle) {
+  return String(text).split(needle).length - 1;
+}
+
+function lineCount(text) {
+  const normalized = String(text).endsWith("\n") ? String(text).slice(0, -1) : String(text);
+  return normalized ? normalized.split(/\r?\n/).length : 0;
+}
+
 function extractActiveBlock(text, relativePath, failures) {
+  if (countOccurrences(text, ACTIVE_START) !== 1 || countOccurrences(text, ACTIVE_END) !== 1) {
+    failures.push(`${relativePath} must contain exactly one current-facts active block`);
+    return "";
+  }
   const start = text.indexOf(ACTIVE_START);
   const end = text.indexOf(ACTIVE_END);
-  if (start === -1 || end === -1 || end < start) {
-    failures.push(`${relativePath} missing CURRENT-FACTS active markers`);
+  if (end < start) {
+    failures.push(`${relativePath} current-facts active block markers are reversed`);
     return "";
   }
   return text.slice(start + ACTIVE_START.length, end);
 }
 
-function cmId(value) {
-  const match = String(value || "").match(/\bCM-\d{4}\b/);
-  return match ? match[0] : null;
+function sameStringSet(actual, expected) {
+  return Array.isArray(actual) &&
+    actual.length === expected.length &&
+    [...actual].sort().join("\n") === [...expected].sort().join("\n");
 }
 
-function cmNumber(value) {
-  const id = cmId(value);
-  return id ? Number(id.slice(3)) : null;
+function sameObjectKeys(actual, expected) {
+  return actual && typeof actual === "object" && !Array.isArray(actual) &&
+    sameStringSet(Object.keys(actual), expected);
 }
 
-function latestByCm(rows, fieldName, filter) {
-  return rows
-    .filter(filter)
-    .map((row) => ({ row, id: cmId(row[fieldName]), number: cmNumber(row[fieldName]) }))
-    .filter((item) => item.id && Number.isFinite(item.number))
-    .sort((left, right) => right.number - left.number)[0] || null;
+function blockerFingerprint(blocker) {
+  return JSON.stringify([
+    blocker && blocker.id,
+    blocker && blocker.status,
+    blocker && blocker.summary
+  ]);
 }
 
-function validateCurrentFactsSchema(facts, failures) {
+function extractHeadingSection(text, heading, nextHeading) {
+  const startMarker = `## ${heading}`;
+  const endMarker = `## ${nextHeading}`;
+  const start = String(text).indexOf(startMarker);
+  const end = String(text).indexOf(endMarker, start + startMarker.length);
+  if (start < 0 || end < 0 || end <= start) return "";
+  return String(text).slice(start + startMarker.length, end).trim();
+}
+
+function stripInlineCode(value) {
+  return String(value || "").replace(/^`|`$/g, "").trim();
+}
+
+function loadModuleFresh(modulePath) {
+  const resolved = require.resolve(modulePath);
+  delete require.cache[resolved];
+  return require(resolved);
+}
+
+function loadSourceContractFacts(root, failures) {
+  try {
+    const core = loadModuleFresh(path.join(root, "src/core/constants.js"));
+    const server = loadModuleFresh(path.join(root, "src/adapters/codex-mcp/server.js"));
+    const edge = loadModuleFresh(path.join(root, "packages/chatgpt-r4-contracts/constants.js"));
+    const observer = loadModuleFresh(path.join(root, "src/runtime/chatgpt-r4/private-dogfood-observer.js"));
+    return {
+      vcpCodexMemoryCore: Array.isArray(core.TOOL_DEFINITIONS) ? core.TOOL_DEFINITIONS.length : null,
+      codexDefaultExposed: typeof server.getPublicToolDefinitions === "function"
+        ? server.getPublicToolDefinitions({}).length
+        : null,
+      chatgptEdge: (
+        Array.isArray(edge.DATA_TOOL_NAMES) && Array.isArray(edge.RENDER_TOOL_NAMES)
+          ? edge.DATA_TOOL_NAMES.length + edge.RENDER_TOOL_NAMES.length
+          : null
+      ),
+      dogfoodObservationSchemaVersion: observer.DOGFOOD_OBSERVATION_SCHEMA_VERSION
+    };
+  } catch {
+    failures.push("Unable to load canonical source contract facts");
+    return null;
+  }
+}
+
+function validateCurrentFactsSchema(facts, root, failures) {
   if (!facts || typeof facts !== "object" || Array.isArray(facts)) {
     failures.push(`${FACTS_PATH} must contain a JSON object`);
     return;
   }
 
+  if (!sameStringSet(Object.keys(facts), EXPECTED_TOP_LEVEL_KEYS)) {
+    failures.push(`schema v5 top-level keys must be exactly: ${EXPECTED_TOP_LEVEL_KEYS.join(", ")}`);
+  }
   if (facts.schemaVersion !== SCHEMA_VERSION) failures.push(`schemaVersion must be ${SCHEMA_VERSION}`);
   if (facts.factsMode !== FACTS_MODE) failures.push(`factsMode must be ${FACTS_MODE}`);
-  if (facts.gitFactsSource !== GIT_FACTS_SOURCE) failures.push(`gitFactsSource must be ${GIT_FACTS_SOURCE}`);
-  if (facts.liveGitFactsCommitted !== false) failures.push("liveGitFactsCommitted must be false");
-  if (Object.prototype.hasOwnProperty.call(facts, "localHead")) {
-    failures.push("schema v4 must not commit localHead; collect live git facts with fresh git commands");
-  }
-  if (Object.prototype.hasOwnProperty.call(facts, "originHead")) {
-    failures.push("schema v4 must not commit originHead; collect live git facts with fresh git commands");
-  }
-  const liveGitFactsPolicy = facts.liveGitFactsPolicy;
-  if (!liveGitFactsPolicy || typeof liveGitFactsPolicy !== "object" || Array.isArray(liveGitFactsPolicy)) {
-    failures.push("liveGitFactsPolicy object is required");
-  } else {
-    if (liveGitFactsPolicy.currentHeadCommitted !== false) failures.push("liveGitFactsPolicy.currentHeadCommitted must be false");
-    if (liveGitFactsPolicy.originHeadCommitted !== false) failures.push("liveGitFactsPolicy.originHeadCommitted must be false");
-    if (liveGitFactsPolicy.freshGitRequiredBeforeRemoteAction !== true) {
-      failures.push("liveGitFactsPolicy.freshGitRequiredBeforeRemoteAction must be true");
-    }
-    if (liveGitFactsPolicy.freshGitRequiredBeforeRuntimeAction !== true) {
-      failures.push("liveGitFactsPolicy.freshGitRequiredBeforeRuntimeAction must be true");
-    }
-  }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(facts.updatedAt || ""))) {
     failures.push("updatedAt must use YYYY-MM-DD");
   }
-  if (!CM_RE.test(String(facts.taskId || ""))) failures.push("taskId must look like CM-0000");
-  if (!CMV_RE.test(String(facts.validationId || ""))) failures.push("validationId must look like CMV-0000");
-  if (Object.prototype.hasOwnProperty.call(facts, "branch")) {
-    failures.push("schema v4 must not use top-level branch for historical evidence");
-  }
-  const repositoryObservation = facts.repositoryObservation;
-  if (!repositoryObservation || typeof repositoryObservation !== "object" || Array.isArray(repositoryObservation)) {
-    failures.push("repositoryObservation object is required");
+  if (facts.baseBranch !== "main") failures.push("baseBranch must be main");
+
+  const status = facts.status;
+  if (!status || status.project !== "NOT_READY_BLOCKED" || status.rc !== "RC_NOT_READY_BLOCKED") {
+    failures.push("status must remain NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED");
   } else {
     for (const field of [
-      "observedAtCommitted",
-      "observedBranchCommitted",
-      "observedHeadCommitted",
-      "worktreeStateCommitted"
+      "productionReady",
+      "releaseReady",
+      "deployReady",
+      "cutoverReady",
+      "completeV8Claimed"
     ]) {
-      if (repositoryObservation[field] !== false) {
-        failures.push(`repositoryObservation.${field} must be false`);
-      }
-    }
-    if (repositoryObservation.freshGitRequiredBeforeBranchSensitiveAction !== true) {
-      failures.push("repositoryObservation.freshGitRequiredBeforeBranchSensitiveAction must be true");
-    }
-    const baseline = repositoryObservation.baselineObservation;
-    if (!baseline || typeof baseline !== "object" || Array.isArray(baseline)) {
-      failures.push("repositoryObservation.baselineObservation object is required");
-    } else {
-      if (baseline.source !== "fresh_git_commands_and_github_actions") {
-        failures.push("repositoryObservation.baselineObservation.source must identify fresh Git and GitHub Actions evidence");
-      }
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(baseline.observedAt || ""))) {
-        failures.push("repositoryObservation.baselineObservation.observedAt must use YYYY-MM-DD");
-      }
-      if (baseline.baselineBranch !== "main") {
-        failures.push("repositoryObservation.baselineObservation.baselineBranch must be main");
-      }
-      for (const field of ["baselineCommit", "baselineTree", "prHeadCommit", "prHeadTree", "mainCiHeadCommit"]) {
-        if (!SHA40_RE.test(String(baseline[field] || ""))) {
-          failures.push(`repositoryObservation.baselineObservation.${field} must be a 40-char SHA`);
-        }
-      }
-      if (!Number.isInteger(baseline.prNumber) || baseline.prNumber < 1) {
-        failures.push("repositoryObservation.baselineObservation.prNumber must be a positive integer");
-      }
-      if (!/^\d+$/.test(String(baseline.mainCiRunId || ""))) {
-        failures.push("repositoryObservation.baselineObservation.mainCiRunId must be a decimal run id");
-      }
-      if (baseline.baselineWorktreeClean !== true) {
-        failures.push("repositoryObservation.baselineObservation.baselineWorktreeClean must be true");
-      }
-      if (baseline.mergeTreeMatchesPrHeadTree !== true || baseline.baselineTree !== baseline.prHeadTree) {
-        failures.push("repositoryObservation baseline tree must match the PR head tree");
-      }
-      if (baseline.mainCiPassed !== true || baseline.mainCiHeadCommit !== baseline.baselineCommit) {
-        failures.push("repositoryObservation main CI must pass on the observed baseline commit");
-      }
+      if (status[field] !== false) failures.push(`status.${field} must be false`);
     }
   }
-  if (!facts.evidenceBaseline || typeof facts.evidenceBaseline.snapshotBranch !== "string") {
-    failures.push("evidenceBaseline.snapshotBranch is required");
+
+  if (facts.activeTask !== null && !CM_RE.test(String(facts.activeTask || ""))) {
+    failures.push("activeTask must be null or a CM id");
   }
-  const governanceState = facts.governanceState;
-  if (!governanceState || typeof governanceState !== "object" || Array.isArray(governanceState)) {
-    failures.push("governanceState object is required");
+
+  const lastCompleted = facts.lastCompleted;
+  if (!lastCompleted || typeof lastCompleted !== "object" || Array.isArray(lastCompleted)) {
+    failures.push("lastCompleted must be an object");
   } else {
-    if (governanceState.evidenceRevalidated !== true) {
-      failures.push("governanceState.evidenceRevalidated must be true");
+    if (!CM_RE.test(String(lastCompleted.taskId || ""))) {
+      failures.push("lastCompleted.taskId must be a CM id");
     }
-    for (const field of [
-      "freshNativeContextProofPerformed",
-      "freshNativeContextProofPassed",
-      "nativeFirstPathProven",
-      "statusSyncPerformed"
-    ]) {
-      if (governanceState[field] !== true) {
-        failures.push(`governanceState.${field} must be true`);
-      }
+    if (!CMV_RE.test(String(lastCompleted.validationId || ""))) {
+      failures.push("lastCompleted.validationId must be a CMV id");
     }
-    for (const field of [
-      "freshNativeContextProofFallbackUsed",
-      "freshNativeContextProofMemoryWritePerformed",
-      "freshNativeContextProofPrimaryMemoryStoreWritePerformed",
-      "freshNativeContextProofRawDisclosure",
-      "nonEmptyRecallProven",
-      "planPackCompleted",
-      "recallRelevanceProven",
-      "readinessClaimed"
-    ]) {
-      if (governanceState[field] !== false) {
-        failures.push(`governanceState.${field} must be false`);
-      }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(lastCompleted.completedAt || ""))) {
+      failures.push("lastCompleted.completedAt must use YYYY-MM-DD");
     }
-    if (!SHA40_RE.test(String(governanceState.freshNativeContextProofHead || ""))) {
-      failures.push("governanceState.freshNativeContextProofHead must be a 40-char SHA");
+    if (typeof lastCompleted.scope !== "string" || !lastCompleted.scope.trim()) {
+      failures.push("lastCompleted.scope must be a non-empty string");
     }
-    if (governanceState.freshNativeContextProofSourceRuntime !== "vcp_native") {
-      failures.push("governanceState.freshNativeContextProofSourceRuntime must be vcp_native");
-    }
-    if (governanceState.freshNativeContextProofDerivedIndexWritePerformed !== true) {
-      failures.push("governanceState.freshNativeContextProofDerivedIndexWritePerformed must be true");
-    }
-    if (!Number.isInteger(governanceState.freshNativeContextProofResultItemCount)
-      || governanceState.freshNativeContextProofResultItemCount < 0) {
-      failures.push("governanceState.freshNativeContextProofResultItemCount must be a non-negative integer");
-    }
-    if (governanceState.freshNativeContextProofResultItemCount === 0
-      && (governanceState.nonEmptyRecallProven !== false || governanceState.recallRelevanceProven !== false)) {
-      failures.push("an empty fresh native context proof cannot prove non-empty recall or relevance");
-    }
-    const callCounts = governanceState.freshNativeContextProofCallCounts;
-    if (!callCounts || typeof callCounts !== "object" || Array.isArray(callCounts)) {
-      failures.push("governanceState.freshNativeContextProofCallCounts object is required");
-    } else {
-      for (const field of [
-        "governedBridgeAuditReceipt",
-        "initialize",
-        "nativeSearch",
-        "prepareMemoryContext",
-        "providerRequest",
-        "toolsList"
-      ]) {
-        if (callCounts[field] !== 1) {
-          failures.push(`governanceState.freshNativeContextProofCallCounts.${field} must be 1`);
-        }
-      }
-    }
-  }
-  if (!facts.baseBranch || typeof facts.baseBranch !== "string") failures.push("baseBranch is required");
-
-  const projectStatus = facts.status && facts.status.project;
-  const rcStatus = facts.status && facts.status.rc;
-  if (!["NOT_READY_BLOCKED", "READY", "BLOCKED"].includes(projectStatus)) {
-    failures.push("status.project must be NOT_READY_BLOCKED, READY, or BLOCKED");
-  }
-  if (!["RC_NOT_READY_BLOCKED", "RC_READY", "RC_BLOCKED"].includes(rcStatus)) {
-    failures.push("status.rc must be RC_NOT_READY_BLOCKED, RC_READY, or RC_BLOCKED");
   }
 
-  const pr = facts.pr;
-  if (!pr || typeof pr !== "object" || Array.isArray(pr)) failures.push("pr object is required");
-  const reviewed = facts.reviewedObject;
-  if (!reviewed || typeof reviewed !== "object" || Array.isArray(reviewed)) {
-    failures.push("reviewedObject object is required");
+  const baseline = facts.acceptedProductBaseline;
+  if (!sameObjectKeys(baseline, ["prNumber", "reviewedHead", "mergeCommit", "ciRunId"])) {
+    failures.push("acceptedProductBaseline must contain exactly prNumber, reviewedHead, mergeCommit, and ciRunId");
   } else {
-    if (reviewed.commit !== null && !SHA40_RE.test(String(reviewed.commit || ""))) {
-      failures.push("reviewedObject.commit must be a 40-char lowercase SHA or null");
+    if (!Number.isInteger(baseline.prNumber) || baseline.prNumber <= 0) {
+      failures.push("acceptedProductBaseline.prNumber must be a positive integer");
     }
-    if (reviewed.parent !== null && !SHA40_RE.test(String(reviewed.parent || ""))) {
-      failures.push("reviewedObject.parent must be a 40-char lowercase SHA or null");
+    if (!SHA40_RE.test(String(baseline.reviewedHead || "")) ||
+        !SHA40_RE.test(String(baseline.mergeCommit || ""))) {
+      failures.push("accepted product baseline commit anchors must be 40-char lowercase SHAs");
     }
-    if (
-      reviewed.commit &&
-      reviewed.presentInLocalCheckout === false &&
-      reviewed.source === "local_git"
-    ) {
-      failures.push("reviewedObject absent from checkout cannot use source=local_git");
+    if (!/^\d+$/.test(String(baseline.ciRunId || ""))) {
+      failures.push("acceptedProductBaseline.ciRunId must contain decimal digits");
     }
   }
 
-  if (!Array.isArray(facts.validationSummary)) failures.push("validationSummary must be an array");
-  if (!Array.isArray(facts.notValidated)) failures.push("notValidated must be an array");
-  if (!facts.constraints || typeof facts.constraints !== "object" || Array.isArray(facts.constraints)) {
-    failures.push("constraints object is required");
-  }
-}
-
-function validateActiveBlocks(root, failures) {
-  for (const relativePath of REQUIRED_ACTIVE_FILES) {
-    const text = readText(root, relativePath, failures);
-    const active = extractActiveBlock(text, relativePath, failures);
-    if (!active) continue;
-    if (!active.includes(FACTS_PATH)) {
-      failures.push(`${relativePath} active block must reference ${FACTS_PATH}`);
+  const source = loadSourceContractFacts(root, failures);
+  const toolSurfaces = facts.contracts && facts.contracts.toolSurfaces;
+  const expectedSurfaces = {
+    vcpCodexMemoryCore: {
+      name: "vcp_codex_memory core tool definitions",
+      count: 9
+    },
+    codexDefaultExposed: {
+      name: "Codex default exposed tools",
+      count: 5
+    },
+    chatgptEdge: {
+      name: "ChatGPT Edge tools",
+      count: 6
     }
-    const matches = active.match(SHA40_SCAN_RE) || [];
-    if (matches.length > 0) {
-      failures.push(`${relativePath} active block contains full 40-char SHA: ${matches[0]}`);
+  };
+  for (const [key, expected] of Object.entries(expectedSurfaces)) {
+    const actual = toolSurfaces && toolSurfaces[key];
+    if (!actual || actual.name !== expected.name || actual.count !== expected.count) {
+      failures.push(`contracts.toolSurfaces.${key} must be named exactly and count ${expected.count}`);
+    }
+    if (source && source[key] !== expected.count) {
+      failures.push(`canonical source ${key} count must be ${expected.count}`);
+    }
+    if (source && actual && actual.count !== source[key]) {
+      failures.push(`snapshot ${key} count must match canonical source`);
+    }
+  }
+
+  const observationVersion = facts.contracts &&
+    facts.contracts.dogfoodObservation &&
+    facts.contracts.dogfoodObservation.schemaVersion;
+  if (observationVersion !== 3) {
+    failures.push("contracts.dogfoodObservation.schemaVersion must be 3");
+  }
+  if (source && source.dogfoodObservationSchemaVersion !== observationVersion) {
+    failures.push("source dogfood observation schema version must match CURRENT_FACTS");
+  }
+
+  if (!Array.isArray(facts.blockers) || facts.blockers.length > 30) {
+    failures.push("blockers must be an array with at most 30 current entries");
+  } else {
+    const blockerIds = new Set();
+    for (const blocker of facts.blockers) {
+      if (!sameObjectKeys(blocker, ["id", "status", "summary"]) ||
+          !BLOCKER_ID_RE.test(String(blocker && blocker.id || "")) ||
+          !BLOCKER_STATUS_RE.test(String(blocker && blocker.status || "")) ||
+          typeof blocker.summary !== "string" ||
+          !blocker.summary.trim()) {
+        failures.push("every blocker must contain a valid id, status, and non-empty summary");
+        continue;
+      }
+      if (blockerIds.has(blocker.id)) {
+        failures.push(`blocker ids must be unique: ${blocker.id}`);
+      } else {
+        blockerIds.add(blocker.id);
+      }
+    }
+  }
+
+  const history = facts.history;
+  if (!history || history.baselineCommit !== HISTORY_BASELINE_COMMIT ||
+      history.indexPath !== HISTORY_INDEX_PATH ||
+      !sameStringSet(history.recoverablePaths, HISTORY_RECOVERY_PATHS)) {
+    failures.push("history must bind the fixed baseline, index, and recoverable paths");
+  }
+
+  const livePolicy = facts.liveGitFactsPolicy;
+  if (!livePolicy || livePolicy.freshQueryRequired !== true) {
+    failures.push("liveGitFactsPolicy.freshQueryRequired must be true");
+  } else {
+    for (const field of [
+      "currentBranchCommitted",
+      "currentHeadCommitted",
+      "aheadBehindCommitted",
+      "currentPullRequestCommitted",
+      "currentCiCommitted"
+    ]) {
+      if (livePolicy[field] !== false) failures.push(`liveGitFactsPolicy.${field} must be false`);
     }
   }
 }
 
-function validateActiveBlockBindings(root, facts, failures) {
-  for (const relativePath of REQUIRED_ACTIVE_FILES) {
-    const text = readText(root, relativePath, failures);
-    const active = extractActiveBlock(text, relativePath, failures);
-    if (!active) continue;
-    if (!active.includes(facts.taskId)) {
-      failures.push(`${relativePath} active block must include current facts taskId ${facts.taskId}`);
-    }
-    if (!active.includes(facts.validationId)) {
-      failures.push(`${relativePath} active block must include current facts validationId ${facts.validationId}`);
-    }
+function validateAuthoritySurfaces(root, facts, failures) {
+  const currentState = readText(root, "CURRENT_STATE.md", failures);
+  const active = extractActiveBlock(currentState, "CURRENT_STATE.md", failures);
+  for (const heading of [
+    "Project Status",
+    "Active Work",
+    "Last Accepted Product Baseline",
+    "Open Blockers",
+    "Next Safe Action",
+    "Authority Boundaries",
+    "Evidence And History"
+  ]) {
+    if (!active.includes(`## ${heading}`)) failures.push(`CURRENT_STATE missing ${heading}`);
   }
-}
+  if (!active.includes("NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED")) {
+    failures.push("CURRENT_STATE status must match CURRENT_FACTS");
+  }
 
-function validateLatestIds(root, facts, failures) {
-  const taskQueue = parseMarkdownTable(readText(root, ".agent_board/TASK_QUEUE.md", failures));
-  const validationLog = parseMarkdownTable(readText(root, ".agent_board/VALIDATION_LOG.md", failures));
+  const stateTaskDeclarationLines = active
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) =>
+      !line.startsWith("<!--") && /\bactiveTask\s*:/i.test(line)
+    );
+  const stateTaskMatch = stateTaskDeclarationLines.length === 1
+    ? stateTaskDeclarationLines[0].match(/^(`?)activeTask:\s*(null|CM-\d{4})\1$/)
+    : null;
+  const stateActiveTask = stateTaskMatch && stateTaskMatch[2] !== "null"
+    ? stateTaskMatch[2]
+    : null;
+  if (!stateTaskMatch) {
+    failures.push("CURRENT_STATE must declare exactly one canonical activeTask");
+  }
+  if (stateTaskMatch && stateActiveTask !== facts.activeTask) {
+    failures.push("CURRENT_STATE activeTask must match CURRENT_FACTS.activeTask");
+  }
 
-  const latestDoneTask = latestByCm(
-    taskQueue,
-    "ID",
-    (row) => String(row.Status || "").toLowerCase() === "done"
+  const stateCloseoutDeclarationLines = active
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) =>
+      !line.startsWith("<!--") && /\bLast completed\s*:/i.test(line)
+    );
+  const stateCloseoutMatch = stateCloseoutDeclarationLines.length === 1
+    ? stateCloseoutDeclarationLines[0].match(
+      /^Last completed:\s*(`?)(CM-\d{4})\s*\/\s*(CMV-\d{4})\1\.$/
+    )
+    : null;
+  if (!stateCloseoutMatch) {
+    failures.push("CURRENT_STATE must declare exactly one canonical last completed CM / CMV pair");
+  } else if (!facts.lastCompleted ||
+      stateCloseoutMatch[2] !== facts.lastCompleted.taskId ||
+      stateCloseoutMatch[3] !== facts.lastCompleted.validationId) {
+    failures.push("CURRENT_STATE last completed pair must match CURRENT_FACTS.lastCompleted");
+  }
+
+  const baselineSection = extractHeadingSection(
+    active,
+    "Last Accepted Product Baseline",
+    "Open Blockers"
   );
-  const latestValidation = latestByCm(
-    validationLog,
-    "Scope",
-    (row) => String(row.Result || "").toUpperCase().startsWith("COMPLETED")
+  const malformedBaselineRows = [];
+  const baselineDiagnostics = {};
+  const baselineRows = parseMarkdownTable(baselineSection, {
+    diagnostics: baselineDiagnostics,
+    malformedRows: malformedBaselineRows,
+    trackBeforeHeader: false,
+    trackedRowPattern: /^\|/
+  });
+  const baselineFields = new Map(
+    baselineRows.map((row) => [stripInlineCode(row.Field), stripInlineCode(row["Accepted value"])])
   );
-
-  if (!latestDoneTask) failures.push("No completed CM task found in .agent_board/TASK_QUEUE.md");
-  if (!latestValidation) failures.push("No completed CM validation scope found in .agent_board/VALIDATION_LOG.md");
-  if (latestDoneTask && latestDoneTask.id !== facts.taskId) {
-    failures.push(`latest done task ${latestDoneTask.id} does not match current facts taskId ${facts.taskId}`);
+  const baseline = facts.acceptedProductBaseline || {};
+  const observationVersion = facts.contracts &&
+    facts.contracts.dogfoodObservation &&
+    facts.contracts.dogfoodObservation.schemaVersion;
+  const expectedBaselineFields = new Map([
+    ["Pull request", `#${baseline.prNumber}`],
+    ["Reviewed head", String(baseline.reviewedHead || "")],
+    ["Merge commit", String(baseline.mergeCommit || "")],
+    ["Main CI run", String(baseline.ciRunId || "")],
+    ["Private dogfood observation schema", String(observationVersion || "")]
+  ]);
+  if (!hasExactTableShape(baselineDiagnostics, ["Field", "Accepted value"]) ||
+      malformedBaselineRows.length > 0 ||
+      baselineRows.length !== expectedBaselineFields.size ||
+      baselineFields.size !== expectedBaselineFields.size ||
+      [...expectedBaselineFields].some(([field, expected]) => baselineFields.get(field) !== expected)) {
+    failures.push("CURRENT_STATE accepted product baseline must match CURRENT_FACTS and observation schema");
   }
-  if (latestValidation && latestValidation.id !== facts.taskId) {
-    failures.push(`latest validation scope ${latestValidation.id} does not match current facts taskId ${facts.taskId}`);
+
+  const blockersSection = extractHeadingSection(active, "Open Blockers", "Next Safe Action");
+  const blockerLines = blockersSection.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const stateBlockers = [];
+  let malformedBlockerLine = false;
+  for (const line of blockerLines) {
+    if (line === "No current blockers.") continue;
+    const match = line.match(/^- `([^`]+)` \[([a-z][a-z0-9_]*)\]: (.+)$/);
+    if (!match) {
+      malformedBlockerLine = true;
+      continue;
+    }
+    stateBlockers.push({ id: match[1], status: match[2], summary: match[3] });
+  }
+  const factsBlockers = Array.isArray(facts.blockers) ? facts.blockers : [];
+  const emptyBlockerDeclarationInvalid = factsBlockers.length === 0
+    ? blockerLines.length !== 1 || blockerLines[0] !== "No current blockers."
+    : blockerLines.includes("No current blockers.");
+  if (malformedBlockerLine ||
+      emptyBlockerDeclarationInvalid ||
+      !sameStringSet(
+        stateBlockers.map(blockerFingerprint),
+        factsBlockers.map(blockerFingerprint)
+      )) {
+    failures.push("CURRENT_STATE blockers must exactly match CURRENT_FACTS.blockers");
   }
 
-  const validationIds = new Set(validationLog.map((row) => String(row.ID || "").replace(/`/g, "").trim()));
-  if (!validationIds.has(facts.validationId)) {
-    failures.push(`current facts validationId ${facts.validationId} is missing from VALIDATION_LOG`);
+  for (const relativePath of POINTER_FILES) {
+    const text = readText(root, relativePath, failures);
+    if (!text.includes("CURRENT_STATE.md")) {
+      failures.push(`${relativePath} must point to CURRENT_STATE.md`);
+    }
+    if (!/(Non-authoritative|非权威|不具当前权威)/i.test(text)) {
+      failures.push(`${relativePath} must declare itself non-authoritative`);
+    }
+    if (POINTER_SELF_AUTHORITY_RE.test(text)) {
+      failures.push(`${relativePath} must not claim independent current authority`);
+    }
+    if (text.includes(ACTIVE_START) || text.includes(ACTIVE_END)) {
+      failures.push(`${relativePath} must not own a current-facts active block`);
+    }
   }
-}
 
-function validateReferenceDocs(root, failures) {
   for (const relativePath of REQUIRED_DOC_REFERENCES) {
     const text = readText(root, relativePath, failures);
-    if (!text.includes(FACTS_PATH)) {
-      failures.push(`${relativePath} must reference ${FACTS_PATH}`);
+    if (!text.includes("CURRENT_STATE.md") || !/\b(only|sole)\b/i.test(text)) {
+      failures.push(`${relativePath} must declare CURRENT_STATE.md as the only default work entry`);
     }
   }
 }
 
-function validateCurrentFactsDrift(root = process.cwd()) {
+function validateQueueAndReceipts(root, facts, failures) {
+  const queueText = readText(root, ".agent_board/TASK_QUEUE.md", failures);
+  const validationText = readText(root, ".agent_board/VALIDATION_LOG.md", failures);
+  const ledgerText = readText(root, ".agent_board/AUTOPILOT_LEDGER.md", failures);
+  const malformedQueueRows = [];
+  const malformedValidationRows = [];
+  const malformedLedgerRows = [];
+  const queueDiagnostics = {};
+  const validationDiagnostics = {};
+  const ledgerDiagnostics = {};
+  const queueRows = parseMarkdownTable(queueText, {
+    diagnostics: queueDiagnostics,
+    malformedRows: malformedQueueRows,
+    trackedRowPattern: ACTIVE_ROW_CANDIDATE_RE
+  });
+  const validationRows = parseMarkdownTable(validationText, {
+    diagnostics: validationDiagnostics,
+    malformedRows: malformedValidationRows,
+    trackedRowPattern: ACTIVE_ROW_CANDIDATE_RE
+  });
+  const ledgerRows = parseMarkdownTable(ledgerText, {
+    diagnostics: ledgerDiagnostics,
+    malformedRows: malformedLedgerRows,
+    trackedRowPattern: ACTIVE_ROW_CANDIDATE_RE
+  });
+
+  if (queueRows.length > 30) failures.push("TASK_QUEUE active row budget exceeded");
+  for (const [name, diagnostics, expectedHeader] of [
+    ["TASK_QUEUE", queueDiagnostics, TABLE_HEADERS.taskQueue],
+    ["VALIDATION_LOG", validationDiagnostics, TABLE_HEADERS.validationLog],
+    ["AUTOPILOT_LEDGER", ledgerDiagnostics, TABLE_HEADERS.ledger]
+  ]) {
+    if (!hasExactTableShape(diagnostics, expectedHeader)) {
+      failures.push(`${name} must retain its exact table header and separator`);
+    }
+  }
+  if (malformedQueueRows.length > 0) {
+    failures.push("TASK_QUEUE must not contain malformed CM data rows");
+  }
+  if (malformedValidationRows.length > 0) {
+    failures.push("VALIDATION_LOG must not contain malformed CM/CMV data rows");
+  }
+  if (malformedLedgerRows.length > 0) {
+    failures.push("AUTOPILOT_LEDGER must not contain malformed CM/CMV data rows");
+  }
+  const doneRows = queueRows.filter((row) => String(row.Status || "").trim().toLowerCase() === "done");
+  if (doneRows.length > 0) failures.push("TASK_QUEUE must not contain done rows");
+  if (queueText.includes("CM-1422")) failures.push("TASK_QUEUE must not restore stale CM-1422");
+
+  const allowedActiveStatuses = new Set(["todo", "in_progress"]);
+  const invalidStatusRows = queueRows.filter((row) =>
+    !allowedActiveStatuses.has(String(row.Status || "").trim())
+  );
+  if (invalidStatusRows.length > 0) {
+    failures.push("TASK_QUEUE rows must use only todo or in_progress status");
+  }
+  if (queueRows.some((row) => !CM_RE.test(String(row.ID || "").trim()))) {
+    failures.push("TASK_QUEUE IDs must use raw canonical CM format");
+  }
+  if (validationRows.some((row) => !CMV_RE.test(String(row.ID || "").trim()))) {
+    failures.push("VALIDATION_LOG IDs must use raw canonical CMV format");
+  }
+  if (ledgerRows.some((row) => !CM_RE.test(String(row.ID || "").trim()))) {
+    failures.push("AUTOPILOT_LEDGER IDs must use raw canonical CM format");
+  }
+  const activeRows = queueRows.filter((row) =>
+    allowedActiveStatuses.has(String(row.Status || "").trim())
+  );
+  const activeIds = activeRows.map((row) => String(row.ID || "").trim());
+  if (facts.activeTask === null && queueRows.length !== 0) {
+    failures.push("CURRENT_FACTS activeTask null requires an empty active queue");
+  } else if (typeof facts.activeTask === "string" &&
+      (queueRows.length !== 1 || activeIds.length !== 1 || activeIds[0] !== facts.activeTask)) {
+    failures.push("CURRENT_FACTS activeTask must match the single active queue row");
+  }
+
+  const expectedTask = facts.lastCompleted && facts.lastCompleted.taskId;
+  const expectedValidation = facts.lastCompleted && facts.lastCompleted.validationId;
+  const validationMatches = validationRows.filter((row) =>
+    String(row.ID || "").trim() === expectedValidation
+  );
+  const ledgerMatches = ledgerRows.filter((row) =>
+    String(row.ID || "").trim() === expectedTask
+  );
+  if (validationRows.length !== 1 || validationMatches.length !== 1 ||
+      !containsExactIdToken(validationMatches[0] && validationMatches[0].Scope, expectedTask)) {
+    failures.push(`${expectedTask} / ${expectedValidation} must have one bound VALIDATION_LOG row`);
+  }
+  if (validationMatches.length === 1 &&
+      !isCanonicalCompletedResult(validationMatches[0].Result)) {
+    failures.push(`${expectedValidation} result must be exactly ${COMPLETED_RESULT}`);
+  }
+  if (ledgerRows.length !== 1 || ledgerMatches.length !== 1 ||
+      !containsExactIdToken(ledgerMatches[0] && ledgerMatches[0].Validation, expectedValidation)) {
+    failures.push(`${expectedTask} / ${expectedValidation} must have one bound AUTOPILOT_LEDGER receipt`);
+  }
+  if (ledgerMatches.length === 1 && !hasNonEmptyReceipt(ledgerMatches[0].Receipt)) {
+    failures.push(`${expectedTask} ledger receipt must be non-empty`);
+  }
+  if (ledgerMatches.length === 1 &&
+      !isCanonicalCompletedResult(ledgerMatches[0].Result)) {
+    failures.push(`${expectedTask} ledger result must be exactly ${COMPLETED_RESULT}`);
+  }
+}
+
+function validateSizeBudgets(root, failures) {
+  for (const [relativePath, budget] of Object.entries(SIZE_BUDGETS)) {
+    const text = readText(root, relativePath, failures);
+    const actual = budget.kind === "bytes" ? Buffer.byteLength(text, "utf8") : lineCount(text);
+    if (actual > budget.maximum) {
+      failures.push(`${relativePath} exceeds ${budget.maximum} ${budget.kind}`);
+    }
+  }
+}
+
+function validateStalePhrases(root, failures) {
+  for (const relativePath of ACTIVE_SURFACE_FILES) {
+    const text = readText(root, relativePath, failures);
+    for (const phrase of STALE_ACTIVE_PHRASES) {
+      if (text.toLowerCase().includes(phrase.toLowerCase())) {
+        failures.push(`${relativePath} contains stale active phrase: ${phrase}`);
+      }
+    }
+  }
+}
+
+function defaultGitRunner(root, args) {
+  return childProcess.spawnSync("git", ["-C", root, ...args], {
+    encoding: "utf8",
+    maxBuffer: 2 * 1024 * 1024
+  });
+}
+
+function readableBaseBranchRefs(root, baseBranch, gitRunner) {
+  const remoteResult = gitRunner(root, [
+    "for-each-ref",
+    "--format=%(refname)",
+    "refs/remotes"
+  ]);
+  if (!remoteResult || remoteResult.status !== 0) {
+    return {
+      lookupOk: false,
+      refs: []
+    };
+  }
+  const escapedBaseBranch = String(baseBranch || "")
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const remoteBranchRefPattern = new RegExp(
+    `^refs/remotes/[^/]+/${escapedBaseBranch}$`
+  );
+  const remoteCandidates = String(remoteResult.stdout || "")
+    .split(/\r?\n/)
+    .map((ref) => ref.trim())
+    .filter((ref) => remoteBranchRefPattern.test(ref));
+  const readableRemoteRefs = [...new Set(remoteCandidates)].filter((ref) => {
+    const result = gitRunner(root, ["cat-file", "-e", `${ref}^{commit}`]);
+    return result && result.status === 0;
+  });
+  if (remoteCandidates.length > 0) {
+    return {
+      lookupOk: true,
+      refs: readableRemoteRefs
+    };
+  }
+
+  const localRef = `refs/heads/${baseBranch}`;
+  const localResult = gitRunner(root, ["cat-file", "-e", `${localRef}^{commit}`]);
+  return {
+    lookupOk: true,
+    refs: localResult && localResult.status === 0 ? [localRef] : []
+  };
+}
+
+function validateHistory(root, facts, failures, options) {
+  const index = readText(root, HISTORY_INDEX_PATH, failures);
+  if (!index.includes(HISTORY_BASELINE_COMMIT) ||
+      !index.includes(`Governance reset task: \`${HISTORY_RESET_CLOSEOUT.taskId}\``) ||
+      !index.includes(`Governance reset validation: \`${HISTORY_RESET_CLOSEOUT.validationId}\``) ||
+      !index.includes(`git show ${HISTORY_BASELINE_COMMIT}:CURRENT_STATE.md`) ||
+      !index.includes("git log --follow") ||
+      !index.includes("git blame")) {
+    failures.push("history index must contain the fixed reset closeout, baseline, and recovery commands");
+  }
+
+  const gitRunner = options.gitRunner || defaultGitRunner;
+  const inside = gitRunner(root, ["rev-parse", "--is-inside-work-tree"]);
+  if (inside && inside.status === 0 && String(inside.stdout || "").trim() === "true") {
+    const productBaseline = facts.acceptedProductBaseline || {};
+    const baseBranchResolution = readableBaseBranchRefs(
+      root,
+      facts.baseBranch,
+      gitRunner
+    );
+    const baseBranchRefs = baseBranchResolution.refs;
+    if (!baseBranchResolution.lookupOk) {
+      failures.push(`unable to enumerate Git refs for baseBranch ${facts.baseBranch}`);
+    } else if (baseBranchRefs.length === 0) {
+      failures.push(`no readable Git ref found for baseBranch ${facts.baseBranch}`);
+    }
+    const checks = [
+      `${HISTORY_BASELINE_COMMIT}^{commit}`,
+      `${productBaseline.reviewedHead}^{commit}`,
+      `${productBaseline.mergeCommit}^{commit}`,
+      ...HISTORY_RECOVERY_PATHS.map((relativePath) =>
+        `${HISTORY_BASELINE_COMMIT}:${relativePath}`
+      )
+    ];
+    for (const objectName of checks) {
+      const result = gitRunner(root, ["cat-file", "-e", objectName]);
+      if (!result || result.status !== 0) {
+        failures.push(`required Git object is not readable: ${objectName}`);
+      }
+    }
+    for (const [ancestor, descendant, label] of [
+      [
+        HISTORY_BASELINE_COMMIT,
+        productBaseline.mergeCommit,
+        "accepted product merge must descend from the pre-compaction history baseline"
+      ],
+      [
+        productBaseline.reviewedHead,
+        productBaseline.mergeCommit,
+        "accepted product reviewed head must be an ancestor of its merge commit"
+      ]
+    ]) {
+      const result = gitRunner(root, ["merge-base", "--is-ancestor", ancestor, descendant]);
+      if (!result || result.status !== 0) failures.push(label);
+    }
+    if (baseBranchRefs.length > 0) {
+      const acceptedOnBase = baseBranchRefs.some((baseBranchRef) => {
+        const result = gitRunner(root, [
+          "merge-base",
+          "--is-ancestor",
+          productBaseline.mergeCommit,
+          baseBranchRef
+        ]);
+        return result && result.status === 0;
+      });
+      if (!acceptedOnBase) {
+        failures.push(
+          `accepted product merge must already be an ancestor of a current ${facts.baseBranch} ref`
+        );
+      }
+    }
+  }
+}
+
+function validateCurrentFactsDrift(root = process.cwd(), options = {}) {
   const failures = [];
   const facts = readJson(root, FACTS_PATH, failures);
-  validateCurrentFactsSchema(facts, failures);
+  validateCurrentFactsSchema(facts, root, failures);
   if (facts) {
-    validateActiveBlocks(root, failures);
-    validateActiveBlockBindings(root, facts, failures);
-    validateLatestIds(root, facts, failures);
-    validateReferenceDocs(root, failures);
+    validateAuthoritySurfaces(root, facts, failures);
+    validateQueueAndReceipts(root, facts, failures);
+    validateSizeBudgets(root, failures);
+    validateStalePhrases(root, failures);
+    validateHistory(root, facts, failures, options);
   }
   return { ok: failures.length === 0, failures, facts };
 }
@@ -366,15 +768,27 @@ if (require.main === module) {
   }
 
   console.log("CURRENT FACTS DRIFT VALIDATION PASSED");
-  console.log(`task=${result.facts.taskId} validation=${result.facts.validationId} facts=${FACTS_PATH}`);
+  console.log(
+    `active_task=${result.facts.activeTask === null ? "null" : result.facts.activeTask} ` +
+    `last_completed=${result.facts.lastCompleted.taskId}/${result.facts.lastCompleted.validationId} ` +
+    `facts=${FACTS_PATH}`
+  );
 }
 
 module.exports = {
   ACTIVE_END,
   ACTIVE_START,
+  ACTIVE_SURFACE_FILES,
+  EXPECTED_TOP_LEVEL_KEYS,
   FACTS_PATH,
-  REQUIRED_DOC_REFERENCES,
+  HISTORY_BASELINE_COMMIT,
+  HISTORY_INDEX_PATH,
+  HISTORY_RECOVERY_PATHS,
+  HISTORY_RESET_CLOSEOUT,
+  POINTER_FILES,
   REQUIRED_ACTIVE_FILES,
+  REQUIRED_DOC_REFERENCES,
+  SIZE_BUDGETS,
   extractActiveBlock,
   validateCurrentFactsDrift
 };

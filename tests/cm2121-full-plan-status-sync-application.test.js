@@ -35,7 +35,7 @@ test('exact nine-path status-sync application is prepared but non-executing', ()
   assert.equal(evaluation.readinessClaimed, false);
 });
 
-test('historical projected status stays ledger-valid but cannot replace current-facts schema v4', () => {
+test('historical projected status cannot replace schema v5 current gates', () => {
   const { options } = prepared();
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'cm2121-status-projection-'));
   try {
@@ -52,15 +52,23 @@ test('historical projected status stays ledger-valid but cannot replace current-
     }
     const drift = validateCurrentFactsDrift(root);
     assert.equal(drift.ok, false);
-    assert.match(drift.failures.join('\n'), /schemaVersion must be 4/);
-    assert.match(drift.failures.join('\n'), /must not use top-level branch/);
+    assert.match(drift.failures.join('\n'), /schemaVersion must be 5/);
     const ledger = validateAutopilotLedgerConsistency(root);
-    assert.equal(ledger.ok, true, ledger.failures.join('\n'));
-    assert.equal(ledger.latestTask, application.TASK_ID);
-    assert.equal(ledger.latestLedgerValidationId, application.VALIDATION_ID);
+    assert.equal(ledger.ok, false);
+    assert.match(ledger.failures.join('\n'), /CURRENT_FACTS schemaVersion must be 5/);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('legacy CM-2121 applicator fails closed on schema v5 current facts', () => {
+  const currentFacts = fs.readFileSync(
+    path.resolve(__dirname, '..', application.CURRENT_FACTS_PATH)
+  );
+  assert.throws(
+    () => application.projectStatusFile(application.CURRENT_FACTS_PATH, currentFacts),
+    /cm2121_current_facts_schema_unsupported:5/
+  );
 });
 
 test('CURRENT_FACTS projection preserves historical CM-2121 evidence without re-closing current status sync', () => {
