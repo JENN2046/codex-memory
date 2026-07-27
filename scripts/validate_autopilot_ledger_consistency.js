@@ -4,6 +4,10 @@
 const fs = require("fs");
 const path = require("path");
 
+const FACTS_PATH = ".agent_board/CURRENT_FACTS.json";
+const SCHEMA_VERSION = 5;
+const COMPLETED_RESULT_RE = /^completed/i;
+
 function readText(root, relativePath, failures) {
   const fullPath = path.join(root, relativePath);
   if (!fs.existsSync(fullPath)) {
@@ -13,8 +17,19 @@ function readText(root, relativePath, failures) {
   return fs.readFileSync(fullPath, "utf8");
 }
 
+function readFacts(root, failures) {
+  const text = readText(root, FACTS_PATH, failures);
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    failures.push(`${FACTS_PATH} must contain valid JSON`);
+    return null;
+  }
+}
+
 function parseMarkdownTable(text) {
-  const lines = text
+  const lines = String(text)
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line.startsWith("|") && line.endsWith("|"));
@@ -47,99 +62,102 @@ function parseMarkdownTable(text) {
       header = cells;
       continue;
     }
-
     if (cells.every((cell) => /^:?-{3,}:?$/.test(cell))) continue;
     if (cells.length !== header.length) continue;
 
-    const row = {};
-    for (let index = 0; index < header.length; index += 1) {
-      row[header[index]] = cells[index];
-    }
-    rows.push(row);
+    rows.push(Object.fromEntries(header.map((name, index) => [name, cells[index]])));
   }
 
   return rows;
 }
 
-function cmNumber(id) {
-  const match = String(id || "").match(/\bCM-(\d{4})\b/);
-  return match ? Number(match[1]) : null;
-}
-
-function cmId(id) {
-  const match = String(id || "").match(/\bCM-\d{4}\b/);
-  return match ? match[0] : null;
-}
-
-function cmvId(text) {
-  const match = String(text || "").match(/\bCMV-\d{4}\b/);
-  return match ? match[0] : null;
-}
-
-function latestByCmNumber(rows, fieldName, filter = () => true) {
-  return rows
-    .filter(filter)
-    .map((row) => ({ row, id: cmId(row[fieldName]), number: cmNumber(row[fieldName]) }))
-    .filter((item) => item.id && Number.isFinite(item.number))
-    .sort((left, right) => right.number - left.number)[0] || null;
+function normalizedId(value) {
+  return String(value || "").replace(/`/g, "").trim();
 }
 
 function validateAutopilotLedgerConsistency(root = process.cwd()) {
   const failures = [];
+  const facts = readFacts(root, failures);
   const taskQueue = parseMarkdownTable(readText(root, ".agent_board/TASK_QUEUE.md", failures));
   const validationLog = parseMarkdownTable(readText(root, ".agent_board/VALIDATION_LOG.md", failures));
   const ledger = parseMarkdownTable(readText(root, ".agent_board/AUTOPILOT_LEDGER.md", failures));
 
-  const latestDoneTask = latestByCmNumber(
-    taskQueue,
-    "ID",
-    (row) => String(row.Status || "").toLowerCase() === "done"
-  );
-  const latestValidationScope = latestByCmNumber(
-    validationLog,
-    "Scope",
-    (row) => String(row.Result || "").toUpperCase().startsWith("COMPLETED")
-  );
-  const latestLedger = latestByCmNumber(
-    ledger,
-    "ID",
-    (row) => String(row.Result || "").toLowerCase().startsWith("completed")
-  );
-
-  if (!latestDoneTask) failures.push("No completed CM task found in .agent_board/TASK_QUEUE.md");
-  if (!latestValidationScope) failures.push("No completed CM validation scope found in .agent_board/VALIDATION_LOG.md");
-  if (!latestLedger) failures.push("No completed CM ledger row found in .agent_board/AUTOPILOT_LEDGER.md");
-
-  const expectedLatest = latestDoneTask && latestDoneTask.id;
-  if (expectedLatest && latestValidationScope && latestValidationScope.id !== expectedLatest) {
-    failures.push(`Latest validation scope ${latestValidationScope.id} does not match latest done task ${expectedLatest}`);
-  }
-  if (expectedLatest && latestLedger && latestLedger.id !== expectedLatest) {
-    failures.push(`Latest ledger row ${latestLedger.id} does not match latest done task ${expectedLatest}`);
+  if (!facts || facts.schemaVersion !== SCHEMA_VERSION) {
+    failures.push(`CURRENT_FACTS schemaVersion must be ${SCHEMA_VERSION}`);
   }
 
-  const validationIds = new Set(validationLog.map((row) => String(row.ID || "").replace(/`/g, "").trim()));
-  for (const row of ledger) {
-    const id = cmId(row.ID);
-    const validationId = cmvId(row.Validation);
-    if (!id || !validationId) continue;
-    if (!validationIds.has(validationId)) {
-      failures.push(`Ledger row ${id} references missing validation log row ${validationId}`);
+  const lastCompleted = facts && facts.lastCompleted;
+  const taskId = normalizedId(lastCompleted && lastCompleted.taskId);
+  const validationId = normalizedId(lastCompleted && lastCompleted.validationId);
+  if (!/^CM-\d{4}$/.test(taskId)) {
+    failures.push("CURRENT_FACTS.lastCompleted.taskId must be a CM id");
+  }
+  if (!/^CMV-\d{4}$/.test(validationId)) {
+    failures.push("CURRENT_FACTS.lastCompleted.validationId must be a CMV id");
+  }
+
+  const doneRows = taskQueue.filter((row) => String(row.Status || "").trim().toLowerCase() === "done");
+  if (doneRows.length > 0) {
+    failures.push("TASK_QUEUE must not contain historical done rows");
+  }
+
+  const currentValidationRows = validationLog.filter((row) => normalizedId(row.ID) === validationId);
+  const currentLedgerRows = ledger.filter((row) => normalizedId(row.ID) === taskId);
+  if (currentValidationRows.length !== 1) {
+    failures.push(`VALIDATION_LOG must contain exactly one ${validationId} row`);
+  }
+  if (currentLedgerRows.length !== 1) {
+    failures.push(`AUTOPILOT_LEDGER must contain exactly one ${taskId} receipt row`);
+  }
+  if (validationLog.length !== 1) {
+    failures.push("VALIDATION_LOG must retain only the current lastCompleted validation row");
+  }
+  if (ledger.length !== 1) {
+    failures.push("AUTOPILOT_LEDGER must retain only the current lastCompleted receipt row");
+  }
+
+  const validationRow = currentValidationRows[0];
+  if (validationRow) {
+    if (!String(validationRow.Scope || "").includes(taskId)) {
+      failures.push(`${validationId} scope must bind ${taskId}`);
+    }
+    if (!COMPLETED_RESULT_RE.test(String(validationRow.Result || ""))) {
+      failures.push(`${validationId} result must be completed`);
     }
   }
 
-  const latestLedgerValidationId = latestLedger ? cmvId(latestLedger.row.Validation) : null;
-  if (latestLedger && !latestLedgerValidationId) {
-    failures.push(`Latest ledger row ${latestLedger.id} does not reference a CMV validation id`);
+  const ledgerRow = currentLedgerRows[0];
+  if (ledgerRow) {
+    if (!String(ledgerRow.Validation || "").includes(validationId)) {
+      failures.push(`${taskId} ledger receipt must reference ${validationId}`);
+    }
+    if (!COMPLETED_RESULT_RE.test(String(ledgerRow.Result || ""))) {
+      failures.push(`${taskId} ledger result must be completed`);
+    }
+  }
+
+  const activeQueueRows = taskQueue.filter((row) =>
+    ["todo", "in_progress"].includes(String(row.Status || "").trim().toLowerCase())
+  );
+  const activeTask = facts && facts.activeTask;
+  if (activeTask === null && activeQueueRows.length !== 0) {
+    failures.push("activeTask null requires an empty active queue");
+  } else if (typeof activeTask === "string") {
+    const activeIds = activeQueueRows.map((row) => normalizedId(row.ID));
+    if (activeIds.length !== 1 || activeIds[0] !== activeTask) {
+      failures.push("CURRENT_FACTS.activeTask must match the single active queue row");
+    }
   }
 
   return {
     ok: failures.length === 0,
     failures,
-    latestTask: latestDoneTask ? latestDoneTask.id : null,
-    latestValidationScope: latestValidationScope ? latestValidationScope.id : null,
-    latestLedger: latestLedger ? latestLedger.id : null,
-    latestLedgerValidationId
+    activeTask: activeTask === undefined ? null : activeTask,
+    activeQueueCount: activeQueueRows.length,
+    lastCompletedTask: taskId || null,
+    lastCompletedValidation: validationId || null,
+    validationRowCount: validationLog.length,
+    ledgerRowCount: ledger.length
   };
 }
 
@@ -152,10 +170,15 @@ if (require.main === module) {
   }
 
   console.log("AUTOPILOT LEDGER CONSISTENCY VALIDATION PASSED");
-  console.log(`latest_task=${result.latestTask} latest_ledger=${result.latestLedger} latest_validation=${result.latestLedgerValidationId}`);
+  console.log(
+    `last_completed_task=${result.lastCompletedTask} ` +
+    `last_completed_validation=${result.lastCompletedValidation} ` +
+    `active_queue=${result.activeQueueCount}`
+  );
 }
 
 module.exports = {
+  FACTS_PATH,
   parseMarkdownTable,
   validateAutopilotLedgerConsistency
 };

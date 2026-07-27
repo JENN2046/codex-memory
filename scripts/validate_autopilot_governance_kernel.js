@@ -671,7 +671,7 @@ if (greenFileWriteExecutorContract) {
 }
 
 requireIncludes(".agent_board/AUTOPILOT_LEDGER.md", [
-  "CM-0684",
+  "CM-2155",
   "Blocked Red Lane Items",
   "push / PR / tag / release / deploy",
 ]);

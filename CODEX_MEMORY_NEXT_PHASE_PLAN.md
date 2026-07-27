@@ -1,5 +1,8 @@
 # codex-memory Next Phase Plan
 
+> Non-authoritative historical plan. It does not select current work.
+> Start only from `CURRENT_STATE.md`; Jenn chooses the next product goal.
+
 更新时间：2026-06-03
 
 ## Purpose

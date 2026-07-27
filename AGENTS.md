@@ -35,6 +35,16 @@ fallback/test substrate. VCPToolBox remains the native memory behavior owner;
 low-disclosure projections, receipts, rollback posture, client scope
 governance, and local fallback/test contracts.
 
+Canonical default work entry:
+
+* Start normal project work from `CURRENT_STATE.md` only.
+* Treat `.agent_board/CURRENT_FACTS.json` as its compact machine companion.
+* Treat `STATUS.md`, `.agent_board/`, roadmaps, plans, checkpoints, handoffs,
+  and historical docs as non-authoritative unless the selected current task
+  references them.
+* Do not infer or resume a task from historical rows. Collect current branch,
+  HEAD, upstream divergence, PR, and CI facts through fresh queries.
+
 Current protected source realities:
 
 * MCP service identity is `vcp_codex_memory`.
@@ -138,7 +148,8 @@ Instruction precedence inside this repository:
 
 Default repository posture:
 
-* Standard local profile: root `AGENTS.md` plus `.agent_board/`.
+* Standard local profile: root `AGENTS.md` plus `CURRENT_STATE.md`; load
+  `.agent_board/` only for machine validation or a directly relevant receipt.
 * Smart Standing Authorization v3 and Jenn's global L3 protocol apply by
   default.
 * This repository narrows L3 only for memory/runtime-sensitive actions. Safe

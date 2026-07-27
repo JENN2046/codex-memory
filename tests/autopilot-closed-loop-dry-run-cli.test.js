@@ -10,6 +10,9 @@ const {
   collectAutopilotClosedLoopSummary,
   parseMarkdownTable
 } = require('../src/core/AutopilotClosedLoopDryRun');
+const {
+  collectAutopilotControllerSummary
+} = require('../src/core/AutopilotControllerReadOnly');
 
 const repoRoot = path.resolve(__dirname, '..');
 const cliPath = path.join(repoRoot, 'src', 'cli', 'autopilot-closed-loop-dry-run.js');
@@ -96,6 +99,37 @@ test('closed-loop receipt coverage starts at first ledger task while validation 
   assert.deepEqual(summary.validation_coverage.missing_tasks, []);
   assert.equal(summary.receipt_coverage.completed_tasks, 1);
   assert.deepEqual(summary.receipt_coverage.missing_tasks, []);
+});
+
+test('empty active queue stops safely and never falls back to a historical task', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-empty-queue-'));
+  const boardDir = path.join(tempRoot, '.agent_board');
+  fs.mkdirSync(boardDir, { recursive: true });
+  fs.writeFileSync(path.join(boardDir, 'TASK_QUEUE.md'), [
+    '| ID | Status | Area | Risk | Task | Required Validation | Notes |',
+    '|---|---|---|---|---|---|---|'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-0808 | tests | P6 | CM-0684 historical validation | COMPLETED_VALIDATED | historical receipt only | none | 2026-05-21 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-0684 | historical goal | Green | default | action | receipt | CMV-0808 | zero | 0 | completed_validated | 2026-05-21 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'CHECKPOINT.md'), '');
+  fs.writeFileSync(path.join(tempRoot, 'STATUS.md'), 'NOT_READY_BLOCKED\n');
+
+  const loop = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  const controller = collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
+
+  assert.equal(loop.latest_task, 'not_recorded');
+  assert.equal(loop.next_safe_task, 'none_local_queue_empty');
+  assert.equal(controller.current_state, 'continued_or_stopped');
+  assert.equal(controller.next_safe_task, 'none_local_queue_empty');
+  assert.equal(controller.lane_decision.decision, 'NO_EXECUTABLE_TASK_AVAILABLE');
 });
 
 test('closed-loop dry-run CLI outputs json summary', () => {
