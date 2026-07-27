@@ -63,7 +63,10 @@ sequences, but the canonical service does not yet wire or expose it.
 Model-visible routing is constrained to fields each public output schema
 actually returns: search guidance preserves `result_count`, returned
 `results[].summary`, and `results[].relevance`, while bounded-status tools use
-their distinct `item_count`. The six public tool names remain unchanged, but
+their distinct `item_count`. The owner-only dogfood observation contract now
+uses schema v3 for the required low-disclosure `error_detail_code`; the CLI
+still validates v2 from an older runtime, and a new runtime projects v2 for an
+older schema-2 client. The six public tool names remain unchanged, but
 `resolve_memory_context` now requires `requested_visibility`; its public input
 schema and digest are intentionally tightened. This is source hardening and
 contract clarification only: no live runtime, provider, private configuration,

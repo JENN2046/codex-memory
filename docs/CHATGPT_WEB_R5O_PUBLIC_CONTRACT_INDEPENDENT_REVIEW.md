@@ -26,8 +26,10 @@ metadata was corrected, and the two original review threads received truthful
 dispositions. Exact-head automated review then identified one search
 terminal-guidance mismatch; the current worktree fixes it and independent
 incremental review returns `PASS`. Delivery still requires commit/push,
-exact-head CI, and disposition of that new thread. Merge is a separate Jenn
-decision.
+exact-head CI, and disposition of the current review threads, including the
+observation-schema compatibility finding. Merge is a separate Jenn decision.
+The final observation-compatibility incremental review returns `PASS` with
+both version-relation blockers closed and no remaining source finding.
 
 ## Closed Findings
 
@@ -85,6 +87,22 @@ decision.
 - The redundant monolithic `nativeEvidence()` revalidation block was removed.
 - Named fail-closed receipt classifiers remain authoritative.
 
+### Private observation schema compatibility
+
+- The owner-only dogfood observation exact key set moves from v2 to v3 when
+  `last_session.error_detail_code` becomes required.
+- The current CLI validates v2 without that field and v3 with that field,
+  preserving exact-key fail-closed behavior in both versions.
+- A new runtime projects observation v2 for control-schema-2 clients and
+  requires observation v3 for control-schema-3 clients; a stale v2 producer
+  on the new schema-3 server path fails closed.
+- A new CLI accepts observation v2 from a prior runtime; an older schema-2 CLI
+  receives no unexpected v3-only field from the new runtime.
+- Response/observation versions accept only `2 -> 2`, `3 -> 2`, and `3 -> 3`;
+  the impossible `2 -> 3` combination fails closed.
+- The compatibility projection carries no raw details and changes no public
+  MCP name, schema, or digest.
+
 ## Validation Observed
 
 - `git diff --check`: pass.
@@ -101,6 +119,11 @@ decision.
 - terminal-guidance targeted regression: `12/12`.
 - post-fix all R5 plus synthetic E2E: `48/48`; base R4 contracts: `9/9`.
 - incremental independent review: `PASS`, no blocking finding.
+- observation-v2/v3 compatibility and adjacent control/runtime tests:
+  `16/16`.
+- final observation-version independent incremental review: `PASS`, including
+  accepted `2 -> 2`, `3 -> 2`, `3 -> 3`, rejected `2 -> 3`, and schema-3
+  server rejection of a stale v2 producer.
 
 The restricted local sandbox rejects listener creation with `EPERM`, so the
 full listener-dependent Relay and HTTP cases require exact-head GitHub CI.
@@ -117,10 +140,10 @@ full listener-dependent Relay and HTTP cases require exact-head GitHub CI.
 
 ## Current Delivery Gates
 
-1. Commit and push the independently reviewed search terminal-guidance fix.
-2. Obtain terminal-success CI for that new exact head.
-3. Reply to and truthfully resolve the new terminal-guidance review thread.
-4. Do not merge without Jenn's separate current decision.
+1. Commit and push the independently reviewed compatibility fix.
+2. Obtain terminal-success CI and current-head automated review.
+3. Reply to and truthfully resolve the observation-schema review thread.
+4. Merge only under Jenn's current explicit decision and after all gates pass.
 
 ## Accepted Residuals
 

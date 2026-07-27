@@ -20,6 +20,7 @@ const {
 } = require('../../src/runtime/chatgpt-r4/private-dogfood-observer');
 const {
   createSessionActivationControlServer,
+  projectDogfoodObservation,
   validateControlRequest
 } = require('../../src/runtime/chatgpt-r4/session-activation-control-server');
 
@@ -139,6 +140,9 @@ test('R5-H task classification is owner-only, versioned, and fail closed', () =>
 
   const legacy = parseArguments(['activate', '--visibility', 'project', '--json']);
   assert.equal(legacy.request.schema_version, 2);
+  assert.equal(parseArguments(['status', '--json']).request.schema_version, 3);
+  assert.equal(parseArguments(['kill', '--reason', 'operator_requested', '--json'])
+    .request.schema_version, 3);
 
   assert.throws(() => parseArguments([
     'activate', '--task-class', 'memory_relevant', '--json'
@@ -179,6 +183,7 @@ test('R5-H schema-3 control response remains low disclosure and passes the owner
   };
   const response = server.handleControlRequest(request);
   assert.equal(response.schema_version, 3);
+  assert.equal(response.observation.schema_version, 3);
   assert.equal(response.observation.schema_version, DOGFOOD_OBSERVATION_SCHEMA_VERSION);
   assert.equal(response.observation.last_session.task_class, 'memory_relevant');
   assert.doesNotThrow(() => validateResponse(response, 'activate'));
@@ -186,6 +191,60 @@ test('R5-H schema-3 control response remains low disclosure and passes the owner
   const serialized = JSON.stringify(response);
   assert.doesNotMatch(serialized, /project-alpha|r5h-owner|"query"|"prompt"/iu);
   assert.equal(response.observation.raw_memory_recorded, false);
+
+  const legacyObservation = projectDogfoodObservation(response.observation, 2);
+  assert.equal(legacyObservation.schema_version, 2);
+  assert.equal(Object.hasOwn(legacyObservation.last_session, 'error_detail_code'), false);
+  assert.doesNotThrow(() => validateObservation(legacyObservation));
+  assert.doesNotThrow(() => validateResponse({
+    ...response,
+    observation: legacyObservation
+  }, 'activate'));
+  assert.throws(() => validateResponse({
+    ...response,
+    schema_version: 2
+  }, 'activate'), { code: 'r5a_dogfood_cli_response_invalid' });
+  assert.throws(() => projectDogfoodObservation(legacyObservation, 3), {
+    code: 'r5a_dogfood_control_observation_invalid'
+  });
+  const legacyStatus = server.handleControlRequest({
+    schema_version: 2,
+    operation: 'status',
+    request_id: 'op_r5h_control_status_legacy_0001'
+  });
+  assert.equal(legacyStatus.schema_version, 2);
+  assert.equal(legacyStatus.observation.schema_version, 2);
+  assert.equal(
+    Object.hasOwn(legacyStatus.observation.last_session, 'error_detail_code'),
+    false
+  );
+  assert.doesNotThrow(() => validateResponse(legacyStatus, 'status'));
+  const currentStatus = server.handleControlRequest({
+    schema_version: 3,
+    operation: 'status',
+    request_id: 'op_r5h_control_status_current_001'
+  });
+  assert.equal(currentStatus.schema_version, 3);
+  assert.equal(currentStatus.observation.schema_version, 3);
+  assert.equal(
+    Object.hasOwn(currentStatus.observation.last_session, 'error_detail_code'),
+    true
+  );
+  assert.doesNotThrow(() => validateResponse(currentStatus, 'status'));
+  assert.throws(() => validateObservation({
+    ...legacyObservation,
+    last_session: {
+      ...legacyObservation.last_session,
+      error_detail_code: null
+    }
+  }), { code: 'r5a_dogfood_cli_last_session_invalid' });
+  assert.throws(() => validateObservation({
+    ...response.observation,
+    last_session: Object.fromEntries(
+      Object.entries(response.observation.last_session)
+        .filter(([key]) => key !== 'error_detail_code')
+    )
+  }), { code: 'r5a_dogfood_cli_last_session_invalid' });
 
   assert.throws(() => validateObservation({
     ...response.observation,

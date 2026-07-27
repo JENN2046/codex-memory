@@ -297,6 +297,9 @@ function projectControlResponse(
   schemaVersion = 1
 ) {
   const snapshot = postOperationSnapshot;
+  const projectedDogfoodObservation = dogfoodObservation && schemaVersion >= 2
+    ? projectDogfoodObservation(dogfoodObservation, schemaVersion)
+    : null;
   const value = {
     schema_version: schemaVersion,
     operation,
@@ -309,17 +312,43 @@ function projectControlResponse(
     default_closed: true,
     durable_state_written: false,
     receipt_digest: response.receipt_digest,
-    ...(schemaVersion >= 2 ? { observation: dogfoodObservation } : {})
+    ...(schemaVersion >= 2 ? { observation: projectedDogfoodObservation } : {})
   };
-  if (schemaVersion >= 2 && (!dogfoodObservation ||
-      dogfoodObservation.durable_observation_state_written !== false ||
-      dogfoodObservation.raw_memory_recorded !== false)) {
+  if (schemaVersion >= 2 && (!projectedDogfoodObservation ||
+      projectedDogfoodObservation.durable_observation_state_written !== false ||
+      projectedDogfoodObservation.raw_memory_recorded !== false)) {
     reject('r5a_dogfood_control_observation_invalid');
   }
   if (!/^sha256:[a-f0-9]{64}$/u.test(value.receipt_digest || '')) {
     reject('r4_session_control_receipt_invalid');
   }
   return Object.freeze(value);
+}
+
+function projectDogfoodObservation(observation, controlSchemaVersion) {
+  if (!observation || typeof observation !== 'object' || Array.isArray(observation) ||
+      ![2, 3].includes(observation.schema_version) ||
+      ![2, 3].includes(controlSchemaVersion)) {
+    reject('r5a_dogfood_control_observation_invalid');
+  }
+  if (controlSchemaVersion >= 3) {
+    if (observation.schema_version !== 3) {
+      reject('r5a_dogfood_control_observation_invalid');
+    }
+    return observation;
+  }
+  if (observation.schema_version === 2) return observation;
+  const lastSession = observation.last_session === null
+    ? null
+    : Object.freeze(Object.fromEntries(
+      Object.entries(observation.last_session)
+        .filter(([key]) => key !== 'error_detail_code')
+    ));
+  return Object.freeze({
+    ...observation,
+    schema_version: 2,
+    last_session: lastSession
+  });
 }
 
 function safeError(code) {
@@ -333,6 +362,7 @@ module.exports = {
   MAX_CONTROL_REQUEST_BYTES,
   MAX_CONTROL_RESPONSE_BYTES,
   createSessionActivationControlServer,
+  projectDogfoodObservation,
   projectControlResponse,
   validateControlRequest
 };

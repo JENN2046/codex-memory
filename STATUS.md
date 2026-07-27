@@ -6,7 +6,7 @@ Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current task: `CM-2154 ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility Contract`.
 Current validation: `CMV-2239`.
-Current fact: Relay response expiry is capped by request expiry and the UDS budget is aligned; incomplete UDS input keeps the daemon available without replaying the acknowledged request, and model-visible routing preserves the distinct fields each selected output schema can return.
+Current fact: Relay response expiry is capped by request expiry and the UDS budget is aligned; incomplete UDS input keeps the daemon available without replaying the acknowledged request, model-visible routing preserves each selected output schema, and the private observation contract uses exact v2/v3 compatibility.
 The six public tool names remain unchanged, but `resolve_memory_context` now requires `requested_visibility`, so its public input schema and digest are intentionally tightened. No live runtime/provider/private-config/memory action occurred and the Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
@@ -35,6 +35,13 @@ and `results[].relevance`; it does not expose `result_ref` as answer content or
 permit a follow-up read. After a successful resolve, exactly the preselected
 read runs once and every result or transport error terminates the workflow.
 
+The owner-only dogfood observation contract now versions the required
+`last_session.error_detail_code` field as observation schema 3. The CLI
+continues to accept the prior exact observation-v2 shape from an older runtime,
+while a new runtime projects observation v2 without the new field for a
+schema-2 client. Schema-3 clients receive the exact v3 shape. This staged
+compatibility changes no public MCP name, schema, or digest.
+
 The public tool count and names remain six. The public input contract does
 change: `resolve_memory_context` now requires both `project_alias` and
 `requested_visibility`. Its schema digest changes from
@@ -51,7 +58,8 @@ restricted agent sandbox blocks listener creation with `EPERM`. GitHub Actions
 run `30236898520` passed on `56bca4221b036965aa2a04f39b997cb20bd9deaf`;
 an exact-head review then identified and the worktree fixed the search terminal
 guidance mismatch, with targeted regression tests passing `12/12`. CI must run
-again after that fix is pushed.
+again after the observation compatibility fix is pushed. The adjacent
+observation/control/runtime regression set passes `16/16`.
 
 No live runtime, provider, memory read/write, private configuration, or VCP
 core action ran. Prior owner-only artifacts remain unchanged and the Edge

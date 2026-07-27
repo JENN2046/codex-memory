@@ -30,6 +30,7 @@ const {
 } = require('../../src/runtime/chatgpt-r4/governance-runtime-authority');
 const {
   createSessionActivationControlServer,
+  projectDogfoodObservation,
   validateControlRequest
 } = require('../../src/runtime/chatgpt-r4/session-activation-control-server');
 const {
@@ -1269,7 +1270,7 @@ test('R5-D permits authorized isolated derived mutation with lifecycle evidence'
     default_closed: true,
     durable_state_written: false,
     receipt_digest: fixture.controller.snapshot().receipt_digest,
-    observation: observer.snapshot()
+    observation: projectDogfoodObservation(observer.snapshot(), 2)
   }, 'status'));
   for (const terminalStatus of ['expired', 'killed']) {
     const terminalObserver = createPrivateDogfoodObserver();

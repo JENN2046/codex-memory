@@ -7,7 +7,7 @@ const MAX_DOGFOOD_PROVIDER_CALLS = 25;
 const MAX_DOGFOOD_TOOL_EVENTS_PER_SESSION = 4;
 const MAX_DOGFOOD_POST_TERMINAL_ATTEMPTS_PER_SESSION = 4;
 const DOGFOOD_OBSERVATION_KIND = 'meaningful_task_unprompted';
-const DOGFOOD_OBSERVATION_SCHEMA_VERSION = 2;
+const DOGFOOD_OBSERVATION_SCHEMA_VERSION = 3;
 const DOGFOOD_TASK_CLASSES = Object.freeze([
   'memory_relevant',
   'memory_irrelevant',

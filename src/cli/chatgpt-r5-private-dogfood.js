@@ -67,7 +67,7 @@ function parseArguments(argv) {
     reject('r5h_dogfood_cli_task_class_invalid');
   }
   const request = {
-    schema_version: taskClass === undefined ? 2 : 3,
+    schema_version: operation === 'activate' && taskClass === undefined ? 2 : 3,
     operation,
     request_id: `op_${crypto.randomBytes(24).toString('base64url')}`
   };
@@ -98,6 +98,10 @@ function parseArguments(argv) {
 }
 
 function validateObservation(observation) {
+  if (!observation || typeof observation !== 'object' || Array.isArray(observation) ||
+      ![2, DOGFOOD_OBSERVATION_SCHEMA_VERSION].includes(observation.schema_version)) {
+    reject('r5a_dogfood_cli_observation_invalid');
+  }
   const exactKeys = [
     'schema_version', 'observation_kind', 'sessions_started', 'session_limit',
     'memory_relevant_sessions', 'memory_irrelevant_sessions', 'scope_missing_sessions',
@@ -132,10 +136,8 @@ function validateObservation(observation) {
     'derived_runtime_mutation_evidence_count', 'derived_runtime_mutation_policy_violations',
     'unrestricted_native_searches'
   ];
-  if (!observation || typeof observation !== 'object' || Array.isArray(observation) ||
-      Object.keys(observation).sort().some((key, index) => key !== exactKeys[index]) ||
+  if (Object.keys(observation).sort().some((key, index) => key !== exactKeys[index]) ||
       Object.keys(observation).length !== exactKeys.length ||
-      observation.schema_version !== DOGFOOD_OBSERVATION_SCHEMA_VERSION ||
       observation.observation_kind !== DOGFOOD_OBSERVATION_KIND ||
       observation.session_limit !== MAX_DOGFOOD_SESSIONS ||
       observation.provider_call_limit !== MAX_DOGFOOD_PROVIDER_CALLS ||
@@ -179,7 +181,11 @@ function validateObservation(observation) {
       observation.raw_memory_recorded !== false) {
     reject('r5a_dogfood_cli_observation_invalid');
   }
-  validateLastSession(observation.last_session, observation.sessions_started);
+  validateLastSession(
+    observation.last_session,
+    observation.sessions_started,
+    observation.schema_version
+  );
   const forbiddenCounterObserved = observation.local_fallbacks !== 0 ||
     observation.primary_memory_writes !== 0 ||
     observation.unrestricted_native_searches !== 0 ||
@@ -192,7 +198,14 @@ function validateObservation(observation) {
   return observation;
 }
 
-function validateLastSession(lastSession, sessionsStarted) {
+function validateLastSession(
+  lastSession,
+  sessionsStarted,
+  observationSchemaVersion = DOGFOOD_OBSERVATION_SCHEMA_VERSION
+) {
+  if (![2, DOGFOOD_OBSERVATION_SCHEMA_VERSION].includes(observationSchemaVersion)) {
+    reject('r5a_dogfood_cli_last_session_invalid');
+  }
   if (lastSession === null) {
     if (sessionsStarted !== 0) reject('r5a_dogfood_cli_last_session_invalid');
     return null;
@@ -202,7 +215,8 @@ function validateLastSession(lastSession, sessionsStarted) {
     'resolve_attempt_count', 'read_attempt_count', 'post_terminal_attempt_count',
     'first_resolve_status', 'terminal_read_status', 'workflow_outcome',
     'total_latency_ms', 'result_count',
-    'max_relevance', 'timed_out', 'error_code', 'error_detail_code',
+    'max_relevance', 'timed_out', 'error_code',
+    ...(observationSchemaVersion >= 3 ? ['error_detail_code'] : []),
     'tool_attempt_in_flight',
     'provider_calls', 'native_invocations'
   ].sort();
@@ -253,7 +267,7 @@ function validateLastSession(lastSession, sessionsStarted) {
       typeof lastSession.timed_out !== 'boolean' ||
       (lastSession.error_code !== null &&
        !/^[a-z][a-z0-9_]{0,79}$/u.test(lastSession.error_code)) ||
-      (lastSession.error_detail_code !== null &&
+      (observationSchemaVersion >= 3 && lastSession.error_detail_code !== null &&
        !/^r4_live_read_receipt_[a-z0-9_]{1,55}$/u.test(lastSession.error_detail_code)) ||
       typeof lastSession.tool_attempt_in_flight !== 'boolean' ||
       !Number.isInteger(lastSession.provider_calls) || lastSession.provider_calls < 0 ||
@@ -277,6 +291,9 @@ function validateResponse(response, operation) {
     reject('r5a_dogfood_cli_response_invalid');
   }
   validateObservation(response.observation);
+  if (response.schema_version === 2 && response.observation.schema_version !== 2) {
+    reject('r5a_dogfood_cli_response_invalid');
+  }
   return response;
 }
 
