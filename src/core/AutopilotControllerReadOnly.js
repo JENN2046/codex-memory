@@ -148,7 +148,12 @@ function collectAutopilotControllerSummary(options = {}) {
   const tasks = parseTaskQueue(taskQueueText).filter(isCurrentAutopilotTask);
   const ledgerRows = parseLedgerRows(ledgerText);
   const validationRows = parseValidationRows(validationLogText);
-  const selectedTask = tasks.find(task => task.status === 'todo' || task.status === 'in_progress') || null;
+  const parsedSelectedTask =
+    tasks.find(task => task.status === 'todo' || task.status === 'in_progress') || null;
+  const selectedTask = parsedSelectedTask &&
+    closedLoop.next_safe_task === parsedSelectedTask.id
+    ? parsedSelectedTask
+    : null;
   const latestLedger = ledgerRows[ledgerRows.length - 1] || null;
   const latestValidation = validationRows[0] || null;
   const laneDecision = inferLaneDecision(selectedTask);

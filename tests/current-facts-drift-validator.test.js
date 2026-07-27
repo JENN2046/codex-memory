@@ -212,7 +212,7 @@ function ledger(rows = null) {
     "| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |",
     "|---|---|---|---|---|---|---|---|---:|---|---|",
     ...(rows || [
-      `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId} | zero | 0 | completed_validated | 2026-07-27 |`
+      `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
     ]),
     "",
     "## Blocked Red Lane Items",
@@ -486,7 +486,7 @@ test("current facts validator accepts a future lastCompleted closeout without va
     "| CMV-3002 | tests | P6 | CM-3001 selected product goal | COMPLETED_VALIDATED | Green Lane local closeout | none | 2026-07-28 |"
   ]));
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
-    "| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | completed_validated | 2026-07-28 |"
+    "| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |"
   ]));
 
   const result = validateCurrentFactsDrift(root);
@@ -507,7 +507,7 @@ test("current facts validator rejects a stale CURRENT_STATE last completed pair"
     "| CMV-3002 | tests | P6 | CM-3001 selected product goal | COMPLETED_VALIDATED | Green Lane local closeout | none | 2026-07-28 |"
   ]));
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
-    "| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | completed_validated | 2026-07-28 |"
+    "| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |"
   ]));
 
   const result = validateCurrentFactsDrift(root);
@@ -580,7 +580,8 @@ test("current facts validator rejects malformed CM queue rows before empty-queue
   const root = workspace();
   writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
     "| CM-3001 | 3001 | todo | P6 | Green | docs | unescaped | pipe | tests | none | no | active |",
-    "| CM-3002 | 3002 | todo | P6 | Green | docs | missing notes | tests | none | no |"
+    "| CM-3002 | 3002 | todo | P6 | Green | docs | missing notes | tests | none | no |",
+    "CM-3006X | 3006 | todo | P6 | Green | docs | missing boundaries | tests | none | no | stale"
   ]));
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, false);
@@ -591,11 +592,13 @@ test("current facts validator rejects malformed validation and ledger rows besid
   const root = workspace();
   writeFile(root, ".agent_board/VALIDATION_LOG.md", validationLog([
     `| ${FIXTURE_CLOSEOUT.validationId} | tests | P6 | ${FIXTURE_CLOSEOUT.taskId} synthetic closeout | COMPLETED_VALIDATED | Green Lane | none | 2026-07-27 |`,
-    "| CMV-3003 | tests | P6 | CM-3004 unescaped | scope | COMPLETED_VALIDATED | extra | none | 2026-07-28 |"
+    "| CMV-3003 | tests | P6 | CM-3004 unescaped | scope | COMPLETED_VALIDATED | extra | none | 2026-07-28 |",
+    "CMV-3003X | tests | P6 | CM-3004X missing boundaries | COMPLETED_VALIDATED | extra | none | 2026-07-28"
   ]));
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
-    `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId} | zero | 0 | completed_validated | 2026-07-27 |`,
-    "| CM-3004 | extra | Yellow | closeout | complete | receipt | with | pipe | CMV-3003 | zero | 0 | completed_validated | 2026-07-28 |"
+    `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`,
+    "| CM-3004 | extra | Yellow | closeout | complete | receipt | with | pipe | CMV-3003 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |",
+    "CM-3004X | extra | Yellow | closeout | complete | receipt | CMV-3003X | zero | 0 | COMPLETED_VALIDATED | 2026-07-28"
   ]));
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, false);
@@ -627,6 +630,37 @@ test("current facts validator rejects changed active-table headers", () => {
   assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must retain its exact table header and separator/);
 });
 
+test("current facts validator rejects duplicate active-table separators", () => {
+  const root = workspace();
+  const queueSeparator = "|---|---:|---|---|---|---|---|---|---|---|---|";
+  const validationSeparator = "|---|---|---|---|---|---|---|---|";
+  const ledgerSeparator = "|---|---|---|---|---|---|---|---|---:|---|---|";
+  writeFile(
+    root,
+    ".agent_board/TASK_QUEUE.md",
+    queue().replace(queueSeparator, `${queueSeparator}\n${queueSeparator}`)
+  );
+  writeFile(
+    root,
+    ".agent_board/VALIDATION_LOG.md",
+    validationLog().replace(
+      validationSeparator,
+      `${validationSeparator}\n${validationSeparator}`
+    )
+  );
+  writeFile(
+    root,
+    ".agent_board/AUTOPILOT_LEDGER.md",
+    ledger().replace(ledgerSeparator, `${ledgerSeparator}\n${ledgerSeparator}`)
+  );
+
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /TASK_QUEUE must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must retain its exact table header and separator/);
+});
+
 test("current facts validator accepts exactly one selected active queue row", () => {
   const root = workspace();
   const changed = facts();
@@ -638,6 +672,38 @@ test("current facts validator accepts exactly one selected active queue row", ()
   ]));
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects an inline-code active queue ID", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.activeTask = "CM-3001";
+  writeFacts(root, changed);
+  writeFile(root, "CURRENT_STATE.md", currentState("CM-3001"));
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| `CM-3001` | 3001 | todo | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /TASK_QUEUE IDs must use raw canonical CM format/);
+  assert.match(result.failures.join("\n"), /activeTask must match the single active queue row/);
+});
+
+test("current facts validator rejects noncanonical active status casing", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.activeTask = "CM-3001";
+  writeFacts(root, changed);
+  writeFile(root, "CURRENT_STATE.md", currentState("CM-3001"));
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | TODO | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /only todo or in_progress status/);
+  assert.match(result.failures.join("\n"), /activeTask must match the single active queue row/);
 });
 
 test("current facts validator rejects extra queue rows beside activeTask", () => {
@@ -676,13 +742,48 @@ test("current facts validator rejects missing lastCompleted validation and ledge
   assert.match(result.failures.join("\n"), /must have one bound AUTOPILOT_LEDGER receipt/);
 });
 
+test("current facts validator rejects noncanonical closeout results", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validationLog([
+    `| ${FIXTURE_CLOSEOUT.validationId} | tests | P6 | ${FIXTURE_CLOSEOUT.taskId} synthetic closeout | COMPLETED_VALIDATED_EXTRA | Green Lane | none | 2026-07-27 |`
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId} | zero | 0 | completed_validated_suffix | 2026-07-27 |`
+  ]));
+
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(
+    result.failures.join("\n"),
+    new RegExp(`${FIXTURE_CLOSEOUT.validationId} result must be exactly COMPLETED_VALIDATED`)
+  );
+  assert.match(
+    result.failures.join("\n"),
+    new RegExp(`${FIXTURE_CLOSEOUT.taskId} ledger result must be exactly COMPLETED_VALIDATED`)
+  );
+});
+
+test("current facts validator rejects an empty current ledger receipt", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Yellow | closeout | complete |  | ${FIXTURE_CLOSEOUT.validationId} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
+  ]));
+
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(
+    result.failures.join("\n"),
+    new RegExp(`${FIXTURE_CLOSEOUT.taskId} ledger receipt must be non-empty`)
+  );
+});
+
 test("current facts validator rejects near-collision receipt tokens", () => {
   const root = workspace();
   writeFile(root, ".agent_board/VALIDATION_LOG.md", validationLog([
     `| ${FIXTURE_CLOSEOUT.validationId} | tests | P6 | ${FIXTURE_CLOSEOUT.taskId}0 synthetic closeout | COMPLETED_VALIDATED | Green Lane local closeout | none | 2026-07-27 |`
   ]));
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
-    `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Green | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId}0 | zero | 0 | completed_validated | 2026-07-27 |`
+    `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Green | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId}0 | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
   ]));
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, false);

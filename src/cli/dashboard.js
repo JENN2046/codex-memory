@@ -13,6 +13,10 @@ const {
   parseReceiptMarkdown
 } = require('../core/SmartStandingAuthorizationV3ReceiptParser');
 const {
+  COMPLETED_RESULT,
+  isCanonicalCompletedResult
+} = require('../core/AutopilotCloseoutContract');
+const {
   collectAutopilotClosedLoopSummary
 } = require('../core/AutopilotClosedLoopDryRun');
 const {
@@ -787,7 +791,7 @@ function collectAutopilotKernel() {
     .find(line => {
       if (!/^\| CMV-\d{4} /.test(line)) return false;
       const cells = line.split('|').slice(1, -1).map(cell => cell.trim());
-      return String(cells[4] || '').startsWith('COMPLETED');
+      return isCanonicalCompletedResult(cells[4]);
     });
   const latestValidationCells = latestValidationRow
     ? latestValidationRow.split('|').slice(1, -1).map(cell => cell.trim())
@@ -796,7 +800,7 @@ function collectAutopilotKernel() {
     ? (latestValidationRow.match(/\| (CMV-\d{4}) /) || [])[1] || 'not_recorded'
     : 'not_recorded';
   const validationStatus = latestValidationId !== 'not_recorded'
-    ? String(latestValidationCells[4] || 'completed').toLowerCase()
+    ? String(latestValidationCells[4] || '')
     : 'not_recorded';
 
   const status = profileExists
@@ -806,7 +810,8 @@ function collectAutopilotKernel() {
     && missingRequiredExamples.length === 0
     && validators.governance_kernel
     && validators.goal_compiler
-    && validationStatus.startsWith('completed')
+    && isCanonicalCompletedResult(latestLedgerCells[9])
+    && validationStatus === COMPLETED_RESULT
       ? 'ok'
       : 'warn';
 

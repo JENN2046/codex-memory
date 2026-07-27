@@ -47,12 +47,18 @@ test('closed-loop core reports coverage objects for completed tasks', () => {
 
   assert.equal(typeof summary.latest_task, 'string');
   assert.equal(typeof summary.next_safe_task, 'string');
-  assert.equal(typeof summary.receipt_coverage.completed_tasks, 'number');
-  assert.equal(typeof summary.receipt_coverage.covered_tasks, 'number');
-  assert.ok(Array.isArray(summary.receipt_coverage.missing_tasks));
-  assert.equal(typeof summary.validation_coverage.completed_tasks, 'number');
-  assert.equal(typeof summary.validation_coverage.covered_tasks, 'number');
-  assert.ok(Array.isArray(summary.validation_coverage.missing_tasks));
+  assert.deepEqual(summary.receipt_coverage, {
+    completed_tasks: 1,
+    covered_tasks: 1,
+    missing_tasks: [],
+    ratio: 1
+  });
+  assert.deepEqual(summary.validation_coverage, {
+    completed_tasks: 1,
+    covered_tasks: 1,
+    missing_tasks: [],
+    ratio: 1
+  });
   assert.equal(typeof summary.repair_once_remaining, 'boolean');
   assert.equal(summary.blocked_red_count >= 1, true);
 });
@@ -74,6 +80,9 @@ test('closed-loop receipt coverage starts at first ledger task while validation 
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-loop-'));
   const boardDir = path.join(tempRoot, '.agent_board');
   fs.mkdirSync(boardDir, { recursive: true });
+  fs.writeFileSync(path.join(boardDir, 'CURRENT_FACTS.json'), JSON.stringify({
+    schemaVersion: 4
+  }));
   fs.writeFileSync(path.join(boardDir, 'TASK_QUEUE.md'), [
     '| ID | Status | Area | Risk | Task | Required Validation | Notes |',
     '|---|---|---|---|---|---|---|',
@@ -88,7 +97,7 @@ test('closed-loop receipt coverage starts at first ledger task while validation 
   ].join('\n'));
   fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
     '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
-    '|---|---|---|---|---|---|---|---:|---|---|',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
     '| CM-0684 | Kernel | Green | default | action | not_required_no_amber_external_or_write_action | CMV-0808 | provider=0 | 0 | completed_validated | 2026-05-21 |'
   ].join('\n'));
   fs.writeFileSync(path.join(boardDir, 'CHECKPOINT.md'), '');
@@ -99,6 +108,232 @@ test('closed-loop receipt coverage starts at first ledger task while validation 
   assert.deepEqual(summary.validation_coverage.missing_tasks, []);
   assert.equal(summary.receipt_coverage.completed_tasks, 1);
   assert.deepEqual(summary.receipt_coverage.missing_tasks, []);
+});
+
+test('schema v5 closeout coverage follows lastCompleted with an empty active queue', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-v5-closeout-'));
+  const boardDir = path.join(tempRoot, '.agent_board');
+  fs.mkdirSync(boardDir, { recursive: true });
+  fs.writeFileSync(path.join(boardDir, 'CURRENT_FACTS.json'), JSON.stringify({
+    schemaVersion: 5,
+    activeTask: null,
+    lastCompleted: {
+      taskId: 'CM-3001',
+      validationId: 'CMV-3002'
+    }
+  }));
+  fs.writeFileSync(path.join(boardDir, 'TASK_QUEUE.md'), [
+    '| ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |',
+    '|---|---:|---|---|---|---|---|---|---|---|---|'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-3002 | tests | P6 | CM-3001 selected goal | COMPLETED_VALIDATED | current closeout | none | 2026-07-28 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'CHECKPOINT.md'), '');
+
+  const covered = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  assert.equal(covered.latest_task, 'not_recorded');
+  assert.deepEqual(covered.validation_coverage, {
+    completed_tasks: 1,
+    covered_tasks: 1,
+    missing_tasks: [],
+    ratio: 1
+  });
+  assert.deepEqual(covered.receipt_coverage, {
+    completed_tasks: 1,
+    covered_tasks: 1,
+    missing_tasks: [],
+    ratio: 1
+  });
+
+  fs.appendFileSync(
+    path.join(boardDir, 'VALIDATION_LOG.md'),
+    '\n| `CMV-3003` | stale | P6 | CM-3004 stale closeout | COMPLETED_VALIDATED | stale | none | 2026-07-28 |'
+  );
+  fs.appendFileSync(
+    path.join(boardDir, 'AUTOPILOT_LEDGER.md'),
+    '\n| `CM-3004` | stale | Green | closeout | complete | receipt | CMV-3003 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |'
+  );
+  const noncanonical = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  assert.deepEqual(noncanonical.validation_coverage.missing_tasks, ['CM-3001']);
+  assert.deepEqual(noncanonical.receipt_coverage.missing_tasks, ['CM-3001']);
+
+  fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-3002 | tests | P6 | CM-3001 selected goal | COMPLETED_VALIDATED | current closeout | none | 2026-07-28 |',
+    '| CMV-3003X | stale | P6 | CM-3004X stale closeout | COMPLETED_VALIDATED | stale | none | 2026-07-28 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |',
+    '| CM-3004X | stale | Green | closeout | complete | receipt | CMV-3003X | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |'
+  ].join('\n'));
+  const suffixed = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  assert.deepEqual(suffixed.validation_coverage.missing_tasks, ['CM-3001']);
+  assert.deepEqual(suffixed.receipt_coverage.missing_tasks, ['CM-3001']);
+
+  fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-3002 | tests | P6 | CM-3001 selected goal | COMPLETED_VALIDATED | current closeout | none | 2026-07-28 |',
+    'CMV-3003 | malformed | P6 | CM-3004 stale closeout | COMPLETED_VALIDATED | stale | none | 2026-07-28'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |',
+    'CM-3004 | malformed | Green | closeout | complete | receipt | CMV-3003 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28'
+  ].join('\n'));
+  const malformed = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  assert.deepEqual(malformed.validation_coverage.missing_tasks, ['CM-3001']);
+  assert.deepEqual(malformed.receipt_coverage.missing_tasks, ['CM-3001']);
+
+  fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-3002 | tests | P6 | CM-3001 selected goal | COMPLETED_VALIDATED_EXTRA | current closeout | none | 2026-07-28 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | completed_validated_suffix | 2026-07-28 |'
+  ].join('\n'));
+
+  const rejected = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  assert.deepEqual(rejected.validation_coverage.missing_tasks, ['CM-3001']);
+  assert.deepEqual(rejected.receipt_coverage.missing_tasks, ['CM-3001']);
+  assert.equal(rejected.validation_coverage.covered_tasks, 0);
+  assert.equal(rejected.receipt_coverage.covered_tasks, 0);
+});
+
+test('unsupported current facts schemas fail closed instead of using stale done rows', () => {
+  for (const schemaVersion of [3, 0, 6]) {
+    const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-schema-drift-'));
+    const boardDir = path.join(tempRoot, '.agent_board');
+    fs.mkdirSync(boardDir, { recursive: true });
+    fs.writeFileSync(path.join(boardDir, 'CURRENT_FACTS.json'), JSON.stringify({
+      schemaVersion,
+      lastCompleted: {
+        taskId: 'CM-3001',
+        validationId: 'CMV-3002'
+      }
+    }));
+    fs.writeFileSync(path.join(boardDir, 'TASK_QUEUE.md'), [
+      '| ID | Status | Area | Risk | Task | Required Validation | Notes |',
+      '|---|---|---|---|---|---|---|',
+      '| CM-3001 | done | P6 | Green | stale | tests | stale |'
+    ].join('\n'));
+    fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
+      '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+      '|---|---|---|---|---|---|---|---|',
+      '| CMV-3002 | tests | P6 | CM-3001 stale | COMPLETED_VALIDATED | stale | none | 2026-07-28 |'
+    ].join('\n'));
+    fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
+      '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+      '|---|---|---|---|---|---|---|---|---:|---|---|',
+      '| CM-3001 | stale | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |'
+    ].join('\n'));
+    fs.writeFileSync(path.join(boardDir, 'CHECKPOINT.md'), '');
+
+    const summary = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+    assert.equal(summary.latest_task, 'not_recorded', `schema ${schemaVersion}`);
+    assert.equal(summary.next_safe_task, 'none_local_queue_empty', `schema ${schemaVersion}`);
+    assert.equal(summary.validation_coverage.completed_tasks, 1, `schema ${schemaVersion}`);
+    assert.equal(summary.validation_coverage.covered_tasks, 0, `schema ${schemaVersion}`);
+    assert.equal(summary.receipt_coverage.completed_tasks, 1, `schema ${schemaVersion}`);
+    assert.equal(summary.receipt_coverage.covered_tasks, 0, `schema ${schemaVersion}`);
+  }
+});
+
+test('schema v5 controller refuses a valid task beside a malformed queue candidate', () => {
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-v5-queue-drift-'));
+  const boardDir = path.join(tempRoot, '.agent_board');
+  fs.mkdirSync(boardDir, { recursive: true });
+  fs.writeFileSync(path.join(boardDir, 'CURRENT_FACTS.json'), JSON.stringify({
+    schemaVersion: 5,
+    activeTask: 'CM-3005',
+    lastCompleted: {
+      taskId: 'CM-3001',
+      validationId: 'CMV-3002'
+    }
+  }));
+  fs.writeFileSync(path.join(boardDir, 'TASK_QUEUE.md'), [
+    '| ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |',
+    '|---|---:|---|---|---|---|---|---|---|---|---|',
+    '| CM-3005 | 3005 | todo | P6 | Green | docs | selected | tests | none | no | active |',
+    '| CM-3006X | 3006 | todo | P6 | Green | docs | malformed | tests | none | no | stale |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-3002 | tests | P6 | CM-3001 selected goal | COMPLETED_VALIDATED | current closeout | none | 2026-07-28 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'CHECKPOINT.md'), '');
+  fs.writeFileSync(path.join(tempRoot, 'STATUS.md'), 'NOT_READY_BLOCKED\n');
+
+  const loop = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  const controller = collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
+  assert.equal(loop.latest_task, 'not_recorded');
+  assert.equal(loop.next_safe_task, 'none_local_queue_empty');
+  assert.equal(controller.next_safe_task, 'none_local_queue_empty');
+  assert.equal(controller.lane_decision.decision, 'NO_EXECUTABLE_TASK_AVAILABLE');
+
+  fs.writeFileSync(path.join(boardDir, 'TASK_QUEUE.md'), [
+    '| ID | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |',
+    '| CM-3005 | 3005 | todo | P6 | Green | docs | selected | tests | none | no | active |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '| CMV-3002 | tests | P6 | CM-3001 selected goal | COMPLETED_VALIDATED | current closeout | none | 2026-07-28 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |'
+  ].join('\n'));
+  const missingSeparators = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  const missingSeparatorController =
+    collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
+  assert.equal(missingSeparators.next_safe_task, 'none_local_queue_empty');
+  assert.equal(missingSeparators.validation_coverage.covered_tasks, 0);
+  assert.equal(missingSeparators.receipt_coverage.covered_tasks, 0);
+  assert.equal(missingSeparatorController.next_safe_task, 'none_local_queue_empty');
+
+  fs.writeFileSync(path.join(boardDir, 'TASK_QUEUE.md'), [
+    '| id | Priority | Status | Area | Risk | Target Files | Task | Required Validation | Rollback Check | Gate Required | Notes |',
+    '|---|---:|---|---|---|---|---|---|---|---|---|',
+    '| CM-3005 | 3005 | todo | P6 | Green | docs | selected | tests | none | no | active |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
+    '| id | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-3002 | tests | P6 | CM-3001 selected goal | COMPLETED_VALIDATED | current closeout | none | 2026-07-28 |'
+  ].join('\n'));
+  fs.writeFileSync(path.join(boardDir, 'AUTOPILOT_LEDGER.md'), [
+    '| id | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |'
+  ].join('\n'));
+  const lowercaseHeaders = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  const lowercaseHeaderController =
+    collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
+  assert.equal(lowercaseHeaders.next_safe_task, 'none_local_queue_empty');
+  assert.equal(lowercaseHeaders.validation_coverage.covered_tasks, 0);
+  assert.equal(lowercaseHeaders.receipt_coverage.covered_tasks, 0);
+  assert.equal(lowercaseHeaderController.next_safe_task, 'none_local_queue_empty');
 });
 
 test('empty active queue stops safely and never falls back to a historical task', () => {

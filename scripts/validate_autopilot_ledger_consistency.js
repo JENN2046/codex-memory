@@ -3,48 +3,16 @@
 
 const fs = require("fs");
 const path = require("path");
+const {
+  ACTIVE_ROW_CANDIDATE_RE,
+  ACTIVE_TABLE_HEADERS: TABLE_HEADERS,
+  COMPLETED_RESULT,
+  hasNonEmptyReceipt,
+  isCanonicalCompletedResult
+} = require("../src/core/AutopilotCloseoutContract");
 
 const FACTS_PATH = ".agent_board/CURRENT_FACTS.json";
 const SCHEMA_VERSION = 5;
-const COMPLETED_RESULT_RE = /^completed/i;
-const TABLE_HEADERS = Object.freeze({
-  taskQueue: Object.freeze([
-    "ID",
-    "Priority",
-    "Status",
-    "Area",
-    "Risk",
-    "Target Files",
-    "Task",
-    "Required Validation",
-    "Rollback Check",
-    "Gate Required",
-    "Notes"
-  ]),
-  validationLog: Object.freeze([
-    "ID",
-    "Command / Check",
-    "Area",
-    "Scope",
-    "Result",
-    "Summary",
-    "Follow-up",
-    "Date"
-  ]),
-  ledger: Object.freeze([
-    "ID",
-    "Goal",
-    "Lane",
-    "Envelope",
-    "Action",
-    "Receipt",
-    "Validation",
-    "Budget Used",
-    "Red Stops",
-    "Result",
-    "Date"
-  ])
-});
 
 function readText(root, relativePath, failures) {
   const fullPath = path.join(root, relativePath);
@@ -116,11 +84,19 @@ function parseMarkdownTable(text, options = {}) {
           continue;
         }
         header = cells;
-        if (diagnostics) diagnostics.header = [...cells];
+        if (diagnostics) {
+          diagnostics.header = [...cells];
+          diagnostics.headerLine = lineIndex + 1;
+        }
         continue;
       }
       if (cells.every((cell) => /^:?-{3,}:?$/.test(cell))) {
-        if (diagnostics) diagnostics.separatorFound = cells.length === header.length;
+        if (diagnostics) {
+          diagnostics.separatorCount = (diagnostics.separatorCount || 0) + 1;
+          diagnostics.separatorFound = cells.length === header.length;
+          diagnostics.separatorImmediatelyAfterHeader =
+            diagnostics.headerLine === lineIndex;
+        }
         continue;
       }
       if (diagnostics && diagnostics.separatorFound !== true) {
@@ -144,13 +120,15 @@ function parseMarkdownTable(text, options = {}) {
 function hasExactTableShape(diagnostics, expectedHeader) {
   return diagnostics &&
     diagnostics.separatorFound === true &&
+    diagnostics.separatorCount === 1 &&
+    diagnostics.separatorImmediatelyAfterHeader === true &&
     Array.isArray(diagnostics.header) &&
     diagnostics.header.length === expectedHeader.length &&
     diagnostics.header.every((cell, index) => cell === expectedHeader[index]);
 }
 
-function normalizedId(value) {
-  return String(value || "").replace(/`/g, "").trim();
+function rawId(value) {
+  return String(value || "").trim();
 }
 
 function containsExactIdToken(value, expectedId) {
@@ -172,7 +150,7 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
     {
       diagnostics: taskQueueDiagnostics,
       malformedRows: malformedTaskRows,
-      trackedRowPattern: /\bCM-\d{4}\b/
+      trackedRowPattern: ACTIVE_ROW_CANDIDATE_RE
     }
   );
   const validationLog = parseMarkdownTable(
@@ -180,7 +158,7 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
     {
       diagnostics: validationLogDiagnostics,
       malformedRows: malformedValidationRows,
-      trackedRowPattern: /\b(?:CMV|CM)-\d{4}\b/
+      trackedRowPattern: ACTIVE_ROW_CANDIDATE_RE
     }
   );
   const ledger = parseMarkdownTable(
@@ -188,7 +166,7 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
     {
       diagnostics: ledgerDiagnostics,
       malformedRows: malformedLedgerRows,
-      trackedRowPattern: /\b(?:CMV|CM)-\d{4}\b/
+      trackedRowPattern: ACTIVE_ROW_CANDIDATE_RE
     }
   );
 
@@ -206,8 +184,8 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
   }
 
   const lastCompleted = facts && facts.lastCompleted;
-  const taskId = normalizedId(lastCompleted && lastCompleted.taskId);
-  const validationId = normalizedId(lastCompleted && lastCompleted.validationId);
+  const taskId = rawId(lastCompleted && lastCompleted.taskId);
+  const validationId = rawId(lastCompleted && lastCompleted.validationId);
   if (!/^CM-\d{4}$/.test(taskId)) {
     failures.push("CURRENT_FACTS.lastCompleted.taskId must be a CM id");
   }
@@ -230,14 +208,23 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
   }
   const allowedActiveStatuses = new Set(["todo", "in_progress"]);
   const invalidStatusRows = taskQueue.filter((row) =>
-    !allowedActiveStatuses.has(String(row.Status || "").trim().toLowerCase())
+    !allowedActiveStatuses.has(String(row.Status || "").trim())
   );
   if (invalidStatusRows.length > 0) {
     failures.push("TASK_QUEUE rows must use only todo or in_progress status");
   }
+  if (taskQueue.some((row) => !/^CM-\d{4}$/.test(rawId(row.ID)))) {
+    failures.push("TASK_QUEUE IDs must use raw canonical CM format");
+  }
+  if (validationLog.some((row) => !/^CMV-\d{4}$/.test(rawId(row.ID)))) {
+    failures.push("VALIDATION_LOG IDs must use raw canonical CMV format");
+  }
+  if (ledger.some((row) => !/^CM-\d{4}$/.test(rawId(row.ID)))) {
+    failures.push("AUTOPILOT_LEDGER IDs must use raw canonical CM format");
+  }
 
-  const currentValidationRows = validationLog.filter((row) => normalizedId(row.ID) === validationId);
-  const currentLedgerRows = ledger.filter((row) => normalizedId(row.ID) === taskId);
+  const currentValidationRows = validationLog.filter((row) => rawId(row.ID) === validationId);
+  const currentLedgerRows = ledger.filter((row) => rawId(row.ID) === taskId);
   if (currentValidationRows.length !== 1) {
     failures.push(`VALIDATION_LOG must contain exactly one ${validationId} row`);
   }
@@ -256,8 +243,8 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
     if (!containsExactIdToken(validationRow.Scope, taskId)) {
       failures.push(`${validationId} scope must bind ${taskId}`);
     }
-    if (!COMPLETED_RESULT_RE.test(String(validationRow.Result || ""))) {
-      failures.push(`${validationId} result must be completed`);
+    if (!isCanonicalCompletedResult(validationRow.Result)) {
+      failures.push(`${validationId} result must be exactly ${COMPLETED_RESULT}`);
     }
   }
 
@@ -266,13 +253,16 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
     if (!containsExactIdToken(ledgerRow.Validation, validationId)) {
       failures.push(`${taskId} ledger receipt must reference ${validationId}`);
     }
-    if (!COMPLETED_RESULT_RE.test(String(ledgerRow.Result || ""))) {
-      failures.push(`${taskId} ledger result must be completed`);
+    if (!hasNonEmptyReceipt(ledgerRow.Receipt)) {
+      failures.push(`${taskId} ledger receipt must be non-empty`);
+    }
+    if (!isCanonicalCompletedResult(ledgerRow.Result)) {
+      failures.push(`${taskId} ledger result must be exactly ${COMPLETED_RESULT}`);
     }
   }
 
   const activeQueueRows = taskQueue.filter((row) =>
-    allowedActiveStatuses.has(String(row.Status || "").trim().toLowerCase())
+    allowedActiveStatuses.has(String(row.Status || "").trim())
   );
   const activeTask = facts && facts.activeTask;
   const validActiveTask = activeTask === null ||
@@ -282,7 +272,7 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
   } else if (activeTask === null && taskQueue.length !== 0) {
     failures.push("activeTask null requires an empty active queue");
   } else if (activeTask !== null) {
-    const activeIds = activeQueueRows.map((row) => normalizedId(row.ID));
+    const activeIds = activeQueueRows.map((row) => rawId(row.ID));
     if (taskQueue.length !== 1 || activeIds.length !== 1 || activeIds[0] !== activeTask) {
       failures.push("CURRENT_FACTS.activeTask must match the single active queue row");
     }
@@ -317,10 +307,14 @@ if (require.main === module) {
 }
 
 module.exports = {
+  ACTIVE_ROW_CANDIDATE_RE,
+  COMPLETED_RESULT,
   FACTS_PATH,
   TABLE_HEADERS,
   containsExactIdToken,
+  hasNonEmptyReceipt,
   hasExactTableShape,
+  isCanonicalCompletedResult,
   parseMarkdownTable,
   validateAutopilotLedgerConsistency
 };

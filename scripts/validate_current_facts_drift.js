@@ -5,9 +5,13 @@ const childProcess = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const {
+  ACTIVE_ROW_CANDIDATE_RE,
+  COMPLETED_RESULT,
   TABLE_HEADERS,
   containsExactIdToken,
+  hasNonEmptyReceipt,
   hasExactTableShape,
+  isCanonicalCompletedResult,
   parseMarkdownTable
 } = require("./validate_autopilot_ledger_consistency");
 
@@ -487,17 +491,17 @@ function validateQueueAndReceipts(root, facts, failures) {
   const queueRows = parseMarkdownTable(queueText, {
     diagnostics: queueDiagnostics,
     malformedRows: malformedQueueRows,
-    trackedRowPattern: /\bCM-\d{4}\b/
+    trackedRowPattern: ACTIVE_ROW_CANDIDATE_RE
   });
   const validationRows = parseMarkdownTable(validationText, {
     diagnostics: validationDiagnostics,
     malformedRows: malformedValidationRows,
-    trackedRowPattern: /\b(?:CMV|CM)-\d{4}\b/
+    trackedRowPattern: ACTIVE_ROW_CANDIDATE_RE
   });
   const ledgerRows = parseMarkdownTable(ledgerText, {
     diagnostics: ledgerDiagnostics,
     malformedRows: malformedLedgerRows,
-    trackedRowPattern: /\b(?:CMV|CM)-\d{4}\b/
+    trackedRowPattern: ACTIVE_ROW_CANDIDATE_RE
   });
 
   if (queueRows.length > 30) failures.push("TASK_QUEUE active row budget exceeded");
@@ -525,15 +529,24 @@ function validateQueueAndReceipts(root, facts, failures) {
 
   const allowedActiveStatuses = new Set(["todo", "in_progress"]);
   const invalidStatusRows = queueRows.filter((row) =>
-    !allowedActiveStatuses.has(String(row.Status || "").trim().toLowerCase())
+    !allowedActiveStatuses.has(String(row.Status || "").trim())
   );
   if (invalidStatusRows.length > 0) {
     failures.push("TASK_QUEUE rows must use only todo or in_progress status");
   }
+  if (queueRows.some((row) => !CM_RE.test(String(row.ID || "").trim()))) {
+    failures.push("TASK_QUEUE IDs must use raw canonical CM format");
+  }
+  if (validationRows.some((row) => !CMV_RE.test(String(row.ID || "").trim()))) {
+    failures.push("VALIDATION_LOG IDs must use raw canonical CMV format");
+  }
+  if (ledgerRows.some((row) => !CM_RE.test(String(row.ID || "").trim()))) {
+    failures.push("AUTOPILOT_LEDGER IDs must use raw canonical CM format");
+  }
   const activeRows = queueRows.filter((row) =>
-    allowedActiveStatuses.has(String(row.Status || "").trim().toLowerCase())
+    allowedActiveStatuses.has(String(row.Status || "").trim())
   );
-  const activeIds = activeRows.map((row) => String(row.ID || "").replace(/`/g, "").trim());
+  const activeIds = activeRows.map((row) => String(row.ID || "").trim());
   if (facts.activeTask === null && queueRows.length !== 0) {
     failures.push("CURRENT_FACTS activeTask null requires an empty active queue");
   } else if (typeof facts.activeTask === "string" &&
@@ -544,18 +557,29 @@ function validateQueueAndReceipts(root, facts, failures) {
   const expectedTask = facts.lastCompleted && facts.lastCompleted.taskId;
   const expectedValidation = facts.lastCompleted && facts.lastCompleted.validationId;
   const validationMatches = validationRows.filter((row) =>
-    String(row.ID || "").replace(/`/g, "").trim() === expectedValidation
+    String(row.ID || "").trim() === expectedValidation
   );
   const ledgerMatches = ledgerRows.filter((row) =>
-    String(row.ID || "").replace(/`/g, "").trim() === expectedTask
+    String(row.ID || "").trim() === expectedTask
   );
   if (validationRows.length !== 1 || validationMatches.length !== 1 ||
       !containsExactIdToken(validationMatches[0] && validationMatches[0].Scope, expectedTask)) {
     failures.push(`${expectedTask} / ${expectedValidation} must have one bound VALIDATION_LOG row`);
   }
+  if (validationMatches.length === 1 &&
+      !isCanonicalCompletedResult(validationMatches[0].Result)) {
+    failures.push(`${expectedValidation} result must be exactly ${COMPLETED_RESULT}`);
+  }
   if (ledgerRows.length !== 1 || ledgerMatches.length !== 1 ||
       !containsExactIdToken(ledgerMatches[0] && ledgerMatches[0].Validation, expectedValidation)) {
     failures.push(`${expectedTask} / ${expectedValidation} must have one bound AUTOPILOT_LEDGER receipt`);
+  }
+  if (ledgerMatches.length === 1 && !hasNonEmptyReceipt(ledgerMatches[0].Receipt)) {
+    failures.push(`${expectedTask} ledger receipt must be non-empty`);
+  }
+  if (ledgerMatches.length === 1 &&
+      !isCanonicalCompletedResult(ledgerMatches[0].Result)) {
+    failures.push(`${expectedTask} ledger result must be exactly ${COMPLETED_RESULT}`);
   }
 }
 

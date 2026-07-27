@@ -55,7 +55,7 @@ function ledger(rows = null) {
     "| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |",
     "|---|---|---|---|---|---|---|---|---:|---|---|",
     ...(rows || [
-      `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | completed_validated | 2026-07-27 |`
+      `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
     ])
   ].join("\n");
 }
@@ -110,7 +110,7 @@ test("ledger validator accepts a future lastCompleted id pair when receipts rota
     "| CMV-3002 | tests | P6 | CM-3001 selected goal | COMPLETED_VALIDATED | ok | none | 2026-07-28 |"
   ]));
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
-    "| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | completed_validated | 2026-07-28 |"
+    "| CM-3001 | selected goal | Green | closeout | complete | receipt | CMV-3002 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |"
   ]));
 
   const result = validateAutopilotLedgerConsistency(root);
@@ -125,7 +125,7 @@ test("ledger validator rejects near-collision receipt bindings", () => {
     `| ${FIXTURE_VALIDATION_ID} | tests | P6 | ${FIXTURE_TASK_ID}0 synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |`
   ]));
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
-    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID}0 | zero | 0 | completed_validated | 2026-07-27 |`
+    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID}0 | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
   ]));
 
   const result = validateAutopilotLedgerConsistency(root);
@@ -161,7 +161,7 @@ test("ledger validator rejects a missing current ledger receipt", () => {
 
 test("ledger validator rejects duplicate current receipts", () => {
   const root = workspace();
-  const row = `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | completed_validated | 2026-07-27 |`;
+  const row = `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`;
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([row, row]));
   const result = validateAutopilotLedgerConsistency(root);
   assert.equal(result.ok, false);
@@ -204,7 +204,8 @@ test("ledger validator rejects malformed CM queue rows before empty-queue select
   const root = workspace();
   writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
     "| CM-3001 | 3001 | todo | P6 | Green | docs | unescaped | pipe | tests | none | no | active |",
-    "| CM-3002 | 3002 | todo | P6 | Green | docs | missing notes | tests | none | no |"
+    "| CM-3002 | 3002 | todo | P6 | Green | docs | missing notes | tests | none | no |",
+    "CM-3006X | 3006 | todo | P6 | Green | docs | missing boundaries | tests | none | no | stale"
   ]));
   const result = validateAutopilotLedgerConsistency(root);
   assert.equal(result.ok, false);
@@ -215,11 +216,13 @@ test("ledger validator rejects malformed validation and ledger rows beside curre
   const root = workspace();
   writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([
     `| ${FIXTURE_VALIDATION_ID} | tests | P6 | ${FIXTURE_TASK_ID} synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |`,
-    "| CMV-3003 | tests | P6 | CM-3004 unescaped | scope | COMPLETED_VALIDATED | extra | none | 2026-07-28 |"
+    "| CMV-3003 | tests | P6 | CM-3004 unescaped | scope | COMPLETED_VALIDATED | extra | none | 2026-07-28 |",
+    "CMV-3003X | tests | P6 | CM-3004X missing boundaries | COMPLETED_VALIDATED | extra | none | 2026-07-28"
   ]));
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
-    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | completed_validated | 2026-07-27 |`,
-    "| CM-3004 | extra | Yellow | closeout | complete | receipt | with | pipe | CMV-3003 | zero | 0 | completed_validated | 2026-07-28 |"
+    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`,
+    "| CM-3004 | extra | Yellow | closeout | complete | receipt | with | pipe | CMV-3003 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |",
+    "CM-3004X | extra | Yellow | closeout | complete | receipt | CMV-3003X | zero | 0 | COMPLETED_VALIDATED | 2026-07-28"
   ]));
   const result = validateAutopilotLedgerConsistency(root);
   assert.equal(result.ok, false);
@@ -251,6 +254,34 @@ test("ledger validator rejects changed active-table headers", () => {
   assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must retain its exact table header and separator/);
 });
 
+test("ledger validator rejects duplicate active-table separators", () => {
+  const root = workspace();
+  const queueSeparator = "|---|---:|---|---|---|---|---|---|---|---|---|";
+  const validationSeparator = "|---|---|---|---|---|---|---|---|";
+  const ledgerSeparator = "|---|---|---|---|---|---|---|---|---:|---|---|";
+  writeFile(
+    root,
+    ".agent_board/TASK_QUEUE.md",
+    queue().replace(queueSeparator, `${queueSeparator}\n${queueSeparator}`)
+  );
+  writeFile(
+    root,
+    ".agent_board/VALIDATION_LOG.md",
+    validation().replace(validationSeparator, `${validationSeparator}\n${validationSeparator}`)
+  );
+  writeFile(
+    root,
+    ".agent_board/AUTOPILOT_LEDGER.md",
+    ledger().replace(ledgerSeparator, `${ledgerSeparator}\n${ledgerSeparator}`)
+  );
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /TASK_QUEUE must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must retain its exact table header and separator/);
+});
+
 test("ledger validator rejects a non-null non-CM activeTask", () => {
   const root = workspace();
   writeFile(
@@ -275,6 +306,83 @@ test("ledger validator accepts exactly one selected active queue row", () => {
   ]));
   const result = validateAutopilotLedgerConsistency(root);
   assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("ledger validator rejects inline-code IDs that downstream parsers would drop", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts("CM-3001"), null, 2)}\n`
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| `CM-3001` | 3001 | todo | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([
+    `| \`${FIXTURE_VALIDATION_ID}\` | tests | P6 | ${FIXTURE_TASK_ID} synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |`
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| \`${FIXTURE_TASK_ID}\` | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
+  ]));
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /TASK_QUEUE IDs must use raw canonical CM format/);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG IDs must use raw canonical CMV format/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER IDs must use raw canonical CM format/);
+  assert.match(result.failures.join("\n"), /activeTask must match the single active queue row/);
+});
+
+test("ledger validator rejects noncanonical active status casing", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/CURRENT_FACTS.json",
+    `${JSON.stringify(baseFacts("CM-3001"), null, 2)}\n`
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | TODO | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /only todo or in_progress status/);
+  assert.match(result.failures.join("\n"), /activeTask must match the single active queue row/);
+});
+
+test("ledger validator rejects noncanonical completed-family results", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([
+    `| ${FIXTURE_VALIDATION_ID} | tests | P6 | ${FIXTURE_TASK_ID} synthetic closeout | COMPLETED_VALIDATED_EXTRA | ok | none | 2026-07-27 |`
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | completed_validated | 2026-07-27 |`
+  ]));
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(
+    result.failures.join("\n"),
+    new RegExp(`${FIXTURE_VALIDATION_ID} result must be exactly COMPLETED_VALIDATED`)
+  );
+  assert.match(
+    result.failures.join("\n"),
+    new RegExp(`${FIXTURE_TASK_ID} ledger result must be exactly COMPLETED_VALIDATED`)
+  );
+});
+
+test("ledger validator rejects an empty current receipt", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete |  | ${FIXTURE_VALIDATION_ID} | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
+  ]));
+
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(
+    result.failures.join("\n"),
+    new RegExp(`${FIXTURE_TASK_ID} ledger receipt must be non-empty`)
+  );
 });
 
 test("ledger validator rejects extra queue rows beside activeTask", () => {

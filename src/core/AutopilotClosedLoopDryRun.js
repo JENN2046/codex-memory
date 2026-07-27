@@ -1,5 +1,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
+const {
+  ACTIVE_ROW_CANDIDATE_RE,
+  ACTIVE_TABLE_HEADERS,
+  hasNonEmptyReceipt,
+  isCanonicalCompletedResult
+} = require('./AutopilotCloseoutContract');
 
 const LOOP_STATES = Object.freeze([
   'intake',
@@ -47,11 +53,29 @@ const REJECTED_FLAGS = Object.freeze(new Set([
   '--readiness-claim'
 ]));
 
+const CURRENT_FACTS_SCHEMA_VERSION = 5;
+const CM_ID_RE = /^CM-\d{4}$/;
+const CMV_ID_RE = /^CMV-\d{4}$/;
+
 function readFileSafe(filePath) {
   try {
     return fs.readFileSync(filePath, 'utf8');
   } catch {
     return '';
+  }
+}
+
+function readJsonSafe(filePath) {
+  try {
+    return {
+      exists: true,
+      value: JSON.parse(fs.readFileSync(filePath, 'utf8'))
+    };
+  } catch (error) {
+    return {
+      exists: error && error.code !== 'ENOENT',
+      value: null
+    };
   }
 }
 
@@ -67,7 +91,7 @@ function listMatching(workspaceRoot, relativeDir, pattern) {
   }
 }
 
-function splitMarkdownRow(line) {
+function splitMarkdownRowCells(line) {
   const trimmed = String(line || '').trim();
   if (!trimmed.startsWith('|') || !trimmed.endsWith('|')) return null;
   const body = trimmed.slice(1, -1);
@@ -89,8 +113,18 @@ function splitMarkdownRow(line) {
     current += char;
   }
   cells.push(current.trim());
-  if (cells.every(cell => /^:?-{3,}:?$/.test(cell))) return null;
   return cells;
+}
+
+function isSeparatorRow(cells) {
+  return Array.isArray(cells) &&
+    cells.length > 0 &&
+    cells.every(cell => /^:?-{3,}:?$/.test(cell));
+}
+
+function splitMarkdownRow(line) {
+  const cells = splitMarkdownRowCells(line);
+  return isSeparatorRow(cells) ? null : cells;
 }
 
 function parseMarkdownTable(markdownText = '') {
@@ -115,7 +149,7 @@ function parseMarkdownTable(markdownText = '') {
 
 function parseTaskQueue(markdownText = '') {
   return parseMarkdownTable(markdownText)
-    .filter(row => /^CM-\d{4}$/.test(row.id || ''))
+    .filter(row => CM_ID_RE.test(row.id || ''))
     .map(row => ({
       id: row.id,
       status: row.status || '',
@@ -139,7 +173,7 @@ function isCurrentAutopilotTask(task) {
 
 function parseValidationRows(markdownText = '') {
   return parseMarkdownTable(markdownText)
-    .filter(row => /^CMV-\d{4}$/.test(row.id || ''))
+    .filter(row => CMV_ID_RE.test(row.id || ''))
     .map(row => ({
       id: row.id,
       scope: row.scope || '',
@@ -151,7 +185,7 @@ function parseValidationRows(markdownText = '') {
 
 function parseLedgerRows(markdownText = '') {
   return parseMarkdownTable(markdownText)
-    .filter(row => /^CM-\d{4}$/.test(row.id || ''))
+    .filter(row => CM_ID_RE.test(row.id || ''))
     .map(row => ({
       id: row.id,
       goal: row.goal || '',
@@ -162,11 +196,119 @@ function parseLedgerRows(markdownText = '') {
     }));
 }
 
-function taskHasValidation(task, validationRows) {
+function inspectActiveTable(markdownText, expectedHeader) {
+  const lines = String(markdownText || '').split(/\r?\n/);
+  const headerIndexes = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    const cells = splitMarkdownRowCells(lines[index]);
+    if (cells &&
+        cells.length === expectedHeader.length &&
+        cells.every((cell, cellIndex) => cell === expectedHeader[cellIndex])) {
+      headerIndexes.push(index);
+    }
+  }
+  const headerIndex = headerIndexes.length === 1 ? headerIndexes[0] : -1;
+  const separatorIndex = headerIndex >= 0 ? headerIndex + 1 : -1;
+  const separatorCells = separatorIndex >= 0
+    ? splitMarkdownRowCells(lines[separatorIndex])
+    : null;
+  const shapeValid = headerIndex >= 0 &&
+    separatorCells &&
+    separatorCells.length === expectedHeader.length &&
+    isSeparatorRow(separatorCells);
+  let rawDataRowCount = 0;
+  for (let index = 0; index < lines.length; index += 1) {
+    if (headerIndexes.includes(index) || index === separatorIndex) continue;
+    const cells = splitMarkdownRowCells(lines[index]);
+    if (cells || ACTIVE_ROW_CANDIDATE_RE.test(lines[index])) {
+      rawDataRowCount += 1;
+    }
+  }
+  return {
+    rawDataRowCount,
+    shapeValid: Boolean(shapeValid)
+  };
+}
+
+function containsExactIdToken(value, expectedId) {
+  const tokens = String(value || '').match(/\b(?:CM|CMV)-\d{4}\b/g) || [];
+  return tokens.includes(expectedId);
+}
+
+function resolveCurrentCloseout(currentFacts) {
+  if (!currentFacts.exists) return null;
+  const facts = currentFacts.value;
+  if (facts && facts.schemaVersion === 4) return null;
+  const closeout = facts && facts.lastCompleted;
+  if (!facts || facts.schemaVersion !== CURRENT_FACTS_SCHEMA_VERSION ||
+      !closeout || !CM_ID_RE.test(closeout.taskId || '') ||
+      !CMV_ID_RE.test(closeout.validationId || '')) {
+    return {
+      id: 'invalid_current_facts_last_completed',
+      validationId: null,
+      status: 'done',
+      invalid: true
+    };
+  }
+  return {
+    id: closeout.taskId,
+    validationId: closeout.validationId,
+    status: 'done',
+    invalid: false
+  };
+}
+
+function resolveCurrentQueueTasks(currentFacts, parsedTasks, tableInspection) {
+  if (!currentFacts.exists) return parsedTasks;
+  const facts = currentFacts.value;
+  if (facts && facts.schemaVersion === 4) return parsedTasks;
+  if (!facts || facts.schemaVersion !== CURRENT_FACTS_SCHEMA_VERSION) return [];
+  const activeTask = facts.activeTask;
+  if (activeTask === null) return [];
+  if (!CM_ID_RE.test(activeTask || '') ||
+      !tableInspection.shapeValid ||
+      tableInspection.rawDataRowCount !== 1 ||
+      parsedTasks.length !== 1) {
+    return [];
+  }
+  const selected = parsedTasks[0];
+  if (selected.id !== activeTask ||
+      !['todo', 'in_progress'].includes(selected.status)) {
+    return [];
+  }
+  return parsedTasks;
+}
+
+function taskHasValidation(task, validationRows, tableInspection) {
+  if (task.invalid) return false;
+  if (task.validationId) {
+    const matches = validationRows.filter(row =>
+      row.id === task.validationId &&
+      containsExactIdToken(row.scope, task.id) &&
+      isCanonicalCompletedResult(row.result)
+    );
+    return tableInspection.shapeValid &&
+      tableInspection.rawDataRowCount === 1 &&
+      validationRows.length === 1 &&
+      matches.length === 1;
+  }
   return validationRows.some(row => `${row.scope} ${row.summary}`.includes(task.id));
 }
 
-function taskHasReceipt(task, ledgerRows, validationRows) {
+function taskHasReceipt(task, ledgerRows, validationRows, tableInspection) {
+  if (task.invalid) return false;
+  if (task.validationId) {
+    const matches = ledgerRows.filter(row =>
+      row.id === task.id &&
+      hasNonEmptyReceipt(row.receipt) &&
+      containsExactIdToken(row.validation, task.validationId) &&
+      isCanonicalCompletedResult(row.result)
+    );
+    return tableInspection.shapeValid &&
+      tableInspection.rawDataRowCount === 1 &&
+      ledgerRows.length === 1 &&
+      matches.length === 1;
+  }
   const ledger = ledgerRows.find(row => row.id === task.id);
   if (ledger && ledger.receipt) return true;
   return validationRows.some(row => {
@@ -211,19 +353,47 @@ function ledgerCoverageTasks(tasks, ledgerRows) {
 
 function collectAutopilotClosedLoopSummary(options = {}) {
   const workspaceRoot = options.workspaceRoot || process.cwd();
+  const currentFacts = readJsonSafe(path.join(workspaceRoot, '.agent_board', 'CURRENT_FACTS.json'));
   const taskQueueText = readFileSafe(path.join(workspaceRoot, '.agent_board', 'TASK_QUEUE.md'));
   const validationLogText = readFileSafe(path.join(workspaceRoot, '.agent_board', 'VALIDATION_LOG.md'));
   const ledgerText = readFileSafe(path.join(workspaceRoot, '.agent_board', 'AUTOPILOT_LEDGER.md'));
   const checkpointText = readFileSafe(path.join(workspaceRoot, '.agent_board', 'CHECKPOINT.md'));
 
-  const tasks = parseTaskQueue(taskQueueText).filter(isCurrentAutopilotTask);
+  const queueTableInspection =
+    inspectActiveTable(taskQueueText, ACTIVE_TABLE_HEADERS.taskQueue);
+  const validationTableInspection =
+    inspectActiveTable(validationLogText, ACTIVE_TABLE_HEADERS.validationLog);
+  const ledgerTableInspection =
+    inspectActiveTable(ledgerText, ACTIVE_TABLE_HEADERS.ledger);
+  const parsedTasks = parseTaskQueue(taskQueueText);
+  const tasks = resolveCurrentQueueTasks(
+    currentFacts,
+    parsedTasks,
+    queueTableInspection
+  ).filter(isCurrentAutopilotTask);
   const validationRows = parseValidationRows(validationLogText);
   const ledgerRows = parseLedgerRows(ledgerText);
+  const currentCloseout = resolveCurrentCloseout(currentFacts);
   const latestTask = tasks[0] || null;
   const latestGoal = ledgerRows[ledgerRows.length - 1] || latestTask || null;
   const nextSafeTask = tasks.find(task => task.status === 'todo' || task.status === 'in_progress') || null;
-  const validationCoverage = computeCoverage(tasks, task => taskHasValidation(task, validationRows));
-  const receiptCoverage = computeCoverage(ledgerCoverageTasks(tasks, ledgerRows), task => taskHasReceipt(task, ledgerRows, validationRows));
+  const validationCoverageTasks = currentCloseout ? [currentCloseout] : tasks;
+  const receiptCoverageTasks = currentCloseout
+    ? [currentCloseout]
+    : ledgerCoverageTasks(tasks, ledgerRows);
+  const validationCoverage = computeCoverage(
+    validationCoverageTasks,
+    task => taskHasValidation(task, validationRows, validationTableInspection)
+  );
+  const receiptCoverage = computeCoverage(
+    receiptCoverageTasks,
+    task => taskHasReceipt(
+      task,
+      ledgerRows,
+      validationRows,
+      ledgerTableInspection
+    )
+  );
 
   const schemas = listMatching(workspaceRoot, 'schemas', /^autopilot_.*\.schema\.yaml$/);
   const examples = listMatching(workspaceRoot, path.join('tests', 'schema_examples'), /^autopilot_.*\.example\.json$/);
@@ -277,6 +447,7 @@ module.exports = {
   LOOP_STATES,
   REJECTED_FLAGS,
   collectAutopilotClosedLoopSummary,
+  inspectActiveTable,
   isCurrentAutopilotTask,
   parseLedgerRows,
   parseMarkdownTable,
