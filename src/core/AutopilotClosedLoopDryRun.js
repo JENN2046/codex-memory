@@ -232,7 +232,14 @@ function inspectActiveTable(markdownText, expectedHeader) {
 }
 
 function resolveCurrentCloseout(currentFacts) {
-  if (!currentFacts.exists) return null;
+  if (!currentFacts.exists) {
+    return {
+      id: 'invalid_current_facts_last_completed',
+      validationId: null,
+      status: 'done',
+      invalid: true
+    };
+  }
   const facts = currentFacts.value;
   if (facts && facts.schemaVersion === 4) return null;
   const closeout = facts && facts.lastCompleted;
@@ -255,7 +262,7 @@ function resolveCurrentCloseout(currentFacts) {
 }
 
 function resolveCurrentQueueTasks(currentFacts, parsedTasks, tableInspection) {
-  if (!currentFacts.exists) return parsedTasks;
+  if (!currentFacts.exists) return [];
   const facts = currentFacts.value;
   if (facts && facts.schemaVersion === 4) return parsedTasks;
   if (!facts || facts.schemaVersion !== CURRENT_FACTS_SCHEMA_VERSION) return [];
@@ -371,7 +378,6 @@ function collectAutopilotClosedLoopSummary(options = {}) {
   const ledgerRows = parseLedgerRows(ledgerText);
   const currentCloseout = resolveCurrentCloseout(currentFacts);
   const latestTask = tasks[0] || null;
-  const latestGoal = ledgerRows[ledgerRows.length - 1] || latestTask || null;
   const nextSafeTask = tasks.find(task => task.status === 'todo' || task.status === 'in_progress') || null;
   const validationCoverageTasks = currentCloseout ? [currentCloseout] : tasks;
   const receiptCoverageTasks = currentCloseout
@@ -390,6 +396,17 @@ function collectAutopilotClosedLoopSummary(options = {}) {
       ledgerTableInspection
     )
   );
+  const currentCloseoutCovered = !currentCloseout || (
+    !currentCloseout.invalid &&
+    validationCoverage.completed_tasks === 1 &&
+    validationCoverage.covered_tasks === 1 &&
+    receiptCoverage.completed_tasks === 1 &&
+    receiptCoverage.covered_tasks === 1
+  );
+  const legacyLatestGoal = ledgerRows[ledgerRows.length - 1] || latestTask || null;
+  const latestGoal = currentCloseout
+    ? (currentCloseoutCovered ? currentCloseout : null)
+    : legacyLatestGoal;
 
   const schemas = listMatching(workspaceRoot, 'schemas', /^autopilot_.*\.schema\.yaml$/);
   const examples = listMatching(workspaceRoot, path.join('tests', 'schema_examples'), /^autopilot_.*\.example\.json$/);
@@ -399,16 +416,20 @@ function collectAutopilotClosedLoopSummary(options = {}) {
   const cliPresent = exists(workspaceRoot, path.join('src', 'cli', 'autopilot-closed-loop-dry-run.js'));
   const validatorPresent = exists(workspaceRoot, path.join('scripts', 'validate_autopilot_closed_loop.js'));
   const completedValidated = validationRows.some(row => row.scope.includes('CM-0691') && row.result === 'COMPLETED_VALIDATED');
-  const status = loopDocsPresent
+  const surfacesComplete = loopDocsPresent
     && helperPresent
     && cliPresent
     && validatorPresent
     && schemas.includes('autopilot_closed_loop_state.schema.yaml')
     && schemas.includes('autopilot_failure_recovery_matrix.schema.yaml')
     && examples.includes('autopilot_closed_loop_state.example.json')
-    && examples.includes('autopilot_failure_recovery_matrix.example.json')
-      ? 'ok'
-      : 'warn';
+    && examples.includes('autopilot_failure_recovery_matrix.example.json');
+  const status = surfacesComplete && currentCloseoutCovered ? 'ok' : 'warn';
+  const stopReason = !currentCloseoutCovered
+    ? 'current_closeout_coverage_incomplete'
+    : !surfacesComplete
+      ? 'autopilot_closed_loop_surface_incomplete'
+      : 'none';
 
   return {
     mode: 'autopilot-closed-loop-dry-run',
@@ -434,7 +455,7 @@ function collectAutopilotClosedLoopSummary(options = {}) {
     config_changes_performed: false,
     failure_matrix_types: [...FAILURE_TYPES],
     closed_loop_validation_recorded: completedValidated,
-    stop_reason: status === 'ok' ? 'none' : 'autopilot_closed_loop_surface_incomplete'
+    stop_reason: stopReason
   };
 }
 

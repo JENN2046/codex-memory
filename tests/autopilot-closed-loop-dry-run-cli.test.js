@@ -24,6 +24,39 @@ function runCli(args = []) {
   });
 }
 
+function writeClosedLoopSurfaceFixtures(workspaceRoot) {
+  for (const relativePath of [
+    'docs/AUTOPILOT_CLOSED_LOOP_STATE_MACHINE.md',
+    'docs/AUTOPILOT_FAILURE_RECOVERY_MATRIX.md',
+    'src/core/AutopilotClosedLoopDryRun.js',
+    'src/cli/autopilot-closed-loop-dry-run.js',
+    'scripts/validate_autopilot_closed_loop.js',
+    'schemas/autopilot_closed_loop_state.schema.yaml',
+    'schemas/autopilot_failure_recovery_matrix.schema.yaml',
+    'tests/schema_examples/autopilot_closed_loop_state.example.json',
+    'tests/schema_examples/autopilot_failure_recovery_matrix.example.json'
+  ]) {
+    const target = path.join(workspaceRoot, relativePath);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, '');
+  }
+}
+
+function writeControllerSurfaceFixtures(workspaceRoot) {
+  for (const relativePath of [
+    'src/core/AutopilotControllerReadOnly.js',
+    'src/cli/autopilot-controller.js',
+    'schemas/autopilot_controller_cycle.schema.yaml',
+    'tests/schema_examples/autopilot_controller_cycle.example.json',
+    'scripts/validate_autopilot_controller.js'
+  ]) {
+    const target = path.join(workspaceRoot, relativePath);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, '');
+  }
+  fs.writeFileSync(path.join(workspaceRoot, 'STATUS.md'), 'NOT_READY_BLOCKED\n');
+}
+
 test('closed-loop core exposes local read-only status and required fields', () => {
   const summary = collectAutopilotClosedLoopSummary({ workspaceRoot: repoRoot });
 
@@ -114,6 +147,8 @@ test('schema v5 closeout coverage follows lastCompleted with an empty active que
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-v5-closeout-'));
   const boardDir = path.join(tempRoot, '.agent_board');
   fs.mkdirSync(boardDir, { recursive: true });
+  writeClosedLoopSurfaceFixtures(tempRoot);
+  writeControllerSurfaceFixtures(tempRoot);
   fs.writeFileSync(path.join(boardDir, 'CURRENT_FACTS.json'), JSON.stringify({
     schemaVersion: 5,
     activeTask: null,
@@ -139,6 +174,14 @@ test('schema v5 closeout coverage follows lastCompleted with an empty active que
   fs.writeFileSync(path.join(boardDir, 'CHECKPOINT.md'), '');
 
   const covered = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  const coveredController =
+    collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
+  assert.equal(covered.status, 'ok');
+  assert.equal(covered.stop_reason, 'none');
+  assert.equal(covered.latest_goal, 'CM-3001');
+  assert.equal(coveredController.status, 'ok');
+  assert.equal(coveredController.goal_id, 'CM-3001');
+  assert.equal(coveredController.stop_reason, 'none');
   assert.equal(covered.latest_task, 'not_recorded');
   assert.deepEqual(covered.validation_coverage, {
     completed_tasks: 1,
@@ -162,8 +205,34 @@ test('schema v5 closeout coverage follows lastCompleted with an empty active que
     '\n| `CM-3004` | stale | Green | closeout | complete | receipt | CMV-3003 | zero | 0 | COMPLETED_VALIDATED | 2026-07-28 |'
   );
   const noncanonical = collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  const noncanonicalController =
+    collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
   assert.deepEqual(noncanonical.validation_coverage.missing_tasks, ['CM-3001']);
   assert.deepEqual(noncanonical.receipt_coverage.missing_tasks, ['CM-3001']);
+  assert.equal(noncanonical.status, 'warn');
+  assert.equal(noncanonical.stop_reason, 'current_closeout_coverage_incomplete');
+  assert.equal(noncanonical.latest_goal, 'not_recorded');
+  assert.equal(noncanonicalController.status, 'warn');
+  assert.equal(noncanonicalController.goal_id, 'not_recorded');
+  assert.equal(
+    noncanonicalController.stop_reason,
+    'current_closeout_coverage_incomplete'
+  );
+
+  const stateMachinePath = path.join(
+    tempRoot,
+    'docs',
+    'AUTOPILOT_CLOSED_LOOP_STATE_MACHINE.md'
+  );
+  fs.unlinkSync(stateMachinePath);
+  const combinedFailure =
+    collectAutopilotClosedLoopSummary({ workspaceRoot: tempRoot });
+  assert.equal(combinedFailure.status, 'warn');
+  assert.equal(
+    combinedFailure.stop_reason,
+    'current_closeout_coverage_incomplete'
+  );
+  fs.writeFileSync(stateMachinePath, '');
 
   fs.writeFileSync(path.join(boardDir, 'VALIDATION_LOG.md'), [
     '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
@@ -361,7 +430,9 @@ test('empty active queue stops safely and never falls back to a historical task'
   const controller = collectAutopilotControllerSummary({ workspaceRoot: tempRoot });
 
   assert.equal(loop.latest_task, 'not_recorded');
+  assert.equal(loop.latest_goal, 'not_recorded');
   assert.equal(loop.next_safe_task, 'none_local_queue_empty');
+  assert.equal(controller.goal_id, 'not_recorded');
   assert.equal(controller.current_state, 'continued_or_stopped');
   assert.equal(controller.next_safe_task, 'none_local_queue_empty');
   assert.equal(controller.lane_decision.decision, 'NO_EXECUTABLE_TASK_AVAILABLE');
