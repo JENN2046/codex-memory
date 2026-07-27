@@ -156,8 +156,14 @@ test('desktop launchers are repository-relative and WSL distribution is configur
     'scripts',
     'launch-owner-runtime-mapping-package-windows.bat'
   );
+  const noReplaceHelperPath = path.join(
+    workspaceRoot,
+    'scripts',
+    'owner-mapping-rename-noreplace.py'
+  );
   const linux = fs.readFileSync(linuxPath, 'utf8');
   const windows = fs.readFileSync(windowsPath, 'utf8');
+  const noReplaceHelper = fs.readFileSync(noReplaceHelperPath, 'utf8');
 
   assert.match(linux, /owner-runtime:mapping-package/);
   assert.match(linux, /WRITE PRIVATE CONFIG/);
@@ -171,4 +177,9 @@ test('desktop launchers are repository-relative and WSL distribution is configur
   assert.match(windows, /--cd "%REPO_ROOT%"/);
   assert.doesNotMatch(windows, /\/home\/jenn/);
   assert.doesNotMatch(windows, /Ubuntu-24\.04/);
+
+  assert.equal(fs.statSync(noReplaceHelperPath).mode & 0o777, 0o755);
+  assert.match(noReplaceHelper, /RENAME_NOREPLACE = 1/);
+  assert.match(noReplaceHelper, /\.renameat2/);
+  assert.doesNotMatch(noReplaceHelper, /\bprint\s*\(/);
 });

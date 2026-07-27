@@ -15,7 +15,8 @@ const {
   MAX_MAPPING_BYTES,
   applyMappingPackage,
   checkMappingPackage,
-  planMappingPackage
+  planMappingPackage,
+  renameDirectoryNoReplace
 } = require('../src/core/OwnerOnlyMappingPackage');
 
 const repositoryRoot = path.resolve(__dirname, '..');
@@ -83,6 +84,48 @@ test('plan validates an owner-only source and complete private root without writ
     assert.equal(result.config_write_performed, false);
     assert.equal(result.private_material_disclosed, false);
     assert.deepEqual(after, before);
+  } finally {
+    cleanup(fixture.base);
+  }
+});
+
+test('plan fails closed before mapping read when no-replace primitive is unavailable', () => {
+  const fixture = makeFixture();
+  try {
+    let mappingOpened = false;
+    const missingPrimitiveFs = new Proxy(fs, {
+      get(target, property, receiver) {
+        if (property === 'openSync') {
+          return (targetPath, ...args) => {
+            if (String(targetPath).endsWith('/mapping.json')) {
+              mappingOpened = true;
+            }
+            return fs.openSync(targetPath, ...args);
+          };
+        }
+        if (property === 'statSync') {
+          return (targetPath, ...args) => {
+            if (targetPath === '/usr/bin/python3') {
+              const error = new Error('synthetic missing primitive');
+              error.code = 'ENOENT';
+              throw error;
+            }
+            return fs.statSync(targetPath, ...args);
+          };
+        }
+        return Reflect.get(target, property, receiver);
+      }
+    });
+
+    expectCode(
+      () => planMappingPackage({
+        ...fixture,
+        fsImpl: missingPrimitiveFs
+      }),
+      'owner_mapping_noreplace_primitive_unavailable'
+    );
+    assert.equal(mappingOpened, false);
+    assert.deepEqual(fs.readdirSync(fixture.privateRoot), []);
   } finally {
     cleanup(fixture.base);
   }
@@ -241,23 +284,16 @@ test('package verification fails closed when a file entry changes after descript
 test('apply cleans its staging directory when the atomic rename fails', () => {
   const fixture = makeFixture();
   try {
-    const failingFs = new Proxy(fs, {
-      get(target, property, receiver) {
-        if (property === 'renameSync') {
-          return () => {
-            const error = new Error('synthetic rename failure');
-            error.code = 'EIO';
-            throw error;
-          };
-        }
-        return Reflect.get(target, property, receiver);
-      }
-    });
+    const failingRename = () => {
+      const error = new Error('synthetic rename failure');
+      error.code = 'EIO';
+      throw error;
+    };
     assert.throws(
       () => applyMappingPackage({
         ...fixture,
         confirmed: true,
-        fsImpl: failingFs
+        renameNoReplace: failingRename
       }),
       (error) => {
         assert.equal(error.code, 'owner_mapping_package_apply_failed');
@@ -409,27 +445,23 @@ test('apply detects a private-root path swap and reports committed-state reconci
     fs.mkdirSync(replacementRoot, { mode: 0o700 });
     fs.chmodSync(replacementRoot, 0o700);
     let swapped = false;
-    const swappingFs = new Proxy(fs, {
-      get(target, property, receiver) {
-        if (property === 'renameSync') {
-          return (source, destination) => {
-            if (!swapped) {
-              fs.renameSync(fixture.privateRoot, displacedRoot);
-              fs.renameSync(replacementRoot, fixture.privateRoot);
-              swapped = true;
-            }
-            return fs.renameSync(source, destination);
-          };
-        }
-        return Reflect.get(target, property, receiver);
+    const swappingRename = (rootFd, sourceName, targetName) => {
+      if (!swapped) {
+        fs.renameSync(fixture.privateRoot, displacedRoot);
+        fs.renameSync(replacementRoot, fixture.privateRoot);
+        swapped = true;
       }
-    });
+      fs.renameSync(
+        `/proc/self/fd/${rootFd}/${sourceName}`,
+        `/proc/self/fd/${rootFd}/${targetName}`
+      );
+    };
 
     assert.throws(
       () => applyMappingPackage({
         ...fixture,
         confirmed: true,
-        fsImpl: swappingFs
+        renameNoReplace: swappingRename
       }),
       (error) => {
         assert.equal(error.code, 'owner_mapping_private_root_identity_changed');
@@ -447,6 +479,52 @@ test('apply detects a private-root path swap and reports committed-state reconci
     assert.equal(
       fs.existsSync(path.join(displacedRoot, fixture.packageName)),
       true
+    );
+  } finally {
+    cleanup(fixture.base);
+  }
+});
+
+test('atomic no-replace commit preserves a target created in the final race window', () => {
+  const fixture = makeFixture();
+  try {
+    let targetCreated = false;
+    const racingRename = (rootFd, sourceName, targetName, options) => {
+      fs.mkdirSync(`/proc/self/fd/${rootFd}/${targetName}`, {
+        mode: 0o700
+      });
+      targetCreated = true;
+      renameDirectoryNoReplace(rootFd, sourceName, targetName, options);
+    };
+
+    assert.throws(
+      () => applyMappingPackage({
+        ...fixture,
+        confirmed: true,
+        renameNoReplace: racingRename
+      }),
+      (error) => {
+        assert.equal(error.code, 'owner_mapping_package_exists');
+        assert.deepEqual(error.effects, {
+          config_write_performed: true,
+          cleanup_performed: true,
+          durably_committed: false,
+          reconciliation_required: false
+        });
+        return true;
+      }
+    );
+    assert.equal(targetCreated, true);
+    const targetPath = path.join(fixture.privateRoot, fixture.packageName);
+    assert.deepEqual(fs.readdirSync(targetPath), []);
+    assert.equal(
+      fs.existsSync(
+        path.join(
+          fixture.privateRoot,
+          `.${fixture.packageName}.staging`
+        )
+      ),
+      false
     );
   } finally {
     cleanup(fixture.base);

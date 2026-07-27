@@ -13,7 +13,7 @@ create a complete runtime configuration.
 
 ## Commands
 
-Read-only planning:
+Read-only planning, including a no-replace primitive probe:
 
 ```bash
 npm run owner-runtime:mapping-package -- plan \
@@ -50,6 +50,8 @@ private-runtime-configuration boundary.
 ## Input Boundary
 
 - Linux/WSL descriptor semantics are required.
+- `apply` requires `/usr/bin/python3` and a libc exposing Linux `renameat2`;
+  missing no-replace support fails closed.
 - The mapping source must be a regular owner-owned file beneath an owner-only
   canonical directory.
 - The existing complete private root must be a canonical owner-only directory.
@@ -101,7 +103,9 @@ configuration.
   `fstat` identity.
 - Writes use an exclusive owner-only staging directory and exclusive files.
 - Each file is read back and `fsync`ed before the staging directory is synced.
-- Commit uses an atomic rename followed by parent-directory `fsync`.
+- Commit uses a bundled isolated helper around
+  `renameat2(RENAME_NOREPLACE)`, then parent-directory `fsync`. A target
+  created during the final race window is preserved rather than overwritten.
 - Pre-commit failures clean only the known staging files.
 - A deterministic per-package staging name makes crash re-entry fail closed
   with `reconciliation_required` instead of creating another partial package.

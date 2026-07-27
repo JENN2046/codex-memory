@@ -89,6 +89,7 @@ function usage() {
     '',
     'plan validates without writing. apply performs an explicit private-configuration write.',
     'check validates the non-overwriting package without starting a runtime, calling a provider, or reading memory.',
+    'apply requires Linux renameat2(RENAME_NOREPLACE) through the bundled isolated Python helper.',
     'The package exports mapping-only bindings; it never replaces the complete R4 private root.',
     'Output never includes paths, diary names, mapping references, mapping digests, credentials, or raw content.',
     'The apply confirmation flag records operator intent but does not grant an agent authorization.'

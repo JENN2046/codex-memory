@@ -1,5 +1,6 @@
 'use strict';
 
+const childProcess = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -9,6 +10,16 @@ const PACKAGE_SCHEMA_VERSION = 1;
 const PACKAGE_KIND = 'codex_memory_owner_only_mapping_package';
 const MAX_MAPPING_BYTES = 262_144;
 const MAX_METADATA_BYTES = 65_536;
+const NO_REPLACE_HELPER_MAX_BYTES = 65_536;
+const NO_REPLACE_HELPER_PATH = path.resolve(
+  __dirname,
+  '..',
+  '..',
+  'scripts',
+  'owner-mapping-rename-noreplace.py'
+);
+const PYTHON_EXECUTABLE = '/usr/bin/python3';
+const NO_REPLACE_TARGET_EXISTS_EXIT = 17;
 const MAPPING_FILE_NAME = 'diary-scope-mapping.json';
 const BINDING_FILE_NAME = 'mapping-binding.json';
 const ENVIRONMENT_FILE_NAME = 'mapping-binding.env';
@@ -714,6 +725,93 @@ function inspectStagingAbsent(rootFd, packageName, fsImpl = fs) {
   });
 }
 
+function assertNoReplaceHelper(fsImpl = fs) {
+  let helperStat;
+  let helperRealPath;
+  let pythonStat;
+  try {
+    helperStat = fsImpl.lstatSync(NO_REPLACE_HELPER_PATH);
+    helperRealPath = fsImpl.realpathSync(NO_REPLACE_HELPER_PATH);
+    pythonStat = fsImpl.statSync(PYTHON_EXECUTABLE);
+  } catch {
+    reject('owner_mapping_noreplace_primitive_unavailable');
+  }
+  if (helperRealPath !== NO_REPLACE_HELPER_PATH ||
+      helperStat.isSymbolicLink() ||
+      !helperStat.isFile() ||
+      helperStat.uid !== currentUid() ||
+      (helperStat.mode & 0o022) !== 0 ||
+      helperStat.size < 1 ||
+      helperStat.size > NO_REPLACE_HELPER_MAX_BYTES ||
+      !pythonStat.isFile() ||
+      pythonStat.uid !== 0 ||
+      (pythonStat.mode & 0o022) !== 0) {
+    reject('owner_mapping_noreplace_primitive_unavailable');
+  }
+}
+
+function runNoReplaceHelper(rootFd, arguments_, {
+  fsImpl = fs,
+  platform = process.platform,
+  spawnSyncImpl = childProcess.spawnSync
+} = {}) {
+  requireDescriptorPlatform(fsImpl, platform);
+  assertNoReplaceHelper(fsImpl);
+
+  let result;
+  try {
+    result = spawnSyncImpl(
+      PYTHON_EXECUTABLE,
+      ['-I', NO_REPLACE_HELPER_PATH, ...arguments_],
+      {
+        env: {
+          LANG: 'C',
+          LC_ALL: 'C'
+        },
+        stdio: ['ignore', 'ignore', 'ignore', rootFd],
+        timeout: 30_000,
+        windowsHide: true
+      }
+    );
+  } catch {
+    reject('owner_mapping_noreplace_primitive_unavailable');
+  }
+  return result;
+}
+
+function probeNoReplacePrimitive(rootFd, {
+  fsImpl = fs,
+  platform = process.platform,
+  spawnSyncImpl = childProcess.spawnSync
+} = {}) {
+  const result = runNoReplaceHelper(rootFd, ['--probe'], {
+    fsImpl,
+    platform,
+    spawnSyncImpl
+  });
+  if (result?.status === 0 && !result.error && result.signal === null) return;
+  reject('owner_mapping_noreplace_primitive_unavailable');
+}
+
+function renameDirectoryNoReplace(rootFd, sourceName, targetName, {
+  fsImpl = fs,
+  platform = process.platform,
+  spawnSyncImpl = childProcess.spawnSync
+} = {}) {
+  descriptorEntryPath(rootFd, sourceName);
+  descriptorEntryPath(rootFd, targetName);
+  const result = runNoReplaceHelper(rootFd, [sourceName, targetName], {
+    fsImpl,
+    platform,
+    spawnSyncImpl
+  });
+  if (result?.status === 0 && !result.error && result.signal === null) return;
+  if (result?.status === NO_REPLACE_TARGET_EXISTS_EXIT) {
+    reject('owner_mapping_package_exists');
+  }
+  reject('owner_mapping_noreplace_primitive_failed');
+}
+
 function lowDisclosureReport(status, command, overrides = {}) {
   return Object.freeze({
     status,
@@ -755,6 +853,7 @@ function planMappingPackage({
   try {
     inspectTargetAbsent(root.fd, name, fsImpl);
     inspectStagingAbsent(root.fd, name, fsImpl);
+    probeNoReplacePrimitive(root.fd, { fsImpl, platform });
     const state = parseMappingBytes(readOwnerOnlyPath(mappingSource, {
       fsImpl,
       repoRoot,
@@ -958,7 +1057,8 @@ function applyMappingPackage({
   confirmed = false,
   fsImpl = fs,
   repoRoot = repositoryRoot(),
-  platform = process.platform
+  platform = process.platform,
+  renameNoReplace = renameDirectoryNoReplace
 } = {}) {
   if (confirmed !== true) reject('owner_mapping_private_config_confirmation_required');
   const name = validatePackageName(packageName);
@@ -974,6 +1074,7 @@ function applyMappingPackage({
   try {
     inspectTargetAbsent(root.fd, name, fsImpl);
     inspectStagingAbsent(root.fd, name, fsImpl);
+    probeNoReplacePrimitive(root.fd, { fsImpl, platform });
     const state = parseMappingBytes(readOwnerOnlyPath(mappingSource, {
       fsImpl,
       repoRoot,
@@ -1016,10 +1117,10 @@ function applyMappingPackage({
       code: 'owner_mapping_staging_identity_changed',
       requireWrite: true
     });
-    fsImpl.renameSync(
-      descriptorEntryPath(root.fd, staging.name),
-      descriptorEntryPath(root.fd, name)
-    );
+    renameNoReplace(root.fd, staging.name, name, {
+      fsImpl,
+      platform
+    });
     committed = true;
     fsImpl.fsyncSync(root.fd);
     assertOpenRootIdentity(root, fsImpl);
@@ -1108,5 +1209,6 @@ module.exports = {
   applyMappingPackage,
   checkMappingPackage,
   lowDisclosureReport,
-  planMappingPackage
+  planMappingPackage,
+  renameDirectoryNoReplace
 };
