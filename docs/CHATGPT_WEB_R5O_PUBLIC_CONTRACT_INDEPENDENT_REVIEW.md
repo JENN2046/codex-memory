@@ -12,16 +12,22 @@ Reviewed range and state:
 - base: `13f167358e4ce154e2af0248a396de3215adefaf`;
 - original remote head:
   `8c6b5d193d30688b851444390f4740ca8c4e2a1e`;
-- current remediation worktree before delivery.
+- first remediation head:
+  `56bca4221b036965aa2a04f39b997cb20bd9deaf`;
+- current terminal-guidance remediation worktree before delivery.
 
 ## Verdict
 
-`CONDITIONAL_PASS_SOURCE / BLOCKED_DELIVERY`
+`PASS_SOURCE / DELIVERY_PENDING`
 
-No source-level blocker remains after remediation. Delivery remains blocked
-until the remediation commit is pushed, PR metadata is corrected, exact-head
-CI passes, and the two review threads receive truthful dispositions. Merge is
-a separate Jenn decision.
+No source-level blocker remains after the original and incremental independent
+reviews. The first remediation was pushed, its exact-head CI passed, PR
+metadata was corrected, and the two original review threads received truthful
+dispositions. Exact-head automated review then identified one search
+terminal-guidance mismatch; the current worktree fixes it and independent
+incremental review returns `PASS`. Delivery still requires commit/push,
+exact-head CI, and disposition of that new thread. Merge is a separate Jenn
+decision.
 
 ## Closed Findings
 
@@ -45,6 +51,10 @@ a separate Jenn decision.
 - `memory_overview`, `audit_memory`, and `prepare_memory_context` promise only
   fields present in their bounded status schemas: `status`, `kind`, and
   response `item_count`.
+- `search_memory` terminal guidance preserves `result_count` and explicitly
+  authorizes the returned `results[].summary` and `results[].relevance` for the
+  answer, while continuing to forbid reporting or dereferencing `result_ref`
+  and any follow-up read.
 - Tests assert both descriptor text and code-level structured projections.
 
 ### Relay completion
@@ -86,20 +96,31 @@ a separate Jenn decision.
   tests: pass.
 - changed JavaScript syntax checks: pass.
 - docs, current-facts drift, and ledger consistency gates: pass.
+- first-remediation exact-head GitHub Actions run `30236898520`: pass on
+  `56bca4221b036965aa2a04f39b997cb20bd9deaf`.
+- terminal-guidance targeted regression: `12/12`.
+- post-fix all R5 plus synthetic E2E: `48/48`; base R4 contracts: `9/9`.
+- incremental independent review: `PASS`, no blocking finding.
 
 The restricted local sandbox rejects listener creation with `EPERM`, so the
 full listener-dependent Relay and HTTP cases require exact-head GitHub CI.
 
-## Delivery Blockers At Review Completion
+## Initial Delivery Blockers Closed On First Remediation
 
-1. Commit and push the remediation.
-2. Replace the stale PR title/body, including the false no-schema-change and
-   same-request-retry claims.
-3. Obtain terminal-success CI for the new head.
-4. Reply to and truthfully resolve or retain both review threads:
-   latest-event observer correctness, and the decision to keep observer
-   telemetry injectable-only/non-operational.
-5. Do not merge without Jenn's separate current decision.
+1. The first remediation was committed and pushed.
+2. The stale PR title/body and false no-schema-change/same-request-retry claims
+   were corrected.
+3. Exact-head CI passed on
+   `56bca4221b036965aa2a04f39b997cb20bd9deaf`.
+4. The latest-event observer and injectable-only/non-operational telemetry
+   threads were answered and resolved truthfully.
+
+## Current Delivery Gates
+
+1. Commit and push the independently reviewed search terminal-guidance fix.
+2. Obtain terminal-success CI for that new exact head.
+3. Reply to and truthfully resolve the new terminal-guidance review thread.
+4. Do not merge without Jenn's separate current decision.
 
 ## Accepted Residuals
 
@@ -111,3 +132,6 @@ full listener-dependent Relay and HTTP cases require exact-head GitHub CI.
   explicitly labelled user utterance; it retains the existing model-guidance
   plus registry-allowlist posture. No automatic-selection or user-intent
   provenance guarantee is claimed.
+- Empty-search and MCP-handler terminal-text integration coverage remain
+  non-blocking future test-depth improvements; the core found-result regression
+  and all three shared bounded-status behaviors were independently reviewed.

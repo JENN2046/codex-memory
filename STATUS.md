@@ -6,7 +6,7 @@ Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
 Current task: `CM-2154 ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility Contract`.
 Current validation: `CMV-2239`.
-Current fact: Relay response expiry is capped by request expiry and the UDS budget is aligned; incomplete UDS input keeps the daemon available without replaying the acknowledged request, and model-visible routing is limited to fields the selected output schema can return.
+Current fact: Relay response expiry is capped by request expiry and the UDS budget is aligned; incomplete UDS input keeps the daemon available without replaying the acknowledged request, and model-visible routing preserves the distinct fields each selected output schema can return.
 The six public tool names remain unchanged, but `resolve_memory_context` now requires `requested_visibility`, so its public input schema and digest are intentionally tightened. No live runtime/provider/private-config/memory action occurred and the Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
@@ -29,8 +29,11 @@ stored record/content uses `search_memory`; overview response status and
 `audit_memory`; named task-start response status and `item_count` use
 `prepare_memory_context`. The bounded-status tools do not return category
 counts, access/receipt/scope/visibility details, audit-event details, or
-task-context content. After a successful resolve, exactly the preselected read
-runs once and every result or transport error terminates the workflow.
+task-context content. `search_memory` terminal guidance instead preserves
+`result_count` and explicitly permits using each returned `results[].summary`
+and `results[].relevance`; it does not expose `result_ref` as answer content or
+permit a follow-up read. After a successful resolve, exactly the preselected
+read runs once and every result or transport error terminates the workflow.
 
 The public tool count and names remain six. The public input contract does
 change: `resolve_memory_context` now requires both `project_alias` and
@@ -44,8 +47,11 @@ expansion.
 R5-O passes `6/6`, R5-K current-contract tests pass `9/9`, all R5 plus
 synthetic E2E pass `8/8` files, and the base contract passes `9/9`. Selected
 remaining-TTL, expiry-race, observer, and availability Relay tests pass. The
-restricted agent sandbox blocks listener creation with `EPERM`; exact-head PR
-CI must rerun after this review remediation.
+restricted agent sandbox blocks listener creation with `EPERM`. GitHub Actions
+run `30236898520` passed on `56bca4221b036965aa2a04f39b997cb20bd9deaf`;
+an exact-head review then identified and the worktree fixed the search terminal
+guidance mismatch, with targeted regression tests passing `12/12`. CI must run
+again after that fix is pushed.
 
 No live runtime, provider, memory read/write, private configuration, or VCP
 core action ran. Prior owner-only artifacts remain unchanged and the Edge

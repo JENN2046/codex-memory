@@ -220,10 +220,13 @@ function modelVisibleResultText(name, response) {
   }
   if (response.status === 'ok') {
     const boundedStatus = response.structured_content?.status || 'completed';
-    const candidateGuidance = name === 'search_memory' && boundedStatus === 'found'
-      ? ' Search results are retrieval candidates, not proof by themselves; relevance 0.5 is low-confidence and inconclusive unless the returned summary explicitly supports the requested fact. Do not dereference result_ref or run a follow-up search.'
-      : '';
-    return `FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS. The authorized read is complete and the workflow is consumed. Answer now using only these returned facts: tool=${name}; receipt=bound; status=${boundedStatus}; item_count=${resultCount(response.structured_content)}.${candidateGuidance} Omit every category not returned here. Never infer or report the status or availability of an uncalled tool. Do not call any tool to verify, supplement, expand, or fill a table. Do not call resolve_memory_context, render_memory_scope, or another read. END OF TOOL WORKFLOW — RESPOND TO THE USER NOW.`;
+    if (name === 'search_memory') {
+      const candidateGuidance = boundedStatus === 'found'
+        ? ' Search results are retrieval candidates, not proof by themselves; relevance 0.5 is low-confidence and inconclusive unless the returned summary explicitly supports the requested fact.'
+        : '';
+      return `FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS. The authorized read is complete and the workflow is consumed. Answer now using only the actual returned search facts: tool=${name}; receipt=bound; status=${boundedStatus}; result_count=${resultCount(response.structured_content)}. Each returned results[].summary is retrieved content authorized for the answer, and its results[].relevance is the confidence signal for that summary.${candidateGuidance} Do not report or dereference result_ref, and do not run a follow-up search. Omit every category not returned here. Never infer or report the status or availability of an uncalled tool. Do not call any tool to verify, supplement, expand, or fill a table. Do not call resolve_memory_context, render_memory_scope, or another read. END OF TOOL WORKFLOW — RESPOND TO THE USER NOW.`;
+    }
+    return `FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS. The authorized read is complete and the workflow is consumed. Answer now using only these returned facts: tool=${name}; receipt=bound; status=${boundedStatus}; item_count=${resultCount(response.structured_content)}. Omit every category not returned here. Never infer or report the status or availability of an uncalled tool. Do not call any tool to verify, supplement, expand, or fill a table. Do not call resolve_memory_context, render_memory_scope, or another read. END OF TOOL WORKFLOW — RESPOND TO THE USER NOW.`;
   }
   return `FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS. The authorized read is complete and the workflow is consumed. Answer now using only these returned facts: tool=${name}; receipt=bound; status=${response.status}. This is not a transport timeout or another transport failure. Omit every category not returned here. Never infer or report the status or availability of an uncalled tool. Do not call any tool to retry, verify, supplement, expand, or fill a table. Do not call resolve_memory_context, render_memory_scope, or another read. END OF TOOL WORKFLOW — RESPOND TO THE USER NOW.`;
 }

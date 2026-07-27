@@ -53,6 +53,12 @@ bounded by what each public output schema can actually return:
 - named task-start response status and `item_count`:
   `prepare_memory_context`.
 
+`search_memory` terminal guidance preserves its distinct output vocabulary:
+`result_count` remains `result_count`, and each returned `results[].summary`
+and `results[].relevance` is explicitly available to answer the user. It does
+not rename the search count to `item_count`, expose `result_ref` as content, or
+permit a dereference or follow-up read.
+
 The three bounded-status tools do not return memory-category counts, access,
 receipt, scope, visibility, audit-event, or task-context content. A stored
 summary or fact must use `search_memory`. The model must not promise a detail
@@ -151,10 +157,13 @@ Local validation in the restricted agent sandbox:
 - selected remaining-TTL, expiry-race, observer, and availability Relay cases
   pass without a listener.
 
-The exact source head before this docs/status synchronization passed GitHub
-Actions CI run `1015`, including dependency installation, tests, release-gate
-summary, and profile CLI smoke. That historical run does not cover the
-remediation; PR CI must run again after the new commit.
+GitHub Actions run `30236898520` passed on remediation head
+`56bca4221b036965aa2a04f39b997cb20bd9deaf`, including dependency
+installation, tests, release-gate summary, and profile CLI smoke. Exact-head
+automated review then identified a terminal-guidance mismatch that renamed the
+search count to `item_count` and failed to authorize use of returned summaries.
+The source and targeted tests now correct that mismatch; the next pushed head
+must pass CI again.
 
 ## Review Boundary
 
@@ -170,7 +179,9 @@ Independent review must cover:
 - the fact that the canonical service does not yet wire the observer;
 - the intentional schema-v1 accepted-set break and Edge-first/Relay-last
   rollout order;
-- preservation of the six public tool names and zero-memory default.
+- preservation of the six public tool names and zero-memory default;
+- preservation of `search_memory` result fields in terminal guidance without
+  enabling `result_ref` dereference or another read.
 
 The completed source review and its delivery blockers are recorded in
 `docs/CHATGPT_WEB_R5O_PUBLIC_CONTRACT_INDEPENDENT_REVIEW.md`.

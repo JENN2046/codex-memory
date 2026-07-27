@@ -61,7 +61,9 @@ incomplete UDS response without replaying the acknowledged one-read request.
 An injectable low-disclosure observer library now handles mixed lifecycle
 sequences, but the canonical service does not yet wire or expose it.
 Model-visible routing is constrained to fields each public output schema
-actually returns. The six public tool names remain unchanged, but
+actually returns: search guidance preserves `result_count`, returned
+`results[].summary`, and `results[].relevance`, while bounded-status tools use
+their distinct `item_count`. The six public tool names remain unchanged, but
 `resolve_memory_context` now requires `requested_visibility`; its public input
 schema and digest are intentionally tightened. This is source hardening and
 contract clarification only: no live runtime, provider, private configuration,

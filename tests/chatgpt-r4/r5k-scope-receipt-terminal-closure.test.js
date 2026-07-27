@@ -106,13 +106,27 @@ test('R5-K makes governed result receipts and transport failures unambiguous and
 
   const found = modelVisibleResultText('search_memory', {
     status: 'ok',
-    structured_content: { status: 'found', result_count: 1, results: [] }
+    structured_content: {
+      status: 'found',
+      result_count: 1,
+      results: [{
+        result_ref: `mref_${'r'.repeat(24)}`,
+        summary: 'The bounded returned fact.',
+        relevance: 0.9
+      }]
+    }
   });
   assert.match(found, /^FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS/u);
   assert.match(found, /workflow is consumed/u);
+  assert.match(found, /actual returned search facts/u);
+  assert.match(found, /result_count=1/u);
+  assert.match(found, /results\[\]\.summary is retrieved content authorized for the answer/u);
+  assert.match(found, /results\[\]\.relevance is the confidence signal/u);
+  assert.doesNotMatch(found, /item_count=/u);
   assert.match(found, /Never infer or report the status or availability of an uncalled tool/u);
   assert.match(found, /resolve_memory_context, render_memory_scope, or another read/u);
-  assert.match(found, /Do not dereference result_ref or run a follow-up search/u);
+  assert.match(found, /Do not report or dereference result_ref/u);
+  assert.match(found, /do not run a follow-up search/u);
 
   const timeout = modelVisibleErrorText('edge_response_timeout');
   assert.match(timeout, /^TERMINAL TRANSPORT FAILURE — NO MORE TOOL CALLS/u);

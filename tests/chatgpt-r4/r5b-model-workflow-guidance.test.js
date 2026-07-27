@@ -92,7 +92,15 @@ test('R5-B model-visible results stop retries while preserving bounded status', 
     const text = modelVisibleResultText('search_memory', {
       status,
       structured_content: status === 'ok'
-        ? { status: 'found', result_count: 1, results: [] }
+        ? {
+            status: 'found',
+            result_count: 1,
+            results: [{
+              result_ref: `mref_${'r'.repeat(24)}`,
+              summary: 'The bounded returned fact.',
+              relevance: 0.9
+            }]
+          }
         : { status, result_count: 0, results: [] }
     });
     assert.match(text, /^FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS/u, status);
@@ -100,5 +108,11 @@ test('R5-B model-visible results stop retries while preserving bounded status', 
     assert.match(text, /Omit every category not returned here/u, status);
     assert.match(text, /Never infer or report the status or availability of an uncalled tool/u, status);
     assert.match(text, /END OF TOOL WORKFLOW — RESPOND TO THE USER NOW/u, status);
+    if (status === 'ok') {
+      assert.match(text, /result_count=1/u);
+      assert.match(text, /results\[\]\.summary is retrieved content authorized for the answer/u);
+      assert.match(text, /results\[\]\.relevance is the confidence signal/u);
+      assert.doesNotMatch(text, /item_count=/u);
+    }
   }
 });
