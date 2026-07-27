@@ -83,9 +83,15 @@ test("parseMarkdownTable preserves pipes inside inline code cells", () => {
 
 test("containsExactIdToken rejects prefix and suffix near-collisions", () => {
   assert.equal(containsExactIdToken("scope CM-3001 complete", "CM-3001"), true);
+  assert.equal(containsExactIdToken("scope (`CM-3001`) complete", "CM-3001"), true);
   assert.equal(containsExactIdToken("scope CM-30010 complete", "CM-3001"), false);
+  assert.equal(containsExactIdToken("scope CM-3001-extra complete", "CM-3001"), false);
+  assert.equal(containsExactIdToken("scope CM-3001_extra complete", "CM-3001"), false);
   assert.equal(containsExactIdToken("validation CMV-30020", "CMV-3002"), false);
+  assert.equal(containsExactIdToken("validation CMV-3002-extra", "CMV-3002"), false);
+  assert.equal(containsExactIdToken("validation CMV-3002_extra", "CMV-3002"), false);
   assert.equal(containsExactIdToken("xCM-3001", "CM-3001"), false);
+  assert.equal(containsExactIdToken("_CM-3001", "CM-3001"), false);
 });
 
 test("ledger validator accepts an empty active queue as a terminal state", () => {

@@ -394,14 +394,22 @@ function validateAuthoritySurfaces(root, facts, failures) {
     failures.push("CURRENT_STATE activeTask must match CURRENT_FACTS.activeTask");
   }
 
-  const stateCloseoutMatch = active.match(
-    /Last completed:\s*`?(CM-\d{4})\s*\/\s*(CMV-\d{4})`?(?:[.\s]|$)/
-  );
+  const stateCloseoutDeclarationLines = active
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) =>
+      !line.startsWith("<!--") && /\bLast completed\s*:/i.test(line)
+    );
+  const stateCloseoutMatch = stateCloseoutDeclarationLines.length === 1
+    ? stateCloseoutDeclarationLines[0].match(
+      /^Last completed:\s*(`?)(CM-\d{4})\s*\/\s*(CMV-\d{4})\1\.$/
+    )
+    : null;
   if (!stateCloseoutMatch) {
-    failures.push("CURRENT_STATE must declare the last completed CM / CMV pair");
+    failures.push("CURRENT_STATE must declare exactly one canonical last completed CM / CMV pair");
   } else if (!facts.lastCompleted ||
-      stateCloseoutMatch[1] !== facts.lastCompleted.taskId ||
-      stateCloseoutMatch[2] !== facts.lastCompleted.validationId) {
+      stateCloseoutMatch[2] !== facts.lastCompleted.taskId ||
+      stateCloseoutMatch[3] !== facts.lastCompleted.validationId) {
     failures.push("CURRENT_STATE last completed pair must match CURRENT_FACTS.lastCompleted");
   }
 
@@ -623,6 +631,46 @@ function defaultGitRunner(root, args) {
   });
 }
 
+function readableBaseBranchRefs(root, baseBranch, gitRunner) {
+  const remoteResult = gitRunner(root, [
+    "for-each-ref",
+    "--format=%(refname)",
+    "refs/remotes"
+  ]);
+  if (!remoteResult || remoteResult.status !== 0) {
+    return {
+      lookupOk: false,
+      refs: []
+    };
+  }
+  const escapedBaseBranch = String(baseBranch || "")
+    .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const remoteBranchRefPattern = new RegExp(
+    `^refs/remotes/[^/]+/${escapedBaseBranch}$`
+  );
+  const remoteCandidates = String(remoteResult.stdout || "")
+    .split(/\r?\n/)
+    .map((ref) => ref.trim())
+    .filter((ref) => remoteBranchRefPattern.test(ref));
+  const readableRemoteRefs = [...new Set(remoteCandidates)].filter((ref) => {
+    const result = gitRunner(root, ["cat-file", "-e", `${ref}^{commit}`]);
+    return result && result.status === 0;
+  });
+  if (remoteCandidates.length > 0) {
+    return {
+      lookupOk: true,
+      refs: readableRemoteRefs
+    };
+  }
+
+  const localRef = `refs/heads/${baseBranch}`;
+  const localResult = gitRunner(root, ["cat-file", "-e", `${localRef}^{commit}`]);
+  return {
+    lookupOk: true,
+    refs: localResult && localResult.status === 0 ? [localRef] : []
+  };
+}
+
 function validateHistory(root, facts, failures, options) {
   const index = readText(root, HISTORY_INDEX_PATH, failures);
   if (!index.includes(HISTORY_BASELINE_COMMIT) ||
@@ -638,12 +686,21 @@ function validateHistory(root, facts, failures, options) {
   const inside = gitRunner(root, ["rev-parse", "--is-inside-work-tree"]);
   if (inside && inside.status === 0 && String(inside.stdout || "").trim() === "true") {
     const productBaseline = facts.acceptedProductBaseline || {};
-    const baseBranchRef = `refs/remotes/origin/${facts.baseBranch}`;
+    const baseBranchResolution = readableBaseBranchRefs(
+      root,
+      facts.baseBranch,
+      gitRunner
+    );
+    const baseBranchRefs = baseBranchResolution.refs;
+    if (!baseBranchResolution.lookupOk) {
+      failures.push(`unable to enumerate Git refs for baseBranch ${facts.baseBranch}`);
+    } else if (baseBranchRefs.length === 0) {
+      failures.push(`no readable Git ref found for baseBranch ${facts.baseBranch}`);
+    }
     const checks = [
       `${HISTORY_BASELINE_COMMIT}^{commit}`,
       `${productBaseline.reviewedHead}^{commit}`,
       `${productBaseline.mergeCommit}^{commit}`,
-      `${baseBranchRef}^{commit}`,
       ...HISTORY_RECOVERY_PATHS.map((relativePath) =>
         `${HISTORY_BASELINE_COMMIT}:${relativePath}`
       )
@@ -664,15 +721,26 @@ function validateHistory(root, facts, failures, options) {
         productBaseline.reviewedHead,
         productBaseline.mergeCommit,
         "accepted product reviewed head must be an ancestor of its merge commit"
-      ],
-      [
-        productBaseline.mergeCommit,
-        baseBranchRef,
-        "accepted product merge must already be an ancestor of origin/main"
       ]
     ]) {
       const result = gitRunner(root, ["merge-base", "--is-ancestor", ancestor, descendant]);
       if (!result || result.status !== 0) failures.push(label);
+    }
+    if (baseBranchRefs.length > 0) {
+      const acceptedOnBase = baseBranchRefs.some((baseBranchRef) => {
+        const result = gitRunner(root, [
+          "merge-base",
+          "--is-ancestor",
+          productBaseline.mergeCommit,
+          baseBranchRef
+        ]);
+        return result && result.status === 0;
+      });
+      if (!acceptedOnBase) {
+        failures.push(
+          `accepted product merge must already be an ancestor of a current ${facts.baseBranch} ref`
+        );
+      }
     }
   }
 }

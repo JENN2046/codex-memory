@@ -49,10 +49,20 @@ function hasNonEmptyReceipt(value) {
   return typeof value === "string" && value.trim().length > 0;
 }
 
+function containsExactIdToken(value, expectedId) {
+  const id = String(expectedId || "").trim();
+  if (!/^(?:CM|CMV)-\d{4}$/.test(id)) return false;
+  const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(
+    `(?:^|[^A-Za-z0-9_-])${escapedId}(?![A-Za-z0-9_-])`
+  ).test(String(value || ""));
+}
+
 module.exports = {
   ACTIVE_ROW_CANDIDATE_RE,
   ACTIVE_TABLE_HEADERS,
   COMPLETED_RESULT,
+  containsExactIdToken,
   hasNonEmptyReceipt,
   isCanonicalCompletedResult
 };

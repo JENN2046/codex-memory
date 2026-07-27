@@ -7,6 +7,7 @@ const {
   ACTIVE_ROW_CANDIDATE_RE,
   ACTIVE_TABLE_HEADERS: TABLE_HEADERS,
   COMPLETED_RESULT,
+  containsExactIdToken,
   hasNonEmptyReceipt,
   isCanonicalCompletedResult
 } = require("../src/core/AutopilotCloseoutContract");
@@ -129,11 +130,6 @@ function hasExactTableShape(diagnostics, expectedHeader) {
 
 function rawId(value) {
   return String(value || "").trim();
-}
-
-function containsExactIdToken(value, expectedId) {
-  const tokens = String(value || "").match(/\b(?:CM|CMV)-\d{4}\b/g) || [];
-  return tokens.includes(expectedId);
 }
 
 function validateAutopilotLedgerConsistency(root = process.cwd()) {

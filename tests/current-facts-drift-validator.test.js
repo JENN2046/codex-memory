@@ -338,7 +338,7 @@ test("current facts validator rejects stale or unrelated accepted product baseli
   assert.equal(result.ok, false);
   assert.match(result.failures.join("\n"), /accepted product merge must descend/);
   assert.match(result.failures.join("\n"), /accepted product reviewed head must be an ancestor/);
-  assert.match(result.failures.join("\n"), /accepted product merge must already be an ancestor of origin\/main/);
+  assert.match(result.failures.join("\n"), /accepted product merge must already be an ancestor of a current main ref/);
 });
 
 test("current facts validator rejects an unmerged feature head as accepted product baseline", () => {
@@ -358,15 +358,132 @@ test("current facts validator rejects an unmerged feature head as accepted produ
   );
   const gitRunner = (_root, args) => {
     if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
-    if (args[0] === "merge-base" && args[3] === "refs/remotes/origin/main") {
+    if (args[0] === "merge-base" &&
+        args[2] === changed.acceptedProductBaseline.mergeCommit) {
       return { status: 1, stdout: "" };
     }
     return { status: 0, stdout: "" };
   };
   const result = validateCurrentFactsDrift(root, { gitRunner });
   assert.equal(result.ok, false);
-  assert.match(result.failures.join("\n"), /accepted product merge must already be an ancestor of origin\/main/);
+  assert.match(result.failures.join("\n"), /accepted product merge must already be an ancestor of a current main ref/);
 });
+
+test("current facts validator accepts local main when no remote tracking ref exists", () => {
+  const root = workspace();
+  const gitRunner = (_root, args) => {
+    if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
+    if (args[0] === "for-each-ref") return { status: 0, stdout: "" };
+    return { status: 0, stdout: "" };
+  };
+
+  const result = validateCurrentFactsDrift(root, { gitRunner });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator accepts a non-origin remote main ref", () => {
+  const root = workspace();
+  const gitRunner = (_root, args) => {
+    if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
+    if (args[0] === "for-each-ref") {
+      return { status: 0, stdout: "refs/remotes/upstream/main\n" };
+    }
+    return { status: 0, stdout: "" };
+  };
+
+  const result = validateCurrentFactsDrift(root, { gitRunner });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator accepts the baseline on one current remote main ref", () => {
+  const root = workspace();
+  const gitRunner = (_root, args) => {
+    if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
+    if (args[0] === "for-each-ref") {
+      return {
+        status: 0,
+        stdout: "refs/remotes/origin/main\nrefs/remotes/upstream/main\n"
+      };
+    }
+    if (args[0] === "merge-base" &&
+        args[2] === RESET_ACCEPTED_PRODUCT_BASELINE.mergeCommit &&
+        args[3] === "refs/remotes/upstream/main") {
+      return { status: 1, stdout: "" };
+    }
+    return { status: 0, stdout: "" };
+  };
+
+  const result = validateCurrentFactsDrift(root, { gitRunner });
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects an unreadable remote main instead of falling back local", () => {
+  const root = workspace();
+  const gitRunner = (_root, args) => {
+    if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
+    if (args[0] === "for-each-ref") {
+      return { status: 0, stdout: "refs/remotes/origin/main\n" };
+    }
+    if (args[0] === "cat-file" &&
+        String(args[2] || "").startsWith("refs/remotes/origin/main")) {
+      return { status: 1, stdout: "", stderr: "unreadable" };
+    }
+    return { status: 0, stdout: "" };
+  };
+
+  const result = validateCurrentFactsDrift(root, { gitRunner });
+
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /no readable Git ref found for baseBranch main/);
+});
+
+test("current facts validator rejects a failed remote ref enumeration", () => {
+  const root = workspace();
+  const gitRunner = (_root, args) => {
+    if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
+    if (args[0] === "for-each-ref") {
+      return { status: 1, stdout: "", stderr: "lookup failed" };
+    }
+    return { status: 0, stdout: "" };
+  };
+
+  const result = validateCurrentFactsDrift(root, { gitRunner });
+
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /unable to enumerate Git refs for baseBranch main/);
+});
+
+for (const fakeRemoteRef of [
+  "refs/remotes/origin/archive/main",
+  "refs/remotes/main"
+]) {
+  test(`current facts validator ignores noncanonical remote ref ${fakeRemoteRef}`, () => {
+    const root = workspace();
+    const gitRunner = (_root, args) => {
+      if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
+      if (args[0] === "for-each-ref") {
+        return { status: 0, stdout: `${fakeRemoteRef}\n` };
+      }
+      if (args[0] === "merge-base" &&
+          args[2] === RESET_ACCEPTED_PRODUCT_BASELINE.mergeCommit &&
+          args[3] === "refs/heads/main") {
+        return { status: 1, stdout: "" };
+      }
+      return { status: 0, stdout: "" };
+    };
+
+    const result = validateCurrentFactsDrift(root, { gitRunner });
+
+    assert.equal(result.ok, false);
+    assert.match(
+      result.failures.join("\n"),
+      /accepted product merge must already be an ancestor of a current main ref/
+    );
+  });
+}
 
 test("current facts validator rejects malformed accepted product baseline fields", () => {
   const root = workspace();
@@ -513,6 +630,42 @@ test("current facts validator rejects a stale CURRENT_STATE last completed pair"
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, false);
   assert.match(result.failures.join("\n"), /CURRENT_STATE last completed pair must match/);
+});
+
+test("current facts validator rejects duplicate last completed declarations", () => {
+  const root = workspace();
+  const canonical = `Last completed: \`${FIXTURE_CLOSEOUT.taskId} / ${FIXTURE_CLOSEOUT.validationId}\`.`;
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState().replace(
+      canonical,
+      `${canonical}\nLast completed: \`CM-3001 / CMV-3002\`.`
+    )
+  );
+
+  const result = validateCurrentFactsDrift(root);
+
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /exactly one canonical last completed/);
+});
+
+test("current facts validator rejects a canonical closeout beside an unpaired declaration", () => {
+  const root = workspace();
+  const canonical = `Last completed: \`${FIXTURE_CLOSEOUT.taskId} / ${FIXTURE_CLOSEOUT.validationId}\`.`;
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState().replace(
+      canonical,
+      `${canonical}\nLast completed: \`CM-3001 / CMV-3002.`
+    )
+  );
+
+  const result = validateCurrentFactsDrift(root);
+
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /exactly one canonical last completed/);
 });
 
 test("current facts validator rejects malformed lastCompleted ids and empty scope", () => {
@@ -834,10 +987,10 @@ test("current facts validator rejects an empty current ledger receipt", () => {
 test("current facts validator rejects near-collision receipt tokens", () => {
   const root = workspace();
   writeFile(root, ".agent_board/VALIDATION_LOG.md", validationLog([
-    `| ${FIXTURE_CLOSEOUT.validationId} | tests | P6 | ${FIXTURE_CLOSEOUT.taskId}0 synthetic closeout | COMPLETED_VALIDATED | Green Lane local closeout | none | 2026-07-27 |`
+    `| ${FIXTURE_CLOSEOUT.validationId} | tests | P6 | ${FIXTURE_CLOSEOUT.taskId}-extra synthetic closeout | COMPLETED_VALIDATED | Green Lane local closeout | none | 2026-07-27 |`
   ]));
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
-    `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Green | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId}0 | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
+    `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Green | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId}_extra | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |`
   ]));
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, false);

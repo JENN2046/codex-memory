@@ -15,6 +15,8 @@ const {
 const {
   ACTIVE_TABLE_HEADERS,
   COMPLETED_RESULT,
+  containsExactIdToken,
+  hasNonEmptyReceipt,
   isCanonicalCompletedResult
 } = require('../core/AutopilotCloseoutContract');
 const {
@@ -709,6 +711,7 @@ function collectAutopilotKernel(options = {}) {
   const workspaceRoot = options.workspaceRoot || process.cwd();
   const profilePath = path.join(workspaceRoot, 'docs', 'AUTOPILOT_PROJECT_PROFILE.md');
   const runtimePath = path.join(workspaceRoot, 'docs', 'AUTOPILOT_GOAL_DECOMPOSITION_RUNTIME.md');
+  const currentFactsPath = path.join(workspaceRoot, '.agent_board', 'CURRENT_FACTS.json');
   const ledgerPath = path.join(workspaceRoot, '.agent_board', 'AUTOPILOT_LEDGER.md');
   const validationLogPath = path.join(workspaceRoot, '.agent_board', 'VALIDATION_LOG.md');
   const schemaDir = path.join(workspaceRoot, 'schemas');
@@ -764,6 +767,10 @@ function collectAutopilotKernel(options = {}) {
   const runtimeExists = fs.existsSync(runtimePath);
   const ledgerTextOverridden = typeof options.ledgerText === 'string';
   const validationLogTextOverridden = typeof options.validationLogText === 'string';
+  const currentFactsOverridden = Object.prototype.hasOwnProperty.call(
+    options,
+    'currentFacts'
+  );
   const ledgerExists = ledgerTextOverridden || fs.existsSync(ledgerPath);
   const validators = {
     governance_kernel: fs.existsSync(governanceValidatorPath),
@@ -785,6 +792,16 @@ function collectAutopilotKernel(options = {}) {
   const validationLog = validationLogTextOverridden
     ? options.validationLogText
     : readFileSafe(validationLogPath);
+  const currentFacts = currentFactsOverridden
+    ? options.currentFacts
+    : readJsonFileSafe(currentFactsPath);
+  const lastCompleted = currentFacts
+    && currentFacts.schemaVersion === 5
+    && currentFacts.lastCompleted;
+  const currentTaskId = String(lastCompleted && lastCompleted.taskId || '');
+  const currentValidationId = String(lastCompleted && lastCompleted.validationId || '');
+  const currentCloseoutValid = /^CM-\d{4}$/.test(currentTaskId)
+    && /^CMV-\d{4}$/.test(currentValidationId);
   const ledgerRows = parseLedgerRows(ledgerText);
   const validationRows = parseValidationRows(validationLog);
   const ledgerInspection = inspectActiveTable(
@@ -798,6 +815,11 @@ function collectAutopilotKernel(options = {}) {
   const latestLedger = ledgerInspection.shapeValid
     && ledgerInspection.rawDataRowCount === 1
     && ledgerRows.length === 1
+    && currentCloseoutValid
+    && ledgerRows[0].id === currentTaskId
+    && hasNonEmptyReceipt(ledgerRows[0].receipt)
+    && containsExactIdToken(ledgerRows[0].validation, currentValidationId)
+    && isCanonicalCompletedResult(ledgerRows[0].result)
     ? ledgerRows[0]
     : null;
   const blockedRedCount = (() => {
@@ -808,6 +830,9 @@ function collectAutopilotKernel(options = {}) {
   const latestValidation = validationInspection.shapeValid
     && validationInspection.rawDataRowCount === 1
     && validationRows.length === 1
+    && currentCloseoutValid
+    && validationRows[0].id === currentValidationId
+    && containsExactIdToken(validationRows[0].scope, currentTaskId)
     && isCanonicalCompletedResult(validationRows[0].result)
     ? validationRows[0]
     : null;
@@ -856,6 +881,14 @@ function readFileSafe(filePath) {
     return fs.readFileSync(filePath, 'utf8');
   } catch {
     return '';
+  }
+}
+
+function readJsonFileSafe(filePath) {
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch {
+    return null;
   }
 }
 

@@ -3,6 +3,7 @@ const path = require('node:path');
 const {
   ACTIVE_ROW_CANDIDATE_RE,
   ACTIVE_TABLE_HEADERS,
+  containsExactIdToken,
   hasNonEmptyReceipt,
   isCanonicalCompletedResult
 } = require('./AutopilotCloseoutContract');
@@ -230,11 +231,6 @@ function inspectActiveTable(markdownText, expectedHeader) {
   };
 }
 
-function containsExactIdToken(value, expectedId) {
-  const tokens = String(value || '').match(/\b(?:CM|CMV)-\d{4}\b/g) || [];
-  return tokens.includes(expectedId);
-}
-
 function resolveCurrentCloseout(currentFacts) {
   if (!currentFacts.exists) return null;
   const facts = currentFacts.value;
@@ -447,6 +443,7 @@ module.exports = {
   LOOP_STATES,
   REJECTED_FLAGS,
   collectAutopilotClosedLoopSummary,
+  containsExactIdToken,
   inspectActiveTable,
   isCurrentAutopilotTask,
   parseLedgerRows,

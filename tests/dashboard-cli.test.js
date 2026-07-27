@@ -124,6 +124,16 @@ function assertKeySet(value, expected, label) {
   assert.deepEqual(Object.keys(value).sort(), expected, `${label} keys`);
 }
 
+function currentCloseoutFacts(taskId = 'CM-2991', validationId = 'CMV-2992') {
+  return {
+    schemaVersion: 5,
+    lastCompleted: {
+      taskId,
+      validationId
+    }
+  };
+}
+
 test('dashboard autopilot kernel preserves escaped and inline-code pipes', () => {
   const ledgerText = [
     '# AUTOPILOT_LEDGER',
@@ -142,6 +152,7 @@ test('dashboard autopilot kernel preserves escaped and inline-code pipes', () =>
 
   const result = collectAutopilotKernel({
     workspaceRoot: process.cwd(),
+    currentFacts: currentCloseoutFacts(),
     ledgerText,
     validationLogText
   });
@@ -172,6 +183,7 @@ test('dashboard autopilot kernel fails closed on an extra malformed ledger row',
 
   const result = collectAutopilotKernel({
     workspaceRoot: process.cwd(),
+    currentFacts: currentCloseoutFacts(),
     ledgerText,
     validationLogText
   });
@@ -179,6 +191,63 @@ test('dashboard autopilot kernel fails closed on an extra malformed ledger row',
   assert.equal(result.status, 'warn');
   assert.equal(result.latest_ledger_goal, 'not_recorded');
   assert.equal(result.latest_ledger_result, 'not_recorded');
+});
+
+test('dashboard autopilot kernel requires a non-empty current receipt', () => {
+  const ledgerText = [
+    '# AUTOPILOT_LEDGER',
+    '',
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-2991 | synthetic | Yellow | closeout | complete |  | CMV-2992 bound validation | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |'
+  ].join('\n');
+  const validationLogText = [
+    '# VALIDATION_LOG',
+    '',
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-2992 | tests | P6 | CM-2991 synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |'
+  ].join('\n');
+
+  const result = collectAutopilotKernel({
+    workspaceRoot: process.cwd(),
+    currentFacts: currentCloseoutFacts(),
+    ledgerText,
+    validationLogText
+  });
+
+  assert.equal(result.status, 'warn');
+  assert.equal(result.latest_ledger_goal, 'not_recorded');
+  assert.equal(result.latest_ledger_result, 'not_recorded');
+});
+
+test('dashboard autopilot kernel binds both rows to CURRENT_FACTS.lastCompleted', () => {
+  const ledgerText = [
+    '# AUTOPILOT_LEDGER',
+    '',
+    '| ID | Goal | Lane | Envelope | Action | Receipt | Validation | Budget Used | Red Stops | Result | Date |',
+    '|---|---|---|---|---|---|---|---|---:|---|---|',
+    '| CM-2991 | synthetic | Yellow | closeout | complete | receipt | CMV-2992-extra wrong validation | zero | 0 | COMPLETED_VALIDATED | 2026-07-27 |'
+  ].join('\n');
+  const validationLogText = [
+    '# VALIDATION_LOG',
+    '',
+    '| ID | Command / Check | Area | Scope | Result | Summary | Follow-up | Date |',
+    '|---|---|---|---|---|---|---|---|',
+    '| CMV-2992 | tests | P6 | CM-2991_extra wrong task | COMPLETED_VALIDATED | ok | none | 2026-07-27 |'
+  ].join('\n');
+
+  const result = collectAutopilotKernel({
+    workspaceRoot: process.cwd(),
+    currentFacts: currentCloseoutFacts(),
+    ledgerText,
+    validationLogText
+  });
+
+  assert.equal(result.status, 'warn');
+  assert.equal(result.latest_ledger_goal, 'not_recorded');
+  assert.equal(result.latest_validation_id, 'not_recorded');
+  assert.equal(result.validation_status, 'not_recorded');
 });
 
 test('dashboard CLI should report all sections in json mode', async () => {
