@@ -211,6 +211,46 @@ test("ledger validator rejects malformed CM queue rows before empty-queue select
   assert.match(result.failures.join("\n"), /must not contain malformed CM data rows/);
 });
 
+test("ledger validator rejects malformed validation and ledger rows beside current receipts", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validation([
+    `| ${FIXTURE_VALIDATION_ID} | tests | P6 | ${FIXTURE_TASK_ID} synthetic closeout | COMPLETED_VALIDATED | ok | none | 2026-07-27 |`,
+    "| CMV-3003 | tests | P6 | CM-3004 unescaped | scope | COMPLETED_VALIDATED | extra | none | 2026-07-28 |"
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_TASK_ID} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_VALIDATION_ID} | zero | 0 | completed_validated | 2026-07-27 |`,
+    "| CM-3004 | extra | Yellow | closeout | complete | receipt | with | pipe | CMV-3003 | zero | 0 | completed_validated | 2026-07-28 |"
+  ]));
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG must not contain malformed CM\/CMV data rows/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must not contain malformed CM\/CMV data rows/);
+});
+
+test("ledger validator rejects changed active-table headers", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/TASK_QUEUE.md",
+    queue().replace("| ID | Priority | Status |", "| ID | Priority | State |")
+  );
+  writeFile(
+    root,
+    ".agent_board/VALIDATION_LOG.md",
+    validation().replace("| ID | Command / Check | Area | Scope |", "| ID | Command / Check | Area | Target |")
+  );
+  writeFile(
+    root,
+    ".agent_board/AUTOPILOT_LEDGER.md",
+    ledger().replace("| ID | Goal | Lane |", "| ID | Objective | Lane |")
+  );
+  const result = validateAutopilotLedgerConsistency(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /TASK_QUEUE must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must retain its exact table header and separator/);
+});
+
 test("ledger validator rejects a non-null non-CM activeTask", () => {
   const root = workspace();
   writeFile(

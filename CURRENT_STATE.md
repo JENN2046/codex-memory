@@ -35,10 +35,10 @@ future task.
 
 ## Open Blockers
 
-1. The canonical service does not wire or expose the low-disclosure observer.
-2. The R5-H private ChatGPT dogfood matrix is incomplete.
-3. R5-O private exact-head runtime behavior has not been verified.
-4. Fresh non-empty task-context recall relevance has not been proven.
+- `canonical_observer_not_wired` [open]: The canonical service does not wire or expose the low-disclosure observer.
+- `r5_h_matrix_incomplete` [open]: The R5-H private ChatGPT dogfood matrix is incomplete.
+- `r5_o_private_exact_head_runtime_unverified` [open]: R5-O private exact-head runtime behavior has not been verified.
+- `fresh_non_empty_task_context_relevance_unproven` [open]: Fresh non-empty task-context recall relevance has not been proven.
 
 ## Next Safe Action
 

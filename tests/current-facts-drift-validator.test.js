@@ -7,10 +7,10 @@ const path = require("node:path");
 const test = require("node:test");
 
 const {
-  ACCEPTED_BASELINE,
   ACTIVE_END,
   ACTIVE_START,
   FACTS_PATH,
+  HISTORY_BASELINE_COMMIT,
   HISTORY_INDEX_PATH,
   HISTORY_RESET_CLOSEOUT,
   POINTER_FILES,
@@ -21,6 +21,34 @@ const FIXTURE_CLOSEOUT = Object.freeze({
   taskId: "CM-2991",
   validationId: "CMV-2992"
 });
+const RESET_ACCEPTED_PRODUCT_BASELINE = Object.freeze({
+  prNumber: 61,
+  reviewedHead: "4680b4c198a71bb9e61d7bc1f21c0b77a1769fd9",
+  mergeCommit: HISTORY_BASELINE_COMMIT,
+  ciRunId: "30238902177"
+});
+const FIXTURE_BLOCKERS = Object.freeze([
+  Object.freeze({
+    id: "canonical_observer_not_wired",
+    status: "open",
+    summary: "observer not wired"
+  }),
+  Object.freeze({
+    id: "r5_h_matrix_incomplete",
+    status: "open",
+    summary: "matrix incomplete"
+  }),
+  Object.freeze({
+    id: "r5_o_private_exact_head_runtime_unverified",
+    status: "open",
+    summary: "runtime unverified"
+  }),
+  Object.freeze({
+    id: "fresh_non_empty_task_context_relevance_unproven",
+    status: "open",
+    summary: "relevance unproven"
+  })
+]);
 
 function writeFile(root, relativePath, text) {
   const fullPath = path.join(root, relativePath);
@@ -50,7 +78,7 @@ function facts() {
       completedAt: "2026-07-27",
       scope: "synthetic_closeout"
     },
-    acceptedProductBaseline: { ...ACCEPTED_BASELINE },
+    acceptedProductBaseline: { ...RESET_ACCEPTED_PRODUCT_BASELINE },
     contracts: {
       toolSurfaces: {
         vcpCodexMemoryCore: {
@@ -70,30 +98,9 @@ function facts() {
         schemaVersion: 3
       }
     },
-    blockers: [
-      {
-        id: "canonical_observer_not_wired",
-        status: "open",
-        summary: "observer not wired"
-      },
-      {
-        id: "r5_h_matrix_incomplete",
-        status: "open",
-        summary: "matrix incomplete"
-      },
-      {
-        id: "r5_o_private_exact_head_runtime_unverified",
-        status: "open",
-        summary: "runtime unverified"
-      },
-      {
-        id: "fresh_non_empty_task_context_relevance_unproven",
-        status: "open",
-        summary: "relevance unproven"
-      }
-    ],
+    blockers: FIXTURE_BLOCKERS.map((blocker) => ({ ...blocker })),
     history: {
-      baselineCommit: ACCEPTED_BASELINE.mergeCommit,
+      baselineCommit: HISTORY_BASELINE_COMMIT,
       indexPath: HISTORY_INDEX_PATH,
       recoverablePaths: [
         "CURRENT_STATE.md",
@@ -113,10 +120,15 @@ function facts() {
   };
 }
 
-function currentState(activeTask = null, lastCompleted = {
-  taskId: FIXTURE_CLOSEOUT.taskId,
-  validationId: FIXTURE_CLOSEOUT.validationId
-}) {
+function currentState(
+  activeTask = null,
+  lastCompleted = {
+    taskId: FIXTURE_CLOSEOUT.taskId,
+    validationId: FIXTURE_CLOSEOUT.validationId
+  },
+  acceptedProductBaseline = RESET_ACCEPTED_PRODUCT_BASELINE,
+  blockers = FIXTURE_BLOCKERS
+) {
   return [
     "# Current State",
     "",
@@ -132,11 +144,21 @@ function currentState(activeTask = null, lastCompleted = {
     "",
     "## Last Accepted Product Baseline",
     "",
-    `${ACCEPTED_BASELINE.reviewedHead} ${ACCEPTED_BASELINE.mergeCommit}`,
+    "| Field | Accepted value |",
+    "|---|---|",
+    `| Pull request | \`#${acceptedProductBaseline.prNumber}\` |`,
+    `| Reviewed head | \`${acceptedProductBaseline.reviewedHead}\` |`,
+    `| Merge commit | \`${acceptedProductBaseline.mergeCommit}\` |`,
+    `| Main CI run | \`${acceptedProductBaseline.ciRunId}\` |`,
+    "| Private dogfood observation schema | `3` |",
     "",
     "## Open Blockers",
     "",
-    "four blockers",
+    ...(blockers.length > 0
+      ? blockers.map((blocker) =>
+        `- \`${blocker.id}\` [${blocker.status}]: ${blocker.summary}`
+      )
+      : ["No current blockers."]),
     "",
     "## Next Safe Action",
     "",
@@ -245,10 +267,10 @@ function workspace() {
       "",
       `Governance reset task: \`${HISTORY_RESET_CLOSEOUT.taskId}\``,
       `Governance reset validation: \`${HISTORY_RESET_CLOSEOUT.validationId}\``,
-      ACCEPTED_BASELINE.mergeCommit,
-      `git show ${ACCEPTED_BASELINE.mergeCommit}:CURRENT_STATE.md`,
+      HISTORY_BASELINE_COMMIT,
+      `git show ${HISTORY_BASELINE_COMMIT}:CURRENT_STATE.md`,
       "git log --follow -- CURRENT_STATE.md",
-      `git blame ${ACCEPTED_BASELINE.mergeCommit} -- CURRENT_STATE.md`
+      `git blame ${HISTORY_BASELINE_COMMIT} -- CURRENT_STATE.md`
     ].join("\n")
   );
   writeSourceContracts(root);
@@ -263,6 +285,189 @@ test("current facts validator accepts the compact schema v5 authority surfaces",
   const root = workspace();
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator accepts a rotated product baseline with valid Git relationships", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.acceptedProductBaseline = {
+    prNumber: 62,
+    reviewedHead: "1".repeat(40),
+    mergeCommit: "2".repeat(40),
+    ciRunId: "30270000000"
+  };
+  writeFacts(root, changed);
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(null, undefined, changed.acceptedProductBaseline, changed.blockers)
+  );
+  const gitRunner = (_root, args) => {
+    if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
+    return { status: 0, stdout: "" };
+  };
+  const result = validateCurrentFactsDrift(root, { gitRunner });
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects stale or unrelated accepted product baselines", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.acceptedProductBaseline = {
+    prNumber: 62,
+    reviewedHead: "1".repeat(40),
+    mergeCommit: "2".repeat(40),
+    ciRunId: "30270000000"
+  };
+  writeFacts(root, changed);
+  let result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /CURRENT_STATE accepted product baseline must match/);
+
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(null, undefined, changed.acceptedProductBaseline, changed.blockers)
+  );
+  const gitRunner = (_root, args) => {
+    if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
+    if (args[0] === "merge-base") return { status: 1, stdout: "" };
+    return { status: 0, stdout: "" };
+  };
+  result = validateCurrentFactsDrift(root, { gitRunner });
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /accepted product merge must descend/);
+  assert.match(result.failures.join("\n"), /accepted product reviewed head must be an ancestor/);
+  assert.match(result.failures.join("\n"), /accepted product merge must already be an ancestor of origin\/main/);
+});
+
+test("current facts validator rejects an unmerged feature head as accepted product baseline", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.acceptedProductBaseline = {
+    prNumber: 62,
+    reviewedHead: "1".repeat(40),
+    mergeCommit: "2".repeat(40),
+    ciRunId: "30270000000"
+  };
+  writeFacts(root, changed);
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(null, undefined, changed.acceptedProductBaseline, changed.blockers)
+  );
+  const gitRunner = (_root, args) => {
+    if (args[0] === "rev-parse") return { status: 0, stdout: "true\n" };
+    if (args[0] === "merge-base" && args[3] === "refs/remotes/origin/main") {
+      return { status: 1, stdout: "" };
+    }
+    return { status: 0, stdout: "" };
+  };
+  const result = validateCurrentFactsDrift(root, { gitRunner });
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /accepted product merge must already be an ancestor of origin\/main/);
+});
+
+test("current facts validator rejects malformed accepted product baseline fields", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.acceptedProductBaseline = {
+    prNumber: 0,
+    reviewedHead: "not-a-sha",
+    mergeCommit: "also-not-a-sha",
+    ciRunId: "run-3027"
+  };
+  writeFacts(root, changed);
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(null, undefined, changed.acceptedProductBaseline, changed.blockers)
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /prNumber must be a positive integer/);
+  assert.match(result.failures.join("\n"), /commit anchors must be 40-char lowercase SHAs/);
+  assert.match(result.failures.join("\n"), /ciRunId must contain decimal digits/);
+});
+
+test("current facts validator accepts blocker set and status rotation", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.blockers = [
+    {
+      id: "r5_h_matrix_incomplete",
+      status: "resolved",
+      summary: "matrix evidence accepted"
+    },
+    {
+      id: "new_product_blocker",
+      status: "triaged",
+      summary: "new evidence requires a product decision"
+    }
+  ];
+  writeFacts(root, changed);
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(null, undefined, changed.acceptedProductBaseline, changed.blockers)
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator accepts an empty current blocker set", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.blockers = [];
+  writeFacts(root, changed);
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(null, undefined, changed.acceptedProductBaseline, changed.blockers)
+  );
+  let result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(null, undefined, changed.acceptedProductBaseline, changed.blockers)
+      .replace("No current blockers.", "")
+  );
+  result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /CURRENT_STATE blockers must exactly match/);
+});
+
+test("current facts validator rejects blocker duplication and cross-surface drift", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.blockers = [
+    {
+      id: "duplicate_blocker",
+      status: "open",
+      summary: "first"
+    },
+    {
+      id: "duplicate_blocker",
+      status: "triaged",
+      summary: "second"
+    }
+  ];
+  writeFacts(root, changed);
+  let result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /blocker ids must be unique/);
+  assert.match(result.failures.join("\n"), /CURRENT_STATE blockers must exactly match/);
+
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(null, undefined, changed.acceptedProductBaseline, changed.blockers)
+  );
+  result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /blocker ids must be unique/);
 });
 
 test("current facts validator accepts a future lastCompleted closeout without validator changes", () => {
@@ -382,6 +587,46 @@ test("current facts validator rejects malformed CM queue rows before empty-queue
   assert.match(result.failures.join("\n"), /must not contain malformed CM data rows/);
 });
 
+test("current facts validator rejects malformed validation and ledger rows beside current receipts", () => {
+  const root = workspace();
+  writeFile(root, ".agent_board/VALIDATION_LOG.md", validationLog([
+    `| ${FIXTURE_CLOSEOUT.validationId} | tests | P6 | ${FIXTURE_CLOSEOUT.taskId} synthetic closeout | COMPLETED_VALIDATED | Green Lane | none | 2026-07-27 |`,
+    "| CMV-3003 | tests | P6 | CM-3004 unescaped | scope | COMPLETED_VALIDATED | extra | none | 2026-07-28 |"
+  ]));
+  writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger([
+    `| ${FIXTURE_CLOSEOUT.taskId} | synthetic | Yellow | closeout | complete | receipt | ${FIXTURE_CLOSEOUT.validationId} | zero | 0 | completed_validated | 2026-07-27 |`,
+    "| CM-3004 | extra | Yellow | closeout | complete | receipt | with | pipe | CMV-3003 | zero | 0 | completed_validated | 2026-07-28 |"
+  ]));
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG must not contain malformed CM\/CMV data rows/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must not contain malformed CM\/CMV data rows/);
+});
+
+test("current facts validator rejects changed active-table headers", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    ".agent_board/TASK_QUEUE.md",
+    queue().replace("| ID | Priority | Status |", "| ID | Priority | State |")
+  );
+  writeFile(
+    root,
+    ".agent_board/VALIDATION_LOG.md",
+    validationLog().replace("| ID | Command / Check | Area | Scope |", "| ID | Command / Check | Area | Target |")
+  );
+  writeFile(
+    root,
+    ".agent_board/AUTOPILOT_LEDGER.md",
+    ledger().replace("| ID | Goal | Lane |", "| ID | Objective | Lane |")
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /TASK_QUEUE must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /VALIDATION_LOG must retain its exact table header and separator/);
+  assert.match(result.failures.join("\n"), /AUTOPILOT_LEDGER must retain its exact table header and separator/);
+});
+
 test("current facts validator accepts exactly one selected active queue row", () => {
   const root = workspace();
   const changed = facts();
@@ -492,7 +737,7 @@ test("current facts validator fails closed when baseline objects are unreadable"
   };
   const result = validateCurrentFactsDrift(root, { gitRunner });
   assert.equal(result.ok, false);
-  assert.match(result.failures.join("\n"), /history baseline object is not readable/);
+  assert.match(result.failures.join("\n"), /required Git object is not readable/);
 });
 
 test("current facts validator keeps the fixed CM-2155 closeout only in the history index", () => {

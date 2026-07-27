@@ -5,7 +5,9 @@ const childProcess = require("child_process");
 const fs = require("fs");
 const path = require("path");
 const {
+  TABLE_HEADERS,
   containsExactIdToken,
+  hasExactTableShape,
   parseMarkdownTable
 } = require("./validate_autopilot_ledger_consistency");
 
@@ -14,15 +16,12 @@ const ACTIVE_END = "<!-- CURRENT-FACTS-ACTIVE-END -->";
 const FACTS_PATH = ".agent_board/CURRENT_FACTS.json";
 const SCHEMA_VERSION = 5;
 const FACTS_MODE = "committed_status_snapshot";
-const ACCEPTED_BASELINE = Object.freeze({
-  prNumber: 61,
-  reviewedHead: "4680b4c198a71bb9e61d7bc1f21c0b77a1769fd9",
-  mergeCommit: "ef62d4819ece3d93cb90e2d55fa84973cf43b7d1",
-  ciRunId: "30238902177"
-});
+const HISTORY_BASELINE_COMMIT = "ef62d4819ece3d93cb90e2d55fa84973cf43b7d1";
 const SHA40_RE = /^[0-9a-f]{40}$/;
 const CM_RE = /^CM-\d{4}$/;
 const CMV_RE = /^CMV-\d{4}$/;
+const BLOCKER_ID_RE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
+const BLOCKER_STATUS_RE = /^[a-z][a-z0-9_]*$/;
 
 const EXPECTED_TOP_LEVEL_KEYS = Object.freeze([
   "schemaVersion",
@@ -79,12 +78,6 @@ const HISTORY_RECOVERY_PATHS = Object.freeze([
   ".agent_board/TASK_QUEUE.md",
   ".agent_board/CURRENT_FACTS.json",
   "STATUS.md"
-]);
-const REQUIRED_BLOCKERS = Object.freeze([
-  "canonical_observer_not_wired",
-  "r5_h_matrix_incomplete",
-  "r5_o_private_exact_head_runtime_unverified",
-  "fresh_non_empty_task_context_relevance_unproven"
 ]);
 const STALE_ACTIVE_PHRASES = Object.freeze([
   "CI must rerun",
@@ -150,6 +143,32 @@ function sameStringSet(actual, expected) {
   return Array.isArray(actual) &&
     actual.length === expected.length &&
     [...actual].sort().join("\n") === [...expected].sort().join("\n");
+}
+
+function sameObjectKeys(actual, expected) {
+  return actual && typeof actual === "object" && !Array.isArray(actual) &&
+    sameStringSet(Object.keys(actual), expected);
+}
+
+function blockerFingerprint(blocker) {
+  return JSON.stringify([
+    blocker && blocker.id,
+    blocker && blocker.status,
+    blocker && blocker.summary
+  ]);
+}
+
+function extractHeadingSection(text, heading, nextHeading) {
+  const startMarker = `## ${heading}`;
+  const endMarker = `## ${nextHeading}`;
+  const start = String(text).indexOf(startMarker);
+  const end = String(text).indexOf(endMarker, start + startMarker.length);
+  if (start < 0 || end < 0 || end <= start) return "";
+  return String(text).slice(start + startMarker.length, end).trim();
+}
+
+function stripInlineCode(value) {
+  return String(value || "").replace(/^`|`$/g, "").trim();
 }
 
 function loadModuleFresh(modulePath) {
@@ -236,14 +255,19 @@ function validateCurrentFactsSchema(facts, root, failures) {
   }
 
   const baseline = facts.acceptedProductBaseline;
-  for (const [field, expected] of Object.entries(ACCEPTED_BASELINE)) {
-    if (!baseline || baseline[field] !== expected) {
-      failures.push(`acceptedProductBaseline.${field} must equal the accepted PR #61 baseline`);
+  if (!sameObjectKeys(baseline, ["prNumber", "reviewedHead", "mergeCommit", "ciRunId"])) {
+    failures.push("acceptedProductBaseline must contain exactly prNumber, reviewedHead, mergeCommit, and ciRunId");
+  } else {
+    if (!Number.isInteger(baseline.prNumber) || baseline.prNumber <= 0) {
+      failures.push("acceptedProductBaseline.prNumber must be a positive integer");
     }
-  }
-  if (baseline && (!SHA40_RE.test(String(baseline.reviewedHead || "")) ||
-      !SHA40_RE.test(String(baseline.mergeCommit || "")))) {
-    failures.push("accepted product baseline commit anchors must be 40-char lowercase SHAs");
+    if (!SHA40_RE.test(String(baseline.reviewedHead || "")) ||
+        !SHA40_RE.test(String(baseline.mergeCommit || ""))) {
+      failures.push("accepted product baseline commit anchors must be 40-char lowercase SHAs");
+    }
+    if (!/^\d+$/.test(String(baseline.ciRunId || ""))) {
+      failures.push("acceptedProductBaseline.ciRunId must contain decimal digits");
+    }
   }
 
   const source = loadSourceContractFacts(root, failures);
@@ -285,22 +309,29 @@ function validateCurrentFactsSchema(facts, root, failures) {
     failures.push("source dogfood observation schema version must match CURRENT_FACTS");
   }
 
-  if (!Array.isArray(facts.blockers) || facts.blockers.length !== REQUIRED_BLOCKERS.length) {
-    failures.push("blockers must contain exactly the four open product blockers");
+  if (!Array.isArray(facts.blockers) || facts.blockers.length > 30) {
+    failures.push("blockers must be an array with at most 30 current entries");
   } else {
-    const blockerIds = facts.blockers.map((item) => item && item.id);
-    if (!sameStringSet(blockerIds, REQUIRED_BLOCKERS)) {
-      failures.push("blocker ids do not match the required open blocker set");
-    }
+    const blockerIds = new Set();
     for (const blocker of facts.blockers) {
-      if (!blocker || blocker.status !== "open" || typeof blocker.summary !== "string" || !blocker.summary) {
-        failures.push("every blocker must be open and include a summary");
+      if (!sameObjectKeys(blocker, ["id", "status", "summary"]) ||
+          !BLOCKER_ID_RE.test(String(blocker && blocker.id || "")) ||
+          !BLOCKER_STATUS_RE.test(String(blocker && blocker.status || "")) ||
+          typeof blocker.summary !== "string" ||
+          !blocker.summary.trim()) {
+        failures.push("every blocker must contain a valid id, status, and non-empty summary");
+        continue;
+      }
+      if (blockerIds.has(blocker.id)) {
+        failures.push(`blocker ids must be unique: ${blocker.id}`);
+      } else {
+        blockerIds.add(blocker.id);
       }
     }
   }
 
   const history = facts.history;
-  if (!history || history.baselineCommit !== ACCEPTED_BASELINE.mergeCommit ||
+  if (!history || history.baselineCommit !== HISTORY_BASELINE_COMMIT ||
       history.indexPath !== HISTORY_INDEX_PATH ||
       !sameStringSet(history.recoverablePaths, HISTORY_RECOVERY_PATHS)) {
     failures.push("history must bind the fixed baseline, index, and recoverable paths");
@@ -358,6 +389,67 @@ function validateAuthoritySurfaces(root, facts, failures) {
     failures.push("CURRENT_STATE last completed pair must match CURRENT_FACTS.lastCompleted");
   }
 
+  const baselineSection = extractHeadingSection(
+    active,
+    "Last Accepted Product Baseline",
+    "Open Blockers"
+  );
+  const malformedBaselineRows = [];
+  const baselineDiagnostics = {};
+  const baselineRows = parseMarkdownTable(baselineSection, {
+    diagnostics: baselineDiagnostics,
+    malformedRows: malformedBaselineRows,
+    trackBeforeHeader: false,
+    trackedRowPattern: /^\|/
+  });
+  const baselineFields = new Map(
+    baselineRows.map((row) => [stripInlineCode(row.Field), stripInlineCode(row["Accepted value"])])
+  );
+  const baseline = facts.acceptedProductBaseline || {};
+  const observationVersion = facts.contracts &&
+    facts.contracts.dogfoodObservation &&
+    facts.contracts.dogfoodObservation.schemaVersion;
+  const expectedBaselineFields = new Map([
+    ["Pull request", `#${baseline.prNumber}`],
+    ["Reviewed head", String(baseline.reviewedHead || "")],
+    ["Merge commit", String(baseline.mergeCommit || "")],
+    ["Main CI run", String(baseline.ciRunId || "")],
+    ["Private dogfood observation schema", String(observationVersion || "")]
+  ]);
+  if (!hasExactTableShape(baselineDiagnostics, ["Field", "Accepted value"]) ||
+      malformedBaselineRows.length > 0 ||
+      baselineRows.length !== expectedBaselineFields.size ||
+      baselineFields.size !== expectedBaselineFields.size ||
+      [...expectedBaselineFields].some(([field, expected]) => baselineFields.get(field) !== expected)) {
+    failures.push("CURRENT_STATE accepted product baseline must match CURRENT_FACTS and observation schema");
+  }
+
+  const blockersSection = extractHeadingSection(active, "Open Blockers", "Next Safe Action");
+  const blockerLines = blockersSection.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const stateBlockers = [];
+  let malformedBlockerLine = false;
+  for (const line of blockerLines) {
+    if (line === "No current blockers.") continue;
+    const match = line.match(/^- `([^`]+)` \[([a-z][a-z0-9_]*)\]: (.+)$/);
+    if (!match) {
+      malformedBlockerLine = true;
+      continue;
+    }
+    stateBlockers.push({ id: match[1], status: match[2], summary: match[3] });
+  }
+  const factsBlockers = Array.isArray(facts.blockers) ? facts.blockers : [];
+  const emptyBlockerDeclarationInvalid = factsBlockers.length === 0
+    ? blockerLines.length !== 1 || blockerLines[0] !== "No current blockers."
+    : blockerLines.includes("No current blockers.");
+  if (malformedBlockerLine ||
+      emptyBlockerDeclarationInvalid ||
+      !sameStringSet(
+        stateBlockers.map(blockerFingerprint),
+        factsBlockers.map(blockerFingerprint)
+      )) {
+    failures.push("CURRENT_STATE blockers must exactly match CURRENT_FACTS.blockers");
+  }
+
   for (const relativePath of POINTER_FILES) {
     const text = readText(root, relativePath, failures);
     if (!text.includes("CURRENT_STATE.md")) {
@@ -387,16 +479,45 @@ function validateQueueAndReceipts(root, facts, failures) {
   const validationText = readText(root, ".agent_board/VALIDATION_LOG.md", failures);
   const ledgerText = readText(root, ".agent_board/AUTOPILOT_LEDGER.md", failures);
   const malformedQueueRows = [];
+  const malformedValidationRows = [];
+  const malformedLedgerRows = [];
+  const queueDiagnostics = {};
+  const validationDiagnostics = {};
+  const ledgerDiagnostics = {};
   const queueRows = parseMarkdownTable(queueText, {
+    diagnostics: queueDiagnostics,
     malformedRows: malformedQueueRows,
     trackedRowPattern: /\bCM-\d{4}\b/
   });
-  const validationRows = parseMarkdownTable(validationText);
-  const ledgerRows = parseMarkdownTable(ledgerText);
+  const validationRows = parseMarkdownTable(validationText, {
+    diagnostics: validationDiagnostics,
+    malformedRows: malformedValidationRows,
+    trackedRowPattern: /\b(?:CMV|CM)-\d{4}\b/
+  });
+  const ledgerRows = parseMarkdownTable(ledgerText, {
+    diagnostics: ledgerDiagnostics,
+    malformedRows: malformedLedgerRows,
+    trackedRowPattern: /\b(?:CMV|CM)-\d{4}\b/
+  });
 
   if (queueRows.length > 30) failures.push("TASK_QUEUE active row budget exceeded");
+  for (const [name, diagnostics, expectedHeader] of [
+    ["TASK_QUEUE", queueDiagnostics, TABLE_HEADERS.taskQueue],
+    ["VALIDATION_LOG", validationDiagnostics, TABLE_HEADERS.validationLog],
+    ["AUTOPILOT_LEDGER", ledgerDiagnostics, TABLE_HEADERS.ledger]
+  ]) {
+    if (!hasExactTableShape(diagnostics, expectedHeader)) {
+      failures.push(`${name} must retain its exact table header and separator`);
+    }
+  }
   if (malformedQueueRows.length > 0) {
     failures.push("TASK_QUEUE must not contain malformed CM data rows");
+  }
+  if (malformedValidationRows.length > 0) {
+    failures.push("VALIDATION_LOG must not contain malformed CM/CMV data rows");
+  }
+  if (malformedLedgerRows.length > 0) {
+    failures.push("AUTOPILOT_LEDGER must not contain malformed CM/CMV data rows");
   }
   const doneRows = queueRows.filter((row) => String(row.Status || "").trim().toLowerCase() === "done");
   if (doneRows.length > 0) failures.push("TASK_QUEUE must not contain done rows");
@@ -468,10 +589,10 @@ function defaultGitRunner(root, args) {
 
 function validateHistory(root, facts, failures, options) {
   const index = readText(root, HISTORY_INDEX_PATH, failures);
-  if (!index.includes(ACCEPTED_BASELINE.mergeCommit) ||
+  if (!index.includes(HISTORY_BASELINE_COMMIT) ||
       !index.includes(`Governance reset task: \`${HISTORY_RESET_CLOSEOUT.taskId}\``) ||
       !index.includes(`Governance reset validation: \`${HISTORY_RESET_CLOSEOUT.validationId}\``) ||
-      !index.includes(`git show ${ACCEPTED_BASELINE.mergeCommit}:CURRENT_STATE.md`) ||
+      !index.includes(`git show ${HISTORY_BASELINE_COMMIT}:CURRENT_STATE.md`) ||
       !index.includes("git log --follow") ||
       !index.includes("git blame")) {
     failures.push("history index must contain the fixed reset closeout, baseline, and recovery commands");
@@ -480,17 +601,42 @@ function validateHistory(root, facts, failures, options) {
   const gitRunner = options.gitRunner || defaultGitRunner;
   const inside = gitRunner(root, ["rev-parse", "--is-inside-work-tree"]);
   if (inside && inside.status === 0 && String(inside.stdout || "").trim() === "true") {
-    const baseline = facts.history && facts.history.baselineCommit;
+    const productBaseline = facts.acceptedProductBaseline || {};
+    const baseBranchRef = `refs/remotes/origin/${facts.baseBranch}`;
     const checks = [
-      `${baseline}^{commit}`,
-      `${ACCEPTED_BASELINE.reviewedHead}^{commit}`,
-      ...HISTORY_RECOVERY_PATHS.map((relativePath) => `${baseline}:${relativePath}`)
+      `${HISTORY_BASELINE_COMMIT}^{commit}`,
+      `${productBaseline.reviewedHead}^{commit}`,
+      `${productBaseline.mergeCommit}^{commit}`,
+      `${baseBranchRef}^{commit}`,
+      ...HISTORY_RECOVERY_PATHS.map((relativePath) =>
+        `${HISTORY_BASELINE_COMMIT}:${relativePath}`
+      )
     ];
     for (const objectName of checks) {
       const result = gitRunner(root, ["cat-file", "-e", objectName]);
       if (!result || result.status !== 0) {
-        failures.push(`history baseline object is not readable: ${objectName}`);
+        failures.push(`required Git object is not readable: ${objectName}`);
       }
+    }
+    for (const [ancestor, descendant, label] of [
+      [
+        HISTORY_BASELINE_COMMIT,
+        productBaseline.mergeCommit,
+        "accepted product merge must descend from the pre-compaction history baseline"
+      ],
+      [
+        productBaseline.reviewedHead,
+        productBaseline.mergeCommit,
+        "accepted product reviewed head must be an ancestor of its merge commit"
+      ],
+      [
+        productBaseline.mergeCommit,
+        baseBranchRef,
+        "accepted product merge must already be an ancestor of origin/main"
+      ]
+    ]) {
+      const result = gitRunner(root, ["merge-base", "--is-ancestor", ancestor, descendant]);
+      if (!result || result.status !== 0) failures.push(label);
     }
   }
 }
@@ -526,12 +672,12 @@ if (require.main === module) {
 }
 
 module.exports = {
-  ACCEPTED_BASELINE,
   ACTIVE_END,
   ACTIVE_START,
   ACTIVE_SURFACE_FILES,
   EXPECTED_TOP_LEVEL_KEYS,
   FACTS_PATH,
+  HISTORY_BASELINE_COMMIT,
   HISTORY_INDEX_PATH,
   HISTORY_RECOVERY_PATHS,
   HISTORY_RESET_CLOSEOUT,

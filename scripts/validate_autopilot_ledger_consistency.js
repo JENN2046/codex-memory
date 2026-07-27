@@ -7,6 +7,44 @@ const path = require("path");
 const FACTS_PATH = ".agent_board/CURRENT_FACTS.json";
 const SCHEMA_VERSION = 5;
 const COMPLETED_RESULT_RE = /^completed/i;
+const TABLE_HEADERS = Object.freeze({
+  taskQueue: Object.freeze([
+    "ID",
+    "Priority",
+    "Status",
+    "Area",
+    "Risk",
+    "Target Files",
+    "Task",
+    "Required Validation",
+    "Rollback Check",
+    "Gate Required",
+    "Notes"
+  ]),
+  validationLog: Object.freeze([
+    "ID",
+    "Command / Check",
+    "Area",
+    "Scope",
+    "Result",
+    "Summary",
+    "Follow-up",
+    "Date"
+  ]),
+  ledger: Object.freeze([
+    "ID",
+    "Goal",
+    "Lane",
+    "Envelope",
+    "Action",
+    "Receipt",
+    "Validation",
+    "Budget Used",
+    "Red Stops",
+    "Result",
+    "Date"
+  ])
+});
 
 function readText(root, relativePath, failures) {
   const fullPath = path.join(root, relativePath);
@@ -34,12 +72,22 @@ function parseMarkdownTable(text, options = {}) {
   const trackedRowPattern = options.trackedRowPattern instanceof RegExp
     ? options.trackedRowPattern
     : null;
+  const diagnostics = options.diagnostics &&
+    typeof options.diagnostics === "object" &&
+    !Array.isArray(options.diagnostics)
+    ? options.diagnostics
+    : null;
   let header = null;
   const rows = [];
 
   for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
     const line = lines[lineIndex].trim();
     let acceptedDataRow = false;
+    let trackedLine = false;
+    if (trackedRowPattern) {
+      trackedRowPattern.lastIndex = 0;
+      trackedLine = trackedRowPattern.test(line);
+    }
 
     if (line.startsWith("|") && line.endsWith("|")) {
       const body = line.slice(1, -1);
@@ -63,25 +111,42 @@ function parseMarkdownTable(text, options = {}) {
       cells.push(current.trim());
 
       if (!header) {
+        if (malformedRows && trackedLine && options.trackBeforeHeader !== false) {
+          malformedRows.push({ line: lineIndex + 1 });
+          continue;
+        }
         header = cells;
+        if (diagnostics) diagnostics.header = [...cells];
         continue;
       }
-      if (cells.every((cell) => /^:?-{3,}:?$/.test(cell))) continue;
+      if (cells.every((cell) => /^:?-{3,}:?$/.test(cell))) {
+        if (diagnostics) diagnostics.separatorFound = cells.length === header.length;
+        continue;
+      }
+      if (diagnostics && diagnostics.separatorFound !== true) {
+        if (malformedRows && trackedLine) malformedRows.push({ line: lineIndex + 1 });
+        continue;
+      }
       if (cells.length === header.length) {
         rows.push(Object.fromEntries(header.map((name, index) => [name, cells[index]])));
         acceptedDataRow = true;
       }
     }
 
-    if (!acceptedDataRow && header && malformedRows && trackedRowPattern) {
-      trackedRowPattern.lastIndex = 0;
-      if (trackedRowPattern.test(line)) {
-        malformedRows.push({ line: lineIndex + 1 });
-      }
+    if (!acceptedDataRow && malformedRows && trackedLine) {
+      malformedRows.push({ line: lineIndex + 1 });
     }
   }
 
   return rows;
+}
+
+function hasExactTableShape(diagnostics, expectedHeader) {
+  return diagnostics &&
+    diagnostics.separatorFound === true &&
+    Array.isArray(diagnostics.header) &&
+    diagnostics.header.length === expectedHeader.length &&
+    diagnostics.header.every((cell, index) => cell === expectedHeader[index]);
 }
 
 function normalizedId(value) {
@@ -97,18 +162,47 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
   const failures = [];
   const facts = readFacts(root, failures);
   const malformedTaskRows = [];
+  const malformedValidationRows = [];
+  const malformedLedgerRows = [];
+  const taskQueueDiagnostics = {};
+  const validationLogDiagnostics = {};
+  const ledgerDiagnostics = {};
   const taskQueue = parseMarkdownTable(
     readText(root, ".agent_board/TASK_QUEUE.md", failures),
     {
+      diagnostics: taskQueueDiagnostics,
       malformedRows: malformedTaskRows,
       trackedRowPattern: /\bCM-\d{4}\b/
     }
   );
-  const validationLog = parseMarkdownTable(readText(root, ".agent_board/VALIDATION_LOG.md", failures));
-  const ledger = parseMarkdownTable(readText(root, ".agent_board/AUTOPILOT_LEDGER.md", failures));
+  const validationLog = parseMarkdownTable(
+    readText(root, ".agent_board/VALIDATION_LOG.md", failures),
+    {
+      diagnostics: validationLogDiagnostics,
+      malformedRows: malformedValidationRows,
+      trackedRowPattern: /\b(?:CMV|CM)-\d{4}\b/
+    }
+  );
+  const ledger = parseMarkdownTable(
+    readText(root, ".agent_board/AUTOPILOT_LEDGER.md", failures),
+    {
+      diagnostics: ledgerDiagnostics,
+      malformedRows: malformedLedgerRows,
+      trackedRowPattern: /\b(?:CMV|CM)-\d{4}\b/
+    }
+  );
 
   if (!facts || facts.schemaVersion !== SCHEMA_VERSION) {
     failures.push(`CURRENT_FACTS schemaVersion must be ${SCHEMA_VERSION}`);
+  }
+  for (const [name, diagnostics, expectedHeader] of [
+    ["TASK_QUEUE", taskQueueDiagnostics, TABLE_HEADERS.taskQueue],
+    ["VALIDATION_LOG", validationLogDiagnostics, TABLE_HEADERS.validationLog],
+    ["AUTOPILOT_LEDGER", ledgerDiagnostics, TABLE_HEADERS.ledger]
+  ]) {
+    if (!hasExactTableShape(diagnostics, expectedHeader)) {
+      failures.push(`${name} must retain its exact table header and separator`);
+    }
   }
 
   const lastCompleted = facts && facts.lastCompleted;
@@ -127,6 +221,12 @@ function validateAutopilotLedgerConsistency(root = process.cwd()) {
   }
   if (malformedTaskRows.length > 0) {
     failures.push("TASK_QUEUE must not contain malformed CM data rows");
+  }
+  if (malformedValidationRows.length > 0) {
+    failures.push("VALIDATION_LOG must not contain malformed CM/CMV data rows");
+  }
+  if (malformedLedgerRows.length > 0) {
+    failures.push("AUTOPILOT_LEDGER must not contain malformed CM/CMV data rows");
   }
   const allowedActiveStatuses = new Set(["todo", "in_progress"]);
   const invalidStatusRows = taskQueue.filter((row) =>
@@ -218,7 +318,9 @@ if (require.main === module) {
 
 module.exports = {
   FACTS_PATH,
+  TABLE_HEADERS,
   containsExactIdToken,
+  hasExactTableShape,
   parseMarkdownTable,
   validateAutopilotLedgerConsistency
 };
