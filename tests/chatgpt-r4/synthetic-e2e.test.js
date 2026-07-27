@@ -121,7 +121,7 @@ test('context resolution returns signed low-disclosure denials without a context
   }
 });
 
-test('missing visibility returns a receipt-bound denial before context issuance', async () => {
+test('missing visibility is rejected by the request contract before context issuance', async () => {
   const result = await runZeroMemorySyntheticE2E();
   const contextResolutionCount = result.internal.observations.context_resolutions;
   const request = buildCandidateEdgeRequest({
@@ -134,19 +134,11 @@ test('missing visibility returns a receipt-bound denial before context issuance'
     signing: signing(result.internal.identities.edgeIdentity)
   });
 
-  const response = await result.internal.relay.handle(request);
-
-  assert.equal(response.status, 'denied');
-  assert.deepEqual(response.structured_content, { context_status: 'denied' });
-  assert.deepEqual(response.counters, ZERO_MEMORY_COUNTERS);
+  await assert.rejects(result.internal.relay.handle(request), {
+    code: 'tool_arguments_shape_invalid'
+  });
   assert.equal(result.internal.observations.context_resolutions, contextResolutionCount);
   assert.equal(result.internal.contextStore.size, 1);
-  assert.doesNotThrow(() => validateResponseEnvelope(response, {
-    now: result.internal.clock(),
-    resolveResponsePublicKey: keyResolver(result.internal.identities.relayIdentity),
-    expectedRequest: request,
-    requireZeroCounters: true
-  }));
 });
 
 test('Relay receipt is exact, request-bound, and proves replay checking without claiming a rejection', () => {

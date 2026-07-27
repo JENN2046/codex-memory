@@ -37,7 +37,8 @@ function validateDelay(value) {
 
 function isAvailabilityError(code) {
   return code === 'relay_edge_unavailable' || code === 'relay_edge_timeout' ||
-    code === 'relay_uds_unavailable' || code === 'relay_uds_timeout';
+    code === 'relay_uds_unavailable' || code === 'relay_uds_timeout' ||
+    code === 'relay_uds_response_incomplete';
 }
 
 function safeError(code) {

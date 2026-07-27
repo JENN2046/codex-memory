@@ -4,32 +4,44 @@
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 
-Current task: `CM-2153 ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection`.
-Current validation: `CMV-2238`.
-Current fact: private runtime preparation proves exact mapping-bound, read-only selected-diary shim capabilities before binding; verified pre-provider mapping failure no longer masquerades as transport timeout.
-No runtime/provider/private-config/memory action occurred; the six public schemas and prior owner-only artifacts remain unchanged and Edge remains zero-memory.
+Current task: `CM-2154 ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility Contract`.
+Current validation: `CMV-2239`.
+Current fact: the outbound Relay now correlates asynchronous UDS completion to the originating request, model routing is explicit, and `resolve_memory_context.requested_visibility` is a required public input.
+No runtime/provider/private-config/memory action occurred; the six public tool names remain unchanged, one public input schema is intentionally tightened without tool expansion, and Edge remains zero-memory.
 Production/release/deploy/cutover/RC/complete-V8/readiness remain false.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
 
 ## Active Handoff
 
-CM-2153 implements R5-N source hardening. Private runtime preparation probes
-`initialize` and `tools/list` before binding, verifies exact read-only
-selected-diary capabilities and a full mapping reference-plus-digest
-fingerprint, and rejects missing/mismatched/writable/drifted targets.
+CM-2154 records the complete R5-O scope in PR #61. The outbound Relay keeps a
+response inside the accepted request's remaining lifetime and uses a
+`15000 ms` UDS budget. Incomplete UDS input
+keeps the daemon available/backing off but does not replay the acknowledged
+one-read request. The injectable observer library classifies the latest mixed
+lifecycle state and local completion uncertainty; the canonical service does
+not yet wire or expose it.
 
-Only fully evidenced pre-provider mapping failures project receipt-bound
-`unavailable`; unsafe evidence remains fail-closed and genuine transport
-failures stay terminal. The Widget consumes both ChatGPT host globals and MCP
-Apps tool-result notifications.
+ChatGPT instructions and tool metadata route only to capabilities present in
+the public output schema. Only `search_memory` returns stored content; overview,
+audit, and task-start outputs are bounded to status, kind, and response
+`item_count`.
 
-Targeted, all R4/R5, default, hardening, and CI-safe gates pass. Strict
-contract/test/compare/rollback pass; strict overall remains non-pass only
-because the inactive loopback health service was not started. No service,
-provider, real-memory, private-config, or VCP core action ran; Edge remains
-`zero_memory`. Deliver through normal PR CI/review. An exact-head private
-runtime behavior check is a separate authorization boundary.
+The public surface still has six tool names, but its contract is not unchanged.
+`resolve_memory_context.inputSchema.required` changes from
+`["project_alias"]` to `["project_alias", "requested_visibility"]`; its canonical
+digest changes from
+`sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6`
+to
+`sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf`.
+Callers that omit visibility now fail public schema validation before context
+issuance. This is an intentional compatibility tightening without tool
+expansion. It narrows the accepted signed schema-v1 argument set; rollout is
+Edge first/Relay last and rollback is Relay first/Edge last.
+
+No service, provider, real-memory, private-config, or VCP core action ran; Edge
+remains `zero_memory`. Complete independent public-contract review and normal
+PR CI/review before Jenn makes a separate merge decision.
 
 The prior CM-2149/R5-H artifact remains immutable. Its observed 10/10 task mix
 still does not satisfy the frozen 12/8 matrix; no session was reclassified or
@@ -39,7 +51,7 @@ release, deploy, cutover, or readiness.
 ## Historical Handoff Context
 
 The entries below are retained as chronology only. They are not current route
-instructions; CM-2153 and the zero-memory-preservation boundary above control.
+instructions; CM-2154 and the zero-memory-preservation boundary above control.
 
 CM-2139 implements the D2A external Edge artifact without activation. The
 official SDK MCP runtime, Auth0 verifier, PRMD, immutable Widget resource,

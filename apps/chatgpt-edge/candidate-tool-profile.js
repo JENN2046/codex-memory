@@ -24,20 +24,13 @@ const IDEMPOTENT_READ_ONLY_ANNOTATIONS = deepFreeze({
 });
 const SECURITY_SCHEMES = deepFreeze([{ type: 'oauth2', scopes: ['memory.read'] }]);
 const MODEL_WORKFLOW_INSTRUCTIONS = [
-  'Use these tools only for an explicit project-memory request. Do not call any codex-memory tool for rewriting, translation, scheduling, general advice, or another memory-irrelevant task.',
-  'A memory workflow requires an exact registered project_alias and one exact requested_visibility supplied by the user or trusted task context. If either value is missing, ask one concise clarification and call no tool.',
-  'When the user or trusted task context explicitly labels a value as project_alias, copy it verbatim even if it matches an App, connector, or repository name.',
-  'An unlabelled App display name, connector name, URL, client identifier, workspace name, or repository name is not a project_alias. Never use current, default, this-project, or another sentinel as an alias.',
-  'Never choose task_start_context as a default or describe it as minimal disclosure.',
-  'Before one read, call resolve_memory_context exactly once. Copy project_alias and requested_visibility exactly from the user-provided task context; never invent, normalize, suffix, enumerate, or probe alternatives.',
-  'After a resolved context, choose exactly one read tool: memory_overview for counts or status; search_memory for one specific semantic fact; audit_memory for bounded access or receipt categories; prepare_memory_context for a task-start context package.',
-  'The first read attempt consumes this workflow, even when it returns empty, denied, unavailable, or a transport error.',
-  'After any read result or transport error, stop all codex-memory tool use immediately and answer the user; do not call another read tool or resolve again, and do not call render_memory_scope.',
-  'Report only the receipt-backed result category or the single transport failure actually returned; never invent retry counts or claim another attempt occurred.',
-  'A found search result is a retrieval candidate, not proof by itself. Treat relevance 0.5 as low-confidence and inconclusive unless the returned summary explicitly supports the requested fact.',
-  'Receipt-bound denied or unavailable means a governed result receipt exists even when no usable project context was issued; it is not a transport failure.',
+  'No tool for rewriting, translation, formatting, math, checklists, summaries of user text, or echoing supplied scope.',
+  'Memory retrieval needs explicitly labelled project_alias and requested_visibility. If either is missing, ask only for missing values; call no tool.',
+  'Select one read: stored fact/record/content → search_memory; overview status/item_count → memory_overview; audit status/item_count → audit_memory; named task-start status/item_count → prepare_memory_context.',
+  'Read tools do not return access, receipt, scope, or visibility details. Overview, audit, and task-start outputs contain only bounded status, kind, and response item_count.',
+  'With both values present, call resolve_memory_context once, wait for project_context_ref, call the chosen read once, then answer. A denied, unavailable, empty, low-confidence, or error result is terminal.',
+  'Treat current, default, this project, and unlabelled App or repository names as absent; a labelled alias may match those names. Copy both labelled values exactly. Use only returned fields; never infer another tool status or loaded memory.',
   'render_memory_scope is component-only and unavailable to the model.',
-  'Never infer that memory was loaded without a tool result.'
 ].join(' ');
 
 function descriptor({
@@ -74,12 +67,12 @@ function descriptor({
 
 const toolDescriptors = deepFreeze({
   resolve_memory_context: descriptor({
-    title: 'Resolve memory project context',
-    description: 'Use this when an explicit project-memory request includes both an exact registered project alias and an exact visibility, and a short-lived governed context reference is required before one memory read. Copy both values verbatim and call once. If the user or trusted task context explicitly labels a value as project_alias, accept it verbatim even when it matches an App, connector, or repository name. An unlabelled App name, connector name, URL, client identifier, workspace name, opaque reference, or repository name is not a project alias. Never use current, default, this-project, or another sentinel; never guess or probe alternative aliases or visibilities. Never infer task_start_context as a default or call this tool to discover missing scope. If either exact value is missing, ask one concise clarification and call no tool. A denied, unavailable, or error result is terminal and must not be retried.',
+    title: 'Resolve exact memory scope',
+    description: 'Use this when the current request explicitly supplies both exact project_alias and requested_visibility for stored-memory retrieval. Copy both values exactly and call once before one preselected read to obtain project_context_ref. If either value is absent, ask for it and call no tool.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
-      required: ['project_alias'],
+      required: ['project_alias', 'requested_visibility'],
       properties: {
         project_alias: { type: 'string', minLength: 1, maxLength: 80, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' },
         requested_visibility: { enum: CONTEXT_VISIBILITIES }
@@ -93,14 +86,14 @@ const toolDescriptors = deepFreeze({
     }
   }),
   memory_overview: descriptor({
-    title: 'View memory overview',
-    description: 'Use this when a valid project_context_ref exists and the user needs only a bounded low-disclosure count or status overview. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
+    title: 'Get overview availability and item count',
+    description: 'Use this when resolve_memory_context just returned project_context_ref and the requested output is only the overview response status and item_count. It does not return memory-category counts, access, receipts, scope, or visibility details. Call once and answer from the first result.',
     inputSchema: contextInputSchema(),
     outputSchema: boundedStatusSchema('overview')
   }),
   search_memory: descriptor({
-    title: 'Search governed project memory',
-    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware semantic fact. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
+    title: 'Find one historical memory record',
+    description: 'Use this when resolve_memory_context just returned project_context_ref and the requested output is one stored past fact, decision, event, or record. Historical records still use this tool when their subject contains audit, receipt, or canary. Call once with one bounded query and answer from the first result.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -136,8 +129,8 @@ const toolDescriptors = deepFreeze({
     }
   }),
   audit_memory: descriptor({
-    title: 'Audit governed memory access',
-    description: 'Use this when a valid project_context_ref exists and the user needs only bounded low-disclosure access or receipt categories. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
+    title: 'Get audit availability and item count',
+    description: 'Use this when resolve_memory_context just returned project_context_ref and the requested output is only the bounded audit response status and item_count. It does not return access, receipt, scope, visibility, or event details. Historical audit or receipt records use search_memory. Call once and answer from the first result.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,
@@ -150,8 +143,8 @@ const toolDescriptors = deepFreeze({
     outputSchema: boundedStatusSchema('audit')
   }),
   prepare_memory_context: descriptor({
-    title: 'Prepare governed task context',
-    description: 'Use this when a valid project_context_ref exists and the user needs one bounded project-aware task-start context package. Choose this as the sole read tool for the task. Its first attempt consumes the one-read workflow; after any result or error, answer the user and do not call another memory read or resolve again; do not switch read tools.',
+    title: 'Check named task-start context availability',
+    description: 'Use this when resolve_memory_context just returned project_context_ref and the requested output is only the bounded task-start response status and item_count for a named task. It does not return context content. A stored-memory summary or fact uses search_memory instead. Call once and answer from the first result.',
     inputSchema: {
       type: 'object',
       additionalProperties: false,

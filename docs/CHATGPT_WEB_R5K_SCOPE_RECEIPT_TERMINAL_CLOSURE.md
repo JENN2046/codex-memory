@@ -12,6 +12,13 @@ formal private runtime-preparation contract.
 This stage does not activate a runtime, call a provider, read or write memory,
 change VCPToolBox core, or make a readiness claim.
 
+> Superseded contract note (R5-O): this document records the historical R5-K
+> behavior. R5-O makes `requested_visibility` required in the public
+> `resolve_memory_context` input schema. Omission now fails request-schema
+> validation before context issuance or a governed receipt; the schema is no
+> longer unchanged. See
+> `docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md`.
+
 ## Five Closed Behavior Defects
 
 ### 1. Missing scope is clarified, not guessed

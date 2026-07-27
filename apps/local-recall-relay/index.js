@@ -5,6 +5,7 @@ module.exports = {
   ...require('./relay-runtime'),
   ...require('./loopback-http-client'),
   ...require('./loopback-runtime'),
+  ...require('./low-disclosure-observer'),
   ...require('./outbound-https-client'),
   ...require('./outbound-runtime'),
   ...require('./runtime-authority'),

@@ -129,7 +129,7 @@ test('R4-C event-sink failures cannot corrupt Edge or Relay state transitions', 
   assert.equal((await harness.relayRuntime.processNext()).status, 'completed');
   assert.equal((await harness.edgeClient.result(request.request_id)).status, 'completed');
   assert.equal(edgeSinkCalls, 4);
-  assert.equal(relaySinkCalls, 5);
+  assert.equal(relaySinkCalls, 7);
 });
 
 test('R4-C cancellation between claim and acknowledgement returns a cancelled result', async t => {

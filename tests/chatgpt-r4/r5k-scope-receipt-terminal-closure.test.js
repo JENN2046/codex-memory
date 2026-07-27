@@ -30,8 +30,8 @@ const {
   preparePrivateRuntimeEnvironment
 } = require('../../src/runtime/chatgpt-r4/private-runtime-preparation');
 
-const PUBLIC_SCHEMA_DIGESTS_FROM_R5I_MAIN = Object.freeze({
-  resolve_memory_context: 'sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6',
+const EXPECTED_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
+  resolve_memory_context: 'sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf',
   memory_overview: 'sha256:a9314eb1604641ae76d95132bf73ed28c3136afe5c9a8352fb2474b695f372d1',
   search_memory: 'sha256:c301306bf253377183d8dc4d660dd09d527db4c361d8aba96137c72234f8f324',
   audit_memory: 'sha256:498956aa48b7e2c8ef30c2e1dd622fbc7df0c359786bcfc74b958d37ea2eab9f',
@@ -39,14 +39,18 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5I_MAIN = Object.freeze({
   render_memory_scope: 'sha256:07308f75e3ed7ecc950bf97c0496a598a0582194527d43a1df093223bc626a1a'
 });
 
-test('R5-K puts scope clarification and negative abstention in the first 512 instruction characters', () => {
+test('R5-K puts scope and positive read selection in the first 512 instruction characters', () => {
   const leading = MODEL_WORKFLOW_INSTRUCTIONS.slice(0, 512);
-  assert.match(leading, /only for an explicit project-memory request/u);
-  assert.match(leading, /memory-irrelevant task/u);
-  assert.match(leading, /If either value is missing, ask one concise clarification and call no tool/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never use current, default, this-project/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Never choose task_start_context as a default/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /stop all codex-memory tool use immediately/u);
+  assert.match(leading, /No tool for rewriting, translation, formatting, math, checklists/u);
+  assert.match(leading, /explicitly labelled project_alias and requested_visibility/u);
+  assert.match(leading, /If either is missing, ask only for missing values; call no tool/u);
+  assert.match(leading, /stored fact\/record\/content → search_memory/u);
+  assert.match(leading, /overview status\/item_count → memory_overview/u);
+  assert.match(leading, /audit status\/item_count → audit_memory/u);
+  assert.match(leading, /named task-start status\/item_count → prepare_memory_context/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Treat current, default, this project/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /unlabelled App or repository names as absent/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /error result is terminal/u);
   assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /render_memory_scope is component-only/u);
 });
 
@@ -66,21 +70,17 @@ test('R5-K hides the render-only tool from the model and attaches the scope widg
   );
   assert.match(
     toolDescriptors.resolve_memory_context.description,
-    /Never use current, default, this-project/u
-  );
-  assert.match(
-    toolDescriptors.resolve_memory_context.description,
-    /Never infer task_start_context as a default/u
+    /exact project_alias and requested_visibility/u
   );
 });
 
-test('R5-K preserves the six public tool names and exact input/output schemas', () => {
-  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(PUBLIC_SCHEMA_DIGESTS_FROM_R5I_MAIN));
+test('current profile keeps six tool names and matches the R5-O schema digests', () => {
+  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(EXPECTED_PUBLIC_SCHEMA_DIGESTS));
   for (const [name, descriptor] of Object.entries(toolDescriptors)) {
     assert.equal(digestObject({
       inputSchema: descriptor.inputSchema,
       outputSchema: descriptor.outputSchema
-    }), PUBLIC_SCHEMA_DIGESTS_FROM_R5I_MAIN[name], name);
+    }), EXPECTED_PUBLIC_SCHEMA_DIGESTS[name], name);
   }
 });
 
@@ -106,16 +106,60 @@ test('R5-K makes governed result receipts and transport failures unambiguous and
 
   const found = modelVisibleResultText('search_memory', {
     status: 'ok',
-    structured_content: { status: 'found', result_count: 1, results: [] }
+    structured_content: {
+      status: 'found',
+      result_count: 1,
+      results: [{
+        result_ref: `mref_${'r'.repeat(24)}`,
+        summary: 'The bounded returned fact.',
+        relevance: 0.9
+      }]
+    }
   });
-  assert.match(found, /TERMINAL RECEIPT-BOUND GOVERNED READ/u);
-  assert.match(found, /call no codex-memory tool again/u);
-  assert.match(found, /including render_memory_scope/u);
+  assert.match(found, /^FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS/u);
+  assert.match(found, /workflow is consumed/u);
+  assert.match(found, /actual returned search facts/u);
+  assert.match(found, /result_count=1/u);
+  assert.match(found, /results\[\]\.summary is retrieved content authorized for the answer/u);
+  assert.match(found, /results\[\]\.relevance is the confidence signal/u);
+  assert.doesNotMatch(found, /item_count=/u);
+  assert.match(found, /Never infer or report the status or availability of an uncalled tool/u);
+  assert.match(found, /resolve_memory_context, render_memory_scope, or another read/u);
+  assert.match(found, /Do not report or dereference result_ref/u);
+  assert.match(found, /do not run a follow-up search/u);
 
   const timeout = modelVisibleErrorText('edge_response_timeout');
-  assert.match(timeout, /^TERMINAL TRANSPORT FAILURE/u);
-  assert.match(timeout, /No receipt-bound memory result was returned/u);
-  assert.match(timeout, /do not invent attempts/u);
+  assert.match(timeout, /^TERMINAL TRANSPORT FAILURE — NO MORE TOOL CALLS/u);
+  assert.match(timeout, /receipt_bound_result=false/u);
+  assert.match(timeout, /END OF TOOL WORKFLOW — RESPOND TO THE USER NOW/u);
+});
+
+test('R5-O capability-honest bounded status routing keeps terminal closure', () => {
+  assert.match(
+    toolDescriptors.audit_memory.description,
+    /bounded audit response status and item_count/u
+  );
+  assert.match(
+    toolDescriptors.audit_memory.description,
+    /does not return access, receipt, scope, visibility, or event details/u
+  );
+  assert.match(
+    toolDescriptors.audit_memory.description,
+    /Historical audit or receipt records use search_memory/u
+  );
+  assert.match(
+    toolDescriptors.memory_overview.description,
+    /does not return memory-category counts, access, receipts, scope, or visibility details/u
+  );
+  const audit = modelVisibleResultText('audit_memory', {
+    status: 'ok',
+    structured_content: { status: 'available', kind: 'audit', item_count: 1 }
+  });
+  assert.match(audit, /tool=audit_memory/u);
+  assert.match(audit, /item_count=1/u);
+  assert.match(audit, /Omit every category not returned here/u);
+  assert.match(audit, /Never infer or report the status or availability of an uncalled tool/u);
+  assert.match(audit, /Do not call any tool to verify, supplement, expand, or fill a table/u);
 });
 
 test('R5-K projects only low-disclosure receipt presentation metadata to the widget', () => {

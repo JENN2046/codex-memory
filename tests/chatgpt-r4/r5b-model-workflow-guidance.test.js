@@ -10,8 +10,8 @@ const {
   toolDescriptors
 } = require('../../apps/chatgpt-edge');
 
-const PUBLIC_SCHEMA_DIGESTS_FROM_MAIN = Object.freeze({
-  resolve_memory_context: 'sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6',
+const EXPECTED_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
+  resolve_memory_context: 'sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf',
   memory_overview: 'sha256:a9314eb1604641ae76d95132bf73ed28c3136afe5c9a8352fb2474b695f372d1',
   search_memory: 'sha256:c301306bf253377183d8dc4d660dd09d527db4c361d8aba96137c72234f8f324',
   audit_memory: 'sha256:498956aa48b7e2c8ef30c2e1dd622fbc7df0c359786bcfc74b958d37ea2eab9f',
@@ -20,17 +20,16 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_MAIN = Object.freeze({
 });
 
 test('R5-B instructions require exact first context selection and one terminal read', () => {
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /resolve_memory_context exactly once/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Copy project_alias and requested_visibility exactly/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /never invent, normalize, suffix, enumerate, or probe alternatives/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either value is missing, ask one concise clarification/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /choose exactly one read tool/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /After any read result.+do not call another read tool or resolve again/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call resolve_memory_context once/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /explicitly labelled project_alias and requested_visibility/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either is missing, ask only for missing values; call no tool/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /Select one read/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /call the chosen read once, then answer/u);
 
   const resolveDescription = toolDescriptors.resolve_memory_context.description;
-  assert.match(resolveDescription, /both an exact registered project alias and an exact visibility/u);
-  assert.match(resolveDescription, /Copy both values verbatim/u);
-  assert.match(resolveDescription, /never guess or probe alternative aliases or visibilities/u);
+  assert.match(resolveDescription, /both exact project_alias and requested_visibility/u);
+  assert.match(resolveDescription, /Copy both values exactly and call once/u);
+  assert.match(resolveDescription, /If either value is absent, ask for it and call no tool/u);
 
   for (const toolName of [
     'memory_overview',
@@ -38,9 +37,18 @@ test('R5-B instructions require exact first context selection and one terminal r
     'audit_memory',
     'prepare_memory_context'
   ]) {
-    assert.match(toolDescriptors[toolName].description, /sole read tool/u, toolName);
-    assert.match(toolDescriptors[toolName].description, /do not call another memory read or resolve again/u, toolName);
+    assert.match(
+      toolDescriptors[toolName].description,
+      /^Use this when resolve_memory_context just returned project_context_ref/u,
+      toolName
+    );
+    assert.match(toolDescriptors[toolName].description, /Call once/u, toolName);
+    assert.match(toolDescriptors[toolName].description, /first result/u, toolName);
   }
+  assert.match(
+    toolDescriptors.search_memory.description,
+    /Historical records still use this tool when their subject contains audit, receipt, or canary/u
+  );
 
   const publicGuidance = JSON.stringify({
     instructions: MODEL_WORKFLOW_INSTRUCTIONS,
@@ -55,13 +63,13 @@ test('R5-B instructions require exact first context selection and one terminal r
   );
 });
 
-test('R5-B changes metadata and model-visible text without changing six public schemas', () => {
-  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(PUBLIC_SCHEMA_DIGESTS_FROM_MAIN));
+test('R5-B keeps the approved current public tool set and schema digests', () => {
+  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(EXPECTED_PUBLIC_SCHEMA_DIGESTS));
   for (const [name, descriptor] of Object.entries(toolDescriptors)) {
     assert.equal(digestObject({
       inputSchema: descriptor.inputSchema,
       outputSchema: descriptor.outputSchema
-    }), PUBLIC_SCHEMA_DIGESTS_FROM_MAIN[name], name);
+    }), EXPECTED_PUBLIC_SCHEMA_DIGESTS[name], name);
   }
 });
 
@@ -84,10 +92,27 @@ test('R5-B model-visible results stop retries while preserving bounded status', 
     const text = modelVisibleResultText('search_memory', {
       status,
       structured_content: status === 'ok'
-        ? { status: 'found', result_count: 1, results: [] }
+        ? {
+            status: 'found',
+            result_count: 1,
+            results: [{
+              result_ref: `mref_${'r'.repeat(24)}`,
+              summary: 'The bounded returned fact.',
+              relevance: 0.9
+            }]
+          }
         : { status, result_count: 0, results: [] }
     });
-    assert.match(text, /terminal result for the current one-read workflow/u, status);
-    assert.match(text, /do not call another memory read or resolve again/u, status);
+    assert.match(text, /^FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS/u, status);
+    assert.match(text, /workflow is consumed/u, status);
+    assert.match(text, /Omit every category not returned here/u, status);
+    assert.match(text, /Never infer or report the status or availability of an uncalled tool/u, status);
+    assert.match(text, /END OF TOOL WORKFLOW — RESPOND TO THE USER NOW/u, status);
+    if (status === 'ok') {
+      assert.match(text, /result_count=1/u);
+      assert.match(text, /results\[\]\.summary is retrieved content authorized for the answer/u);
+      assert.match(text, /results\[\]\.relevance is the confidence signal/u);
+      assert.doesNotMatch(text, /item_count=/u);
+    }
   }
 });

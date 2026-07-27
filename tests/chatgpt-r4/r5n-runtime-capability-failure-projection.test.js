@@ -37,8 +37,8 @@ const {
   createPrivateDogfoodObserver
 } = require('../../src/runtime/chatgpt-r4/private-dogfood-observer');
 
-const PUBLIC_SCHEMA_DIGESTS_FROM_R5M_MAIN = Object.freeze({
-  resolve_memory_context: 'sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6',
+const EXPECTED_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
+  resolve_memory_context: 'sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf',
   memory_overview: 'sha256:a9314eb1604641ae76d95132bf73ed28c3136afe5c9a8352fb2474b695f372d1',
   search_memory: 'sha256:c301306bf253377183d8dc4d660dd09d527db4c361d8aba96137c72234f8f324',
   audit_memory: 'sha256:498956aa48b7e2c8ef30c2e1dd622fbc7df0c359786bcfc74b958d37ea2eab9f',
@@ -46,13 +46,13 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5M_MAIN = Object.freeze({
   render_memory_scope: 'sha256:07308f75e3ed7ecc950bf97c0496a598a0582194527d43a1df093223bc626a1a'
 });
 
-test('R5-N keeps all six public tool names and exact schemas frozen', () => {
-  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(PUBLIC_SCHEMA_DIGESTS_FROM_R5M_MAIN));
+test('current profile keeps six tool names and matches the R5-O schema digests', () => {
+  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(EXPECTED_PUBLIC_SCHEMA_DIGESTS));
   for (const [name, descriptor] of Object.entries(toolDescriptors)) {
     assert.equal(digestObject({
       inputSchema: descriptor.inputSchema,
       outputSchema: descriptor.outputSchema
-    }), PUBLIC_SCHEMA_DIGESTS_FROM_R5M_MAIN[name], name);
+    }), EXPECTED_PUBLIC_SCHEMA_DIGESTS[name], name);
   }
 });
 
@@ -269,7 +269,7 @@ test('R5-N projects a proven pre-provider scope-binding rejection as receipt-bac
       counterMode: COUNTER_MODES.sessionScopedLiveReadV1
     }));
     const text = modelVisibleResultText(toolName, invocation);
-    assert.match(text, new RegExp(`Receipt-bound governed ${toolName} status: unavailable`, 'u'));
+    assert.match(text, new RegExp(`tool=${toolName}; receipt=bound; status=unavailable`, 'u'));
     assert.match(text, /not a transport timeout or another transport failure/u);
     assert.doesNotMatch(text, /TERMINAL TRANSPORT FAILURE/u);
   }

@@ -220,12 +220,15 @@ function modelVisibleResultText(name, response) {
   }
   if (response.status === 'ok') {
     const boundedStatus = response.structured_content?.status || 'completed';
-    const candidateGuidance = name === 'search_memory' && boundedStatus === 'found'
-      ? ' Search results are retrieval candidates, not proof by themselves; relevance 0.5 is low-confidence and inconclusive unless the returned summary explicitly supports the requested fact.'
-      : '';
-    return `Receipt-bound governed ${name} status: ${boundedStatus}; ${resultCount(response.structured_content)} item(s).${candidateGuidance} TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. Answer the user now and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Report exactly this one result and do not invent retries or attempts.`;
+    if (name === 'search_memory') {
+      const candidateGuidance = boundedStatus === 'found'
+        ? ' Search results are retrieval candidates, not proof by themselves; relevance 0.5 is low-confidence and inconclusive unless the returned summary explicitly supports the requested fact.'
+        : '';
+      return `FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS. The authorized read is complete and the workflow is consumed. Answer now using only the actual returned search facts: tool=${name}; receipt=bound; status=${boundedStatus}; result_count=${resultCount(response.structured_content)}. Each returned results[].summary is retrieved content authorized for the answer, and its results[].relevance is the confidence signal for that summary.${candidateGuidance} Do not report or dereference result_ref, and do not run a follow-up search. Omit every category not returned here. Never infer or report the status or availability of an uncalled tool. Do not call any tool to verify, supplement, expand, or fill a table. Do not call resolve_memory_context, render_memory_scope, or another read. END OF TOOL WORKFLOW — RESPOND TO THE USER NOW.`;
+    }
+    return `FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS. The authorized read is complete and the workflow is consumed. Answer now using only these returned facts: tool=${name}; receipt=bound; status=${boundedStatus}; item_count=${resultCount(response.structured_content)}. Omit every category not returned here. Never infer or report the status or availability of an uncalled tool. Do not call any tool to verify, supplement, expand, or fill a table. Do not call resolve_memory_context, render_memory_scope, or another read. END OF TOOL WORKFLOW — RESPOND TO THE USER NOW.`;
   }
-  return `Receipt-bound governed ${name} status: ${response.status}. TERMINAL RECEIPT-BOUND GOVERNED READ: this is the terminal result for the current one-read workflow. This is not a transport timeout or another transport failure. Answer with exactly this bounded status and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Do not invent retries or attempts.`;
+  return `FINAL CODEX-MEMORY RESULT — NO MORE TOOL CALLS. The authorized read is complete and the workflow is consumed. Answer now using only these returned facts: tool=${name}; receipt=bound; status=${response.status}. This is not a transport timeout or another transport failure. Omit every category not returned here. Never infer or report the status or availability of an uncalled tool. Do not call any tool to retry, verify, supplement, expand, or fill a table. Do not call resolve_memory_context, render_memory_scope, or another read. END OF TOOL WORKFLOW — RESPOND TO THE USER NOW.`;
 }
 
 function modelVisibleErrorText(errorCode) {
@@ -233,7 +236,7 @@ function modelVisibleErrorText(errorCode) {
     ? errorCode
     : 'edge_governed_read_unavailable';
   const category = transportFailureCategory(safeErrorCode);
-  return `TERMINAL TRANSPORT FAILURE. Governed memory transport status: ${category} (${safeErrorCode}). No receipt-bound memory result was returned. This transport failure is terminal for the current one-read workflow. Answer now and call no codex-memory tool again in this response, including render_memory_scope; do not call another memory read or resolve again; do not retry or switch read tools. Do not describe it as an empty, denied, or unavailable memory result; do not invent retries; do not invent attempts.`;
+  return `TERMINAL TRANSPORT FAILURE — NO MORE TOOL CALLS. The authorized read attempt consumed the workflow. Answer now using only these returned facts: transport_status=${category}; error_code=${safeErrorCode}; receipt_bound_result=false. No receipt-bound memory result was returned. Do not describe it as an empty, denied, or unavailable memory result. Omit every category not returned here. Never infer or report the status or availability of an uncalled tool. Do not call any tool to retry, verify, supplement, expand, or fill a table. Do not call resolve_memory_context, render_memory_scope, or another read. Do not invent retries or attempts. END OF TOOL WORKFLOW — RESPOND TO THE USER NOW.`;
 }
 
 function receiptPresentation(name, response) {

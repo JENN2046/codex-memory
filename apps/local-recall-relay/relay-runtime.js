@@ -66,13 +66,31 @@ function createRelayRuntime({
           attempt: claim.attempt
         });
       }
+      function processingFailure(error, failureStage) {
+        const errorStatus = classifyEdgeInterruption(error);
+        if (error?.code === 'relay_cancelled' || errorStatus || cancellation.signal.aborted) {
+          const status = interruptionStatus || errorStatus || 'cancelled';
+          return interrupted(status);
+        }
+        const code = safeErrorCode(error?.code);
+        emit('request_failed', claim.request_id, {
+          attempt: claim.attempt,
+          error_code: code,
+          failure_stage: failureStage
+        });
+        throw Object.assign(new Error(code), { code });
+      }
       try {
         await edgeClient.acknowledge(claim);
       } catch (error) {
         const status = classifyEdgeInterruption(error);
         if (status) return interrupted(status);
         const code = safeErrorCode(error?.code);
-        emit('request_failed', claim.request_id, { attempt: claim.attempt, error_code: code });
+        emit('request_failed', claim.request_id, {
+          attempt: claim.attempt,
+          error_code: code,
+          failure_stage: 'acknowledge'
+        });
         throw Object.assign(new Error(code), { code });
       }
       emit('claim_acknowledged', claim.request_id, { attempt: claim.attempt });
@@ -108,8 +126,19 @@ function createRelayRuntime({
       });
 
       try {
-        const response = await processor.handle(claim.request);
-        await edgeClient.complete(claim, response);
+        let response;
+        try {
+          response = await processor.handle(claim.request);
+          emit('response_prepared', claim.request_id, { attempt: claim.attempt });
+        } catch (error) {
+          return processingFailure(error, 'process');
+        }
+        try {
+          emit('edge_complete_started', claim.request_id, { attempt: claim.attempt });
+          await edgeClient.complete(claim, response);
+        } catch (error) {
+          return processingFailure(error, 'complete');
+        }
         emit('response_completed', claim.request_id, { attempt: claim.attempt });
         return Object.freeze({
           status: 'completed',
@@ -117,15 +146,6 @@ function createRelayRuntime({
           attempt: claim.attempt,
           response
         });
-      } catch (error) {
-        const errorStatus = classifyEdgeInterruption(error);
-        if (error?.code === 'relay_cancelled' || errorStatus || cancellation.signal.aborted) {
-          const status = interruptionStatus || errorStatus || 'cancelled';
-          return interrupted(status);
-        }
-        const code = safeErrorCode(error?.code);
-        emit('request_failed', claim.request_id, { attempt: claim.attempt, error_code: code });
-        throw Object.assign(new Error(code), { code });
       } finally {
         monitorStopped = true;
         await monitor;
@@ -144,7 +164,8 @@ function validateEdgeClient(value) {
 function classifyEdgeInterruption(error) {
   if (error?.code === 'edge_request_cancelled') return 'cancelled';
   if (error?.code === 'edge_request_expired' || error?.code === 'edge_claim_expired' ||
-      error?.code === 'edge_request_not_found') return 'expired';
+      error?.code === 'edge_request_not_found' ||
+      error?.code === 'relay_request_expired_before_response') return 'expired';
   return null;
 }
 

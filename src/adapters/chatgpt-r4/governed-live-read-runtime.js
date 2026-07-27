@@ -259,16 +259,26 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
   const receipt = result?.receipt;
   const invocation = receipt?.nativeInvocationReceipt;
   const runtime = invocation?.nativeRuntimeReceipt;
-  if (!isPlainObject(receipt) || !isPlainObject(invocation) || !isPlainObject(runtime) ||
-      result?.access?.localMemoryFallbackUsed !== false ||
+  if (!isPlainObject(receipt) || !isPlainObject(invocation) || !isPlainObject(runtime)) {
+    reject(
+      'r4_live_read_native_receipt_invalid',
+      'r4_live_read_receipt_structure_invalid'
+    );
+  }
+  if (result?.access?.localMemoryFallbackUsed !== false ||
       invocation.invocationBindingMatched !== true ||
       invocation.governanceMetadataSent !== true ||
       invocation.governanceMetadataRawValueDisclosed !== false ||
       invocation.endpointDisclosed !== false ||
       invocation.tokenMaterialDisclosed !== false ||
       invocation.rawRequestBodyDisclosed !== false ||
-      invocation.rawResponseBodyDisclosed !== false ||
-      runtime.present !== true ||
+      invocation.rawResponseBodyDisclosed !== false) {
+    reject(
+      'r4_live_read_native_receipt_invalid',
+      'r4_live_read_receipt_invocation_invalid'
+    );
+  }
+  if (runtime.present !== true ||
       runtime.nativeRuntimeCalled !== true ||
       typeof runtime.providerApiCalled !== 'boolean' ||
       typeof runtime.derivedIndexWritePerformed !== 'boolean' ||
@@ -277,8 +287,13 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       runtime.isolatedRuntimeStoreUsed !== true ||
       typeof runtime.durableWritePerformed !== 'boolean' ||
       runtime.primaryMemoryStoreWritePerformed !== false ||
-      runtime.durableWritePerformed !== runtime.derivedIndexWritePerformed ||
-      runtime.derivedRuntimeMutationPolicy !== 'isolated_derived_runtime_mutation_v1' ||
+      runtime.durableWritePerformed !== runtime.derivedIndexWritePerformed) {
+    reject(
+      'r4_live_read_native_receipt_invalid',
+      'r4_live_read_receipt_execution_invalid'
+    );
+  }
+  if (runtime.derivedRuntimeMutationPolicy !== 'isolated_derived_runtime_mutation_v1' ||
       runtime.derivedRuntimeMutationAccountingMode !== 'lifecycle_event_v1' ||
       runtime.derivedRuntimeMutationAuthorized !== true ||
       runtime.derivedRuntimeMutationAccountingFinal !== false ||
@@ -319,8 +334,13 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       (runtime.derivedIndexWritePerformed === true && ![
         'isolated_derived_index',
         'native_runtime_store'
-      ].includes(runtime.durableWriteScope)) ||
-      runtime.authorizationResolvedBeforeProvider !== true ||
+      ].includes(runtime.durableWriteScope))) {
+    reject(
+      'r4_live_read_native_receipt_invalid',
+      'r4_live_read_receipt_lifecycle_invalid'
+    );
+  }
+  if (runtime.authorizationResolvedBeforeProvider !== true ||
       runtime.diaryAllowlistEnforcedBeforeIndexLoad !== true ||
       runtime.diaryAllowlistEnforcedBeforeVectorSearch !== true ||
       runtime.resultScopePostcheckPassed !== true ||
@@ -328,8 +348,13 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
       runtime.mappingReferenceBound !== true ||
       runtime.mappingDigestBound !== true ||
       runtime.allowedDiaryCount !== expectedAllowedDiaryCount ||
-      runtime.rawDiaryNamesReturned !== false ||
-      runtime.vectorRetrievalDiagnosticsMode !== 'fail_closed_v1' ||
+      runtime.rawDiaryNamesReturned !== false) {
+    reject(
+      'r4_live_read_native_receipt_invalid',
+      'r4_live_read_receipt_scope_invalid'
+    );
+  }
+  if (runtime.vectorRetrievalDiagnosticsMode !== 'fail_closed_v1' ||
       !Number.isSafeInteger(runtime.hydratedChunkCount) ||
       runtime.hydratedChunkCount < 0 ||
       !Number.isSafeInteger(runtime.loadedIndexVectorCount) ||
@@ -359,14 +384,22 @@ function nativeEvidence(result, expectedAllowedDiaryCount) {
         !emptyIndexDelegatedResultEvidenceComplete(result)
       )) ||
       (runtime.vectorRetrievalOutcome === 'found' &&
-        runtime.rawCandidateCount < 1) ||
-      runtime.rawRuntimeOutputDisclosed !== false ||
+        runtime.rawCandidateCount < 1)) {
+    reject(
+      'r4_live_read_native_receipt_invalid',
+      'r4_live_read_receipt_vector_invalid'
+    );
+  }
+  if (runtime.rawRuntimeOutputDisclosed !== false ||
       runtime.rawMemoryContentDisclosed !== false ||
       runtime.runtimeLocatorDisclosed !== false ||
       runtime.tokenMaterialDisclosed !== false ||
       runtime.readinessClaimed !== false ||
       receipt.localAuditReceipt?.appended !== true) {
-    reject('r4_live_read_native_receipt_invalid');
+    reject(
+      'r4_live_read_native_receipt_invalid',
+      'r4_live_read_receipt_disclosure_or_audit_invalid'
+    );
   }
   return { receipt, invocation, runtime };
 }
@@ -865,10 +898,16 @@ function createR4GovernanceRuntime({
             /^[a-z][a-z0-9_]{0,79}$/u.test(error.code)
             ? error.code
             : 'r5a_dogfood_runtime_error';
+          const errorDetailCode = errorCode === 'r4_live_read_native_receipt_invalid' &&
+            typeof error?.message === 'string' &&
+            /^r4_live_read_receipt_[a-z0-9_]{1,55}$/u.test(error.message)
+            ? error.message
+            : null;
           dogfoodObserver.observeToolError({
             toolName,
             latencyMs,
             errorCode,
+            errorDetailCode,
             activationSnapshot: activationController.snapshot(),
             sessionOrdinal: observationSessionOrdinal
           });
@@ -923,5 +962,6 @@ module.exports = {
   effectiveVisibility,
   receiptBackedNativePreflightFailure,
   searchProjection,
+  structuredProjection,
   visibilityLabels
 };

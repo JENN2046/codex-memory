@@ -8,6 +8,13 @@ R5-I is a source, contract, test, and documentation change. It does not activate
 the private runtime, read or write memory, call a provider, or amend the frozen
 R5-H observation artifact.
 
+> Superseded contract note (R5-O): this document records the historical R5-I
+> behavior. R5-O makes `requested_visibility` required in the public
+> `resolve_memory_context` input schema. Omission now fails request-schema
+> validation before context issuance or a governed receipt; the schema is no
+> longer unchanged. See
+> `docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md`.
+
 ## Baseline And Boundary
 
 - source baseline: `main@c06c6959e40f0cc0b75f2fd24b5dd1986b434a1a`

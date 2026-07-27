@@ -19,8 +19,8 @@ const {
   classifyReceiptFailure
 } = require('../../src/adapters/chatgpt-r4');
 
-const PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN = Object.freeze({
-  resolve_memory_context: 'sha256:323d0cdcd4ca76d41b0af27ce514c0446e30bd5ba87da8d172f024c69626bbb6',
+const EXPECTED_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
+  resolve_memory_context: 'sha256:fe92ada83513b769a01d241fe1df483fcf3b9b0330b253cfa4c8a343b3093faf',
   memory_overview: 'sha256:a9314eb1604641ae76d95132bf73ed28c3136afe5c9a8352fb2474b695f372d1',
   search_memory: 'sha256:c301306bf253377183d8dc4d660dd09d527db4c361d8aba96137c72234f8f324',
   audit_memory: 'sha256:498956aa48b7e2c8ef30c2e1dd622fbc7df0c359786bcfc74b958d37ea2eab9f',
@@ -29,15 +29,15 @@ const PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN = Object.freeze({
 });
 
 test('R5-I selects only exact user-provided alias and visibility without probing identities', () => {
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /project_alias and requested_visibility exactly/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /App display name.+is not a project_alias/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /If either value is missing, ask one concise clarification/u);
-  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /never invent retry counts/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /explicitly labelled project_alias and requested_visibility/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /unlabelled App or repository names as absent/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /a labelled alias may match those names/u);
+  assert.match(MODEL_WORKFLOW_INSTRUCTIONS, /ask only for missing values; call no tool/u);
 
   const description = toolDescriptors.resolve_memory_context.description;
-  assert.match(description, /App name, connector name, URL, client identifier/u);
-  assert.match(description, /never guess or probe alternative aliases or visibilities/u);
-  assert.match(description, /denied, unavailable, or error result is terminal/u);
+  assert.match(description, /explicitly supplies both exact project_alias and requested_visibility/u);
+  assert.match(description, /Copy both values exactly and call once/u);
+  assert.match(description, /If either value is absent, ask for it and call no tool/u);
 
   const publicGuidance = JSON.stringify({
     instructions: MODEL_WORKFLOW_INSTRUCTIONS,
@@ -53,24 +53,27 @@ test('R5-I selects only exact user-provided alias and visibility without probing
 });
 
 test('R5-I preserves all six public tool names and exact input/output schema digests', () => {
-  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN));
+  assert.deepEqual(Object.keys(toolDescriptors), Object.keys(EXPECTED_PUBLIC_SCHEMA_DIGESTS));
   for (const [name, descriptor] of Object.entries(toolDescriptors)) {
     assert.equal(digestObject({
       inputSchema: descriptor.inputSchema,
       outputSchema: descriptor.outputSchema
-    }), PUBLIC_SCHEMA_DIGESTS_FROM_R5H_MAIN[name], name);
+    }), EXPECTED_PUBLIC_SCHEMA_DIGESTS[name], name);
   }
 });
 
-test('R5-I keeps the frozen public schema and request validator compatible', () => {
-  assert.doesNotThrow(() => validateToolArguments('resolve_memory_context', {
+test('R5-I requires exact visibility in the public schema and request validator', () => {
+  assert.throws(() => validateToolArguments('resolve_memory_context', {
     project_alias: 'project-alpha'
-  }));
+  }), { code: 'tool_arguments_shape_invalid' });
   assert.doesNotThrow(() => validateToolArguments('resolve_memory_context', {
     project_alias: 'project-alpha',
     requested_visibility: 'project'
   }));
-  assert.deepEqual(toolDescriptors.resolve_memory_context.inputSchema.required, ['project_alias']);
+  assert.deepEqual(
+    toolDescriptors.resolve_memory_context.inputSchema.required,
+    ['project_alias', 'requested_visibility']
+  );
 });
 
 test('R5-I projects verified governed outcomes separately from transport failures', () => {
@@ -101,9 +104,10 @@ test('R5-I projects verified governed outcomes separately from transport failure
         results: []
       }
     });
-    assert.match(result, new RegExp(`Receipt-bound.+status: ${status}`, 'u'));
-    assert.match(result, /terminal result for the current one-read workflow/u);
-    assert.match(result, /Report exactly this one result and do not invent retries/u);
+    assert.match(result, new RegExp(`receipt=bound; status=${status}`, 'u'));
+    assert.match(result, /workflow is consumed/u);
+    assert.match(result, /Omit every category not returned here/u);
+    assert.match(result, /Never infer or report the status or availability of an uncalled tool/u);
   }
 
   for (const status of ['denied', 'unavailable']) {
@@ -111,9 +115,9 @@ test('R5-I projects verified governed outcomes separately from transport failure
       status,
       structured_content: { status, result_count: 0, results: [] }
     });
-    assert.match(result, new RegExp(`Receipt-bound.+status: ${status}`, 'u'));
+    assert.match(result, new RegExp(`receipt=bound; status=${status}`, 'u'));
     assert.match(result, /not a transport timeout/u);
-    assert.match(result, /do not call another memory read or resolve again/u);
+    assert.match(result, /workflow is consumed/u);
   }
 });
 
@@ -132,10 +136,10 @@ test('R5-I transport projection is terminal and never masquerades as a memory re
   ]) {
     const text = modelVisibleErrorText(code);
     assert.match(text, /No receipt-bound memory result was returned/u, code);
-    assert.match(text, /terminal for the current one-read workflow/u, code);
-    assert.match(text, /do not call another memory read or resolve again/u, code);
+    assert.match(text, /consumed the workflow/u, code);
+    assert.match(text, /Do not call any tool to retry, verify, supplement, expand, or fill a table/u, code);
     assert.match(text, /Do not describe it as an empty, denied, or unavailable memory result/u, code);
-    assert.match(text, /do not invent retries/u, code);
+    assert.match(text, /Do not invent retries/u, code);
   }
 
   const unsafeCode = modelVisibleErrorText('token=do-not-project');

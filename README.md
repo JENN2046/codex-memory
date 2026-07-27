@@ -46,12 +46,32 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-K Scope, Receipt, And Terminal Closure](docs/CHATGPT_WEB_R5K_SCOPE_RECEIPT_TERMINAL_CLOSURE.md)
 - [ChatGPT Web R5-M Alias, Result Semantics, And Widget Receipt Projection](docs/CHATGPT_WEB_R5M_ALIAS_RECEIPT_SEMANTICS.md)
 - [ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection](docs/CHATGPT_WEB_R5N_RUNTIME_CAPABILITY_FAILURE_PROJECTION.md)
+- [ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility](docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md)
+- [ChatGPT Web R5-O Public Contract Independent Review](docs/CHATGPT_WEB_R5O_PUBLIC_CONTRACT_INDEPENDENT_REVIEW.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
 ## Current Status
 
 Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
+
+R5-O caps Relay response expiry at the accepted request expiry, raises the
+default UDS read budget to 15 seconds, and keeps the daemon alive after an
+incomplete UDS response without replaying the acknowledged one-read request.
+An injectable low-disclosure observer library now handles mixed lifecycle
+sequences, but the canonical service does not yet wire or expose it.
+Model-visible routing is constrained to fields each public output schema
+actually returns: search guidance preserves `result_count`, returned
+`results[].summary`, and `results[].relevance`, while bounded-status tools use
+their distinct `item_count`. The owner-only dogfood observation contract now
+uses schema v3 for the required low-disclosure `error_detail_code`; the CLI
+still validates v2 from an older runtime, and a new runtime projects v2 for an
+older schema-2 client. The six public tool names remain unchanged, but
+`resolve_memory_context` now requires `requested_visibility`; its public input
+schema and digest are intentionally tightened. This is source hardening and
+contract clarification only: no live runtime, provider, private configuration,
+or memory action ran. See
+`docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md`.
 
 R5-N requires an exact zero-read shim capability preflight before private
 runtime binding. It proves unauthenticated enforcement before sending a private

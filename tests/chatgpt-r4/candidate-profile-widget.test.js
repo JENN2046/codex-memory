@@ -27,7 +27,7 @@ test('R4-B candidate profile is non-default, non-activated, read-only, and has n
   assert.deepEqual(candidateToolProfile.writeTools, []);
   assert.deepEqual(candidateToolProfile.proposalTools, []);
   for (const [name, descriptor] of Object.entries(candidateToolProfile.toolDescriptors)) {
-    assert.match(descriptor.description, /^Use this when/u, name);
+    assert.match(descriptor.description, /^Use this/u, name);
     assert.deepEqual(descriptor.annotations, {
       readOnlyHint: true,
       destructiveHint: false,

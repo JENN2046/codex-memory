@@ -248,7 +248,7 @@ function validateToolArguments(name, args) {
   assertNoNormalizedKeys(args, FORBIDDEN_AUTHORITY_KEYS, 'tool_authority_argument_forbidden');
 
   const definitions = {
-    resolve_memory_context: { required: ['project_alias'], optional: ['requested_visibility'] },
+    resolve_memory_context: { required: ['project_alias', 'requested_visibility'], optional: [] },
     memory_overview: { required: ['project_context_ref'], optional: [] },
     search_memory: { required: ['project_context_ref', 'query'], optional: ['limit'] },
     audit_memory: { required: ['project_context_ref'], optional: ['event_limit'] },
@@ -268,7 +268,7 @@ function validateToolArguments(name, args) {
       max: LIMITS.maxProjectAliasCharacters,
       pattern: /^[A-Za-z0-9][A-Za-z0-9._-]*$/u
     });
-    if (args.requested_visibility !== undefined && !CONTEXT_VISIBILITIES.includes(args.requested_visibility)) {
+    if (!CONTEXT_VISIBILITIES.includes(args.requested_visibility)) {
       reject('requested_visibility_invalid');
     }
   } else {

@@ -20,17 +20,189 @@ const {
 const {
   createOutboundEdgeClient,
   createOutboundRelayRuntime,
+  createLowDisclosureRelayObserver,
+  createRelayRuntime,
   loadOutboundRelayRuntimeFromEnvironment
 } = require('../../apps/local-recall-relay');
 const {
   createOutboundRelayService,
   isAvailabilityError
 } = require('../../apps/local-recall-relay/outbound-main');
+const {
+  DEFAULT_UDS_TIMEOUT_MS
+} = require('../../apps/local-recall-relay/uds-transport');
 
 const ISSUER = 'https://tenant.jenn.dev/';
 const ORIGIN = 'https://memory.jenn.dev';
 const MCP_RESOURCE = `${ORIGIN}/mcp`;
 const TOKEN = 'r'.repeat(48);
+
+test('R4-D Relay default UDS budget covers governed provider reads', () => {
+  assert.equal(DEFAULT_UDS_TIMEOUT_MS, 15_000);
+});
+
+test('R5-O Relay response expiry never exceeds the accepted request expiry', async () => {
+  const edge = crypto.generateKeyPairSync('ed25519');
+  const relay = crypto.generateKeyPairSync('ed25519');
+  const edgeKeyId = 'edge-r5o-remaining-ttl';
+  const relayKeyId = 'relay-r5o-remaining-ttl';
+  const startedAt = new Date('2026-07-27T08:00:00.000Z');
+  const principal = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: MCP_RESOURCE,
+    subjectFingerprint: sha256('r5o-remaining-ttl-operator'),
+    now: startedAt,
+    nonce: 'r5o_remaining_ttl_principal_nonce',
+    signing: { privateKey: edge.privateKey, keyId: edgeKeyId }
+  });
+  const request = createRequestEnvelope({
+    principalAssertion: principal,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'t'.repeat(32)}` },
+    now: startedAt,
+    requestId: 'req_r5o_remaining_ttl_000000001',
+    nonce: 'r5o_remaining_ttl_request_nonce',
+    ttlSeconds: 30,
+    signing: { privateKey: edge.privateKey, keyId: edgeKeyId }
+  });
+  const claim = {
+    request_id: request.request_id,
+    claim_token: 'r5o-remaining-ttl-claim',
+    attempt: 1,
+    request
+  };
+  let claimAvailable = true;
+  let completedResponse = null;
+  let clockReads = 0;
+  const runtime = createRelayRuntime({
+    edgeClient: {
+      async claim() {
+        if (!claimAvailable) return null;
+        claimAvailable = false;
+        return claim;
+      },
+      async acknowledge() {
+        return { status: 'acked' };
+      },
+      async complete(_claim, response) {
+        completedResponse = response;
+        return { status: 'completed' };
+      },
+      async state() {
+        return { status: 'claimed' };
+      }
+    },
+    async forwardToUds() {
+      return {
+        status: 'ok',
+        structured_content: {
+          status: 'available',
+          kind: 'overview',
+          item_count: 1
+        },
+        counters: ZERO_MEMORY_COUNTERS,
+        receipt_digests: {
+          governance: sha256('r5o-remaining-ttl-governance'),
+          context: sha256('r5o-remaining-ttl-context')
+        }
+      };
+    },
+    relayId: 'local-relay-r5o-remaining-ttl',
+    expectedIssuer: ISSUER,
+    expectedAudience: MCP_RESOURCE,
+    resolveRequestPublicKey: keyId => keyId === edgeKeyId ? edge.publicKey : null,
+    resolvePrincipalPublicKey: value =>
+      value?.issuer === ISSUER && value?.key_id === edgeKeyId ? edge.publicKey : null,
+    responseSigning: { privateKey: relay.privateKey, keyId: relayKeyId },
+    clock() {
+      clockReads += 1;
+      return new Date(startedAt.getTime() + (clockReads >= 3 ? 5_000 : 0));
+    },
+    cancelPollMs: 1
+  });
+
+  const result = await runtime.processNext();
+  assert.equal(result.status, 'completed');
+  assert.ok(completedResponse);
+  assert.equal(completedResponse.issued_at, '2026-07-27T08:00:05.000Z');
+  assert.equal(completedResponse.expires_at, request.expires_at);
+  assert.equal(
+    Date.parse(completedResponse.expires_at) -
+      Date.parse(completedResponse.issued_at),
+    25_000
+  );
+
+  const expiredRequest = createRequestEnvelope({
+    principalAssertion: principal,
+    toolName: 'memory_overview',
+    toolArguments: { project_context_ref: `pctx_${'e'.repeat(32)}` },
+    now: startedAt,
+    requestId: 'req_r5o_expired_before_response_0001',
+    nonce: 'r5o_expired_before_response_nonce',
+    ttlSeconds: 30,
+    signing: { privateKey: edge.privateKey, keyId: edgeKeyId }
+  });
+  const expiredClaim = {
+    request_id: expiredRequest.request_id,
+    claim_token: 'r5o-expired-before-response-claim',
+    attempt: 1,
+    request: expiredRequest
+  };
+  const observer = createLowDisclosureRelayObserver();
+  let expiredClaimAvailable = true;
+  let expiredClockReads = 0;
+  const expiredRuntime = createRelayRuntime({
+    edgeClient: {
+      async claim() {
+        if (!expiredClaimAvailable) return null;
+        expiredClaimAvailable = false;
+        return expiredClaim;
+      },
+      async acknowledge() {
+        return { status: 'acked' };
+      },
+      async complete() {
+        assert.fail('expired request must not be completed');
+      },
+      async state() {
+        return { status: 'claimed' };
+      }
+    },
+    async forwardToUds() {
+      return {
+        status: 'ok',
+        structured_content: {
+          status: 'available',
+          kind: 'overview',
+          item_count: 1
+        },
+        counters: ZERO_MEMORY_COUNTERS,
+        receipt_digests: {
+          governance: sha256('r5o-expired-response-governance'),
+          context: sha256('r5o-expired-response-context')
+        }
+      };
+    },
+    relayId: 'local-relay-r5o-expired-response',
+    expectedIssuer: ISSUER,
+    expectedAudience: MCP_RESOURCE,
+    resolveRequestPublicKey: keyId => keyId === edgeKeyId ? edge.publicKey : null,
+    resolvePrincipalPublicKey: value =>
+      value?.issuer === ISSUER && value?.key_id === edgeKeyId ? edge.publicKey : null,
+    responseSigning: { privateKey: relay.privateKey, keyId: relayKeyId },
+    clock() {
+      expiredClockReads += 1;
+      return new Date(startedAt.getTime() +
+        (expiredClockReads >= 3 ? 31_000 : 0));
+    },
+    cancelPollMs: 1,
+    eventSink: observer.observe
+  });
+  const expiredResult = await expiredRuntime.processNext();
+  assert.equal(expiredResult.status, 'expired');
+  assert.equal(observer.snapshot().completion_state, 'request_expired');
+  assert.equal(observer.snapshot().requests_expired, 1);
+});
 
 test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes signed zero-counter UDS work', async t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4d-d2b-'));
@@ -55,6 +227,7 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
     now,
     requestId: 'req_d2b_outbound_relay_0000000001',
     nonce: 'd2b_request_nonce_0000001',
+    ttlSeconds: 30,
     signing: { privateKey: edge.privateKey, keyId: edgeKeyId }
   });
   const claim = {
@@ -102,6 +275,7 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   });
 
   const events = [];
+  const observer = createLowDisclosureRelayObserver();
   const runtime = createOutboundRelayRuntime({
     edgeOrigin: ORIGIN,
     relayAuthToken: TOKEN,
@@ -116,7 +290,10 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
     clock: () => new Date(now),
     cancelPollMs: 1,
     edgeRequest: fakeRequest,
-    eventSink: event => events.push(event)
+    eventSink(event) {
+      events.push(event);
+      observer.observe(event);
+    }
   });
   const result = await runtime.processNext();
   assert.equal(result.status, 'completed');
@@ -126,6 +303,10 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   assert.equal(requests.some(item => item.path === '/v1/relay/ack'), true);
   assert.equal(requests.some(item => item.path === '/v1/relay/complete'), true);
   assert.ok(completedResponse);
+  assert.equal(
+    Date.parse(completedResponse.expires_at) <= Date.parse(requestEnvelope.expires_at),
+    true
+  );
   assert.doesNotThrow(() => validateResponseEnvelope(completedResponse, {
     now,
     resolveResponsePublicKey: keyId => keyId === relayKeyId ? relay.publicKey : null,
@@ -136,6 +317,176 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   for (const forbidden of [TOKEN, claim.claim_token, requestEnvelope.nonce, 'project_context_ref']) {
     assert.equal(eventText.includes(forbidden), false, forbidden);
   }
+  assert.deepEqual(observer.snapshot(), {
+    schema_version: 1,
+    component: 'outbound_relay',
+    claims_received: 1,
+    claims_acknowledged: 1,
+    uds_forwards_started: 1,
+    uds_forwards_completed: 1,
+    responses_prepared: 1,
+    edge_completions_started: 1,
+    edge_completions_accepted: 1,
+    requests_failed: 0,
+    requests_cancelled: 0,
+    requests_expired: 0,
+    last_failure_stage: null,
+    last_error_code: null,
+    completion_state: 'edge_accepted',
+    request_identifiers_retained: false,
+    response_bodies_retained: false,
+    raw_memory_retained: false,
+    secret_values_retained: false
+  });
+});
+
+test('R4-D Relay observer distinguishes Edge completion failure without retaining identifiers', async () => {
+  const edge = crypto.generateKeyPairSync('ed25519');
+  const relay = crypto.generateKeyPairSync('ed25519');
+  const edgeKeyId = 'edge-r4d-completion-observer';
+  const relayKeyId = 'relay-r4d-completion-observer';
+  const now = new Date('2026-07-26T08:00:00.000Z');
+  const principal = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: MCP_RESOURCE,
+    subjectFingerprint: sha256('completion-observer-operator'),
+    now,
+    nonce: 'completion_observer_principal_nonce',
+    signing: { privateKey: edge.privateKey, keyId: edgeKeyId }
+  });
+  const request = createRequestEnvelope({
+    principalAssertion: principal,
+    toolName: 'prepare_memory_context',
+    toolArguments: { project_context_ref: `pctx_${'z'.repeat(32)}` },
+    now,
+    requestId: 'req_completion_observer_000000001',
+    nonce: 'completion_observer_request_nonce',
+    ttlSeconds: 30,
+    signing: { privateKey: edge.privateKey, keyId: edgeKeyId }
+  });
+  const claim = {
+    request_id: request.request_id,
+    claim_token: 'completion-observer-claim-token',
+    attempt: 1,
+    request
+  };
+  let claimed = false;
+  const observer = createLowDisclosureRelayObserver();
+  const runtime = createRelayRuntime({
+    edgeClient: {
+      async claim() {
+        if (claimed) return null;
+        claimed = true;
+        return claim;
+      },
+      async acknowledge() {
+        return { status: 'acked' };
+      },
+      async complete() {
+        throw Object.assign(new Error('relay_edge_timeout'), {
+          code: 'relay_edge_timeout'
+        });
+      },
+      async state() {
+        return { status: 'claimed' };
+      }
+    },
+    async forwardToUds() {
+      return {
+        status: 'ok',
+        structured_content: { status: 'completed', kind: 'context', item_count: 1 },
+        counters: ZERO_MEMORY_COUNTERS,
+        receipt_digests: {
+          governance: sha256('completion-observer-governance'),
+          context: sha256('completion-observer-context')
+        }
+      };
+    },
+    relayId: 'local-relay-completion-observer',
+    expectedIssuer: ISSUER,
+    expectedAudience: MCP_RESOURCE,
+    resolveRequestPublicKey: keyId => keyId === edgeKeyId ? edge.publicKey : null,
+    resolvePrincipalPublicKey: value =>
+      value?.issuer === ISSUER && value?.key_id === edgeKeyId ? edge.publicKey : null,
+    responseSigning: { privateKey: relay.privateKey, keyId: relayKeyId },
+    clock: () => new Date(now),
+    cancelPollMs: 1,
+    eventSink: observer.observe
+  });
+
+  await assert.rejects(runtime.processNext(), { code: 'relay_edge_timeout' });
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.completion_state, 'edge_completion_unconfirmed');
+  assert.equal(snapshot.uds_forwards_completed, 1);
+  assert.equal(snapshot.responses_prepared, 1);
+  assert.equal(snapshot.edge_completions_started, 1);
+  assert.equal(snapshot.edge_completions_accepted, 0);
+  assert.equal(snapshot.requests_failed, 1);
+  assert.equal(snapshot.last_failure_stage, 'complete');
+  assert.equal(snapshot.last_error_code, 'relay_edge_timeout');
+  const serialized = JSON.stringify(snapshot);
+  for (const forbidden of [
+    request.request_id,
+    claim.claim_token,
+    request.nonce,
+    request.tool_request.arguments.project_context_ref
+  ]) {
+    assert.equal(serialized.includes(forbidden), false, forbidden);
+  }
+});
+
+test('R5-O Relay observer reports the latest mixed-sequence terminal outcome', () => {
+  const observer = createLowDisclosureRelayObserver();
+  const observe = event => observer.observe({
+    component: 'outbound_relay',
+    request_id: 'never-retained',
+    attempt: 1,
+    ...event
+  });
+
+  observe({ event: 'response_completed' });
+  observe({
+    event: 'request_failed',
+    failure_stage: 'complete',
+    error_code: 'relay_edge_timeout'
+  });
+  let snapshot = observer.snapshot();
+  assert.equal(snapshot.edge_completions_accepted, 1);
+  assert.equal(snapshot.requests_failed, 1);
+  assert.equal(snapshot.completion_state, 'edge_completion_unconfirmed');
+  assert.equal(snapshot.last_failure_stage, 'complete');
+  assert.equal(snapshot.last_error_code, 'relay_edge_timeout');
+
+  observe({ event: 'response_completed' });
+  snapshot = observer.snapshot();
+  assert.equal(snapshot.edge_completions_accepted, 2);
+  assert.equal(snapshot.requests_failed, 1);
+  assert.equal(snapshot.completion_state, 'edge_accepted');
+  assert.equal(snapshot.last_failure_stage, null);
+  assert.equal(snapshot.last_error_code, null);
+  assert.equal(JSON.stringify(snapshot).includes('never-retained'), false);
+
+  observe({ event: 'uds_forward_started' });
+  observe({ event: 'request_cancelled' });
+  snapshot = observer.snapshot();
+  assert.equal(snapshot.completion_state, 'request_cancelled');
+  assert.equal(snapshot.last_failure_stage, null);
+  assert.equal(snapshot.last_error_code, null);
+
+  observe({ event: 'uds_forward_started' });
+  observe({ event: 'request_expired' });
+  snapshot = observer.snapshot();
+  assert.equal(snapshot.completion_state, 'request_expired');
+  assert.equal(snapshot.last_failure_stage, null);
+  assert.equal(snapshot.last_error_code, null);
+
+  observe({ event: 'claim_received' });
+  observe({ event: 'claim_acknowledged' });
+  observe({ event: 'uds_forward_started' });
+  snapshot = observer.snapshot();
+  assert.equal(snapshot.completion_state, 'uds_incomplete');
+  assert.equal(snapshot.last_failure_stage, null);
+  assert.equal(snapshot.last_error_code, null);
 });
 
 test('R4-D D2B outbound client rejects unsafe origins and Edge-incompatible tokens before network', () => {
@@ -178,6 +529,7 @@ test('R4-D D2B retries a non-JSON 5xx gateway response but keeps malformed succe
   });
 
   assert.equal(isAvailabilityError('relay_edge_unavailable'), true);
+  assert.equal(isAvailabilityError('relay_uds_response_incomplete'), true);
   let attempts = 0;
   let service;
   const runtime = {

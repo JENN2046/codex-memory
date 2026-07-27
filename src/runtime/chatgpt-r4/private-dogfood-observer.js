@@ -7,7 +7,7 @@ const MAX_DOGFOOD_PROVIDER_CALLS = 25;
 const MAX_DOGFOOD_TOOL_EVENTS_PER_SESSION = 4;
 const MAX_DOGFOOD_POST_TERMINAL_ATTEMPTS_PER_SESSION = 4;
 const DOGFOOD_OBSERVATION_KIND = 'meaningful_task_unprompted';
-const DOGFOOD_OBSERVATION_SCHEMA_VERSION = 2;
+const DOGFOOD_OBSERVATION_SCHEMA_VERSION = 3;
 const DOGFOOD_TASK_CLASSES = Object.freeze([
   'memory_relevant',
   'memory_irrelevant',
@@ -125,6 +125,7 @@ function createPrivateDogfoodObserver({
       max_relevance: null,
       timed_out: false,
       error_code: null,
+      error_detail_code: null,
       tool_attempt_in_flight: false,
       counters: {
         provider_calls: 0,
@@ -327,16 +328,22 @@ function createPrivateDogfoodObserver({
     toolName,
     latencyMs,
     errorCode,
+    errorDetailCode = null,
     activationSnapshot,
     sessionOrdinal = null
   } = {}) {
     const session = assertToolEvent(toolName, latencyMs, sessionOrdinal);
     if (!session) return false;
     if (!SAFE_ERROR_CODE_PATTERN.test(errorCode || '')) reject('r5a_dogfood_error_code_invalid');
+    if (errorDetailCode !== null &&
+        !SAFE_ERROR_CODE_PATTERN.test(errorDetailCode || '')) {
+      reject('r5a_dogfood_error_detail_code_invalid');
+    }
     recordToolEvent(session, toolName, 'error');
     session.tool_attempt_in_flight = false;
     session.total_latency_ms += latencyMs;
     session.error_code = errorCode;
+    session.error_detail_code = errorDetailCode;
     session.timed_out = errorCode.includes('timeout');
     syncActivation(activationSnapshot);
     return true;
@@ -375,6 +382,7 @@ function createPrivateDogfoodObserver({
       max_relevance: session.max_relevance,
       timed_out: session.timed_out,
       error_code: session.error_code,
+      error_detail_code: session.error_detail_code,
       tool_attempt_in_flight: session.tool_attempt_in_flight,
       provider_calls: session.counters.provider_calls,
       native_invocations: session.counters.native_invocations

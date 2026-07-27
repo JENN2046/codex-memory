@@ -2,7 +2,10 @@
 
 const { createOutboundEdgeClient } = require('./outbound-https-client');
 const { createRelayRuntime } = require('./relay-runtime');
-const { createUdsForwarder } = require('./uds-transport');
+const {
+  DEFAULT_UDS_TIMEOUT_MS,
+  createUdsForwarder
+} = require('./uds-transport');
 
 function createOutboundRelayRuntime({
   edgeOrigin,
@@ -10,7 +13,7 @@ function createOutboundRelayRuntime({
   socketPath,
   relayId = 'local-relay-r4d',
   edgeTimeoutMs = 5_000,
-  udsTimeoutMs = 2_000,
+  udsTimeoutMs = DEFAULT_UDS_TIMEOUT_MS,
   edgeRequest,
   ...options
 } = {}) {
