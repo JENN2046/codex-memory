@@ -76,7 +76,10 @@ function createObserverSnapshotUdsServer({
     }
 
     socket.once('close', release);
-    socket.setTimeout(SNAPSHOT_SOCKET_TIMEOUT_MS, rejectFrame);
+    socket.setTimeout(SNAPSHOT_SOCKET_TIMEOUT_MS, () => {
+      if (handled) socket.destroy();
+      else rejectFrame();
+    });
     socket.on('data', chunk => {
       if (handled) return;
       bytes += chunk.length;
@@ -101,7 +104,7 @@ function createObserverSnapshotUdsServer({
           throw safeError('relay_observer_snapshot_response_too_large');
         }
         observations.accepted_frames += 1;
-        socket.end(encoded);
+        socket.end(encoded, () => socket.destroy());
       } catch {
         observations.rejected_frames += 1;
         socket.destroy();
@@ -128,6 +131,8 @@ function createObserverSnapshotUdsServer({
         await prepareObserverSnapshotSocketPath(authority, {
           lstatSync,
           probeSocket,
+          realpathSync,
+          statSync,
           unlinkSync
         });
         startupLock.assertHeld();
@@ -284,11 +289,45 @@ function validateBoundSnapshotSocket(authority, {
   return true;
 }
 
+function revalidateOwnerOnlySnapshotParentAuthority(authority, {
+  realpathSync = fs.realpathSync,
+  statSync = fs.statSync
+} = {}) {
+  if (!authority ||
+      typeof authority.parentPath !== 'string' ||
+      !Number.isInteger(authority.parentDevice) ||
+      !Number.isInteger(authority.parentInode) ||
+      !Number.isInteger(authority.ownerUid)) {
+    throw safeError('relay_observer_snapshot_parent_security_invalid');
+  }
+  let resolvedParent;
+  let parentStat;
+  try {
+    resolvedParent = realpathSync(authority.parentPath);
+    parentStat = statSync(resolvedParent);
+  } catch {
+    throw safeError('relay_observer_snapshot_parent_unavailable');
+  }
+  if (resolvedParent !== authority.parentPath ||
+      !parentStat.isDirectory() ||
+      (parentStat.mode & 0o077) !== 0 ||
+      parentStat.uid !== authority.ownerUid ||
+      parentStat.dev !== authority.parentDevice ||
+      parentStat.ino !== authority.parentInode) {
+    throw safeError('relay_observer_snapshot_parent_security_invalid');
+  }
+  return true;
+}
+
 async function prepareObserverSnapshotSocketPath(authority, {
   lstatSync = fs.lstatSync,
   probeSocket = probeObserverSnapshotSocket,
+  realpathSync = fs.realpathSync,
+  revalidateParentAuthority = revalidateOwnerOnlySnapshotParentAuthority,
+  statSync = fs.statSync,
   unlinkSync = fs.unlinkSync
 } = {}) {
+  revalidateParentAuthority(authority, { realpathSync, statSync });
   const existingStat = readExistingSnapshotSocketStat(authority.socketPath, lstatSync);
   if (existingStat === null) return false;
   validateStaleSnapshotSocketCandidate(existingStat, authority);
@@ -302,6 +341,7 @@ async function prepareObserverSnapshotSocketPath(authority, {
     throw safeError('relay_observer_snapshot_socket_probe_uncertain');
   }
 
+  revalidateParentAuthority(authority, { realpathSync, statSync });
   const currentStat = readExistingSnapshotSocketStat(authority.socketPath, lstatSync);
   if (currentStat === null) return false;
   validateStaleSnapshotSocketCandidate(currentStat, authority);
@@ -329,8 +369,7 @@ function readExistingSnapshotSocketStat(socketPath, lstatSync = fs.lstatSync) {
 function validateStaleSnapshotSocketCandidate(stat, authority) {
   if (!stat || typeof stat.isSocket !== 'function' ||
       !stat.isSocket() ||
-      stat.uid !== authority.ownerUid ||
-      (stat.mode & 0o777) !== 0o600) {
+      stat.uid !== authority.ownerUid) {
     throw safeError('relay_observer_snapshot_stale_socket_candidate_invalid');
   }
   return true;
@@ -451,6 +490,7 @@ module.exports = {
   prepareObserverSnapshotSocketPath,
   probeObserverSnapshotSocket,
   readExistingSnapshotSocketStat,
+  revalidateOwnerOnlySnapshotParentAuthority,
   validateBoundSnapshotSocket,
   validateOwnerOnlySnapshotSocketPath,
   validateStaleSnapshotSocketCandidate,

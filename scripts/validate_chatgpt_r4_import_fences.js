@@ -445,6 +445,7 @@ function validateComponentSource(component, { file, source }) {
         /\bcrypto\.createHash\s*\(\s*['"]sha256['"]\s*\)/u,
         /\bnet\.createServer\s*\(\s*socket\s*=>\s*socket\.destroy\s*\(\s*\)\s*\)/u,
         /\blockServer\.maxConnections\s*=\s*1\b/u,
+        /\bsocket\.end\s*\(\s*encoded\s*,\s*\(\s*\)\s*=>\s*socket\.destroy\s*\(\s*\)\s*\)/u,
         /\bstartupLock\s*=\s*await\s+acquireStartupLock\s*\(\s*authority\s*\)[\s\S]{0,240}\bawait\s+prepareObserverSnapshotSocketPath\b/u
       ];
       const startupLockAssertions =
@@ -491,10 +492,20 @@ function validateComponentSource(component, { file, source }) {
     const exactUnlinkCall =
       /\bunlinkSync\s*\(\s*authority\s*\.\s*socketPath\s*\)/u;
     const unlinkReferences = [...maskedSource.matchAll(/\bunlinkSync\b/gu)].length;
+    const parentAuthorityRevalidations = [
+      ...maskedSource.matchAll(
+        /\brevalidateParentAuthority\s*\(\s*authority\s*,\s*\{\s*realpathSync\s*,\s*statSync\s*\}\s*\)/gu
+      )
+    ].length;
+    const staleModeChecks = [
+      ...maskedSource.matchAll(
+        /\(\s*stat\s*\.\s*mode\s*&\s*0o777\s*\)/gu
+      )
+    ].length;
     const staleCleanupContracts = [
       /!\s*stat\s*\.\s*isSocket\s*\(\s*\)/u,
       /\bstat\s*\.\s*uid\s*!==\s*authority\s*\.\s*ownerUid\b/u,
-      /\(\s*stat\s*\.\s*mode\s*&\s*0o777\s*\)\s*!==\s*0o600\b/u,
+      /\brevalidateParentAuthority\s*=\s*revalidateOwnerOnlySnapshotParentAuthority\b/u,
       /\bprobeStatus\s*===\s*['"]active['"]/u,
       /\bprobeStatus\s*!==\s*['"]stale['"]/u,
       /\bcurrentStat\s*\.\s*dev\s*!==\s*existingStat\s*\.\s*dev\b/u,
@@ -503,6 +514,8 @@ function validateComponentSource(component, { file, source }) {
     if (!exactUnlinkBinding.test(source) ||
         !exactUnlinkCall.test(source) ||
         unlinkReferences !== 5 ||
+        parentAuthorityRevalidations !== 2 ||
+        staleModeChecks !== 0 ||
         staleCleanupContracts.some(pattern => !pattern.test(source))) {
       throw new Error(`stale_socket_cleanup_contract_invalid:${relativeFile}`);
     }
@@ -594,9 +607,12 @@ function validateBoundaryManifests() {
       relay.observerSnapshotDurableStateImplemented !== false ||
       relay.observerSnapshotStaleSocketCleanupImplemented !== true ||
       relay.observerSnapshotStaleSocketCleanupRequiresInactiveProbe !== true ||
+      relay.observerSnapshotStaleSocketModePolicy !==
+        'current_uid_socket_under_revalidated_owner_only_parent' ||
       relay.observerSnapshotStartupSerialization !== 'linux_abstract_uds_lock' ||
       relay.observerSnapshotStartupLockDurableStateImplemented !== false ||
       relay.observerSnapshotStartupLockDataSurface !== false ||
+      relay.observerSnapshotResponseClosesConnection !== true ||
       relay.observerSnapshotRequestIdentifiersRetained !== false ||
       relay.observerSnapshotBodiesRetained !== false ||
       relay.durableStateImplemented !== false) {

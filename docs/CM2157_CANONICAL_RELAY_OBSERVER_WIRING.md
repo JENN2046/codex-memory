@@ -44,12 +44,16 @@ The configured socket path must:
 - resolve to a socket owned by the current process user with exact mode
   `0600`.
 
-Before binding, a pre-existing path is removed only when it is a current-UID
-socket with exact mode `0600`, a bounded connection probe returns
-`ECONNREFUSED`, and a second `lstat` confirms the same device/inode. An active
-socket, a vanished path, identity drift, a non-socket, an ownership or mode
-mismatch, and every uncertain probe result are never unlinked. Active and
-uncertain collisions fail closed.
+Before binding, the canonical parent authority is revalidated before stale
+inspection and again immediately before unlink. A pre-existing path is removed
+only when it remains under that same current-UID, owner-only parent, is a
+current-UID socket, a bounded connection probe returns `ECONNREFUSED`, and a
+second `lstat` confirms the same device/inode. The stale socket may have an
+umask-derived mode so a crash between bind and the final `0600` chmod remains
+recoverable; this exception never weakens the exact `0600` post-bind check. An
+active socket, a vanished path, parent or socket identity drift, a non-socket,
+an ownership mismatch, and every uncertain probe result are never unlinked.
+Active and uncertain collisions fail closed.
 
 The stale-path check, unlink, rebind, chmod, and post-bind validation are held
 under a deterministic per-UID/per-path Linux abstract UDS startup lock. The
@@ -85,6 +89,8 @@ retention flag other than `false` close the connection without a response.
 The UDS:
 
 - accepts at most four concurrent connections;
+- closes the full connection after the bounded response is flushed, including
+  when a client keeps its write half open;
 - limits requests to 128 bytes and responses to 4096 bytes;
 - has no mutation operation;
 - retains no request identifier, response body, raw memory, or secret value;
@@ -111,10 +117,13 @@ Source validation covers:
 - valid owner-only UDS request/response and exact socket mode;
 - malformed request and unsafe projection rejection;
 - permissive and symlinked parent rejection;
-- safe recovery from a synthetic crash-left stale socket, plus rejection of
-  active, unsafe, identity-drifted, and probe-uncertain socket paths;
+- safe recovery from synthetic crash-left stale sockets at both final `0600`
+  and pre-chmod modes, plus rejection of active, unsafe,
+  parent/socket-identity-drifted, and probe-uncertain paths;
 - concurrent stale-socket recovery serialization, with exactly one live
   rebound socket and no loser-side unlink;
+- full connection release after a valid response to a half-open client, so
+  handled clients cannot exhaust the four connection slots;
 - canonical main factory wiring and snapshot-server lifecycle, including
   fail-safe running-state reset and primary-error preservation when snapshot
   shutdown also fails;

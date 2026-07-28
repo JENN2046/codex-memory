@@ -138,6 +138,39 @@ test('owner-only Relay observer UDS exposes only the governed read-only snapshot
   assert.equal(fs.existsSync(socketPath), false);
 });
 
+test('Relay observer UDS releases handled connections whose clients keep writing open', async t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-half-open-'));
+  fs.chmodSync(root, 0o700);
+  const socketPath = path.join(root, 'observer.sock');
+  const server = createObserverSnapshotUdsServer({
+    socketPath,
+    readObservation: () => createLowDisclosureRelayObserver().snapshot()
+  });
+  t.after(async () => {
+    await server.stop().catch(() => {});
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+  await server.start();
+
+  for (let index = 0; index < 5; index += 1) {
+    const held = await exchangeHoldingWriteOpen(socketPath, {
+      schema_version: 1,
+      operation: 'snapshot'
+    });
+    try {
+      assert.equal(JSON.parse(held.data).operation, 'snapshot');
+      await waitForCondition(() => server.snapshot().active_connections === 0);
+    } finally {
+      held.socket.destroy();
+    }
+  }
+  const snapshot = server.snapshot();
+  assert.equal(snapshot.connections, 5);
+  assert.equal(snapshot.accepted_frames, 5);
+  assert.equal(snapshot.rejected_frames, 0);
+  assert.equal(snapshot.active_connections, 0);
+});
+
 test('Relay observer UDS rejects permissive or non-canonical parent authority', async t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-parent-'));
   const target = path.join(root, 'target');
@@ -174,7 +207,7 @@ test('Relay observer UDS revalidates parent authority after bind', async t => {
       const stat = fs.statSync(candidate);
       if (candidate === root) {
         parentStatCalls += 1;
-        if (parentStatCalls === 3) {
+        if (parentStatCalls === 4) {
           return Object.assign(Object.create(stat), {
             mode: stat.mode | 0o077
           });
@@ -194,39 +227,68 @@ test('Relay observer UDS revalidates parent authority after bind', async t => {
   assert.equal(fs.existsSync(socketPath), false);
 });
 
-test('Relay observer UDS removes only a probed-stale owner socket before rebinding', {
+test('Relay observer UDS recovers probed-stale owner sockets across final and pre-chmod modes', {
+  skip: process.platform !== 'linux' || typeof process.getuid !== 'function'
+}, async () => {
+  for (const staleMode of [0o600, 0o755]) {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-stale-'));
+    fs.chmodSync(root, 0o700);
+    const socketPath = path.join(root, 'observer.sock');
+    let server = null;
+    try {
+      await leaveCrashLeftSocket(socketPath, { socketMode: staleMode });
+      const staleStat = fs.lstatSync(socketPath);
+      assert.equal(staleStat.isSocket(), true);
+      assert.equal(staleStat.uid, process.getuid());
+      assert.equal(staleStat.mode & 0o777, staleMode);
+
+      const observer = createLowDisclosureRelayObserver();
+      server = createObserverSnapshotUdsServer({
+        socketPath,
+        readObservation: observer.snapshot
+      });
+      await server.start();
+      const reboundStat = fs.lstatSync(socketPath);
+      assert.equal(reboundStat.isSocket(), true);
+      assert.equal(reboundStat.uid, process.getuid());
+      assert.equal(reboundStat.mode & 0o777, 0o600);
+      const response = await exchange(socketPath, {
+        schema_version: 1,
+        operation: 'snapshot'
+      });
+      assert.equal(JSON.parse(response.data).observation.completion_state, 'idle');
+    } finally {
+      await server?.stop().catch(() => {});
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  }
+});
+
+test('Relay observer UDS revalidates owner-only parent authority before stale unlink', {
   skip: process.platform !== 'linux' || typeof process.getuid !== 'function'
 }, async t => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-stale-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-parent-race-'));
   fs.chmodSync(root, 0o700);
   const socketPath = path.join(root, 'observer.sock');
-  let server = null;
+  await leaveCrashLeftSocket(socketPath, { socketMode: 0o755 });
+  const server = createObserverSnapshotUdsServer({
+    socketPath,
+    readObservation: () => createLowDisclosureRelayObserver().snapshot(),
+    async probeSocket() {
+      fs.chmodSync(root, 0o755);
+      return 'stale';
+    }
+  });
   t.after(async () => {
-    await server?.stop().catch(() => {});
+    fs.chmodSync(root, 0o700);
+    await server.stop().catch(() => {});
     fs.rmSync(root, { recursive: true, force: true });
   });
 
-  await leaveCrashLeftSocket(socketPath);
-  const staleStat = fs.lstatSync(socketPath);
-  assert.equal(staleStat.isSocket(), true);
-  assert.equal(staleStat.uid, process.getuid());
-  assert.equal(staleStat.mode & 0o777, 0o600);
-
-  const observer = createLowDisclosureRelayObserver();
-  server = createObserverSnapshotUdsServer({
-    socketPath,
-    readObservation: observer.snapshot
+  await assert.rejects(server.start(), {
+    code: 'relay_observer_snapshot_parent_security_invalid'
   });
-  await server.start();
-  const reboundStat = fs.lstatSync(socketPath);
-  assert.equal(reboundStat.isSocket(), true);
-  assert.equal(reboundStat.uid, process.getuid());
-  assert.equal(reboundStat.mode & 0o777, 0o600);
-  const response = await exchange(socketPath, {
-    schema_version: 1,
-    operation: 'snapshot'
-  });
-  assert.equal(JSON.parse(response.data).observation.completion_state, 'idle');
+  assert.equal(fs.lstatSync(socketPath).isSocket(), true);
 });
 
 test('Relay observer UDS serializes concurrent stale-socket recovery', {
@@ -307,15 +369,31 @@ test('stale socket cleanup rejects unsafe candidates and identity drift', async 
 
   for (const unsafe of [
     socketStat({ isSocket: () => false }),
-    socketStat({ uid: 1001 }),
-    socketStat({ mode: 0o140660 })
+    socketStat({ uid: 1001 })
   ]) {
     await assert.rejects(prepareObserverSnapshotSocketPath(authority, {
       lstatSync: () => unsafe,
       probeSocket: () => assert.fail('unsafe candidate must not be probed'),
+      revalidateParentAuthority: () => true,
       unlinkSync: () => assert.fail('unsafe candidate must not be unlinked')
     }), { code: 'relay_observer_snapshot_stale_socket_candidate_invalid' });
   }
+
+  let parentRevalidations = 0;
+  let permissiveStaleUnlinked = false;
+  assert.equal(await prepareObserverSnapshotSocketPath(authority, {
+    lstatSync: () => socketStat({ mode: 0o140755 }),
+    probeSocket: async () => 'stale',
+    revalidateParentAuthority() {
+      parentRevalidations += 1;
+    },
+    unlinkSync(candidate) {
+      assert.equal(candidate, authority.socketPath);
+      permissiveStaleUnlinked = true;
+    }
+  }), true);
+  assert.equal(parentRevalidations, 2);
+  assert.equal(permissiveStaleUnlinked, true);
 
   let calls = 0;
   await assert.rejects(prepareObserverSnapshotSocketPath(authority, {
@@ -324,12 +402,14 @@ test('stale socket cleanup rejects unsafe candidates and identity drift', async 
       return calls === 1 ? socketStat() : socketStat({ ino: 3 });
     },
     probeSocket: async () => 'stale',
+    revalidateParentAuthority: () => true,
     unlinkSync: () => assert.fail('identity drift must not be unlinked')
   }), { code: 'relay_observer_snapshot_socket_identity_changed' });
 
   await assert.rejects(prepareObserverSnapshotSocketPath(authority, {
     lstatSync: () => socketStat(),
     probeSocket: async () => 'uncertain',
+    revalidateParentAuthority: () => true,
     unlinkSync: () => assert.fail('uncertain liveness must not be unlinked')
   }), { code: 'relay_observer_snapshot_socket_probe_uncertain' });
 });
@@ -520,16 +600,14 @@ test('canonical outbound-main entrypoint cannot bypass observer wiring factory',
   assert.doesNotMatch(mainBody, /loadOutboundRelayRuntimeFromEnvironment/u);
 });
 
-async function leaveCrashLeftSocket(socketPath) {
+async function leaveCrashLeftSocket(socketPath, { socketMode = 0o600 } = {}) {
   const child = childProcess.spawn(process.execPath, [
     '-e',
     [
-      "const fs = require('node:fs');",
       "const net = require('node:net');",
       'const socketPath = process.argv[1];',
       'const server = net.createServer(socket => socket.destroy());',
       'server.listen(socketPath, () => {',
-      '  fs.chmodSync(socketPath, 0o600);',
       "  if (process.send) process.send('ready');",
       '});'
     ].join('\n'),
@@ -549,6 +627,7 @@ async function leaveCrashLeftSocket(socketPath) {
       if (!ready) reject(new Error('stale fixture exited before readiness'));
     });
   });
+  fs.chmodSync(socketPath, socketMode);
   if (child.exitCode !== null || child.signalCode !== null) {
     throw new Error('stale fixture exited before crash simulation');
   }
@@ -589,4 +668,47 @@ function exchange(socketPath, payload) {
     });
     socket.once('close', finish);
   });
+}
+
+function exchangeHoldingWriteOpen(socketPath, payload) {
+  return new Promise((resolve, reject) => {
+    const socket = net.createConnection({
+      path: socketPath,
+      allowHalfOpen: true
+    });
+    const chunks = [];
+    let settled = false;
+    const timer = setTimeout(() => {
+      socket.destroy();
+      finish(new Error('half-open snapshot exchange timed out'));
+    }, 2000);
+
+    function finish(error) {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (error) reject(error);
+      else resolve({
+        socket,
+        data: Buffer.concat(chunks).toString('utf8')
+      });
+    }
+
+    socket.once('connect', () => {
+      socket.write(`${JSON.stringify(payload)}\n`);
+    });
+    socket.on('data', chunk => chunks.push(chunk));
+    socket.once('end', () => finish());
+    socket.once('error', finish);
+  });
+}
+
+async function waitForCondition(predicate, timeoutMs = 500) {
+  const deadline = Date.now() + timeoutMs;
+  while (!predicate()) {
+    if (Date.now() >= deadline) {
+      throw new Error('condition wait timed out');
+    }
+    await new Promise(resolve => setTimeout(resolve, 10));
+  }
 }

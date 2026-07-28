@@ -150,13 +150,20 @@ test('R4-C listener and transport builtin exceptions are exact-file and exact-lo
   assert.throws(() => validateComponentSource('relay', {
     file: relayObserverFile,
     source: relayObserverSource.replace(
+      'socket.end(encoded, () => socket.destroy())',
+      'socket.end(encoded)'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
       'resolvedParent !== parentPath',
       'resolvedParent === parentPath'
     )
   }), /owner_only_snapshot_listener_contract_invalid/);
   assert.throws(() => validateComponentSource('relay', {
     file: relayObserverFile,
-    source: relayObserverSource.replace(
+    source: relayObserverSource.replaceAll(
       'parentStat.uid !== authority.ownerUid',
       'parentStat.uid === authority.ownerUid'
     )
@@ -173,6 +180,20 @@ test('R4-C listener and transport builtin exceptions are exact-file and exact-lo
     source: relayObserverSource.replace(
       "probeStatus !== 'stale'",
       "probeStatus === 'stale'"
+    )
+  }), /stale_socket_cleanup_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'revalidateParentAuthority(authority, { realpathSync, statSync });',
+      'true;'
+    )
+  }), /stale_socket_cleanup_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'stat.uid !== authority.ownerUid) {',
+      'stat.uid !== authority.ownerUid ||\n      (stat.mode & 0o777) !== 0o600) {'
     )
   }), /stale_socket_cleanup_contract_invalid/);
   assert.throws(() => validateComponentSource('relay', {
