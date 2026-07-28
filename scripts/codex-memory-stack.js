@@ -70,6 +70,7 @@ const LEGACY_PROFILE_KEYS = Object.freeze([
 ]);
 const PROFILE_KEYS = Object.freeze([
   ...LEGACY_PROFILE_KEYS,
+  'controllerSourceCommit',
   'vcpProviderConfigDigest',
   'vcpRuntimeBaseline',
   'vcpRuntimeRepository',
@@ -469,6 +470,7 @@ function validateProfile(value) {
   }
   if (value.schemaVersion === PROFILE_SCHEMA_VERSION &&
       (
+        !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') ||
         !SAFE_GIT_OBJECT.test(value.vcpRuntimeBaseline || '') ||
         !SAFE_SHA256_DIGEST.test(value.vcpProviderConfigDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.vcpRuntimeScopeDigest || '') ||
@@ -671,6 +673,26 @@ function acquireOwnerLock(file, {
       return true;
     }
   });
+}
+
+function acquireLifecycleProfile({
+  environment = process.env,
+  ensureRuntime = ensureRuntimeDirectories,
+  acquireLock = acquireOwnerLock,
+  read = readProfile
+} = {}) {
+  ensureRuntime(environment);
+  const lifecycleLock = acquireLock(lifecycleLockPath(environment));
+  try {
+    const profile = read({ environment });
+    return Object.freeze({
+      profile,
+      release: () => lifecycleLock.release()
+    });
+  } catch (error) {
+    lifecycleLock.release();
+    throw error;
+  }
 }
 
 function parsePid(value) {
@@ -1181,7 +1203,8 @@ function legacyVcpRuntimeBootstrapMatches(profile, identity) {
 function profileWithVcpRuntimeBinding(
   profile,
   identity,
-  providerEnvironment
+  providerEnvironment,
+  controllerSourceCommit
 ) {
   if (!legacyVcpRuntimeBootstrapMatches(profile, identity)) {
     throw codedError('stack_vcp_runtime_identity_mismatch');
@@ -1189,6 +1212,7 @@ function profileWithVcpRuntimeBinding(
   return validateProfile({
     ...profile,
     schemaVersion: PROFILE_SCHEMA_VERSION,
+    controllerSourceCommit,
     vcpProviderConfigDigest:
       vcpProviderConfigDigest(providerEnvironment),
     vcpRuntimeBaseline: identity.revision,
@@ -1221,6 +1245,11 @@ function inspectSourceCompatibility(profile, options = {}) {
   const controllerOnlyChanges = baselineExists &&
     changedPaths.every(candidate => CONTROLLER_CHANGE_PATHS.has(candidate));
   const repositoryMatch = inspectedRepository === profile.runtimeRepository;
+  const controllerSourceMatch =
+    profile.schemaVersion === PROFILE_SCHEMA_VERSION
+      ? SAFE_GIT_OBJECT.test(profile.controllerSourceCommit || '') &&
+        head === profile.controllerSourceCommit
+      : controllerOnlyChanges;
   return Object.freeze({
     head,
     originMain,
@@ -1229,8 +1258,9 @@ function inspectSourceCompatibility(profile, options = {}) {
     currentMain: head === originMain,
     repositoryMatch,
     controllerOnlyChanges,
+    controllerSourceMatch,
     compatible: clean && baselineExists && head === originMain &&
-      repositoryMatch && controllerOnlyChanges
+      repositoryMatch && controllerOnlyChanges && controllerSourceMatch
   });
 }
 
@@ -1239,6 +1269,7 @@ function adoptionSourceCompatible(source) {
     source?.clean === true &&
     source?.baselineExists === true &&
     source?.controllerOnlyChanges === true &&
+    source?.controllerSourceMatch === true &&
     source?.currentMain === true &&
     source?.repositoryMatch === true &&
     source?.compatible === true
@@ -1257,6 +1288,48 @@ function dockerText(args, {
   } catch {
     throw codedError(failureCode);
   }
+}
+
+function publishedPortsLoopbackOnly(portMap, {
+  requiredContainerPort,
+  requiredHostPort = null,
+  requireSingleBinding = false
+} = {}) {
+  if (!portMap ||
+      typeof portMap !== 'object' ||
+      Array.isArray(portMap) ||
+      !/^[1-9][0-9]{0,4}\/(?:tcp|udp|sctp)$/u.test(
+        requiredContainerPort || ''
+      )) {
+    return false;
+  }
+  const requiredBindings = portMap[requiredContainerPort];
+  if (!Array.isArray(requiredBindings) ||
+      requiredBindings.length < 1 ||
+      (requireSingleBinding && requiredBindings.length !== 1)) {
+    return false;
+  }
+  for (const [containerPort, bindings] of Object.entries(portMap)) {
+    if (!/^[1-9][0-9]{0,4}\/(?:tcp|udp|sctp)$/u.test(containerPort)) {
+      return false;
+    }
+    if (bindings === null) continue;
+    if (!Array.isArray(bindings) || bindings.length < 1) return false;
+    for (const binding of bindings) {
+      const hostPort = binding?.HostPort;
+      const numericPort = Number(hostPort);
+      if (!['127.0.0.1', '::1'].includes(binding?.HostIp) ||
+          !/^[1-9][0-9]{0,4}$/u.test(hostPort || '') ||
+          !Number.isInteger(numericPort) ||
+          numericPort > 65_535) {
+        return false;
+      }
+    }
+  }
+  return requiredHostPort === null ||
+    requiredBindings.every(binding =>
+      binding.HostPort === requiredHostPort
+    );
 }
 
 function inspectProviderContainer(name, options = {}) {
@@ -1282,19 +1355,18 @@ function inspectProviderContainer(name, options = {}) {
   const composeService = query(
     '{{ index .Config.Labels "com.docker.compose.service" }}'
   );
-  const portBindingsText = query(
-    '{{ json (index .NetworkSettings.Ports "3000/tcp") }}'
-  );
-  let portBindings;
+  const portBindingsText = query('{{ json .NetworkSettings.Ports }}');
+  let portMap;
   try {
-    portBindings = JSON.parse(portBindingsText);
+    portMap = JSON.parse(portBindingsText);
   } catch {
-    portBindings = null;
+    portMap = null;
   }
-  const hostLoopbackOnly = Array.isArray(portBindings) &&
-    portBindings.length === 1 &&
-    ['127.0.0.1', '::1'].includes(portBindings[0]?.HostIp) &&
-    portBindings[0]?.HostPort === '3000';
+  const hostLoopbackOnly = publishedPortsLoopbackOnly(portMap, {
+    requiredContainerPort: '3000/tcp',
+    requiredHostPort: '3000',
+    requireSingleBinding: true
+  });
   const running = query('{{ .State.Running }}') === 'true';
   const recognized = SAFE_CONTAINER_ID.test(id) &&
     SAFE_IMAGE_ID.test(imageId) &&
@@ -1341,18 +1413,16 @@ function inspectEdgeContainer(name, options = {}) {
   const secretMountReadOnly = query(
     '{{ range .Mounts }}{{ if eq .Destination "/run/secrets/codex-memory-r4" }}{{ not .RW }}{{ end }}{{ end }}'
   ) === 'true';
-  const portBindingsText = query('{{ json (index .NetworkSettings.Ports "8080/tcp") }}');
-  let portBindings;
+  const portBindingsText = query('{{ json .NetworkSettings.Ports }}');
+  let portMap;
   try {
-    portBindings = JSON.parse(portBindingsText);
+    portMap = JSON.parse(portBindingsText);
   } catch {
-    portBindings = null;
+    portMap = null;
   }
-  const hostLoopbackOnly = Array.isArray(portBindings) && portBindings.length > 0 &&
-    portBindings.every(binding =>
-      ['127.0.0.1', '::1'].includes(binding?.HostIp) &&
-      /^[1-9][0-9]{0,4}$/u.test(binding?.HostPort || '')
-    );
+  const hostLoopbackOnly = publishedPortsLoopbackOnly(portMap, {
+    requiredContainerPort: '8080/tcp'
+  });
   const running = query('{{ .State.Running }}') === 'true';
   const health = query('{{ if .State.Health }}{{ .State.Health.Status }}{{ else }}none{{ end }}');
   const nonRoot = user === 'node' || (/^[1-9][0-9]*$/u.test(user) && user !== '0');
@@ -1860,6 +1930,8 @@ function buildControllerChildEnvironment(environmentFile, {
       profile.retainedBindingSource
   };
   if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+    childEnvironment.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT =
+      profile.controllerSourceCommit;
     childEnvironment.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION =
       String(PROFILE_SCHEMA_VERSION);
     childEnvironment.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST =
@@ -2239,6 +2311,7 @@ async function inspectStack({
     source: Object.freeze({
       clean: source.clean,
       currentMain: source.currentMain,
+      controllerIdentityMatch: source.controllerSourceMatch,
       repositoryMatch: source.repositoryMatch,
       compatible: source.compatible
     }),
@@ -2474,13 +2547,14 @@ async function rollbackStarted(started, profile, environment) {
 async function startStack({
   environment = process.env
 } = {}) {
-  const storedProfile = readProfile({ environment });
-  let profile = storedProfile;
-  const source = inspectSourceCompatibility(storedProfile);
-  if (!source.compatible) throw codedError('stack_source_compatibility_failed');
-  ensureRuntimeDirectories(environment);
-  const lifecycleLock = acquireOwnerLock(lifecycleLockPath(environment));
+  const lifecycle = acquireLifecycleProfile({ environment });
+  const storedProfile = lifecycle.profile;
   try {
+    let profile = storedProfile;
+    const source = inspectSourceCompatibility(storedProfile);
+    if (!source.compatible) {
+      throw codedError('stack_source_compatibility_failed');
+    }
     if (!profileRetainedBindingMatches(profile)) {
       throw codedError('stack_retained_binding_identity_mismatch');
     }
@@ -2503,7 +2577,8 @@ async function startStack({
       profile = profileWithVcpRuntimeBinding(
         profile,
         vcpRuntime,
-        vcpProviderEnvironment
+        vcpProviderEnvironment,
+        source.head
       );
     } else {
       throw codedError('stack_vcp_runtime_identity_mismatch');
@@ -2714,16 +2789,15 @@ async function startStack({
       throw error;
     }
   } finally {
-    lifecycleLock.release();
+    lifecycle.release();
   }
 }
 
 async function stopStack({
   environment = process.env
 } = {}) {
-  const profile = readProfile({ environment });
-  ensureRuntimeDirectories(environment);
-  const lifecycleLock = acquireOwnerLock(lifecycleLockPath(environment));
+  const lifecycle = acquireLifecycleProfile({ environment });
+  const profile = lifecycle.profile;
   try {
     if (!profileRetainedBindingMatches(profile)) {
       throw codedError('stack_retained_binding_identity_mismatch');
@@ -2752,7 +2826,7 @@ async function stopStack({
       rawMemoryReturned: false
     });
   } finally {
-    lifecycleLock.release();
+    lifecycle.release();
   }
 }
 
@@ -2816,6 +2890,14 @@ async function adoptRunningStack({
       identities.http.identity
     );
     assertAdoptionRepositoryMatch(runtimeRepository);
+    const controllerSource = inspectSourceCompatibility({
+      schemaVersion: LEGACY_PROFILE_SCHEMA_VERSION,
+      runtimeBaseline: edge.revision,
+      runtimeRepository
+    });
+    if (!adoptionSourceCompatible(controllerSource)) {
+      throw codedError('stack_adoption_source_incompatible');
+    }
     const vcpBootstrapProfile = {
       schemaVersion: LEGACY_PROFILE_SCHEMA_VERSION,
       runtimeBaseline: edge.revision
@@ -2832,6 +2914,7 @@ async function adoptRunningStack({
     );
     const profile = validateProfile({
       schemaVersion: PROFILE_SCHEMA_VERSION,
+      controllerSourceCommit: controllerSource.head,
       runtimeBaseline: edge.revision,
       runtimeRepository,
       privateRoot,
@@ -3039,6 +3122,9 @@ function assertChildMode() {
 async function runShimChild() {
   assertChildMode();
   const profile = {
+    controllerSourceCommit:
+      process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
+    runtimeRepository: REPO_ROOT,
     schemaVersion: Number(
       process.env.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION
     ),
@@ -3052,6 +3138,10 @@ async function runShimChild() {
     vcpRuntimeScopeDigest:
       process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST
   };
+  const source = inspectSourceCompatibility(profile);
+  if (!source.compatible) {
+    throw codedError('stack_source_compatibility_failed');
+  }
   const vcpRuntime = inspectVcpRuntimeIdentity(profile);
   if (!profileVcpRuntimeIdentityMatches(profile, vcpRuntime)) {
     throw codedError('stack_vcp_runtime_identity_mismatch');
@@ -3157,6 +3247,8 @@ function requireShimListenerForGovernanceChild(privateRoot) {
     process.env.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION
   );
   const profile = {
+    controllerSourceCommit:
+      process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
     governanceEnvironment: environmentReference,
     privateRoot,
     retainedBinding,
@@ -3175,6 +3267,7 @@ function requireShimListenerForGovernanceChild(privateRoot) {
       process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST
   };
   if (schemaVersion !== PROFILE_SCHEMA_VERSION ||
+      !SAFE_GIT_OBJECT.test(profile.controllerSourceCommit || '') ||
       !SAFE_GIT_OBJECT.test(profile.runtimeBaseline || '') ||
       !SAFE_GIT_OBJECT.test(profile.retainedBindingSource || '') ||
       !SAFE_SHA256_DIGEST.test(profile.vcpProviderConfigDigest || '') ||
@@ -3448,6 +3541,7 @@ module.exports = {
   PROFILE_KEYS,
   VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
   VCP_RUNTIME_SOURCE_PATHS,
+  acquireLifecycleProfile,
   acquireOwnerLock,
   adoptionSourceCompatible,
   adoptRunningStack,

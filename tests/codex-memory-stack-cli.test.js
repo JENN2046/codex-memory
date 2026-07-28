@@ -13,6 +13,7 @@ const {
   PROFILE_KEYS,
   VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
   VCP_RUNTIME_SOURCE_PATHS,
+  acquireLifecycleProfile,
   acquireOwnerLock,
   adoptionSourceCompatible,
   assertAdoptionRepositoryMatch,
@@ -64,6 +65,8 @@ const {
 } = require('../scripts/codex-memory-stack');
 
 const BASELINE = '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118';
+const CONTROLLER_SOURCE_COMMIT =
+  '89abcdef0123456789abcdef0123456789abcdef';
 const RETAINED_BINDING_SOURCE = 'f1dea016a7a167898d77be6575403e7a7d28c8d5';
 const EDGE_CONTAINER_ID = 'ab'.repeat(32);
 const PROVIDER_CONTAINER_ID = 'cd'.repeat(32);
@@ -82,6 +85,7 @@ const VCP_PROVIDER_CONFIG_DIGEST = vcpProviderConfigDigest(
 function profile(overrides = {}) {
   return {
     schemaVersion: 5,
+    controllerSourceCommit: CONTROLLER_SOURCE_COMMIT,
     runtimeBaseline: BASELINE,
     runtimeRepository: '/repo',
     retainedBindingSource: RETAINED_BINDING_SOURCE,
@@ -105,6 +109,7 @@ function profile(overrides = {}) {
 
 function legacyProfile(overrides = {}) {
   const {
+    controllerSourceCommit: _controllerSourceCommit,
     vcpProviderConfigDigest: _vcpProviderConfigDigest,
     vcpRuntimeBaseline: _vcpRuntimeBaseline,
     vcpRuntimeRepository: _vcpRuntimeRepository,
@@ -591,6 +596,65 @@ test('lifecycle lock recovers only a well-formed dead-owner lock', t => {
   assert.equal(fs.readFileSync(file, 'utf8'), 'not-a-pid\n');
 });
 
+test('lifecycle profile snapshot is read only after the lock is acquired', () => {
+  const events = [];
+  const environment = { XDG_RUNTIME_DIR: '/synthetic/runtime' };
+  const lifecycle = acquireLifecycleProfile({
+    environment,
+    ensureRuntime(observedEnvironment) {
+      assert.equal(observedEnvironment, environment);
+      events.push('ensure');
+    },
+    acquireLock(file) {
+      assert.equal(
+        file,
+        '/synthetic/runtime/codex-memory-full-stack-001/pids/lifecycle.lock'
+      );
+      events.push('lock');
+      return {
+        release() {
+          events.push('release');
+          return true;
+        }
+      };
+    },
+    read(options) {
+      assert.equal(options.environment, environment);
+      events.push('read');
+      return profile();
+    }
+  });
+  assert.deepEqual(events, ['ensure', 'lock', 'read']);
+  assert.equal(lifecycle.profile.controllerSourceCommit, CONTROLLER_SOURCE_COMMIT);
+  assert.equal(lifecycle.release(), true);
+  assert.deepEqual(events, ['ensure', 'lock', 'read', 'release']);
+
+  const failedEvents = [];
+  assert.throws(
+    () => acquireLifecycleProfile({
+      environment,
+      ensureRuntime() {
+        failedEvents.push('ensure');
+      },
+      acquireLock() {
+        failedEvents.push('lock');
+        return {
+          release() {
+            failedEvents.push('release');
+            return true;
+          }
+        };
+      },
+      read() {
+        failedEvents.push('read');
+        throw new Error('synthetic profile failure');
+      }
+    }),
+    /synthetic profile failure/u
+  );
+  assert.deepEqual(failedEvents, ['ensure', 'lock', 'read', 'release']);
+});
+
 test('managed spawn persists PID before unref and confirms failed spawns exit', async () => {
   let written = null;
   let unreferenced = false;
@@ -957,6 +1021,10 @@ test('controller child environment binds the persisted v5 VCP identity', t => {
     profile: boundProfile,
     environment
   });
+  assert.equal(
+    child.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
+    boundProfile.controllerSourceCommit
+  );
   assert.equal(child.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION, '5');
   assert.equal(
     child.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST,
@@ -984,6 +1052,10 @@ test('controller child environment binds the persisted v5 VCP identity', t => {
     }),
     environment
   });
+  assert.equal(
+    Object.hasOwn(legacy, 'CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT'),
+    false
+  );
   assert.equal(
     Object.hasOwn(legacy, 'CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION'),
     false
@@ -1149,12 +1221,16 @@ test('retained governance binding is pinned independently from the runtime basel
   );
 });
 
-test('source compatibility allows only controller delivery paths over the accepted runtime baseline', () => {
+test('source compatibility pins v5 to one exact allowlisted controller commit', () => {
   const calls = [];
   const fakeExec = (_command, args) => {
     calls.push(args);
-    if (args[0] === 'rev-parse' && args[1] === 'HEAD^{commit}') return `${BASELINE}\n`;
-    if (args[0] === 'rev-parse' && args[1] === 'origin/main^{commit}') return `${BASELINE}\n`;
+    if (args[0] === 'rev-parse' && args[1] === 'HEAD^{commit}') {
+      return `${CONTROLLER_SOURCE_COMMIT}\n`;
+    }
+    if (args[0] === 'rev-parse' && args[1] === 'origin/main^{commit}') {
+      return `${CONTROLLER_SOURCE_COMMIT}\n`;
+    }
     if (args[0] === 'status') return '';
     if (args[0] === 'cat-file') return '';
     if (args[0] === 'diff') {
@@ -1168,6 +1244,7 @@ test('source compatibility allows only controller delivery paths over the accept
   });
   assert.equal(result.compatible, true);
   assert.equal(result.controllerOnlyChanges, true);
+  assert.equal(result.controllerSourceMatch, true);
   assert.equal(adoptionSourceCompatible(result), true);
   assert.equal(adoptionSourceCompatible({
     ...result,
@@ -1186,6 +1263,31 @@ test('source compatibility allows only controller delivery paths over the accept
     compatible: false
   }), false);
   assert.ok(calls.length >= 5);
+  assert.equal(
+    inspectSourceCompatibility(legacyProfile(), {
+      exec: fakeExec,
+      repoRoot: '/repo'
+    }).compatible,
+    true
+  );
+
+  const futureControllerCommit = '01'.repeat(20);
+  const future = inspectSourceCompatibility(profile(), {
+    repoRoot: '/repo',
+    exec(_command, args) {
+      if (args[0] === 'rev-parse') {
+        return `${futureControllerCommit}\n`;
+      }
+      if (args[0] === 'status' || args[0] === 'cat-file') return '';
+      if (args[0] === 'diff') {
+        return `${[...CONTROLLER_CHANGE_PATHS].join('\n')}\n`;
+      }
+      throw new Error('unexpected git call');
+    }
+  });
+  assert.equal(future.controllerOnlyChanges, true);
+  assert.equal(future.controllerSourceMatch, false);
+  assert.equal(future.compatible, false);
 
   const unsafe = inspectSourceCompatibility(profile(), {
     repoRoot: '/repo',
@@ -1330,9 +1432,14 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
   const upgraded = profileWithVcpRuntimeBinding(
     legacy,
     identity,
-    VCP_PROVIDER_ENVIRONMENT
+    VCP_PROVIDER_ENVIRONMENT,
+    CONTROLLER_SOURCE_COMMIT
   );
   assert.equal(upgraded.schemaVersion, 5);
+  assert.equal(
+    upgraded.controllerSourceCommit,
+    CONTROLLER_SOURCE_COMMIT
+  );
   assert.equal(
     upgraded.vcpProviderConfigDigest,
     VCP_PROVIDER_CONFIG_DIGEST
@@ -1352,7 +1459,8 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
         ...identity,
         scopeDigest: null
       },
-      VCP_PROVIDER_ENVIRONMENT
+      VCP_PROVIDER_ENVIRONMENT,
+      CONTROLLER_SOURCE_COMMIT
     ),
     { code: 'stack_vcp_runtime_identity_mismatch' }
   );
@@ -1396,8 +1504,10 @@ test('provider inspection pins the accepted container, image, revision, and loop
       'new-api'
     ],
     [
-      '{{ json (index .NetworkSettings.Ports "3000/tcp") }}',
-      JSON.stringify([{ HostIp: '127.0.0.1', HostPort: '3000' }])
+      '{{ json .NetworkSettings.Ports }}',
+      JSON.stringify({
+        '3000/tcp': [{ HostIp: '127.0.0.1', HostPort: '3000' }]
+      })
     ],
     ['{{ .State.Running }}', 'true']
   ]);
@@ -1414,13 +1524,25 @@ test('provider inspection pins the accepted container, image, revision, and loop
   assert.equal(profileProviderIdentityMatches(profile(), provider), true);
 
   values.set(
-    '{{ json (index .NetworkSettings.Ports "3000/tcp") }}',
-    JSON.stringify([{ HostIp: '0.0.0.0', HostPort: '3000' }])
+    '{{ json .NetworkSettings.Ports }}',
+    JSON.stringify({
+      '3000/tcp': [{ HostIp: '0.0.0.0', HostPort: '3000' }]
+    })
   );
   assert.equal(inspect().recognized, false);
   values.set(
-    '{{ json (index .NetworkSettings.Ports "3000/tcp") }}',
-    JSON.stringify([{ HostIp: '127.0.0.1', HostPort: '3000' }])
+    '{{ json .NetworkSettings.Ports }}',
+    JSON.stringify({
+      '3000/tcp': [{ HostIp: '127.0.0.1', HostPort: '3000' }],
+      '9000/tcp': [{ HostIp: '0.0.0.0', HostPort: '49000' }]
+    })
+  );
+  assert.equal(inspect().recognized, false);
+  values.set(
+    '{{ json .NetworkSettings.Ports }}',
+    JSON.stringify({
+      '3000/tcp': [{ HostIp: '127.0.0.1', HostPort: '3000' }]
+    })
   );
   values.set('{{ .Image }}', `sha256:${'01'.repeat(32)}`);
   assert.equal(
@@ -1442,8 +1564,10 @@ test('Edge inspection validates non-root, read-only, non-restarting, logless loo
       'true'
     ],
     [
-      '{{ json (index .NetworkSettings.Ports "8080/tcp") }}',
-      JSON.stringify([{ HostIp: '127.0.0.1', HostPort: '49152' }])
+      '{{ json .NetworkSettings.Ports }}',
+      JSON.stringify({
+        '8080/tcp': [{ HostIp: '127.0.0.1', HostPort: '49152' }]
+      })
     ],
     ['{{ .State.Running }}', 'true'],
     ['{{ if .State.Health }}{{ .State.Health.Status }}{{ else }}none{{ end }}', 'healthy']
@@ -1460,8 +1584,11 @@ test('Edge inspection validates non-root, read-only, non-restarting, logless loo
   assert.equal(edge.healthy, true);
 
   values.set(
-    '{{ json (index .NetworkSettings.Ports "8080/tcp") }}',
-    JSON.stringify([{ HostIp: '0.0.0.0', HostPort: '49152' }])
+    '{{ json .NetworkSettings.Ports }}',
+    JSON.stringify({
+      '8080/tcp': [{ HostIp: '127.0.0.1', HostPort: '49152' }],
+      '9090/tcp': [{ HostIp: '0.0.0.0', HostPort: '49153' }]
+    })
   );
   assert.equal(
     inspectEdgeContainer('codex-memory-full-stack-001-edge', {

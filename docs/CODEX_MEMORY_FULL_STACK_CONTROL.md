@@ -66,12 +66,14 @@ working-tree state is not executed by this shim and is outside the declared
 scope; any drift in the loaded source files, Rust module, or dependency
 manifests fails closed.
 
-Profile schema v5 persists the canonical VCPToolBox repository, selected commit,
-declared-source digest, and a digest of the selected embedding model plus vector
-dimension alongside the codex-memory and container bindings. The API key is
-neither included in that digest nor stored in the profile. Model or dimension
-drift fails closed before shim launch and during live acceptance; an API-key
-rotation does not disclose or persist the key.
+Profile schema v5 persists the exact accepted controller source commit, the
+canonical VCPToolBox repository, selected VCP commit, declared-source digest,
+and a digest of the selected embedding model plus vector dimension alongside
+the container bindings. The API key is neither included in that digest nor
+stored in the profile. Later changes to any controller allowlisted path require
+new adoption even when they are on `origin/main`; model or dimension drift
+fails closed before shim launch and during live acceptance. An API-key rotation
+does not disclose or persist the key.
 An existing schema-v4 profile remains readable for status, controlled shutdown,
 and only the reviewed baseline-to-VCP bootstrap; it cannot represent accepted
 runtime state. After this controller is merged, perform the one-time authorized
@@ -86,7 +88,8 @@ stored, ordinary same-baseline restarts use only `start`.
 
 `start` is optimized for the normal same-baseline restart:
 
-1. require a clean local `main` equal to the locally known `origin/main`;
+1. require a clean local `main` equal to both the exact controller source
+   commit stored by adoption and the locally known `origin/main`;
 2. allow only this controller's delivery paths to differ from the accepted
    runtime baseline;
 3. require the existing provider dependency to match the adopted container,
@@ -95,7 +98,7 @@ stored, ordinary same-baseline restarts use only `start`.
    match its accepted identity;
 5. require the retained Edge container to match the accepted revision and
    retain its non-root, read-only, no-restart, no-log, read-only-secret-mount,
-   host-loopback-only posture;
+   host-loopback-only posture across every published container port;
 6. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
    retained Edge, and outbound Relay plus observer in order;
 7. run the native shim in the controller-managed process itself and prove that
@@ -113,7 +116,9 @@ stored, ordinary same-baseline restarts use only `start`.
 10. stop only components newly started by that invocation if any gate fails.
 
 `start`, `stop`, and profile adoption share an owner-only atomic lifecycle
-lock. A concurrent lifecycle invocation fails closed, and a crash-left lock is
+lock. `start` and `stop` acquire that lock before reading the owner profile, so
+the binding snapshot cannot race a concurrent `adopt-running --replace`.
+A concurrent lifecycle invocation fails closed, and a crash-left lock is
 removed only after its recorded PID is dead and its inode is revalidated.
 
 The controller never performs `record_memory`. HTTP write delegation, write
