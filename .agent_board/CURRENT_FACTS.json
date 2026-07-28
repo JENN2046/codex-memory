@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
   "factsMode": "committed_status_snapshot",
-  "updatedAt": "2026-07-27",
+  "updatedAt": "2026-07-28",
   "baseBranch": "main",
   "status": {
     "project": "NOT_READY_BLOCKED",
@@ -14,10 +14,10 @@
   },
   "activeTask": null,
   "lastCompleted": {
-    "taskId": "CM-2155",
-    "validationId": "CMV-2240",
-    "completedAt": "2026-07-27",
-    "scope": "governance_surface_reset"
+    "taskId": "CM-2156",
+    "validationId": "CMV-2241",
+    "completedAt": "2026-07-28",
+    "scope": "owner_only_mapping_package_preflight_v2"
   },
   "acceptedProductBaseline": {
     "prNumber": 61,

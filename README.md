@@ -282,6 +282,17 @@ redacted example; it does not contain or derive a live diary inventory. See
 [Diary scope enforcement v1](docs/DIARY_SCOPE_ENFORCEMENT_V1.md) and the
 [Stage 3B closeout](docs/DIARY_SCOPE_STAGE3B_CLOSEOUT.md).
 
+For repeatable owner-only mapping preparation, the source-only
+`owner-runtime:mapping-package` utility separates read-only `plan` / `check`
+from an explicit `apply` private-configuration write. It installs a
+non-overwriting mapping-only package beneath an existing complete private root,
+never exports a replacement `CODEX_MEMORY_R4_GOVERNANCE_PRIVATE_ROOT`, rejects
+symlinks and write-eligible mappings, and returns only low-disclosure receipts.
+Final commit uses Linux `renameat2(RENAME_NOREPLACE)` so a concurrently created
+target is preserved. The apply confirmation flag does not grant an agent
+authorization or weaken P3. See
+[owner-only mapping package preflight](docs/OWNER_ONLY_MAPPING_PACKAGE_PREFLIGHT.md).
+
 An isolated read runtime may perform VCP's normal derived maintenance without
 becoming a primary-memory writer. The native shim accounts startup,
 selected-diary hydration/cache, vector/tag persistence, and matrix refresh
