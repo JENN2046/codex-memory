@@ -15,10 +15,12 @@ deploy, cutover, complete-V8, or readiness claim.
 
 ## Active Work
 
-`activeTask: null`
+`activeTask: CM-2159`
 
-There is no selected product task and `.agent_board/TASK_QUEUE.md` is empty.
-Historical tasks, including `CM-1422`, must not be resumed automatically.
+`CM-2159` repairs the controller source-identity granularity by replacing the
+schema-v5 whole-HEAD gate with a versioned runtime-source manifest and a
+fail-closed schema-v6 transition. The current phase is source/test/docs only;
+it does not authorize a runtime probe or lifecycle action.
 
 ## Last Accepted Product Baseline
 
@@ -35,18 +37,18 @@ future task.
 
 ## Open Blockers
 
+- `controller_source_identity_granularity_pending` [open]: The schema-v5 whole-HEAD controller binding must transition to a runtime-source manifest before another accepted lifecycle start.
 - `r5_h_matrix_incomplete` [open]: The R5-H private ChatGPT dogfood matrix is incomplete.
 - `r5_o_private_exact_head_runtime_unverified` [open]: R5-O private exact-head runtime behavior has not been verified.
 - `fresh_non_empty_task_context_relevance_unproven` [open]: Fresh non-empty task-context recall relevance has not been proven.
 
 ## Next Safe Action
 
-Jenn selects a new product goal. The leading candidate is R5-O private
-exact-head runtime verification, but it requires separate current
-authorization before any private/runtime action. Until a goal is selected,
-keep the active queue empty and do not infer work from historical task rows,
-roadmap text, plans, checkpoints, handoffs, status archives, or prior
-conversation.
+Complete the `CM-2159` source/test/docs implementation, deterministic
+validation, independent governance review, and implementation PR. After that PR
+is merged and local `main` is fast-forwarded, prepare a separately bound P3
+authorization package for `status -> stop -> start -> adopt-running --replace
+-> status`. Do not run that transition from this source-only task authority.
 
 ## Authority Boundaries
 
@@ -62,10 +64,17 @@ conversation.
   authorize another status probe, lifecycle action, provider call, private
   runtime verification, real memory read or write, release, deploy, cutover, or
   readiness claim.
+- `CM-2159` does not change the public MCP surface, dependencies, CI workflow,
+  runtime/provider configuration, retained product baseline, or readiness
+  status.
 
 ## Evidence And History
 
 Last completed: `CM-2158 / CMV-2243`.
+
+- Active implementation: `CM-2159`; its validation receipt will not replace
+  the unique completed ledger/validation pair until the authorized runtime
+  transition and governance closeout are complete.
 
 - PR `#65` delivered the governed full-stack lifecycle controller and merged as
   `48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e`.

@@ -12,7 +12,7 @@
     "cutoverReady": false,
     "completeV8Claimed": false
   },
-  "activeTask": null,
+  "activeTask": "CM-2159",
   "lastCompleted": {
     "taskId": "CM-2158",
     "validationId": "CMV-2243",
@@ -45,6 +45,11 @@
     }
   },
   "blockers": [
+    {
+      "id": "controller_source_identity_granularity_pending",
+      "status": "open",
+      "summary": "The schema-v5 whole-HEAD controller binding must transition to a runtime-source manifest before another accepted lifecycle start."
+    },
     {
       "id": "r5_h_matrix_incomplete",
       "status": "open",

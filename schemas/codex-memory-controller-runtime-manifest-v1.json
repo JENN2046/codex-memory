@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "paths": [
+    ".gitattributes",
+    "apps/local-recall-relay",
+    "package-lock.json",
+    "package.json",
+    "packages/chatgpt-r4-contracts",
+    "schemas/codex-memory-controller-runtime-manifest-v1.json",
+    "scripts",
+    "src"
+  ]
+}

@@ -13,10 +13,15 @@ const {
   execFileSync,
   spawn
 } = require('node:child_process');
+const {
+  MANIFEST_SCHEMA_VERSION,
+  inspectControllerSourceManifest
+} = require('./codex-memory-controller-source-manifest');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
-const PROFILE_SCHEMA_VERSION = 5;
+const PROFILE_SCHEMA_VERSION = 6;
+const EXACT_HEAD_PROFILE_SCHEMA_VERSION = 5;
 const LEGACY_PROFILE_SCHEMA_VERSION = 4;
 const PROFILE_FILENAME = 'full-stack-control.json';
 const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
@@ -43,6 +48,9 @@ const CONTROLLER_CHANGE_PATHS = new Set([
   'tests/codex-memory-stack-cli.test.js',
   'tests/chatgpt-r4/local-integration.test.js',
   'tests/chatgpt-r4/outbound-relay.test.js'
+]);
+const V5_CONTROLLER_SOURCE_UPGRADE_COMMITS = new Set([
+  '48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e'
 ]);
 const COMPONENTS = Object.freeze({
   shim: Object.freeze({
@@ -88,9 +96,21 @@ const LEGACY_PROFILE_KEYS = Object.freeze([
   'runtimeRepository',
   'schemaVersion'
 ]);
-const PROFILE_KEYS = Object.freeze([
+const V5_PROFILE_KEYS = Object.freeze([
   ...LEGACY_PROFILE_KEYS,
   'controllerSourceCommit',
+  'governanceEnvironmentConfigDigest',
+  'relayEnvironmentConfigDigest',
+  'vcpProviderConfigDigest',
+  'vcpRuntimeBaseline',
+  'vcpRuntimeRepository',
+  'vcpRuntimeScopeDigest'
+]);
+const PROFILE_KEYS = Object.freeze([
+  ...LEGACY_PROFILE_KEYS,
+  'adoptedRepositoryHead',
+  'controllerSourceManifestDigest',
+  'controllerSourceManifestVersion',
   'governanceEnvironmentConfigDigest',
   'relayEnvironmentConfigDigest',
   'vcpProviderConfigDigest',
@@ -170,6 +190,47 @@ function exactKeys(value, expected) {
   const wanted = [...expected].sort();
   return actual.length === wanted.length &&
     actual.every((key, index) => key === wanted[index]);
+}
+
+function profileHasRuntimeBinding(profile) {
+  return [
+    EXACT_HEAD_PROFILE_SCHEMA_VERSION,
+    PROFILE_SCHEMA_VERSION
+  ].includes(profile?.schemaVersion);
+}
+
+function profileControllerIdentityReceipt(profile) {
+  if (profile?.schemaVersion === PROFILE_SCHEMA_VERSION) {
+    return Object.freeze({
+      controllerSourceManifestDigest:
+        profile.controllerSourceManifestDigest,
+      controllerSourceManifestVersion:
+        profile.controllerSourceManifestVersion,
+      schemaVersion: 2
+    });
+  }
+  if (profile?.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION) {
+    return Object.freeze({
+      controllerSourceCommit: profile.controllerSourceCommit,
+      schemaVersion: 1
+    });
+  }
+  throw codedError('stack_profile_controller_identity_invalid');
+}
+
+function controllerIdentityReceiptMatches(receipt, profile) {
+  if (profile?.schemaVersion === PROFILE_SCHEMA_VERSION) {
+    return receipt?.schemaVersion === 2 &&
+      receipt.controllerSourceManifestVersion ===
+        profile.controllerSourceManifestVersion &&
+      receipt.controllerSourceManifestDigest ===
+        profile.controllerSourceManifestDigest;
+  }
+  if (profile?.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION) {
+    return receipt?.schemaVersion === 1 &&
+      receipt.controllerSourceCommit === profile.controllerSourceCommit;
+  }
+  return false;
 }
 
 function currentUid() {
@@ -475,7 +536,7 @@ function profileManagedEnvironmentConfigMatches(
   options = {}
 ) {
   try {
-    if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION) return false;
+    if (!profileHasRuntimeBinding(profile)) return false;
     const current = managedEnvironmentConfigDigests(
       governanceEnvironmentFile,
       relayEnvironmentFile,
@@ -568,15 +629,30 @@ function readVcpProviderEnvironmentSnapshot(file, options = {}) {
 
 function validateProviderConfigIdentityReceipt(value) {
   const shimPid = parsePid(value?.shimPid);
+  const controllerKeys = value?.schemaVersion === 2
+    ? [
+        'controllerSourceManifestDigest',
+        'controllerSourceManifestVersion'
+      ]
+    : ['controllerSourceCommit'];
   if (!exactKeys(value, [
-    'controllerSourceCommit',
+    ...controllerKeys,
     'providerConfigIdentity',
     'schemaVersion',
     'shimPid',
     'shimProcessStartTicks'
   ]) ||
-      value.schemaVersion !== 1 ||
-      !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') ||
+      ![1, 2].includes(value.schemaVersion) ||
+      (value.schemaVersion === 1 &&
+        !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '')) ||
+      (value.schemaVersion === 2 &&
+        (
+          value.controllerSourceManifestVersion !==
+            MANIFEST_SCHEMA_VERSION ||
+          !SAFE_SHA256_DIGEST.test(
+            value.controllerSourceManifestDigest || ''
+          )
+        )) ||
       shimPid === null ||
       value.shimPid !== shimPid ||
       !/^[1-9][0-9]{0,39}$/u.test(
@@ -596,11 +672,18 @@ function validateProviderConfigIdentityReceipt(value) {
     throw codedError('stack_provider_config_receipt_invalid');
   }
   return Object.freeze({
-    controllerSourceCommit: value.controllerSourceCommit,
+    ...(value.schemaVersion === 1
+      ? { controllerSourceCommit: value.controllerSourceCommit }
+      : {
+          controllerSourceManifestDigest:
+            value.controllerSourceManifestDigest,
+          controllerSourceManifestVersion:
+            value.controllerSourceManifestVersion
+        }),
     providerConfigIdentity: Object.freeze({
       ...value.providerConfigIdentity
     }),
-    schemaVersion: 1,
+    schemaVersion: value.schemaVersion,
     shimPid,
     shimProcessStartTicks: value.shimProcessStartTicks
   });
@@ -725,7 +808,7 @@ function providerCredentialFreshnessMatches({
   readStartTicks = readLinuxProcessStartTicks
 } = {}) {
   try {
-    if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+    if (!profileHasRuntimeBinding(profile) ||
         parsePid(shimPid) === null) {
       return false;
     }
@@ -733,7 +816,7 @@ function providerCredentialFreshnessMatches({
       runtimeRoot,
       { fsModule }
     );
-    return receipt.controllerSourceCommit === profile.controllerSourceCommit &&
+    return controllerIdentityReceiptMatches(receipt, profile) &&
       receipt.shimPid === shimPid &&
       receipt.shimProcessStartTicks ===
         readStartTicks(shimPid, { fsModule }) &&
@@ -816,15 +899,30 @@ function fileIdentitySetMatches(
 
 function validateGovernancePrivateIdentityReceipt(value) {
   const governancePid = parsePid(value?.governancePid);
+  const controllerKeys = value?.schemaVersion === 2
+    ? [
+        'controllerSourceManifestDigest',
+        'controllerSourceManifestVersion'
+      ]
+    : ['controllerSourceCommit'];
   if (!exactKeys(value, [
-    'controllerSourceCommit',
+    ...controllerKeys,
     'governancePid',
     'governanceProcessStartTicks',
     'privateFileIdentities',
     'schemaVersion'
   ]) ||
-      value.schemaVersion !== 1 ||
-      !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') ||
+      ![1, 2].includes(value.schemaVersion) ||
+      (value.schemaVersion === 1 &&
+        !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '')) ||
+      (value.schemaVersion === 2 &&
+        (
+          value.controllerSourceManifestVersion !==
+            MANIFEST_SCHEMA_VERSION ||
+          !SAFE_SHA256_DIGEST.test(
+            value.controllerSourceManifestDigest || ''
+          )
+        )) ||
       governancePid === null ||
       value.governancePid !== governancePid ||
       !/^[1-9][0-9]{0,39}$/u.test(
@@ -838,7 +936,14 @@ function validateGovernancePrivateIdentityReceipt(value) {
     throw codedError('stack_governance_private_receipt_invalid');
   }
   return Object.freeze({
-    controllerSourceCommit: value.controllerSourceCommit,
+    ...(value.schemaVersion === 1
+      ? { controllerSourceCommit: value.controllerSourceCommit }
+      : {
+          controllerSourceManifestDigest:
+            value.controllerSourceManifestDigest,
+          controllerSourceManifestVersion:
+            value.controllerSourceManifestVersion
+        }),
     governancePid,
     governanceProcessStartTicks: value.governanceProcessStartTicks,
     privateFileIdentities: Object.freeze(Object.fromEntries(
@@ -847,7 +952,7 @@ function validateGovernancePrivateIdentityReceipt(value) {
         Object.freeze({ ...identity })
       ])
     )),
-    schemaVersion: 1
+    schemaVersion: value.schemaVersion
   });
 }
 
@@ -883,7 +988,7 @@ function governanceCredentialFreshnessMatches({
   readStartTicks = readLinuxProcessStartTicks
 } = {}) {
   try {
-    if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+    if (!profileHasRuntimeBinding(profile) ||
         parsePid(governancePid) === null) {
       return false;
     }
@@ -895,7 +1000,7 @@ function governanceCredentialFreshnessMatches({
       runtimeRoot,
       { fsModule }
     );
-    return receipt.controllerSourceCommit === profile.controllerSourceCommit &&
+    return controllerIdentityReceiptMatches(receipt, profile) &&
       receipt.governancePid === governancePid &&
       receipt.governanceProcessStartTicks ===
         readStartTicks(governancePid, { fsModule }) &&
@@ -915,15 +1020,30 @@ function governanceCredentialFreshnessMatches({
 
 function validateRelaySecretIdentityReceipt(value) {
   const relayPid = parsePid(value?.relayPid);
+  const controllerKeys = value?.schemaVersion === 2
+    ? [
+        'controllerSourceManifestDigest',
+        'controllerSourceManifestVersion'
+      ]
+    : ['controllerSourceCommit'];
   if (!exactKeys(value, [
-    'controllerSourceCommit',
+    ...controllerKeys,
     'relayPid',
     'relayProcessStartTicks',
     'schemaVersion',
     'secretFileIdentities'
   ]) ||
-      value.schemaVersion !== 1 ||
-      !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') ||
+      ![1, 2].includes(value.schemaVersion) ||
+      (value.schemaVersion === 1 &&
+        !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '')) ||
+      (value.schemaVersion === 2 &&
+        (
+          value.controllerSourceManifestVersion !==
+            MANIFEST_SCHEMA_VERSION ||
+          !SAFE_SHA256_DIGEST.test(
+            value.controllerSourceManifestDigest || ''
+          )
+        )) ||
       relayPid === null ||
       value.relayPid !== relayPid ||
       !/^[1-9][0-9]{0,39}$/u.test(
@@ -936,10 +1056,17 @@ function validateRelaySecretIdentityReceipt(value) {
     throw codedError('stack_relay_secret_receipt_invalid');
   }
   return Object.freeze({
-    controllerSourceCommit: value.controllerSourceCommit,
+    ...(value.schemaVersion === 1
+      ? { controllerSourceCommit: value.controllerSourceCommit }
+      : {
+          controllerSourceManifestDigest:
+            value.controllerSourceManifestDigest,
+          controllerSourceManifestVersion:
+            value.controllerSourceManifestVersion
+        }),
     relayPid,
     relayProcessStartTicks: value.relayProcessStartTicks,
-    schemaVersion: 1,
+    schemaVersion: value.schemaVersion,
     secretFileIdentities: Object.freeze(Object.fromEntries(
       Object.entries(value.secretFileIdentities).map(([name, identity]) => [
         name,
@@ -977,7 +1104,7 @@ function relayCredentialFreshnessMatches({
   readStartTicks = readLinuxProcessStartTicks
 } = {}) {
   try {
-    if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+    if (!profileHasRuntimeBinding(profile) ||
         parsePid(relayPid) === null) {
       return false;
     }
@@ -989,7 +1116,7 @@ function relayCredentialFreshnessMatches({
       runtimeRoot,
       { fsModule }
     );
-    return receipt.controllerSourceCommit === profile.controllerSourceCommit &&
+    return controllerIdentityReceiptMatches(receipt, profile) &&
       receipt.relayPid === relayPid &&
       receipt.relayProcessStartTicks ===
         readStartTicks(relayPid, { fsModule }) &&
@@ -1021,7 +1148,7 @@ function vcpProviderConfigDigest(providerEnvironment) {
 
 function profileVcpProviderConfigMatches(profile, providerEnvironment) {
   try {
-    return profile?.schemaVersion === PROFILE_SCHEMA_VERSION &&
+    return profileHasRuntimeBinding(profile) &&
       SAFE_SHA256_DIGEST.test(profile?.vcpProviderConfigDigest || '') &&
       vcpProviderConfigDigest(providerEnvironment) ===
         profile.vcpProviderConfigDigest;
@@ -1064,11 +1191,15 @@ function profileRetainedBindingMatches(profile, {
 function validateProfile(value) {
   const keys = value?.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION
     ? LEGACY_PROFILE_KEYS
-    : PROFILE_KEYS;
+    : value?.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION
+      ? V5_PROFILE_KEYS
+      : PROFILE_KEYS;
   if (!exactKeys(value, keys) ||
-      ![LEGACY_PROFILE_SCHEMA_VERSION, PROFILE_SCHEMA_VERSION].includes(
-        value.schemaVersion
-      ) ||
+      ![
+        LEGACY_PROFILE_SCHEMA_VERSION,
+        EXACT_HEAD_PROFILE_SCHEMA_VERSION,
+        PROFILE_SCHEMA_VERSION
+      ].includes(value.schemaVersion) ||
       !SAFE_GIT_OBJECT.test(value.runtimeBaseline || '') ||
       !SAFE_GIT_OBJECT.test(value.retainedBindingSource || '') ||
       !SAFE_CONTAINER_NAME.test(value.edgeContainer || '') ||
@@ -1085,9 +1216,32 @@ function validateProfile(value) {
       path.resolve(value.runtimeRepository) !== value.runtimeRepository) {
     throw codedError('stack_profile_invalid');
   }
-  if (value.schemaVersion === PROFILE_SCHEMA_VERSION &&
+  if (value.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION &&
       (
         !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') ||
+        !SAFE_SHA256_DIGEST.test(
+          value.governanceEnvironmentConfigDigest || ''
+        ) ||
+        !SAFE_SHA256_DIGEST.test(
+          value.relayEnvironmentConfigDigest || ''
+        ) ||
+        !SAFE_GIT_OBJECT.test(value.vcpRuntimeBaseline || '') ||
+        !SAFE_SHA256_DIGEST.test(value.vcpProviderConfigDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.vcpRuntimeScopeDigest || '') ||
+        typeof value.vcpRuntimeRepository !== 'string' ||
+        !path.isAbsolute(value.vcpRuntimeRepository) ||
+        path.resolve(value.vcpRuntimeRepository) !==
+          value.vcpRuntimeRepository
+      )) {
+    throw codedError('stack_profile_invalid');
+  }
+  if (value.schemaVersion === PROFILE_SCHEMA_VERSION &&
+      (
+        !SAFE_GIT_OBJECT.test(value.adoptedRepositoryHead || '') ||
+        value.controllerSourceManifestVersion !== MANIFEST_SCHEMA_VERSION ||
+        !SAFE_SHA256_DIGEST.test(
+          value.controllerSourceManifestDigest || ''
+        ) ||
         !SAFE_SHA256_DIGEST.test(
           value.governanceEnvironmentConfigDigest || ''
         ) ||
@@ -1774,12 +1928,12 @@ function inspectVcpRuntimeIdentity(profile, {
   exec = execFileSync,
   fsModule = fs
 } = {}) {
-  const expectedRevision = profile?.schemaVersion === PROFILE_SCHEMA_VERSION
+  const expectedRevision = profileHasRuntimeBinding(profile)
     ? profile.vcpRuntimeBaseline
     : VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[profile?.runtimeBaseline] || null;
   const boundRepository = expectedRepository ||
     (
-      profile?.schemaVersion === PROFILE_SCHEMA_VERSION
+      profileHasRuntimeBinding(profile)
         ? profile.vcpRuntimeRepository
         : canonicalRepository
     );
@@ -1878,7 +2032,7 @@ function inspectVcpRuntimeIdentity(profile, {
 
 function profileVcpRuntimeIdentityMatches(profile, identity) {
   return Boolean(
-    profile?.schemaVersion === PROFILE_SCHEMA_VERSION &&
+    profileHasRuntimeBinding(profile) &&
     SAFE_GIT_OBJECT.test(profile?.vcpRuntimeBaseline || '') &&
     SAFE_SHA256_DIGEST.test(profile?.vcpRuntimeScopeDigest || '') &&
     identity?.recognized === true &&
@@ -1909,20 +2063,35 @@ function legacyVcpRuntimeBootstrapMatches(profile, identity) {
   );
 }
 
-function profileWithVcpRuntimeBinding(
+function profileWithControllerManifestBinding(
   profile,
   identity,
   providerEnvironment,
-  controllerSourceCommit,
+  source,
   environmentConfigDigests
 ) {
-  if (!legacyVcpRuntimeBootstrapMatches(profile, identity)) {
+  const legacyV4 = profile?.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION;
+  const legacyV5 =
+    profile?.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION;
+  if ((!legacyV4 && !legacyV5) ||
+      (legacyV4 && !legacyVcpRuntimeBootstrapMatches(profile, identity)) ||
+      (legacyV5 && !profileVcpRuntimeIdentityMatches(profile, identity)) ||
+      source?.upgradeEligible !== true ||
+      source?.manifestVersion !== MANIFEST_SCHEMA_VERSION ||
+      !SAFE_SHA256_DIGEST.test(source?.manifestDigest || '') ||
+      !SAFE_GIT_OBJECT.test(source?.head || '')) {
     throw codedError('stack_vcp_runtime_identity_mismatch');
   }
+  const {
+    controllerSourceCommit: _controllerSourceCommit,
+    ...baseProfile
+  } = profile;
   return validateProfile({
-    ...profile,
+    ...baseProfile,
     schemaVersion: PROFILE_SCHEMA_VERSION,
-    controllerSourceCommit,
+    adoptedRepositoryHead: source.head,
+    controllerSourceManifestDigest: source.manifestDigest,
+    controllerSourceManifestVersion: source.manifestVersion,
     governanceEnvironmentConfigDigest:
       environmentConfigDigests?.governanceEnvironmentConfigDigest,
     relayEnvironmentConfigDigest:
@@ -1959,11 +2128,78 @@ function inspectSourceCompatibility(profile, options = {}) {
   const controllerOnlyChanges = baselineExists &&
     changedPaths.every(candidate => CONTROLLER_CHANGE_PATHS.has(candidate));
   const repositoryMatch = inspectedRepository === profile.runtimeRepository;
-  const controllerSourceMatch =
+  const inspectManifest = options.inspectControllerManifest ||
+    inspectControllerSourceManifest;
+  const manifest = inspectManifest({
+    repoRoot: inspectedRepository,
+    exec: options.exec,
+    fsModule: options.fsModule
+  });
+  const manifestRecognized = manifest?.recognized === true &&
+    manifest?.manifestVersion === MANIFEST_SCHEMA_VERSION &&
+    SAFE_SHA256_DIGEST.test(manifest?.manifestDigest || '') &&
+    manifest?.manifestComplete === true &&
+    manifest?.manifestScopeClean === true;
+  const adoptedRepositoryHead =
     profile.schemaVersion === PROFILE_SCHEMA_VERSION
+      ? profile.adoptedRepositoryHead
+      : profile.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION
+        ? profile.controllerSourceCommit
+        : null;
+  const adoptedHeadReadable = adoptedRepositoryHead === null
+    ? true
+    : (() => {
+        try {
+          gitText(
+            ['cat-file', '-e', `${adoptedRepositoryHead}^{commit}`],
+            options
+          );
+          return true;
+        } catch {
+          return false;
+        }
+      })();
+  const adoptedHeadAncestor = adoptedRepositoryHead === null
+    ? true
+    : adoptedHeadReadable && (() => {
+        try {
+          gitText(
+            ['merge-base', '--is-ancestor', adoptedRepositoryHead, head],
+            options
+          );
+          return true;
+        } catch {
+          return false;
+        }
+      })();
+  const controllerSourceMatch = profile.schemaVersion === PROFILE_SCHEMA_VERSION
+    ? manifestRecognized &&
+      profile.controllerSourceManifestVersion === manifest.manifestVersion &&
+      profile.controllerSourceManifestDigest === manifest.manifestDigest
+    : profile.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION
       ? SAFE_GIT_OBJECT.test(profile.controllerSourceCommit || '') &&
         head === profile.controllerSourceCommit
       : controllerOnlyChanges;
+  const commonCompatible = clean && baselineExists && head === originMain &&
+    repositoryMatch && adoptedHeadReadable && adoptedHeadAncestor;
+  const compatible = commonCompatible && controllerSourceMatch &&
+    (
+      profile.schemaVersion === PROFILE_SCHEMA_VERSION
+        ? manifestRecognized
+        : controllerOnlyChanges
+    );
+  const upgradeEligible = commonCompatible && manifestRecognized && (
+    profile.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION
+      ? SAFE_GIT_OBJECT.test(
+          VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[
+            profile.runtimeBaseline
+          ] || ''
+        )
+      : profile.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION &&
+        V5_CONTROLLER_SOURCE_UPGRADE_COMMITS.has(
+          profile.controllerSourceCommit
+        )
+  );
   return Object.freeze({
     head,
     originMain,
@@ -1973,8 +2209,20 @@ function inspectSourceCompatibility(profile, options = {}) {
     repositoryMatch,
     controllerOnlyChanges,
     controllerSourceMatch,
-    compatible: clean && baselineExists && head === originMain &&
-      repositoryMatch && controllerOnlyChanges && controllerSourceMatch
+    identityMode: profile.schemaVersion === PROFILE_SCHEMA_VERSION
+      ? 'manifest_v1'
+      : profile.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION
+        ? 'exact_commit_v5'
+        : 'legacy_v4',
+    manifestRecognized,
+    manifestVersion: manifestRecognized ? manifest.manifestVersion : null,
+    manifestDigest: manifestRecognized ? manifest.manifestDigest : null,
+    manifestComplete: manifest?.manifestComplete === true,
+    manifestScopeClean: manifest?.manifestScopeClean === true,
+    adoptedHeadReadable,
+    adoptedHeadAncestor,
+    upgradeEligible,
+    compatible
   });
 }
 
@@ -1982,10 +2230,16 @@ function adoptionSourceCompatible(source) {
   return Boolean(
     source?.clean === true &&
     source?.baselineExists === true &&
-    source?.controllerOnlyChanges === true &&
     source?.controllerSourceMatch === true &&
     source?.currentMain === true &&
     source?.repositoryMatch === true &&
+    source?.adoptedHeadReadable === true &&
+    source?.adoptedHeadAncestor === true &&
+    (
+      source?.identityMode === 'manifest_v1'
+        ? source?.manifestRecognized === true
+        : source?.controllerOnlyChanges === true
+    ) &&
     source?.compatible === true
   );
 }
@@ -2738,10 +2992,25 @@ function buildControllerChildEnvironment(environmentFile, {
       profile.retainedBindingSource
   };
   if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+    childEnvironment.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_DIGEST =
+      profile.controllerSourceManifestDigest;
+    childEnvironment.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_VERSION =
+      String(profile.controllerSourceManifestVersion);
+    childEnvironment.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION =
+      String(PROFILE_SCHEMA_VERSION);
+    childEnvironment.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST =
+      profile.vcpProviderConfigDigest;
+    childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE =
+      profile.vcpRuntimeBaseline;
+    childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_REPOSITORY =
+      profile.vcpRuntimeRepository;
+    childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST =
+      profile.vcpRuntimeScopeDigest;
+  } else if (profile.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION) {
     childEnvironment.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT =
       profile.controllerSourceCommit;
     childEnvironment.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION =
-      String(PROFILE_SCHEMA_VERSION);
+      String(EXACT_HEAD_PROFILE_SCHEMA_VERSION);
     childEnvironment.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST =
       profile.vcpProviderConfigDigest;
     childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE =
@@ -2958,6 +3227,7 @@ function computeRuntimeAccepted({
 
 function computeStackAccepted(options) {
   return Boolean(
+    options?.profile?.schemaVersion === PROFILE_SCHEMA_VERSION &&
     options?.source?.compatible === true &&
     computeRuntimeAccepted(options)
   );
@@ -2981,7 +3251,7 @@ async function inspectStack({
   const relayEnvironment = resolvePrivateReference(profile, profile.relayEnvironment);
   let governanceEnvironmentConfigMatch = false;
   let relayEnvironmentConfigMatch = false;
-  if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+  if (profileHasRuntimeBinding(profile)) {
     try {
       const environmentConfigDigests = managedEnvironmentConfigDigests(
         governanceEnvironment,
@@ -3021,7 +3291,7 @@ async function inspectStack({
     vcpRuntimeRepository(),
     'config.env'
   );
-  if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+  if (profileHasRuntimeBinding(profile)) {
     try {
       const providerConfigSnapshot = readVcpProviderEnvironmentSnapshot(
         providerConfigFile
@@ -3204,11 +3474,21 @@ async function inspectStack({
     accepted,
     runtimeAccepted,
     configured: true,
+    profileSchemaVersion: profile.schemaVersion,
+    profileUpgradeRequired:
+      profile.schemaVersion !== PROFILE_SCHEMA_VERSION,
     runtimeBaseline: profile.runtimeBaseline,
     source: Object.freeze({
       clean: source.clean,
       currentMain: source.currentMain,
       controllerIdentityMatch: source.controllerSourceMatch,
+      identityMode: source.identityMode,
+      manifestVersion: source.manifestVersion,
+      manifestComplete: source.manifestComplete,
+      manifestScopeClean: source.manifestScopeClean,
+      adoptedHeadReadable: source.adoptedHeadReadable,
+      adoptedHeadAncestor: source.adoptedHeadAncestor,
+      upgradeEligible: source.upgradeEligible,
       repositoryMatch: source.repositoryMatch,
       compatible: source.compatible
     }),
@@ -3469,7 +3749,12 @@ async function startStack({
   try {
     let profile = storedProfile;
     const source = inspectSourceCompatibility(storedProfile);
-    if (!source.compatible) {
+    const transitionRequired =
+      storedProfile.schemaVersion !== PROFILE_SCHEMA_VERSION;
+    if (
+      (!transitionRequired && !source.compatible) ||
+      (transitionRequired && !source.upgradeEligible)
+    ) {
       throw codedError('stack_source_compatibility_failed');
     }
     if (!profileRetainedBindingMatches(profile)) {
@@ -3487,7 +3772,7 @@ async function startStack({
       governanceEnvironment,
       relayEnvironment
     );
-    if (profile.schemaVersion === PROFILE_SCHEMA_VERSION &&
+    if (profileHasRuntimeBinding(profile) &&
         (
           environmentConfigDigests.governanceEnvironmentConfigDigest !==
             profile.governanceEnvironmentConfigDigest ||
@@ -3502,7 +3787,7 @@ async function startStack({
     );
     const vcpProviderEnvironment =
       vcpProviderConfigSnapshot.providerEnvironment;
-    if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+    if (profileHasRuntimeBinding(profile)) {
       if (!profileVcpRuntimeIdentityMatches(profile, vcpRuntime)) {
         throw codedError('stack_vcp_runtime_identity_mismatch');
       }
@@ -3512,17 +3797,31 @@ async function startStack({
       )) {
         throw codedError('stack_vcp_provider_config_identity_mismatch');
       }
-      profile = storedProfile;
+      if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+        profile = storedProfile;
+      } else {
+        profile = profileWithControllerManifestBinding(
+          profile,
+          vcpRuntime,
+          vcpProviderEnvironment,
+          source,
+          environmentConfigDigests
+        );
+      }
     } else if (legacyVcpRuntimeBootstrapMatches(profile, vcpRuntime)) {
-      profile = profileWithVcpRuntimeBinding(
+      profile = profileWithControllerManifestBinding(
         profile,
         vcpRuntime,
         vcpProviderEnvironment,
-        source.head,
+        source,
         environmentConfigDigests
       );
     } else {
       throw codedError('stack_vcp_runtime_identity_mismatch');
+    }
+    const activeSource = inspectSourceCompatibility(profile);
+    if (!activeSource.compatible) {
+      throw codedError('stack_source_compatibility_failed');
     }
     const provider = inspectProviderContainer(profile.providerContainer);
     if (!profileProviderIdentityMatches(profile, provider)) {
@@ -3773,7 +4072,7 @@ async function startStack({
 
       const result = await inspectStack({ environment, profile });
       if (!result.accepted) throw codedError('stack_final_acceptance_failed');
-      if (storedProfile.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION) {
+      if (transitionRequired) {
         return Object.freeze({
           ...result,
           accepted: false,
@@ -3904,10 +4203,22 @@ async function adoptRunningStack({
       identities.http.identity
     );
     assertAdoptionRepositoryMatch(runtimeRepository);
+    const controllerManifest = inspectControllerSourceManifest({
+      repoRoot: runtimeRepository
+    });
+    const adoptedRepositoryHead = gitText(
+      ['rev-parse', 'HEAD^{commit}'],
+      { repoRoot: runtimeRepository }
+    );
     const controllerSource = inspectSourceCompatibility({
-      schemaVersion: LEGACY_PROFILE_SCHEMA_VERSION,
+      schemaVersion: PROFILE_SCHEMA_VERSION,
       runtimeBaseline: edge.revision,
-      runtimeRepository
+      runtimeRepository,
+      adoptedRepositoryHead,
+      controllerSourceManifestDigest:
+        controllerManifest.manifestDigest,
+      controllerSourceManifestVersion:
+        controllerManifest.manifestVersion
     });
     if (!adoptionSourceCompatible(controllerSource)) {
       throw codedError('stack_adoption_source_incompatible');
@@ -3930,7 +4241,11 @@ async function adoptRunningStack({
       vcpProviderConfigSnapshot.providerEnvironment;
     const profile = validateProfile({
       schemaVersion: PROFILE_SCHEMA_VERSION,
-      controllerSourceCommit: controllerSource.head,
+      adoptedRepositoryHead,
+      controllerSourceManifestDigest:
+        controllerManifest.manifestDigest,
+      controllerSourceManifestVersion:
+        controllerManifest.manifestVersion,
       governanceEnvironmentConfigDigest:
         environmentConfigDigests.governanceEnvironmentConfigDigest,
       relayEnvironmentConfigDigest:
@@ -4139,15 +4454,33 @@ function assertChildMode() {
   process.umask(0o077);
 }
 
+function childControllerProfileFields() {
+  const schemaVersion = Number(
+    process.env.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION
+  );
+  const controllerSourceManifestVersion = Number(
+    process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_VERSION
+  );
+  const controllerSourceManifestDigest =
+    process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_DIGEST;
+  if (schemaVersion !== PROFILE_SCHEMA_VERSION ||
+      controllerSourceManifestVersion !== MANIFEST_SCHEMA_VERSION ||
+      !SAFE_SHA256_DIGEST.test(controllerSourceManifestDigest || '')) {
+    throw codedError('stack_child_controller_identity_invalid');
+  }
+  return Object.freeze({
+    adoptedRepositoryHead: gitText(['rev-parse', 'HEAD^{commit}']),
+    controllerSourceManifestDigest,
+    controllerSourceManifestVersion,
+    schemaVersion
+  });
+}
+
 async function runShimChild() {
   assertChildMode();
   const profile = {
-    controllerSourceCommit:
-      process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
+    ...childControllerProfileFields(),
     runtimeRepository: REPO_ROOT,
-    schemaVersion: Number(
-      process.env.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION
-    ),
     runtimeBaseline: process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE,
     vcpProviderConfigDigest:
       process.env.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST,
@@ -4194,9 +4527,8 @@ async function runShimChild() {
     providerEnvironment
   });
   writeProviderConfigIdentityReceipt({
-    controllerSourceCommit: profile.controllerSourceCommit,
+    ...profileControllerIdentityReceipt(profile),
     providerConfigIdentity: providerConfigSnapshot.fileIdentity,
-    schemaVersion: 1,
     shimPid: process.pid,
     shimProcessStartTicks: readLinuxProcessStartTicks(process.pid)
   }, runtimeRoot);
@@ -4271,12 +4603,9 @@ function requireShimListenerForGovernanceChild(privateRoot) {
   const retainedBinding = assertRelativeReference(
     path.relative(privateRoot, retainedBindingFile)
   );
-  const schemaVersion = Number(
-    process.env.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION
-  );
+  const controllerProfile = childControllerProfileFields();
   const profile = {
-    controllerSourceCommit:
-      process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
+    ...controllerProfile,
     governanceEnvironment: environmentReference,
     privateRoot,
     retainedBinding,
@@ -4284,7 +4613,6 @@ function requireShimListenerForGovernanceChild(privateRoot) {
       process.env.CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE,
     runtimeBaseline: process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE,
     runtimeRepository: REPO_ROOT,
-    schemaVersion,
     vcpProviderConfigDigest:
       process.env.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST,
     vcpRuntimeBaseline:
@@ -4294,8 +4622,11 @@ function requireShimListenerForGovernanceChild(privateRoot) {
     vcpRuntimeScopeDigest:
       process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST
   };
-  if (schemaVersion !== PROFILE_SCHEMA_VERSION ||
-      !SAFE_GIT_OBJECT.test(profile.controllerSourceCommit || '') ||
+  if (!SAFE_GIT_OBJECT.test(profile.adoptedRepositoryHead || '') ||
+      profile.controllerSourceManifestVersion !== MANIFEST_SCHEMA_VERSION ||
+      !SAFE_SHA256_DIGEST.test(
+        profile.controllerSourceManifestDigest || ''
+      ) ||
       !SAFE_GIT_OBJECT.test(profile.runtimeBaseline || '') ||
       !SAFE_GIT_OBJECT.test(profile.retainedBindingSource || '') ||
       !SAFE_SHA256_DIGEST.test(profile.vcpProviderConfigDigest || '') ||
@@ -4400,12 +4731,12 @@ async function runGovernanceChild() {
   }
   try {
     writeGovernancePrivateIdentityReceipt({
-      controllerSourceCommit:
-        process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
+      ...profileControllerIdentityReceipt(
+        childControllerProfileFields()
+      ),
       governancePid: process.pid,
       governanceProcessStartTicks: readLinuxProcessStartTicks(process.pid),
-      privateFileIdentities: privateFileIdentitiesAfter,
-      schemaVersion: 1
+      privateFileIdentities: privateFileIdentitiesAfter
     }, runtimeRoot);
   } catch (error) {
     await runtime.stop().catch(() => {});
@@ -4508,11 +4839,11 @@ async function runRelayChild() {
     throw codedError('stack_relay_secret_identity_changed');
   }
   writeRelaySecretIdentityReceipt({
-    controllerSourceCommit:
-      process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
+    ...profileControllerIdentityReceipt(
+      childControllerProfileFields()
+    ),
     relayPid: process.pid,
     relayProcessStartTicks: readLinuxProcessStartTicks(process.pid),
-    schemaVersion: 1,
     secretFileIdentities: secretFileIdentitiesAfter
   }, runtimeRoot);
   process.stdout.write(`${JSON.stringify({
@@ -4654,7 +4985,11 @@ if (require.main === module) {
 
 module.exports = {
   CONTROLLER_CHANGE_PATHS,
+  EXACT_HEAD_PROFILE_SCHEMA_VERSION,
   PROFILE_KEYS,
+  PROFILE_SCHEMA_VERSION,
+  V5_CONTROLLER_SOURCE_UPGRADE_COMMITS,
+  V5_PROFILE_KEYS,
   VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
   VCP_RUNTIME_SOURCE_PATHS,
   acquireLifecycleProfile,
@@ -4703,7 +5038,7 @@ module.exports = {
   profileManagedEnvironmentConfigMatches,
   profileProviderIdentityMatches,
   profileVcpProviderConfigMatches,
-  profileWithVcpRuntimeBinding,
+  profileWithControllerManifestBinding,
   profileVcpRuntimeIdentityMatches,
   governanceCredentialFreshnessMatches,
   governancePrivateFileIdentities,

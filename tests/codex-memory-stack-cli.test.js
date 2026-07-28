@@ -10,7 +10,10 @@ const test = require('node:test');
 
 const {
   CONTROLLER_CHANGE_PATHS,
+  EXACT_HEAD_PROFILE_SCHEMA_VERSION,
   PROFILE_KEYS,
+  PROFILE_SCHEMA_VERSION,
+  V5_PROFILE_KEYS,
   VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
   VCP_RUNTIME_SOURCE_PATHS,
   acquireLifecycleProfile,
@@ -60,7 +63,7 @@ const {
   profileManagedEnvironmentConfigMatches,
   profileProviderIdentityMatches,
   profileVcpProviderConfigMatches,
-  profileWithVcpRuntimeBinding,
+  profileWithControllerManifestBinding,
   profileVcpRuntimeIdentityMatches,
   providerCredentialFreshnessMatches,
   projectHttpHealthPayload,
@@ -83,6 +86,9 @@ const {
 const BASELINE = '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118';
 const CONTROLLER_SOURCE_COMMIT =
   '89abcdef0123456789abcdef0123456789abcdef';
+const V5_CONTROLLER_SOURCE_COMMIT =
+  '48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e';
+const CONTROLLER_SOURCE_MANIFEST_DIGEST = `sha256:${'34'.repeat(32)}`;
 const RETAINED_BINDING_SOURCE = 'f1dea016a7a167898d77be6575403e7a7d28c8d5';
 const EDGE_CONTAINER_ID = 'ab'.repeat(32);
 const PROVIDER_CONTAINER_ID = 'cd'.repeat(32);
@@ -106,10 +112,24 @@ const RELAY_ENVIRONMENT_CONFIG_DIGEST =
     CODEX_MEMORY_R4_PUBLIC_ORIGIN: 'https://memory.example'
   });
 
+function manifestInspection(overrides = {}) {
+  return {
+    recognized: true,
+    manifestVersion: 1,
+    manifestDigest: CONTROLLER_SOURCE_MANIFEST_DIGEST,
+    manifestComplete: true,
+    manifestScopeClean: true,
+    fileCount: 738,
+    ...overrides
+  };
+}
+
 function profile(overrides = {}) {
   return {
-    schemaVersion: 5,
-    controllerSourceCommit: CONTROLLER_SOURCE_COMMIT,
+    schemaVersion: PROFILE_SCHEMA_VERSION,
+    adoptedRepositoryHead: CONTROLLER_SOURCE_COMMIT,
+    controllerSourceManifestDigest: CONTROLLER_SOURCE_MANIFEST_DIGEST,
+    controllerSourceManifestVersion: 1,
     governanceEnvironmentConfigDigest:
       GOVERNANCE_ENVIRONMENT_CONFIG_DIGEST,
     relayEnvironmentConfigDigest:
@@ -135,6 +155,21 @@ function profile(overrides = {}) {
   };
 }
 
+function v5Profile(overrides = {}) {
+  const {
+    adoptedRepositoryHead: _adoptedRepositoryHead,
+    controllerSourceManifestDigest: _controllerSourceManifestDigest,
+    controllerSourceManifestVersion: _controllerSourceManifestVersion,
+    ...v5
+  } = profile();
+  return {
+    ...v5,
+    schemaVersion: EXACT_HEAD_PROFILE_SCHEMA_VERSION,
+    controllerSourceCommit: V5_CONTROLLER_SOURCE_COMMIT,
+    ...overrides
+  };
+}
+
 function legacyProfile(overrides = {}) {
   const {
     controllerSourceCommit: _controllerSourceCommit,
@@ -145,7 +180,7 @@ function legacyProfile(overrides = {}) {
     vcpRuntimeRepository: _vcpRuntimeRepository,
     vcpRuntimeScopeDigest: _vcpRuntimeScopeDigest,
     ...legacy
-  } = profile();
+  } = v5Profile();
   return {
     ...legacy,
     schemaVersion: 4,
@@ -227,6 +262,11 @@ function acceptedStack(overrides = {}) {
 
 test('profile contract is exact and stores references rather than secret values', () => {
   assert.deepEqual(Object.keys(validateProfile(profile())).sort(), [...PROFILE_KEYS].sort());
+  assert.deepEqual(
+    Object.keys(validateProfile(v5Profile())).sort(),
+    [...V5_PROFILE_KEYS].sort()
+  );
+  assert.equal(validateProfile(v5Profile()).schemaVersion, 5);
   assert.equal(validateProfile(legacyProfile()).schemaVersion, 4);
   assert.throws(
     () => validateProfile({ ...profile(), token: 'must-not-be-stored' }),
@@ -246,6 +286,12 @@ test('profile contract is exact and stores references rather than secret values'
   );
   assert.throws(
     () => validateProfile(profile({ providerContainer: 'unrelated-provider' })),
+    { code: 'stack_profile_invalid' }
+  );
+  assert.throws(
+    () => validateProfile(profile({
+      controllerSourceManifestVersion: 2
+    })),
     { code: 'stack_profile_invalid' }
   );
 });
@@ -788,7 +834,10 @@ test('lifecycle profile snapshot is read only after the lock is acquired', () =>
     }
   });
   assert.deepEqual(events, ['ensure', 'lock', 'read']);
-  assert.equal(lifecycle.profile.controllerSourceCommit, CONTROLLER_SOURCE_COMMIT);
+  assert.equal(
+    lifecycle.profile.controllerSourceManifestDigest,
+    CONTROLLER_SOURCE_MANIFEST_DIGEST
+  );
   assert.equal(lifecycle.release(), true);
   assert.deepEqual(events, ['ensure', 'lock', 'read', 'release']);
 
@@ -1270,7 +1319,7 @@ test('managed environment identity pins non-secret configuration without key mat
   );
 });
 
-test('controller child environment binds the persisted v5 VCP identity', t => {
+test('controller child environment binds v6 manifest and historical v5 identities', t => {
   const root = fs.mkdtempSync(path.join(
     os.tmpdir(),
     'codex-memory-stack-vcp-env-'
@@ -1302,10 +1351,18 @@ test('controller child environment binds the persisted v5 VCP identity', t => {
     environment
   });
   assert.equal(
-    child.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
-    boundProfile.controllerSourceCommit
+    child.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_DIGEST,
+    boundProfile.controllerSourceManifestDigest
   );
-  assert.equal(child.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION, '5');
+  assert.equal(
+    child.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_VERSION,
+    '1'
+  );
+  assert.equal(
+    Object.hasOwn(child, 'CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT'),
+    false
+  );
+  assert.equal(child.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION, '6');
   assert.equal(
     child.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST,
     boundProfile.vcpProviderConfigDigest
@@ -1338,6 +1395,31 @@ test('controller child environment binds the persisted v5 VCP identity', t => {
       expectedGovernancePid: 'not-a-pid'
     }),
     { code: 'stack_governance_listener_identity_missing' }
+  );
+
+  const exactHead = buildControllerChildEnvironment(environmentFile, {
+    profile: v5Profile({
+      privateRoot,
+      governanceEnvironment: 'runtime.env',
+      relayEnvironment: 'runtime.env',
+      retainedBinding: 'binding.json'
+    }),
+    environment
+  });
+  assert.equal(
+    exactHead.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
+    V5_CONTROLLER_SOURCE_COMMIT
+  );
+  assert.equal(
+    exactHead.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION,
+    '5'
+  );
+  assert.equal(
+    Object.hasOwn(
+      exactHead,
+      'CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_DIGEST'
+    ),
+    false
   );
 
   const legacy = buildControllerChildEnvironment(environmentFile, {
@@ -1518,30 +1600,35 @@ test('retained governance binding is pinned independently from the runtime basel
   );
 });
 
-test('source compatibility pins v5 to one exact allowlisted controller commit', () => {
+test('source compatibility accepts a governance-only descendant when the v6 manifest is unchanged', () => {
+  const governanceHead = '01'.repeat(20);
   const calls = [];
   const fakeExec = (_command, args) => {
     calls.push(args);
     if (args[0] === 'rev-parse' && args[1] === 'HEAD^{commit}') {
-      return `${CONTROLLER_SOURCE_COMMIT}\n`;
+      return `${governanceHead}\n`;
     }
     if (args[0] === 'rev-parse' && args[1] === 'origin/main^{commit}') {
-      return `${CONTROLLER_SOURCE_COMMIT}\n`;
+      return `${governanceHead}\n`;
     }
-    if (args[0] === 'status') return '';
-    if (args[0] === 'cat-file') return '';
+    if (args[0] === 'status' ||
+        args[0] === 'cat-file' ||
+        args[0] === 'merge-base') return '';
     if (args[0] === 'diff') {
-      return `${[...CONTROLLER_CHANGE_PATHS].join('\n')}\n`;
+      return 'CURRENT_STATE.md\n.agent_board/CURRENT_FACTS.json\n';
     }
     throw new Error('unexpected git call');
   };
   const result = inspectSourceCompatibility(profile(), {
     exec: fakeExec,
+    inspectControllerManifest: () => manifestInspection(),
     repoRoot: '/repo'
   });
   assert.equal(result.compatible, true);
-  assert.equal(result.controllerOnlyChanges, true);
+  assert.equal(result.controllerOnlyChanges, false);
   assert.equal(result.controllerSourceMatch, true);
+  assert.equal(result.identityMode, 'manifest_v1');
+  assert.equal(result.adoptedHeadAncestor, true);
   assert.equal(adoptionSourceCompatible(result), true);
   assert.equal(adoptionSourceCompatible({
     ...result,
@@ -1560,43 +1647,174 @@ test('source compatibility pins v5 to one exact allowlisted controller commit', 
     compatible: false
   }), false);
   assert.ok(calls.length >= 5);
+});
+
+test('source compatibility retains exact-head v5 semantics and exposes only the reviewed upgrade path', () => {
+  const fakeManifest = () => manifestInspection();
+  const exactExec = (_command, args) => {
+    if (args[0] === 'rev-parse') {
+      return `${V5_CONTROLLER_SOURCE_COMMIT}\n`;
+    }
+    if (args[0] === 'status' ||
+        args[0] === 'cat-file' ||
+        args[0] === 'merge-base') return '';
+    if (args[0] === 'diff') {
+      return `${[...CONTROLLER_CHANGE_PATHS].join('\n')}\n`;
+    }
+    throw new Error('unexpected git call');
+  };
+  const exact = inspectSourceCompatibility(v5Profile(), {
+    exec: exactExec,
+    inspectControllerManifest: fakeManifest,
+    repoRoot: '/repo'
+  });
+  assert.equal(exact.compatible, true);
+  assert.equal(exact.controllerSourceMatch, true);
+  assert.equal(exact.upgradeEligible, true);
+  assert.equal(exact.identityMode, 'exact_commit_v5');
+
+  const futureControllerCommit = '02'.repeat(20);
+  const future = inspectSourceCompatibility(v5Profile(), {
+    repoRoot: '/repo',
+    inspectControllerManifest: fakeManifest,
+    exec(_command, args) {
+      if (args[0] === 'rev-parse') {
+        return `${futureControllerCommit}\n`;
+      }
+      if (args[0] === 'status' ||
+          args[0] === 'cat-file' ||
+          args[0] === 'merge-base') return '';
+      if (args[0] === 'diff') return 'CURRENT_STATE.md\n';
+      throw new Error('unexpected git call');
+    }
+  });
+  assert.equal(future.controllerSourceMatch, false);
+  assert.equal(future.compatible, false);
+  assert.equal(future.upgradeEligible, true);
+
+  const unreviewed = inspectSourceCompatibility(v5Profile({
+    controllerSourceCommit: '03'.repeat(20)
+  }), {
+    repoRoot: '/repo',
+    inspectControllerManifest: fakeManifest,
+    exec(_command, args) {
+      if (args[0] === 'rev-parse') return `${futureControllerCommit}\n`;
+      if (args[0] === 'status' ||
+          args[0] === 'cat-file' ||
+          args[0] === 'merge-base') return '';
+      if (args[0] === 'diff') return '';
+      throw new Error('unexpected git call');
+    }
+  });
+  assert.equal(unreviewed.upgradeEligible, false);
+});
+
+test('external VCP dynamic module targets remain inside the bound VCP source scope', () => {
+  const source = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'src',
+      'core',
+      'GovernedMcpVcpNativeVcpToolBoxMcpShim.js'
+    ),
+    'utf8'
+  );
+  const dynamicRequires = [
+    ...source.matchAll(
+      /\brequire\s*\(\s*([A-Za-z_$][A-Za-z0-9_$]*)\s*\)/gu
+    )
+  ].map(match => match[1]).sort();
+  assert.deepEqual(dynamicRequires, [
+    'embeddingUtilsPath',
+    'knowledgeBaseManagerPath'
+  ]);
+  const bindings = {
+    embeddingUtilsPath: 'EmbeddingUtils.js',
+    knowledgeBaseManagerPath: 'KnowledgeBaseManager.js'
+  };
+  for (const [variable, target] of Object.entries(bindings)) {
+    assert.equal(
+      source.includes(
+        `const ${variable} = path.join(vcpToolBoxRoot, '${target}');`
+      ),
+      true,
+      variable
+    );
+    assert.equal(VCP_RUNTIME_SOURCE_PATHS.includes(target), true, target);
+  }
+});
+
+test('transition lifecycle keeps profile persistence inside adoption only', () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, '..', 'scripts', 'codex-memory-stack.js'),
+    'utf8'
+  );
+  const start = source.slice(
+    source.indexOf('async function startStack('),
+    source.indexOf('async function stopStack(')
+  );
+  const stop = source.slice(
+    source.indexOf('async function stopStack('),
+    source.indexOf('async function adoptRunningStack(')
+  );
+  const adopt = source.slice(
+    source.indexOf('async function adoptRunningStack('),
+    source.indexOf('function readPrivateText(')
+  );
+  assert.equal(start.includes('writeProfile('), false);
+  assert.equal(stop.includes('writeProfile('), false);
+  assert.equal(
+    [...adopt.matchAll(/\bwriteProfile\s*\(/gu)].length,
+    1
+  );
+  assert.equal(
+    start.includes('profileWithControllerManifestBinding('),
+    true
+  );
+  for (const contract of [
+    'accepted: false',
+    'transitionRuntimeAccepted: true',
+    'profileUpgradeRequired: true'
+  ]) {
+    assert.equal(start.includes(contract), true, contract);
+  }
+});
+
+test('legacy source compatibility remains historical and manifest failures reject v6', () => {
+  const legacyExec = (_command, args) => {
+    if (args[0] === 'rev-parse') return `${CONTROLLER_SOURCE_COMMIT}\n`;
+    if (args[0] === 'status' || args[0] === 'cat-file') return '';
+    if (args[0] === 'diff') {
+      return `${[...CONTROLLER_CHANGE_PATHS].join('\n')}\n`;
+    }
+    throw new Error('unexpected git call');
+  };
   assert.equal(
     inspectSourceCompatibility(legacyProfile(), {
-      exec: fakeExec,
+      exec: legacyExec,
+      inspectControllerManifest: () => manifestInspection(),
       repoRoot: '/repo'
     }).compatible,
     true
   );
 
-  const futureControllerCommit = '01'.repeat(20);
-  const future = inspectSourceCompatibility(profile(), {
-    repoRoot: '/repo',
-    exec(_command, args) {
-      if (args[0] === 'rev-parse') {
-        return `${futureControllerCommit}\n`;
-      }
-      if (args[0] === 'status' || args[0] === 'cat-file') return '';
-      if (args[0] === 'diff') {
-        return `${[...CONTROLLER_CHANGE_PATHS].join('\n')}\n`;
-      }
-      throw new Error('unexpected git call');
-    }
-  });
-  assert.equal(future.controllerOnlyChanges, true);
-  assert.equal(future.controllerSourceMatch, false);
-  assert.equal(future.compatible, false);
-
   const unsafe = inspectSourceCompatibility(profile(), {
     repoRoot: '/repo',
+    inspectControllerManifest: () => manifestInspection({
+      manifestDigest: `sha256:${'ff'.repeat(32)}`
+    }),
     exec(_command, args) {
-      if (args[0] === 'rev-parse') return `${BASELINE}\n`;
-      if (args[0] === 'status' || args[0] === 'cat-file') return '';
-      if (args[0] === 'diff') return 'src/core/MemoryOverviewService.js\n';
+      if (args[0] === 'rev-parse') return `${CONTROLLER_SOURCE_COMMIT}\n`;
+      if (args[0] === 'status' ||
+          args[0] === 'cat-file' ||
+          args[0] === 'merge-base') return '';
+      if (args[0] === 'diff') return '';
       throw new Error('unexpected git call');
     }
   });
   assert.equal(unsafe.compatible, false);
-  assert.equal(unsafe.controllerOnlyChanges, false);
+  assert.equal(unsafe.controllerSourceMatch, false);
 });
 
 test('VCP runtime identity is pinned to the profile-selected commit and clean source scope', () => {
@@ -1740,9 +1958,10 @@ test('provider key rotation invalidates the running shim without persisting key 
     ownerFileIdentity(providerConfigFile)
   );
   writeProviderConfigIdentityReceipt({
-    controllerSourceCommit: CONTROLLER_SOURCE_COMMIT,
+    controllerSourceManifestDigest: CONTROLLER_SOURCE_MANIFEST_DIGEST,
+    controllerSourceManifestVersion: 1,
     providerConfigIdentity: snapshot.fileIdentity,
-    schemaVersion: 1,
+    schemaVersion: 2,
     shimPid: process.pid,
     shimProcessStartTicks: readLinuxProcessStartTicks(process.pid)
   }, runtimeRoot);
@@ -1761,6 +1980,40 @@ test('provider key rotation invalidates the running shim without persisting key 
     }),
     true
   );
+
+  writeProviderConfigIdentityReceipt({
+    controllerSourceCommit: V5_CONTROLLER_SOURCE_COMMIT,
+    providerConfigIdentity: snapshot.fileIdentity,
+    schemaVersion: 1,
+    shimPid: process.pid,
+    shimProcessStartTicks: readLinuxProcessStartTicks(process.pid)
+  }, runtimeRoot);
+  assert.equal(
+    providerCredentialFreshnessMatches({
+      profile: v5Profile(),
+      providerConfigFile,
+      runtimeRoot,
+      shimPid: process.pid
+    }),
+    true
+  );
+  assert.equal(
+    providerCredentialFreshnessMatches({
+      profile: profile(),
+      providerConfigFile,
+      runtimeRoot,
+      shimPid: process.pid
+    }),
+    false
+  );
+  writeProviderConfigIdentityReceipt({
+    controllerSourceManifestDigest: CONTROLLER_SOURCE_MANIFEST_DIGEST,
+    controllerSourceManifestVersion: 1,
+    providerConfigIdentity: snapshot.fileIdentity,
+    schemaVersion: 2,
+    shimPid: process.pid,
+    shimProcessStartTicks: readLinuxProcessStartTicks(process.pid)
+  }, runtimeRoot);
 
   fs.writeFileSync(
     providerConfigFile,
@@ -1840,11 +2093,12 @@ test('Governance private-file rotation invalidates the running process without p
     privateRoot
   );
   writeGovernancePrivateIdentityReceipt({
-    controllerSourceCommit: CONTROLLER_SOURCE_COMMIT,
+    controllerSourceManifestDigest: CONTROLLER_SOURCE_MANIFEST_DIGEST,
+    controllerSourceManifestVersion: 1,
     governancePid: process.pid,
     governanceProcessStartTicks: readLinuxProcessStartTicks(process.pid),
     privateFileIdentities: identities,
-    schemaVersion: 1
+    schemaVersion: 2
   }, runtimeRoot);
   const receiptText = fs.readFileSync(
     path.join(pidDirectory, 'governance-private-files.identity.json'),
@@ -1852,7 +2106,10 @@ test('Governance private-file rotation invalidates the running process without p
   );
   assert.equal(receiptText.includes('synthetic-'), false);
   assert.equal(receiptText.includes(privateRoot), false);
-  assert.equal(receiptText.includes('sha256:'), false);
+  assert.equal(
+    receiptText.includes(CONTROLLER_SOURCE_MANIFEST_DIGEST),
+    true
+  );
   const boundProfile = profile({ privateRoot });
   assert.equal(
     governanceCredentialFreshnessMatches({
@@ -1920,10 +2177,11 @@ test('Relay secret-file rotation invalidates the running process without secret 
     privateRoot
   );
   writeRelaySecretIdentityReceipt({
-    controllerSourceCommit: CONTROLLER_SOURCE_COMMIT,
+    controllerSourceManifestDigest: CONTROLLER_SOURCE_MANIFEST_DIGEST,
+    controllerSourceManifestVersion: 1,
     relayPid: process.pid,
     relayProcessStartTicks: readLinuxProcessStartTicks(process.pid),
-    schemaVersion: 1,
+    schemaVersion: 2,
     secretFileIdentities: identities
   }, runtimeRoot);
   const receiptText = fs.readFileSync(
@@ -1959,7 +2217,7 @@ test('Relay secret-file rotation invalidates the running process without secret 
   );
 });
 
-test('legacy profile can bootstrap only the reviewed VCP identity into an exact v5 binding', () => {
+test('legacy profiles bootstrap only reviewed identities into a v6 manifest binding', () => {
   const identity = {
     recognized: true,
     revision: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
@@ -1972,11 +2230,17 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
   };
   const legacy = legacyProfile();
   assert.equal(legacyVcpRuntimeBootstrapMatches(legacy, identity), true);
-  const upgraded = profileWithVcpRuntimeBinding(
+  const source = {
+    upgradeEligible: true,
+    manifestVersion: 1,
+    manifestDigest: CONTROLLER_SOURCE_MANIFEST_DIGEST,
+    head: CONTROLLER_SOURCE_COMMIT
+  };
+  const upgraded = profileWithControllerManifestBinding(
     legacy,
     identity,
     VCP_PROVIDER_ENVIRONMENT,
-    CONTROLLER_SOURCE_COMMIT,
+    source,
     {
       governanceEnvironmentConfigDigest:
         GOVERNANCE_ENVIRONMENT_CONFIG_DIGEST,
@@ -1984,10 +2248,14 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
         RELAY_ENVIRONMENT_CONFIG_DIGEST
     }
   );
-  assert.equal(upgraded.schemaVersion, 5);
+  assert.equal(upgraded.schemaVersion, 6);
   assert.equal(
-    upgraded.controllerSourceCommit,
+    upgraded.adoptedRepositoryHead,
     CONTROLLER_SOURCE_COMMIT
+  );
+  assert.equal(
+    upgraded.controllerSourceManifestDigest,
+    CONTROLLER_SOURCE_MANIFEST_DIGEST
   );
   assert.equal(
     upgraded.vcpProviderConfigDigest,
@@ -2009,15 +2277,38 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
     legacyVcpRuntimeBootstrapMatches(upgraded, identity),
     false
   );
+
+  const exactHead = v5Profile();
+  const exactHeadIdentity = {
+    ...identity,
+    repository: exactHead.vcpRuntimeRepository
+  };
+  const upgradedFromV5 = profileWithControllerManifestBinding(
+    exactHead,
+    exactHeadIdentity,
+    VCP_PROVIDER_ENVIRONMENT,
+    source,
+    {
+      governanceEnvironmentConfigDigest:
+        GOVERNANCE_ENVIRONMENT_CONFIG_DIGEST,
+      relayEnvironmentConfigDigest:
+        RELAY_ENVIRONMENT_CONFIG_DIGEST
+    }
+  );
+  assert.equal(upgradedFromV5.schemaVersion, 6);
+  assert.equal(
+    Object.hasOwn(upgradedFromV5, 'controllerSourceCommit'),
+    false
+  );
   assert.throws(
-    () => profileWithVcpRuntimeBinding(
+    () => profileWithControllerManifestBinding(
       legacy,
       {
         ...identity,
         scopeDigest: null
       },
       VCP_PROVIDER_ENVIRONMENT,
-      CONTROLLER_SOURCE_COMMIT,
+      source,
       {
         governanceEnvironmentConfigDigest:
           GOVERNANCE_ENVIRONMENT_CONFIG_DIGEST,
@@ -2295,6 +2586,12 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
   const accepted = acceptedStack();
   assert.equal(computeRuntimeAccepted(accepted), true);
   assert.equal(computeStackAccepted(accepted), true);
+  const historicalV5 = {
+    ...accepted,
+    profile: v5Profile()
+  };
+  assert.equal(computeRuntimeAccepted(historicalV5), true);
+  assert.equal(computeStackAccepted(historicalV5), false);
   assert.equal(
     computeStackAccepted({
       ...accepted,
