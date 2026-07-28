@@ -70,42 +70,67 @@ working-tree state is not executed by this shim and is outside the declared
 scope; any drift in the loaded source files, Rust module, or dependency
 manifests fails closed.
 
-Profile schema v5 persists the exact accepted controller source commit, the
-canonical VCPToolBox repository, selected VCP commit, declared-source digest,
-the non-secret Governance/Relay configuration digests, and a digest of the
-selected embedding model plus vector dimension alongside the container
-bindings. The API key and other secret-bearing values are neither included in
-those digests nor stored in the profile. The shim, Governance, and Relay each
-write an owner-only freshness receipt containing only their PID/start identity
-and the device/inode/size/time identity of the private files they loaded.
+Profile schema v6 persists a versioned controller runtime-source manifest
+digest plus the repository HEAD at adoption time. The manifest binds the
+tracked mode and byte-level SHA-256 of every file in the fixed broad runtime
+roots: all of `src/`, the Local Recall Relay, the ChatGPT R4 contracts package,
+all of `scripts/`, the manifest itself, and the package manifests. Because this
+does not infer dependencies from JavaScript syntax, aliases or dynamic module
+loading cannot omit a repository runtime file from the identity. The adopted
+repository HEAD remains an audit and
+ancestor-continuity anchor; later committed governance/docs/test changes do not
+invalidate the runtime when the manifest digest is unchanged. A changed,
+missing, newly added, untracked, symlinked, or mode-drifted file inside a bound
+root still fails closed.
+
+Manifest inspection takes `O_NOFOLLOW` descriptor snapshots and requires each
+path and descriptor to retain the same owner-visible inode, mode, size, and
+nanosecond timestamps before and after the read; the bytes must also reproduce
+the exact Git `HEAD` blob object. Lifecycle operations therefore require a
+quiescent owner worktree. Concurrent same-owner checkout or source replacement
+is unsupported and fails closed when observed. This is not a claim that a
+mutable checkout is an immutable runtime image.
+
+The profile also persists the canonical VCPToolBox repository, selected VCP
+commit, declared-source digest, the non-secret Governance/Relay configuration
+digests, and a digest of the selected embedding model plus vector dimension
+alongside the container bindings. The API key and other secret-bearing values
+are neither included in those digests nor stored in the profile. The shim,
+Governance, and Relay each write an owner-only schema-v2 freshness receipt
+containing the controller manifest identity, their PID/start identity, and the
+device/inode/size/time identity of the private files they loaded.
 Governance binds its context signing private key, diary-scope mapping, Edge
 signing public key, native HTTP token, operator-subject fingerprint, and
 project registry as one identity set. Relay binds its auth token and three
-signing-key files as another identity set. These receipts contain no path,
-private content, secret digest, key digest, or environment value. A bound-file
+signing-key files as another identity set. These receipts contain no private
+path, private content, secret digest, key digest, or environment value. A bound-file
 identity change therefore marks the corresponding running process unaccepted
 until a controlled stop/start refreshes it. Later changes to any controller
-allowlisted path or non-secret managed runtime configuration require new
+manifest file or non-secret managed runtime configuration require new
 adoption; model or dimension drift fails closed before shim launch and during
 live acceptance.
-An existing schema-v4 profile remains readable for status, controlled shutdown,
-and only the reviewed baseline-to-VCP bootstrap; it cannot represent accepted
-runtime state. After this controller is merged, perform the one-time authorized
-transition with `stop`, then `start`, then `adopt-running --replace`. The
-transitioning `start` deliberately returns `accepted: false`,
+
+Existing schema-v4 and schema-v5 profiles remain readable for status and
+controlled shutdown; neither can represent accepted schema-v6 runtime state.
+Only the reviewed schema-v4 baseline mapping and the exact schema-v5 controller
+commit `48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e` may bootstrap the one-time
+authorized transition. Run `stop`, then `start`, then
+`adopt-running --replace`. The transitioning `start` launches only
+manifest-bound schema-v6 children and deliberately returns `accepted: false`,
 `transitionRuntimeAccepted: true`, and `profileUpgradeRequired: true`; it does
 not rewrite the owner profile. Adoption re-inspects the live process
-environments and all acceptance gates before atomically storing v5. Once v5 is
-stored, ordinary same-baseline restarts use only `start`.
+environments and all acceptance gates before atomically storing v6. Once v6 is
+stored, ordinary manifest-matched restarts use only `start`.
 
 ## Start Semantics
 
-`start` is optimized for the normal same-baseline restart:
+`start` is optimized for the normal manifest-matched restart:
 
-1. require a clean local `main` equal to both the exact controller source
-   commit stored by adoption and the locally known `origin/main`;
-2. allow only this controller's delivery paths to differ from the accepted
-   runtime baseline;
+1. require a clean local `main` equal to the locally known `origin/main`, with
+   the adopted repository HEAD still readable and ancestral;
+2. enumerate the fixed manifest roots and require their canonical aggregate
+   digest to equal the schema-v6 profile, while allowing committed non-runtime
+   governance/docs/test changes outside those roots;
 3. require the existing provider dependency to match the adopted container,
    image, revision, Compose service, and exact
    `127.0.0.1:3000` publication used by the shim;

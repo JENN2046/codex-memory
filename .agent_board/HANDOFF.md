@@ -5,16 +5,15 @@
 
 ## Handoff Summary
 
-The current governance surface is intentionally closed with no active product
-task:
+The current governance surface has one selected runtime-adjacent source task:
 
 - status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`;
-- active task: `null`;
+- active task: `CM-2159`;
 - last completed lifecycle/governance task: `CM-2158 / CMV-2243`;
 - accepted product baseline: PR `#61`, reviewed head `4680b4c1…`, merge
   `ef62d481…`, main CI run `30238902177`;
 - private dogfood observation schema: `3`;
-- active queue: empty.
+- active queue: one `CM-2159 in_progress` row.
 
 PR `#65` delivered the governed full-stack controller. Under exact
 `CODEX_MEMORY_V5_TRANSITION_001` authorization, the transition at
@@ -23,19 +22,26 @@ reference-only schema-v5 profile adoption, and final low-disclosure acceptance
 inspection. Those results are historical point-in-time evidence and do not
 assert current runtime health.
 
+PR `#66` advanced only governance surfaces, but the schema-v5 profile binds the
+entire repository HEAD. `CM-2159` therefore replaces exact-HEAD equality with a
+fixed runtime-source manifest, moves new adoption to owner profile schema v6,
+and retains v4/v5 status plus controlled-stop compatibility. The implementation
+phase is source/test/docs only.
+
 ## Remaining Product Blockers
 
 - the R5-H private dogfood matrix is incomplete;
+- the schema-v6 manifest source implementation is under validation and is not
+  yet merged or adopted;
 - R5-O private exact-head runtime behavior is unverified;
 - fresh non-empty task-context relevance is unproven.
 
 ## Receiving Rule
 
-Jenn selects the next product goal. R5-O private exact-head runtime verification
-is the leading candidate, but it requires separate current authorization. Do
-not infer a task from this handoff, historical queue rows, old checkpoints,
-roadmap language, plans, or prior conversation. Record a selected task in
-`CURRENT_STATE.md` and the v5 snapshot before treating it as active.
+Continue only `CM-2159` from `CURRENT_STATE.md`: finish the implementation,
+validation, independent review, and PR follow-through. After merge, stop at the
+P3 boundary and prepare exact authorization for the runtime transition. Do not
+substitute R5-O or another historical task.
 
 ## Safety Boundary
 

@@ -3,6 +3,23 @@
 > Non-authoritative checkpoint pointer. Current authority is
 > `CURRENT_STATE.md`.
 
+## CM-2159 Controller Source Manifest Binding
+
+Status: `IN_PROGRESS`
+
+- Current lane: source/test/docs only
+- Goal: replace schema-v5 whole-HEAD equality with manifest-v1 runtime identity
+- New owner profile target: schema v6
+- Historical compatibility: schema v4/v5 status and controlled stop
+- Last completed receipt remains: `CM-2158 / CMV-2243`
+- Runtime transition: not authorized in this phase
+- Accepted product baseline: PR `#61`
+
+The implementation must preserve clean-current-main, repository ancestry, VCP,
+provider, Edge, non-secret configuration, owner credential freshness,
+write-free runtime, rollback, and low-disclosure gates. An implementation PR
+does not itself prove current runtime health.
+
 ## CM-2158 V5 Full-Stack Controller Transition Closeout
 
 Status: `COMPLETED_VALIDATED`
@@ -32,9 +49,9 @@ readiness claim occurred.
 
 ## Stop State
 
-There is no automatic continuation. Jenn selects a new product goal; R5-O is
-the leading candidate but requires separate current authorization. Agents do
-not resume a historical task from this checkpoint.
+Continue the source-only `CM-2159` implementation and PR follow-through.
+Runtime `status`, lifecycle conversion, profile replacement, and R5-O remain
+separate current-authorization boundaries.
 
 History and recovery commands:
 `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`.

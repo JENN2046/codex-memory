@@ -7,23 +7,27 @@
 - Current authority: `CURRENT_STATE.md`
 - Machine companion: `.agent_board/CURRENT_FACTS.json`
 - Current status: `NOT_READY_BLOCKED / RC_NOT_READY_BLOCKED`
-- Active task: `null`
+- Active task: `CM-2159`
 - Last completed lifecycle/governance task: `CM-2158 / CMV-2243`
 - Accepted product baseline: PR `#61`, reviewed head `4680b4c1…`, merge
   `ef62d481…`, main CI run `30238902177`
 
 ## Open State
 
-PR `#65` delivered the governed full-stack lifecycle controller. The exact
-V5 transition closed successfully at merge baseline `48ecfe1c…`, including the
-owner-only reference-only schema-v5 profile adoption. That is historical
-closeout evidence, not a stored assertion of current runtime health.
+PR `#65` delivered the governed full-stack lifecycle controller. The exact V5
+transition closed successfully at merge baseline `48ecfe1c…`, including the
+owner-only reference-only schema-v5 profile adoption. PR `#66` then advanced
+only governance surfaces, exposing that the whole-HEAD profile binding rejects
+an unchanged runtime source after its own closeout.
 
-The R5-H matrix remains incomplete, R5-O private exact-head runtime behavior is
-unverified, and fresh non-empty task-context relevance is unproven.
+`CM-2159` is the active source/test/docs repair. It introduces a versioned
+runtime-source manifest and schema-v6 profile compatibility while preserving
+whole-repository cleanliness, current-main, ancestry, provider, VCP, Edge,
+configuration, credential, and write-free gates. No live runtime action is
+authorized by this status.
 
-Jenn must select the next product goal. R5-O is the leading candidate, but this
-file does not select, authorize, or reactivate a task.
+The source-identity transition, R5-H matrix, R5-O private exact-head runtime
+behavior, and fresh non-empty task-context relevance remain unclosed.
 
 ## Live Facts
 
