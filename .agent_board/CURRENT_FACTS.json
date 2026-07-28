@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
   "factsMode": "committed_status_snapshot",
-  "updatedAt": "2026-07-28",
+  "updatedAt": "2026-07-29",
   "baseBranch": "main",
   "status": {
     "project": "NOT_READY_BLOCKED",
@@ -46,9 +46,9 @@
   },
   "blockers": [
     {
-      "id": "controller_source_identity_granularity_pending",
+      "id": "controller_runtime_profile_transition_pending",
       "status": "open",
-      "summary": "The schema-v5 whole-HEAD controller binding must transition to a runtime-source manifest before another accepted lifecycle start."
+      "summary": "The manifest-v1 and schema-v6 source implementation is merged, but the owner-only runtime profile has not yet been transitioned and re-adopted under exact authorization."
     },
     {
       "id": "r5_h_matrix_incomplete",

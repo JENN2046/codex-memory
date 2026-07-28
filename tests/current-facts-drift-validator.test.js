@@ -14,6 +14,8 @@ const {
   HISTORY_INDEX_PATH,
   HISTORY_RESET_CLOSEOUT,
   POINTER_FILES,
+  PURE_POINTER_FILES,
+  PURE_POINTER_TEMPLATES,
   validateCurrentFactsDrift
 } = require("../scripts/validate_current_facts_drift");
 
@@ -127,7 +129,8 @@ function currentState(
     validationId: FIXTURE_CLOSEOUT.validationId
   },
   acceptedProductBaseline = RESET_ACCEPTED_PRODUCT_BASELINE,
-  blockers = FIXTURE_BLOCKERS
+  blockers = FIXTURE_BLOCKERS,
+  activePhase = activeTask === null ? null : "implementation_in_progress"
 ) {
   return [
     "# Current State",
@@ -141,6 +144,7 @@ function currentState(
     "## Active Work",
     "",
     `activeTask: ${activeTask === null ? "null" : activeTask}`,
+    `activePhase: ${activePhase === null ? "null" : activePhase}`,
     "",
     "## Last Accepted Product Baseline",
     "",
@@ -252,6 +256,9 @@ function workspace() {
   writeFile(root, ".agent_board/VALIDATION_LOG.md", validationLog());
   writeFile(root, ".agent_board/AUTOPILOT_LEDGER.md", ledger());
 
+  for (const [relativePath, template] of Object.entries(PURE_POINTER_TEMPLATES)) {
+    writeFile(root, relativePath, template);
+  }
   for (const relativePath of POINTER_FILES) {
     if (fs.existsSync(path.join(root, relativePath))) continue;
     writeFile(root, relativePath, `# Pointer\n\n> Non-authoritative pointer to CURRENT_STATE.md.\n`);
@@ -885,6 +892,90 @@ test("current facts validator rejects active task disagreement", () => {
   assert.match(result.failures.join("\n"), /single active queue row/);
 });
 
+test("current facts validator accepts one canonical active phase for a selected task", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.activeTask = "CM-3001";
+  writeFacts(root, changed);
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(
+      "CM-3001",
+      undefined,
+      changed.acceptedProductBaseline,
+      changed.blockers,
+      "runtime_transition_authorization_pending"
+    )
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | in_progress | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+
+  const result = validateCurrentFactsDrift(root);
+
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+for (const [name, replacement, expected] of [
+  [
+    "missing",
+    "",
+    /exactly one canonical activePhase/
+  ],
+  [
+    "duplicate",
+    "activePhase: implementation_in_progress\nactivePhase: second_phase",
+    /exactly one canonical activePhase/
+  ],
+  [
+    "malformed",
+    "activePhase: Runtime Transition",
+    /exactly one canonical activePhase/
+  ]
+]) {
+  test(`current facts validator rejects ${name} activePhase declarations`, () => {
+    const root = workspace();
+    writeFile(
+      root,
+      "CURRENT_STATE.md",
+      currentState().replace("activePhase: null", replacement)
+    );
+
+    const result = validateCurrentFactsDrift(root);
+
+    assert.equal(result.ok, false);
+    assert.match(result.failures.join("\n"), expected);
+  });
+}
+
+test("current facts validator binds activePhase nullability to activeTask", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState(null, undefined, undefined, undefined, "unexpected_phase")
+  );
+  let result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /activePhase must be null when activeTask is null/);
+
+  const changed = facts();
+  changed.activeTask = "CM-3001";
+  writeFacts(root, changed);
+  writeFile(
+    root,
+    "CURRENT_STATE.md",
+    currentState("CM-3001", undefined, undefined, undefined, null)
+  );
+  writeFile(root, ".agent_board/TASK_QUEUE.md", queue([
+    "| CM-3001 | 3001 | in_progress | P6 | Green | docs | selected row | tests | none | no | active |"
+  ]));
+  result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /activePhase must be non-null when activeTask is selected/);
+});
+
 test("current facts validator rejects an activeTask prefix near-collision", () => {
   const root = workspace();
   const changed = facts();
@@ -1100,3 +1191,53 @@ test("current facts validator rejects contradictory pointer authority claims", (
   assert.equal(result.ok, false);
   assert.match(result.failures.join("\n"), /must not claim independent current authority/);
 });
+
+for (const [name, declaration] of [
+  ["active phase", "activePhase: implementation_in_progress"],
+  ["task identity", "Current work is CM-3001."],
+  ["status", "NOT_READY_BLOCKED"],
+  ["receipt", "Last completed: CM-2991 / CMV-2992."],
+  ["pull request", "PR #67 is merged."],
+  ["owned section", "## Next Safe Action\n\nContinue."],
+  ["natural-language phase", "Current phase: runtime transition pending."],
+  ["natural-language work", "Current work is the runtime profile transition."],
+  ["natural-language receipt", "The latest transition receipt is complete."],
+  ["natural-language PR", "The implementation pull request has merged."],
+  ["natural-language action", "Next action: execute the controller transition."],
+  ["natural-language CI", "CI passed."],
+  ["natural-language health", "The runtime is healthy."],
+  ["natural-language instruction", "Proceed with the transition."]
+]) {
+  test(`current facts validator rejects ${name} ownership on pure pointers`, () => {
+    const root = workspace();
+    writeFile(
+      root,
+      PURE_POINTER_FILES[0],
+      `# Pointer\n\n> Non-authoritative pointer to CURRENT_STATE.md.\n\n${declaration}\n`
+    );
+
+    const result = validateCurrentFactsDrift(root);
+
+    assert.equal(result.ok, false);
+    assert.match(result.failures.join("\n"), /must match its canonical pure-pointer template/);
+  });
+}
+
+for (const relativePath of PURE_POINTER_FILES) {
+  test(`current facts validator binds ${relativePath} to its canonical template`, () => {
+    const root = workspace();
+    writeFile(
+      root,
+      relativePath,
+      PURE_POINTER_TEMPLATES[relativePath].replace(
+        "CURRENT_STATE.md",
+        "CURRENT_STATUS.md"
+      )
+    );
+
+    const result = validateCurrentFactsDrift(root);
+
+    assert.equal(result.ok, false);
+    assert.match(result.failures.join("\n"), /must match its canonical pure-pointer template/);
+  });
+}
