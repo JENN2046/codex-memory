@@ -198,6 +198,7 @@ function acceptedStack(overrides = {}) {
     shimListenerOwned: true,
     httpListenerOwned: true,
     governanceListenerOwned: true,
+    governanceDataListenerOwned: true,
     relayListenerOwned: true,
     httpHealth: {
       reachable: true,
@@ -1207,6 +1208,23 @@ test('controller child environment binds the persisted v5 VCP identity', t => {
     child.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST,
     boundProfile.vcpRuntimeScopeDigest
   );
+  const relayChild = buildControllerChildEnvironment(environmentFile, {
+    profile: boundProfile,
+    environment,
+    expectedGovernancePid: process.pid
+  });
+  assert.equal(
+    relayChild.CODEX_MEMORY_STACK_EXPECTED_GOVERNANCE_PID,
+    String(process.pid)
+  );
+  assert.throws(
+    () => buildControllerChildEnvironment(environmentFile, {
+      profile: boundProfile,
+      environment,
+      expectedGovernancePid: 'not-a-pid'
+    }),
+    { code: 'stack_governance_listener_identity_missing' }
+  );
 
   const legacy = buildControllerChildEnvironment(environmentFile, {
     profile: legacyProfile({
@@ -2161,6 +2179,13 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
     computeStackAccepted({
       ...accepted,
       governanceListenerOwned: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      governanceDataListenerOwned: false
     }),
     false
   );

@@ -11,7 +11,8 @@ const DEFAULT_UDS_TIMEOUT_MS = 15_000;
 function createUdsForwarder({
   socketPath,
   timeoutMs = DEFAULT_UDS_TIMEOUT_MS,
-  maxResponseBytes = MAX_UDS_RESPONSE_BYTES
+  maxResponseBytes = MAX_UDS_RESPONSE_BYTES,
+  verifyUdsListenerOwner = null
 } = {}) {
   if (typeof socketPath !== 'string' || !socketPath.startsWith('/') || socketPath.includes('\0')) {
     reject('relay_uds_path_invalid');
@@ -22,6 +23,10 @@ function createUdsForwarder({
   if (!Number.isInteger(maxResponseBytes) || maxResponseBytes < 1 || maxResponseBytes > MAX_UDS_RESPONSE_BYTES) {
     reject('relay_uds_response_limit_invalid');
   }
+  if (verifyUdsListenerOwner !== null &&
+      typeof verifyUdsListenerOwner !== 'function') {
+    reject('relay_uds_listener_verifier_invalid');
+  }
 
   return function forwardToUds(payload, { signal } = {}) {
     const encoded = Buffer.from(`${JSON.stringify(payload)}\n`, 'utf8');
@@ -31,11 +36,11 @@ function createUdsForwarder({
       let settled = false;
       let bytes = 0;
       const chunks = [];
-      const socket = net.createConnection({ path: socketPath });
-      const timer = setTimeout(() => fail('relay_uds_timeout'), timeoutMs);
+      let socket = null;
+      let timer = null;
 
       function cleanup() {
-        clearTimeout(timer);
+        if (timer !== null) clearTimeout(timer);
         signal?.removeEventListener('abort', onAbort);
       }
 
@@ -43,7 +48,7 @@ function createUdsForwarder({
         if (settled) return;
         settled = true;
         cleanup();
-        socket.destroy();
+        socket?.destroy();
         rejectForward(Object.assign(new Error(code), { code, cause }));
       }
 
@@ -78,8 +83,25 @@ function createUdsForwarder({
         fail('relay_cancelled');
         return;
       }
+      if (!listenerOwnerVerified()) {
+        fail('relay_uds_listener_identity_mismatch');
+        return;
+      }
       signal?.addEventListener('abort', onAbort, { once: true });
-      socket.on('connect', () => socket.write(encoded));
+      try {
+        socket = net.createConnection({ path: socketPath });
+      } catch (error) {
+        fail('relay_uds_unavailable', error);
+        return;
+      }
+      timer = setTimeout(() => fail('relay_uds_timeout'), timeoutMs);
+      socket.on('connect', () => {
+        if (!listenerOwnerVerified()) {
+          fail('relay_uds_listener_identity_mismatch');
+          return;
+        }
+        socket.write(encoded);
+      });
       socket.on('data', chunk => {
         if (settled) return;
         bytes += chunk.length;
@@ -94,6 +116,15 @@ function createUdsForwarder({
       socket.on('error', error => {
         if (!settled) fail('relay_uds_unavailable', error);
       });
+
+      function listenerOwnerVerified() {
+        if (verifyUdsListenerOwner === null) return true;
+        try {
+          return verifyUdsListenerOwner(socketPath) === true;
+        } catch {
+          return false;
+        }
+      }
     });
   };
 }

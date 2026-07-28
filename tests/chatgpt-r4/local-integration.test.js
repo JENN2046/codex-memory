@@ -415,6 +415,48 @@ test('R4-C UDS forwarding resolves a complete frame without waiting for peer EOF
   assert.deepEqual(await forward({ request: 'synthetic' }), expected);
 });
 
+test('R4-C UDS forwarding revalidates listener ownership before payload write', async t => {
+  const directory = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-r4c-owned-uds-'
+  ));
+  const socketPath = path.join(directory, 'governance.sock');
+  const sockets = new Set();
+  let receivedBytes = 0;
+  const server = net.createServer(socket => {
+    sockets.add(socket);
+    socket.on('data', chunk => {
+      receivedBytes += chunk.length;
+    });
+    socket.once('close', () => sockets.delete(socket));
+  });
+  t.after(async () => {
+    for (const socket of sockets) socket.destroy();
+    await new Promise(resolve => server.close(resolve));
+    fs.rmSync(directory, { recursive: true, force: true });
+  });
+  await new Promise((resolve, rejectListen) => {
+    server.once('error', rejectListen);
+    server.listen(socketPath, resolve);
+  });
+
+  let ownershipChecks = 0;
+  const forward = createUdsForwarder({
+    socketPath,
+    verifyUdsListenerOwner(candidate) {
+      ownershipChecks += 1;
+      return candidate === socketPath && ownershipChecks === 1;
+    }
+  });
+  await assert.rejects(
+    () => forward({ request: 'must-not-be-forwarded' }),
+    { code: 'relay_uds_listener_identity_mismatch' }
+  );
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(ownershipChecks, 2);
+  assert.equal(receivedBytes, 0);
+});
+
 async function waitFor(predicate, timeoutMs = 1_000) {
   const started = Date.now();
   while (!predicate()) {

@@ -23,12 +23,16 @@ const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
 const EDGE_CONTAINER_DEFAULT = 'codex-memory-full-stack-001-edge';
 const PROVIDER_CONTAINER_DEFAULT = 'new-api-wsl';
 const CONTROLLER_CHANGE_PATHS = new Set([
+  'apps/local-recall-relay/outbound-runtime.js',
+  'apps/local-recall-relay/runtime-authority.js',
+  'apps/local-recall-relay/uds-transport.js',
   'docs/CODEX_MEMORY_FULL_STACK_CONTROL.md',
   'scripts/codex-memory-stack.js',
   'src/adapters/codex-mcp/http.js',
   'src/cli/vcp-toolbox-native-mcp-shim.js',
   'tests/mcp-http.test.js',
-  'tests/codex-memory-stack-cli.test.js'
+  'tests/codex-memory-stack-cli.test.js',
+  'tests/chatgpt-r4/local-integration.test.js'
 ]);
 const COMPONENTS = Object.freeze({
   shim: Object.freeze({
@@ -1671,9 +1675,20 @@ function inspectManagedProcess(name, {
   if (state.running && commandKind === 'controller') {
     try {
       const environmentFile = expectedComponentEnvironmentFile(name, profile);
+      const governanceState = name === 'relay'
+        ? inspectProcessIdentity('governance', { environment, fsModule })
+        : null;
+      const expectedGovernancePid = governanceState?.running === true
+        ? governanceState.pid
+        : null;
       const expectedEnvironment = buildControllerChildEnvironment(
         environmentFile,
-        { profile, environment, fsModule }
+        {
+          profile,
+          environment,
+          expectedGovernancePid,
+          fsModule
+        }
       );
       controllerEnvironmentBound = processEnvironmentExactlyMatches(
         state.pid,
@@ -2593,6 +2608,7 @@ async function prepareStaleOwnerSocket(socketPath, privateRoot, {
 function buildControllerChildEnvironment(environmentFile, {
   profile,
   environment = process.env,
+  expectedGovernancePid = null,
   expectedHttpPid = null,
   fsModule = fs
 } = {}) {
@@ -2630,6 +2646,14 @@ function buildControllerChildEnvironment(environmentFile, {
     const pid = parsePid(expectedHttpPid);
     if (pid === null) throw codedError('stack_http_listener_identity_missing');
     childEnvironment.CODEX_MEMORY_STACK_EXPECTED_HTTP_PID = String(pid);
+  }
+  if (expectedGovernancePid !== null) {
+    const pid = parsePid(expectedGovernancePid);
+    if (pid === null) {
+      throw codedError('stack_governance_listener_identity_missing');
+    }
+    childEnvironment.CODEX_MEMORY_STACK_EXPECTED_GOVERNANCE_PID =
+      String(pid);
   }
   return Object.freeze(childEnvironment);
 }
@@ -2781,6 +2805,7 @@ function computeRuntimeAccepted({
   shimListenerOwned,
   httpListenerOwned,
   governanceListenerOwned,
+  governanceDataListenerOwned,
   relayListenerOwned,
   httpHealth,
   governance,
@@ -2804,6 +2829,7 @@ function computeRuntimeAccepted({
     shimListenerOwned === true &&
     httpListenerOwned === true &&
     governanceListenerOwned === true &&
+    governanceDataListenerOwned === true &&
     relayListenerOwned === true &&
     httpHealth?.reachable === true &&
     httpHealth?.ok === true &&
@@ -2922,6 +2948,8 @@ async function inspectStack({
     ))
     : lowDisclosureHttpProjection(null);
   let governanceSocketPath = null;
+  let governanceDataSocketPath = null;
+  let relayDataSocketPath = null;
   try {
     const governanceChildEnvironment = buildControllerChildEnvironment(
       governanceEnvironment,
@@ -2929,11 +2957,24 @@ async function inspectStack({
     );
     governanceSocketPath =
       governanceChildEnvironment.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH;
+    governanceDataSocketPath =
+      governanceChildEnvironment.CODEX_MEMORY_R4_RELAY_UDS_PATH;
+    relayDataSocketPath = buildControllerChildEnvironment(
+      relayEnvironment,
+      { profile, environment }
+    ).CODEX_MEMORY_R4_RELAY_UDS_PATH;
   } catch {}
   const governanceListenerOwned = processes.governance.managed &&
     processOwnsUnixListener(
       processes.governance.pid,
       governanceSocketPath
+    );
+  const governanceDataListenerOwned =
+    governanceDataSocketPath === relayDataSocketPath &&
+    processes.governance.managed &&
+    processOwnsUnixListener(
+      processes.governance.pid,
+      governanceDataSocketPath
     );
   const governanceCredentialFresh = governanceCredentialFreshnessMatches({
     governanceEnvironmentFile: governanceEnvironment,
@@ -2954,6 +2995,7 @@ async function inspectStack({
         : lowDisclosureGovernanceProjection(null)
     ),
     listenerIdentityMatch: governanceListenerOwned,
+    dataListenerIdentityMatch: governanceDataListenerOwned,
     credentialFresh: governanceCredentialFresh
   });
   const relaySocketPath = path.join(
@@ -3017,6 +3059,7 @@ async function inspectStack({
     shimListenerOwned,
     httpListenerOwned,
     governanceListenerOwned,
+    governanceDataListenerOwned,
     relayListenerOwned,
     httpHealth,
     governance,
@@ -3038,6 +3081,7 @@ async function inspectStack({
     shimListenerOwned,
     httpListenerOwned,
     governanceListenerOwned,
+    governanceDataListenerOwned,
     relayListenerOwned,
     httpHealth,
     governance,
@@ -3186,7 +3230,8 @@ async function finalizeManagedSpawn(child, pidFile, {
 
 async function spawnManaged(name, mode, environmentFile, {
   profile,
-  environment = process.env
+  environment = process.env,
+  expectedGovernancePid = null
 }) {
   const existing = inspectManagedProcess(name, { environment, profile });
   if (existing.running) {
@@ -3203,7 +3248,7 @@ async function spawnManaged(name, mode, environmentFile, {
   fs.chmodSync(locations.log, 0o600);
   const childEnvironment = buildControllerChildEnvironment(
     environmentFile,
-    { profile, environment }
+    { profile, environment, expectedGovernancePid }
   );
   let child;
   try {
@@ -3365,12 +3410,31 @@ async function startStack({
     }
     const edgeBefore = inspectEdgeContainer(profile.edgeContainer);
     requireProfileEdgeIdentity(profile, edgeBefore);
-    const governanceControlSocket = buildControllerChildEnvironment(
+    const governanceChildEnvironment = buildControllerChildEnvironment(
       governanceEnvironment,
       { profile, environment }
-    ).CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH;
+    );
+    const relayChildEnvironment = buildControllerChildEnvironment(
+      relayEnvironment,
+      { profile, environment }
+    );
+    const governanceControlSocket =
+      governanceChildEnvironment.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH;
+    const governanceDataSocket =
+      governanceChildEnvironment.CODEX_MEMORY_R4_RELAY_UDS_PATH;
+    const relayDataSocket =
+      relayChildEnvironment.CODEX_MEMORY_R4_RELAY_UDS_PATH;
     if (!path.isAbsolute(governanceControlSocket || '')) {
       throw codedError('stack_governance_control_socket_invalid');
+    }
+    if (!path.isAbsolute(governanceDataSocket || '')) {
+      throw codedError('stack_governance_data_socket_invalid');
+    }
+    if (governanceDataSocket === governanceControlSocket) {
+      throw codedError('stack_governance_socket_paths_reused');
+    }
+    if (relayDataSocket !== governanceDataSocket) {
+      throw codedError('stack_relay_data_socket_binding_mismatch');
     }
     const relayObserverSocket = path.join(
       runtimeDirectory(environment),
@@ -3506,7 +3570,8 @@ async function startStack({
           { environment, profile }
         );
         if (!state.controllerManaged ||
-            state.pid !== governanceProcess.pid) {
+            state.pid !== governanceProcess.pid ||
+            !processOwnsUnixListener(state.pid, governanceDataSocket)) {
           return false;
         }
         const result = runOwnedUnixProbe(
@@ -3549,7 +3614,11 @@ async function startStack({
         'relay',
         '_run-relay',
         relayEnvironment,
-        { profile, environment }
+        {
+          profile,
+          environment,
+          expectedGovernancePid: governanceProcess.pid
+        }
       );
       if (relayProcess.started) started.add('relay');
       await waitFor(() => {
@@ -4249,6 +4318,29 @@ async function runRelayChild() {
   const runtimeRoot = assertOwnerOnlyDirectory(
     process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
   );
+  const governancePid = parsePid(
+    process.env.CODEX_MEMORY_STACK_EXPECTED_GOVERNANCE_PID
+  );
+  if (governancePid === null) {
+    throw codedError('stack_governance_data_listener_identity_mismatch');
+  }
+  const governanceProcessStartTicks =
+    readLinuxProcessStartTicks(governancePid);
+  const governanceDataSocket =
+    process.env.CODEX_MEMORY_R4_RELAY_UDS_PATH;
+  const verifyUdsListenerOwner = candidate => {
+    try {
+      return candidate === governanceDataSocket &&
+        readLinuxProcessStartTicks(governancePid) ===
+          governanceProcessStartTicks &&
+        processOwnsUnixListener(governancePid, candidate);
+    } catch {
+      return false;
+    }
+  };
+  if (!verifyUdsListenerOwner(governanceDataSocket)) {
+    throw codedError('stack_governance_data_listener_identity_mismatch');
+  }
   process.env.CODEX_MEMORY_R5_RELAY_OBSERVER_UDS_PATH =
     path.join(runtimeRoot, 'relay-observer.sock');
   const secretFileIdentitiesBefore = relaySecretFileIdentities(
@@ -4266,7 +4358,8 @@ async function runRelayChild() {
     loadRuntime(environment, options) {
       return loadOutboundRelayRuntimeFromEnvironment(environment, {
         ...options,
-        secretRoot: privateRoot
+        secretRoot: privateRoot,
+        verifyUdsListenerOwner
       });
     }
   });

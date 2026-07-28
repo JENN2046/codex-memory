@@ -128,8 +128,9 @@ stored, ordinary same-baseline restarts use only `start`.
    validate authenticated full HTTP health and its hardened,
    no-external-provider, read-only public surface, native-write-off,
    cache/shadow/vector-write-off, and automatic-rebuild-off policy;
-11. bind the Governance control UDS and Relay observer UDS path/inode to their
-   recorded managed PIDs before and after each low-disclosure probe, then
+11. bind both the Governance control and Relay-data UDS path/inode to the
+   recorded Governance PID, bind the Relay observer UDS to the recorded Relay
+   PID, revalidate Relay-data ownership before every payload write, then
    validate schema-v3 governance observation, schema-v1 relay observation, and
    Edge health;
 12. stop only components newly started by that invocation if any gate fails.
@@ -160,6 +161,12 @@ The shim is launched directly with the controller's verified
 listener. It is bound back to the pinned canonical VCPToolBox runtime, isolated
 store, governed mapping, loopback provider dependency,
 provider/Governance/Relay private-file freshness, and native-write-off posture.
+The Relay child receives the controller-verified Governance PID, captures its
+Linux start identity before loading its runtime, and refuses to start unless
+that exact process owns the configured data UDS. Its forwarder checks the same
+ownership before connecting and again after connection but before writing the
+encoded request payload; identity drift is a terminal fail-closed error rather
+than a retryable availability condition.
 
 Each managed child is released from the controller's process handle only after
 its owner-only PID file is durably written. If PID persistence fails, the
@@ -177,11 +184,11 @@ exact-baseline acceptance instead of using `--force`.
 `status` performs the same authenticated, full hardened-policy HTTP probe used
 by startup and adoption, but only after the HTTP command is controller-managed
 and the loopback listener belongs to its recorded PID. It returns only
-booleans for managed-configuration and provider/Governance/Relay credential
-freshness alongside counters, schema versions, baseline identity, and bounded
-policy failure codes. It does not return private paths, file identities,
-environment values, tokens, keys, key digests, raw memory, request bodies, or
-provider responses.
+booleans for managed-configuration, listener identities, and
+provider/Governance/Relay credential freshness alongside counters, schema
+versions, baseline identity, and bounded policy failure codes. It does not
+return private paths, file identities, environment values, tokens, keys, key
+digests, raw memory, request bodies, or provider responses.
 
 A legacy HTTP process remains running, but a newer controller marks it
 `controllerManaged: false` and does not read or send its bearer token. A
