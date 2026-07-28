@@ -162,6 +162,20 @@ test('R4-C listener and transport builtin exceptions are exact-file and exact-lo
     )
   }), /owner_only_snapshot_listener_contract_invalid/);
   assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'unlinkSync(authority.socketPath)',
+      "unlinkSync('/tmp/unsafe-observer.sock')"
+    )
+  }), /stale_socket_cleanup_contract_invalid|durable_file_mutation/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      "probeStatus !== 'stale'",
+      "probeStatus === 'stale'"
+    )
+  }), /stale_socket_cleanup_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
     file: path.join(ROOTS.relay, 'copied-observer-snapshot-uds.js'),
     source: relayObserverSource
   }), /runtime_process_access|service_listener|builtin_import_forbidden/);

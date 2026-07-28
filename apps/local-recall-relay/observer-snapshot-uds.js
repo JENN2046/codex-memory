@@ -12,6 +12,7 @@ const MAX_SNAPSHOT_REQUEST_BYTES = 128;
 const MAX_SNAPSHOT_RESPONSE_BYTES = 4096;
 const MAX_SNAPSHOT_CONNECTIONS = 4;
 const SNAPSHOT_SOCKET_TIMEOUT_MS = 5000;
+const STALE_SOCKET_PROBE_TIMEOUT_MS = 500;
 const MAX_SNAPSHOT_SOCKET_PATH_BYTES = 100;
 const SNAPSHOT_REQUEST_KEYS = Object.freeze(['operation', 'schema_version']);
 
@@ -21,7 +22,9 @@ function createObserverSnapshotUdsServer({
   chmodSync = fs.chmodSync,
   lstatSync = fs.lstatSync,
   realpathSync = fs.realpathSync,
-  statSync = fs.statSync
+  statSync = fs.statSync,
+  unlinkSync,
+  probeSocket = probeObserverSnapshotSocket
 } = {}) {
   if (typeof readObservation !== 'function') {
     throw safeError('relay_observer_snapshot_reader_invalid');
@@ -116,6 +119,11 @@ function createObserverSnapshotUdsServer({
       });
       let listening = false;
       try {
+        await prepareObserverSnapshotSocketPath(authority, {
+          lstatSync,
+          probeSocket,
+          unlinkSync
+        });
         await new Promise((resolve, rejectStart) => {
           const onError = () => {
             server.off('listening', onListening);
@@ -264,6 +272,92 @@ function validateBoundSnapshotSocket(authority, {
   return true;
 }
 
+async function prepareObserverSnapshotSocketPath(authority, {
+  lstatSync = fs.lstatSync,
+  probeSocket = probeObserverSnapshotSocket,
+  unlinkSync = fs.unlinkSync
+} = {}) {
+  const existingStat = readExistingSnapshotSocketStat(authority.socketPath, lstatSync);
+  if (existingStat === null) return false;
+  validateStaleSnapshotSocketCandidate(existingStat, authority);
+
+  const probeStatus = await probeSocket(authority.socketPath);
+  if (probeStatus === 'active') {
+    throw safeError('relay_observer_snapshot_socket_active');
+  }
+  if (probeStatus === 'absent') return false;
+  if (probeStatus !== 'stale') {
+    throw safeError('relay_observer_snapshot_socket_probe_uncertain');
+  }
+
+  const currentStat = readExistingSnapshotSocketStat(authority.socketPath, lstatSync);
+  if (currentStat === null) return false;
+  validateStaleSnapshotSocketCandidate(currentStat, authority);
+  if (currentStat.dev !== existingStat.dev ||
+      currentStat.ino !== existingStat.ino) {
+    throw safeError('relay_observer_snapshot_socket_identity_changed');
+  }
+  try {
+    unlinkSync(authority.socketPath);
+  } catch {
+    throw safeError('relay_observer_snapshot_stale_socket_cleanup_failed');
+  }
+  return true;
+}
+
+function readExistingSnapshotSocketStat(socketPath, lstatSync = fs.lstatSync) {
+  try {
+    return lstatSync(socketPath);
+  } catch (error) {
+    if (error?.code === 'ENOENT') return null;
+    throw safeError('relay_observer_snapshot_socket_inspection_failed');
+  }
+}
+
+function validateStaleSnapshotSocketCandidate(stat, authority) {
+  if (!stat || typeof stat.isSocket !== 'function' ||
+      !stat.isSocket() ||
+      stat.uid !== authority.ownerUid ||
+      (stat.mode & 0o777) !== 0o600) {
+    throw safeError('relay_observer_snapshot_stale_socket_candidate_invalid');
+  }
+  return true;
+}
+
+function probeObserverSnapshotSocket(socketPath, {
+  connectSocket = net.createConnection,
+  timeoutMs = STALE_SOCKET_PROBE_TIMEOUT_MS
+} = {}) {
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 10 || timeoutMs > 5_000) {
+    return Promise.resolve('uncertain');
+  }
+  return new Promise(resolve => {
+    let socket;
+    let settled = false;
+
+    function finish(status) {
+      if (settled) return;
+      settled = true;
+      socket?.destroy();
+      resolve(status);
+    }
+
+    try {
+      socket = connectSocket(socketPath);
+    } catch {
+      finish('uncertain');
+      return;
+    }
+    socket.once('connect', () => finish('active'));
+    socket.once('error', error => {
+      if (error?.code === 'ECONNREFUSED') return finish('stale');
+      if (error?.code === 'ENOENT') return finish('absent');
+      return finish('uncertain');
+    });
+    socket.setTimeout(timeoutMs, () => finish('uncertain'));
+  });
+}
+
 function safeError(code) {
   return Object.assign(new Error(code), { code });
 }
@@ -274,8 +368,13 @@ module.exports = {
   MAX_SNAPSHOT_RESPONSE_BYTES,
   MAX_SNAPSHOT_SOCKET_PATH_BYTES,
   SNAPSHOT_SOCKET_TIMEOUT_MS,
+  STALE_SOCKET_PROBE_TIMEOUT_MS,
   createObserverSnapshotUdsServer,
+  prepareObserverSnapshotSocketPath,
+  probeObserverSnapshotSocket,
+  readExistingSnapshotSocketStat,
   validateBoundSnapshotSocket,
   validateOwnerOnlySnapshotSocketPath,
+  validateStaleSnapshotSocketCandidate,
   validateSnapshotRequest
 };

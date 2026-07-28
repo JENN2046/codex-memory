@@ -43,6 +43,13 @@ The configured socket path must:
 - resolve to a socket owned by the current process user with exact mode
   `0600`.
 
+Before binding, a pre-existing path is removed only when it is a current-UID
+socket with exact mode `0600`, a bounded connection probe returns
+`ECONNREFUSED`, and a second `lstat` confirms the same device/inode. An active
+socket, a vanished path, identity drift, a non-socket, an ownership or mode
+mismatch, and every uncertain probe result are never unlinked. Active and
+uncertain collisions fail closed.
+
 The surface accepts exactly one newline-terminated request:
 
 ```json
@@ -96,6 +103,8 @@ Source validation covers:
 - valid owner-only UDS request/response and exact socket mode;
 - malformed request and unsafe projection rejection;
 - permissive and symlinked parent rejection;
+- safe recovery from a synthetic crash-left stale socket, plus rejection of
+  active, unsafe, identity-drifted, and probe-uncertain socket paths;
 - canonical main factory wiring and snapshot-server lifecycle;
 - failure before secret-bound runtime loading when snapshot authority is
   missing or unsafe;

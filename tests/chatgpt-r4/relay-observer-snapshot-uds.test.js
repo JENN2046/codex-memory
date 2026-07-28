@@ -1,6 +1,8 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const childProcess = require('node:child_process');
+const { once } = require('node:events');
 const fs = require('node:fs');
 const net = require('node:net');
 const os = require('node:os');
@@ -13,6 +15,7 @@ const {
 } = require('../../apps/local-recall-relay/low-disclosure-observer');
 const {
   createObserverSnapshotUdsServer,
+  prepareObserverSnapshotSocketPath,
   validateOwnerOnlySnapshotSocketPath,
   validateSnapshotRequest
 } = require('../../apps/local-recall-relay/observer-snapshot-uds');
@@ -188,6 +191,141 @@ test('Relay observer UDS revalidates parent authority after bind', async t => {
     code: 'relay_observer_snapshot_socket_security_invalid'
   });
   assert.equal(fs.existsSync(socketPath), false);
+});
+
+test('Relay observer UDS removes only a probed-stale owner socket before rebinding', {
+  skip: process.platform !== 'linux' || typeof process.getuid !== 'function'
+}, async t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-stale-'));
+  fs.chmodSync(root, 0o700);
+  const socketPath = path.join(root, 'observer.sock');
+  const child = childProcess.spawn(process.execPath, [
+    '-e',
+    [
+      "const fs = require('node:fs');",
+      "const net = require('node:net');",
+      'const socketPath = process.argv[1];',
+      'const server = net.createServer(socket => socket.destroy());',
+      'server.listen(socketPath, () => {',
+      '  fs.chmodSync(socketPath, 0o600);',
+      "  if (process.send) process.send('ready');",
+      '});'
+    ].join('\n'),
+    socketPath
+  ], {
+    stdio: ['ignore', 'ignore', 'ignore', 'ipc']
+  });
+  let server = null;
+  t.after(async () => {
+    if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
+    await server?.stop().catch(() => {});
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  await new Promise((resolve, reject) => {
+    let ready = false;
+    child.once('message', message => {
+      if (message !== 'ready') return reject(new Error('stale fixture readiness invalid'));
+      ready = true;
+      resolve();
+    });
+    child.once('error', reject);
+    child.once('exit', () => {
+      if (!ready) reject(new Error('stale fixture exited before readiness'));
+    });
+  });
+  const childExit = once(child, 'exit');
+  child.kill('SIGKILL');
+  await childExit;
+  const staleStat = fs.lstatSync(socketPath);
+  assert.equal(staleStat.isSocket(), true);
+  assert.equal(staleStat.uid, process.getuid());
+  assert.equal(staleStat.mode & 0o777, 0o600);
+
+  const observer = createLowDisclosureRelayObserver();
+  server = createObserverSnapshotUdsServer({
+    socketPath,
+    readObservation: observer.snapshot
+  });
+  await server.start();
+  const reboundStat = fs.lstatSync(socketPath);
+  assert.equal(reboundStat.isSocket(), true);
+  assert.equal(reboundStat.uid, process.getuid());
+  assert.equal(reboundStat.mode & 0o777, 0o600);
+  const response = await exchange(socketPath, {
+    schema_version: 1,
+    operation: 'snapshot'
+  });
+  assert.equal(JSON.parse(response.data).observation.completion_state, 'idle');
+});
+
+test('Relay observer UDS refuses to unlink an active owner socket', async t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-active-'));
+  fs.chmodSync(root, 0o700);
+  const socketPath = path.join(root, 'observer.sock');
+  const activeServer = net.createServer(socket => socket.destroy());
+  const candidateServer = createObserverSnapshotUdsServer({
+    socketPath,
+    readObservation: () => createLowDisclosureRelayObserver().snapshot()
+  });
+  t.after(async () => {
+    await candidateServer.stop().catch(() => {});
+    await new Promise(resolve => activeServer.close(() => resolve()));
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+  await new Promise((resolve, reject) => {
+    activeServer.once('error', reject);
+    activeServer.listen(socketPath, resolve);
+  });
+  fs.chmodSync(socketPath, 0o600);
+
+  await assert.rejects(candidateServer.start(), {
+    code: 'relay_observer_snapshot_socket_active'
+  });
+  assert.equal(fs.lstatSync(socketPath).isSocket(), true);
+});
+
+test('stale socket cleanup rejects unsafe candidates and identity drift', async () => {
+  const authority = {
+    socketPath: '/synthetic/owner-only/observer.sock',
+    ownerUid: 1000
+  };
+  const socketStat = (overrides = {}) => ({
+    dev: 1,
+    ino: 2,
+    uid: 1000,
+    mode: 0o140600,
+    isSocket: () => true,
+    ...overrides
+  });
+
+  for (const unsafe of [
+    socketStat({ isSocket: () => false }),
+    socketStat({ uid: 1001 }),
+    socketStat({ mode: 0o140660 })
+  ]) {
+    await assert.rejects(prepareObserverSnapshotSocketPath(authority, {
+      lstatSync: () => unsafe,
+      probeSocket: () => assert.fail('unsafe candidate must not be probed'),
+      unlinkSync: () => assert.fail('unsafe candidate must not be unlinked')
+    }), { code: 'relay_observer_snapshot_stale_socket_candidate_invalid' });
+  }
+
+  let calls = 0;
+  await assert.rejects(prepareObserverSnapshotSocketPath(authority, {
+    lstatSync() {
+      calls += 1;
+      return calls === 1 ? socketStat() : socketStat({ ino: 3 });
+    },
+    probeSocket: async () => 'stale',
+    unlinkSync: () => assert.fail('identity drift must not be unlinked')
+  }), { code: 'relay_observer_snapshot_socket_identity_changed' });
+
+  await assert.rejects(prepareObserverSnapshotSocketPath(authority, {
+    lstatSync: () => socketStat(),
+    probeSocket: async () => 'uncertain',
+    unlinkSync: () => assert.fail('uncertain liveness must not be unlinked')
+  }), { code: 'relay_observer_snapshot_socket_probe_uncertain' });
 });
 
 test('canonical Relay service wires observer events and brackets snapshot UDS lifetime', async () => {

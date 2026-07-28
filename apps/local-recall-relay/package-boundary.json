@@ -10,6 +10,8 @@
   "observerSnapshotOwnerOnlyParentRequired": true,
   "observerSnapshotReadOnly": true,
   "observerSnapshotDurableStateImplemented": false,
+  "observerSnapshotStaleSocketCleanupImplemented": true,
+  "observerSnapshotStaleSocketCleanupRequiresInactiveProbe": true,
   "observerSnapshotRequestIdentifiersRetained": false,
   "observerSnapshotBodiesRetained": false,
   "loopbackHttpClientImplemented": true,
