@@ -12,7 +12,7 @@ const {
 const MAX_SNAPSHOT_REQUEST_BYTES = 128;
 const MAX_SNAPSHOT_RESPONSE_BYTES = 4096;
 const MAX_SNAPSHOT_CONNECTIONS = 4;
-const SNAPSHOT_SOCKET_TIMEOUT_MS = 5000;
+const SNAPSHOT_REQUEST_DEADLINE_MS = 5000;
 const STALE_SOCKET_PROBE_TIMEOUT_MS = 500;
 const MAX_STARTUP_LOCK_ADDRESS_BYTES = 100;
 const MAX_SNAPSHOT_SOCKET_PATH_BYTES = 100;
@@ -27,11 +27,13 @@ function createObserverSnapshotUdsServer({
   statSync = fs.statSync,
   unlinkSync,
   probeSocket = probeObserverSnapshotSocket,
-  acquireStartupLock = acquireObserverSnapshotStartupLock
+  acquireStartupLock = acquireObserverSnapshotStartupLock,
+  requestDeadlineMs = SNAPSHOT_REQUEST_DEADLINE_MS
 } = {}) {
   if (typeof readObservation !== 'function') {
     throw safeError('relay_observer_snapshot_reader_invalid');
   }
+  validateSnapshotRequestDeadline(requestDeadlineMs);
   validateOwnerOnlySnapshotSocketPath(socketPath, {
     realpathSync,
     statSync
@@ -58,12 +60,20 @@ function createObserverSnapshotUdsServer({
     openSockets.add(socket);
     let released = false;
     let handled = false;
+    let requestDeadline = null;
     let bytes = 0;
     const chunks = [];
+
+    function clearRequestDeadline() {
+      if (requestDeadline === null) return;
+      clearTimeout(requestDeadline);
+      requestDeadline = null;
+    }
 
     function release() {
       if (released) return;
       released = true;
+      clearRequestDeadline();
       activeConnections -= 1;
       openSockets.delete(socket);
     }
@@ -76,10 +86,10 @@ function createObserverSnapshotUdsServer({
     }
 
     socket.once('close', release);
-    socket.setTimeout(SNAPSHOT_SOCKET_TIMEOUT_MS, () => {
+    requestDeadline = setTimeout(() => {
       if (handled) socket.destroy();
       else rejectFrame();
-    });
+    }, requestDeadlineMs);
     socket.on('data', chunk => {
       if (handled) return;
       bytes += chunk.length;
@@ -104,7 +114,10 @@ function createObserverSnapshotUdsServer({
           throw safeError('relay_observer_snapshot_response_too_large');
         }
         observations.accepted_frames += 1;
-        socket.end(encoded, () => socket.destroy());
+        socket.end(encoded, () => {
+          clearRequestDeadline();
+          socket.destroy();
+        });
       } catch {
         observations.rejected_frames += 1;
         socket.destroy();
@@ -221,6 +234,14 @@ function validateSnapshotRequest(request) {
     throw safeError('relay_observer_snapshot_request_invalid');
   }
   return request;
+}
+
+function validateSnapshotRequestDeadline(value) {
+  if (!Number.isInteger(value) || value < 10 ||
+      value > SNAPSHOT_REQUEST_DEADLINE_MS) {
+    throw safeError('relay_observer_snapshot_request_deadline_invalid');
+  }
+  return value;
 }
 
 function validateOwnerOnlySnapshotSocketPath(value, {
@@ -482,7 +503,7 @@ module.exports = {
   MAX_SNAPSHOT_RESPONSE_BYTES,
   MAX_SNAPSHOT_SOCKET_PATH_BYTES,
   MAX_STARTUP_LOCK_ADDRESS_BYTES,
-  SNAPSHOT_SOCKET_TIMEOUT_MS,
+  SNAPSHOT_REQUEST_DEADLINE_MS,
   STALE_SOCKET_PROBE_TIMEOUT_MS,
   acquireObserverSnapshotStartupLock,
   createObserverSnapshotUdsServer,
@@ -494,5 +515,6 @@ module.exports = {
   validateBoundSnapshotSocket,
   validateOwnerOnlySnapshotSocketPath,
   validateStaleSnapshotSocketCandidate,
+  validateSnapshotRequestDeadline,
   validateSnapshotRequest
 };

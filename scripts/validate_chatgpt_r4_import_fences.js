@@ -445,13 +445,23 @@ function validateComponentSource(component, { file, source }) {
         /\bcrypto\.createHash\s*\(\s*['"]sha256['"]\s*\)/u,
         /\bnet\.createServer\s*\(\s*socket\s*=>\s*socket\.destroy\s*\(\s*\)\s*\)/u,
         /\blockServer\.maxConnections\s*=\s*1\b/u,
-        /\bsocket\.end\s*\(\s*encoded\s*,\s*\(\s*\)\s*=>\s*socket\.destroy\s*\(\s*\)\s*\)/u,
         /\bstartupLock\s*=\s*await\s+acquireStartupLock\s*\(\s*authority\s*\)[\s\S]{0,240}\bawait\s+prepareObserverSnapshotSocketPath\b/u
+      ];
+      const observerSnapshotDeadlineContracts = [
+        /\bconst\s+SNAPSHOT_REQUEST_DEADLINE_MS\s*=\s*5000\s*;/u,
+        /\bvalidateSnapshotRequestDeadline\s*\(\s*requestDeadlineMs\s*\)/u,
+        /\brequestDeadline\s*=\s*setTimeout\s*\(\s*\(\s*\)\s*=>[\s\S]{0,160}\brequestDeadlineMs\s*\)/u,
+        /\bclearTimeout\s*\(\s*requestDeadline\s*\)/u,
+        /\bsocket\.end\s*\(\s*encoded\s*,\s*\(\s*\)\s*=>\s*\{[\s\S]{0,160}\bclearRequestDeadline\s*\(\s*\)[\s\S]{0,80}\bsocket\.destroy\s*\(\s*\)/u
       ];
       const startupLockAssertions =
         [...maskedSource.matchAll(/\bstartupLock\s*\.\s*assertHeld\s*\(\s*\)/gu)].length;
+      const socketIdleTimeoutCalls =
+        [...maskedSource.matchAll(/\bsocket\s*\.\s*setTimeout\s*\(/gu)].length;
       if (ownerOnlySnapshotContracts.some(pattern => !pattern.test(source)) ||
-          startupLockAssertions !== 3) {
+          observerSnapshotDeadlineContracts.some(pattern => !pattern.test(maskedSource)) ||
+          startupLockAssertions !== 3 ||
+          socketIdleTimeoutCalls !== 1) {
         throw new Error(`owner_only_snapshot_listener_contract_invalid:${relativeFile}`);
       }
     }
@@ -613,6 +623,8 @@ function validateBoundaryManifests() {
       relay.observerSnapshotStartupLockDurableStateImplemented !== false ||
       relay.observerSnapshotStartupLockDataSurface !== false ||
       relay.observerSnapshotResponseClosesConnection !== true ||
+      relay.observerSnapshotRequestDeadlineKind !== 'absolute_from_accept' ||
+      relay.observerSnapshotRequestDeadlineMs !== 5000 ||
       relay.observerSnapshotRequestIdentifiersRetained !== false ||
       relay.observerSnapshotBodiesRetained !== false ||
       relay.durableStateImplemented !== false) {

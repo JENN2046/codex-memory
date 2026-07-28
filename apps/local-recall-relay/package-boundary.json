@@ -17,6 +17,8 @@
   "observerSnapshotStartupLockDurableStateImplemented": false,
   "observerSnapshotStartupLockDataSurface": false,
   "observerSnapshotResponseClosesConnection": true,
+  "observerSnapshotRequestDeadlineKind": "absolute_from_accept",
+  "observerSnapshotRequestDeadlineMs": 5000,
   "observerSnapshotRequestIdentifiersRetained": false,
   "observerSnapshotBodiesRetained": false,
   "loopbackHttpClientImplemented": true,

@@ -150,8 +150,40 @@ test('R4-C listener and transport builtin exceptions are exact-file and exact-lo
   assert.throws(() => validateComponentSource('relay', {
     file: relayObserverFile,
     source: relayObserverSource.replace(
-      'socket.end(encoded, () => socket.destroy())',
+      `socket.end(encoded, () => {
+          clearRequestDeadline();
+          socket.destroy();
+        })`,
       'socket.end(encoded)'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'requestDeadline = setTimeout(',
+      'socket.setTimeout('
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'const SNAPSHOT_REQUEST_DEADLINE_MS = 5000;',
+      'const SNAPSHOT_REQUEST_DEADLINE_MS = 5001;'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'const SNAPSHOT_REQUEST_DEADLINE_MS = 5000;',
+      `const SNAPSHOT_REQUEST_DEADLINE_MS = 6000;
+/* const SNAPSHOT_REQUEST_DEADLINE_MS = 5000; */`
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'clearTimeout(requestDeadline);',
+      'true;'
     )
   }), /owner_only_snapshot_listener_contract_invalid/);
   assert.throws(() => validateComponentSource('relay', {

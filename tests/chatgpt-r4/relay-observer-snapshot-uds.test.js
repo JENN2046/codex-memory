@@ -14,9 +14,12 @@ const {
   projectLowDisclosureRelayObservation
 } = require('../../apps/local-recall-relay/low-disclosure-observer');
 const {
+  MAX_SNAPSHOT_CONNECTIONS,
+  SNAPSHOT_REQUEST_DEADLINE_MS,
   createObserverSnapshotUdsServer,
   prepareObserverSnapshotSocketPath,
   validateOwnerOnlySnapshotSocketPath,
+  validateSnapshotRequestDeadline,
   validateSnapshotRequest
 } = require('../../apps/local-recall-relay/observer-snapshot-uds');
 const {
@@ -169,6 +172,62 @@ test('Relay observer UDS releases handled connections whose clients keep writing
   assert.equal(snapshot.accepted_frames, 5);
   assert.equal(snapshot.rejected_frames, 0);
   assert.equal(snapshot.active_connections, 0);
+});
+
+test('Relay observer UDS applies an absolute deadline to drip-fed request frames', async t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-deadline-'));
+  fs.chmodSync(root, 0o700);
+  const socketPath = path.join(root, 'observer.sock');
+  assert.equal(SNAPSHOT_REQUEST_DEADLINE_MS, 5000);
+  assert.equal(validateSnapshotRequestDeadline(500), 500);
+  assert.throws(() => validateSnapshotRequestDeadline(
+    SNAPSHOT_REQUEST_DEADLINE_MS + 1
+  ), { code: 'relay_observer_snapshot_request_deadline_invalid' });
+
+  const server = createObserverSnapshotUdsServer({
+    socketPath,
+    readObservation: () => createLowDisclosureRelayObserver().snapshot(),
+    requestDeadlineMs: 500
+  });
+  t.after(async () => {
+    await server.stop().catch(() => {});
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+  await server.start();
+
+  const sockets = Array.from({ length: MAX_SNAPSHOT_CONNECTIONS }, () => {
+    const socket = net.createConnection({
+      path: socketPath,
+      allowHalfOpen: true
+    });
+    socket.on('error', () => {});
+    return socket;
+  });
+  await Promise.all(sockets.map(socket => once(socket, 'connect')));
+  await waitForCondition(
+    () => server.snapshot().active_connections === MAX_SNAPSHOT_CONNECTIONS,
+    1000
+  );
+  const intervals = sockets.map(socket => setInterval(() => {
+    if (!socket.destroyed) socket.write(' ');
+  }, 25));
+  try {
+    await waitForCondition(
+      () => server.snapshot().active_connections === 0,
+      2000
+    );
+  } finally {
+    for (const interval of intervals) clearInterval(interval);
+    for (const socket of sockets) socket.destroy();
+  }
+
+  assert.equal(server.snapshot().rejected_frames, MAX_SNAPSHOT_CONNECTIONS);
+  const valid = await exchange(socketPath, {
+    schema_version: 1,
+    operation: 'snapshot'
+  });
+  assert.equal(JSON.parse(valid.data).operation, 'snapshot');
+  assert.equal(server.snapshot().active_connections, 0);
 });
 
 test('Relay observer UDS rejects permissive or non-canonical parent authority', async t => {

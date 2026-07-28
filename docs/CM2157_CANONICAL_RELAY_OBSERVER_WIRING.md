@@ -89,6 +89,8 @@ retention flag other than `false` close the connection without a response.
 The UDS:
 
 - accepts at most four concurrent connections;
+- applies an absolute five-second request deadline from connection acceptance;
+  incoming activity does not refresh or extend that deadline;
 - closes the full connection after the bounded response is flushed, including
   when a client keeps its write half open;
 - limits requests to 128 bytes and responses to 4096 bytes;
@@ -122,6 +124,8 @@ Source validation covers:
   parent/socket-identity-drifted, and probe-uncertain paths;
 - concurrent stale-socket recovery serialization, with exactly one live
   rebound socket and no loser-side unlink;
+- absolute request-deadline enforcement against four concurrent clients that
+  continuously drip bytes, followed by successful slot reuse;
 - full connection release after a valid response to a half-open client, so
   handled clients cannot exhaust the four connection slots;
 - canonical main factory wiring and snapshot-server lifecycle, including
