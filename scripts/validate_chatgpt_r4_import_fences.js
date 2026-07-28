@@ -61,6 +61,14 @@ const R4C_RUNTIME_FILE_POLICIES = Object.freeze({
     allowedBuiltins: Object.freeze([]),
     allowedRuntimeRules: Object.freeze(['runtime_process_access'])
   }),
+  'apps/local-recall-relay/observer-snapshot-uds.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:crypto', 'node:fs', 'node:net', 'node:path']),
+    allowedRuntimeRules: Object.freeze([
+      'runtime_process_access',
+      'service_listener',
+      'stale_socket_cleanup'
+    ])
+  }),
   'apps/local-recall-relay/uds-transport.js': Object.freeze({
     allowedBuiltins: Object.freeze(['node:net']),
     allowedRuntimeRules: Object.freeze([])
@@ -106,7 +114,7 @@ const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
   { pattern: /\b(?:eval|Function)\b/u, code: 'runtime_code_generation' },
   { pattern: /\\u(?:\{[0-9a-fA-F]+\}|[0-9a-fA-F]{4})/u, code: 'escaped_source_identifier' },
   {
-    pattern: /\b(?:writeFile|appendFile|createWriteStream|mkdir|rm|unlink)\b/u,
+    pattern: /\b(?:writeFile|appendFile|createWriteStream|mkdir|rm|unlink|unlinkSync)\b/u,
     code: 'durable_file_mutation'
   },
   {
@@ -406,28 +414,134 @@ function validateComponentSource(component, { file, source }) {
   });
   const runtimeFilePolicy = R4C_RUNTIME_FILE_POLICIES[relativeFile];
   let listenerCheckedSource = maskedSource;
+  let mutationCheckedSource = maskedSource;
   if (runtimeFilePolicy?.allowedRuntimeRules.includes('service_listener')) {
     const exactLoopbackListen = /\bserver\s*\.\s*listen\s*\(\s*0\s*,\s*['"]127\.0\.0\.1['"]\s*\)/u;
     const exactExternalListen = /\bserver\s*\.\s*listen\s*\(\s*config\.bindPort\s*,\s*config\.bindHost\s*\)/u;
-    const exactServerCreation = /\bhttp\s*\.\s*createServer\s*\(/u;
+    const exactObserverSnapshotListen = /\bserver\s*\.\s*listen\s*\(\s*socketPath\s*\)/u;
+    const exactObserverStartupLockListen =
+      /\blockServer\s*\.\s*listen\s*\(\s*lockAddress\s*\)/u;
+    const exactHttpServerCreation = /\bhttp\s*\.\s*createServer\s*\(/u;
+    const exactUdsServerCreation = /\bnet\s*\.\s*createServer\s*\(/u;
     const listenerCalls = [...maskedSource.matchAll(/\bserver\s*\.\s*listen\s*\(/gu)].length;
-    const serverCreations = [...maskedSource.matchAll(/\bhttp\s*\.\s*createServer\s*\(/gu)].length;
-    const listenPattern = relativeFile === 'apps/chatgpt-edge/loopback-runtime.js'
-      ? exactLoopbackListen
-      : exactExternalListen;
-    if (!listenPattern.test(source) || listenerCalls !== 1 || serverCreations !== 1) {
+    const startupLockListenerCalls =
+      [...maskedSource.matchAll(/\blockServer\s*\.\s*listen\s*\(/gu)].length;
+    const httpServerCreations = [...maskedSource.matchAll(/\bhttp\s*\.\s*createServer\s*\(/gu)].length;
+    const udsServerCreations = [...maskedSource.matchAll(/\bnet\s*\.\s*createServer\s*\(/gu)].length;
+    const observerSnapshotFile =
+      relativeFile === 'apps/local-recall-relay/observer-snapshot-uds.js';
+    if (observerSnapshotFile) {
+      const ownerOnlySnapshotContracts = [
+        /\bresolvedParent\s*!==\s*parentPath\b/u,
+        /\(\s*parentStat\.mode\s*&\s*0o077\s*\)\s*!==\s*0\b/u,
+        /\bparentStat\.uid\s*!==\s*currentUid\b/u,
+        /\bchmodSync\s*\(\s*socketPath\s*,\s*0o600\s*\)/u,
+        /\bboundParentPath\s*!==\s*authority\.parentPath\b/u,
+        /\(\s*parentStat\.mode\s*&\s*0o077\s*\)\s*!==\s*0\b/u,
+        /\bparentStat\.uid\s*!==\s*authority\.ownerUid\b/u,
+        /\(\s*socketStat\.mode\s*&\s*0o777\s*\)\s*!==\s*0o600\b/u,
+        /\bsocketStat\.uid\s*!==\s*authority\.ownerUid\b/u,
+        /\bprocess\.platform\s*!==\s*['"]linux['"]/u,
+        /\bcrypto\.createHash\s*\(\s*['"]sha256['"]\s*\)/u,
+        /\bnet\.createServer\s*\(\s*socket\s*=>\s*socket\.destroy\s*\(\s*\)\s*\)/u,
+        /\blockServer\.maxConnections\s*=\s*1\b/u,
+        /\bstartupLock\s*=\s*await\s+acquireStartupLock\s*\(\s*authority\s*\)[\s\S]{0,240}\bawait\s+prepareObserverSnapshotSocketPath\b/u
+      ];
+      const observerSnapshotDeadlineContracts = [
+        /\bconst\s+SNAPSHOT_REQUEST_DEADLINE_MS\s*=\s*5000\s*;/u,
+        /\bvalidateSnapshotRequestDeadline\s*\(\s*requestDeadlineMs\s*\)/u,
+        /\brequestDeadline\s*=\s*setTimeout\s*\(\s*\(\s*\)\s*=>[\s\S]{0,160}\brequestDeadlineMs\s*\)/u,
+        /\bclearTimeout\s*\(\s*requestDeadline\s*\)/u,
+        /\bsocket\.end\s*\(\s*encoded\s*,\s*\(\s*\)\s*=>\s*\{[\s\S]{0,160}\bclearRequestDeadline\s*\(\s*\)[\s\S]{0,80}\bsocket\.destroy\s*\(\s*\)/u
+      ];
+      const startupLockAssertions =
+        [...maskedSource.matchAll(/\bstartupLock\s*\.\s*assertHeld\s*\(\s*\)/gu)].length;
+      const socketIdleTimeoutCalls =
+        [...maskedSource.matchAll(/\bsocket\s*\.\s*setTimeout\s*\(/gu)].length;
+      if (ownerOnlySnapshotContracts.some(pattern => !pattern.test(source)) ||
+          observerSnapshotDeadlineContracts.some(pattern => !pattern.test(maskedSource)) ||
+          startupLockAssertions !== 3 ||
+          socketIdleTimeoutCalls !== 1) {
+        throw new Error(`owner_only_snapshot_listener_contract_invalid:${relativeFile}`);
+      }
+    }
+    const listenPattern = observerSnapshotFile
+      ? exactObserverSnapshotListen
+      : relativeFile === 'apps/chatgpt-edge/loopback-runtime.js'
+        ? exactLoopbackListen
+        : exactExternalListen;
+    const creationPattern = observerSnapshotFile
+      ? exactUdsServerCreation
+      : exactHttpServerCreation;
+    const creationCount = observerSnapshotFile
+      ? udsServerCreations
+      : httpServerCreations;
+    if (!listenPattern.test(source) ||
+        listenerCalls !== 1 ||
+        creationCount !== (observerSnapshotFile ? 2 : 1) ||
+        (observerSnapshotFile &&
+          (!exactObserverStartupLockListen.test(source) ||
+           startupLockListenerCalls !== 1)) ||
+        (observerSnapshotFile ? httpServerCreations !== 0 : udsServerCreations !== 0)) {
       throw new Error(`loopback_listener_contract_invalid:${relativeFile}`);
     }
-    const withoutAllowedListeners = source
-      .replace(exactServerCreation, match => ' '.repeat(match.length))
-      .replace(listenPattern, match => ' '.repeat(match.length));
+    const withoutAllowedListeners = (
+      observerSnapshotFile
+        ? source
+          .replace(/\bnet\s*\.\s*createServer\s*\(/gu, match => ' '.repeat(match.length))
+          .replace(exactObserverSnapshotListen, match => ' '.repeat(match.length))
+          .replace(exactObserverStartupLockListen, match => ' '.repeat(match.length))
+        : source
+          .replace(creationPattern, match => ' '.repeat(match.length))
+          .replace(listenPattern, match => ' '.repeat(match.length))
+    );
     listenerCheckedSource = maskCommentsAndStringContents(withoutAllowedListeners);
+  }
+  if (runtimeFilePolicy?.allowedRuntimeRules.includes('stale_socket_cleanup')) {
+    const exactUnlinkBinding = /\bunlinkSync\s*=\s*fs\s*\.\s*unlinkSync\b/u;
+    const exactUnlinkCall =
+      /\bunlinkSync\s*\(\s*authority\s*\.\s*socketPath\s*\)/u;
+    const unlinkReferences = [...maskedSource.matchAll(/\bunlinkSync\b/gu)].length;
+    const parentAuthorityRevalidations = [
+      ...maskedSource.matchAll(
+        /\brevalidateParentAuthority\s*\(\s*authority\s*,\s*\{\s*realpathSync\s*,\s*statSync\s*\}\s*\)/gu
+      )
+    ].length;
+    const staleModeChecks = [
+      ...maskedSource.matchAll(
+        /\(\s*stat\s*\.\s*mode\s*&\s*0o777\s*\)/gu
+      )
+    ].length;
+    const staleCleanupContracts = [
+      /!\s*stat\s*\.\s*isSocket\s*\(\s*\)/u,
+      /\bstat\s*\.\s*uid\s*!==\s*authority\s*\.\s*ownerUid\b/u,
+      /\brevalidateParentAuthority\s*=\s*revalidateOwnerOnlySnapshotParentAuthority\b/u,
+      /\bprobeStatus\s*===\s*['"]active['"]/u,
+      /\bprobeStatus\s*!==\s*['"]stale['"]/u,
+      /\bcurrentStat\s*\.\s*dev\s*!==\s*existingStat\s*\.\s*dev\b/u,
+      /\bcurrentStat\s*\.\s*ino\s*!==\s*existingStat\s*\.\s*ino\b/u
+    ];
+    if (!exactUnlinkBinding.test(source) ||
+        !exactUnlinkCall.test(source) ||
+        unlinkReferences !== 5 ||
+        parentAuthorityRevalidations !== 2 ||
+        staleModeChecks !== 0 ||
+        staleCleanupContracts.some(pattern => !pattern.test(source))) {
+      throw new Error(`stale_socket_cleanup_contract_invalid:${relativeFile}`);
+    }
+    const withoutAllowedMutation = source
+      .replace(/\bunlinkSync\b/gu, match => ' '.repeat(match.length));
+    mutationCheckedSource = maskCommentsAndStringContents(withoutAllowedMutation);
   }
   for (const rule of FORBIDDEN_RUNTIME_PATTERNS) {
     if (rule.code !== 'service_listener' && runtimeFilePolicy?.allowedRuntimeRules.includes(rule.code)) {
       continue;
     }
-    const ruleSource = rule.code === 'service_listener' ? listenerCheckedSource : maskedSource;
+    const ruleSource = rule.code === 'service_listener'
+      ? listenerCheckedSource
+      : rule.code === 'durable_file_mutation'
+        ? mutationCheckedSource
+        : maskedSource;
     if (rule.pattern.test(ruleSource) || rule.bracketPattern?.test(bracketMaskedSource)) {
       throw new Error(`${rule.code}:${relativeFile}`);
     }
@@ -493,7 +607,27 @@ function validateBoundaryManifests() {
     if (!relay.forbiddenCapabilities.includes(capability)) throw new Error(`relay_capability_not_forbidden:${capability}`);
   }
   if (relay.loopbackHttpClientImplemented !== true || relay.temporaryUdsClientImplemented !== true ||
-      relay.serviceListenerImplemented !== false || relay.durableStateImplemented !== false) {
+      relay.serviceListenerImplemented !== true ||
+      relay.serviceListenerKind !== 'owner_only_readonly_observer_snapshot_uds' ||
+      relay.observerSnapshotUdsImplemented !== true ||
+      relay.observerSnapshotUdsActivated !== false ||
+      relay.observerSnapshotSocketMode !== '0600' ||
+      relay.observerSnapshotOwnerOnlyParentRequired !== true ||
+      relay.observerSnapshotReadOnly !== true ||
+      relay.observerSnapshotDurableStateImplemented !== false ||
+      relay.observerSnapshotStaleSocketCleanupImplemented !== true ||
+      relay.observerSnapshotStaleSocketCleanupRequiresInactiveProbe !== true ||
+      relay.observerSnapshotStaleSocketModePolicy !==
+        'current_uid_socket_under_revalidated_owner_only_parent' ||
+      relay.observerSnapshotStartupSerialization !== 'linux_abstract_uds_lock' ||
+      relay.observerSnapshotStartupLockDurableStateImplemented !== false ||
+      relay.observerSnapshotStartupLockDataSurface !== false ||
+      relay.observerSnapshotResponseClosesConnection !== true ||
+      relay.observerSnapshotRequestDeadlineKind !== 'absolute_from_accept' ||
+      relay.observerSnapshotRequestDeadlineMs !== 5000 ||
+      relay.observerSnapshotRequestIdentifiersRetained !== false ||
+      relay.observerSnapshotBodiesRetained !== false ||
+      relay.durableStateImplemented !== false) {
     throw new Error('relay_loopback_boundary_invalid');
   }
   if (relay.outboundHttpsClientImplemented !== true ||

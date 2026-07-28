@@ -126,6 +126,126 @@ test('R4-C listener and transport builtin exceptions are exact-file and exact-lo
     file: path.join(ROOTS.relay, 'unexpected-http-client.js'),
     source: "require('node:http')"
   }), /builtin_import_forbidden/);
+
+  const relayObserverFile = path.join(ROOTS.relay, 'observer-snapshot-uds.js');
+  const relayObserverSource = require('node:fs').readFileSync(relayObserverFile, 'utf8');
+  assert.doesNotThrow(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource
+  }));
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'server.listen(socketPath)',
+      "server.listen(8080, '0.0.0.0')"
+    )
+  }), /loopback_listener_contract_invalid|service_listener/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'chmodSync(socketPath, 0o600)',
+      'chmodSync(socketPath, 0o666)'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      `socket.end(encoded, () => {
+          clearRequestDeadline();
+          socket.destroy();
+        })`,
+      'socket.end(encoded)'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'requestDeadline = setTimeout(',
+      'socket.setTimeout('
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'const SNAPSHOT_REQUEST_DEADLINE_MS = 5000;',
+      'const SNAPSHOT_REQUEST_DEADLINE_MS = 5001;'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'const SNAPSHOT_REQUEST_DEADLINE_MS = 5000;',
+      `const SNAPSHOT_REQUEST_DEADLINE_MS = 6000;
+/* const SNAPSHOT_REQUEST_DEADLINE_MS = 5000; */`
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'clearTimeout(requestDeadline);',
+      'true;'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'resolvedParent !== parentPath',
+      'resolvedParent === parentPath'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replaceAll(
+      'parentStat.uid !== authority.ownerUid',
+      'parentStat.uid === authority.ownerUid'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'unlinkSync(authority.socketPath)',
+      "unlinkSync('/tmp/unsafe-observer.sock')"
+    )
+  }), /stale_socket_cleanup_contract_invalid|durable_file_mutation/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      "probeStatus !== 'stale'",
+      "probeStatus === 'stale'"
+    )
+  }), /stale_socket_cleanup_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'revalidateParentAuthority(authority, { realpathSync, statSync });',
+      'true;'
+    )
+  }), /stale_socket_cleanup_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'stat.uid !== authority.ownerUid) {',
+      'stat.uid !== authority.ownerUid ||\n      (stat.mode & 0o777) !== 0o600) {'
+    )
+  }), /stale_socket_cleanup_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'lockServer.listen(lockAddress)',
+      "lockServer.listen(8080, '0.0.0.0')"
+    )
+  }), /loopback_listener_contract_invalid|service_listener/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'startupLock.assertHeld();',
+      'startupLock.wasHeld();'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: path.join(ROOTS.relay, 'copied-observer-snapshot-uds.js'),
+    source: relayObserverSource
+  }), /runtime_process_access|service_listener|builtin_import_forbidden/);
 });
 
 test('public Edge cannot import local config, storage, recall, or arbitrary packages', () => {

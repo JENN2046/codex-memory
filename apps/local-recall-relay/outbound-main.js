@@ -1,34 +1,95 @@
 #!/usr/bin/env node
 'use strict';
 
+const { createLowDisclosureRelayObserver } = require('./low-disclosure-observer');
+const { createObserverSnapshotUdsServer } = require('./observer-snapshot-uds');
 const { loadOutboundRelayRuntimeFromEnvironment } = require('./runtime-authority');
 
 function createOutboundRelayService({
   runtime,
+  snapshotServer = null,
   idlePollMs = 250,
   unavailableBackoffMs = 1_000
 } = {}) {
   if (!runtime || typeof runtime.processNext !== 'function') throw safeError('relay_runtime_invalid');
+  if (snapshotServer !== null &&
+      (typeof snapshotServer.start !== 'function' ||
+       typeof snapshotServer.stop !== 'function' ||
+       typeof snapshotServer.snapshot !== 'function')) {
+    throw safeError('relay_observer_snapshot_server_invalid');
+  }
   validateDelay(idlePollMs);
   validateDelay(unavailableBackoffMs);
   let stopping = false;
+  let running = false;
 
   return Object.freeze({
     stop() {
       stopping = true;
     },
     async run() {
-      while (!stopping) {
+      if (running) throw safeError('relay_service_already_running');
+      running = true;
+      let primaryFailure = false;
+      try {
+        if (snapshotServer) await snapshotServer.start();
+        while (!stopping) {
+          try {
+            const result = await runtime.processNext();
+            if (result.status === 'idle') await delay(idlePollMs);
+          } catch (error) {
+            if (!isAvailabilityError(error?.code)) throw safeError(error?.code);
+            await delay(unavailableBackoffMs);
+          }
+        }
+      } catch (error) {
+        primaryFailure = true;
+        throw error;
+      } finally {
         try {
-          const result = await runtime.processNext();
-          if (result.status === 'idle') await delay(idlePollMs);
+          await snapshotServer?.stop();
         } catch (error) {
-          if (!isAvailabilityError(error?.code)) throw safeError(error?.code);
-          await delay(unavailableBackoffMs);
+          if (!primaryFailure) throw error;
+        } finally {
+          running = false;
         }
       }
+    },
+    snapshot() {
+      return Object.freeze({
+        running,
+        stopping,
+        observer_snapshot_exposed: snapshotServer !== null,
+        observer_snapshot: snapshotServer?.snapshot() || null
+      });
     }
   });
+}
+
+function createCanonicalOutboundRelayService({
+  environment = process.env,
+  createObserver = createLowDisclosureRelayObserver,
+  createSnapshotServer = createObserverSnapshotUdsServer,
+  loadRuntime = loadOutboundRelayRuntimeFromEnvironment
+} = {}) {
+  const socketPath = environment?.CODEX_MEMORY_R5_RELAY_OBSERVER_UDS_PATH;
+  if (typeof socketPath !== 'string' || !socketPath ||
+      socketPath.trim() !== socketPath) {
+    throw safeError('relay_observer_snapshot_environment_missing');
+  }
+  const observer = createObserver();
+  if (!observer || typeof observer.observe !== 'function' ||
+      typeof observer.snapshot !== 'function') {
+    throw safeError('relay_observer_invalid');
+  }
+  const snapshotServer = createSnapshotServer({
+    socketPath,
+    readObservation: observer.snapshot
+  });
+  const runtime = loadRuntime(environment, {
+    eventSink: observer.observe
+  });
+  return createOutboundRelayService({ runtime, snapshotServer });
 }
 
 function validateDelay(value) {
@@ -53,8 +114,7 @@ function delay(milliseconds) {
 }
 
 async function main() {
-  const runtime = loadOutboundRelayRuntimeFromEnvironment();
-  const service = createOutboundRelayService({ runtime });
+  const service = createCanonicalOutboundRelayService();
   process.once('SIGTERM', () => service.stop());
   process.once('SIGINT', () => service.stop());
   await service.run();
@@ -71,6 +131,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  createCanonicalOutboundRelayService,
   createOutboundRelayService,
   isAvailabilityError,
   safeError,

@@ -3,28 +3,30 @@
 > Non-authoritative checkpoint pointer. Current authority is
 > `CURRENT_STATE.md`.
 
-## CM-2156 Owner-Only Mapping Package Preflight
+## CM-2157 Canonical Relay Observer Wiring
 
 Status: `COMPLETED_VALIDATED`
 
-- Validation: `CMV-2241`
+- Validation: `CMV-2242`
 - Active task after closeout: `null`
 - Active queue after closeout: empty
-- Package shape: mapping-only child of an existing complete private root
-- Filesystem boundary: Linux/WSL owner-only descriptor semantics
-- Apply boundary: explicit private-config write; no agent authorization implied
+- Source boundary: canonical observer injection plus owner-only read-only UDS
+- Socket boundary: canonical current-UID parent and exact socket mode `0600`
+- Runtime boundary: synthetic temporary fixtures only
 - Accepted product baseline: PR `#61`
 - Reviewed product head: `4680b4c1…`
 - Product merge baseline: `ef62d481…`
 - Accepted main CI run: `30238902177`
 - Historical baseline: `ef62d481…`
 
-The source-only utility replaces the abandoned incomplete-root prototype with
-bounded `plan` / `apply` / `check` operations, mapping-only bindings, atomic
-owner-only package creation, low-disclosure receipts, and synthetic negative
-tests. It was not applied to real private configuration and does not change
-runtime/provider behavior, expand public MCP schemas, change dependencies or
-CI, perform memory operations, or authorize readiness.
+The source-only delivery projects an exact low-disclosure Relay observation,
+serves it through an exact-request owner-only UDS, injects the observer through
+the canonical constructor, and brackets the socket with service lifetime.
+Negative tests reject disclosure drift, unsafe parent authority, missing
+configuration, listener drift, and bypass of canonical wiring. It does not set
+a real socket path, start a real runtime, change provider behavior, expand
+public MCP schemas, change dependencies or CI, perform memory operations, or
+authorize readiness.
 
 ## Stop State
 

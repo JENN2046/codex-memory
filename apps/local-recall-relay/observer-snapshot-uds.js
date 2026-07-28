@@ -1,0 +1,520 @@
+'use strict';
+
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+const net = require('node:net');
+const path = require('node:path');
+
+const {
+  projectLowDisclosureRelayObservation
+} = require('./low-disclosure-observer');
+
+const MAX_SNAPSHOT_REQUEST_BYTES = 128;
+const MAX_SNAPSHOT_RESPONSE_BYTES = 4096;
+const MAX_SNAPSHOT_CONNECTIONS = 4;
+const SNAPSHOT_REQUEST_DEADLINE_MS = 5000;
+const STALE_SOCKET_PROBE_TIMEOUT_MS = 500;
+const MAX_STARTUP_LOCK_ADDRESS_BYTES = 100;
+const MAX_SNAPSHOT_SOCKET_PATH_BYTES = 100;
+const SNAPSHOT_REQUEST_KEYS = Object.freeze(['operation', 'schema_version']);
+
+function createObserverSnapshotUdsServer({
+  socketPath,
+  readObservation,
+  chmodSync = fs.chmodSync,
+  lstatSync = fs.lstatSync,
+  realpathSync = fs.realpathSync,
+  statSync = fs.statSync,
+  unlinkSync,
+  probeSocket = probeObserverSnapshotSocket,
+  acquireStartupLock = acquireObserverSnapshotStartupLock,
+  requestDeadlineMs = SNAPSHOT_REQUEST_DEADLINE_MS
+} = {}) {
+  if (typeof readObservation !== 'function') {
+    throw safeError('relay_observer_snapshot_reader_invalid');
+  }
+  validateSnapshotRequestDeadline(requestDeadlineMs);
+  validateOwnerOnlySnapshotSocketPath(socketPath, {
+    realpathSync,
+    statSync
+  });
+  let started = false;
+  let activeConnections = 0;
+  const openSockets = new Set();
+  const observations = {
+    connections: 0,
+    accepted_frames: 0,
+    rejected_frames: 0,
+    request_bodies_logged: 0,
+    response_bodies_logged: 0
+  };
+
+  const server = net.createServer(socket => {
+    observations.connections += 1;
+    if (activeConnections >= MAX_SNAPSHOT_CONNECTIONS) {
+      observations.rejected_frames += 1;
+      socket.destroy();
+      return;
+    }
+    activeConnections += 1;
+    openSockets.add(socket);
+    let released = false;
+    let handled = false;
+    let requestDeadline = null;
+    let bytes = 0;
+    const chunks = [];
+
+    function clearRequestDeadline() {
+      if (requestDeadline === null) return;
+      clearTimeout(requestDeadline);
+      requestDeadline = null;
+    }
+
+    function release() {
+      if (released) return;
+      released = true;
+      clearRequestDeadline();
+      activeConnections -= 1;
+      openSockets.delete(socket);
+    }
+
+    function rejectFrame() {
+      if (handled) return;
+      handled = true;
+      observations.rejected_frames += 1;
+      socket.destroy();
+    }
+
+    socket.once('close', release);
+    requestDeadline = setTimeout(() => {
+      if (handled) socket.destroy();
+      else rejectFrame();
+    }, requestDeadlineMs);
+    socket.on('data', chunk => {
+      if (handled) return;
+      bytes += chunk.length;
+      if (bytes > MAX_SNAPSHOT_REQUEST_BYTES) return rejectFrame();
+      chunks.push(chunk);
+      const frame = Buffer.concat(chunks, bytes);
+      const newline = frame.indexOf(0x0a);
+      if (newline === -1) return;
+      if (newline !== frame.length - 1) return rejectFrame();
+      handled = true;
+      try {
+        const request = JSON.parse(frame.subarray(0, newline).toString('utf8'));
+        validateSnapshotRequest(request);
+        const observation = projectLowDisclosureRelayObservation(readObservation());
+        const response = Object.freeze({
+          schema_version: 1,
+          operation: 'snapshot',
+          observation
+        });
+        const encoded = Buffer.from(`${JSON.stringify(response)}\n`, 'utf8');
+        if (encoded.length > MAX_SNAPSHOT_RESPONSE_BYTES) {
+          throw safeError('relay_observer_snapshot_response_too_large');
+        }
+        observations.accepted_frames += 1;
+        socket.end(encoded, () => {
+          clearRequestDeadline();
+          socket.destroy();
+        });
+      } catch {
+        observations.rejected_frames += 1;
+        socket.destroy();
+      }
+    });
+    socket.on('error', () => {});
+    socket.on('end', () => {
+      if (!handled) rejectFrame();
+    });
+  });
+
+  return Object.freeze({
+    async start() {
+      if (started) throw safeError('relay_observer_snapshot_already_started');
+      const authority = validateOwnerOnlySnapshotSocketPath(socketPath, {
+        realpathSync,
+        statSync
+      });
+      let listening = false;
+      let startupLock = null;
+      try {
+        startupLock = await acquireStartupLock(authority);
+        startupLock.assertHeld();
+        await prepareObserverSnapshotSocketPath(authority, {
+          lstatSync,
+          probeSocket,
+          realpathSync,
+          statSync,
+          unlinkSync
+        });
+        startupLock.assertHeld();
+        await new Promise((resolve, rejectStart) => {
+          const onError = () => {
+            server.off('listening', onListening);
+            rejectStart(safeError('relay_observer_snapshot_start_failed'));
+          };
+          const onListening = () => {
+            server.off('error', onError);
+            resolve();
+          };
+          server.once('error', onError);
+          server.once('listening', onListening);
+          server.listen(socketPath);
+        });
+        listening = true;
+        chmodSync(socketPath, 0o600);
+        validateBoundSnapshotSocket(authority, {
+          lstatSync,
+          realpathSync,
+          statSync
+        });
+        startupLock.assertHeld();
+        await startupLock.release();
+        startupLock = null;
+      } catch (error) {
+        for (const socket of openSockets) socket.destroy();
+        if (listening) {
+          await new Promise(resolve => server.close(() => resolve()));
+        }
+        throw safeError(
+          typeof error?.code === 'string' && error.code.startsWith('relay_observer_snapshot_')
+            ? error.code
+            : 'relay_observer_snapshot_start_failed'
+        );
+      } finally {
+        await startupLock?.release();
+      }
+      started = true;
+      return Object.freeze({
+        started: true,
+        owner_only_socket: true,
+        read_only: true
+      });
+    },
+    async stop() {
+      if (!started) return;
+      for (const socket of openSockets) socket.destroy();
+      try {
+        await new Promise((resolve, rejectStop) => {
+          server.close(error => error ? rejectStop(error) : resolve());
+        });
+      } catch {
+        throw safeError('relay_observer_snapshot_stop_failed');
+      } finally {
+        started = false;
+      }
+    },
+    snapshot() {
+      return Object.freeze({
+        started,
+        ...observations,
+        active_connections: activeConnections,
+        max_concurrent_connections: MAX_SNAPSHOT_CONNECTIONS,
+        owner_only_socket: true,
+        read_only: true,
+        durable_state_written: false,
+        request_bodies_logged: 0,
+        response_bodies_logged: 0
+      });
+    }
+  });
+}
+
+function validateSnapshotRequest(request) {
+  if (!request || typeof request !== 'object' || Array.isArray(request)) {
+    throw safeError('relay_observer_snapshot_request_invalid');
+  }
+  const actualKeys = Object.keys(request).sort();
+  const expectedKeys = [...SNAPSHOT_REQUEST_KEYS].sort();
+  if (actualKeys.length !== expectedKeys.length ||
+      actualKeys.some((key, index) => key !== expectedKeys[index]) ||
+      request.schema_version !== 1 ||
+      request.operation !== 'snapshot') {
+    throw safeError('relay_observer_snapshot_request_invalid');
+  }
+  return request;
+}
+
+function validateSnapshotRequestDeadline(value) {
+  if (!Number.isInteger(value) || value < 10 ||
+      value > SNAPSHOT_REQUEST_DEADLINE_MS) {
+    throw safeError('relay_observer_snapshot_request_deadline_invalid');
+  }
+  return value;
+}
+
+function validateOwnerOnlySnapshotSocketPath(value, {
+  realpathSync = fs.realpathSync,
+  statSync = fs.statSync
+} = {}) {
+  if (typeof value !== 'string' ||
+      !path.isAbsolute(value) ||
+      path.resolve(value) !== value ||
+      value.includes('\0') ||
+      Buffer.byteLength(value, 'utf8') > MAX_SNAPSHOT_SOCKET_PATH_BYTES) {
+    throw safeError('relay_observer_snapshot_socket_path_invalid');
+  }
+  const parentPath = path.dirname(value);
+  let resolvedParent;
+  let parentStat;
+  try {
+    resolvedParent = realpathSync(parentPath);
+    parentStat = statSync(resolvedParent);
+  } catch {
+    throw safeError('relay_observer_snapshot_parent_unavailable');
+  }
+  const currentUid = typeof process.getuid === 'function' ? process.getuid() : null;
+  if (resolvedParent !== parentPath ||
+      !Number.isInteger(currentUid) ||
+      !parentStat.isDirectory() ||
+      (parentStat.mode & 0o077) !== 0 ||
+      parentStat.uid !== currentUid) {
+    throw safeError('relay_observer_snapshot_parent_security_invalid');
+  }
+  return Object.freeze({
+    socketPath: value,
+    parentPath,
+    parentDevice: parentStat.dev,
+    parentInode: parentStat.ino,
+    ownerUid: currentUid
+  });
+}
+
+function validateBoundSnapshotSocket(authority, {
+  lstatSync = fs.lstatSync,
+  realpathSync = fs.realpathSync,
+  statSync = fs.statSync
+} = {}) {
+  let boundParentPath;
+  let parentStat;
+  let socketStat;
+  try {
+    boundParentPath = realpathSync(authority.parentPath);
+    parentStat = statSync(boundParentPath);
+    socketStat = lstatSync(authority.socketPath);
+  } catch {
+    throw safeError('relay_observer_snapshot_socket_security_invalid');
+  }
+  if (boundParentPath !== authority.parentPath ||
+      !parentStat.isDirectory() ||
+      (parentStat.mode & 0o077) !== 0 ||
+      parentStat.uid !== authority.ownerUid ||
+      parentStat.dev !== authority.parentDevice ||
+      parentStat.ino !== authority.parentInode ||
+      !socketStat.isSocket() ||
+      socketStat.uid !== authority.ownerUid ||
+      (socketStat.mode & 0o777) !== 0o600) {
+    throw safeError('relay_observer_snapshot_socket_security_invalid');
+  }
+  return true;
+}
+
+function revalidateOwnerOnlySnapshotParentAuthority(authority, {
+  realpathSync = fs.realpathSync,
+  statSync = fs.statSync
+} = {}) {
+  if (!authority ||
+      typeof authority.parentPath !== 'string' ||
+      !Number.isInteger(authority.parentDevice) ||
+      !Number.isInteger(authority.parentInode) ||
+      !Number.isInteger(authority.ownerUid)) {
+    throw safeError('relay_observer_snapshot_parent_security_invalid');
+  }
+  let resolvedParent;
+  let parentStat;
+  try {
+    resolvedParent = realpathSync(authority.parentPath);
+    parentStat = statSync(resolvedParent);
+  } catch {
+    throw safeError('relay_observer_snapshot_parent_unavailable');
+  }
+  if (resolvedParent !== authority.parentPath ||
+      !parentStat.isDirectory() ||
+      (parentStat.mode & 0o077) !== 0 ||
+      parentStat.uid !== authority.ownerUid ||
+      parentStat.dev !== authority.parentDevice ||
+      parentStat.ino !== authority.parentInode) {
+    throw safeError('relay_observer_snapshot_parent_security_invalid');
+  }
+  return true;
+}
+
+async function prepareObserverSnapshotSocketPath(authority, {
+  lstatSync = fs.lstatSync,
+  probeSocket = probeObserverSnapshotSocket,
+  realpathSync = fs.realpathSync,
+  revalidateParentAuthority = revalidateOwnerOnlySnapshotParentAuthority,
+  statSync = fs.statSync,
+  unlinkSync = fs.unlinkSync
+} = {}) {
+  revalidateParentAuthority(authority, { realpathSync, statSync });
+  const existingStat = readExistingSnapshotSocketStat(authority.socketPath, lstatSync);
+  if (existingStat === null) return false;
+  validateStaleSnapshotSocketCandidate(existingStat, authority);
+
+  const probeStatus = await probeSocket(authority.socketPath);
+  if (probeStatus === 'active') {
+    throw safeError('relay_observer_snapshot_socket_active');
+  }
+  if (probeStatus === 'absent') return false;
+  if (probeStatus !== 'stale') {
+    throw safeError('relay_observer_snapshot_socket_probe_uncertain');
+  }
+
+  revalidateParentAuthority(authority, { realpathSync, statSync });
+  const currentStat = readExistingSnapshotSocketStat(authority.socketPath, lstatSync);
+  if (currentStat === null) return false;
+  validateStaleSnapshotSocketCandidate(currentStat, authority);
+  if (currentStat.dev !== existingStat.dev ||
+      currentStat.ino !== existingStat.ino) {
+    throw safeError('relay_observer_snapshot_socket_identity_changed');
+  }
+  try {
+    unlinkSync(authority.socketPath);
+  } catch {
+    throw safeError('relay_observer_snapshot_stale_socket_cleanup_failed');
+  }
+  return true;
+}
+
+function readExistingSnapshotSocketStat(socketPath, lstatSync = fs.lstatSync) {
+  try {
+    return lstatSync(socketPath);
+  } catch (error) {
+    if (error?.code === 'ENOENT') return null;
+    throw safeError('relay_observer_snapshot_socket_inspection_failed');
+  }
+}
+
+function validateStaleSnapshotSocketCandidate(stat, authority) {
+  if (!stat || typeof stat.isSocket !== 'function' ||
+      !stat.isSocket() ||
+      stat.uid !== authority.ownerUid) {
+    throw safeError('relay_observer_snapshot_stale_socket_candidate_invalid');
+  }
+  return true;
+}
+
+function probeObserverSnapshotSocket(socketPath, {
+  connectSocket = net.createConnection,
+  timeoutMs = STALE_SOCKET_PROBE_TIMEOUT_MS
+} = {}) {
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 10 || timeoutMs > 5_000) {
+    return Promise.resolve('uncertain');
+  }
+  return new Promise(resolve => {
+    let socket;
+    let settled = false;
+
+    function finish(status) {
+      if (settled) return;
+      settled = true;
+      socket?.destroy();
+      resolve(status);
+    }
+
+    try {
+      socket = connectSocket(socketPath);
+    } catch {
+      finish('uncertain');
+      return;
+    }
+    socket.once('connect', () => finish('active'));
+    socket.once('error', error => {
+      if (error?.code === 'ECONNREFUSED') return finish('stale');
+      if (error?.code === 'ENOENT') return finish('absent');
+      return finish('uncertain');
+    });
+    socket.setTimeout(timeoutMs, () => finish('uncertain'));
+  });
+}
+
+function observerSnapshotStartupLockAddress(authority) {
+  if (process.platform !== 'linux' ||
+      !authority ||
+      !Number.isInteger(authority.ownerUid) ||
+      typeof authority.socketPath !== 'string') {
+    throw safeError('relay_observer_snapshot_startup_lock_unsupported');
+  }
+  const digest = crypto.createHash('sha256')
+    .update(`${authority.ownerUid}\0${authority.socketPath}`, 'utf8')
+    .digest('hex')
+    .slice(0, 32);
+  const lockAddress =
+    `\0codex-memory-r5-observer-start-${authority.ownerUid}-${digest}`;
+  if (Buffer.byteLength(lockAddress, 'utf8') > MAX_STARTUP_LOCK_ADDRESS_BYTES) {
+    throw safeError('relay_observer_snapshot_startup_lock_invalid');
+  }
+  return lockAddress;
+}
+
+async function acquireObserverSnapshotStartupLock(authority) {
+  const lockAddress = observerSnapshotStartupLockAddress(authority);
+  const lockServer = net.createServer(socket => socket.destroy());
+  lockServer.maxConnections = 1;
+  await new Promise((resolve, rejectLock) => {
+    const onError = error => {
+      lockServer.off('listening', onListening);
+      rejectLock(safeError(
+        error?.code === 'EADDRINUSE'
+          ? 'relay_observer_snapshot_startup_lock_busy'
+          : 'relay_observer_snapshot_startup_lock_failed'
+      ));
+    };
+    const onListening = () => {
+      lockServer.off('error', onError);
+      resolve();
+    };
+    lockServer.once('error', onError);
+    lockServer.once('listening', onListening);
+    lockServer.listen(lockAddress);
+  });
+  let released = false;
+  return Object.freeze({
+    assertHeld() {
+      if (released || lockServer.listening !== true) {
+        throw safeError('relay_observer_snapshot_startup_lock_lost');
+      }
+      return true;
+    },
+    async release() {
+      if (released) return;
+      try {
+        await new Promise((resolve, rejectRelease) => {
+          lockServer.close(error => error ? rejectRelease(error) : resolve());
+        });
+      } catch {
+        throw safeError('relay_observer_snapshot_startup_lock_release_failed');
+      } finally {
+        released = true;
+      }
+    }
+  });
+}
+
+function safeError(code) {
+  return Object.assign(new Error(code), { code });
+}
+
+module.exports = {
+  MAX_SNAPSHOT_CONNECTIONS,
+  MAX_SNAPSHOT_REQUEST_BYTES,
+  MAX_SNAPSHOT_RESPONSE_BYTES,
+  MAX_SNAPSHOT_SOCKET_PATH_BYTES,
+  MAX_STARTUP_LOCK_ADDRESS_BYTES,
+  SNAPSHOT_REQUEST_DEADLINE_MS,
+  STALE_SOCKET_PROBE_TIMEOUT_MS,
+  acquireObserverSnapshotStartupLock,
+  createObserverSnapshotUdsServer,
+  observerSnapshotStartupLockAddress,
+  prepareObserverSnapshotSocketPath,
+  probeObserverSnapshotSocket,
+  readExistingSnapshotSocketStat,
+  revalidateOwnerOnlySnapshotParentAuthority,
+  validateBoundSnapshotSocket,
+  validateOwnerOnlySnapshotSocketPath,
+  validateStaleSnapshotSocketCandidate,
+  validateSnapshotRequestDeadline,
+  validateSnapshotRequest
+};

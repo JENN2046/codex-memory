@@ -7,6 +7,12 @@ completion changes. It is not a human approval and does not authorize merge,
 runtime activation, provider calls, private configuration access, or memory
 reads/writes.
 
+Post-review source follow-up: CM-2157 later wires the observer into canonical
+Relay source and adds an owner-only, read-only snapshot UDS. That later change
+is outside this historical PR #61 review and has not configured or verified a
+real private runtime. See
+`docs/CM2157_CANONICAL_RELAY_OBSERVER_WIRING.md`.
+
 Reviewed range and state:
 
 - base: `13f167358e4ce154e2af0248a396de3215adefaf`;
@@ -78,9 +84,8 @@ both version-relation blockers closed and no remaining source finding.
   are covered.
 - Request identifiers, response bodies, raw memory, and secrets are not
   retained.
-- The observer is an injectable library only. The canonical executable does
-  not wire or expose operational telemetry; documentation no longer claims
-  otherwise.
+- At the reviewed PR #61 head, the observer was an injectable library only and
+  the canonical executable did not wire or expose operational telemetry.
 
 ### Receipt validator maintenance
 
@@ -149,7 +154,8 @@ full listener-dependent Relay and HTTP cases require exact-head GitHub CI.
 
 - `SCHEMA_VERSION=1` remains an explicit compatibility exception whose safe
   delivery depends on the documented rollout/rollback order.
-- The observer provides no operational telemetry in the canonical service.
+- The reviewed PR #61 head provided no operational observer telemetry in the
+  canonical service; CM-2157 is a later source-only follow-up.
 - An acknowledged request with incomplete UDS input is not replayed.
 - Non-session mode cannot prove that a visibility value originated from an
   explicitly labelled user utterance; it retains the existing model-guidance

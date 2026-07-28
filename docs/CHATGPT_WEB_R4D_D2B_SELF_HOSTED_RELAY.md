@@ -20,7 +20,9 @@ MCP discovery canary passed. Exact values and digests remain private.
 self_hosted_amendment_contract: pass
 outbound_https_relay_client: pass
 local_uds_forwarding: pass
-relay_inbound_listener: false
+relay_public_or_data_listener: false
+relay_observer_snapshot_uds_implemented: true
+relay_observer_snapshot_uds_activated: false
 edge_relay_signing_authority_separated: pass
 owner_only_secret_references: pass
 private_d1_prerequisites_present: true
@@ -41,9 +43,16 @@ cutover_ready: false
 ## Runtime Boundary
 
 The Relay initiates canonical public HTTPS requests to the Edge and forwards an
-already signed request to the existing local governance UDS. It has no inbound
-listener and cannot load mappings, authorize diary scope, invoke a provider,
-access storage, search native memory, or persist request/response state.
+already signed request to the existing local governance UDS. It has no public
+or data-plane inbound listener and cannot load mappings, authorize diary scope,
+invoke a provider, access storage, search native memory, or persist
+request/response state.
+
+CM-2157 later adds one source-only owner-only UDS listener for exact-key
+low-disclosure observer snapshots. It has no mutation operation and exposes no
+request identifier, response body, raw memory, secret, public network, or MCP
+surface. No real observer path was configured and no real Relay was started for
+that follow-up.
 
 The outbound client:
 
