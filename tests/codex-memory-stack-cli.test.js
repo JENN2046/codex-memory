@@ -11,6 +11,7 @@ const {
   CONTROLLER_CHANGE_PATHS,
   PROFILE_KEYS,
   acquireOwnerLock,
+  adoptionSourceCompatible,
   assertPrivateRootBoundary,
   assertRelativeReference,
   buildHttpChildEnvironment,
@@ -573,6 +574,11 @@ test('source compatibility allows only controller delivery paths over the accept
   });
   assert.equal(result.compatible, true);
   assert.equal(result.controllerOnlyChanges, true);
+  assert.equal(adoptionSourceCompatible(result), true);
+  assert.equal(adoptionSourceCompatible({
+    ...result,
+    clean: false
+  }), false);
   assert.ok(calls.length >= 5);
 
   const unsafe = inspectSourceCompatibility(profile(), {

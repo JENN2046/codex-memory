@@ -836,6 +836,14 @@ function inspectSourceCompatibility(profile, options = {}) {
   });
 }
 
+function adoptionSourceCompatible(source) {
+  return Boolean(
+    source?.clean === true &&
+    source?.baselineExists === true &&
+    source?.controllerOnlyChanges === true
+  );
+}
+
 function dockerText(args, {
   exec = execFileSync
 } = {}) {
@@ -1726,7 +1734,7 @@ async function adoptRunningStack({
       edgeContainer: EDGE_CONTAINER_DEFAULT
     });
     const source = inspectSourceCompatibility(profile);
-    if (!source.baselineExists || !source.controllerOnlyChanges) {
+    if (!adoptionSourceCompatible(source)) {
       throw codedError('stack_adoption_source_incompatible');
     }
     const runtimeSource = inspectSourceCompatibility(profile, {
@@ -2220,6 +2228,7 @@ module.exports = {
   CONTROLLER_CHANGE_PATHS,
   PROFILE_KEYS,
   acquireOwnerLock,
+  adoptionSourceCompatible,
   adoptRunningStack,
   assertPrivateRootBoundary,
   assertRelativeReference,
