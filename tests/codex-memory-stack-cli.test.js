@@ -12,6 +12,7 @@ const {
   PROFILE_KEYS,
   acquireOwnerLock,
   adoptionSourceCompatible,
+  assertAdoptionRepositoryMatch,
   assertPrivateRootBoundary,
   assertRelativeReference,
   buildHttpChildEnvironment,
@@ -787,6 +788,18 @@ test('source compatibility allows only controller delivery paths over the accept
     ...result,
     clean: false
   }), false);
+  assert.equal(adoptionSourceCompatible({
+    ...result,
+    currentMain: false
+  }), false);
+  assert.equal(adoptionSourceCompatible({
+    ...result,
+    repositoryMatch: false
+  }), false);
+  assert.equal(adoptionSourceCompatible({
+    ...result,
+    compatible: false
+  }), false);
   assert.ok(calls.length >= 5);
 
   const unsafe = inspectSourceCompatibility(profile(), {
@@ -800,6 +813,22 @@ test('source compatibility allows only controller delivery paths over the accept
   });
   assert.equal(unsafe.compatible, false);
   assert.equal(unsafe.controllerOnlyChanges, false);
+});
+
+test('adoption repository must be the repository bound to the running HTTP process', () => {
+  assert.equal(assertAdoptionRepositoryMatch('/repo', '/repo'), true);
+  assert.throws(
+    () => assertAdoptionRepositoryMatch('/repo-b', '/repo-a'),
+    { code: 'stack_adoption_repository_mismatch' }
+  );
+  assert.throws(
+    () => assertAdoptionRepositoryMatch('', '/repo'),
+    { code: 'stack_adoption_repository_mismatch' }
+  );
+  assert.throws(
+    () => assertAdoptionRepositoryMatch('/repo', null),
+    { code: 'stack_adoption_repository_mismatch' }
+  );
 });
 
 test('provider inspection pins the accepted container, image, revision, and loopback port', () => {
@@ -1011,12 +1040,21 @@ test('authenticated HTTP health projection requires the full hardened policy sha
       runtimeDetailLevel: 'bounded'
     },
     policyGates: {
+      activeMemoryAutoRebuildEnabled: false,
+      candidateCacheEnabled: false,
+      controlledMutationToolsExposed: false,
       securityProfile: 'hardened',
       softReadPolicyEnabled: true,
       lifecycleReadPolicyEnabled: true,
       writePreflightEnabled: true,
       externalProviderAllowed: false,
-      governedNativeBridgeWarnings: []
+      governedNativeBridgeWarnings: [],
+      mcpPublicToolSurface: 'read_only',
+      nativeWriteDelegationMode: 'off',
+      shadowAutoRebuildEnabled: false,
+      shadowWritesEnabled: false,
+      vectorIndexEnabled: false,
+      writeToolsExposed: false
     }
   };
   const accepted = projectHttpHealthPayload(payload, 200);
@@ -1044,6 +1082,43 @@ test('authenticated HTTP health projection requires the full hardened policy sha
     }, 200).policyFailureCode,
     'stack_http_security_profile_invalid'
   );
+  for (const key of [
+    'activeMemoryAutoRebuildEnabled',
+    'candidateCacheEnabled',
+    'shadowAutoRebuildEnabled',
+    'shadowWritesEnabled',
+    'vectorIndexEnabled'
+  ]) {
+    assert.equal(
+      projectHttpHealthPayload({
+        ...payload,
+        policyGates: {
+          ...payload.policyGates,
+          [key]: true
+        }
+      }, 200).policyFailureCode,
+      'stack_http_storage_mutation_policy_invalid',
+      key
+    );
+  }
+  for (const [key, value] of [
+    ['mcpPublicToolSurface', 'full'],
+    ['controlledMutationToolsExposed', true],
+    ['writeToolsExposed', true],
+    ['nativeWriteDelegationMode', 'primary']
+  ]) {
+    assert.equal(
+      projectHttpHealthPayload({
+        ...payload,
+        policyGates: {
+          ...payload.policyGates,
+          [key]: value
+        }
+      }, 200).policyFailureCode,
+      'stack_http_write_surface_policy_invalid',
+      key
+    );
+  }
   assert.equal(
     projectHttpHealthPayload({
       ...payload,

@@ -40,6 +40,13 @@ binding may predate the runtime baseline, but its accepted source identity
 cannot drift without a new adoption. Use `--replace` only after a newly
 provisioned stack has completed a fresh exact-baseline acceptance.
 
+Run adoption only from the exact repository bound to the running HTTP process.
+That repository must be clean and its current `main` must equal the locally
+known `origin/main`. A sibling worktree or feature branch cannot adopt a runtime
+owned by another checkout. Adoption writes the profile only when the complete
+inspection is immediately accepted, including source identity and all runtime
+gates.
+
 ## Start Semantics
 
 `start` is optimized for the normal same-baseline restart:
@@ -54,8 +61,10 @@ provisioned stack has completed a fresh exact-baseline acceptance.
    host-loopback-only posture;
 5. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
    retained Edge, and outbound Relay plus observer in order;
-6. validate authenticated full HTTP health and its hardened/no-external-provider
-   policy, sockets, schema-v3 governance observation, schema-v1 relay
+6. validate authenticated full HTTP health and its hardened,
+   no-external-provider, read-only public surface, native-write-off,
+   cache/shadow/vector-write-off, and automatic-rebuild-off policy; then
+   validate sockets, schema-v3 governance observation, schema-v1 relay
    observation, and Edge health;
 7. stop only components newly started by that invocation if any gate fails.
 
@@ -95,6 +104,13 @@ by startup and adoption. It returns only booleans, counters, schema versions,
 baseline identity, and bounded policy failure codes. It does not return private
 paths, environment values, tokens, keys, raw memory, request bodies, or
 provider responses.
+
+An already running HTTP process from a revision that predates these bounded
+policy fields remains running, but a newer controller reports its policy shape
+as unaccepted. After this controller is merged, restoring exact-head acceptance
+requires a separately authorized `stop` and `start` from canonical `main`,
+followed by `adopt-running --replace`. PR validation does not perform that
+lifecycle transition.
 
 `stop` first revalidates the retained binding and the exact adopted Edge
 container ID, revision, and security posture. It then sends `SIGTERM` only to

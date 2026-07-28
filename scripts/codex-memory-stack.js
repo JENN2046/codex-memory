@@ -24,6 +24,8 @@ const PROVIDER_CONTAINER_DEFAULT = 'new-api-wsl';
 const CONTROLLER_CHANGE_PATHS = new Set([
   'docs/CODEX_MEMORY_FULL_STACK_CONTROL.md',
   'scripts/codex-memory-stack.js',
+  'src/adapters/codex-mcp/http.js',
+  'tests/mcp-http.test.js',
   'tests/codex-memory-stack-cli.test.js'
 ]);
 const COMPONENTS = Object.freeze({
@@ -814,6 +816,20 @@ function deriveRuntimeRepositoryFromHttpIdentity(identity, {
   return assertOwnerRepositoryDirectory(repository, { fsModule });
 }
 
+function assertAdoptionRepositoryMatch(
+  runtimeRepository,
+  controllerRepository = REPO_ROOT
+) {
+  if (typeof runtimeRepository !== 'string' ||
+      runtimeRepository.length === 0 ||
+      typeof controllerRepository !== 'string' ||
+      controllerRepository.length === 0 ||
+      path.resolve(runtimeRepository) !== path.resolve(controllerRepository)) {
+    throw codedError('stack_adoption_repository_mismatch');
+  }
+  return true;
+}
+
 function inspectManagedProcess(name, {
   environment = process.env,
   fsModule = fs,
@@ -918,7 +934,10 @@ function adoptionSourceCompatible(source) {
   return Boolean(
     source?.clean === true &&
     source?.baselineExists === true &&
-    source?.controllerOnlyChanges === true
+    source?.controllerOnlyChanges === true &&
+    source?.currentMain === true &&
+    source?.repositoryMatch === true &&
+    source?.compatible === true
   );
 }
 
@@ -1117,12 +1136,21 @@ function httpPolicyFailureCode(value) {
     return 'stack_http_auth_shape_invalid';
   }
   if (!exactKeys(policy, [
+    'activeMemoryAutoRebuildEnabled',
+    'candidateCacheEnabled',
+    'controlledMutationToolsExposed',
     'securityProfile',
     'softReadPolicyEnabled',
     'lifecycleReadPolicyEnabled',
     'writePreflightEnabled',
     'externalProviderAllowed',
-    'governedNativeBridgeWarnings'
+    'governedNativeBridgeWarnings',
+    'mcpPublicToolSurface',
+    'nativeWriteDelegationMode',
+    'shadowAutoRebuildEnabled',
+    'shadowWritesEnabled',
+    'vectorIndexEnabled',
+    'writeToolsExposed'
   ])) {
     return 'stack_http_policy_shape_invalid';
   }
@@ -1152,6 +1180,19 @@ function httpPolicyFailureCode(value) {
   }
   if (policy.writePreflightEnabled !== true) {
     return 'stack_http_write_preflight_policy_invalid';
+  }
+  if (policy.candidateCacheEnabled !== false ||
+      policy.shadowWritesEnabled !== false ||
+      policy.vectorIndexEnabled !== false ||
+      policy.shadowAutoRebuildEnabled !== false ||
+      policy.activeMemoryAutoRebuildEnabled !== false) {
+    return 'stack_http_storage_mutation_policy_invalid';
+  }
+  if (policy.mcpPublicToolSurface !== 'read_only' ||
+      policy.controlledMutationToolsExposed !== false ||
+      policy.writeToolsExposed !== false ||
+      policy.nativeWriteDelegationMode !== 'off') {
+    return 'stack_http_write_surface_policy_invalid';
   }
   if (policy.externalProviderAllowed !== false) {
     return 'stack_http_external_provider_policy_invalid';
@@ -2042,6 +2083,7 @@ async function adoptRunningStack({
     const runtimeRepository = deriveRuntimeRepositoryFromHttpIdentity(
       identities.http.identity
     );
+    assertAdoptionRepositoryMatch(runtimeRepository);
     const profile = validateProfile({
       schemaVersion: PROFILE_SCHEMA_VERSION,
       runtimeBaseline: edge.revision,
@@ -2069,7 +2111,7 @@ async function adoptRunningStack({
       throw codedError('stack_adoption_runtime_repository_incompatible');
     }
     const inspection = await inspectStack({ environment, profile });
-    if (!inspection.runtimeAccepted) {
+    if (!inspection.accepted) {
       throw codedError('stack_adoption_runtime_acceptance_failed');
     }
     writeProfile(profile, { environment, replace });
@@ -2593,6 +2635,7 @@ module.exports = {
   acquireOwnerLock,
   adoptionSourceCompatible,
   adoptRunningStack,
+  assertAdoptionRepositoryMatch,
   assertPrivateRootBoundary,
   assertRelativeReference,
   buildHttpChildEnvironment,

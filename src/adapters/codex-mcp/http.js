@@ -261,6 +261,11 @@ function buildRuntimeFreshness(freshness = {}) {
 function buildPolicyGateSummary(app) {
   const config = app?.config || {};
   return {
+    activeMemoryAutoRebuildEnabled:
+      config.autoRebuildActiveMemoryOnStart === true,
+    candidateCacheEnabled: config.enableCandidateCache === true,
+    controlledMutationToolsExposed:
+      config.exposeControlledMutationMcpTools === true,
     securityProfile: typeof config.securityProfile === 'string' ? config.securityProfile : 'unknown',
     softReadPolicyEnabled: config.enableSoftReadPolicy === true,
     lifecycleReadPolicyEnabled: config.enableLifecycleReadPolicy === true,
@@ -268,7 +273,18 @@ function buildPolicyGateSummary(app) {
     externalProviderAllowed: config.allowExternalProvider === true,
     governedNativeBridgeWarnings: projectGovernedMcpVcpNativeBridgeConfigWarnings(
       config.governedMcpVcpNativeBridgeConfigWarnings
-    )
+    ),
+    mcpPublicToolSurface: typeof config.mcpPublicToolSurface === 'string'
+      ? config.mcpPublicToolSurface
+      : 'unknown',
+    nativeWriteDelegationMode:
+      typeof config.governedMcpVcpNativeWriteDelegationMode === 'string'
+        ? config.governedMcpVcpNativeWriteDelegationMode
+        : 'unknown',
+    shadowAutoRebuildEnabled: config.autoRebuildShadowOnStart === true,
+    shadowWritesEnabled: config.enableShadowWrites === true,
+    vectorIndexEnabled: config.enableVectorIndex === true,
+    writeToolsExposed: config.exposeWriteMcpTools === true
   };
 }
 
