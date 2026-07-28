@@ -41,9 +41,12 @@ future task.
 
 ## Next Safe Action
 
-Jenn selects a new product goal. Until then, keep the active queue empty and do
-not infer work from historical task rows, roadmap
-text, plans, checkpoints, handoffs, status archives, or prior conversation.
+Jenn selects a new product goal. The leading candidate is R5-O private
+exact-head runtime verification, but it requires separate current
+authorization before any private/runtime action. Until a goal is selected,
+keep the active queue empty and do not infer work from historical task rows,
+roadmap text, plans, checkpoints, handoffs, status archives, or prior
+conversation.
 
 ## Authority Boundaries
 
@@ -55,19 +58,29 @@ text, plans, checkpoints, handoffs, status archives, or prior conversation.
 - P3, secrets, raw memory, raw audit/log, runtime/provider configuration,
   production, release, deploy, public MCP expansion, and durable mutation
   boundaries remain unchanged.
-- No current scope authorizes runtime activation, provider calls, real memory
-  reads or writes, release, deploy, cutover, or readiness claims.
+- The completed V5 transition is historical point-in-time evidence. It does not
+  authorize another status probe, lifecycle action, provider call, private
+  runtime verification, real memory read or write, release, deploy, cutover, or
+  readiness claim.
 
 ## Evidence And History
 
-Last completed: `CM-2157 / CMV-2242`.
+Last completed: `CM-2158 / CMV-2243`.
 
-- The canonical Relay source now injects the low-disclosure observer and
-  brackets an owner-only, read-only UDS snapshot surface.
-- Validation used only synthetic temporary UDS fixtures. No real private
-  configuration was changed and no real runtime/provider/memory activity was
-  started.
-- Delivery detail: `docs/CM2157_CANONICAL_RELAY_OBSERVER_WIRING.md`.
+- PR `#65` delivered the governed full-stack lifecycle controller and merged as
+  `48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e`.
+- Under the exact `CODEX_MEMORY_V5_TRANSITION_001` authorization, the transition
+  ran `stop` -> `start` -> `adopt-running --replace` -> low-disclosure `status`
+  against that baseline. The transitional start required the intended profile
+  upgrade; adoption stored one owner-only, reference-only schema-v5 controller
+  profile; final inspection returned accepted runtime/controller bindings.
+- Those results are closeout-time evidence only, not committed current health.
+  No PID, socket, secret reference, raw log, provider response, or raw memory is
+  stored here.
+- The transition did not call `record_memory`, modify `.env` or real
+  configuration, run migration/import/export/rebuild, expand public MCP,
+  deploy, release, or claim readiness.
+- Controller contract detail: `docs/CODEX_MEMORY_FULL_STACK_CONTROL.md`.
 - Compact machine snapshot: `.agent_board/CURRENT_FACTS.json`.
 - Historical recovery index:
   `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`.
