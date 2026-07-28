@@ -20,7 +20,8 @@ const {
   validateSnapshotRequest
 } = require('../../apps/local-recall-relay/observer-snapshot-uds');
 const {
-  createCanonicalOutboundRelayService
+  createCanonicalOutboundRelayService,
+  createOutboundRelayService
 } = require('../../apps/local-recall-relay/outbound-main');
 
 test('Relay observation projection is exact-key and rejects disclosure drift', () => {
@@ -401,6 +402,79 @@ test('canonical Relay service wires observer events and brackets snapshot UDS li
       durable_state_written: false
     }
   });
+});
+
+test('Relay service clears running state when snapshot shutdown fails', async () => {
+  let processAttempts = 0;
+  let snapshotStarts = 0;
+  let snapshotStops = 0;
+  let service;
+  const snapshotServer = {
+    async start() {
+      snapshotStarts += 1;
+    },
+    async stop() {
+      snapshotStops += 1;
+      throw Object.assign(new Error('synthetic snapshot stop failure'), {
+        code: 'relay_observer_snapshot_stop_failed'
+      });
+    },
+    snapshot() {
+      return { started: snapshotStarts > snapshotStops };
+    }
+  };
+  service = createOutboundRelayService({
+    runtime: {
+      async processNext() {
+        processAttempts += 1;
+        service.stop();
+        return { status: 'completed' };
+      }
+    },
+    snapshotServer,
+    idlePollMs: 10,
+    unavailableBackoffMs: 10
+  });
+
+  await assert.rejects(service.run(), {
+    code: 'relay_observer_snapshot_stop_failed'
+  });
+  assert.equal(service.snapshot().running, false);
+  await assert.rejects(service.run(), {
+    code: 'relay_observer_snapshot_stop_failed'
+  });
+  assert.equal(service.snapshot().running, false);
+  assert.equal(processAttempts, 1);
+  assert.equal(snapshotStarts, 2);
+  assert.equal(snapshotStops, 2);
+});
+
+test('Relay service preserves its primary failure when snapshot shutdown also fails', async () => {
+  const service = createOutboundRelayService({
+    runtime: {
+      async processNext() {
+        throw Object.assign(new Error('synthetic Relay failure'), {
+          code: 'relay_processing_failed'
+        });
+      }
+    },
+    snapshotServer: {
+      async start() {},
+      async stop() {
+        throw Object.assign(new Error('synthetic snapshot stop failure'), {
+          code: 'relay_observer_snapshot_stop_failed'
+        });
+      },
+      snapshot() {
+        return { started: true };
+      }
+    },
+    idlePollMs: 10,
+    unavailableBackoffMs: 10
+  });
+
+  await assert.rejects(service.run(), { code: 'relay_processing_failed' });
+  assert.equal(service.snapshot().running, false);
 });
 
 test('canonical Relay fails closed before runtime loading when snapshot config is absent', () => {

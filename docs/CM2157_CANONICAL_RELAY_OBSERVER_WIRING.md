@@ -25,6 +25,7 @@ create low-disclosure observer
   -> load Relay runtime with eventSink=observer.observe
   -> start snapshot UDS before Relay polling
   -> stop snapshot UDS on every service exit
+  -> reset service running state even when snapshot shutdown fails
 ```
 
 The canonical factory requires
@@ -114,11 +115,15 @@ Source validation covers:
   active, unsafe, identity-drifted, and probe-uncertain socket paths;
 - concurrent stale-socket recovery serialization, with exactly one live
   rebound socket and no loser-side unlink;
-- canonical main factory wiring and snapshot-server lifecycle;
+- canonical main factory wiring and snapshot-server lifecycle, including
+  fail-safe running-state reset and primary-error preservation when snapshot
+  shutdown also fails;
 - failure before secret-bound runtime loading when snapshot authority is
   missing or unsafe;
 - static import-fence rejection for copied, public, or permission-weakened
   listeners;
+- default-safe test-wrapper coverage so the observer suite runs under
+  `npm test` and pull-request CI;
 - existing outbound Relay behavior.
 
 All UDS execution used synthetic temporary fixtures. No real runtime or private

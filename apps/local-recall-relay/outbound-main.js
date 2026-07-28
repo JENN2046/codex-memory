@@ -30,6 +30,7 @@ function createOutboundRelayService({
     async run() {
       if (running) throw safeError('relay_service_already_running');
       running = true;
+      let primaryFailure = false;
       try {
         if (snapshotServer) await snapshotServer.start();
         while (!stopping) {
@@ -41,9 +42,17 @@ function createOutboundRelayService({
             await delay(unavailableBackoffMs);
           }
         }
+      } catch (error) {
+        primaryFailure = true;
+        throw error;
       } finally {
-        await snapshotServer?.stop();
-        running = false;
+        try {
+          await snapshotServer?.stop();
+        } catch (error) {
+          if (!primaryFailure) throw error;
+        } finally {
+          running = false;
+        }
       }
     },
     snapshot() {
