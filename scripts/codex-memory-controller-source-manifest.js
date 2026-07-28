@@ -258,6 +258,16 @@ function gitBlobObjectId(bytes) {
     .digest('hex');
 }
 
+function gitBlobMatchesWorkingTreeBytes(expectedObjectId, bytes) {
+  if (gitBlobObjectId(bytes) === expectedObjectId) return true;
+  if (!bytes.includes(Buffer.from('\r\n', 'ascii'))) return false;
+  const normalized = Buffer.from(
+    bytes.toString('latin1').replace(/\r\n/g, '\n'),
+    'latin1'
+  );
+  return gitBlobObjectId(normalized) === expectedObjectId;
+}
+
 function computeManifestDigest(manifest, {
   fsModule = fs,
   repoRoot = REPO_ROOT,
@@ -287,7 +297,7 @@ function computeManifestDigest(manifest, {
       throw codedError('controller_source_manifest_worktree_mode_mismatch');
     }
     const { bytes } = stable;
-    if (gitBlobObjectId(bytes) !== entry.objectId) {
+    if (!gitBlobMatchesWorkingTreeBytes(entry.objectId, bytes)) {
       throw codedError('controller_source_manifest_worktree_blob_mismatch');
     }
     const fileDigest = crypto.createHash('sha256')
@@ -367,6 +377,7 @@ module.exports = {
   computeManifestDigest,
   discoverManifestFiles,
   gitBlobObjectId,
+  gitBlobMatchesWorkingTreeBytes,
   inspectControllerSourceManifest,
   loadManifest,
   readStableRegularFile,

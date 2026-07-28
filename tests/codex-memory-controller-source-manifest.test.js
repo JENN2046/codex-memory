@@ -12,6 +12,7 @@ const {
   REQUIRED_PATHS,
   computeManifestDigest,
   discoverManifestFiles,
+  gitBlobObjectId,
   inspectControllerSourceManifest,
   loadManifest,
   readStableRegularFile,
@@ -193,6 +194,40 @@ test('committed governance files outside runtime roots do not change the digest'
   assert.equal(
     computeManifestDigest(manifest, { repoRoot: root }),
     original
+  );
+});
+
+test('CRLF checkout bytes reproduce the canonical HEAD blob', t => {
+  const root = createSyntheticRepository(t);
+  write(root, '.gitattributes', '*.ps1 text eol=crlf\n');
+  write(root, 'scripts/runtime-fixture.ps1', "Write-Output 'bound'\n");
+  execFileSync(
+    'git',
+    ['add', '--', '.gitattributes', 'scripts/runtime-fixture.ps1'],
+    { cwd: root }
+  );
+  execFileSync('git', ['commit', '-qm', 'add CRLF runtime fixture'], {
+    cwd: root
+  });
+  fs.writeFileSync(
+    path.join(root, 'scripts/runtime-fixture.ps1'),
+    "Write-Output 'bound'\r\n"
+  );
+  assert.notEqual(
+    gitBlobObjectId(
+      fs.readFileSync(path.join(root, 'scripts/runtime-fixture.ps1'))
+    ),
+    String(execFileSync(
+      'git',
+      ['rev-parse', 'HEAD:scripts/runtime-fixture.ps1'],
+      { cwd: root }
+    )).trim()
+  );
+  assert.match(
+    computeManifestDigest(loadManifest({ repoRoot: root }), {
+      repoRoot: root
+    }),
+    /^sha256:[a-f0-9]{64}$/u
   );
 });
 

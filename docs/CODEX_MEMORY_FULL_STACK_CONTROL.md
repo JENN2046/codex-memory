@@ -86,10 +86,12 @@ root still fails closed.
 Manifest inspection takes `O_NOFOLLOW` descriptor snapshots and requires each
 path and descriptor to retain the same owner-visible inode, mode, size, and
 nanosecond timestamps before and after the read; the bytes must also reproduce
-the exact Git `HEAD` blob object. Lifecycle operations therefore require a
-quiescent owner worktree. Concurrent same-owner checkout or source replacement
-is unsupported and fails closed when observed. This is not a claim that a
-mutable checkout is an immutable runtime image.
+the exact Git `HEAD` blob object, either directly or through the sole permitted
+CRLF-to-LF checkout canonicalization. The aggregate digest still binds the
+exact worktree bytes. Lifecycle operations therefore require a quiescent owner
+worktree. Concurrent same-owner checkout or source replacement is unsupported
+and fails closed when observed. This is not a claim that a mutable checkout is
+an immutable runtime image.
 
 The profile also persists the canonical VCPToolBox repository, selected VCP
 commit, declared-source digest, the non-secret Governance/Relay configuration
