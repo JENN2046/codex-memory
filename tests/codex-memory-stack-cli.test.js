@@ -47,8 +47,10 @@ const {
   privateReferencePath,
   processEnvironmentExactlyMatches,
   processOwnsLoopbackTcpListener,
+  processOwnsUnixListener,
   profileEdgeIdentityMatches,
   profileProviderIdentityMatches,
+  profileVcpProviderConfigMatches,
   profileWithVcpRuntimeBinding,
   profileVcpRuntimeIdentityMatches,
   projectHttpHealthPayload,
@@ -56,6 +58,7 @@ const {
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
   validateProfile,
+  vcpProviderConfigDigest,
   vcpRuntimeRepository,
   waitForProcessGroupExit
 } = require('../scripts/codex-memory-stack');
@@ -67,6 +70,14 @@ const PROVIDER_CONTAINER_ID = 'cd'.repeat(32);
 const PROVIDER_IMAGE_ID = `sha256:${'ef'.repeat(32)}`;
 const PROVIDER_REVISION = '1234567890abcdef1234567890abcdef12345678';
 const VCP_SCOPE_DIGEST = `sha256:${'12'.repeat(32)}`;
+const VCP_PROVIDER_ENVIRONMENT = Object.freeze({
+  apiKey: 'synthetic-provider-key',
+  model: 'synthetic-embedding-model',
+  dimension: '1024'
+});
+const VCP_PROVIDER_CONFIG_DIGEST = vcpProviderConfigDigest(
+  VCP_PROVIDER_ENVIRONMENT
+);
 
 function profile(overrides = {}) {
   return {
@@ -84,6 +95,7 @@ function profile(overrides = {}) {
     retainedBinding: 'r5m-exact-head/private-binding.json',
     edgeContainer: 'codex-memory-full-stack-001-edge',
     edgeContainerId: EDGE_CONTAINER_ID,
+    vcpProviderConfigDigest: VCP_PROVIDER_CONFIG_DIGEST,
     vcpRuntimeBaseline: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
     vcpRuntimeRepository: '/vcp',
     vcpRuntimeScopeDigest: VCP_SCOPE_DIGEST,
@@ -93,6 +105,7 @@ function profile(overrides = {}) {
 
 function legacyProfile(overrides = {}) {
   const {
+    vcpProviderConfigDigest: _vcpProviderConfigDigest,
     vcpRuntimeBaseline: _vcpRuntimeBaseline,
     vcpRuntimeRepository: _vcpRuntimeRepository,
     vcpRuntimeScopeDigest: _vcpRuntimeScopeDigest,
@@ -137,6 +150,7 @@ function acceptedStack(overrides = {}) {
       imageId: PROVIDER_IMAGE_ID,
       revision: PROVIDER_REVISION
     },
+    vcpProviderConfigMatch: true,
     vcpRuntime: {
       recognized: true,
       revision: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
@@ -149,6 +163,8 @@ function acceptedStack(overrides = {}) {
     },
     shimListenerOwned: true,
     httpListenerOwned: true,
+    governanceListenerOwned: true,
+    relayListenerOwned: true,
     httpHealth: {
       reachable: true,
       ok: true,
@@ -385,6 +401,68 @@ test('HTTP listener ownership binds loopback port to the recorded process socket
   );
   assert.equal(
     processOwnsLoopbackTcpListener(0, 7605, { fsModule }),
+    false
+  );
+});
+
+test('UDS listener ownership binds the exact path inode to the recorded process', () => {
+  const socketPath = '/owner/governance.sock';
+  const table = [
+    'Num       RefCount Protocol Flags    Type St Inode Path',
+    `0000000000000000: 00000002 00000000 00010000 0001 01 4242 ${socketPath}`
+  ].join('\n');
+  const fsModule = {
+    lstatSync(file) {
+      if (file !== socketPath) throw new Error('missing');
+      return {
+        isSocket: () => true,
+        isSymbolicLink: () => false,
+        uid: process.getuid(),
+        mode: 0o140600
+      };
+    },
+    readFileSync(file) {
+      assert.equal(file, '/proc/net/unix');
+      return table;
+    },
+    readdirSync(directory) {
+      assert.equal(directory, '/proc/4321/fd');
+      return ['0', '7'];
+    },
+    readlinkSync(file) {
+      return file.endsWith('/7') ? 'socket:[4242]' : '/dev/null';
+    }
+  };
+  assert.equal(
+    processOwnsUnixListener(4321, socketPath, { fsModule }),
+    true
+  );
+  assert.equal(
+    processOwnsUnixListener(4321, '/owner/other.sock', { fsModule }),
+    false
+  );
+  assert.equal(
+    processOwnsUnixListener(4321, socketPath, {
+      fsModule: {
+        ...fsModule,
+        readlinkSync() {
+          return 'socket:[9999]';
+        }
+      }
+    }),
+    false
+  );
+  assert.equal(
+    processOwnsUnixListener(4321, socketPath, {
+      fsModule: {
+        ...fsModule,
+        readFileSync(file) {
+          assert.equal(file, '/proc/net/unix');
+          return `${table}\n` +
+            `0000000000000001: 00000002 00000000 00010000 0001 01 9999 ${socketPath}`;
+        }
+      }
+    }),
     false
   );
 });
@@ -881,6 +959,10 @@ test('controller child environment binds the persisted v5 VCP identity', t => {
   });
   assert.equal(child.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION, '5');
   assert.equal(
+    child.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST,
+    boundProfile.vcpProviderConfigDigest
+  );
+  assert.equal(
     child.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE,
     boundProfile.vcpRuntimeBaseline
   );
@@ -908,6 +990,10 @@ test('controller child environment binds the persisted v5 VCP identity', t => {
   );
   assert.equal(
     Object.hasOwn(legacy, 'CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE'),
+    false
+  );
+  assert.equal(
+    Object.hasOwn(legacy, 'CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST'),
     false
   );
 });
@@ -1188,6 +1274,46 @@ test('VCP runtime identity is pinned to the profile-selected commit and clean so
   );
 });
 
+test('VCP provider binding pins model and dimension without pinning the API key', () => {
+  assert.equal(
+    profileVcpProviderConfigMatches(
+      profile(),
+      VCP_PROVIDER_ENVIRONMENT
+    ),
+    true
+  );
+  assert.equal(
+    profileVcpProviderConfigMatches(
+      profile(),
+      {
+        ...VCP_PROVIDER_ENVIRONMENT,
+        apiKey: 'rotated-synthetic-provider-key'
+      }
+    ),
+    true
+  );
+  assert.equal(
+    profileVcpProviderConfigMatches(
+      profile(),
+      {
+        ...VCP_PROVIDER_ENVIRONMENT,
+        model: 'unadopted-model'
+      }
+    ),
+    false
+  );
+  assert.equal(
+    profileVcpProviderConfigMatches(
+      profile(),
+      {
+        ...VCP_PROVIDER_ENVIRONMENT,
+        dimension: '2048'
+      }
+    ),
+    false
+  );
+});
+
 test('legacy profile can bootstrap only the reviewed VCP identity into an exact v5 binding', () => {
   const identity = {
     recognized: true,
@@ -1201,8 +1327,16 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
   };
   const legacy = legacyProfile();
   assert.equal(legacyVcpRuntimeBootstrapMatches(legacy, identity), true);
-  const upgraded = profileWithVcpRuntimeBinding(legacy, identity);
+  const upgraded = profileWithVcpRuntimeBinding(
+    legacy,
+    identity,
+    VCP_PROVIDER_ENVIRONMENT
+  );
   assert.equal(upgraded.schemaVersion, 5);
+  assert.equal(
+    upgraded.vcpProviderConfigDigest,
+    VCP_PROVIDER_CONFIG_DIGEST
+  );
   assert.equal(upgraded.vcpRuntimeBaseline, identity.revision);
   assert.equal(upgraded.vcpRuntimeRepository, identity.repository);
   assert.equal(upgraded.vcpRuntimeScopeDigest, identity.scopeDigest);
@@ -1212,10 +1346,14 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
     false
   );
   assert.throws(
-    () => profileWithVcpRuntimeBinding(legacy, {
-      ...identity,
-      scopeDigest: null
-    }),
+    () => profileWithVcpRuntimeBinding(
+      legacy,
+      {
+        ...identity,
+        scopeDigest: null
+      },
+      VCP_PROVIDER_ENVIRONMENT
+    ),
     { code: 'stack_vcp_runtime_identity_mismatch' }
   );
 });
@@ -1405,6 +1543,13 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
   assert.equal(
     computeStackAccepted({
       ...accepted,
+      vcpProviderConfigMatch: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
       vcpRuntime: {
         ...accepted.vcpRuntime,
         scopeClean: false
@@ -1423,6 +1568,20 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
     computeStackAccepted({
       ...accepted,
       httpListenerOwned: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      governanceListenerOwned: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      relayListenerOwned: false
     }),
     false
   );

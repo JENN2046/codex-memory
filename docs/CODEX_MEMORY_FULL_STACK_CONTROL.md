@@ -67,7 +67,11 @@ scope; any drift in the loaded source files, Rust module, or dependency
 manifests fails closed.
 
 Profile schema v5 persists the canonical VCPToolBox repository, selected commit,
-and declared-source digest alongside the codex-memory and container bindings.
+declared-source digest, and a digest of the selected embedding model plus vector
+dimension alongside the codex-memory and container bindings. The API key is
+neither included in that digest nor stored in the profile. Model or dimension
+drift fails closed before shim launch and during live acceptance; an API-key
+rotation does not disclose or persist the key.
 An existing schema-v4 profile remains readable for status, controlled shutdown,
 and only the reviewed baseline-to-VCP bootstrap; it cannot represent accepted
 runtime state. After this controller is merged, perform the one-time authorized
@@ -101,10 +105,12 @@ stored, ordinary same-baseline restarts use only `start`.
    the exact loopback listener before reading or sending its bearer token;
    validate authenticated full HTTP health and its hardened,
    no-external-provider, read-only public surface, native-write-off,
-   cache/shadow/vector-write-off, and automatic-rebuild-off policy; then
-   validate sockets, schema-v3 governance observation, schema-v1 relay
-   observation, and Edge health;
-9. stop only components newly started by that invocation if any gate fails.
+   cache/shadow/vector-write-off, and automatic-rebuild-off policy;
+9. bind the Governance control UDS and Relay observer UDS path/inode to their
+   recorded managed PIDs before and after each low-disclosure probe, then
+   validate schema-v3 governance observation, schema-v1 relay observation, and
+   Edge health;
+10. stop only components newly started by that invocation if any gate fails.
 
 `start`, `stop`, and profile adoption share an owner-only atomic lifecycle
 lock. A concurrent lifecycle invocation fails closed, and a crash-left lock is
