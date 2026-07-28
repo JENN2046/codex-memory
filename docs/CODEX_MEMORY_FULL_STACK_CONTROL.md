@@ -31,6 +31,10 @@ accepted Git baseline, exact retained Edge container identity, exact accepted
 NewAPI container/image/revision identity, the independently accepted
 retained-binding source identity, the exact accepted runtime repository, and
 relative references to existing owner-only environment and binding files.
+It also stores digests of the non-secret Governance and Relay configuration
+projection: secret-bearing values are replaced by a fixed presence marker
+before hashing, while endpoints, modes, public/key IDs, and private references
+remain identity-bound without being returned.
 Before writing the profile, adoption validates the exact process executable,
 script, mode and environment-file identities, restricts managed environment
 files to governed `CODEX_MEMORY_R4_*` and `CODEX_MEMORY_R5_*` names, validates
@@ -68,12 +72,17 @@ manifests fails closed.
 
 Profile schema v5 persists the exact accepted controller source commit, the
 canonical VCPToolBox repository, selected VCP commit, declared-source digest,
-and a digest of the selected embedding model plus vector dimension alongside
-the container bindings. The API key is neither included in that digest nor
-stored in the profile. Later changes to any controller allowlisted path require
-new adoption even when they are on `origin/main`; model or dimension drift
-fails closed before shim launch and during live acceptance. An API-key rotation
-does not disclose or persist the key.
+the non-secret Governance/Relay configuration digests, and a digest of the
+selected embedding model plus vector dimension alongside the container
+bindings. The API key and other secret-bearing values are neither included in
+those digests nor stored in the profile. The shim writes only an owner-only
+freshness receipt containing the provider config file's device/inode/size/time
+identity and its own PID/start identity. It contains no path, key, or key
+digest. A provider key-file identity change therefore marks a running shim
+unaccepted until a controlled stop/start refreshes it. Later changes to any
+controller allowlisted path or non-secret managed runtime configuration require
+new adoption; model or dimension drift fails closed before shim launch and
+during live acceptance.
 An existing schema-v4 profile remains readable for status, controlled shutdown,
 and only the reviewed baseline-to-VCP bootstrap; it cannot represent accepted
 runtime state. After this controller is merged, perform the one-time authorized
@@ -94,32 +103,37 @@ stored, ordinary same-baseline restarts use only `start`.
    runtime baseline;
 3. require the existing provider dependency to match the adopted container,
    image, revision, Compose service, and loopback port identity;
-4. require the profile-selected VCPToolBox revision and loaded source scope to
-   match its accepted identity;
-5. require the retained Edge container to match the accepted revision and
+4. require Governance and Relay non-secret configuration to match their
+   secret-redacted adopted digests;
+5. require the profile-selected VCPToolBox revision, loaded source scope,
+   embedding model, and dimension to match their accepted identities;
+6. require a running shim's owner-only provider-config freshness receipt to
+   match both its process start identity and the current config file identity;
+7. require the retained Edge container to match the accepted revision and
    retain its non-root, read-only, no-restart, no-log, read-only-secret-mount,
    host-loopback-only posture across every published container port;
-6. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
+8. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
    retained Edge, and outbound Relay plus observer in order;
-7. run the native shim in the controller-managed process itself and prove that
+9. run the native shim in the controller-managed process itself and prove that
    its recorded PID owns the 7615 loopback listener before any capability
    preflight can send a bearer token;
-8. prove through Linux `/proc` socket metadata that the recorded HTTP PID owns
+10. prove through Linux `/proc` socket metadata that the recorded HTTP PID owns
    the exact loopback listener before reading or sending its bearer token;
    validate authenticated full HTTP health and its hardened,
    no-external-provider, read-only public surface, native-write-off,
    cache/shadow/vector-write-off, and automatic-rebuild-off policy;
-9. bind the Governance control UDS and Relay observer UDS path/inode to their
+11. bind the Governance control UDS and Relay observer UDS path/inode to their
    recorded managed PIDs before and after each low-disclosure probe, then
    validate schema-v3 governance observation, schema-v1 relay observation, and
    Edge health;
-10. stop only components newly started by that invocation if any gate fails.
+12. stop only components newly started by that invocation if any gate fails.
 
 `start`, `stop`, and profile adoption share an owner-only atomic lifecycle
 lock. `start` and `stop` acquire that lock before reading the owner profile, so
 the binding snapshot cannot race a concurrent `adopt-running --replace`.
 A concurrent lifecycle invocation fails closed, and a crash-left lock is
-removed only after its recorded PID is dead and its inode is revalidated.
+removed only after its recorded PID is dead or Linux proves that PID has a
+different `/proc` start identity, and the lock inode is then revalidated.
 
 The controller never performs `record_memory`. HTTP write delegation, write
 tool exposure, candidate cache, shadow writes, vector-index writes, and
@@ -138,8 +152,8 @@ launch; they are not passed through Node's pre-bootstrap `--env-file` handling.
 The shim is launched directly with the controller's verified
 `process.execPath`, without a shell or wrapper child; the managed PID owns the
 listener. It is bound back to the pinned canonical VCPToolBox runtime, isolated
-store, governed mapping, loopback provider dependency, and native-write-off
-posture.
+store, governed mapping, loopback provider dependency, provider-file freshness,
+and native-write-off posture.
 
 Each managed child is released from the controller's process handle only after
 its owner-only PID file is durably written. If PID persistence fails, the
@@ -157,9 +171,10 @@ exact-baseline acceptance instead of using `--force`.
 `status` performs the same authenticated, full hardened-policy HTTP probe used
 by startup and adoption, but only after the HTTP command is controller-managed
 and the loopback listener belongs to its recorded PID. It returns only
-booleans, counters, schema versions, baseline identity, and bounded policy
-failure codes. It does not return private paths, environment values, tokens,
-keys, raw memory, request bodies, or provider responses.
+booleans for managed-configuration and provider-credential freshness alongside
+counters, schema versions, baseline identity, and bounded policy failure codes.
+It does not return private paths, file identities, environment values, tokens,
+keys, key digests, raw memory, request bodies, or provider responses.
 
 A legacy HTTP process remains running, but a newer controller marks it
 `controllerManaged: false` and does not read or send its bearer token. A

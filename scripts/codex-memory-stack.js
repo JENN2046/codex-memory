@@ -71,6 +71,8 @@ const LEGACY_PROFILE_KEYS = Object.freeze([
 const PROFILE_KEYS = Object.freeze([
   ...LEGACY_PROFILE_KEYS,
   'controllerSourceCommit',
+  'governanceEnvironmentConfigDigest',
+  'relayEnvironmentConfigDigest',
   'vcpProviderConfigDigest',
   'vcpRuntimeBaseline',
   'vcpRuntimeRepository',
@@ -86,6 +88,10 @@ const SAFE_CODE = /^[a-z][a-z0-9_]{0,95}$/u;
 const SAFE_CHILD_PATH = '/usr/bin:/bin';
 const SAFE_MANAGED_ENVIRONMENT_NAME =
   /^CODEX_MEMORY_R(?:4|5)_[A-Z0-9_]{1,96}$/u;
+const SENSITIVE_MANAGED_ENVIRONMENT_NAME =
+  /(?:^|_)(?:PASSWORD|PRIVATE_KEY|SECRET|TOKEN)(?:_|$)/u;
+const PROVIDER_CONFIG_IDENTITY_FILENAME =
+  'vcp-provider-config.identity.json';
 const VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE = Object.freeze({
   '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118':
     '555b3b538f6eb736e530c2912de678c5941f9985'
@@ -365,6 +371,73 @@ function loadManagedEnvironmentFile(file, {
   return Object.freeze({ ...parsed });
 }
 
+function managedEnvironmentConfigDigest(environment) {
+  if (!environment ||
+      typeof environment !== 'object' ||
+      Array.isArray(environment)) {
+    throw codedError('stack_managed_environment_invalid');
+  }
+  const entries = Object.entries(environment).sort(([left], [right]) =>
+    left < right ? -1 : left > right ? 1 : 0
+  );
+  const digestInput = [];
+  for (const [name, value] of entries) {
+    if (!SAFE_MANAGED_ENVIRONMENT_NAME.test(name) ||
+        typeof value !== 'string' ||
+        value.length > 16_384 ||
+        value.includes('\0')) {
+      throw codedError('stack_managed_environment_invalid');
+    }
+    const sensitiveValue = SENSITIVE_MANAGED_ENVIRONMENT_NAME.test(name) &&
+      !name.endsWith('_REFERENCE') &&
+      !name.endsWith('_KEY_ID');
+    digestInput.push(
+      `${name}\0${sensitiveValue ? '<secret-value-present>' : value}\n`
+    );
+  }
+  return `sha256:${crypto.createHash('sha256').update(
+    digestInput.join(''),
+    'utf8'
+  ).digest('hex')}`;
+}
+
+function managedEnvironmentConfigDigests(
+  governanceEnvironmentFile,
+  relayEnvironmentFile,
+  { fsModule = fs } = {}
+) {
+  return Object.freeze({
+    governanceEnvironmentConfigDigest: managedEnvironmentConfigDigest(
+      loadManagedEnvironmentFile(governanceEnvironmentFile, { fsModule })
+    ),
+    relayEnvironmentConfigDigest: managedEnvironmentConfigDigest(
+      loadManagedEnvironmentFile(relayEnvironmentFile, { fsModule })
+    )
+  });
+}
+
+function profileManagedEnvironmentConfigMatches(
+  profile,
+  governanceEnvironmentFile,
+  relayEnvironmentFile,
+  options = {}
+) {
+  try {
+    if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION) return false;
+    const current = managedEnvironmentConfigDigests(
+      governanceEnvironmentFile,
+      relayEnvironmentFile,
+      options
+    );
+    return current.governanceEnvironmentConfigDigest ===
+        profile.governanceEnvironmentConfigDigest &&
+      current.relayEnvironmentConfigDigest ===
+        profile.relayEnvironmentConfigDigest;
+  } catch {
+    return false;
+  }
+}
+
 function readVcpProviderEnvironment(file, {
   fsModule = fs,
   parse = parseEnv
@@ -387,6 +460,201 @@ function readVcpProviderEnvironment(file, {
     throw codedError('stack_vcp_provider_environment_invalid');
   }
   return Object.freeze({ apiKey, model, dimension });
+}
+
+function ownerFileIdentity(file, {
+  fsModule = fs
+} = {}) {
+  const target = assertOwnerOnlyFile(file, {
+    maximumBytes: PRIVATE_FILE_MAX_BYTES,
+    fsModule
+  });
+  let stat;
+  try {
+    stat = fsModule.statSync(target, { bigint: true });
+  } catch {
+    throw codedError('stack_provider_config_identity_unavailable');
+  }
+  const values = {
+    device: stat.dev,
+    inode: stat.ino,
+    size: stat.size,
+    mtimeNs: stat.mtimeNs,
+    ctimeNs: stat.ctimeNs
+  };
+  if (Object.values(values).some(value => typeof value !== 'bigint')) {
+    throw codedError('stack_provider_config_identity_unavailable');
+  }
+  return Object.freeze(Object.fromEntries(
+    Object.entries(values).map(([name, value]) => [name, String(value)])
+  ));
+}
+
+function fileIdentityMatches(left, right) {
+  return Boolean(
+    left && right &&
+    ['device', 'inode', 'size', 'mtimeNs', 'ctimeNs'].every(name =>
+      /^[0-9]{1,40}$/u.test(left[name] || '') &&
+      left[name] === right[name]
+    )
+  );
+}
+
+function readVcpProviderEnvironmentSnapshot(file, options = {}) {
+  const before = ownerFileIdentity(file, options);
+  const providerEnvironment = readVcpProviderEnvironment(file, options);
+  const after = ownerFileIdentity(file, options);
+  if (!fileIdentityMatches(before, after)) {
+    throw codedError('stack_provider_config_identity_changed');
+  }
+  return Object.freeze({
+    fileIdentity: after,
+    providerEnvironment
+  });
+}
+
+function validateProviderConfigIdentityReceipt(value) {
+  const shimPid = parsePid(value?.shimPid);
+  if (!exactKeys(value, [
+    'controllerSourceCommit',
+    'providerConfigIdentity',
+    'schemaVersion',
+    'shimPid',
+    'shimProcessStartTicks'
+  ]) ||
+      value.schemaVersion !== 1 ||
+      !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') ||
+      shimPid === null ||
+      value.shimPid !== shimPid ||
+      !/^[1-9][0-9]{0,39}$/u.test(
+        value.shimProcessStartTicks || ''
+      ) ||
+      !exactKeys(value.providerConfigIdentity, [
+        'ctimeNs',
+        'device',
+        'inode',
+        'mtimeNs',
+        'size'
+      ]) ||
+      !fileIdentityMatches(
+        value.providerConfigIdentity,
+        value.providerConfigIdentity
+      )) {
+    throw codedError('stack_provider_config_receipt_invalid');
+  }
+  return Object.freeze({
+    controllerSourceCommit: value.controllerSourceCommit,
+    providerConfigIdentity: Object.freeze({
+      ...value.providerConfigIdentity
+    }),
+    schemaVersion: 1,
+    shimPid,
+    shimProcessStartTicks: value.shimProcessStartTicks
+  });
+}
+
+function providerConfigIdentityReceiptPath(runtimeRoot, {
+  fsModule = fs
+} = {}) {
+  const root = assertOwnerOnlyDirectory(runtimeRoot, { fsModule });
+  const directory = assertOwnerOnlyDirectory(
+    path.join(root, 'pids'),
+    { fsModule }
+  );
+  return path.join(directory, PROVIDER_CONFIG_IDENTITY_FILENAME);
+}
+
+function writeProviderConfigIdentityReceipt(receipt, runtimeRoot, {
+  fsModule = fs
+} = {}) {
+  const validated = validateProviderConfigIdentityReceipt(receipt);
+  const file = providerConfigIdentityReceiptPath(runtimeRoot, { fsModule });
+  const temporary = path.join(
+    path.dirname(file),
+    `.${PROVIDER_CONFIG_IDENTITY_FILENAME}.${process.pid}.` +
+      `${crypto.randomBytes(6).toString('hex')}.tmp`
+  );
+  let descriptor;
+  try {
+    descriptor = fsModule.openSync(
+      temporary,
+      fs.constants.O_CREAT |
+        fs.constants.O_EXCL |
+        fs.constants.O_WRONLY |
+        (fs.constants.O_CLOEXEC || 0) |
+        (fs.constants.O_NOFOLLOW || 0),
+      0o600
+    );
+    fsModule.writeFileSync(
+      descriptor,
+      `${JSON.stringify(validated)}\n`,
+      'utf8'
+    );
+    fsModule.fsyncSync(descriptor);
+    fsModule.closeSync(descriptor);
+    descriptor = undefined;
+    fsModule.renameSync(temporary, file);
+    fsModule.chmodSync(file, 0o600);
+  } catch {
+    if (descriptor !== undefined) {
+      try {
+        fsModule.closeSync(descriptor);
+      } catch {}
+    }
+    try {
+      fsModule.unlinkSync(temporary);
+    } catch {}
+    throw codedError('stack_provider_config_receipt_write_failed');
+  }
+  return validated;
+}
+
+function readProviderConfigIdentityReceipt(runtimeRoot, {
+  fsModule = fs
+} = {}) {
+  const file = providerConfigIdentityReceiptPath(runtimeRoot, { fsModule });
+  assertOwnerOnlyFile(file, { maximumBytes: 4096, fsModule });
+  try {
+    return validateProviderConfigIdentityReceipt(
+      JSON.parse(fsModule.readFileSync(file, 'utf8'))
+    );
+  } catch (error) {
+    if (error?.code?.startsWith?.('stack_')) throw error;
+    throw codedError('stack_provider_config_receipt_invalid');
+  }
+}
+
+function providerCredentialFreshnessMatches({
+  profile,
+  providerConfigIdentity = null,
+  providerConfigFile,
+  runtimeRoot,
+  shimPid
+}, {
+  fsModule = fs,
+  readStartTicks = readLinuxProcessStartTicks
+} = {}) {
+  try {
+    if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+        parsePid(shimPid) === null) {
+      return false;
+    }
+    const receipt = readProviderConfigIdentityReceipt(
+      runtimeRoot,
+      { fsModule }
+    );
+    return receipt.controllerSourceCommit === profile.controllerSourceCommit &&
+      receipt.shimPid === shimPid &&
+      receipt.shimProcessStartTicks ===
+        readStartTicks(shimPid, { fsModule }) &&
+      fileIdentityMatches(
+        receipt.providerConfigIdentity,
+        providerConfigIdentity ||
+          ownerFileIdentity(providerConfigFile, { fsModule })
+      );
+  } catch {
+    return false;
+  }
 }
 
 function vcpProviderConfigDigest(providerEnvironment) {
@@ -471,6 +739,12 @@ function validateProfile(value) {
   if (value.schemaVersion === PROFILE_SCHEMA_VERSION &&
       (
         !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') ||
+        !SAFE_SHA256_DIGEST.test(
+          value.governanceEnvironmentConfigDigest || ''
+        ) ||
+        !SAFE_SHA256_DIGEST.test(
+          value.relayEnvironmentConfigDigest || ''
+        ) ||
         !SAFE_GIT_OBJECT.test(value.vcpRuntimeBaseline || '') ||
         !SAFE_SHA256_DIGEST.test(value.vcpProviderConfigDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.vcpRuntimeScopeDigest || '') ||
@@ -578,9 +852,59 @@ function lifecycleLockPath(environment = process.env) {
   return path.join(runtimeDirectory(environment), 'pids', 'lifecycle.lock');
 }
 
+function readLinuxProcessStartTicks(pid, {
+  fsModule = fs
+} = {}) {
+  const normalizedPid = parsePid(pid);
+  if (normalizedPid === null) {
+    throw codedError('stack_process_start_identity_invalid');
+  }
+  let value;
+  try {
+    value = fsModule.readFileSync(
+      `/proc/${normalizedPid}/stat`,
+      'utf8'
+    );
+  } catch {
+    throw codedError('stack_process_start_identity_unavailable');
+  }
+  if (typeof value !== 'string' ||
+      value.length < 8 ||
+      value.length > 16_384) {
+    throw codedError('stack_process_start_identity_invalid');
+  }
+  const closing = value.lastIndexOf(') ');
+  if (!value.startsWith(`${normalizedPid} (`) || closing < 3) {
+    throw codedError('stack_process_start_identity_invalid');
+  }
+  const fields = value.slice(closing + 2).trim().split(/\s+/u);
+  const startTicks = fields[19];
+  if (!/^[1-9][0-9]{0,39}$/u.test(startTicks || '')) {
+    throw codedError('stack_process_start_identity_invalid');
+  }
+  return startTicks;
+}
+
+function validateLifecycleLockRecord(value) {
+  const pid = parsePid(value?.pid);
+  if (!exactKeys(value, ['pid', 'schemaVersion', 'startTicks']) ||
+      value.schemaVersion !== 1 ||
+      pid === null ||
+      value.pid !== pid ||
+      !/^[1-9][0-9]{0,39}$/u.test(value.startTicks || '')) {
+    throw codedError('stack_lifecycle_lock_invalid');
+  }
+  return Object.freeze({
+    pid,
+    schemaVersion: 1,
+    startTicks: value.startTicks
+  });
+}
+
 function acquireOwnerLock(file, {
   fsModule = fs,
   kill = process.kill,
+  readStartTicks = readLinuxProcessStartTicks,
   retry = true
 } = {}) {
   const parent = assertOwnerOnlyDirectory(path.dirname(file), { fsModule });
@@ -596,21 +920,32 @@ function acquireOwnerLock(file, {
   } catch (error) {
     if (error?.code !== 'EEXIST') throw codedError('stack_lifecycle_lock_failed');
     let existing;
-    let pid;
+    let owner;
     try {
       existing = fsModule.lstatSync(file);
       if (!existing.isFile() || existing.isSymbolicLink() ||
           existing.uid !== currentUid() || (existing.mode & 0o077) !== 0 ||
-          existing.size < 1 || existing.size > 32) {
+          existing.size < 1 || existing.size > 256) {
         throw codedError('stack_lifecycle_lock_invalid');
       }
-      pid = parsePid(fsModule.readFileSync(file, 'utf8'));
-      if (pid === null) throw codedError('stack_lifecycle_lock_invalid');
+      owner = validateLifecycleLockRecord(
+        JSON.parse(fsModule.readFileSync(file, 'utf8'))
+      );
     } catch (inspectionError) {
       if (inspectionError?.code?.startsWith?.('stack_')) throw inspectionError;
       throw codedError('stack_lifecycle_lock_invalid');
     }
-    if (isPidRunning(pid, kill)) throw codedError('stack_lifecycle_busy');
+    if (isPidRunning(owner.pid, kill)) {
+      let currentStartTicks;
+      try {
+        currentStartTicks = readStartTicks(owner.pid, { fsModule });
+      } catch {
+        throw codedError('stack_lifecycle_busy');
+      }
+      if (currentStartTicks === owner.startTicks) {
+        throw codedError('stack_lifecycle_busy');
+      }
+    }
     if (!retry) throw codedError('stack_lifecycle_lock_recovery_failed');
     let current;
     try {
@@ -628,11 +963,25 @@ function acquireOwnerLock(file, {
     } catch {
       throw codedError('stack_lifecycle_lock_recovery_failed');
     }
-    return acquireOwnerLock(file, { fsModule, kill, retry: false });
+    return acquireOwnerLock(file, {
+      fsModule,
+      kill,
+      readStartTicks,
+      retry: false
+    });
   }
   let identity;
   try {
-    fsModule.writeFileSync(descriptor, `${process.pid}\n`, 'utf8');
+    const owner = validateLifecycleLockRecord({
+      pid: process.pid,
+      schemaVersion: 1,
+      startTicks: readStartTicks(process.pid, { fsModule })
+    });
+    fsModule.writeFileSync(
+      descriptor,
+      `${JSON.stringify(owner)}\n`,
+      'utf8'
+    );
     fsModule.fsyncSync(descriptor);
     identity = fsModule.fstatSync(descriptor);
     fsModule.closeSync(descriptor);
@@ -1204,7 +1553,8 @@ function profileWithVcpRuntimeBinding(
   profile,
   identity,
   providerEnvironment,
-  controllerSourceCommit
+  controllerSourceCommit,
+  environmentConfigDigests
 ) {
   if (!legacyVcpRuntimeBootstrapMatches(profile, identity)) {
     throw codedError('stack_vcp_runtime_identity_mismatch');
@@ -1213,6 +1563,10 @@ function profileWithVcpRuntimeBinding(
     ...profile,
     schemaVersion: PROFILE_SCHEMA_VERSION,
     controllerSourceCommit,
+    governanceEnvironmentConfigDigest:
+      environmentConfigDigests?.governanceEnvironmentConfigDigest,
+    relayEnvironmentConfigDigest:
+      environmentConfigDigests?.relayEnvironmentConfigDigest,
     vcpProviderConfigDigest:
       vcpProviderConfigDigest(providerEnvironment),
     vcpRuntimeBaseline: identity.revision,
@@ -2090,8 +2444,10 @@ function lowDisclosureRelayProjection(value) {
 function computeRuntimeAccepted({
   profile,
   processes,
+  managedEnvironmentConfigMatch,
   provider,
   vcpProviderConfigMatch,
+  vcpProviderCredentialFresh,
   vcpRuntime,
   shimListenerOwned,
   httpListenerOwned,
@@ -2105,9 +2461,11 @@ function computeRuntimeAccepted({
 }) {
   return Boolean(
     retainedBindingMatch === true &&
+    managedEnvironmentConfigMatch === true &&
     provider?.reachable === true &&
     profileProviderIdentityMatches(profile, provider) &&
     vcpProviderConfigMatch === true &&
+    vcpProviderCredentialFresh === true &&
     profileVcpRuntimeIdentityMatches(profile, vcpRuntime) &&
     Object.keys(COMPONENTS).every(name =>
       processes?.[name]?.controllerManaged === true
@@ -2153,6 +2511,24 @@ async function inspectStack({
     profile.governanceEnvironment
   );
   const relayEnvironment = resolvePrivateReference(profile, profile.relayEnvironment);
+  let governanceEnvironmentConfigMatch = false;
+  let relayEnvironmentConfigMatch = false;
+  if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+    try {
+      const environmentConfigDigests = managedEnvironmentConfigDigests(
+        governanceEnvironment,
+        relayEnvironment
+      );
+      governanceEnvironmentConfigMatch =
+        environmentConfigDigests.governanceEnvironmentConfigDigest ===
+          profile.governanceEnvironmentConfigDigest;
+      relayEnvironmentConfigMatch =
+        environmentConfigDigests.relayEnvironmentConfigDigest ===
+          profile.relayEnvironmentConfigDigest;
+    } catch {}
+  }
+  const managedEnvironmentConfigMatch =
+    governanceEnvironmentConfigMatch && relayEnvironmentConfigMatch;
   let providerContainer;
   try {
     providerContainer = inspectProviderContainer(profile.providerContainer);
@@ -2172,18 +2548,31 @@ async function inspectStack({
     reachable: providerPort
   });
   let vcpProviderConfigMatch = false;
+  let providerConfigIdentity = null;
+  const providerConfigFile = path.join(
+    vcpRuntimeRepository(),
+    'config.env'
+  );
   if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
     try {
-      const providerEnvironment = readVcpProviderEnvironment(
-        path.join(vcpRuntimeRepository(), 'config.env')
+      const providerConfigSnapshot = readVcpProviderEnvironmentSnapshot(
+        providerConfigFile
       );
+      providerConfigIdentity = providerConfigSnapshot.fileIdentity;
       vcpProviderConfigMatch = profileVcpProviderConfigMatches(
         profile,
-        providerEnvironment
+        providerConfigSnapshot.providerEnvironment
       );
     } catch {}
   }
   const vcpRuntime = inspectVcpRuntimeIdentity(profile);
+  const vcpProviderCredentialFresh = providerCredentialFreshnessMatches({
+    profile,
+    providerConfigIdentity,
+    providerConfigFile,
+    runtimeRoot: runtimeDirectory(environment),
+    shimPid: processes.shim.pid
+  });
   const shimListenerOwned = processes.shim.controllerManaged &&
     processOwnsLoopbackTcpListener(processes.shim.pid, 7615);
   const httpListenerOwned = processes.http.controllerManaged &&
@@ -2273,8 +2662,10 @@ async function inspectStack({
   const runtimeAccepted = computeRuntimeAccepted({
     profile,
     processes,
+    managedEnvironmentConfigMatch,
     provider,
     vcpProviderConfigMatch,
+    vcpProviderCredentialFresh,
     vcpRuntime,
     shimListenerOwned,
     httpListenerOwned,
@@ -2290,8 +2681,10 @@ async function inspectStack({
     profile,
     source,
     processes,
+    managedEnvironmentConfigMatch,
     provider,
     vcpProviderConfigMatch,
+    vcpProviderCredentialFresh,
     vcpRuntime,
     shimListenerOwned,
     httpListenerOwned,
@@ -2316,6 +2709,10 @@ async function inspectStack({
       compatible: source.compatible
     }),
     retainedBinding: Object.freeze({ identityMatch: retainedBindingMatch }),
+    runtimeConfiguration: Object.freeze({
+      governanceIdentityMatch: governanceEnvironmentConfigMatch,
+      relayIdentityMatch: relayEnvironmentConfigMatch
+    }),
     processes: Object.freeze(processProjection),
     provider: Object.freeze({
       reachable: provider.reachable,
@@ -2327,6 +2724,7 @@ async function inspectStack({
     vcpRuntime: Object.freeze({
       identityMatch: profileVcpRuntimeIdentityMatches(profile, vcpRuntime),
       providerConfigIdentityMatch: vcpProviderConfigMatch,
+      providerCredentialFresh: vcpProviderCredentialFresh,
       currentMain: vcpRuntime.currentMain,
       scopeClean: vcpRuntime.scopeClean,
       scopeComplete: vcpRuntime.scopeComplete
@@ -2558,10 +2956,33 @@ async function startStack({
     if (!profileRetainedBindingMatches(profile)) {
       throw codedError('stack_retained_binding_identity_mismatch');
     }
+    const governanceEnvironment = resolvePrivateReference(
+      profile,
+      profile.governanceEnvironment
+    );
+    const relayEnvironment = resolvePrivateReference(
+      profile,
+      profile.relayEnvironment
+    );
+    const environmentConfigDigests = managedEnvironmentConfigDigests(
+      governanceEnvironment,
+      relayEnvironment
+    );
+    if (profile.schemaVersion === PROFILE_SCHEMA_VERSION &&
+        (
+          environmentConfigDigests.governanceEnvironmentConfigDigest !==
+            profile.governanceEnvironmentConfigDigest ||
+          environmentConfigDigests.relayEnvironmentConfigDigest !==
+            profile.relayEnvironmentConfigDigest
+        )) {
+      throw codedError('stack_managed_environment_identity_mismatch');
+    }
     const vcpRuntime = inspectVcpRuntimeIdentity(profile);
-    const vcpProviderEnvironment = readVcpProviderEnvironment(
+    const vcpProviderConfigSnapshot = readVcpProviderEnvironmentSnapshot(
       path.join(vcpRuntimeRepository(), 'config.env')
     );
+    const vcpProviderEnvironment =
+      vcpProviderConfigSnapshot.providerEnvironment;
     if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
       if (!profileVcpRuntimeIdentityMatches(profile, vcpRuntime)) {
         throw codedError('stack_vcp_runtime_identity_mismatch');
@@ -2578,7 +2999,8 @@ async function startStack({
         profile,
         vcpRuntime,
         vcpProviderEnvironment,
-        source.head
+        source.head,
+        environmentConfigDigests
       );
     } else {
       throw codedError('stack_vcp_runtime_identity_mismatch');
@@ -2592,14 +3014,6 @@ async function startStack({
     }
     const edgeBefore = inspectEdgeContainer(profile.edgeContainer);
     requireProfileEdgeIdentity(profile, edgeBefore);
-    const governanceEnvironment = resolvePrivateReference(
-      profile,
-      profile.governanceEnvironment
-    );
-    const relayEnvironment = resolvePrivateReference(
-      profile,
-      profile.relayEnvironment
-    );
     const governanceControlSocket = buildControllerChildEnvironment(
       governanceEnvironment,
       { profile, environment }
@@ -2636,6 +3050,17 @@ async function startStack({
       }, {
         failureCode: 'stack_shim_start_timeout'
       });
+      if (!providerCredentialFreshnessMatches({
+        profile,
+        providerConfigFile: path.join(
+          profile.vcpRuntimeRepository,
+          'config.env'
+        ),
+        runtimeRoot: runtimeDirectory(environment),
+        shimPid: shim.pid
+      })) {
+        throw codedError('stack_vcp_provider_credential_stale');
+      }
 
       const httpState = inspectManagedProcess('http', { environment, profile });
       if (!httpState.running && await portListening(7605)) {
@@ -2858,6 +3283,10 @@ async function adoptRunningStack({
       [governanceFile, relayFile],
       { environment }
     );
+    const environmentConfigDigests = managedEnvironmentConfigDigests(
+      governanceFile,
+      relayFile
+    );
     const relative = file => {
       const value = path.relative(privateRoot, file);
       if (!value || value.startsWith('..') || path.isAbsolute(value)) {
@@ -2909,12 +3338,18 @@ async function adoptRunningStack({
     )) {
       throw codedError('stack_adoption_vcp_runtime_identity_unproven');
     }
-    const vcpProviderEnvironment = readVcpProviderEnvironment(
+    const vcpProviderConfigSnapshot = readVcpProviderEnvironmentSnapshot(
       path.join(vcpRuntimeRepository(), 'config.env')
     );
+    const vcpProviderEnvironment =
+      vcpProviderConfigSnapshot.providerEnvironment;
     const profile = validateProfile({
       schemaVersion: PROFILE_SCHEMA_VERSION,
       controllerSourceCommit: controllerSource.head,
+      governanceEnvironmentConfigDigest:
+        environmentConfigDigests.governanceEnvironmentConfigDigest,
+      relayEnvironmentConfigDigest:
+        environmentConfigDigests.relayEnvironmentConfigDigest,
       runtimeBaseline: edge.revision,
       runtimeRepository,
       privateRoot,
@@ -3155,9 +3590,10 @@ async function runShimChild() {
     privateRoot
   );
   const vcpRoot = vcpRuntimeRepository();
-  const providerEnvironment = readVcpProviderEnvironment(
+  const providerConfigSnapshot = readVcpProviderEnvironmentSnapshot(
     path.join(vcpRoot, 'config.env')
   );
+  const providerEnvironment = providerConfigSnapshot.providerEnvironment;
   if (!profileVcpProviderConfigMatches(profile, providerEnvironment)) {
     throw codedError('stack_vcp_provider_config_identity_mismatch');
   }
@@ -3172,6 +3608,13 @@ async function runShimChild() {
     mappingPath,
     providerEnvironment
   });
+  writeProviderConfigIdentityReceipt({
+    controllerSourceCommit: profile.controllerSourceCommit,
+    providerConfigIdentity: providerConfigSnapshot.fileIdentity,
+    schemaVersion: 1,
+    shimPid: process.pid,
+    shimProcessStartTicks: readLinuxProcessStartTicks(process.pid)
+  }, runtimeRoot);
   for (const name of Object.keys(process.env)) delete process.env[name];
   Object.assign(process.env, shimEnvironment);
   const { main: runShim } = require(
@@ -3570,8 +4013,10 @@ module.exports = {
   legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
   loadManagedEnvironmentFile,
+  managedEnvironmentConfigDigest,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,
+  ownerFileIdentity,
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
@@ -3579,18 +4024,23 @@ module.exports = {
   processOwnsLoopbackTcpListener,
   processOwnsUnixListener,
   profileEdgeIdentityMatches,
+  profileManagedEnvironmentConfigMatches,
   profileProviderIdentityMatches,
   profileVcpProviderConfigMatches,
   profileWithVcpRuntimeBinding,
   profileVcpRuntimeIdentityMatches,
+  providerCredentialFreshnessMatches,
   projectHttpHealthPayload,
   probeUnixSocket,
+  readLinuxProcessStartTicks,
   readPidFile,
+  readVcpProviderEnvironmentSnapshot,
   safeCode,
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
   validateProfile,
   vcpProviderConfigDigest,
   vcpRuntimeRepository,
+  writeProviderConfigIdentityReceipt,
   waitForProcessGroupExit
 };

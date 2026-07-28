@@ -41,8 +41,10 @@ const {
   legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
   loadManagedEnvironmentFile,
+  managedEnvironmentConfigDigest,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,
+  ownerFileIdentity,
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
@@ -50,17 +52,22 @@ const {
   processOwnsLoopbackTcpListener,
   processOwnsUnixListener,
   profileEdgeIdentityMatches,
+  profileManagedEnvironmentConfigMatches,
   profileProviderIdentityMatches,
   profileVcpProviderConfigMatches,
   profileWithVcpRuntimeBinding,
   profileVcpRuntimeIdentityMatches,
+  providerCredentialFreshnessMatches,
   projectHttpHealthPayload,
+  readLinuxProcessStartTicks,
+  readVcpProviderEnvironmentSnapshot,
   safeCode,
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
   validateProfile,
   vcpProviderConfigDigest,
   vcpRuntimeRepository,
+  writeProviderConfigIdentityReceipt,
   waitForProcessGroupExit
 } = require('../scripts/codex-memory-stack');
 
@@ -81,11 +88,23 @@ const VCP_PROVIDER_ENVIRONMENT = Object.freeze({
 const VCP_PROVIDER_CONFIG_DIGEST = vcpProviderConfigDigest(
   VCP_PROVIDER_ENVIRONMENT
 );
+const GOVERNANCE_ENVIRONMENT_CONFIG_DIGEST =
+  managedEnvironmentConfigDigest({
+    CODEX_MEMORY_R4_COUNTER_MODE: 'r4_session_scoped_live_read_v1'
+  });
+const RELAY_ENVIRONMENT_CONFIG_DIGEST =
+  managedEnvironmentConfigDigest({
+    CODEX_MEMORY_R4_PUBLIC_ORIGIN: 'https://memory.example'
+  });
 
 function profile(overrides = {}) {
   return {
     schemaVersion: 5,
     controllerSourceCommit: CONTROLLER_SOURCE_COMMIT,
+    governanceEnvironmentConfigDigest:
+      GOVERNANCE_ENVIRONMENT_CONFIG_DIGEST,
+    relayEnvironmentConfigDigest:
+      RELAY_ENVIRONMENT_CONFIG_DIGEST,
     runtimeBaseline: BASELINE,
     runtimeRepository: '/repo',
     retainedBindingSource: RETAINED_BINDING_SOURCE,
@@ -110,6 +129,8 @@ function profile(overrides = {}) {
 function legacyProfile(overrides = {}) {
   const {
     controllerSourceCommit: _controllerSourceCommit,
+    governanceEnvironmentConfigDigest: _governanceEnvironmentConfigDigest,
+    relayEnvironmentConfigDigest: _relayEnvironmentConfigDigest,
     vcpProviderConfigDigest: _vcpProviderConfigDigest,
     vcpRuntimeBaseline: _vcpRuntimeBaseline,
     vcpRuntimeRepository: _vcpRuntimeRepository,
@@ -155,7 +176,9 @@ function acceptedStack(overrides = {}) {
       imageId: PROVIDER_IMAGE_ID,
       revision: PROVIDER_REVISION
     },
+    managedEnvironmentConfigMatch: true,
     vcpProviderConfigMatch: true,
+    vcpProviderCredentialFresh: true,
     vcpRuntime: {
       recognized: true,
       revision: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
@@ -574,7 +597,11 @@ test('lifecycle lock recovers only a well-formed dead-owner lock', t => {
   const file = path.join(root, 'lifecycle.lock');
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
 
-  fs.writeFileSync(file, '999999999\n', { mode: 0o600 });
+  fs.writeFileSync(file, `${JSON.stringify({
+    schemaVersion: 1,
+    pid: 999999999,
+    startTicks: '42'
+  })}\n`, { mode: 0o600 });
   const recovered = acquireOwnerLock(file, {
     kill() {
       const error = new Error('missing');
@@ -594,6 +621,45 @@ test('lifecycle lock recovers only a well-formed dead-owner lock', t => {
     { code: 'stack_lifecycle_lock_invalid' }
   );
   assert.equal(fs.readFileSync(file, 'utf8'), 'not-a-pid\n');
+});
+
+test('lifecycle lock recovers a live PID only when its start identity changed', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-stack-lock-'));
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'lifecycle.lock');
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  fs.writeFileSync(file, `${JSON.stringify({
+    schemaVersion: 1,
+    pid: process.pid,
+    startTicks: '41'
+  })}\n`, { mode: 0o600 });
+  const recovered = acquireOwnerLock(file, {
+    kill(pid, signal) {
+      assert.equal(pid, process.pid);
+      assert.equal(signal, 0);
+    },
+    readStartTicks(pid) {
+      assert.equal(pid, process.pid);
+      return '42';
+    }
+  });
+  assert.equal(recovered.release(), true);
+
+  fs.writeFileSync(file, `${JSON.stringify({
+    schemaVersion: 1,
+    pid: process.pid,
+    startTicks: '42'
+  })}\n`, { mode: 0o600 });
+  assert.throws(
+    () => acquireOwnerLock(file, {
+      kill() {},
+      readStartTicks() {
+        return '42';
+      }
+    }),
+    { code: 'stack_lifecycle_busy' }
+  );
 });
 
 test('lifecycle profile snapshot is read only after the lock is acquired', () => {
@@ -987,6 +1053,79 @@ test('managed environment files reject Node and non-governed startup keys', t =>
   assert.throws(
     () => loadManagedEnvironmentFile(file),
     { code: 'stack_managed_environment_key_forbidden' }
+  );
+});
+
+test('managed environment identity pins non-secret configuration without key material', t => {
+  const base = {
+    CODEX_MEMORY_R4_CONTEXT_SIGNING_KEY_ID: 'owner-key-v1',
+    CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE: 'token/reference',
+    CODEX_MEMORY_R4_PUBLIC_ORIGIN: 'https://memory.example',
+    CODEX_MEMORY_R4_RELAY_AUTH_TOKEN: 'synthetic-secret-a'
+  };
+  const digest = managedEnvironmentConfigDigest(base);
+  assert.match(digest, /^sha256:[a-f0-9]{64}$/u);
+  assert.equal(
+    digest,
+    managedEnvironmentConfigDigest({
+      ...base,
+      CODEX_MEMORY_R4_RELAY_AUTH_TOKEN: 'synthetic-secret-b'
+    })
+  );
+  assert.notEqual(
+    digest,
+    managedEnvironmentConfigDigest({
+      ...base,
+      CODEX_MEMORY_R4_PUBLIC_ORIGIN: 'https://changed.example'
+    })
+  );
+  assert.notEqual(
+    digest,
+    managedEnvironmentConfigDigest({
+      ...base,
+      CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE: 'other/reference'
+    })
+  );
+
+  const root = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-stack-config-identity-'
+  ));
+  fs.chmodSync(root, 0o700);
+  const governanceFile = path.join(root, 'governance.env');
+  const relayFile = path.join(root, 'relay.env');
+  fs.writeFileSync(
+    governanceFile,
+    'CODEX_MEMORY_R4_COUNTER_MODE=r4_session_scoped_live_read_v1\n',
+    { mode: 0o600 }
+  );
+  fs.writeFileSync(
+    relayFile,
+    'CODEX_MEMORY_R4_PUBLIC_ORIGIN=https://memory.example\n',
+    { mode: 0o600 }
+  );
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  assert.equal(
+    profileManagedEnvironmentConfigMatches(
+      profile(),
+      governanceFile,
+      relayFile
+    ),
+    true
+  );
+  fs.writeFileSync(
+    relayFile,
+    'CODEX_MEMORY_R4_PUBLIC_ORIGIN=https://changed.example\n',
+    { mode: 0o600 }
+  );
+  assert.equal(
+    profileManagedEnvironmentConfigMatches(
+      profile(),
+      governanceFile,
+      relayFile
+    ),
+    false
   );
 });
 
@@ -1416,6 +1555,81 @@ test('VCP provider binding pins model and dimension without pinning the API key'
   );
 });
 
+test('provider key rotation invalidates the running shim without persisting key material', t => {
+  const root = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-stack-provider-freshness-'
+  ));
+  const runtimeRoot = path.join(root, 'runtime');
+  const pidDirectory = path.join(runtimeRoot, 'pids');
+  const providerConfigFile = path.join(root, 'config.env');
+  fs.chmodSync(root, 0o700);
+  fs.mkdirSync(runtimeRoot, { mode: 0o700 });
+  fs.mkdirSync(pidDirectory, { mode: 0o700 });
+  fs.writeFileSync(
+    providerConfigFile,
+    'API_Key=synthetic-provider-key-a\n' +
+      'WhitelistEmbeddingModel=synthetic-embedding-model\n' +
+      'VECTORDB_DIMENSION=1024\n',
+    { mode: 0o600 }
+  );
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  const snapshot = readVcpProviderEnvironmentSnapshot(providerConfigFile);
+  assert.equal(snapshot.providerEnvironment.apiKey, 'synthetic-provider-key-a');
+  assert.deepEqual(
+    snapshot.fileIdentity,
+    ownerFileIdentity(providerConfigFile)
+  );
+  writeProviderConfigIdentityReceipt({
+    controllerSourceCommit: CONTROLLER_SOURCE_COMMIT,
+    providerConfigIdentity: snapshot.fileIdentity,
+    schemaVersion: 1,
+    shimPid: process.pid,
+    shimProcessStartTicks: readLinuxProcessStartTicks(process.pid)
+  }, runtimeRoot);
+  const receiptText = fs.readFileSync(
+    path.join(pidDirectory, 'vcp-provider-config.identity.json'),
+    'utf8'
+  );
+  assert.equal(receiptText.includes('synthetic-provider-key-a'), false);
+  assert.equal(receiptText.includes('API_Key'), false);
+  assert.equal(
+    providerCredentialFreshnessMatches({
+      profile: profile(),
+      providerConfigFile,
+      runtimeRoot,
+      shimPid: process.pid
+    }),
+    true
+  );
+
+  fs.writeFileSync(
+    providerConfigFile,
+    'API_Key=rotated-synthetic-provider-key-bb\n' +
+      'WhitelistEmbeddingModel=synthetic-embedding-model\n' +
+      'VECTORDB_DIMENSION=1024\n',
+    { mode: 0o600 }
+  );
+  assert.equal(
+    profileVcpProviderConfigMatches(
+      profile(),
+      readVcpProviderEnvironmentSnapshot(providerConfigFile)
+        .providerEnvironment
+    ),
+    true
+  );
+  assert.equal(
+    providerCredentialFreshnessMatches({
+      profile: profile(),
+      providerConfigFile,
+      runtimeRoot,
+      shimPid: process.pid
+    }),
+    false
+  );
+});
+
 test('legacy profile can bootstrap only the reviewed VCP identity into an exact v5 binding', () => {
   const identity = {
     recognized: true,
@@ -1433,7 +1647,13 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
     legacy,
     identity,
     VCP_PROVIDER_ENVIRONMENT,
-    CONTROLLER_SOURCE_COMMIT
+    CONTROLLER_SOURCE_COMMIT,
+    {
+      governanceEnvironmentConfigDigest:
+        GOVERNANCE_ENVIRONMENT_CONFIG_DIGEST,
+      relayEnvironmentConfigDigest:
+        RELAY_ENVIRONMENT_CONFIG_DIGEST
+    }
   );
   assert.equal(upgraded.schemaVersion, 5);
   assert.equal(
@@ -1443,6 +1663,14 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
   assert.equal(
     upgraded.vcpProviderConfigDigest,
     VCP_PROVIDER_CONFIG_DIGEST
+  );
+  assert.equal(
+    upgraded.governanceEnvironmentConfigDigest,
+    GOVERNANCE_ENVIRONMENT_CONFIG_DIGEST
+  );
+  assert.equal(
+    upgraded.relayEnvironmentConfigDigest,
+    RELAY_ENVIRONMENT_CONFIG_DIGEST
   );
   assert.equal(upgraded.vcpRuntimeBaseline, identity.revision);
   assert.equal(upgraded.vcpRuntimeRepository, identity.repository);
@@ -1460,7 +1688,13 @@ test('legacy profile can bootstrap only the reviewed VCP identity into an exact 
         scopeDigest: null
       },
       VCP_PROVIDER_ENVIRONMENT,
-      CONTROLLER_SOURCE_COMMIT
+      CONTROLLER_SOURCE_COMMIT,
+      {
+        governanceEnvironmentConfigDigest:
+          GOVERNANCE_ENVIRONMENT_CONFIG_DIGEST,
+        relayEnvironmentConfigDigest:
+          RELAY_ENVIRONMENT_CONFIG_DIGEST
+      }
     ),
     { code: 'stack_vcp_runtime_identity_mismatch' }
   );
@@ -1671,6 +1905,20 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
     computeStackAccepted({
       ...accepted,
       vcpProviderConfigMatch: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      managedEnvironmentConfigMatch: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      vcpProviderCredentialFresh: false
     }),
     false
   );
