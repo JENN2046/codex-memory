@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "paths": [
+    ".gitattributes",
     "apps/local-recall-relay",
     "package-lock.json",
     "package.json",

@@ -119,7 +119,7 @@ function manifestInspection(overrides = {}) {
     manifestDigest: CONTROLLER_SOURCE_MANIFEST_DIGEST,
     manifestComplete: true,
     manifestScopeClean: true,
-    fileCount: 737,
+    fileCount: 738,
     ...overrides
   };
 }

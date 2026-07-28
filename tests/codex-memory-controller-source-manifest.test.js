@@ -8,6 +8,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
+  GIT_ATTRIBUTES_RELATIVE_PATH,
   MANIFEST_RELATIVE_PATH,
   REQUIRED_PATHS,
   computeManifestDigest,
@@ -40,6 +41,11 @@ function createSyntheticRepository(t) {
     'codex-memory-controller-manifest-'
   ));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  write(
+    root,
+    GIT_ATTRIBUTES_RELATIVE_PATH,
+    '* text=auto eol=lf\n\n*.ps1 text eol=crlf\n'
+  );
   write(root, 'package-lock.json', '{"lockfileVersion":3}\n');
   write(root, 'package.json', '{"type":"commonjs"}\n');
   write(
@@ -76,6 +82,7 @@ test('checked-in controller manifest covers the fixed broad runtime source roots
     repoRoot: REPO_ROOT
   });
   assert.deepEqual(manifest.paths, REQUIRED_PATHS);
+  assert.ok(discovered.includes('.gitattributes'));
   assert.ok(discovered.includes('scripts/codex-memory-stack.js'));
   assert.ok(discovered.includes('src/http-index.js'));
   assert.ok(discovered.includes(
@@ -199,36 +206,178 @@ test('committed governance files outside runtime roots do not change the digest'
 
 test('CRLF checkout bytes reproduce the canonical HEAD blob', t => {
   const root = createSyntheticRepository(t);
-  write(root, '.gitattributes', '*.ps1 text eol=crlf\n');
   write(root, 'scripts/runtime-fixture.ps1', "Write-Output 'bound'\n");
-  execFileSync(
-    'git',
-    ['add', '--', '.gitattributes', 'scripts/runtime-fixture.ps1'],
-    { cwd: root }
-  );
+  execFileSync('git', ['add', '--', 'scripts/runtime-fixture.ps1'], {
+    cwd: root
+  });
   execFileSync('git', ['commit', '-qm', 'add CRLF runtime fixture'], {
     cwd: root
   });
+  const manifest = loadManifest({ repoRoot: root });
+  const lfDigest = computeManifestDigest(manifest, { repoRoot: root });
   fs.writeFileSync(
     path.join(root, 'scripts/runtime-fixture.ps1'),
     "Write-Output 'bound'\r\n"
   );
-  assert.notEqual(
-    gitBlobObjectId(
-      fs.readFileSync(path.join(root, 'scripts/runtime-fixture.ps1'))
-    ),
+  const worktreeBytes = fs.readFileSync(
+    path.join(root, 'scripts/runtime-fixture.ps1')
+  );
+  const headObjectId = String(execFileSync(
+    'git',
+    ['rev-parse', 'HEAD:scripts/runtime-fixture.ps1'],
+    { cwd: root }
+  )).trim();
+  assert.notEqual(gitBlobObjectId(worktreeBytes), headObjectId);
+  assert.equal(
     String(execFileSync(
       'git',
-      ['rev-parse', 'HEAD:scripts/runtime-fixture.ps1'],
+      [
+        'hash-object',
+        '--path=scripts/runtime-fixture.ps1',
+        'scripts/runtime-fixture.ps1'
+      ],
+      { cwd: root }
+    )).trim(),
+    headObjectId
+  );
+  const crlfDigest = computeManifestDigest(manifest, { repoRoot: root });
+  assert.match(crlfDigest, /^sha256:[a-f0-9]{64}$/u);
+  assert.notEqual(crlfDigest, lfDigest);
+  execFileSync(
+    'git',
+    ['update-index', '--assume-unchanged', 'scripts/runtime-fixture.ps1'],
+    { cwd: root }
+  );
+  assert.equal(
+    String(execFileSync(
+      'git',
+      ['status', '--porcelain=v1', '--', 'scripts/runtime-fixture.ps1'],
+      { cwd: root }
+    )),
+    ''
+  );
+  assert.equal(
+    inspectControllerSourceManifest({ repoRoot: root }).recognized,
+    true
+  );
+});
+
+test('CRLF fallback rejects binary drift hidden by assume-unchanged', t => {
+  const root = createSyntheticRepository(t);
+  write(
+    root,
+    'scripts/runtime-fixture.bin',
+    Buffer.from([0x41, 0x0a, 0x00, 0x42])
+  );
+  execFileSync('git', ['add', '--', 'scripts/runtime-fixture.bin'], {
+    cwd: root
+  });
+  execFileSync('git', ['commit', '-qm', 'add binary runtime fixture'], {
+    cwd: root
+  });
+  execFileSync(
+    'git',
+    ['update-index', '--assume-unchanged', 'scripts/runtime-fixture.bin'],
+    { cwd: root }
+  );
+  fs.writeFileSync(
+    path.join(root, 'scripts/runtime-fixture.bin'),
+    Buffer.from([0x41, 0x0d, 0x0a, 0x00, 0x42])
+  );
+  assert.equal(
+    String(execFileSync(
+      'git',
+      ['status', '--porcelain=v1', '--', 'scripts/runtime-fixture.bin'],
+      { cwd: root }
+    )),
+    ''
+  );
+  assert.notEqual(
+    String(execFileSync(
+      'git',
+      [
+        'hash-object',
+        '--path=scripts/runtime-fixture.bin',
+        'scripts/runtime-fixture.bin'
+      ],
+      { cwd: root }
+    )).trim(),
+    String(execFileSync(
+      'git',
+      ['rev-parse', 'HEAD:scripts/runtime-fixture.bin'],
       { cwd: root }
     )).trim()
   );
-  assert.match(
-    computeManifestDigest(loadManifest({ repoRoot: root }), {
+  assert.throws(
+    () => computeManifestDigest(loadManifest({ repoRoot: root }), {
       repoRoot: root
     }),
-    /^sha256:[a-f0-9]{64}$/u
+    { code: 'controller_source_manifest_worktree_blob_mismatch' }
   );
+  assert.equal(
+    inspectControllerSourceManifest({ repoRoot: root }).recognized,
+    false
+  );
+});
+
+test('CRLF fallback rejects a path without explicit eol=crlf', t => {
+  const root = createSyntheticRepository(t);
+  write(root, 'scripts/runtime-fixture.txt', 'bound\n');
+  execFileSync('git', ['add', '--', 'scripts/runtime-fixture.txt'], {
+    cwd: root
+  });
+  execFileSync('git', ['commit', '-qm', 'add LF runtime fixture'], {
+    cwd: root
+  });
+  execFileSync(
+    'git',
+    ['update-index', '--assume-unchanged', 'scripts/runtime-fixture.txt'],
+    { cwd: root }
+  );
+  fs.writeFileSync(
+    path.join(root, 'scripts/runtime-fixture.txt'),
+    'bound\r\n'
+  );
+  assert.throws(
+    () => computeManifestDigest(loadManifest({ repoRoot: root }), {
+      repoRoot: root
+    }),
+    { code: 'controller_source_manifest_worktree_blob_mismatch' }
+  );
+  assert.equal(
+    inspectControllerSourceManifest({ repoRoot: root }).recognized,
+    false
+  );
+});
+
+test('attribute policy drift and nested overrides fail closed', t => {
+  for (const [name, relative, body] of [
+    [
+      'root custom filter',
+      GIT_ATTRIBUTES_RELATIVE_PATH,
+      '* text=auto eol=lf\n\n*.ps1 text eol=crlf filter=custom\n'
+    ],
+    [
+      'nested override',
+      'scripts/.gitattributes',
+      '*.ps1 -text\n'
+    ]
+  ]) {
+    const root = createSyntheticRepository(t);
+    write(root, relative, body);
+    execFileSync('git', ['add', '--', relative], { cwd: root });
+    execFileSync('git', ['commit', '-qm', name], { cwd: root });
+    assert.throws(
+      () => computeManifestDigest(loadManifest({ repoRoot: root }), {
+        repoRoot: root
+      }),
+      { code: 'controller_source_manifest_git_attributes_invalid' }
+    );
+    assert.equal(
+      inspectControllerSourceManifest({ repoRoot: root }).recognized,
+      false
+    );
+  }
 });
 
 test('skip-worktree cannot hide a tracked runtime file missing from disk', t => {

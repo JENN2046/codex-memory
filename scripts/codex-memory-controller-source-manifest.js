@@ -10,11 +10,25 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const MANIFEST_SCHEMA_VERSION = 1;
 const MANIFEST_RELATIVE_PATH =
   'schemas/codex-memory-controller-runtime-manifest-v1.json';
+const GIT_ATTRIBUTES_RELATIVE_PATH = '.gitattributes';
+const REQUIRED_GIT_ATTRIBUTES_BYTES = Buffer.from(
+  '* text=auto eol=lf\n\n*.ps1 text eol=crlf\n',
+  'utf8'
+);
+const CONTENT_ATTRIBUTE_NAMES = Object.freeze([
+  'text',
+  'eol',
+  'ident',
+  'filter',
+  'working-tree-encoding',
+  'crlf'
+]);
 const SAFE_SHA256_DIGEST = /^sha256:[a-f0-9]{64}$/u;
 const SAFE_MANIFEST_PATH =
   /^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[A-Za-z0-9._-]+(?:\/[A-Za-z0-9._-]+)*$/u;
 const MAXIMUM_MANIFEST_FILES = 2_048;
 const REQUIRED_PATHS = Object.freeze([
+  GIT_ATTRIBUTES_RELATIVE_PATH,
   'apps/local-recall-relay',
   'package-lock.json',
   'package.json',
@@ -231,6 +245,25 @@ function gitText(args, {
   })).trim();
 }
 
+function gitBytes(args, input, {
+  exec = execFileSync,
+  repoRoot = REPO_ROOT
+} = {}) {
+  const output = exec('git', args, {
+    cwd: repoRoot,
+    encoding: null,
+    env: {
+      ...process.env,
+      GIT_ATTR_NOSYSTEM: '1'
+    },
+    input,
+    stdio: ['pipe', 'pipe', 'pipe']
+  });
+  return Buffer.isBuffer(output)
+    ? output
+    : Buffer.from(String(output), 'utf8');
+}
+
 function gitManifestEntries(paths, options = {}) {
   const output = gitText(
     ['ls-tree', '-r', '--full-tree', 'HEAD', '--', ...paths],
@@ -250,6 +283,42 @@ function gitManifestEntries(paths, options = {}) {
   return entries;
 }
 
+function gitManifestAttributes(files, options = {}) {
+  const output = gitBytes([
+    '-c',
+    'core.attributesFile=/dev/null',
+    'check-attr',
+    '--source=HEAD',
+    '-z',
+    '--stdin',
+    ...CONTENT_ATTRIBUTE_NAMES
+  ], Buffer.from(`${files.join('\0')}\0`, 'utf8'), options);
+  const fields = output.toString('utf8').split('\0');
+  if (fields.pop() !== '' ||
+      fields.length !== files.length * CONTENT_ATTRIBUTE_NAMES.length * 3) {
+    throw codedError('controller_source_manifest_git_attributes_invalid');
+  }
+  const attributes = new Map();
+  let offset = 0;
+  for (const expectedFile of files) {
+    const values = {};
+    for (const expectedName of CONTENT_ATTRIBUTE_NAMES) {
+      const file = fields[offset++];
+      const name = fields[offset++];
+      const value = fields[offset++];
+      if (file !== expectedFile ||
+          name !== expectedName ||
+          typeof value !== 'string' ||
+          value.length === 0) {
+        throw codedError('controller_source_manifest_git_attributes_invalid');
+      }
+      values[name] = value;
+    }
+    attributes.set(expectedFile, Object.freeze(values));
+  }
+  return attributes;
+}
+
 function gitBlobObjectId(bytes) {
   const body = Buffer.isBuffer(bytes) ? bytes : Buffer.from(bytes);
   return crypto.createHash('sha1')
@@ -258,14 +327,56 @@ function gitBlobObjectId(bytes) {
     .digest('hex');
 }
 
-function gitBlobMatchesWorkingTreeBytes(expectedObjectId, bytes) {
+function gitBlobMatchesWorkingTreeBytes(
+  expectedObjectId,
+  relativeFile,
+  bytes,
+  attributes
+) {
   if (gitBlobObjectId(bytes) === expectedObjectId) return true;
-  if (!bytes.includes(Buffer.from('\r\n', 'ascii'))) return false;
+  if (!relativeFile.endsWith('.ps1') ||
+      !exactKeys(attributes, CONTENT_ATTRIBUTE_NAMES) ||
+      attributes.text !== 'set' ||
+      attributes.eol !== 'crlf' ||
+      attributes.ident !== 'unspecified' ||
+      attributes.filter !== 'unspecified' ||
+      attributes['working-tree-encoding'] !== 'unspecified' ||
+      attributes.crlf !== 'unspecified' ||
+      bytes.includes(0) ||
+      !bytes.includes(Buffer.from('\r\n', 'ascii'))) {
+    return false;
+  }
   const normalized = Buffer.from(
     bytes.toString('latin1').replace(/\r\n/g, '\n'),
     'latin1'
   );
-  return gitBlobObjectId(normalized) === expectedObjectId;
+  if (normalized.includes(Buffer.from('\r\n', 'ascii')) ||
+      gitBlobObjectId(normalized) !== expectedObjectId) {
+    return false;
+  }
+  const checkoutBytes = Buffer.from(
+    normalized.toString('latin1').replace(/\n/g, '\r\n'),
+    'latin1'
+  );
+  return checkoutBytes.equals(bytes);
+}
+
+function validateGitAttributesPolicy(files, {
+  fsModule = fs,
+  repoRoot = REPO_ROOT
+} = {}) {
+  if (!files.includes(GIT_ATTRIBUTES_RELATIVE_PATH) ||
+      files.some(file =>
+        file !== GIT_ATTRIBUTES_RELATIVE_PATH &&
+        file.endsWith('/.gitattributes')
+      )) {
+    throw codedError('controller_source_manifest_git_attributes_invalid');
+  }
+  const file = path.resolve(repoRoot, GIT_ATTRIBUTES_RELATIVE_PATH);
+  const { bytes } = readStableRegularFile(file, { fsModule });
+  if (!bytes.equals(REQUIRED_GIT_ATTRIBUTES_BYTES)) {
+    throw codedError('controller_source_manifest_git_attributes_invalid');
+  }
 }
 
 function computeManifestDigest(manifest, {
@@ -274,7 +385,12 @@ function computeManifestDigest(manifest, {
   ...gitOptions
 } = {}) {
   const files = discoverManifestFiles(manifest, { fsModule, repoRoot });
+  validateGitAttributesPolicy(files, { fsModule, repoRoot });
   const entries = gitManifestEntries(manifest.paths, {
+    repoRoot,
+    ...gitOptions
+  });
+  const attributes = gitManifestAttributes(files, {
     repoRoot,
     ...gitOptions
   });
@@ -297,7 +413,12 @@ function computeManifestDigest(manifest, {
       throw codedError('controller_source_manifest_worktree_mode_mismatch');
     }
     const { bytes } = stable;
-    if (!gitBlobMatchesWorkingTreeBytes(entry.objectId, bytes)) {
+    if (!gitBlobMatchesWorkingTreeBytes(
+      entry.objectId,
+      relativeFile,
+      bytes,
+      attributes.get(relativeFile)
+    )) {
       throw codedError('controller_source_manifest_worktree_blob_mismatch');
     }
     const fileDigest = crypto.createHash('sha256')
@@ -370,6 +491,8 @@ function main(argv = process.argv.slice(2)) {
 if (require.main === module) main();
 
 module.exports = {
+  CONTENT_ATTRIBUTE_NAMES,
+  GIT_ATTRIBUTES_RELATIVE_PATH,
   MANIFEST_RELATIVE_PATH,
   MANIFEST_SCHEMA_VERSION,
   MAXIMUM_MANIFEST_FILES,
@@ -378,6 +501,7 @@ module.exports = {
   discoverManifestFiles,
   gitBlobObjectId,
   gitBlobMatchesWorkingTreeBytes,
+  gitManifestAttributes,
   inspectControllerSourceManifest,
   loadManifest,
   readStableRegularFile,

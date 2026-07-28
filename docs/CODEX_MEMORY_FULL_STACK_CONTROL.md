@@ -86,12 +86,16 @@ root still fails closed.
 Manifest inspection takes `O_NOFOLLOW` descriptor snapshots and requires each
 path and descriptor to retain the same owner-visible inode, mode, size, and
 nanosecond timestamps before and after the read; the bytes must also reproduce
-the exact Git `HEAD` blob object, either directly or through the sole permitted
-CRLF-to-LF checkout canonicalization. The aggregate digest still binds the
-exact worktree bytes. Lifecycle operations therefore require a quiescent owner
-worktree. Concurrent same-owner checkout or source replacement is unsupported
-and fails closed when observed. This is not a claim that a mutable checkout is
-an immutable runtime image.
+the exact Git `HEAD` blob object. The sole fallback is path- and
+HEAD-attributes-aware CRLF-to-LF canonicalization for `*.ps1` files explicitly
+marked `text eol=crlf`, with no `ident`, `filter`,
+`working-tree-encoding`, legacy `crlf`, NUL byte, mixed line ending, or nested
+attribute override. The exact root `.gitattributes` policy is itself bound by
+the manifest. The aggregate digest still binds the exact worktree bytes.
+Lifecycle operations therefore require a quiescent owner worktree. Concurrent
+same-owner checkout or source replacement is unsupported and fails closed when
+observed. This is not a claim that a mutable checkout is an immutable runtime
+image.
 
 The profile also persists the canonical VCPToolBox repository, selected VCP
 commit, declared-source digest, the non-secret Governance/Relay configuration
