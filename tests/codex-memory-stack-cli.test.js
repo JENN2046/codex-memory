@@ -59,6 +59,8 @@ const {
   profileVcpRuntimeIdentityMatches,
   providerCredentialFreshnessMatches,
   projectHttpHealthPayload,
+  relayCredentialFreshnessMatches,
+  relaySecretFileIdentities,
   readLinuxProcessStartTicks,
   readVcpProviderEnvironmentSnapshot,
   safeCode,
@@ -68,6 +70,7 @@ const {
   vcpProviderConfigDigest,
   vcpRuntimeRepository,
   writeProviderConfigIdentityReceipt,
+  writeRelaySecretIdentityReceipt,
   waitForProcessGroupExit
 } = require('../scripts/codex-memory-stack');
 
@@ -201,6 +204,7 @@ function acceptedStack(overrides = {}) {
     },
     governance: { reachable: true },
     relay: { reachable: true },
+    relayCredentialFresh: true,
     edge: {
       id: EDGE_CONTAINER_ID,
       revision: BASELINE,
@@ -1630,6 +1634,85 @@ test('provider key rotation invalidates the running shim without persisting key 
   );
 });
 
+test('Relay secret-file rotation invalidates the running process without secret disclosure', t => {
+  const root = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-stack-relay-freshness-'
+  ));
+  const privateRoot = path.join(root, 'private');
+  const runtimeRoot = path.join(root, 'runtime');
+  const pidDirectory = path.join(runtimeRoot, 'pids');
+  fs.chmodSync(root, 0o700);
+  fs.mkdirSync(privateRoot, { mode: 0o700 });
+  fs.mkdirSync(runtimeRoot, { mode: 0o700 });
+  fs.mkdirSync(pidDirectory, { mode: 0o700 });
+  const files = {
+    edgeSigningPublicKey: path.join(privateRoot, 'edge-public.pem'),
+    relayAuthToken: path.join(privateRoot, 'relay-token'),
+    relaySigningPrivateKey: path.join(privateRoot, 'relay-private.pem'),
+    relaySigningPublicKey: path.join(privateRoot, 'relay-public.pem')
+  };
+  for (const [name, file] of Object.entries(files)) {
+    fs.writeFileSync(file, `synthetic-${name}-material\n`, { mode: 0o600 });
+  }
+  const relayEnvironmentFile = path.join(privateRoot, 'relay.env');
+  fs.writeFileSync(
+    relayEnvironmentFile,
+    [
+      `CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY=file:${files.edgeSigningPublicKey}`,
+      `CODEX_MEMORY_R4_RELAY_AUTH_TOKEN=file:${files.relayAuthToken}`,
+      `CODEX_MEMORY_R4_RELAY_SIGNING_PRIVATE_KEY=file:${files.relaySigningPrivateKey}`,
+      `CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY=file:${files.relaySigningPublicKey}`
+    ].join('\n') + '\n',
+    { mode: 0o600 }
+  );
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  const relayEnvironment = loadManagedEnvironmentFile(relayEnvironmentFile);
+  const identities = relaySecretFileIdentities(
+    relayEnvironment,
+    privateRoot
+  );
+  writeRelaySecretIdentityReceipt({
+    controllerSourceCommit: CONTROLLER_SOURCE_COMMIT,
+    relayPid: process.pid,
+    relayProcessStartTicks: readLinuxProcessStartTicks(process.pid),
+    schemaVersion: 1,
+    secretFileIdentities: identities
+  }, runtimeRoot);
+  const receiptText = fs.readFileSync(
+    path.join(pidDirectory, 'relay-secret-files.identity.json'),
+    'utf8'
+  );
+  assert.equal(receiptText.includes('synthetic-'), false);
+  assert.equal(receiptText.includes(privateRoot), false);
+  const boundProfile = profile({ privateRoot });
+  assert.equal(
+    relayCredentialFreshnessMatches({
+      profile: boundProfile,
+      relayEnvironmentFile,
+      relayPid: process.pid,
+      runtimeRoot
+    }),
+    true
+  );
+
+  fs.writeFileSync(
+    files.relayAuthToken,
+    'rotated-synthetic-relay-token-material-longer\n',
+    { mode: 0o600 }
+  );
+  assert.equal(
+    relayCredentialFreshnessMatches({
+      profile: boundProfile,
+      relayEnvironmentFile,
+      relayPid: process.pid,
+      runtimeRoot
+    }),
+    false
+  );
+});
+
 test('legacy profile can bootstrap only the reviewed VCP identity into an exact v5 binding', () => {
   const identity = {
     recognized: true,
@@ -1919,6 +2002,13 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
     computeStackAccepted({
       ...accepted,
       vcpProviderCredentialFresh: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      relayCredentialFresh: false
     }),
     false
   );

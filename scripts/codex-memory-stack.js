@@ -92,6 +92,14 @@ const SENSITIVE_MANAGED_ENVIRONMENT_NAME =
   /(?:^|_)(?:PASSWORD|PRIVATE_KEY|SECRET|TOKEN)(?:_|$)/u;
 const PROVIDER_CONFIG_IDENTITY_FILENAME =
   'vcp-provider-config.identity.json';
+const RELAY_SECRET_IDENTITY_FILENAME =
+  'relay-secret-files.identity.json';
+const RELAY_SECRET_REFERENCE_NAMES = Object.freeze({
+  edgeSigningPublicKey: 'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY',
+  relayAuthToken: 'CODEX_MEMORY_R4_RELAY_AUTH_TOKEN',
+  relaySigningPrivateKey: 'CODEX_MEMORY_R4_RELAY_SIGNING_PRIVATE_KEY',
+  relaySigningPublicKey: 'CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY'
+});
 const VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE = Object.freeze({
   '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118':
     '555b3b538f6eb736e530c2912de678c5941f9985'
@@ -308,7 +316,7 @@ function resolvePrivateReference(profile, reference, options = {}) {
   return assertOwnerOnlyFile(target, options);
 }
 
-function privateReferencePath(reference, privateRoot) {
+function privateReferencePath(reference, privateRoot, options = {}) {
   if (typeof reference !== 'string' || !reference.startsWith('file:')) {
     throw codedError('stack_private_reference_invalid');
   }
@@ -316,13 +324,13 @@ function privateReferencePath(reference, privateRoot) {
   if (!path.isAbsolute(requested)) {
     throw codedError('stack_private_reference_invalid');
   }
-  const root = assertOwnerOnlyDirectory(privateRoot);
+  const root = assertOwnerOnlyDirectory(privateRoot, options);
   const target = path.resolve(requested);
   const relation = path.relative(root, target);
   if (!relation || relation.startsWith('..') || path.isAbsolute(relation)) {
     throw codedError('stack_private_reference_outside_root');
   }
-  return assertOwnerOnlyFile(target);
+  return assertOwnerOnlyFile(target, options);
 }
 
 function readRetainedBindingFile(file, {
@@ -463,10 +471,11 @@ function readVcpProviderEnvironment(file, {
 }
 
 function ownerFileIdentity(file, {
-  fsModule = fs
+  fsModule = fs,
+  maximumBytes = PRIVATE_FILE_MAX_BYTES
 } = {}) {
   const target = assertOwnerOnlyFile(file, {
-    maximumBytes: PRIVATE_FILE_MAX_BYTES,
+    maximumBytes,
     fsModule
   });
   let stat;
@@ -553,25 +562,35 @@ function validateProviderConfigIdentityReceipt(value) {
   });
 }
 
-function providerConfigIdentityReceiptPath(runtimeRoot, {
+function ownerIdentityReceiptPath(runtimeRoot, filename, {
   fsModule = fs
 } = {}) {
+  if (![PROVIDER_CONFIG_IDENTITY_FILENAME, RELAY_SECRET_IDENTITY_FILENAME]
+    .includes(filename)) {
+    throw codedError('stack_identity_receipt_name_invalid');
+  }
   const root = assertOwnerOnlyDirectory(runtimeRoot, { fsModule });
   const directory = assertOwnerOnlyDirectory(
     path.join(root, 'pids'),
     { fsModule }
   );
-  return path.join(directory, PROVIDER_CONFIG_IDENTITY_FILENAME);
+  return path.join(directory, filename);
 }
 
-function writeProviderConfigIdentityReceipt(receipt, runtimeRoot, {
-  fsModule = fs
-} = {}) {
-  const validated = validateProviderConfigIdentityReceipt(receipt);
-  const file = providerConfigIdentityReceiptPath(runtimeRoot, { fsModule });
+function writeOwnerIdentityReceipt(
+  receipt,
+  runtimeRoot,
+  { filename, validate, failureCode, fsModule = fs }
+) {
+  const validated = validate(receipt);
+  const file = ownerIdentityReceiptPath(
+    runtimeRoot,
+    filename,
+    { fsModule }
+  );
   const temporary = path.join(
     path.dirname(file),
-    `.${PROVIDER_CONFIG_IDENTITY_FILENAME}.${process.pid}.` +
+    `.${filename}.${process.pid}.` +
       `${crypto.randomBytes(6).toString('hex')}.tmp`
   );
   let descriptor;
@@ -604,24 +623,47 @@ function writeProviderConfigIdentityReceipt(receipt, runtimeRoot, {
     try {
       fsModule.unlinkSync(temporary);
     } catch {}
-    throw codedError('stack_provider_config_receipt_write_failed');
+    throw codedError(failureCode);
   }
   return validated;
 }
 
-function readProviderConfigIdentityReceipt(runtimeRoot, {
-  fsModule = fs
-} = {}) {
-  const file = providerConfigIdentityReceiptPath(runtimeRoot, { fsModule });
+function readOwnerIdentityReceipt(
+  runtimeRoot,
+  { filename, validate, failureCode, fsModule = fs }
+) {
+  const file = ownerIdentityReceiptPath(
+    runtimeRoot,
+    filename,
+    { fsModule }
+  );
   assertOwnerOnlyFile(file, { maximumBytes: 4096, fsModule });
   try {
-    return validateProviderConfigIdentityReceipt(
+    return validate(
       JSON.parse(fsModule.readFileSync(file, 'utf8'))
     );
   } catch (error) {
     if (error?.code?.startsWith?.('stack_')) throw error;
-    throw codedError('stack_provider_config_receipt_invalid');
+    throw codedError(failureCode);
   }
+}
+
+function writeProviderConfigIdentityReceipt(receipt, runtimeRoot, options = {}) {
+  return writeOwnerIdentityReceipt(receipt, runtimeRoot, {
+    ...options,
+    filename: PROVIDER_CONFIG_IDENTITY_FILENAME,
+    validate: validateProviderConfigIdentityReceipt,
+    failureCode: 'stack_provider_config_receipt_write_failed'
+  });
+}
+
+function readProviderConfigIdentityReceipt(runtimeRoot, options = {}) {
+  return readOwnerIdentityReceipt(runtimeRoot, {
+    ...options,
+    filename: PROVIDER_CONFIG_IDENTITY_FILENAME,
+    validate: validateProviderConfigIdentityReceipt,
+    failureCode: 'stack_provider_config_receipt_invalid'
+  });
 }
 
 function providerCredentialFreshnessMatches({
@@ -651,6 +693,135 @@ function providerCredentialFreshnessMatches({
         receipt.providerConfigIdentity,
         providerConfigIdentity ||
           ownerFileIdentity(providerConfigFile, { fsModule })
+      );
+  } catch {
+    return false;
+  }
+}
+
+function relaySecretFileIdentities(environment, privateRoot, {
+  fsModule = fs
+} = {}) {
+  const identities = {};
+  for (const [identityName, environmentName] of Object.entries(
+    RELAY_SECRET_REFERENCE_NAMES
+  )) {
+    const target = privateReferencePath(
+      environment?.[environmentName],
+      privateRoot,
+      { fsModule }
+    );
+    identities[identityName] = ownerFileIdentity(target, {
+      fsModule,
+      maximumBytes: 16_384
+    });
+  }
+  return Object.freeze(Object.fromEntries(
+    Object.entries(identities).map(([name, identity]) => [
+      name,
+      Object.freeze(identity)
+    ])
+  ));
+}
+
+function fileIdentitySetMatches(left, right) {
+  return Boolean(
+    left && right &&
+    exactKeys(left, Object.keys(RELAY_SECRET_REFERENCE_NAMES)) &&
+    exactKeys(right, Object.keys(RELAY_SECRET_REFERENCE_NAMES)) &&
+    Object.keys(RELAY_SECRET_REFERENCE_NAMES).every(name =>
+      fileIdentityMatches(left[name], right[name])
+    )
+  );
+}
+
+function validateRelaySecretIdentityReceipt(value) {
+  const relayPid = parsePid(value?.relayPid);
+  if (!exactKeys(value, [
+    'controllerSourceCommit',
+    'relayPid',
+    'relayProcessStartTicks',
+    'schemaVersion',
+    'secretFileIdentities'
+  ]) ||
+      value.schemaVersion !== 1 ||
+      !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') ||
+      relayPid === null ||
+      value.relayPid !== relayPid ||
+      !/^[1-9][0-9]{0,39}$/u.test(
+        value.relayProcessStartTicks || ''
+      ) ||
+      !fileIdentitySetMatches(
+        value.secretFileIdentities,
+        value.secretFileIdentities
+      )) {
+    throw codedError('stack_relay_secret_receipt_invalid');
+  }
+  return Object.freeze({
+    controllerSourceCommit: value.controllerSourceCommit,
+    relayPid,
+    relayProcessStartTicks: value.relayProcessStartTicks,
+    schemaVersion: 1,
+    secretFileIdentities: Object.freeze(Object.fromEntries(
+      Object.entries(value.secretFileIdentities).map(([name, identity]) => [
+        name,
+        Object.freeze({ ...identity })
+      ])
+    ))
+  });
+}
+
+function writeRelaySecretIdentityReceipt(receipt, runtimeRoot, options = {}) {
+  return writeOwnerIdentityReceipt(receipt, runtimeRoot, {
+    ...options,
+    filename: RELAY_SECRET_IDENTITY_FILENAME,
+    validate: validateRelaySecretIdentityReceipt,
+    failureCode: 'stack_relay_secret_receipt_write_failed'
+  });
+}
+
+function readRelaySecretIdentityReceipt(runtimeRoot, options = {}) {
+  return readOwnerIdentityReceipt(runtimeRoot, {
+    ...options,
+    filename: RELAY_SECRET_IDENTITY_FILENAME,
+    validate: validateRelaySecretIdentityReceipt,
+    failureCode: 'stack_relay_secret_receipt_invalid'
+  });
+}
+
+function relayCredentialFreshnessMatches({
+  profile,
+  relayEnvironmentFile,
+  relayPid,
+  runtimeRoot
+}, {
+  fsModule = fs,
+  readStartTicks = readLinuxProcessStartTicks
+} = {}) {
+  try {
+    if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+        parsePid(relayPid) === null) {
+      return false;
+    }
+    const environment = loadManagedEnvironmentFile(
+      relayEnvironmentFile,
+      { fsModule }
+    );
+    const receipt = readRelaySecretIdentityReceipt(
+      runtimeRoot,
+      { fsModule }
+    );
+    return receipt.controllerSourceCommit === profile.controllerSourceCommit &&
+      receipt.relayPid === relayPid &&
+      receipt.relayProcessStartTicks ===
+        readStartTicks(relayPid, { fsModule }) &&
+      fileIdentitySetMatches(
+        receipt.secretFileIdentities,
+        relaySecretFileIdentities(
+          environment,
+          profile.privateRoot,
+          { fsModule }
+        )
       );
   } catch {
     return false;
@@ -2456,6 +2627,7 @@ function computeRuntimeAccepted({
   httpHealth,
   governance,
   relay,
+  relayCredentialFresh,
   edge,
   retainedBindingMatch
 }) {
@@ -2482,6 +2654,7 @@ function computeRuntimeAccepted({
     governance?.reachable === true &&
     processes?.relay?.managed === true &&
     relay?.reachable === true &&
+    relayCredentialFresh === true &&
     edge?.running === true &&
     edge?.healthy === true &&
     profileEdgeIdentityMatches(profile, edge)
@@ -2622,6 +2795,12 @@ async function inspectStack({
   );
   const relayListenerOwned = processes.relay.managed &&
     processOwnsUnixListener(processes.relay.pid, relaySocketPath);
+  const relayCredentialFresh = relayCredentialFreshnessMatches({
+    profile,
+    relayEnvironmentFile: relayEnvironment,
+    relayPid: processes.relay.pid,
+    runtimeRoot: runtimeDirectory(environment)
+  });
   const relay = Object.freeze({
     ...(
       relayListenerOwned
@@ -2634,7 +2813,8 @@ async function inspectStack({
         ))
         : lowDisclosureRelayProjection(null)
     ),
-    listenerIdentityMatch: relayListenerOwned
+    listenerIdentityMatch: relayListenerOwned,
+    credentialFresh: relayCredentialFresh
   });
   let edge;
   try {
@@ -2674,6 +2854,7 @@ async function inspectStack({
     httpHealth,
     governance,
     relay,
+    relayCredentialFresh,
     edge,
     retainedBindingMatch
   });
@@ -2693,6 +2874,7 @@ async function inspectStack({
     httpHealth,
     governance,
     relay,
+    relayCredentialFresh,
     edge,
     retainedBindingMatch
   });
@@ -3031,6 +3213,19 @@ async function startStack({
     })) {
       throw codedError('stack_controlled_transition_required');
     }
+    const relayBefore = inspectManagedProcess(
+      'relay',
+      { environment, profile }
+    );
+    if (relayBefore.running &&
+        !relayCredentialFreshnessMatches({
+          profile,
+          relayEnvironmentFile: relayEnvironment,
+          relayPid: relayBefore.pid,
+          runtimeRoot: runtimeDirectory(environment)
+        })) {
+      throw codedError('stack_relay_credential_stale');
+    }
     const started = new Set();
     try {
       const shimState = inspectManagedProcess('shim', { environment, profile });
@@ -3185,6 +3380,14 @@ async function startStack({
         );
         return lowDisclosureRelayProjection(result).reachable;
       }, { failureCode: 'stack_relay_start_timeout' });
+      if (!relayCredentialFreshnessMatches({
+        profile,
+        relayEnvironmentFile: relayEnvironment,
+        relayPid: relayProcess.pid,
+        runtimeRoot: runtimeDirectory(environment)
+      })) {
+        throw codedError('stack_relay_credential_stale');
+      }
 
       const result = await inspectStack({ environment, profile });
       if (!result.accepted) throw codedError('stack_final_acceptance_failed');
@@ -3827,6 +4030,10 @@ async function runRelayChild() {
   );
   process.env.CODEX_MEMORY_R5_RELAY_OBSERVER_UDS_PATH =
     path.join(runtimeRoot, 'relay-observer.sock');
+  const secretFileIdentitiesBefore = relaySecretFileIdentities(
+    process.env,
+    privateRoot
+  );
   const {
     createCanonicalOutboundRelayService
   } = require('../apps/local-recall-relay/outbound-main');
@@ -3842,6 +4049,24 @@ async function runRelayChild() {
       });
     }
   });
+  const secretFileIdentitiesAfter = relaySecretFileIdentities(
+    process.env,
+    privateRoot
+  );
+  if (!fileIdentitySetMatches(
+    secretFileIdentitiesBefore,
+    secretFileIdentitiesAfter
+  )) {
+    throw codedError('stack_relay_secret_identity_changed');
+  }
+  writeRelaySecretIdentityReceipt({
+    controllerSourceCommit:
+      process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
+    relayPid: process.pid,
+    relayProcessStartTicks: readLinuxProcessStartTicks(process.pid),
+    schemaVersion: 1,
+    secretFileIdentities: secretFileIdentitiesAfter
+  }, runtimeRoot);
   process.stdout.write(`${JSON.stringify({
     accepted: true,
     component: 'outbound_relay',
@@ -4032,6 +4257,8 @@ module.exports = {
   providerCredentialFreshnessMatches,
   projectHttpHealthPayload,
   probeUnixSocket,
+  relayCredentialFreshnessMatches,
+  relaySecretFileIdentities,
   readLinuxProcessStartTicks,
   readPidFile,
   readVcpProviderEnvironmentSnapshot,
@@ -4042,5 +4269,6 @@ module.exports = {
   vcpProviderConfigDigest,
   vcpRuntimeRepository,
   writeProviderConfigIdentityReceipt,
+  writeRelaySecretIdentityReceipt,
   waitForProcessGroupExit
 };
