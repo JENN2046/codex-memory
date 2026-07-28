@@ -663,6 +663,56 @@ function readProcessIdentity(pid, fsModule = fs) {
   }
 }
 
+function processEnvironmentExactlyMatches(pid, expected, {
+  fsModule = fs,
+  maximumBytes = PRIVATE_FILE_MAX_BYTES
+} = {}) {
+  const normalizedPid = parsePid(pid);
+  if (normalizedPid === null ||
+      !expected ||
+      typeof expected !== 'object' ||
+      Array.isArray(expected) ||
+      !Number.isSafeInteger(maximumBytes) ||
+      maximumBytes < 1) {
+    return false;
+  }
+  const expectedNames = Object.keys(expected);
+  if (expectedNames.some(name =>
+    !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(name) ||
+    typeof expected[name] !== 'string' ||
+    expected[name].includes('\0')
+  )) {
+    return false;
+  }
+  let value;
+  try {
+    value = fsModule.readFileSync(`/proc/${normalizedPid}/environ`);
+  } catch {
+    return false;
+  }
+  const buffer = Buffer.isBuffer(value) ? value : Buffer.from(value);
+  if (buffer.length < 1 ||
+      buffer.length > maximumBytes ||
+      buffer[buffer.length - 1] !== 0) {
+    return false;
+  }
+  const seen = new Set();
+  let start = 0;
+  while (start < buffer.length) {
+    const end = buffer.indexOf(0, start);
+    if (end < start || end === start) return false;
+    const separator = buffer.indexOf(0x3D, start);
+    if (separator <= start || separator >= end) return false;
+    const name = buffer.subarray(start, separator).toString('utf8');
+    if (!Object.hasOwn(expected, name) || seen.has(name)) return false;
+    const expectedEntry = Buffer.from(`${name}=${expected[name]}`, 'utf8');
+    if (!buffer.subarray(start, end).equals(expectedEntry)) return false;
+    seen.add(name);
+    start = end + 1;
+  }
+  return seen.size === expectedNames.length;
+}
+
 function nodeProcessIdentityMatches(identity, {
   fsModule = fs
 } = {}) {
@@ -849,11 +899,28 @@ function inspectManagedProcess(name, {
       }
     )
     : null;
+  let controllerEnvironmentBound = false;
+  if (state.running && commandKind === 'controller') {
+    try {
+      const environmentFile = expectedComponentEnvironmentFile(name, profile);
+      const expectedEnvironment = buildControllerChildEnvironment(
+        environmentFile,
+        { profile, environment, fsModule }
+      );
+      controllerEnvironmentBound = processEnvironmentExactlyMatches(
+        state.pid,
+        expectedEnvironment,
+        { fsModule }
+      );
+    } catch {}
+  }
   return Object.freeze({
     pid: state.pid,
     running: state.running,
     managed: state.running && commandKind !== null,
-    controllerManaged: state.running && commandKind === 'controller'
+    controllerManaged: state.running &&
+      commandKind === 'controller' &&
+      controllerEnvironmentBound
   });
 }
 
@@ -1481,13 +1548,16 @@ async function prepareStaleOwnerSocket(socketPath, privateRoot, {
   return true;
 }
 
-function runChildProbe(mode, environmentFile, {
+function buildControllerChildEnvironment(environmentFile, {
   profile,
   environment = process.env,
   expectedHttpPid = null,
-  exec = execFileSync
+  fsModule = fs
 } = {}) {
-  const managedEnvironment = loadManagedEnvironmentFile(environmentFile);
+  const managedEnvironment = loadManagedEnvironmentFile(
+    environmentFile,
+    { fsModule }
+  );
   const childEnvironment = {
     ...childBaseEnvironment(environment),
     ...managedEnvironment,
@@ -1500,11 +1570,28 @@ function runChildProbe(mode, environmentFile, {
     CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE:
       profile.retainedBindingSource
   };
-  if (mode === '_probe-http') {
+  if (expectedHttpPid !== null) {
     const pid = parsePid(expectedHttpPid);
     if (pid === null) throw codedError('stack_http_listener_identity_missing');
     childEnvironment.CODEX_MEMORY_STACK_EXPECTED_HTTP_PID = String(pid);
   }
+  return Object.freeze(childEnvironment);
+}
+
+function runChildProbe(mode, environmentFile, {
+  profile,
+  environment = process.env,
+  expectedHttpPid = null,
+  exec = execFileSync
+} = {}) {
+  const childEnvironment = buildControllerChildEnvironment(
+    environmentFile,
+    {
+      profile,
+      environment,
+      expectedHttpPid: mode === '_probe-http' ? expectedHttpPid : null
+    }
+  );
   try {
     const output = exec(process.execPath, [
       SCRIPT_PATH,
@@ -1818,30 +1905,54 @@ function writePidFile(file, pid) {
   fs.chmodSync(file, 0o600);
 }
 
-function finalizeManagedSpawn(child, pidFile, {
+async function waitForProcessGroupExit(pid, {
+  kill = process.kill,
+  wait = delay => new Promise(resolve => setTimeout(resolve, delay)),
+  attempts = 100,
+  intervalMs = 100
+} = {}) {
+  if (!Number.isSafeInteger(pid) || pid <= 1 ||
+      !Number.isSafeInteger(attempts) || attempts < 1 ||
+      !Number.isSafeInteger(intervalMs) || intervalMs < 0) {
+    return false;
+  }
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      kill(-pid, 0);
+    } catch (error) {
+      if (error?.code === 'ESRCH') return true;
+      return false;
+    }
+    if (attempt + 1 < attempts) await wait(intervalMs);
+  }
+  return false;
+}
+
+async function finalizeManagedSpawn(child, pidFile, {
   writePid = writePidFile,
-  kill = process.kill
+  kill = process.kill,
+  waitForExit = waitForProcessGroupExit
 } = {}) {
   try {
     writePid(pidFile, child?.pid);
   } catch {
-    let terminated = false;
-    if (Number.isSafeInteger(child?.pid) && child.pid > 1) {
+    if (!Number.isSafeInteger(child?.pid) || child.pid <= 1) {
+      throw codedError('stack_pid_file_cleanup_failed');
+    }
+    let exited = false;
+    try {
+      kill(-child.pid, 'SIGTERM');
+    } catch (error) {
+      exited = error?.code === 'ESRCH';
+    }
+    if (!exited) {
       try {
-        kill(-child.pid, 'SIGTERM');
-        terminated = true;
-      } catch (error) {
-        terminated = error?.code === 'ESRCH';
+        exited = await waitForExit(child.pid, { kill });
+      } catch {
+        exited = false;
       }
     }
-    if (!terminated && typeof child?.kill === 'function') {
-      try {
-        terminated = child.kill('SIGTERM') === true;
-      } catch {}
-    }
-    if (!terminated &&
-        child?.exitCode === null &&
-        child?.signalCode === null) {
+    if (!exited) {
       throw codedError('stack_pid_file_cleanup_failed');
     }
     throw codedError('stack_pid_file_write_failed');
@@ -1850,7 +1961,7 @@ function finalizeManagedSpawn(child, pidFile, {
   return true;
 }
 
-function spawnManaged(name, mode, environmentFile, {
+async function spawnManaged(name, mode, environmentFile, {
   profile,
   environment = process.env
 }) {
@@ -1859,7 +1970,7 @@ function spawnManaged(name, mode, environmentFile, {
     if (!existing.managed) throw codedError('stack_unmanaged_process_detected');
     return Object.freeze({ started: false, pid: existing.pid });
   }
-  const root = ensureRuntimeDirectories(environment);
+  ensureRuntimeDirectories(environment);
   const locations = componentPaths(name, environment);
   const logDescriptor = fs.openSync(
     locations.log,
@@ -1867,19 +1978,10 @@ function spawnManaged(name, mode, environmentFile, {
     0o600
   );
   fs.chmodSync(locations.log, 0o600);
-  const managedEnvironment = loadManagedEnvironmentFile(environmentFile);
-  const childEnvironment = {
-    ...childBaseEnvironment(environment),
-    ...managedEnvironment,
-    CODEX_MEMORY_STACK_CHILD: '1',
-    CODEX_MEMORY_STACK_PRIVATE_ROOT: profile.privateRoot,
-    CODEX_MEMORY_STACK_RUNTIME_BASELINE: profile.runtimeBaseline,
-    CODEX_MEMORY_STACK_RUNTIME_DIR: root,
-    CODEX_MEMORY_STACK_RETAINED_BINDING_FILE:
-      resolvePrivateReference(profile, profile.retainedBinding),
-    CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE:
-      profile.retainedBindingSource
-  };
+  const childEnvironment = buildControllerChildEnvironment(
+    environmentFile,
+    { profile, environment }
+  );
   let child;
   try {
     child = spawn(process.execPath, [
@@ -1895,7 +1997,7 @@ function spawnManaged(name, mode, environmentFile, {
   } finally {
     fs.closeSync(logDescriptor);
   }
-  finalizeManagedSpawn(child, locations.pid);
+  await finalizeManagedSpawn(child, locations.pid);
   return Object.freeze({ started: true, pid: child.pid });
 }
 
@@ -2009,7 +2111,7 @@ async function startStack({
       if (!shimState.running && await portListening(7615)) {
         throw codedError('stack_unmanaged_shim_listener');
       }
-      const shim = spawnManaged('shim', '_run-shim', governanceEnvironment, {
+      const shim = await spawnManaged('shim', '_run-shim', governanceEnvironment, {
         profile,
         environment
       });
@@ -2022,10 +2124,12 @@ async function startStack({
       if (!httpState.running && await portListening(7605)) {
         throw codedError('stack_unmanaged_http_listener');
       }
-      const httpProcess = spawnManaged('http', '_run-http', governanceEnvironment, {
-        profile,
-        environment
-      });
+      const httpProcess = await spawnManaged(
+        'http',
+        '_run-http',
+        governanceEnvironment,
+        { profile, environment }
+      );
       if (httpProcess.started) started.add('http');
       await waitFor(() => {
         const state = inspectManagedProcess('http', { environment, profile });
@@ -2061,7 +2165,7 @@ async function startStack({
           throw codedError('stack_governance_socket_preparation_failed');
         }
       }
-      const governanceProcess = spawnManaged(
+      const governanceProcess = await spawnManaged(
         'governance',
         '_run-governance',
         governanceEnvironment,
@@ -2094,10 +2198,12 @@ async function startStack({
         failureCode: 'stack_edge_start_timeout'
       });
 
-      const relayProcess = spawnManaged('relay', '_run-relay', relayEnvironment, {
-        profile,
-        environment
-      });
+      const relayProcess = await spawnManaged(
+        'relay',
+        '_run-relay',
+        relayEnvironment,
+        { profile, environment }
+      );
       if (relayProcess.started) started.add('relay');
       await waitFor(() => {
         const result = runChildProbe('_probe-relay', relayEnvironment, {
@@ -2241,17 +2347,12 @@ async function adoptRunningStack({
       edgeContainer: EDGE_CONTAINER_DEFAULT
     });
     for (const name of Object.keys(COMPONENTS)) {
-      const identity = identities[name].identity;
-      if (!controllerCommandMatchesComponent(
+      const managedState = inspectManagedProcess(
         name,
-        identity.command,
-        {
-          executable: identity.executable,
-          cwd: identity.cwd,
-          profile,
-          environment
-        }
-      )) {
+        { profile, environment }
+      );
+      if (managedState.pid !== identities[name].pid ||
+          !managedState.controllerManaged) {
         throw codedError(
           name === 'http'
             ? 'stack_adoption_http_storage_binding_unproven'
@@ -2775,6 +2876,7 @@ module.exports = {
   assertRelativeReference,
   buildHttpChildEnvironment,
   buildShimChildEnvironment,
+  buildControllerChildEnvironment,
   childBaseEnvironment,
   commandMatchesComponent,
   computeRuntimeAccepted,
@@ -2797,6 +2899,7 @@ module.exports = {
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
+  processEnvironmentExactlyMatches,
   processOwnsLoopbackTcpListener,
   profileEdgeIdentityMatches,
   profileProviderIdentityMatches,
@@ -2806,5 +2909,6 @@ module.exports = {
   safeCode,
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
-  validateProfile
+  validateProfile,
+  waitForProcessGroupExit
 };

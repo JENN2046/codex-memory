@@ -51,8 +51,11 @@ Adoption accepts only processes launched through this controller's exact
 `_run-* --stack-environment=...` commands. Legacy process identities remain
 recognizable only for a controlled shutdown of an already adopted stack; they
 cannot become a new accepted profile or be mixed into an accepted restart.
-For HTTP, this specifically keeps legacy storage paths and initialization side
-effects outside the adoption boundary.
+The candidate process environment read from Linux `/proc` must also exactly
+match the controller-built, allowlisted environment, including the isolated
+runtime root and retained binding. No environment values are returned. For
+HTTP, these checks specifically keep legacy or substituted storage paths and
+initialization side effects outside the adoption boundary.
 
 ## Start Semantics
 
@@ -102,8 +105,10 @@ dependency, and native-write-off posture.
 
 Each managed child is released from the controller's process handle only after
 its owner-only PID file is durably written. If PID persistence fails, the
-controller terminates the newly created process group and reports a fail-closed
-error instead of leaving an unmanaged listener.
+controller sends `SIGTERM` to the newly created process group and waits for
+Linux to confirm that the complete group has exited. It reports a distinct
+incomplete-cleanup failure if exit cannot be proved, rather than claiming that
+an unmanaged listener was removed. It never escalates to `SIGKILL`.
 
 If runtime-critical source, the accepted baseline, owner profile, or Edge
 container changes, startup fails closed. Reprovision and complete a fresh

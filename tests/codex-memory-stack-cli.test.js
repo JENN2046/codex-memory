@@ -40,6 +40,7 @@ const {
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
+  processEnvironmentExactlyMatches,
   processOwnsLoopbackTcpListener,
   profileEdgeIdentityMatches,
   profileProviderIdentityMatches,
@@ -47,7 +48,8 @@ const {
   safeCode,
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
-  validateProfile
+  validateProfile,
+  waitForProcessGroupExit
 } = require('../scripts/codex-memory-stack');
 
 const BASELINE = '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118';
@@ -250,6 +252,63 @@ test('PID liveness treats a successful kill zero probe as alive', () => {
   }), false);
 });
 
+test('controller process environment must exactly bind the isolated runtime', () => {
+  const expected = {
+    PATH: '/usr/bin:/bin',
+    CODEX_MEMORY_STACK_CHILD: '1',
+    CODEX_MEMORY_STACK_RUNTIME_DIR: '/owner/isolated-runtime'
+  };
+  const environmentBuffer = Buffer.from([
+    'CODEX_MEMORY_STACK_RUNTIME_DIR=/owner/isolated-runtime',
+    'PATH=/usr/bin:/bin',
+    'CODEX_MEMORY_STACK_CHILD=1',
+    ''
+  ].join('\0'));
+  const fsModule = {
+    readFileSync(file) {
+      assert.equal(file, '/proc/4321/environ');
+      return environmentBuffer;
+    }
+  };
+  assert.equal(
+    processEnvironmentExactlyMatches(4321, expected, { fsModule }),
+    true
+  );
+  assert.equal(
+    processEnvironmentExactlyMatches(4321, {
+      ...expected,
+      CODEX_MEMORY_STACK_RUNTIME_DIR: '/owner/real-private-store'
+    }, { fsModule }),
+    false
+  );
+  assert.equal(
+    processEnvironmentExactlyMatches(4321, expected, {
+      fsModule: {
+        readFileSync() {
+          return Buffer.from([
+            'CODEX_MEMORY_STACK_RUNTIME_DIR=/owner/isolated-runtime',
+            'PATH=/usr/bin:/bin',
+            'CODEX_MEMORY_STACK_CHILD=1',
+            'LD_AUDIT=/untrusted/audit.so',
+            ''
+          ].join('\0'));
+        }
+      }
+    }),
+    false
+  );
+  assert.equal(
+    processEnvironmentExactlyMatches(4321, expected, {
+      fsModule: {
+        readFileSync() {
+          return environmentBuffer.subarray(0, environmentBuffer.length - 1);
+        }
+      }
+    }),
+    false
+  );
+});
+
 test('HTTP listener ownership binds loopback port to the recorded process socket', () => {
   const tcp = [
     '  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode',
@@ -417,7 +476,7 @@ test('lifecycle lock recovers only a well-formed dead-owner lock', t => {
   assert.equal(fs.readFileSync(file, 'utf8'), 'not-a-pid\n');
 });
 
-test('managed spawn persists PID before unref and terminates its process group on failure', () => {
+test('managed spawn persists PID before unref and confirms failed spawns exit', async () => {
   let written = null;
   let unreferenced = false;
   const child = {
@@ -428,7 +487,7 @@ test('managed spawn persists PID before unref and terminates its process group o
       unreferenced = true;
     }
   };
-  assert.equal(finalizeManagedSpawn(child, '/owner/component.pid', {
+  assert.equal(await finalizeManagedSpawn(child, '/owner/component.pid', {
     writePid(file, pid) {
       written = { file, pid };
     }
@@ -441,38 +500,62 @@ test('managed spawn persists PID before unref and terminates its process group o
 
   unreferenced = false;
   let signal = null;
-  assert.throws(
-    () => finalizeManagedSpawn(child, '/owner/component.pid', {
+  let waitedFor = null;
+  await assert.rejects(
+    finalizeManagedSpawn(child, '/owner/component.pid', {
       writePid() {
         throw new Error('synthetic write failure');
       },
       kill(pid, sentSignal) {
         signal = { pid, sentSignal };
+      },
+      async waitForExit(pid, options) {
+        waitedFor = { pid, kill: options.kill };
+        return true;
       }
     }),
     { code: 'stack_pid_file_write_failed' }
   );
   assert.deepEqual(signal, { pid: -4321, sentSignal: 'SIGTERM' });
+  assert.equal(waitedFor.pid, 4321);
+  assert.equal(typeof waitedFor.kill, 'function');
   assert.equal(unreferenced, false);
 
-  assert.throws(
-    () => finalizeManagedSpawn({
-      ...child,
-      kill() {
-        return false;
-      }
-    }, '/owner/component.pid', {
+  await assert.rejects(
+    finalizeManagedSpawn(child, '/owner/component.pid', {
       writePid() {
         throw new Error('synthetic write failure');
       },
-      kill() {
-        const error = new Error('not permitted');
-        error.code = 'EPERM';
-        throw error;
+      kill() {},
+      async waitForExit() {
+        return false;
       }
     }),
     { code: 'stack_pid_file_cleanup_failed' }
   );
+
+  let probes = 0;
+  let waits = 0;
+  assert.equal(await waitForProcessGroupExit(4321, {
+    kill(pid, signal) {
+      assert.equal(pid, -4321);
+      assert.equal(signal, 0);
+      probes += 1;
+      if (probes >= 3) {
+        const error = new Error('gone');
+        error.code = 'ESRCH';
+        throw error;
+      }
+    },
+    async wait(delay) {
+      assert.equal(delay, 0);
+      waits += 1;
+    },
+    attempts: 3,
+    intervalMs: 0
+  }), true);
+  assert.equal(probes, 3);
+  assert.equal(waits, 2);
 });
 
 test('governance stale-socket cleanup rejects active sockets and never unlinks them', async t => {
