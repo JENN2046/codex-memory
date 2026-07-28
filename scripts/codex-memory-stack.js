@@ -1,0 +1,1603 @@
+#!/usr/bin/env node
+'use strict';
+
+const crypto = require('node:crypto');
+const fs = require('node:fs');
+const http = require('node:http');
+const net = require('node:net');
+const os = require('node:os');
+const path = require('node:path');
+const {
+  execFile,
+  execFileSync,
+  spawn
+} = require('node:child_process');
+
+const REPO_ROOT = path.resolve(__dirname, '..');
+const SCRIPT_PATH = path.resolve(__filename);
+const PROFILE_SCHEMA_VERSION = 1;
+const PROFILE_FILENAME = 'full-stack-control.json';
+const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
+const EDGE_CONTAINER_DEFAULT = 'codex-memory-full-stack-001-edge';
+const CONTROLLER_CHANGE_PATHS = new Set([
+  'docs/CODEX_MEMORY_FULL_STACK_CONTROL.md',
+  'scripts/codex-memory-stack.js',
+  'tests/codex-memory-stack-cli.test.js'
+]);
+const COMPONENTS = Object.freeze({
+  shim: Object.freeze({
+    pidFile: 'vcp-native-shim.pid',
+    logFile: 'vcp-native-shim.log',
+    commandMarkers: Object.freeze([
+      'vcp-toolbox-native-mcp-shim.js',
+      '_run-shim'
+    ])
+  }),
+  http: Object.freeze({
+    pidFile: 'codex-memory-http.pid',
+    logFile: 'codex-memory-http.log',
+    commandMarkers: Object.freeze([
+      'src/http-index.js',
+      '_run-http'
+    ])
+  }),
+  governance: Object.freeze({
+    pidFile: 'governance.pid',
+    logFile: 'governance.log',
+    commandMarkers: Object.freeze([
+      'governance-runner.js',
+      '_run-governance'
+    ])
+  }),
+  relay: Object.freeze({
+    pidFile: 'relay.pid',
+    logFile: 'relay.log',
+    commandMarkers: Object.freeze([
+      'relay-runner.js',
+      '_run-relay'
+    ])
+  })
+});
+const PROFILE_KEYS = Object.freeze([
+  'edgeContainer',
+  'governanceEnvironment',
+  'privateRoot',
+  'relayEnvironment',
+  'retainedBinding',
+  'runtimeBaseline',
+  'schemaVersion'
+]);
+const PRIVATE_FILE_MAX_BYTES = 262_144;
+const SAFE_GIT_OBJECT = /^[a-f0-9]{40}$/u;
+const SAFE_CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u;
+const SAFE_CODE = /^[a-z][a-z0-9_]{0,95}$/u;
+
+function codedError(code) {
+  const safe = SAFE_CODE.test(code || '') ? code : 'codex_memory_stack_failed';
+  return Object.assign(new Error(safe), { code: safe });
+}
+
+function safeCode(error, fallback = 'codex_memory_stack_failed') {
+  const candidate = error?.code || error?.message;
+  return SAFE_CODE.test(candidate || '') ? candidate : fallback;
+}
+
+function exactKeys(value, expected) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const actual = Object.keys(value).sort();
+  const wanted = [...expected].sort();
+  return actual.length === wanted.length &&
+    actual.every((key, index) => key === wanted[index]);
+}
+
+function currentUid() {
+  if (typeof process.getuid !== 'function') throw codedError('stack_owner_uid_unavailable');
+  return process.getuid();
+}
+
+function defaultPrivateRoot(environment = process.env) {
+  const dataHome = environment.XDG_DATA_HOME ||
+    path.join(os.homedir(), '.local', 'share');
+  return path.resolve(dataHome, 'codex-memory');
+}
+
+function discoverPrivateRoot(files, {
+  environment = process.env,
+  fsModule = fs
+} = {}) {
+  if (!Array.isArray(files) || files.length < 1) {
+    throw codedError('stack_private_root_discovery_invalid');
+  }
+  const searchBoundary = defaultPrivateRoot(environment);
+  const resolvedFiles = files.map(file => assertOwnerOnlyFile(file, { fsModule }));
+  if (resolvedFiles.some(file => {
+    const relation = path.relative(searchBoundary, file);
+    return !relation || relation.startsWith('..') || path.isAbsolute(relation);
+  })) {
+    throw codedError('stack_private_root_discovery_outside_boundary');
+  }
+  let candidate = path.dirname(resolvedFiles[0]);
+  while (candidate !== searchBoundary && candidate.startsWith(`${searchBoundary}${path.sep}`)) {
+    const containsAll = resolvedFiles.every(file => {
+      const relation = path.relative(candidate, file);
+      return relation && !relation.startsWith('..') && !path.isAbsolute(relation);
+    });
+    if (containsAll) {
+      const binding = path.join(candidate, 'r5m-exact-head', 'private-binding.json');
+      try {
+        assertOwnerOnlyDirectory(candidate, { fsModule });
+        assertOwnerOnlyFile(binding, { fsModule });
+        return candidate;
+      } catch {}
+    }
+    candidate = path.dirname(candidate);
+  }
+  throw codedError('stack_private_root_discovery_failed');
+}
+
+function profilePath(environment = process.env) {
+  if (environment.CODEX_MEMORY_STACK_PROFILE) {
+    if (!path.isAbsolute(environment.CODEX_MEMORY_STACK_PROFILE)) {
+      throw codedError('stack_profile_path_invalid');
+    }
+    return path.resolve(environment.CODEX_MEMORY_STACK_PROFILE);
+  }
+  const configHome = environment.XDG_CONFIG_HOME ||
+    path.join(os.homedir(), '.config');
+  return path.resolve(configHome, 'codex-memory', PROFILE_FILENAME);
+}
+
+function runtimeDirectory(environment = process.env) {
+  const root = environment.XDG_RUNTIME_DIR ||
+    path.join('/run/user', String(currentUid()));
+  if (!path.isAbsolute(root)) throw codedError('stack_runtime_root_invalid');
+  return path.resolve(root, RUNTIME_DIRECTORY_NAME);
+}
+
+function assertOwnerOnlyDirectory(directory, {
+  create = false,
+  fsModule = fs
+} = {}) {
+  if (!path.isAbsolute(directory) || path.resolve(directory) !== directory) {
+    throw codedError('stack_owner_directory_invalid');
+  }
+  if (create) {
+    fsModule.mkdirSync(directory, { recursive: true, mode: 0o700 });
+    fsModule.chmodSync(directory, 0o700);
+  }
+  let resolved;
+  let stat;
+  try {
+    resolved = fsModule.realpathSync(directory);
+    stat = fsModule.statSync(resolved);
+  } catch {
+    throw codedError('stack_owner_directory_unavailable');
+  }
+  if (resolved !== directory || !stat.isDirectory() ||
+      stat.uid !== currentUid() || (stat.mode & 0o077) !== 0) {
+    throw codedError('stack_owner_directory_security_invalid');
+  }
+  return resolved;
+}
+
+function assertOwnerOnlyFile(file, {
+  maximumBytes = PRIVATE_FILE_MAX_BYTES,
+  fsModule = fs
+} = {}) {
+  if (!path.isAbsolute(file) || path.resolve(file) !== file) {
+    throw codedError('stack_owner_file_invalid');
+  }
+  let resolved;
+  let stat;
+  let linkStat;
+  try {
+    linkStat = fsModule.lstatSync(file);
+    resolved = fsModule.realpathSync(file);
+    stat = fsModule.statSync(resolved);
+  } catch {
+    throw codedError('stack_owner_file_unavailable');
+  }
+  if (resolved !== file || linkStat.isSymbolicLink() || !stat.isFile() ||
+      stat.uid !== currentUid() || (stat.mode & 0o077) !== 0 ||
+      stat.size < 1 || stat.size > maximumBytes) {
+    throw codedError('stack_owner_file_security_invalid');
+  }
+  return resolved;
+}
+
+function assertRelativeReference(value) {
+  if (typeof value !== 'string' || !value || value.includes('\0') ||
+      path.isAbsolute(value) || path.normalize(value) !== value ||
+      value === '..' || value.startsWith(`..${path.sep}`)) {
+    throw codedError('stack_profile_reference_invalid');
+  }
+  return value;
+}
+
+function resolvePrivateReference(profile, reference, options = {}) {
+  const relative = assertRelativeReference(reference);
+  const root = assertOwnerOnlyDirectory(profile.privateRoot);
+  const target = path.resolve(root, relative);
+  const relation = path.relative(root, target);
+  if (!relation || relation.startsWith('..') || path.isAbsolute(relation)) {
+    throw codedError('stack_profile_reference_outside_root');
+  }
+  return assertOwnerOnlyFile(target, options);
+}
+
+function validateProfile(value) {
+  if (!exactKeys(value, PROFILE_KEYS) ||
+      value.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+      !SAFE_GIT_OBJECT.test(value.runtimeBaseline || '') ||
+      !SAFE_CONTAINER_NAME.test(value.edgeContainer || '') ||
+      typeof value.privateRoot !== 'string' ||
+      !path.isAbsolute(value.privateRoot) ||
+      path.resolve(value.privateRoot) !== value.privateRoot) {
+    throw codedError('stack_profile_invalid');
+  }
+  assertRelativeReference(value.governanceEnvironment);
+  assertRelativeReference(value.relayEnvironment);
+  assertRelativeReference(value.retainedBinding);
+  return Object.freeze({ ...value });
+}
+
+function readProfile({
+  environment = process.env,
+  fsModule = fs
+} = {}) {
+  const file = profilePath(environment);
+  assertOwnerOnlyFile(file, { maximumBytes: 16_384, fsModule });
+  let parsed;
+  try {
+    parsed = JSON.parse(fsModule.readFileSync(file, 'utf8'));
+  } catch {
+    throw codedError('stack_profile_json_invalid');
+  }
+  const profile = validateProfile(parsed);
+  assertOwnerOnlyDirectory(profile.privateRoot, { fsModule });
+  resolvePrivateReference(profile, profile.governanceEnvironment, { fsModule });
+  resolvePrivateReference(profile, profile.relayEnvironment, { fsModule });
+  resolvePrivateReference(profile, profile.retainedBinding, { fsModule });
+  return profile;
+}
+
+function writeProfile(profile, {
+  environment = process.env,
+  fsModule = fs,
+  replace = false
+} = {}) {
+  const validated = validateProfile(profile);
+  const file = profilePath(environment);
+  const directory = path.dirname(file);
+  assertOwnerOnlyDirectory(directory, { create: true, fsModule });
+  if (!replace && fsModule.existsSync(file)) {
+    throw codedError('stack_profile_already_exists');
+  }
+  const temporary = path.join(
+    directory,
+    `.${PROFILE_FILENAME}.${process.pid}.${crypto.randomBytes(6).toString('hex')}.tmp`
+  );
+  const body = `${JSON.stringify(validated, null, 2)}\n`;
+  let descriptor;
+  try {
+    descriptor = fsModule.openSync(
+      temporary,
+      fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_WRONLY,
+      0o600
+    );
+    fsModule.writeFileSync(descriptor, body, 'utf8');
+    fsModule.fsyncSync(descriptor);
+    fsModule.closeSync(descriptor);
+    descriptor = undefined;
+    fsModule.renameSync(temporary, file);
+    fsModule.chmodSync(file, 0o600);
+  } catch (error) {
+    if (descriptor !== undefined) {
+      try {
+        fsModule.closeSync(descriptor);
+      } catch {}
+    }
+    try {
+      fsModule.unlinkSync(temporary);
+    } catch {}
+    throw error;
+  }
+  return validated;
+}
+
+function ensureRuntimeDirectories(environment = process.env) {
+  const root = runtimeDirectory(environment);
+  assertOwnerOnlyDirectory(path.dirname(root));
+  assertOwnerOnlyDirectory(root, { create: true });
+  for (const name of ['data', 'logs', 'pids', 'store']) {
+    assertOwnerOnlyDirectory(path.join(root, name), { create: true });
+  }
+  return root;
+}
+
+function componentPaths(name, environment = process.env) {
+  const component = COMPONENTS[name];
+  if (!component) throw codedError('stack_component_invalid');
+  const root = runtimeDirectory(environment);
+  return Object.freeze({
+    pid: path.join(root, 'pids', component.pidFile),
+    log: path.join(root, 'logs', component.logFile)
+  });
+}
+
+function parsePid(value) {
+  const normalized = String(value || '').trim();
+  if (!/^[1-9][0-9]{0,9}$/u.test(normalized)) return null;
+  const pid = Number(normalized);
+  return Number.isSafeInteger(pid) && pid > 1 ? pid : null;
+}
+
+function readPidFile(file, fsModule = fs) {
+  try {
+    const stat = fsModule.lstatSync(file);
+    if (!stat.isFile() || stat.isSymbolicLink() ||
+        stat.uid !== currentUid() || (stat.mode & 0o077) !== 0 ||
+        stat.size < 1 || stat.size > 32) {
+      return null;
+    }
+    return parsePid(fsModule.readFileSync(file, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function isPidRunning(pid, kill = process.kill) {
+  if (!Number.isSafeInteger(pid) || pid <= 1) return false;
+  try {
+    kill(pid, 0);
+    return true;
+  } catch (error) {
+    if (error?.code === 'EPERM') return true;
+    return false;
+  }
+}
+
+function readProcessCommand(pid, fsModule = fs) {
+  if (!isPidRunning(pid)) return [];
+  try {
+    const value = fsModule.readFileSync(`/proc/${pid}/cmdline`);
+    return value.toString('utf8').split('\0').filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+function commandMatchesComponent(name, command) {
+  const component = COMPONENTS[name];
+  return Array.isArray(command) && component.commandMarkers.some(marker =>
+    command.some(argument => argument.includes(marker))
+  );
+}
+
+function inspectManagedProcess(name, {
+  environment = process.env,
+  fsModule = fs
+} = {}) {
+  const { pid: pidFile } = componentPaths(name, environment);
+  const pid = readPidFile(pidFile, fsModule);
+  const running = isPidRunning(pid);
+  const command = running ? readProcessCommand(pid, fsModule) : [];
+  return Object.freeze({
+    pid,
+    running,
+    managed: running && commandMatchesComponent(name, command)
+  });
+}
+
+function extractEnvFileArgument(command) {
+  if (!Array.isArray(command)) throw codedError('stack_process_command_invalid');
+  for (let index = 0; index < command.length; index += 1) {
+    const argument = command[index];
+    if (argument.startsWith('--env-file=')) {
+      const value = argument.slice('--env-file='.length);
+      if (!path.isAbsolute(value)) throw codedError('stack_process_env_file_invalid');
+      return path.resolve(value);
+    }
+    if (argument === '--env-file') {
+      const value = command[index + 1];
+      if (!value || !path.isAbsolute(value)) {
+        throw codedError('stack_process_env_file_invalid');
+      }
+      return path.resolve(value);
+    }
+  }
+  throw codedError('stack_process_env_file_missing');
+}
+
+function gitText(args, {
+  repoRoot = REPO_ROOT,
+  exec = execFileSync
+} = {}) {
+  try {
+    return String(exec('git', args, {
+      cwd: repoRoot,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    })).trim();
+  } catch {
+    throw codedError('stack_git_preflight_failed');
+  }
+}
+
+function inspectSourceCompatibility(profile, options = {}) {
+  const head = gitText(['rev-parse', 'HEAD^{commit}'], options);
+  const originMain = gitText(['rev-parse', 'origin/main^{commit}'], options);
+  const clean = gitText(['status', '--porcelain', '--untracked-files=all'], options) === '';
+  const baselineExists = (() => {
+    try {
+      gitText(['cat-file', '-e', `${profile.runtimeBaseline}^{commit}`], options);
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+  let changedPaths = [];
+  if (baselineExists) {
+    const changed = gitText(
+      ['diff', '--name-only', `${profile.runtimeBaseline}..${head}`, '--'],
+      options
+    );
+    changedPaths = changed ? changed.split('\n').filter(Boolean) : [];
+  }
+  const controllerOnlyChanges = baselineExists &&
+    changedPaths.every(candidate => CONTROLLER_CHANGE_PATHS.has(candidate));
+  return Object.freeze({
+    head,
+    originMain,
+    clean,
+    baselineExists,
+    currentMain: head === originMain,
+    controllerOnlyChanges,
+    compatible: clean && baselineExists && head === originMain && controllerOnlyChanges
+  });
+}
+
+function dockerText(args, {
+  exec = execFileSync
+} = {}) {
+  try {
+    return String(exec('docker', args, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe']
+    })).trim();
+  } catch {
+    throw codedError('stack_edge_container_unavailable');
+  }
+}
+
+function inspectEdgeContainer(name, options = {}) {
+  if (!SAFE_CONTAINER_NAME.test(name || '')) {
+    throw codedError('stack_edge_container_name_invalid');
+  }
+  const query = format => dockerText(['inspect', '--format', format, name], options);
+  const revision = query('{{ index .Config.Labels "org.opencontainers.image.revision" }}');
+  const user = query('{{ .Config.User }}');
+  const readOnlyRoot = query('{{ .HostConfig.ReadonlyRootfs }}') === 'true';
+  const restartPolicy = query('{{ .HostConfig.RestartPolicy.Name }}') || 'no';
+  const logDriver = query('{{ .HostConfig.LogConfig.Type }}');
+  const secretMountReadOnly = query(
+    '{{ range .Mounts }}{{ if eq .Destination "/run/secrets/codex-memory-r4" }}{{ not .RW }}{{ end }}{{ end }}'
+  ) === 'true';
+  const portBindingsText = query('{{ json (index .NetworkSettings.Ports "8080/tcp") }}');
+  let portBindings;
+  try {
+    portBindings = JSON.parse(portBindingsText);
+  } catch {
+    portBindings = null;
+  }
+  const hostLoopbackOnly = Array.isArray(portBindings) && portBindings.length > 0 &&
+    portBindings.every(binding =>
+      ['127.0.0.1', '::1'].includes(binding?.HostIp) &&
+      /^[1-9][0-9]{0,4}$/u.test(binding?.HostPort || '')
+    );
+  const running = query('{{ .State.Running }}') === 'true';
+  const health = query('{{ if .State.Health }}{{ .State.Health.Status }}{{ else }}none{{ end }}');
+  const nonRoot = user === 'node' || (/^[1-9][0-9]*$/u.test(user) && user !== '0');
+  return Object.freeze({
+    revision,
+    running,
+    healthy: health === 'healthy',
+    nonRoot,
+    readOnlyRoot,
+    restartPolicy,
+    logDriver,
+    secretMountReadOnly,
+    hostLoopbackOnly,
+    secure: SAFE_GIT_OBJECT.test(revision) && nonRoot && readOnlyRoot &&
+      restartPolicy === 'no' && logDriver === 'none' &&
+      secretMountReadOnly && hostLoopbackOnly
+  });
+}
+
+function runDocker(args, {
+  exec = execFileSync
+} = {}) {
+  try {
+    exec('docker', args, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'ignore', 'pipe']
+    });
+  } catch {
+    throw codedError('stack_edge_container_action_failed');
+  }
+}
+
+function portListening(port, host = '127.0.0.1', timeoutMs = 500) {
+  return new Promise(resolve => {
+    const socket = net.createConnection({ host, port });
+    let settled = false;
+    const finish = value => {
+      if (settled) return;
+      settled = true;
+      socket.destroy();
+      resolve(value);
+    };
+    socket.once('connect', () => finish(true));
+    socket.once('error', () => finish(false));
+    socket.setTimeout(timeoutMs, () => finish(false));
+  });
+}
+
+function getJsonHealth({
+  host = '127.0.0.1',
+  port,
+  pathname = '/health',
+  timeoutMs = 1000
+}) {
+  return new Promise(resolve => {
+    const request = http.get({
+      host,
+      port,
+      path: pathname,
+      timeout: timeoutMs
+    }, response => {
+      let bytes = 0;
+      const chunks = [];
+      response.on('data', chunk => {
+        bytes += chunk.length;
+        if (bytes > 32_768) {
+          request.destroy();
+          return;
+        }
+        chunks.push(chunk);
+      });
+      response.once('end', () => {
+        try {
+          const value = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+          resolve(Object.freeze({
+            reachable: response.statusCode === 200,
+            statusCode: response.statusCode,
+            ok: value?.ok === true,
+            authRequired: value?.auth?.required === true ||
+              value?.authentication?.required === true
+          }));
+        } catch {
+          resolve(Object.freeze({
+            reachable: false,
+            statusCode: response.statusCode || null,
+            ok: false,
+            authRequired: false
+          }));
+        }
+      });
+    });
+    request.once('timeout', () => request.destroy());
+    request.once('error', () => resolve(Object.freeze({
+      reachable: false,
+      statusCode: null,
+      ok: false,
+      authRequired: false
+    })));
+  });
+}
+
+function socketJsonRequest(socketPath, request, {
+  maximumBytes = 16_384,
+  timeoutMs = 1500
+} = {}) {
+  return new Promise((resolve, reject) => {
+    const socket = net.createConnection(socketPath);
+    const chunks = [];
+    let bytes = 0;
+    let settled = false;
+    const fail = code => {
+      if (settled) return;
+      settled = true;
+      socket.destroy();
+      reject(codedError(code));
+    };
+    socket.once('connect', () => {
+      socket.write(`${JSON.stringify(request)}\n`);
+    });
+    socket.on('data', chunk => {
+      if (settled) return;
+      bytes += chunk.length;
+      if (bytes > maximumBytes) return fail('stack_socket_response_too_large');
+      chunks.push(chunk);
+    });
+    socket.once('end', () => {
+      if (settled) return;
+      settled = true;
+      try {
+        resolve(JSON.parse(Buffer.concat(chunks).toString('utf8')));
+      } catch {
+        reject(codedError('stack_socket_response_invalid'));
+      }
+    });
+    socket.once('error', () => fail('stack_socket_unavailable'));
+    socket.setTimeout(timeoutMs, () => fail('stack_socket_timeout'));
+  });
+}
+
+function probeUnixSocket(socketPath, {
+  connect = net.createConnection,
+  timeoutMs = 500
+} = {}) {
+  return new Promise(resolve => {
+    let socket;
+    let settled = false;
+    const finish = value => {
+      if (settled) return;
+      settled = true;
+      socket?.destroy();
+      resolve(value);
+    };
+    try {
+      socket = connect(socketPath);
+    } catch {
+      finish('uncertain');
+      return;
+    }
+    socket.once('connect', () => finish('active'));
+    socket.once('error', error => {
+      if (error?.code === 'ECONNREFUSED') return finish('stale');
+      if (error?.code === 'ENOENT') return finish('absent');
+      return finish('uncertain');
+    });
+    socket.setTimeout(timeoutMs, () => finish('uncertain'));
+  });
+}
+
+async function prepareStaleOwnerSocket(socketPath, privateRoot, {
+  fsModule = fs,
+  probeSocket = probeUnixSocket
+} = {}) {
+  if (typeof socketPath !== 'string' || !path.isAbsolute(socketPath) ||
+      path.resolve(socketPath) !== socketPath || socketPath.includes('\0') ||
+      Buffer.byteLength(socketPath, 'utf8') > 512) {
+    throw codedError('stack_governance_socket_path_invalid');
+  }
+  const root = assertOwnerOnlyDirectory(privateRoot, { fsModule });
+  const parent = path.dirname(socketPath);
+  const relation = path.relative(root, parent);
+  if (relation.startsWith('..') || path.isAbsolute(relation)) {
+    throw codedError('stack_governance_socket_outside_private_root');
+  }
+  const resolvedParent = assertOwnerOnlyDirectory(parent, { fsModule });
+  if (resolvedParent !== parent) {
+    throw codedError('stack_governance_socket_parent_invalid');
+  }
+  let initial;
+  try {
+    initial = fsModule.lstatSync(socketPath);
+  } catch (error) {
+    if (error?.code === 'ENOENT') return false;
+    throw codedError('stack_governance_socket_inspection_failed');
+  }
+  if (!initial.isSocket() || initial.isSymbolicLink?.() ||
+      initial.uid !== currentUid() || (initial.mode & 0o077) !== 0) {
+    throw codedError('stack_governance_socket_candidate_invalid');
+  }
+  const probe = await probeSocket(socketPath);
+  if (probe === 'active') throw codedError('stack_governance_socket_active');
+  if (probe === 'absent') return false;
+  if (probe !== 'stale') throw codedError('stack_governance_socket_probe_uncertain');
+  assertOwnerOnlyDirectory(parent, { fsModule });
+  let current;
+  try {
+    current = fsModule.lstatSync(socketPath);
+  } catch {
+    throw codedError('stack_governance_socket_identity_changed');
+  }
+  if (!current.isSocket() || current.isSymbolicLink?.() ||
+      current.uid !== currentUid() ||
+      current.dev !== initial.dev || current.ino !== initial.ino) {
+    throw codedError('stack_governance_socket_identity_changed');
+  }
+  try {
+    fsModule.unlinkSync(socketPath);
+  } catch {
+    throw codedError('stack_governance_stale_socket_cleanup_failed');
+  }
+  return true;
+}
+
+function runChildProbe(mode, environmentFile, {
+  profile,
+  environment = process.env,
+  exec = execFileSync
+} = {}) {
+  const childEnvironment = {
+    ...environment,
+    CODEX_MEMORY_STACK_CHILD: '1',
+    CODEX_MEMORY_STACK_PRIVATE_ROOT: profile.privateRoot,
+    CODEX_MEMORY_STACK_RUNTIME_BASELINE: profile.runtimeBaseline,
+    CODEX_MEMORY_STACK_RUNTIME_DIR: runtimeDirectory(environment),
+    CODEX_MEMORY_STACK_RETAINED_BINDING_FILE:
+      resolvePrivateReference(profile, profile.retainedBinding)
+  };
+  try {
+    const output = exec(process.execPath, [
+      `--env-file=${environmentFile}`,
+      SCRIPT_PATH,
+      mode
+    ], {
+      cwd: REPO_ROOT,
+      encoding: 'utf8',
+      env: childEnvironment,
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 5000,
+      maxBuffer: 32_768
+    });
+    return JSON.parse(String(output).trim());
+  } catch {
+    return null;
+  }
+}
+
+function lowDisclosureGovernanceProjection(value) {
+  const observation = value?.observation;
+  const safe = value?.accepted === true &&
+    value?.default_closed === true &&
+    value?.activation_status === 'inactive' &&
+    value?.durable_state_written === false &&
+    observation?.schema_version === 3 &&
+    observation?.primary_memory_writes === 0 &&
+    observation?.raw_memory_recorded === false &&
+    observation?.durable_observation_state_written === false;
+  return Object.freeze({
+    reachable: safe,
+    defaultClosed: value?.default_closed === true,
+    activationStatus: value?.activation_status || 'unknown',
+    observationSchema: Number.isInteger(observation?.schema_version)
+      ? observation.schema_version
+      : null,
+    sessionsStarted: Number.isInteger(observation?.sessions_started)
+      ? observation.sessions_started
+      : null,
+    providerCalls: Number.isInteger(observation?.provider_calls)
+      ? observation.provider_calls
+      : null,
+    nativeInvocations: Number.isInteger(observation?.native_invocations)
+      ? observation.native_invocations
+      : null,
+    primaryMemoryWrites: Number.isInteger(observation?.primary_memory_writes)
+      ? observation.primary_memory_writes
+      : null,
+    rawMemoryRecorded: observation?.raw_memory_recorded === true
+  });
+}
+
+function lowDisclosureRelayProjection(value) {
+  const observation = value?.observation;
+  const safe = value?.schema_version === 1 &&
+    value?.operation === 'snapshot' &&
+    observation?.schema_version === 1 &&
+    observation?.component === 'outbound_relay' &&
+    observation?.request_identifiers_retained === false &&
+    observation?.response_bodies_retained === false &&
+    observation?.raw_memory_retained === false &&
+    observation?.secret_values_retained === false;
+  return Object.freeze({
+    reachable: safe,
+    schemaVersion: Number.isInteger(observation?.schema_version)
+      ? observation.schema_version
+      : null,
+    completionState: observation?.completion_state || 'unknown',
+    claimsReceived: Number.isInteger(observation?.claims_received)
+      ? observation.claims_received
+      : null,
+    requestsFailed: Number.isInteger(observation?.requests_failed)
+      ? observation.requests_failed
+      : null,
+    rawMemoryRetained: observation?.raw_memory_retained === true,
+    secretValuesRetained: observation?.secret_values_retained === true
+  });
+}
+
+async function inspectStack({
+  environment = process.env,
+  profile = readProfile({ environment })
+} = {}) {
+  const source = inspectSourceCompatibility(profile);
+  const processes = Object.fromEntries(
+    Object.keys(COMPONENTS).map(name => [name, inspectManagedProcess(name, { environment })])
+  );
+  const [provider, shimPort, httpHealth] = await Promise.all([
+    portListening(3000),
+    portListening(7615),
+    getJsonHealth({ port: 7605 })
+  ]);
+  const governanceEnvironment = resolvePrivateReference(
+    profile,
+    profile.governanceEnvironment
+  );
+  const relayEnvironment = resolvePrivateReference(profile, profile.relayEnvironment);
+  const governance = processes.governance.managed
+    ? lowDisclosureGovernanceProjection(runChildProbe(
+      '_probe-governance',
+      governanceEnvironment,
+      { profile, environment }
+    ))
+    : lowDisclosureGovernanceProjection(null);
+  const relay = processes.relay.managed
+    ? lowDisclosureRelayProjection(runChildProbe(
+      '_probe-relay',
+      relayEnvironment,
+      { profile, environment }
+    ))
+    : lowDisclosureRelayProjection(null);
+  let edge;
+  try {
+    edge = inspectEdgeContainer(profile.edgeContainer);
+  } catch {
+    edge = Object.freeze({
+      revision: null,
+      running: false,
+      healthy: false,
+      secure: false
+    });
+  }
+  const processProjection = Object.fromEntries(
+    Object.entries(processes).map(([name, value]) => [
+      name,
+      Object.freeze({ running: value.running, managed: value.managed })
+    ])
+  );
+  const accepted = source.compatible &&
+    provider &&
+    processes.shim.managed && shimPort &&
+    processes.http.managed && httpHealth.reachable && httpHealth.ok &&
+    processes.governance.managed && governance.reachable &&
+    processes.relay.managed && relay.reachable &&
+    edge.running && edge.healthy && edge.secure &&
+    edge.revision === profile.runtimeBaseline;
+  return Object.freeze({
+    accepted,
+    configured: true,
+    runtimeBaseline: profile.runtimeBaseline,
+    source: Object.freeze({
+      clean: source.clean,
+      currentMain: source.currentMain,
+      compatible: source.compatible
+    }),
+    processes: Object.freeze(processProjection),
+    provider: Object.freeze({ reachable: provider }),
+    shim: Object.freeze({ reachable: shimPort }),
+    httpMcp: Object.freeze({
+      reachable: httpHealth.reachable,
+      healthy: httpHealth.ok,
+      authRequired: httpHealth.authRequired
+    }),
+    governance,
+    relay,
+    edge: Object.freeze({
+      running: edge.running,
+      healthy: edge.healthy,
+      secure: edge.secure,
+      revisionMatch: edge.revision === profile.runtimeBaseline
+    }),
+    secretValuesReturned: false,
+    rawMemoryReturned: false
+  });
+}
+
+function writePidFile(file, pid) {
+  const descriptor = fs.openSync(
+    file,
+    fs.constants.O_CREAT | fs.constants.O_TRUNC | fs.constants.O_WRONLY,
+    0o600
+  );
+  try {
+    fs.writeFileSync(descriptor, `${pid}\n`, 'utf8');
+    fs.fsyncSync(descriptor);
+  } finally {
+    fs.closeSync(descriptor);
+  }
+  fs.chmodSync(file, 0o600);
+}
+
+function spawnManaged(name, mode, environmentFile, {
+  profile,
+  environment = process.env
+}) {
+  const existing = inspectManagedProcess(name, { environment });
+  if (existing.running) {
+    if (!existing.managed) throw codedError('stack_unmanaged_process_detected');
+    return Object.freeze({ started: false, pid: existing.pid });
+  }
+  const root = ensureRuntimeDirectories(environment);
+  const locations = componentPaths(name, environment);
+  const logDescriptor = fs.openSync(
+    locations.log,
+    fs.constants.O_CREAT | fs.constants.O_APPEND | fs.constants.O_WRONLY,
+    0o600
+  );
+  fs.chmodSync(locations.log, 0o600);
+  const childEnvironment = {
+    ...environment,
+    CODEX_MEMORY_STACK_CHILD: '1',
+    CODEX_MEMORY_STACK_PRIVATE_ROOT: profile.privateRoot,
+    CODEX_MEMORY_STACK_RUNTIME_BASELINE: profile.runtimeBaseline,
+    CODEX_MEMORY_STACK_RUNTIME_DIR: root,
+    CODEX_MEMORY_STACK_RETAINED_BINDING_FILE:
+      resolvePrivateReference(profile, profile.retainedBinding)
+  };
+  let child;
+  try {
+    child = spawn(process.execPath, [
+      `--env-file=${environmentFile}`,
+      SCRIPT_PATH,
+      mode
+    ], {
+      cwd: REPO_ROOT,
+      detached: true,
+      env: childEnvironment,
+      stdio: ['ignore', logDescriptor, logDescriptor]
+    });
+  } finally {
+    fs.closeSync(logDescriptor);
+  }
+  child.unref();
+  writePidFile(locations.pid, child.pid);
+  return Object.freeze({ started: true, pid: child.pid });
+}
+
+async function waitFor(check, {
+  attempts = 60,
+  intervalMs = 250,
+  failureCode = 'stack_start_timeout'
+} = {}) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    if (await check()) return true;
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  }
+  throw codedError(failureCode);
+}
+
+async function stopManaged(name, {
+  environment = process.env
+} = {}) {
+  const locations = componentPaths(name, environment);
+  const state = inspectManagedProcess(name, { environment });
+  if (!state.running) {
+    try {
+      fs.unlinkSync(locations.pid);
+    } catch {}
+    return false;
+  }
+  if (!state.managed) throw codedError('stack_unmanaged_process_detected');
+  try {
+    process.kill(state.pid, 'SIGTERM');
+  } catch {
+    throw codedError('stack_process_stop_failed');
+  }
+  await waitFor(() => !isPidRunning(state.pid), {
+    attempts: 50,
+    intervalMs: 200,
+    failureCode: 'stack_process_stop_timeout'
+  });
+  try {
+    fs.unlinkSync(locations.pid);
+  } catch {}
+  return true;
+}
+
+async function rollbackStarted(started, profile, environment) {
+  const failures = [];
+  for (const name of ['relay', 'governance', 'http', 'shim']) {
+    if (!started.has(name)) continue;
+    try {
+      await stopManaged(name, { environment });
+    } catch {
+      failures.push(name);
+    }
+  }
+  if (started.has('edge')) {
+    try {
+      runDocker(['stop', '--time', '10', profile.edgeContainer]);
+    } catch {
+      failures.push('edge');
+    }
+  }
+  return failures;
+}
+
+async function startStack({
+  environment = process.env
+} = {}) {
+  const profile = readProfile({ environment });
+  const source = inspectSourceCompatibility(profile);
+  if (!source.compatible) throw codedError('stack_source_compatibility_failed');
+  ensureRuntimeDirectories(environment);
+  if (!await portListening(3000)) throw codedError('stack_provider_dependency_unavailable');
+  const edgeBefore = inspectEdgeContainer(profile.edgeContainer);
+  if (!edgeBefore.secure || edgeBefore.revision !== profile.runtimeBaseline) {
+    throw codedError('stack_edge_reprovision_required');
+  }
+  const governanceEnvironment = resolvePrivateReference(
+    profile,
+    profile.governanceEnvironment
+  );
+  const relayEnvironment = resolvePrivateReference(profile, profile.relayEnvironment);
+  const started = new Set();
+  try {
+    const shimState = inspectManagedProcess('shim', { environment });
+    if (!shimState.running && await portListening(7615)) {
+      throw codedError('stack_unmanaged_shim_listener');
+    }
+    const shim = spawnManaged('shim', '_run-shim', governanceEnvironment, {
+      profile,
+      environment
+    });
+    if (shim.started) started.add('shim');
+    await waitFor(() => portListening(7615), {
+      failureCode: 'stack_shim_start_timeout'
+    });
+
+    const httpState = inspectManagedProcess('http', { environment });
+    if (!httpState.running && await portListening(7605)) {
+      throw codedError('stack_unmanaged_http_listener');
+    }
+    const httpProcess = spawnManaged('http', '_run-http', governanceEnvironment, {
+      profile,
+      environment
+    });
+    if (httpProcess.started) started.add('http');
+    await waitFor(async () => {
+      const health = await getJsonHealth({ port: 7605 });
+      return health.reachable && health.ok && health.authRequired;
+    }, { failureCode: 'stack_http_start_timeout' });
+
+    const governanceState = inspectManagedProcess('governance', { environment });
+    if (!governanceState.running) {
+      const preparedSockets = runChildProbe(
+        '_prepare-governance-sockets',
+        governanceEnvironment,
+        { profile, environment }
+      );
+      if (preparedSockets?.accepted !== true) {
+        throw codedError('stack_governance_socket_preparation_failed');
+      }
+    }
+    const governanceProcess = spawnManaged(
+      'governance',
+      '_run-governance',
+      governanceEnvironment,
+      { profile, environment }
+    );
+    if (governanceProcess.started) started.add('governance');
+    await waitFor(() => {
+      const result = runChildProbe('_probe-governance', governanceEnvironment, {
+        profile,
+        environment
+      });
+      return lowDisclosureGovernanceProjection(result).reachable;
+    }, { failureCode: 'stack_governance_start_timeout' });
+
+    if (!edgeBefore.running) {
+      runDocker(['start', profile.edgeContainer]);
+      started.add('edge');
+    }
+    await waitFor(() => {
+      try {
+        const edge = inspectEdgeContainer(profile.edgeContainer);
+        return edge.running && edge.healthy && edge.secure &&
+          edge.revision === profile.runtimeBaseline;
+      } catch {
+        return false;
+      }
+    }, {
+      attempts: 80,
+      intervalMs: 500,
+      failureCode: 'stack_edge_start_timeout'
+    });
+
+    const relayProcess = spawnManaged('relay', '_run-relay', relayEnvironment, {
+      profile,
+      environment
+    });
+    if (relayProcess.started) started.add('relay');
+    await waitFor(() => {
+      const result = runChildProbe('_probe-relay', relayEnvironment, {
+        profile,
+        environment
+      });
+      return lowDisclosureRelayProjection(result).reachable;
+    }, { failureCode: 'stack_relay_start_timeout' });
+
+    const result = await inspectStack({ environment, profile });
+    if (!result.accepted) throw codedError('stack_final_acceptance_failed');
+    return Object.freeze({
+      ...result,
+      action: started.size === 0 ? 'already_running' : 'started',
+      failClosedRollbackRequired: false
+    });
+  } catch (error) {
+    const rollbackFailures = await rollbackStarted(started, profile, environment);
+    if (rollbackFailures.length > 0) {
+      throw codedError('stack_fail_closed_rollback_incomplete');
+    }
+    throw error;
+  }
+}
+
+async function stopStack({
+  environment = process.env
+} = {}) {
+  const profile = readProfile({ environment });
+  const stopped = [];
+  for (const name of ['relay', 'governance', 'http', 'shim']) {
+    if (await stopManaged(name, { environment })) stopped.push(name);
+  }
+  const edge = inspectEdgeContainer(profile.edgeContainer);
+  if (edge.running) {
+    runDocker(['stop', '--time', '10', profile.edgeContainer]);
+    stopped.push('edge');
+  }
+  return Object.freeze({
+    accepted: true,
+    action: stopped.length === 0 ? 'already_stopped' : 'stopped',
+    stoppedComponents: stopped,
+    containerRemoved: false,
+    autostartInstalled: false,
+    secretValuesReturned: false,
+    rawMemoryReturned: false
+  });
+}
+
+function adoptRunningStack({
+  environment = process.env,
+  replace = false
+} = {}) {
+  const governance = inspectManagedProcess('governance', { environment });
+  const relay = inspectManagedProcess('relay', { environment });
+  if (!governance.managed || !relay.managed) {
+    throw codedError('stack_adoption_processes_unavailable');
+  }
+  const governanceFile = assertOwnerOnlyFile(
+    extractEnvFileArgument(readProcessCommand(governance.pid))
+  );
+  const relayFile = assertOwnerOnlyFile(
+    extractEnvFileArgument(readProcessCommand(relay.pid))
+  );
+  const privateRoot = discoverPrivateRoot(
+    [governanceFile, relayFile],
+    { environment }
+  );
+  const relative = file => {
+    const value = path.relative(privateRoot, file);
+    if (!value || value.startsWith('..') || path.isAbsolute(value)) {
+      throw codedError('stack_adoption_environment_outside_private_root');
+    }
+    return assertRelativeReference(value);
+  };
+  const retainedBinding = assertRelativeReference(
+    path.join('r5m-exact-head', 'private-binding.json')
+  );
+  assertOwnerOnlyFile(path.resolve(privateRoot, retainedBinding));
+  const edge = inspectEdgeContainer(EDGE_CONTAINER_DEFAULT);
+  if (!edge.secure || !edge.running || !edge.healthy) {
+    throw codedError('stack_adoption_edge_invalid');
+  }
+  const profile = validateProfile({
+    schemaVersion: PROFILE_SCHEMA_VERSION,
+    runtimeBaseline: edge.revision,
+    privateRoot,
+    governanceEnvironment: relative(governanceFile),
+    relayEnvironment: relative(relayFile),
+    retainedBinding,
+    edgeContainer: EDGE_CONTAINER_DEFAULT
+  });
+  const source = inspectSourceCompatibility(profile);
+  if (!source.baselineExists || !source.controllerOnlyChanges) {
+    throw codedError('stack_adoption_source_incompatible');
+  }
+  writeProfile(profile, { environment, replace });
+  return Object.freeze({
+    accepted: true,
+    action: 'adopted',
+    profileStored: true,
+    ownerOnlyProfile: true,
+    runtimeBaseline: profile.runtimeBaseline,
+    secretValuesStored: false,
+    secretValuesReturned: false,
+    rawMemoryReturned: false
+  });
+}
+
+function readPrivateText(reference, privateRoot, maximumBytes = 16_384) {
+  const { readPrivateReference } = require(
+    '../src/runtime/chatgpt-r4/governance-runtime-authority'
+  );
+  const value = readPrivateReference(reference, {
+    privateRoot,
+    readFileSync: fs.readFileSync,
+    statSync: fs.statSync,
+    realpathSync: fs.realpathSync
+  });
+  if (Buffer.byteLength(value, 'utf8') > maximumBytes) {
+    throw codedError('stack_private_reference_too_large');
+  }
+  return value;
+}
+
+function singleLineSecret(value) {
+  const normalized = value.endsWith('\n') ? value.slice(0, -1) : value;
+  if (!normalized || normalized.includes('\r') || normalized.includes('\n') ||
+      normalized.trim() !== normalized) {
+    throw codedError('stack_secret_reference_invalid');
+  }
+  return normalized;
+}
+
+function childPrivateRoot() {
+  return assertOwnerOnlyDirectory(process.env.CODEX_MEMORY_STACK_PRIVATE_ROOT || '');
+}
+
+function assertChildMode() {
+  if (process.env.CODEX_MEMORY_STACK_CHILD !== '1') {
+    throw codedError('stack_child_mode_not_authorized');
+  }
+  process.umask(0o077);
+}
+
+function forwardChild(child) {
+  let stopping = false;
+  const stop = signal => {
+    if (stopping) return;
+    stopping = true;
+    try {
+      child.kill(signal);
+    } catch {}
+  };
+  process.once('SIGTERM', () => stop('SIGTERM'));
+  process.once('SIGINT', () => stop('SIGINT'));
+  child.once('error', () => {
+    process.exitCode = 1;
+  });
+  child.once('exit', (code, signal) => {
+    if (signal) process.exitCode = 1;
+    else process.exitCode = Number.isInteger(code) ? code : 1;
+  });
+}
+
+async function runShimChild() {
+  assertChildMode();
+  const privateRoot = childPrivateRoot();
+  const token = singleLineSecret(readPrivateText(
+    process.env.CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE,
+    privateRoot
+  ));
+  const runtimeRoot = assertOwnerOnlyDirectory(
+    process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
+  );
+  const child = spawn('bash', [
+    path.join(REPO_ROOT, 'scripts', 'start-vcp-native-shim-wsl-newapi.sh')
+  ], {
+    cwd: REPO_ROOT,
+    env: {
+      ...process.env,
+      SHIM_HOST: '127.0.0.1',
+      SHIM_PORT: '7615',
+      CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN: token,
+      KB_STORE: path.join(runtimeRoot, 'store')
+    },
+    stdio: 'inherit'
+  });
+  forwardChild(child);
+}
+
+function runHttpChild() {
+  assertChildMode();
+  const privateRoot = childPrivateRoot();
+  const token = singleLineSecret(readPrivateText(
+    process.env.CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE,
+    privateRoot
+  ));
+  const runtimeRoot = assertOwnerOnlyDirectory(
+    process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
+  );
+  Object.assign(process.env, {
+    CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+    CODEX_MEMORY_HTTP_PORT: '7605',
+    CODEX_MEMORY_HTTP_TOKEN: token,
+    CODEX_MEMORY_DATA_DIR: path.join(runtimeRoot, 'data'),
+    CODEX_MEMORY_LOGS_DIR: path.join(runtimeRoot, 'logs'),
+    CODEX_MEMORY_SECURITY_PROFILE: 'hardened',
+    CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false',
+    CODEX_MEMORY_ENABLE_CANDIDATE_CACHE: 'false',
+    CODEX_MEMORY_ENABLE_SHADOW_WRITES: 'false',
+    CODEX_MEMORY_ENABLE_VECTOR_INDEX: 'false',
+    CODEX_MEMORY_AUTO_REBUILD: 'false',
+    CODEX_MEMORY_AUTO_REBUILD_ACTIVE_MEMORY: 'false',
+    CODEX_MEMORY_EXPOSE_CONTROLLED_MUTATION_TOOLS: 'false',
+    CODEX_MEMORY_EXPOSE_WRITE_TOOLS: 'false',
+    CODEX_MEMORY_VCP_NATIVE_RUNTIME_PROFILE: 'wsl-newapi-prod',
+    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT:
+      'http://127.0.0.1:7615/mcp/vcp-native',
+    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN: token,
+    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE: 'strict',
+    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE: 'primary',
+    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE: 'off'
+  });
+  require('../src/http-index.js');
+}
+
+function validateRetainedBinding(privateRoot) {
+  const file = process.env.CODEX_MEMORY_STACK_RETAINED_BINDING_FILE;
+  const value = readPrivateText(`file:${file}`, privateRoot, PRIVATE_FILE_MAX_BYTES);
+  let binding;
+  try {
+    binding = JSON.parse(value);
+  } catch {
+    throw codedError('stack_retained_binding_invalid');
+  }
+  if (!SAFE_GIT_OBJECT.test(binding?.sourceCommit || '') ||
+      binding?.governanceBindingFinalized !== true ||
+      binding?.defaultClosed !== true ||
+      binding?.primaryMemoryWriteEnabled !== false ||
+      binding?.publicWriteSurfaceEnabled !== false ||
+      binding?.formalIsolatedShimTargetRequired !== true ||
+      binding?.temporaryEndpointOverrideAllowed !== false) {
+    throw codedError('stack_retained_binding_invalid');
+  }
+  return true;
+}
+
+async function runGovernanceChild() {
+  assertChildMode();
+  const privateRoot = childPrivateRoot();
+  validateRetainedBinding(privateRoot);
+  const baseline = process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE;
+  if (!SAFE_GIT_OBJECT.test(baseline || '')) {
+    throw codedError('stack_runtime_baseline_invalid');
+  }
+  const token = singleLineSecret(readPrivateText(
+    process.env.CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE,
+    privateRoot
+  ));
+  const {
+    preparePrivateRuntimeEnvironment
+  } = require('../src/runtime/chatgpt-r4/private-runtime-preparation');
+  const {
+    loadGovernanceRuntimeFromEnvironment
+  } = require('../src/runtime/chatgpt-r4/governance-runtime-authority');
+  const prepared = await preparePrivateRuntimeEnvironment({
+    baseEnvironment: process.env,
+    isolatedShimTarget: {
+      schema_version: 1,
+      target_reference: `full-stack-${baseline.slice(0, 12)}`,
+      bind_host: '127.0.0.1',
+      bind_port: 7615,
+      mcp_path: '/mcp/vcp-native',
+      listener_observed: true,
+      loopback_only: true,
+      native_write_enabled: false
+    },
+    capabilityBearerToken: token
+  });
+  const receipt = prepared.receipt;
+  if (receipt?.isolated_shim_target_bound !== true ||
+      receipt?.capability_preflight_completed !== true ||
+      receipt?.transport_authorization_enforced !== true ||
+      receipt?.initialize_capability_verified !== true ||
+      receipt?.tools_list_capability_verified !== true ||
+      receipt?.mapping_binding_fingerprint_matched !== true ||
+      receipt?.selected_diary_search_supported !== true ||
+      receipt?.provider_calls_during_preflight !== 0 ||
+      receipt?.native_invocations_during_preflight !== 0 ||
+      receipt?.primary_memory_writes_during_preflight !== 0 ||
+      receipt?.unscoped_native_searches_during_preflight !== 0) {
+    throw codedError('stack_governance_preparation_invalid');
+  }
+  const runtime = await loadGovernanceRuntimeFromEnvironment(
+    prepared.private_environment,
+    { privateRoot }
+  );
+  const started = await runtime.start();
+  const snapshot = runtime.snapshot();
+  const observation = snapshot.session_control?.private_dogfood_observation;
+  if (started.owner_only_socket !== true ||
+      started.session_control_started !== true ||
+      snapshot.session_activation_default_closed !== true ||
+      snapshot.session_control?.activation?.activation_status !== 'inactive' ||
+      observation?.sessions_started !== 0 ||
+      observation?.provider_calls !== 0 ||
+      observation?.primary_memory_writes !== 0 ||
+      observation?.unrestricted_native_searches !== 0) {
+    await runtime.stop().catch(() => {});
+    throw codedError('stack_governance_default_closed_invalid');
+  }
+  process.stdout.write(`${JSON.stringify({
+    accepted: true,
+    component: 'governance',
+    defaultClosed: true,
+    activationStatus: 'inactive',
+    secretValuesReturned: false,
+    rawMemoryReturned: false
+  })}\n`);
+  let stopping = false;
+  const stop = async () => {
+    if (stopping) return;
+    stopping = true;
+    try {
+      await runtime.stop();
+      process.exit(0);
+    } catch {
+      process.exit(1);
+    }
+  };
+  process.once('SIGINT', () => void stop());
+  process.once('SIGTERM', () => void stop());
+}
+
+async function runRelayChild() {
+  assertChildMode();
+  const privateRoot = childPrivateRoot();
+  validateRetainedBinding(privateRoot);
+  const runtimeRoot = assertOwnerOnlyDirectory(
+    process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
+  );
+  process.env.CODEX_MEMORY_R5_RELAY_OBSERVER_UDS_PATH =
+    path.join(runtimeRoot, 'relay-observer.sock');
+  const {
+    createCanonicalOutboundRelayService
+  } = require('../apps/local-recall-relay/outbound-main');
+  const {
+    loadOutboundRelayRuntimeFromEnvironment
+  } = require('../apps/local-recall-relay/runtime-authority');
+  const service = createCanonicalOutboundRelayService({
+    environment: process.env,
+    loadRuntime(environment, options) {
+      return loadOutboundRelayRuntimeFromEnvironment(environment, {
+        ...options,
+        secretRoot: privateRoot
+      });
+    }
+  });
+  process.stdout.write(`${JSON.stringify({
+    accepted: true,
+    component: 'outbound_relay',
+    outboundOnly: true,
+    secretValuesReturned: false,
+    rawMemoryReturned: false
+  })}\n`);
+  process.once('SIGINT', () => service.stop());
+  process.once('SIGTERM', () => service.stop());
+  await service.run();
+}
+
+async function probeGovernanceChild() {
+  assertChildMode();
+  const socketPath = process.env.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH;
+  if (!path.isAbsolute(socketPath || '')) {
+    throw codedError('stack_governance_control_socket_invalid');
+  }
+  const value = await socketJsonRequest(socketPath, {
+    schema_version: 3,
+    operation: 'status',
+    request_id: `op_${crypto.randomBytes(16).toString('hex')}`
+  });
+  process.stdout.write(`${JSON.stringify(value)}\n`);
+}
+
+async function probeRelayChild() {
+  assertChildMode();
+  const runtimeRoot = assertOwnerOnlyDirectory(
+    process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
+  );
+  const value = await socketJsonRequest(
+    path.join(runtimeRoot, 'relay-observer.sock'),
+    { schema_version: 1, operation: 'snapshot' },
+    { maximumBytes: 4096 }
+  );
+  process.stdout.write(`${JSON.stringify(value)}\n`);
+}
+
+async function prepareGovernanceSocketsChild() {
+  assertChildMode();
+  const privateRoot = childPrivateRoot();
+  const dataSocket = process.env.CODEX_MEMORY_R4_RELAY_UDS_PATH;
+  const controlSocket = process.env.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH;
+  if (dataSocket === controlSocket) {
+    throw codedError('stack_governance_socket_paths_reused');
+  }
+  const controlCleaned = await prepareStaleOwnerSocket(controlSocket, privateRoot);
+  const dataCleaned = await prepareStaleOwnerSocket(dataSocket, privateRoot);
+  process.stdout.write(`${JSON.stringify({
+    accepted: true,
+    staleControlSocketRemoved: controlCleaned,
+    staleDataSocketRemoved: dataCleaned,
+    activeSocketRemoved: false,
+    secretValuesReturned: false,
+    rawMemoryReturned: false
+  })}\n`);
+}
+
+function printJson(value) {
+  process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+}
+
+function usage() {
+  return [
+    'Usage: codex-memory-stack <start|status|stop|adopt-running> [--replace]',
+    '',
+    'start         Start the adopted full stack and fail closed on validation errors.',
+    'status        Print a low-disclosure health, socket, observer, and baseline summary.',
+    'stop          Stop only managed processes and the retained Edge container.',
+    'adopt-running Create an owner-only, reference-only profile from the live accepted stack.'
+  ].join('\n');
+}
+
+async function main(argv = process.argv.slice(2)) {
+  const command = argv[0] || 'status';
+  if (command === '_run-shim') return runShimChild();
+  if (command === '_run-http') return runHttpChild();
+  if (command === '_run-governance') return runGovernanceChild();
+  if (command === '_run-relay') return runRelayChild();
+  if (command === '_probe-governance') return probeGovernanceChild();
+  if (command === '_probe-relay') return probeRelayChild();
+  if (command === '_prepare-governance-sockets') {
+    return prepareGovernanceSocketsChild();
+  }
+  if (command === 'start') return printJson(await startStack());
+  if (command === 'status') return printJson(await inspectStack());
+  if (command === 'stop') return printJson(await stopStack());
+  if (command === 'adopt-running') {
+    const extra = argv.slice(1);
+    if (extra.some(value => value !== '--replace')) {
+      throw codedError('stack_cli_argument_invalid');
+    }
+    return printJson(adoptRunningStack({ replace: extra.includes('--replace') }));
+  }
+  if (command === '--help' || command === '-h' || command === 'help') {
+    process.stdout.write(`${usage()}\n`);
+    return;
+  }
+  throw codedError('stack_cli_command_invalid');
+}
+
+if (require.main === module) {
+  main().catch(error => {
+    process.stderr.write(`${safeCode(error)}\n`);
+    process.exitCode = 1;
+  });
+}
+
+module.exports = {
+  CONTROLLER_CHANGE_PATHS,
+  PROFILE_KEYS,
+  adoptRunningStack,
+  assertRelativeReference,
+  commandMatchesComponent,
+  discoverPrivateRoot,
+  exactKeys,
+  extractEnvFileArgument,
+  inspectEdgeContainer,
+  inspectSourceCompatibility,
+  isPidRunning,
+  lowDisclosureGovernanceProjection,
+  lowDisclosureRelayProjection,
+  parsePid,
+  prepareStaleOwnerSocket,
+  probeUnixSocket,
+  readPidFile,
+  safeCode,
+  validateProfile
+};
