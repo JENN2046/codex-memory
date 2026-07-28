@@ -2007,7 +2007,8 @@ function dockerText(args, {
 function publishedPortsLoopbackOnly(portMap, {
   requiredContainerPort,
   requiredHostPort = null,
-  requireSingleBinding = false
+  requireSingleBinding = false,
+  allowEmptyHostPort = false
 } = {}) {
   if (!portMap ||
       typeof portMap !== 'object' ||
@@ -2032,10 +2033,16 @@ function publishedPortsLoopbackOnly(portMap, {
     for (const binding of bindings) {
       const hostPort = binding?.HostPort;
       const numericPort = Number(hostPort);
+      const deferredHostPort = allowEmptyHostPort && hostPort === '';
       if (!['127.0.0.1', '::1'].includes(binding?.HostIp) ||
-          !/^[1-9][0-9]{0,4}$/u.test(hostPort || '') ||
-          !Number.isInteger(numericPort) ||
-          numericPort > 65_535) {
+          (
+            !deferredHostPort &&
+            (
+              !/^[1-9][0-9]{0,4}$/u.test(hostPort || '') ||
+              !Number.isInteger(numericPort) ||
+              numericPort > 65_535
+            )
+          )) {
         return false;
       }
     }
@@ -2127,19 +2134,40 @@ function inspectEdgeContainer(name, options = {}) {
   const secretMountReadOnly = query(
     '{{ range .Mounts }}{{ if eq .Destination "/run/secrets/codex-memory-r4" }}{{ not .RW }}{{ end }}{{ end }}'
   ) === 'true';
-  const portBindingsText = query('{{ json .NetworkSettings.Ports }}');
-  let portMap;
+  const configuredPortBindingsText = query(
+    '{{ json .HostConfig.PortBindings }}'
+  );
+  let configuredPortMap;
   try {
-    portMap = JSON.parse(portBindingsText);
+    configuredPortMap = JSON.parse(configuredPortBindingsText);
   } catch {
-    portMap = null;
+    configuredPortMap = null;
   }
-  const hostLoopbackOnly = publishedPortsLoopbackOnly(portMap, {
+  const configuredHostLoopbackOnly = publishedPortsLoopbackOnly(
+    configuredPortMap,
+    {
+      requiredContainerPort: '8080/tcp',
+      allowEmptyHostPort: true
+    }
+  );
+  const activePortBindingsText = query('{{ json .NetworkSettings.Ports }}');
+  let activePortMap;
+  try {
+    activePortMap = JSON.parse(activePortBindingsText);
+  } catch {
+    activePortMap = null;
+  }
+  const hostLoopbackOnly = publishedPortsLoopbackOnly(activePortMap, {
     requiredContainerPort: '8080/tcp'
   });
   const running = query('{{ .State.Running }}') === 'true';
   const health = query('{{ if .State.Health }}{{ .State.Health.Status }}{{ else }}none{{ end }}');
   const nonRoot = user === 'node' || (/^[1-9][0-9]*$/u.test(user) && user !== '0');
+  const configurationSecure = SAFE_CONTAINER_ID.test(id) &&
+    SAFE_GIT_OBJECT.test(revision) &&
+    nonRoot && readOnlyRoot &&
+    restartPolicy === 'no' && logDriver === 'none' &&
+    secretMountReadOnly && configuredHostLoopbackOnly;
   return Object.freeze({
     id,
     revision,
@@ -2150,12 +2178,19 @@ function inspectEdgeContainer(name, options = {}) {
     restartPolicy,
     logDriver,
     secretMountReadOnly,
+    configuredHostLoopbackOnly,
     hostLoopbackOnly,
-    secure: SAFE_CONTAINER_ID.test(id) && SAFE_GIT_OBJECT.test(revision) &&
-      nonRoot && readOnlyRoot &&
-      restartPolicy === 'no' && logDriver === 'none' &&
-      secretMountReadOnly && hostLoopbackOnly
+    configurationSecure,
+    secure: configurationSecure && (!running || hostLoopbackOnly)
   });
+}
+
+function profileEdgeLifecycleIdentityMatches(profile, edge) {
+  return Boolean(
+    edge?.configurationSecure === true &&
+    edge?.id === profile?.edgeContainerId &&
+    edge?.revision === profile?.runtimeBaseline
+  );
 }
 
 function profileEdgeIdentityMatches(profile, edge) {
@@ -3401,10 +3436,10 @@ async function rollbackStarted(started, profile, environment) {
   }
   if (started.has('edge')) {
     try {
-      requireProfileEdgeIdentity(
-        profile,
-        inspectEdgeContainer(profile.edgeContainerId)
-      );
+      const edge = inspectEdgeContainer(profile.edgeContainerId);
+      if (!profileEdgeLifecycleIdentityMatches(profile, edge)) {
+        throw codedError('stack_edge_identity_mismatch');
+      }
       runDocker(['stop', '--time', '10', profile.edgeContainerId]);
     } catch {
       failures.push('edge');
@@ -4651,6 +4686,7 @@ module.exports = {
   processOwnsLoopbackTcpListener,
   processOwnsUnixListener,
   profileEdgeIdentityMatches,
+  profileEdgeLifecycleIdentityMatches,
   profileManagedEnvironmentConfigMatches,
   profileProviderIdentityMatches,
   profileVcpProviderConfigMatches,

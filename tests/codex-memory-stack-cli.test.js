@@ -56,6 +56,7 @@ const {
   processOwnsLoopbackTcpListener,
   processOwnsUnixListener,
   profileEdgeIdentityMatches,
+  profileEdgeLifecycleIdentityMatches,
   profileManagedEnvironmentConfigMatches,
   profileProviderIdentityMatches,
   profileVcpProviderConfigMatches,
@@ -2121,6 +2122,12 @@ test('Edge inspection validates non-root, read-only, non-restarting, logless loo
       'true'
     ],
     [
+      '{{ json .HostConfig.PortBindings }}',
+      JSON.stringify({
+        '8080/tcp': [{ HostIp: '127.0.0.1', HostPort: '49152' }]
+      })
+    ],
+    [
       '{{ json .NetworkSettings.Ports }}',
       JSON.stringify({
         '8080/tcp': [{ HostIp: '127.0.0.1', HostPort: '49152' }]
@@ -2139,6 +2146,8 @@ test('Edge inspection validates non-root, read-only, non-restarting, logless loo
   assert.equal(edge.secure, true);
   assert.equal(edge.running, true);
   assert.equal(edge.healthy, true);
+  assert.equal(edge.configurationSecure, true);
+  assert.equal(edge.configuredHostLoopbackOnly, true);
 
   values.set(
     '{{ json .NetworkSettings.Ports }}',
@@ -2155,15 +2164,70 @@ test('Edge inspection validates non-root, read-only, non-restarting, logless loo
     }).secure,
     false
   );
+
+  values.set('{{ .State.Running }}', 'false');
+  values.set(
+    '{{ json .NetworkSettings.Ports }}',
+    JSON.stringify({})
+  );
+  values.set(
+    '{{ json .HostConfig.PortBindings }}',
+    JSON.stringify({
+      '8080/tcp': [{ HostIp: '127.0.0.1', HostPort: '' }]
+    })
+  );
+  const stoppedEdge = inspectEdgeContainer(
+    'codex-memory-full-stack-001-edge',
+    {
+      exec(_command, args) {
+        return `${values.get(args[2])}\n`;
+      }
+    }
+  );
+  assert.equal(stoppedEdge.running, false);
+  assert.equal(stoppedEdge.hostLoopbackOnly, false);
+  assert.equal(stoppedEdge.configuredHostLoopbackOnly, true);
+  assert.equal(stoppedEdge.configurationSecure, true);
+  assert.equal(stoppedEdge.secure, true);
+  assert.equal(
+    profileEdgeIdentityMatches(profile(), stoppedEdge),
+    true
+  );
+
+  values.set(
+    '{{ json .HostConfig.PortBindings }}',
+    JSON.stringify({
+      '8080/tcp': [{ HostIp: '0.0.0.0', HostPort: '49152' }]
+    })
+  );
+  const unsafeStoppedEdge = inspectEdgeContainer(
+    'codex-memory-full-stack-001-edge',
+    {
+      exec(_command, args) {
+        return `${values.get(args[2])}\n`;
+      }
+    }
+  );
+  assert.equal(unsafeStoppedEdge.configurationSecure, false);
+  assert.equal(unsafeStoppedEdge.secure, false);
+  assert.equal(
+    profileEdgeIdentityMatches(profile(), unsafeStoppedEdge),
+    false
+  );
 });
 
 test('Edge lifecycle identity requires the exact adopted container ID and revision', () => {
   const edge = {
     id: EDGE_CONTAINER_ID,
     revision: BASELINE,
+    configurationSecure: true,
     secure: true
   };
   assert.equal(profileEdgeIdentityMatches(profile(), edge), true);
+  assert.equal(
+    profileEdgeLifecycleIdentityMatches(profile(), edge),
+    true
+  );
   assert.equal(
     profileEdgeIdentityMatches(profile(), {
       ...edge,
@@ -2182,6 +2246,34 @@ test('Edge lifecycle identity requires the exact adopted container ID and revisi
     profileEdgeIdentityMatches(profile(), {
       ...edge,
       secure: false
+    }),
+    false
+  );
+  assert.equal(
+    profileEdgeLifecycleIdentityMatches(profile(), {
+      ...edge,
+      secure: false
+    }),
+    true
+  );
+  assert.equal(
+    profileEdgeLifecycleIdentityMatches(profile(), {
+      ...edge,
+      id: 'cd'.repeat(32)
+    }),
+    false
+  );
+  assert.equal(
+    profileEdgeLifecycleIdentityMatches(profile(), {
+      ...edge,
+      revision: RETAINED_BINDING_SOURCE
+    }),
+    false
+  );
+  assert.equal(
+    profileEdgeLifecycleIdentityMatches(profile(), {
+      ...edge,
+      configurationSecure: false
     }),
     false
   );

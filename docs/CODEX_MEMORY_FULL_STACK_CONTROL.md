@@ -117,7 +117,10 @@ stored, ordinary same-baseline restarts use only `start`.
    identities;
 7. require the retained Edge container to match the accepted revision and
    retain its non-root, read-only, no-restart, no-log, read-only-secret-mount,
-   host-loopback-only posture across every published container port;
+   host-loopback-only posture across every published container port; while
+   Edge is stopped, validate its persistent `HostConfig.PortBindings`, then
+   after `docker start` separately require the live
+   `NetworkSettings.Ports` to remain loopback-only;
 8. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
    retained Edge, and outbound Relay plus observer in order;
 9. run the native shim in the controller-managed process itself and prove that
@@ -206,7 +209,10 @@ canonical `main`, followed by `adopt-running --replace`. PR validation does not
 perform that lifecycle transition.
 
 `stop` first revalidates the retained binding and the exact adopted Edge
-container ID, revision, and security posture. It then sends `SIGTERM` only to
+container ID, revision, and security posture. A later `start` validates the
+stopped container's persistent loopback publication configuration before
+starting that exact ID, then validates the live publication again before
+acceptance. It sends `SIGTERM` only to
 processes whose owner-only PID file, Node executable, working directory, exact
 script/mode, and applicable environment-file identity match the adopted
 component. Relay `SIGTERM` aborts only an Edge claim poll that has not returned
