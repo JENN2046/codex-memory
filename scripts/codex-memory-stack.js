@@ -15,7 +15,7 @@ const {
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
-const PROFILE_SCHEMA_VERSION = 1;
+const PROFILE_SCHEMA_VERSION = 2;
 const PROFILE_FILENAME = 'full-stack-control.json';
 const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
 const EDGE_CONTAINER_DEFAULT = 'codex-memory-full-stack-001-edge';
@@ -60,15 +60,18 @@ const COMPONENTS = Object.freeze({
 });
 const PROFILE_KEYS = Object.freeze([
   'edgeContainer',
+  'edgeContainerId',
   'governanceEnvironment',
   'privateRoot',
   'relayEnvironment',
   'retainedBinding',
+  'retainedBindingSource',
   'runtimeBaseline',
   'schemaVersion'
 ]);
 const PRIVATE_FILE_MAX_BYTES = 262_144;
 const SAFE_GIT_OBJECT = /^[a-f0-9]{40}$/u;
+const SAFE_CONTAINER_ID = /^[a-f0-9]{64}$/u;
 const SAFE_CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u;
 const SAFE_CODE = /^[a-z][a-z0-9_]{0,95}$/u;
 
@@ -240,7 +243,7 @@ function assertRelativeReference(value) {
 
 function resolvePrivateReference(profile, reference, options = {}) {
   const relative = assertRelativeReference(reference);
-  const root = assertOwnerOnlyDirectory(profile.privateRoot);
+  const root = assertOwnerOnlyDirectory(profile.privateRoot, options);
   const target = path.resolve(root, relative);
   const relation = path.relative(root, target);
   if (!relation || relation.startsWith('..') || path.isAbsolute(relation)) {
@@ -266,11 +269,63 @@ function privateReferencePath(reference, privateRoot) {
   return assertOwnerOnlyFile(target);
 }
 
+function readRetainedBindingFile(file, {
+  fsModule = fs
+} = {}) {
+  const target = assertOwnerOnlyFile(file, {
+    maximumBytes: PRIVATE_FILE_MAX_BYTES,
+    fsModule
+  });
+  let binding;
+  try {
+    binding = JSON.parse(fsModule.readFileSync(target, 'utf8'));
+  } catch {
+    throw codedError('stack_retained_binding_invalid');
+  }
+  if (!binding || typeof binding !== 'object' || Array.isArray(binding)) {
+    throw codedError('stack_retained_binding_invalid');
+  }
+  return binding;
+}
+
+function validateRetainedBindingPayload(binding, expectedSource) {
+  if (!SAFE_GIT_OBJECT.test(expectedSource || '') ||
+      binding?.sourceCommit !== expectedSource ||
+      binding?.governanceBindingFinalized !== true ||
+      binding?.defaultClosed !== true ||
+      binding?.primaryMemoryWriteEnabled !== false ||
+      binding?.publicWriteSurfaceEnabled !== false ||
+      binding?.formalIsolatedShimTargetRequired !== true ||
+      binding?.temporaryEndpointOverrideAllowed !== false) {
+    throw codedError('stack_retained_binding_invalid');
+  }
+  return true;
+}
+
+function profileRetainedBindingMatches(profile, {
+  fsModule = fs
+} = {}) {
+  try {
+    const file = resolvePrivateReference(profile, profile.retainedBinding, {
+      fsModule
+    });
+    const binding = readRetainedBindingFile(file, { fsModule });
+    return validateRetainedBindingPayload(
+      binding,
+      profile.retainedBindingSource
+    ) === true;
+  } catch {
+    return false;
+  }
+}
+
 function validateProfile(value) {
   if (!exactKeys(value, PROFILE_KEYS) ||
       value.schemaVersion !== PROFILE_SCHEMA_VERSION ||
       !SAFE_GIT_OBJECT.test(value.runtimeBaseline || '') ||
+      !SAFE_GIT_OBJECT.test(value.retainedBindingSource || '') ||
       !SAFE_CONTAINER_NAME.test(value.edgeContainer || '') ||
+      !SAFE_CONTAINER_ID.test(value.edgeContainerId || '') ||
       typeof value.privateRoot !== 'string' ||
       !path.isAbsolute(value.privateRoot) ||
       path.resolve(value.privateRoot) !== value.privateRoot) {
@@ -365,6 +420,107 @@ function componentPaths(name, environment = process.env) {
   return Object.freeze({
     pid: path.join(root, 'pids', component.pidFile),
     log: path.join(root, 'logs', component.logFile)
+  });
+}
+
+function lifecycleLockPath(environment = process.env) {
+  return path.join(runtimeDirectory(environment), 'pids', 'lifecycle.lock');
+}
+
+function acquireOwnerLock(file, {
+  fsModule = fs,
+  kill = process.kill,
+  retry = true
+} = {}) {
+  const parent = assertOwnerOnlyDirectory(path.dirname(file), { fsModule });
+  if (path.dirname(file) !== parent) throw codedError('stack_lifecycle_lock_path_invalid');
+  const flags = fs.constants.O_CREAT |
+    fs.constants.O_EXCL |
+    fs.constants.O_WRONLY |
+    (fs.constants.O_CLOEXEC || 0) |
+    (fs.constants.O_NOFOLLOW || 0);
+  let descriptor;
+  try {
+    descriptor = fsModule.openSync(file, flags, 0o600);
+  } catch (error) {
+    if (error?.code !== 'EEXIST') throw codedError('stack_lifecycle_lock_failed');
+    let existing;
+    let pid;
+    try {
+      existing = fsModule.lstatSync(file);
+      if (!existing.isFile() || existing.isSymbolicLink() ||
+          existing.uid !== currentUid() || (existing.mode & 0o077) !== 0 ||
+          existing.size < 1 || existing.size > 32) {
+        throw codedError('stack_lifecycle_lock_invalid');
+      }
+      pid = parsePid(fsModule.readFileSync(file, 'utf8'));
+      if (pid === null) throw codedError('stack_lifecycle_lock_invalid');
+    } catch (inspectionError) {
+      if (inspectionError?.code?.startsWith?.('stack_')) throw inspectionError;
+      throw codedError('stack_lifecycle_lock_invalid');
+    }
+    if (isPidRunning(pid, kill)) throw codedError('stack_lifecycle_busy');
+    if (!retry) throw codedError('stack_lifecycle_lock_recovery_failed');
+    let current;
+    try {
+      current = fsModule.lstatSync(file);
+    } catch {
+      throw codedError('stack_lifecycle_lock_identity_changed');
+    }
+    if (current.dev !== existing.dev || current.ino !== existing.ino ||
+        current.uid !== existing.uid || !current.isFile() ||
+        current.isSymbolicLink()) {
+      throw codedError('stack_lifecycle_lock_identity_changed');
+    }
+    try {
+      fsModule.unlinkSync(file);
+    } catch {
+      throw codedError('stack_lifecycle_lock_recovery_failed');
+    }
+    return acquireOwnerLock(file, { fsModule, kill, retry: false });
+  }
+  let identity;
+  try {
+    fsModule.writeFileSync(descriptor, `${process.pid}\n`, 'utf8');
+    fsModule.fsyncSync(descriptor);
+    identity = fsModule.fstatSync(descriptor);
+    fsModule.closeSync(descriptor);
+    descriptor = undefined;
+    fsModule.chmodSync(file, 0o600);
+  } catch {
+    if (descriptor !== undefined) {
+      try {
+        fsModule.closeSync(descriptor);
+      } catch {}
+    }
+    try {
+      fsModule.unlinkSync(file);
+    } catch {}
+    throw codedError('stack_lifecycle_lock_failed');
+  }
+  let released = false;
+  return Object.freeze({
+    release() {
+      if (released) return false;
+      let current;
+      try {
+        current = fsModule.lstatSync(file);
+      } catch {
+        throw codedError('stack_lifecycle_lock_identity_changed');
+      }
+      if (!current.isFile() || current.isSymbolicLink() ||
+          current.uid !== currentUid() ||
+          current.dev !== identity.dev || current.ino !== identity.ino) {
+        throw codedError('stack_lifecycle_lock_identity_changed');
+      }
+      try {
+        fsModule.unlinkSync(file);
+      } catch {
+        throw codedError('stack_lifecycle_lock_release_failed');
+      }
+      released = true;
+      return true;
+    }
   });
 }
 
@@ -518,6 +674,7 @@ function inspectEdgeContainer(name, options = {}) {
     throw codedError('stack_edge_container_name_invalid');
   }
   const query = format => dockerText(['inspect', '--format', format, name], options);
+  const id = query('{{ .Id }}');
   const revision = query('{{ index .Config.Labels "org.opencontainers.image.revision" }}');
   const user = query('{{ .Config.User }}');
   const readOnlyRoot = query('{{ .HostConfig.ReadonlyRootfs }}') === 'true';
@@ -542,6 +699,7 @@ function inspectEdgeContainer(name, options = {}) {
   const health = query('{{ if .State.Health }}{{ .State.Health.Status }}{{ else }}none{{ end }}');
   const nonRoot = user === 'node' || (/^[1-9][0-9]*$/u.test(user) && user !== '0');
   return Object.freeze({
+    id,
     revision,
     running,
     healthy: health === 'healthy',
@@ -551,10 +709,26 @@ function inspectEdgeContainer(name, options = {}) {
     logDriver,
     secretMountReadOnly,
     hostLoopbackOnly,
-    secure: SAFE_GIT_OBJECT.test(revision) && nonRoot && readOnlyRoot &&
+    secure: SAFE_CONTAINER_ID.test(id) && SAFE_GIT_OBJECT.test(revision) &&
+      nonRoot && readOnlyRoot &&
       restartPolicy === 'no' && logDriver === 'none' &&
       secretMountReadOnly && hostLoopbackOnly
   });
+}
+
+function profileEdgeIdentityMatches(profile, edge) {
+  return Boolean(
+    edge?.secure === true &&
+    edge?.id === profile?.edgeContainerId &&
+    edge?.revision === profile?.runtimeBaseline
+  );
+}
+
+function requireProfileEdgeIdentity(profile, edge) {
+  if (!profileEdgeIdentityMatches(profile, edge)) {
+    throw codedError('stack_edge_identity_mismatch');
+  }
+  return true;
 }
 
 function runDocker(args, {
@@ -772,7 +946,9 @@ function runChildProbe(mode, environmentFile, {
     CODEX_MEMORY_STACK_RUNTIME_BASELINE: profile.runtimeBaseline,
     CODEX_MEMORY_STACK_RUNTIME_DIR: runtimeDirectory(environment),
     CODEX_MEMORY_STACK_RETAINED_BINDING_FILE:
-      resolvePrivateReference(profile, profile.retainedBinding)
+      resolvePrivateReference(profile, profile.retainedBinding),
+    CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE:
+      profile.retainedBindingSource
   };
   try {
     const output = exec(process.execPath, [
@@ -853,6 +1029,37 @@ function lowDisclosureRelayProjection(value) {
   });
 }
 
+function computeStackAccepted({
+  profile,
+  source,
+  processes,
+  provider,
+  shimPort,
+  httpHealth,
+  governance,
+  relay,
+  edge,
+  retainedBindingMatch
+}) {
+  return Boolean(
+    source?.compatible === true &&
+    retainedBindingMatch === true &&
+    provider === true &&
+    processes?.shim?.managed === true && shimPort === true &&
+    processes?.http?.managed === true &&
+    httpHealth?.reachable === true &&
+    httpHealth?.ok === true &&
+    httpHealth?.authRequired === true &&
+    processes?.governance?.managed === true &&
+    governance?.reachable === true &&
+    processes?.relay?.managed === true &&
+    relay?.reachable === true &&
+    edge?.running === true &&
+    edge?.healthy === true &&
+    profileEdgeIdentityMatches(profile, edge)
+  );
+}
+
 async function inspectStack({
   environment = process.env,
   profile = readProfile({ environment })
@@ -891,6 +1098,7 @@ async function inspectStack({
   } catch {
     edge = Object.freeze({
       revision: null,
+      id: null,
       running: false,
       healthy: false,
       secure: false
@@ -902,14 +1110,19 @@ async function inspectStack({
       Object.freeze({ running: value.running, managed: value.managed })
     ])
   );
-  const accepted = source.compatible &&
-    provider &&
-    processes.shim.managed && shimPort &&
-    processes.http.managed && httpHealth.reachable && httpHealth.ok &&
-    processes.governance.managed && governance.reachable &&
-    processes.relay.managed && relay.reachable &&
-    edge.running && edge.healthy && edge.secure &&
-    edge.revision === profile.runtimeBaseline;
+  const retainedBindingMatch = profileRetainedBindingMatches(profile);
+  const accepted = computeStackAccepted({
+    profile,
+    source,
+    processes,
+    provider,
+    shimPort,
+    httpHealth,
+    governance,
+    relay,
+    edge,
+    retainedBindingMatch
+  });
   return Object.freeze({
     accepted,
     configured: true,
@@ -919,6 +1132,7 @@ async function inspectStack({
       currentMain: source.currentMain,
       compatible: source.compatible
     }),
+    retainedBinding: Object.freeze({ identityMatch: retainedBindingMatch }),
     processes: Object.freeze(processProjection),
     provider: Object.freeze({ reachable: provider }),
     shim: Object.freeze({ reachable: shimPort }),
@@ -933,7 +1147,8 @@ async function inspectStack({
       running: edge.running,
       healthy: edge.healthy,
       secure: edge.secure,
-      revisionMatch: edge.revision === profile.runtimeBaseline
+      revisionMatch: edge.revision === profile.runtimeBaseline,
+      identityMatch: profileEdgeIdentityMatches(profile, edge)
     }),
     secretValuesReturned: false,
     rawMemoryReturned: false
@@ -979,7 +1194,9 @@ function spawnManaged(name, mode, environmentFile, {
     CODEX_MEMORY_STACK_RUNTIME_BASELINE: profile.runtimeBaseline,
     CODEX_MEMORY_STACK_RUNTIME_DIR: root,
     CODEX_MEMORY_STACK_RETAINED_BINDING_FILE:
-      resolvePrivateReference(profile, profile.retainedBinding)
+      resolvePrivateReference(profile, profile.retainedBinding),
+    CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE:
+      profile.retainedBindingSource
   };
   let child;
   try {
@@ -1053,7 +1270,11 @@ async function rollbackStarted(started, profile, environment) {
   }
   if (started.has('edge')) {
     try {
-      runDocker(['stop', '--time', '10', profile.edgeContainer]);
+      requireProfileEdgeIdentity(
+        profile,
+        inspectEdgeContainer(profile.edgeContainerId)
+      );
+      runDocker(['stop', '--time', '10', profile.edgeContainerId]);
     } catch {
       failures.push('edge');
     }
@@ -1068,115 +1289,126 @@ async function startStack({
   const source = inspectSourceCompatibility(profile);
   if (!source.compatible) throw codedError('stack_source_compatibility_failed');
   ensureRuntimeDirectories(environment);
-  if (!await portListening(3000)) throw codedError('stack_provider_dependency_unavailable');
-  const edgeBefore = inspectEdgeContainer(profile.edgeContainer);
-  if (!edgeBefore.secure || edgeBefore.revision !== profile.runtimeBaseline) {
-    throw codedError('stack_edge_reprovision_required');
-  }
-  const governanceEnvironment = resolvePrivateReference(
-    profile,
-    profile.governanceEnvironment
-  );
-  const relayEnvironment = resolvePrivateReference(profile, profile.relayEnvironment);
-  const started = new Set();
+  const lifecycleLock = acquireOwnerLock(lifecycleLockPath(environment));
   try {
-    const shimState = inspectManagedProcess('shim', { environment });
-    if (!shimState.running && await portListening(7615)) {
-      throw codedError('stack_unmanaged_shim_listener');
+    if (!profileRetainedBindingMatches(profile)) {
+      throw codedError('stack_retained_binding_identity_mismatch');
     }
-    const shim = spawnManaged('shim', '_run-shim', governanceEnvironment, {
-      profile,
-      environment
-    });
-    if (shim.started) started.add('shim');
-    await waitFor(() => portListening(7615), {
-      failureCode: 'stack_shim_start_timeout'
-    });
-
-    const httpState = inspectManagedProcess('http', { environment });
-    if (!httpState.running && await portListening(7605)) {
-      throw codedError('stack_unmanaged_http_listener');
+    if (!await portListening(3000)) {
+      throw codedError('stack_provider_dependency_unavailable');
     }
-    const httpProcess = spawnManaged('http', '_run-http', governanceEnvironment, {
+    const edgeBefore = inspectEdgeContainer(profile.edgeContainer);
+    requireProfileEdgeIdentity(profile, edgeBefore);
+    const governanceEnvironment = resolvePrivateReference(
       profile,
-      environment
-    });
-    if (httpProcess.started) started.add('http');
-    await waitFor(async () => {
-      const health = await getJsonHealth({ port: 7605 });
-      return health.reachable && health.ok && health.authRequired;
-    }, { failureCode: 'stack_http_start_timeout' });
+      profile.governanceEnvironment
+    );
+    const relayEnvironment = resolvePrivateReference(
+      profile,
+      profile.relayEnvironment
+    );
+    const started = new Set();
+    try {
+      const shimState = inspectManagedProcess('shim', { environment });
+      if (!shimState.running && await portListening(7615)) {
+        throw codedError('stack_unmanaged_shim_listener');
+      }
+      const shim = spawnManaged('shim', '_run-shim', governanceEnvironment, {
+        profile,
+        environment
+      });
+      if (shim.started) started.add('shim');
+      await waitFor(() => portListening(7615), {
+        failureCode: 'stack_shim_start_timeout'
+      });
 
-    const governanceState = inspectManagedProcess('governance', { environment });
-    if (!governanceState.running) {
-      const preparedSockets = runChildProbe(
-        '_prepare-governance-sockets',
+      const httpState = inspectManagedProcess('http', { environment });
+      if (!httpState.running && await portListening(7605)) {
+        throw codedError('stack_unmanaged_http_listener');
+      }
+      const httpProcess = spawnManaged('http', '_run-http', governanceEnvironment, {
+        profile,
+        environment
+      });
+      if (httpProcess.started) started.add('http');
+      await waitFor(async () => {
+        const health = await getJsonHealth({ port: 7605 });
+        return health.reachable && health.ok && health.authRequired;
+      }, { failureCode: 'stack_http_start_timeout' });
+
+      const governanceState = inspectManagedProcess('governance', { environment });
+      if (!governanceState.running) {
+        const preparedSockets = runChildProbe(
+          '_prepare-governance-sockets',
+          governanceEnvironment,
+          { profile, environment }
+        );
+        if (preparedSockets?.accepted !== true) {
+          throw codedError('stack_governance_socket_preparation_failed');
+        }
+      }
+      const governanceProcess = spawnManaged(
+        'governance',
+        '_run-governance',
         governanceEnvironment,
         { profile, environment }
       );
-      if (preparedSockets?.accepted !== true) {
-        throw codedError('stack_governance_socket_preparation_failed');
+      if (governanceProcess.started) started.add('governance');
+      await waitFor(() => {
+        const result = runChildProbe('_probe-governance', governanceEnvironment, {
+          profile,
+          environment
+        });
+        return lowDisclosureGovernanceProjection(result).reachable;
+      }, { failureCode: 'stack_governance_start_timeout' });
+
+      if (!edgeBefore.running) {
+        runDocker(['start', profile.edgeContainerId]);
+        started.add('edge');
       }
-    }
-    const governanceProcess = spawnManaged(
-      'governance',
-      '_run-governance',
-      governanceEnvironment,
-      { profile, environment }
-    );
-    if (governanceProcess.started) started.add('governance');
-    await waitFor(() => {
-      const result = runChildProbe('_probe-governance', governanceEnvironment, {
+      await waitFor(() => {
+        try {
+          const edge = inspectEdgeContainer(profile.edgeContainer);
+          return edge.running && edge.healthy &&
+            profileEdgeIdentityMatches(profile, edge);
+        } catch {
+          return false;
+        }
+      }, {
+        attempts: 80,
+        intervalMs: 500,
+        failureCode: 'stack_edge_start_timeout'
+      });
+
+      const relayProcess = spawnManaged('relay', '_run-relay', relayEnvironment, {
         profile,
         environment
       });
-      return lowDisclosureGovernanceProjection(result).reachable;
-    }, { failureCode: 'stack_governance_start_timeout' });
+      if (relayProcess.started) started.add('relay');
+      await waitFor(() => {
+        const result = runChildProbe('_probe-relay', relayEnvironment, {
+          profile,
+          environment
+        });
+        return lowDisclosureRelayProjection(result).reachable;
+      }, { failureCode: 'stack_relay_start_timeout' });
 
-    if (!edgeBefore.running) {
-      runDocker(['start', profile.edgeContainer]);
-      started.add('edge');
-    }
-    await waitFor(() => {
-      try {
-        const edge = inspectEdgeContainer(profile.edgeContainer);
-        return edge.running && edge.healthy && edge.secure &&
-          edge.revision === profile.runtimeBaseline;
-      } catch {
-        return false;
-      }
-    }, {
-      attempts: 80,
-      intervalMs: 500,
-      failureCode: 'stack_edge_start_timeout'
-    });
-
-    const relayProcess = spawnManaged('relay', '_run-relay', relayEnvironment, {
-      profile,
-      environment
-    });
-    if (relayProcess.started) started.add('relay');
-    await waitFor(() => {
-      const result = runChildProbe('_probe-relay', relayEnvironment, {
-        profile,
-        environment
+      const result = await inspectStack({ environment, profile });
+      if (!result.accepted) throw codedError('stack_final_acceptance_failed');
+      return Object.freeze({
+        ...result,
+        action: started.size === 0 ? 'already_running' : 'started',
+        failClosedRollbackRequired: false
       });
-      return lowDisclosureRelayProjection(result).reachable;
-    }, { failureCode: 'stack_relay_start_timeout' });
-
-    const result = await inspectStack({ environment, profile });
-    if (!result.accepted) throw codedError('stack_final_acceptance_failed');
-    return Object.freeze({
-      ...result,
-      action: started.size === 0 ? 'already_running' : 'started',
-      failClosedRollbackRequired: false
-    });
-  } catch (error) {
-    const rollbackFailures = await rollbackStarted(started, profile, environment);
-    if (rollbackFailures.length > 0) {
-      throw codedError('stack_fail_closed_rollback_incomplete');
+    } catch (error) {
+      const rollbackFailures = await rollbackStarted(started, profile, environment);
+      if (rollbackFailures.length > 0) {
+        throw codedError('stack_fail_closed_rollback_incomplete');
+      }
+      throw error;
     }
-    throw error;
+  } finally {
+    lifecycleLock.release();
   }
 }
 
@@ -1184,84 +1416,114 @@ async function stopStack({
   environment = process.env
 } = {}) {
   const profile = readProfile({ environment });
-  const stopped = [];
-  for (const name of ['relay', 'governance', 'http', 'shim']) {
-    if (await stopManaged(name, { environment })) stopped.push(name);
+  ensureRuntimeDirectories(environment);
+  const lifecycleLock = acquireOwnerLock(lifecycleLockPath(environment));
+  try {
+    if (!profileRetainedBindingMatches(profile)) {
+      throw codedError('stack_retained_binding_identity_mismatch');
+    }
+    const edge = inspectEdgeContainer(profile.edgeContainer);
+    requireProfileEdgeIdentity(profile, edge);
+    const stopped = [];
+    for (const name of ['relay', 'governance', 'http', 'shim']) {
+      if (await stopManaged(name, { environment })) stopped.push(name);
+    }
+    if (edge.running) {
+      requireProfileEdgeIdentity(
+        profile,
+        inspectEdgeContainer(profile.edgeContainerId)
+      );
+      runDocker(['stop', '--time', '10', profile.edgeContainerId]);
+      stopped.push('edge');
+    }
+    return Object.freeze({
+      accepted: true,
+      action: stopped.length === 0 ? 'already_stopped' : 'stopped',
+      stoppedComponents: stopped,
+      containerRemoved: false,
+      autostartInstalled: false,
+      secretValuesReturned: false,
+      rawMemoryReturned: false
+    });
+  } finally {
+    lifecycleLock.release();
   }
-  const edge = inspectEdgeContainer(profile.edgeContainer);
-  if (edge.running) {
-    runDocker(['stop', '--time', '10', profile.edgeContainer]);
-    stopped.push('edge');
-  }
-  return Object.freeze({
-    accepted: true,
-    action: stopped.length === 0 ? 'already_stopped' : 'stopped',
-    stoppedComponents: stopped,
-    containerRemoved: false,
-    autostartInstalled: false,
-    secretValuesReturned: false,
-    rawMemoryReturned: false
-  });
 }
 
 function adoptRunningStack({
   environment = process.env,
   replace = false
 } = {}) {
-  const governance = inspectManagedProcess('governance', { environment });
-  const relay = inspectManagedProcess('relay', { environment });
-  if (!governance.managed || !relay.managed) {
-    throw codedError('stack_adoption_processes_unavailable');
-  }
-  const governanceFile = assertOwnerOnlyFile(
-    extractEnvFileArgument(readProcessCommand(governance.pid))
-  );
-  const relayFile = assertOwnerOnlyFile(
-    extractEnvFileArgument(readProcessCommand(relay.pid))
-  );
-  const privateRoot = discoverPrivateRoot(
-    [governanceFile, relayFile],
-    { environment }
-  );
-  const relative = file => {
-    const value = path.relative(privateRoot, file);
-    if (!value || value.startsWith('..') || path.isAbsolute(value)) {
-      throw codedError('stack_adoption_environment_outside_private_root');
+  ensureRuntimeDirectories(environment);
+  const lifecycleLock = acquireOwnerLock(lifecycleLockPath(environment));
+  try {
+    const governance = inspectManagedProcess('governance', { environment });
+    const relay = inspectManagedProcess('relay', { environment });
+    if (!governance.managed || !relay.managed) {
+      throw codedError('stack_adoption_processes_unavailable');
     }
-    return assertRelativeReference(value);
-  };
-  const retainedBinding = assertRelativeReference(
-    path.join('r5m-exact-head', 'private-binding.json')
-  );
-  assertOwnerOnlyFile(path.resolve(privateRoot, retainedBinding));
-  const edge = inspectEdgeContainer(EDGE_CONTAINER_DEFAULT);
-  if (!edge.secure || !edge.running || !edge.healthy) {
-    throw codedError('stack_adoption_edge_invalid');
+    const governanceFile = assertOwnerOnlyFile(
+      extractEnvFileArgument(readProcessCommand(governance.pid))
+    );
+    const relayFile = assertOwnerOnlyFile(
+      extractEnvFileArgument(readProcessCommand(relay.pid))
+    );
+    const privateRoot = discoverPrivateRoot(
+      [governanceFile, relayFile],
+      { environment }
+    );
+    const relative = file => {
+      const value = path.relative(privateRoot, file);
+      if (!value || value.startsWith('..') || path.isAbsolute(value)) {
+        throw codedError('stack_adoption_environment_outside_private_root');
+      }
+      return assertRelativeReference(value);
+    };
+    const retainedBinding = assertRelativeReference(
+      path.join('r5m-exact-head', 'private-binding.json')
+    );
+    const retainedBindingFile = assertOwnerOnlyFile(
+      path.resolve(privateRoot, retainedBinding)
+    );
+    const retainedBindingPayload = readRetainedBindingFile(retainedBindingFile);
+    const retainedBindingSource = retainedBindingPayload?.sourceCommit;
+    validateRetainedBindingPayload(
+      retainedBindingPayload,
+      retainedBindingSource
+    );
+    const edge = inspectEdgeContainer(EDGE_CONTAINER_DEFAULT);
+    if (!edge.secure || !edge.running || !edge.healthy) {
+      throw codedError('stack_adoption_edge_invalid');
+    }
+    const profile = validateProfile({
+      schemaVersion: PROFILE_SCHEMA_VERSION,
+      runtimeBaseline: edge.revision,
+      privateRoot,
+      governanceEnvironment: relative(governanceFile),
+      relayEnvironment: relative(relayFile),
+      retainedBinding,
+      retainedBindingSource,
+      edgeContainerId: edge.id,
+      edgeContainer: EDGE_CONTAINER_DEFAULT
+    });
+    const source = inspectSourceCompatibility(profile);
+    if (!source.baselineExists || !source.controllerOnlyChanges) {
+      throw codedError('stack_adoption_source_incompatible');
+    }
+    writeProfile(profile, { environment, replace });
+    return Object.freeze({
+      accepted: true,
+      action: 'adopted',
+      profileStored: true,
+      ownerOnlyProfile: true,
+      runtimeBaseline: profile.runtimeBaseline,
+      secretValuesStored: false,
+      secretValuesReturned: false,
+      rawMemoryReturned: false
+    });
+  } finally {
+    lifecycleLock.release();
   }
-  const profile = validateProfile({
-    schemaVersion: PROFILE_SCHEMA_VERSION,
-    runtimeBaseline: edge.revision,
-    privateRoot,
-    governanceEnvironment: relative(governanceFile),
-    relayEnvironment: relative(relayFile),
-    retainedBinding,
-    edgeContainer: EDGE_CONTAINER_DEFAULT
-  });
-  const source = inspectSourceCompatibility(profile);
-  if (!source.baselineExists || !source.controllerOnlyChanges) {
-    throw codedError('stack_adoption_source_incompatible');
-  }
-  writeProfile(profile, { environment, replace });
-  return Object.freeze({
-    accepted: true,
-    action: 'adopted',
-    profileStored: true,
-    ownerOnlyProfile: true,
-    runtimeBaseline: profile.runtimeBaseline,
-    secretValuesStored: false,
-    secretValuesReturned: false,
-    rawMemoryReturned: false
-  });
 }
 
 function readPrivateText(reference, privateRoot, maximumBytes = 16_384) {
@@ -1483,23 +1745,12 @@ function runHttpChild() {
 
 function validateRetainedBinding(privateRoot) {
   const file = process.env.CODEX_MEMORY_STACK_RETAINED_BINDING_FILE;
-  const value = readPrivateText(`file:${file}`, privateRoot, PRIVATE_FILE_MAX_BYTES);
-  let binding;
-  try {
-    binding = JSON.parse(value);
-  } catch {
-    throw codedError('stack_retained_binding_invalid');
-  }
-  if (!SAFE_GIT_OBJECT.test(binding?.sourceCommit || '') ||
-      binding?.governanceBindingFinalized !== true ||
-      binding?.defaultClosed !== true ||
-      binding?.primaryMemoryWriteEnabled !== false ||
-      binding?.publicWriteSurfaceEnabled !== false ||
-      binding?.formalIsolatedShimTargetRequired !== true ||
-      binding?.temporaryEndpointOverrideAllowed !== false) {
-    throw codedError('stack_retained_binding_invalid');
-  }
-  return true;
+  const target = privateReferencePath(`file:${file}`, privateRoot);
+  const binding = readRetainedBindingFile(target);
+  return validateRetainedBindingPayload(
+    binding,
+    process.env.CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE
+  );
 }
 
 async function runGovernanceChild() {
@@ -1725,6 +1976,7 @@ if (require.main === module) {
 module.exports = {
   CONTROLLER_CHANGE_PATHS,
   PROFILE_KEYS,
+  acquireOwnerLock,
   adoptRunningStack,
   assertPrivateRootBoundary,
   assertRelativeReference,
@@ -1732,6 +1984,7 @@ module.exports = {
   buildShimChildEnvironment,
   childBaseEnvironment,
   commandMatchesComponent,
+  computeStackAccepted,
   discoverPrivateRoot,
   exactKeys,
   extractEnvFileArgument,
@@ -1743,9 +1996,11 @@ module.exports = {
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
+  profileEdgeIdentityMatches,
   probeUnixSocket,
   readPidFile,
   safeCode,
   validateExpectedMappingEnvironment,
+  validateRetainedBindingPayload,
   validateProfile
 };

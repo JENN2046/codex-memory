@@ -10,12 +10,14 @@ const test = require('node:test');
 const {
   CONTROLLER_CHANGE_PATHS,
   PROFILE_KEYS,
+  acquireOwnerLock,
   assertPrivateRootBoundary,
   assertRelativeReference,
   buildHttpChildEnvironment,
   buildShimChildEnvironment,
   childBaseEnvironment,
   commandMatchesComponent,
+  computeStackAccepted,
   discoverPrivateRoot,
   exactKeys,
   extractEnvFileArgument,
@@ -27,22 +29,72 @@ const {
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
+  profileEdgeIdentityMatches,
   safeCode,
   validateExpectedMappingEnvironment,
+  validateRetainedBindingPayload,
   validateProfile
 } = require('../scripts/codex-memory-stack');
 
 const BASELINE = '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118';
+const RETAINED_BINDING_SOURCE = 'f1dea016a7a167898d77be6575403e7a7d28c8d5';
+const EDGE_CONTAINER_ID = 'ab'.repeat(32);
 
 function profile(overrides = {}) {
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     runtimeBaseline: BASELINE,
+    retainedBindingSource: RETAINED_BINDING_SOURCE,
     privateRoot: '/synthetic/owner-only',
     governanceEnvironment: 'governance/runtime.env',
     relayEnvironment: 'relay/runtime.env',
     retainedBinding: 'r5m-exact-head/private-binding.json',
     edgeContainer: 'codex-memory-full-stack-001-edge',
+    edgeContainerId: EDGE_CONTAINER_ID,
+    ...overrides
+  };
+}
+
+function retainedBinding(overrides = {}) {
+  return {
+    sourceCommit: RETAINED_BINDING_SOURCE,
+    governanceBindingFinalized: true,
+    defaultClosed: true,
+    primaryMemoryWriteEnabled: false,
+    publicWriteSurfaceEnabled: false,
+    formalIsolatedShimTargetRequired: true,
+    temporaryEndpointOverrideAllowed: false,
+    ...overrides
+  };
+}
+
+function acceptedStack(overrides = {}) {
+  return {
+    profile: profile(),
+    source: { compatible: true },
+    processes: {
+      shim: { managed: true },
+      http: { managed: true },
+      governance: { managed: true },
+      relay: { managed: true }
+    },
+    provider: true,
+    shimPort: true,
+    httpHealth: {
+      reachable: true,
+      ok: true,
+      authRequired: true
+    },
+    governance: { reachable: true },
+    relay: { reachable: true },
+    edge: {
+      id: EDGE_CONTAINER_ID,
+      revision: BASELINE,
+      running: true,
+      healthy: true,
+      secure: true
+    },
+    retainedBindingMatch: true,
     ...overrides
   };
 }
@@ -178,6 +230,60 @@ test('PID and env-file parsing fail closed', () => {
     () => extractEnvFileArgument(['node', 'runner.js']),
     { code: 'stack_process_env_file_missing' }
   );
+});
+
+test('lifecycle lock excludes a live owner and releases by exact inode', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-stack-lock-'));
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'lifecycle.lock');
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  const first = acquireOwnerLock(file, {
+    kill(pid, signal) {
+      assert.equal(pid, process.pid);
+      assert.equal(signal, 0);
+    }
+  });
+  assert.throws(
+    () => acquireOwnerLock(file, {
+      kill(pid, signal) {
+        assert.equal(pid, process.pid);
+        assert.equal(signal, 0);
+      }
+    }),
+    { code: 'stack_lifecycle_busy' }
+  );
+  assert.equal(first.release(), true);
+  assert.equal(first.release(), false);
+  assert.equal(fs.existsSync(file), false);
+});
+
+test('lifecycle lock recovers only a well-formed dead-owner lock', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-stack-lock-'));
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'lifecycle.lock');
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  fs.writeFileSync(file, '999999999\n', { mode: 0o600 });
+  const recovered = acquireOwnerLock(file, {
+    kill() {
+      const error = new Error('missing');
+      error.code = 'ESRCH';
+      throw error;
+    }
+  });
+  assert.equal(recovered.release(), true);
+
+  fs.writeFileSync(file, 'not-a-pid\n', { mode: 0o600 });
+  assert.throws(
+    () => acquireOwnerLock(file, {
+      kill() {
+        throw new Error('must not probe malformed owner identity');
+      }
+    }),
+    { code: 'stack_lifecycle_lock_invalid' }
+  );
+  assert.equal(fs.readFileSync(file, 'utf8'), 'not-a-pid\n');
 });
 
 test('governance stale-socket cleanup rejects active sockets and never unlinks them', async t => {
@@ -338,6 +444,28 @@ test('HTTP child requires the exact governed mapping binding shape', () => {
   );
 });
 
+test('retained governance binding is pinned independently from the runtime baseline', () => {
+  assert.notEqual(RETAINED_BINDING_SOURCE, BASELINE);
+  assert.equal(
+    validateRetainedBindingPayload(
+      retainedBinding(),
+      RETAINED_BINDING_SOURCE
+    ),
+    true
+  );
+  assert.throws(
+    () => validateRetainedBindingPayload(retainedBinding(), BASELINE),
+    { code: 'stack_retained_binding_invalid' }
+  );
+  assert.throws(
+    () => validateRetainedBindingPayload(
+      retainedBinding({ publicWriteSurfaceEnabled: true }),
+      RETAINED_BINDING_SOURCE
+    ),
+    { code: 'stack_retained_binding_invalid' }
+  );
+});
+
 test('source compatibility allows only controller delivery paths over the accepted runtime baseline', () => {
   const calls = [];
   const fakeExec = (_command, args) => {
@@ -370,6 +498,7 @@ test('source compatibility allows only controller delivery paths over the accept
 
 test('Edge inspection validates non-root, read-only, non-restarting, logless loopback posture', () => {
   const values = new Map([
+    ['{{ .Id }}', EDGE_CONTAINER_ID],
     ['{{ index .Config.Labels "org.opencontainers.image.revision" }}', BASELINE],
     ['{{ .Config.User }}', 'node'],
     ['{{ .HostConfig.ReadonlyRootfs }}', 'true'],
@@ -407,6 +536,68 @@ test('Edge inspection validates non-root, read-only, non-restarting, logless loo
         return `${values.get(args[2])}\n`;
       }
     }).secure,
+    false
+  );
+});
+
+test('Edge lifecycle identity requires the exact adopted container ID and revision', () => {
+  const edge = {
+    id: EDGE_CONTAINER_ID,
+    revision: BASELINE,
+    secure: true
+  };
+  assert.equal(profileEdgeIdentityMatches(profile(), edge), true);
+  assert.equal(
+    profileEdgeIdentityMatches(profile(), {
+      ...edge,
+      id: 'cd'.repeat(32)
+    }),
+    false
+  );
+  assert.equal(
+    profileEdgeIdentityMatches(profile(), {
+      ...edge,
+      revision: RETAINED_BINDING_SOURCE
+    }),
+    false
+  );
+  assert.equal(
+    profileEdgeIdentityMatches(profile(), {
+      ...edge,
+      secure: false
+    }),
+    false
+  );
+});
+
+test('stack acceptance requires HTTP authentication and every pinned identity', () => {
+  const accepted = acceptedStack();
+  assert.equal(computeStackAccepted(accepted), true);
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      httpHealth: {
+        ...accepted.httpHealth,
+        authRequired: false
+      }
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      retainedBindingMatch: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      edge: {
+        ...accepted.edge,
+        id: 'cd'.repeat(32)
+      }
+    }),
     false
   );
 });

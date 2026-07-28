@@ -4,9 +4,9 @@
 entrypoint for the already provisioned owner runtime:
 
 ```bash
-codex-memory-stack start
-codex-memory-stack status
-codex-memory-stack stop
+node scripts/codex-memory-stack.js start
+node scripts/codex-memory-stack.js status
+node scripts/codex-memory-stack.js stop
 ```
 
 The command is intentionally a controller, not a provisioning or authorization
@@ -26,8 +26,11 @@ node scripts/codex-memory-stack.js adopt-running
 
 Adoption reads process command metadata and container security metadata. It
 does not read or copy environment-file values. It writes an owner-only profile
-containing only the accepted Git baseline and relative references to existing
-owner-only environment and binding files. Use `--replace` only after a newly
+containing the accepted Git baseline, exact retained Edge container identity,
+the independently accepted retained-binding source identity, and relative
+references to existing owner-only environment and binding files. The retained
+binding may predate the runtime baseline, but its accepted source identity
+cannot drift without a new adoption. Use `--replace` only after a newly
 provisioned stack has completed a fresh exact-baseline acceptance.
 
 ## Start Semantics
@@ -47,6 +50,10 @@ provisioned stack has completed a fresh exact-baseline acceptance.
    relay observation, and Edge health;
 7. stop only components newly started by that invocation if any gate fails.
 
+`start`, `stop`, and profile adoption share an owner-only atomic lifecycle
+lock. A concurrent lifecycle invocation fails closed, and a crash-left lock is
+removed only after its recorded PID is dead and its inode is revalidated.
+
 The controller never performs `record_memory`. HTTP write delegation, write
 tool exposure, candidate cache, shadow writes, vector-index writes, and
 automatic rebuilds are forced off by the managed HTTP child.
@@ -65,6 +72,8 @@ exact-baseline acceptance instead of using `--force`.
 and safe lifecycle states. It does not return private paths, environment
 values, tokens, keys, raw memory, request bodies, or provider responses.
 
-`stop` sends `SIGTERM` only to processes whose owner-only PID file and command
-identity match the managed component. It stops but does not remove the retained
-Edge container. It never escalates to `SIGKILL`.
+`stop` first revalidates the retained binding and the exact adopted Edge
+container ID, revision, and security posture. It then sends `SIGTERM` only to
+processes whose owner-only PID file and command identity match the managed
+component. It stops but does not remove the retained Edge container. It never
+escalates to `SIGKILL`.
