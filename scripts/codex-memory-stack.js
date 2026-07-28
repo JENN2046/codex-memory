@@ -66,6 +66,12 @@ const COMPONENTS = Object.freeze({
     mode: '_run-relay'
   })
 });
+const MANAGED_STOP_WAIT_MS = Object.freeze({
+  shim: 45_000,
+  http: 10_000,
+  governance: 10_000,
+  relay: 10_000
+});
 const LEGACY_PROFILE_KEYS = Object.freeze([
   'edgeContainer',
   'edgeContainerId',
@@ -3358,15 +3364,29 @@ async function stopManaged(name, {
   } catch {
     throw codedError('stack_process_stop_failed');
   }
-  await waitFor(() => !isPidRunning(current.pid), {
-    attempts: 50,
-    intervalMs: 200,
-    failureCode: 'stack_process_stop_timeout'
-  });
+  await waitFor(
+    () => !isPidRunning(current.pid),
+    managedStopWaitOptions(name)
+  );
   try {
     fs.unlinkSync(locations.pid);
   } catch {}
   return true;
+}
+
+function managedStopWaitOptions(name) {
+  const budgetMs = MANAGED_STOP_WAIT_MS[name];
+  const intervalMs = 200;
+  if (!Number.isSafeInteger(budgetMs) ||
+      budgetMs < intervalMs ||
+      budgetMs % intervalMs !== 0) {
+    throw codedError('stack_component_invalid');
+  }
+  return Object.freeze({
+    attempts: (budgetMs / intervalMs) + 1,
+    intervalMs,
+    failureCode: 'stack_process_stop_timeout'
+  });
 }
 
 async function rollbackStarted(started, profile, environment) {
@@ -4619,6 +4639,7 @@ module.exports = {
   legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
   loadManagedEnvironmentFile,
+  managedStopWaitOptions,
   managedEnvironmentConfigDigest,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,

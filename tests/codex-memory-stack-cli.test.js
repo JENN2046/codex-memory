@@ -44,6 +44,7 @@ const {
   governanceCredentialFreshnessMatches,
   governancePrivateFileIdentities,
   loadManagedEnvironmentFile,
+  managedStopWaitOptions,
   managedEnvironmentConfigDigest,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,
@@ -896,6 +897,25 @@ test('managed spawn persists PID before unref and confirms failed spawns exit', 
   }), true);
   assert.equal(probes, 3);
   assert.equal(waits, 2);
+});
+
+test('managed stop wait budget covers the complete shim drain window', () => {
+  const shim = managedStopWaitOptions('shim');
+  assert.deepEqual(shim, {
+    attempts: 226,
+    intervalMs: 200,
+    failureCode: 'stack_process_stop_timeout'
+  });
+  assert.equal((shim.attempts - 1) * shim.intervalMs, 45_000);
+  for (const name of ['http', 'governance', 'relay']) {
+    const options = managedStopWaitOptions(name);
+    assert.equal((options.attempts - 1) * options.intervalMs, 10_000);
+    assert.equal(options.failureCode, 'stack_process_stop_timeout');
+  }
+  assert.throws(
+    () => managedStopWaitOptions('unknown'),
+    { code: 'stack_component_invalid' }
+  );
 });
 
 test('governance stale-socket cleanup rejects active sockets and never unlinks them', async t => {

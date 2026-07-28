@@ -210,6 +210,9 @@ container ID, revision, and security posture. It then sends `SIGTERM` only to
 processes whose owner-only PID file, Node executable, working directory, exact
 script/mode, and applicable environment-file identity match the adopted
 component. Relay `SIGTERM` aborts its active Edge or UDS operation so the
-process can close within the controller's bounded shutdown wait. The
-controller stops but does not remove the retained Edge container, and it never
-escalates to `SIGKILL`.
+process can close within its 10-second controller wait. The shim receives a
+45-second wait because its governed shutdown may sequentially wait up to 10
+seconds for active derived work, close the knowledge-base manager, and drain
+for up to another 10 seconds. HTTP and Governance retain the 10-second wait.
+The controller stops but does not remove the retained Edge container, and it
+never escalates to `SIGKILL`.
