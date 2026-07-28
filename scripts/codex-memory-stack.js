@@ -7,6 +7,7 @@ const http = require('node:http');
 const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
+const { parseEnv } = require('node:util');
 const {
   execFile,
   execFileSync,
@@ -64,6 +65,8 @@ const SAFE_CONTAINER_ID = /^[a-f0-9]{64}$/u;
 const SAFE_CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u;
 const SAFE_CODE = /^[a-z][a-z0-9_]{0,95}$/u;
 const SAFE_CHILD_PATH = '/usr/bin:/bin';
+const SAFE_MANAGED_ENVIRONMENT_NAME =
+  /^CODEX_MEMORY_R(?:4|5)_[A-Z0-9_]{1,96}$/u;
 
 function codedError(code) {
   const safe = SAFE_CODE.test(code || '') ? code : 'codex_memory_stack_failed';
@@ -297,6 +300,57 @@ function readRetainedBindingFile(file, {
     throw codedError('stack_retained_binding_invalid');
   }
   return binding;
+}
+
+function loadManagedEnvironmentFile(file, {
+  fsModule = fs,
+  parse = parseEnv
+} = {}) {
+  const target = assertOwnerOnlyFile(file, {
+    maximumBytes: PRIVATE_FILE_MAX_BYTES,
+    fsModule
+  });
+  let parsed;
+  try {
+    parsed = parse(fsModule.readFileSync(target, 'utf8'));
+  } catch {
+    throw codedError('stack_managed_environment_invalid');
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw codedError('stack_managed_environment_invalid');
+  }
+  for (const [name, value] of Object.entries(parsed)) {
+    if (!SAFE_MANAGED_ENVIRONMENT_NAME.test(name) ||
+        typeof value !== 'string' || value.length > 16_384 ||
+        value.includes('\0')) {
+      throw codedError('stack_managed_environment_key_forbidden');
+    }
+  }
+  return Object.freeze({ ...parsed });
+}
+
+function readVcpProviderEnvironment(file, {
+  fsModule = fs,
+  parse = parseEnv
+} = {}) {
+  const target = assertOwnerOnlyFile(file, {
+    maximumBytes: PRIVATE_FILE_MAX_BYTES,
+    fsModule
+  });
+  let parsed;
+  try {
+    parsed = parse(fsModule.readFileSync(target, 'utf8'));
+  } catch {
+    throw codedError('stack_vcp_provider_environment_invalid');
+  }
+  const apiKey = singleLineSecret(parsed?.API_Key || '');
+  const model = parsed?.WhitelistEmbeddingModel;
+  const dimension = parsed?.VECTORDB_DIMENSION;
+  if (!/^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u.test(model || '') ||
+      !/^[1-9][0-9]{0,5}$/u.test(dimension || '')) {
+    throw codedError('stack_vcp_provider_environment_invalid');
+  }
+  return Object.freeze({ apiKey, model, dimension });
 }
 
 function validateRetainedBindingPayload(binding, expectedSource) {
@@ -650,9 +704,9 @@ function commandMatchesComponent(name, command, {
   }
   const controllerCommand = [
     command[0],
-    `--env-file=${environmentFile}`,
     path.join(profile.runtimeRepository, 'scripts', 'codex-memory-stack.js'),
-    component.mode
+    component.mode,
+    `--stack-environment=${environmentFile}`
   ];
   if (command.length === controllerCommand.length &&
       command.every((value, index) => value === controllerCommand[index])) {
@@ -731,6 +785,15 @@ function deriveRuntimeRepositoryFromHttpIdentity(identity, {
         path.basename(path.dirname(script)) !== 'scripts') {
       throw codedError('stack_adoption_http_identity_invalid');
     }
+  } else if (command.length === 4 &&
+      command[2] === '_run-http' &&
+      command[3].startsWith('--stack-environment=')) {
+    extractEnvFileArgument(command);
+    script = resolveCommandPath(command[1], identity.cwd);
+    if (path.basename(script || '') !== 'codex-memory-stack.js' ||
+        path.basename(path.dirname(script)) !== 'scripts') {
+      throw codedError('stack_adoption_http_identity_invalid');
+    }
   } else {
     throw codedError('stack_adoption_http_identity_invalid');
   }
@@ -768,6 +831,11 @@ function extractEnvFileArgument(command) {
   if (!Array.isArray(command)) throw codedError('stack_process_command_invalid');
   for (let index = 0; index < command.length; index += 1) {
     const argument = command[index];
+    if (argument.startsWith('--stack-environment=')) {
+      const value = argument.slice('--stack-environment='.length);
+      if (!path.isAbsolute(value)) throw codedError('stack_process_env_file_invalid');
+      return path.resolve(value);
+    }
     if (argument.startsWith('--env-file=')) {
       const value = argument.slice('--env-file='.length);
       if (!path.isAbsolute(value)) throw codedError('stack_process_env_file_invalid');
@@ -948,18 +1016,103 @@ function portListening(port, host = '127.0.0.1', timeoutMs = 500) {
   });
 }
 
+function httpPolicyFailureCode(value) {
+  const access = value?.access;
+  const auth = value?.auth;
+  const policy = value?.policyGates;
+  if (!exactKeys(access, [
+    'mode',
+    'selectedProjection',
+    'selectedProjectionVersion',
+    'bearerTokenRequiredForMcpTools',
+    'tokenMaterialReturned',
+    'filesystemPathsReturned',
+    'rawStoreFieldsReturned',
+    'rawMemoryFieldsReturned',
+    'embeddingFingerprintReturned',
+    'runtimeDetailLevel'
+  ])) {
+    return 'stack_http_access_shape_invalid';
+  }
+  if (!exactKeys(auth, ['required', 'warning'])) {
+    return 'stack_http_auth_shape_invalid';
+  }
+  if (!exactKeys(policy, [
+    'securityProfile',
+    'softReadPolicyEnabled',
+    'lifecycleReadPolicyEnabled',
+    'writePreflightEnabled',
+    'externalProviderAllowed',
+    'governedNativeBridgeWarnings'
+  ])) {
+    return 'stack_http_policy_shape_invalid';
+  }
+  if (access.mode !== 'health_full' ||
+      access.selectedProjection !== false ||
+      access.selectedProjectionVersion !== 1 ||
+      access.bearerTokenRequiredForMcpTools !== true ||
+      access.tokenMaterialReturned !== false ||
+      access.filesystemPathsReturned !== false ||
+      access.rawStoreFieldsReturned !== false ||
+      access.rawMemoryFieldsReturned !== false ||
+      access.embeddingFingerprintReturned !== false ||
+      access.runtimeDetailLevel !== 'bounded') {
+    return 'stack_http_access_policy_invalid';
+  }
+  if (auth.required !== true || auth.warning !== null) {
+    return 'stack_http_auth_policy_invalid';
+  }
+  if (policy.securityProfile !== 'hardened') {
+    return 'stack_http_security_profile_invalid';
+  }
+  if (policy.softReadPolicyEnabled !== true) {
+    return 'stack_http_soft_read_policy_invalid';
+  }
+  if (policy.lifecycleReadPolicyEnabled !== true) {
+    return 'stack_http_lifecycle_read_policy_invalid';
+  }
+  if (policy.writePreflightEnabled !== true) {
+    return 'stack_http_write_preflight_policy_invalid';
+  }
+  if (policy.externalProviderAllowed !== false) {
+    return 'stack_http_external_provider_policy_invalid';
+  }
+  if (!Array.isArray(policy.governedNativeBridgeWarnings) ||
+      policy.governedNativeBridgeWarnings.length !== 0) {
+    return 'stack_http_native_bridge_policy_invalid';
+  }
+  return null;
+}
+
+function projectHttpHealthPayload(value, statusCode) {
+  const policyFailureCode = httpPolicyFailureCode(value);
+  return Object.freeze({
+    reachable: statusCode === 200,
+    statusCode: Number.isInteger(statusCode) ? statusCode : null,
+    ok: value?.ok === true,
+    authRequired: value?.auth?.required === true ||
+      value?.authentication?.required === true,
+    policyAccepted: policyFailureCode === null,
+    policyFailureCode
+  });
+}
+
 function getJsonHealth({
   host = '127.0.0.1',
   port,
   pathname = '/health',
-  timeoutMs = 1000
+  timeoutMs = 1000,
+  bearerToken = ''
 }) {
   return new Promise(resolve => {
     const request = http.get({
       host,
       port,
       path: pathname,
-      timeout: timeoutMs
+      timeout: timeoutMs,
+      headers: bearerToken
+        ? { Authorization: `Bearer ${bearerToken}` }
+        : undefined
     }, response => {
       let bytes = 0;
       const chunks = [];
@@ -974,30 +1127,15 @@ function getJsonHealth({
       response.once('end', () => {
         try {
           const value = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-          resolve(Object.freeze({
-            reachable: response.statusCode === 200,
-            statusCode: response.statusCode,
-            ok: value?.ok === true,
-            authRequired: value?.auth?.required === true ||
-              value?.authentication?.required === true
-          }));
+          resolve(projectHttpHealthPayload(value, response.statusCode));
         } catch {
-          resolve(Object.freeze({
-            reachable: false,
-            statusCode: response.statusCode || null,
-            ok: false,
-            authRequired: false
-          }));
+          resolve(projectHttpHealthPayload(null, response.statusCode));
         }
       });
     });
     request.once('timeout', () => request.destroy());
-    request.once('error', () => resolve(Object.freeze({
-      reachable: false,
-      statusCode: null,
-      ok: false,
-      authRequired: false
-    })));
+    request.once('error', () =>
+      resolve(projectHttpHealthPayload(null, null)));
   });
 }
 
@@ -1127,8 +1265,10 @@ function runChildProbe(mode, environmentFile, {
   environment = process.env,
   exec = execFileSync
 } = {}) {
+  const managedEnvironment = loadManagedEnvironmentFile(environmentFile);
   const childEnvironment = {
     ...childBaseEnvironment(environment),
+    ...managedEnvironment,
     CODEX_MEMORY_STACK_CHILD: '1',
     CODEX_MEMORY_STACK_PRIVATE_ROOT: profile.privateRoot,
     CODEX_MEMORY_STACK_RUNTIME_BASELINE: profile.runtimeBaseline,
@@ -1140,9 +1280,9 @@ function runChildProbe(mode, environmentFile, {
   };
   try {
     const output = exec(process.execPath, [
-      `--env-file=${environmentFile}`,
       SCRIPT_PATH,
-      mode
+      mode,
+      `--stack-environment=${environmentFile}`
     ], {
       cwd: REPO_ROOT,
       encoding: 'utf8',
@@ -1155,6 +1295,21 @@ function runChildProbe(mode, environmentFile, {
   } catch {
     return null;
   }
+}
+
+function lowDisclosureHttpProjection(value) {
+  const policyFailureCode = SAFE_CODE.test(value?.policyFailureCode || '')
+    ? value.policyFailureCode
+    : 'stack_http_policy_unavailable';
+  return Object.freeze({
+    reachable: value?.reachable === true,
+    ok: value?.ok === true,
+    authRequired: value?.authRequired === true,
+    policyAccepted: value?.policyAccepted === true,
+    policyFailureCode: value?.policyAccepted === true
+      ? null
+      : policyFailureCode
+  });
 }
 
 function lowDisclosureGovernanceProjection(value) {
@@ -1236,6 +1391,7 @@ function computeRuntimeAccepted({
     httpHealth?.reachable === true &&
     httpHealth?.ok === true &&
     httpHealth?.authRequired === true &&
+    httpHealth?.policyAccepted === true &&
     processes?.governance?.managed === true &&
     governance?.reachable === true &&
     processes?.relay?.managed === true &&
@@ -1264,16 +1420,22 @@ async function inspectStack({
       inspectManagedProcess(name, { environment, profile })
     ])
   );
-  const [provider, shimPort, httpHealth] = await Promise.all([
-    portListening(3000),
-    portListening(7615),
-    getJsonHealth({ port: 7605 })
-  ]);
   const governanceEnvironment = resolvePrivateReference(
     profile,
     profile.governanceEnvironment
   );
   const relayEnvironment = resolvePrivateReference(profile, profile.relayEnvironment);
+  const [provider, shimPort] = await Promise.all([
+    portListening(3000),
+    portListening(7615)
+  ]);
+  const httpHealth = processes.http.managed
+    ? lowDisclosureHttpProjection(runChildProbe(
+      '_probe-http',
+      governanceEnvironment,
+      { profile, environment }
+    ))
+    : lowDisclosureHttpProjection(null);
   const governance = processes.governance.managed
     ? lowDisclosureGovernanceProjection(runChildProbe(
       '_probe-governance',
@@ -1348,7 +1510,9 @@ async function inspectStack({
     httpMcp: Object.freeze({
       reachable: httpHealth.reachable,
       healthy: httpHealth.ok,
-      authRequired: httpHealth.authRequired
+      authRequired: httpHealth.authRequired,
+      policyAccepted: httpHealth.policyAccepted,
+      policyFailureCode: httpHealth.policyFailureCode
     }),
     governance,
     relay,
@@ -1396,8 +1560,10 @@ function spawnManaged(name, mode, environmentFile, {
     0o600
   );
   fs.chmodSync(locations.log, 0o600);
+  const managedEnvironment = loadManagedEnvironmentFile(environmentFile);
   const childEnvironment = {
     ...childBaseEnvironment(environment),
+    ...managedEnvironment,
     CODEX_MEMORY_STACK_CHILD: '1',
     CODEX_MEMORY_STACK_PRIVATE_ROOT: profile.privateRoot,
     CODEX_MEMORY_STACK_RUNTIME_BASELINE: profile.runtimeBaseline,
@@ -1410,9 +1576,9 @@ function spawnManaged(name, mode, environmentFile, {
   let child;
   try {
     child = spawn(process.execPath, [
-      `--env-file=${environmentFile}`,
       SCRIPT_PATH,
-      mode
+      mode,
+      `--stack-environment=${environmentFile}`
     ], {
       cwd: REPO_ROOT,
       detached: true,
@@ -1545,9 +1711,14 @@ async function startStack({
         environment
       });
       if (httpProcess.started) started.add('http');
-      await waitFor(async () => {
-        const health = await getJsonHealth({ port: 7605 });
-        return health.reachable && health.ok && health.authRequired;
+      await waitFor(() => {
+        const health = lowDisclosureHttpProjection(runChildProbe(
+          '_probe-http',
+          governanceEnvironment,
+          { profile, environment }
+        ));
+        return health.reachable && health.ok && health.authRequired &&
+          health.policyAccepted;
       }, { failureCode: 'stack_http_start_timeout' });
 
       const governanceState = inspectManagedProcess(
@@ -1823,8 +1994,14 @@ function buildShimChildEnvironment(environment, {
   token,
   runtimeRoot,
   vcpRoot,
-  mappingPath
+  mappingPath,
+  providerEnvironment
 }) {
+  if (!providerEnvironment || typeof providerEnvironment.apiKey !== 'string' ||
+      typeof providerEnvironment.model !== 'string' ||
+      typeof providerEnvironment.dimension !== 'string') {
+    throw codedError('stack_vcp_provider_environment_invalid');
+  }
   return {
     ...childBaseEnvironment(environment),
     SHIM_HOST: '127.0.0.1',
@@ -1833,6 +2010,10 @@ function buildShimChildEnvironment(environment, {
     VCP_ROOT: vcpRoot,
     VCPTOOLBOX_ROOT: vcpRoot,
     VCP_CONFIG_ENV: path.join(vcpRoot, 'config.env'),
+    API_Key: providerEnvironment.apiKey,
+    API_URL: 'http://127.0.0.1:3000',
+    WhitelistEmbeddingModel: providerEnvironment.model,
+    VECTORDB_DIMENSION: providerEnvironment.dimension,
     KB_ROOT: '',
     KNOWLEDGEBASE_ROOT_PATH: '',
     KB_STORE: path.join(runtimeRoot, 'store'),
@@ -1863,6 +2044,9 @@ function buildHttpChildEnvironment(environment, {
     CODEX_MEMORY_VCHAT_DATA_ROOT: '',
     CODEX_MEMORY_SECURITY_PROFILE: 'hardened',
     CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false',
+    CODEX_MEMORY_ENABLE_SOFT_READ_POLICY: 'true',
+    CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY: 'true',
+    CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT: 'true',
     CODEX_MEMORY_ENABLE_CANDIDATE_CACHE: 'false',
     CODEX_MEMORY_ENABLE_SHADOW_WRITES: 'false',
     CODEX_MEMORY_ENABLE_VECTOR_INDEX: 'false',
@@ -1953,16 +2137,27 @@ async function runShimChild() {
     privateRoot
   );
   const vcpRoot = path.resolve(REPO_ROOT, '..', '..', 'runtime', 'VCPToolBox');
-  assertOwnerOnlyFile(path.join(vcpRoot, 'config.env'));
-  const child = spawn('bash', [
-    path.join(REPO_ROOT, 'scripts', 'start-vcp-native-shim-wsl-newapi.sh')
+  const providerEnvironment = readVcpProviderEnvironment(
+    path.join(vcpRoot, 'config.env')
+  );
+  const child = spawn(process.execPath, [
+    path.join(REPO_ROOT, 'src', 'cli', 'vcp-toolbox-native-mcp-shim.js'),
+    '--host',
+    '127.0.0.1',
+    '--port',
+    '7615',
+    '--vcp-root',
+    vcpRoot,
+    '--kb-store',
+    path.join(runtimeRoot, 'store')
   ], {
     cwd: REPO_ROOT,
     env: buildShimChildEnvironment(process.env, {
       token,
       runtimeRoot,
       vcpRoot,
-      mappingPath
+      mappingPath,
+      providerEnvironment
     }),
     stdio: 'inherit'
   });
@@ -2125,6 +2320,20 @@ async function runRelayChild() {
   await service.run();
 }
 
+async function probeHttpChild() {
+  assertChildMode();
+  const privateRoot = childPrivateRoot();
+  const token = singleLineSecret(readPrivateText(
+    process.env.CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE,
+    privateRoot
+  ));
+  const health = await getJsonHealth({
+    port: 7605,
+    bearerToken: token
+  });
+  process.stdout.write(`${JSON.stringify(health)}\n`);
+}
+
 async function probeGovernanceChild() {
   assertChildMode();
   const socketPath = process.env.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH;
@@ -2193,6 +2402,7 @@ async function main(argv = process.argv.slice(2)) {
   if (command === '_run-http') return runHttpChild();
   if (command === '_run-governance') return runGovernanceChild();
   if (command === '_run-relay') return runRelayChild();
+  if (command === '_probe-http') return probeHttpChild();
   if (command === '_probe-governance') return probeGovernanceChild();
   if (command === '_probe-relay') return probeRelayChild();
   if (command === '_prepare-governance-sockets') {
@@ -2238,18 +2448,21 @@ module.exports = {
   commandMatchesComponent,
   computeRuntimeAccepted,
   computeStackAccepted,
+  deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,
   exactKeys,
   extractEnvFileArgument,
   inspectEdgeContainer,
   inspectSourceCompatibility,
   isPidRunning,
+  loadManagedEnvironmentFile,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
   profileEdgeIdentityMatches,
+  projectHttpHealthPayload,
   probeUnixSocket,
   readPidFile,
   safeCode,

@@ -24,17 +24,20 @@ to that running stack:
 node scripts/codex-memory-stack.js adopt-running
 ```
 
-Adoption reads process command metadata and container security metadata. It
-does not read or copy environment-file values. It writes an owner-only profile
-containing the accepted Git baseline, exact retained Edge container identity,
-the independently accepted retained-binding source identity, the exact
-accepted runtime repository, and relative references to existing owner-only
-environment and binding files. Before writing the profile, adoption validates
-the exact process executable, script, mode and environment-file identities and
-runs the complete low-disclosure runtime acceptance. The retained binding may
-predate the runtime baseline, but its accepted source identity cannot drift
-without a new adoption. Use `--replace` only after a newly provisioned stack
-has completed a fresh exact-baseline acceptance.
+Adoption reads process command metadata, container security metadata, and the
+minimum owner-only references needed for governed probes. It does not store,
+return, or copy environment values into the profile. The profile contains the
+accepted Git baseline, exact retained Edge container identity, the
+independently accepted retained-binding source identity, the exact accepted
+runtime repository, and relative references to existing owner-only environment
+and binding files. Before writing the profile, adoption validates the exact
+process executable, script, mode and environment-file identities, restricts
+managed environment files to governed `CODEX_MEMORY_R4_*` and
+`CODEX_MEMORY_R5_*` names, and runs the complete low-disclosure runtime
+acceptance. The retained binding may predate the runtime baseline, but its
+accepted source identity cannot drift without a new adoption. Use `--replace`
+only after a newly provisioned stack has completed a fresh exact-baseline
+acceptance.
 
 ## Start Semantics
 
@@ -49,8 +52,9 @@ has completed a fresh exact-baseline acceptance.
    host-loopback-only posture;
 5. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
    retained Edge, and outbound Relay plus observer in order;
-6. validate HTTP health, sockets, schema-v3 governance observation, schema-v1
-   relay observation, and Edge health;
+6. validate authenticated full HTTP health and its hardened/no-external-provider
+   policy, sockets, schema-v3 governance observation, schema-v1 relay
+   observation, and Edge health;
 7. stop only components newly started by that invocation if any gate fails.
 
 `start`, `stop`, and profile adoption share an owner-only atomic lifecycle
@@ -60,13 +64,17 @@ removed only after its recorded PID is dead and its inode is revalidated.
 The controller never performs `record_memory`. HTTP write delegation, write
 tool exposure, candidate cache, shadow writes, vector-index writes, and
 automatic rebuilds are forced off by the managed HTTP child.
+Hardened soft-read, lifecycle-read, and write-preflight policy checks are
+forced on even though no public or delegated write path is enabled.
 Caller-supplied root, write-enable, provider, preload, Node option, and public
 tool-surface overrides are removed before managed children start. Shell startup
 and trace injection variables such as `BASH_ENV`, `ENV`, `SHELLOPTS`, and `PS4`
-are also removed and `PATH` is pinned to system binaries before the shim
-launches Bash. The shim is bound back to the canonical workspace runtime,
-isolated store, governed mapping, loopback provider dependency, and
-native-write-off posture.
+are also removed and `PATH` is pinned to system binaries. Owner-only runtime
+environment files are parsed and allowlisted before child launch; they are not
+passed through Node's pre-bootstrap `--env-file` handling. The shim is launched
+directly with the controller's verified `process.execPath`, without a shell,
+and is bound back to the canonical workspace runtime, isolated store, governed
+mapping, loopback provider dependency, and native-write-off posture.
 
 If runtime-critical source, the accepted baseline, owner profile, or Edge
 container changes, startup fails closed. Reprovision and complete a fresh
@@ -74,9 +82,11 @@ exact-baseline acceptance instead of using `--force`.
 
 ## Status And Stop
 
-`status` returns only booleans, counters, schema versions, baseline identity,
-and safe lifecycle states. It does not return private paths, environment
-values, tokens, keys, raw memory, request bodies, or provider responses.
+`status` performs the same authenticated, full hardened-policy HTTP probe used
+by startup and adoption. It returns only booleans, counters, schema versions,
+baseline identity, and bounded policy failure codes. It does not return private
+paths, environment values, tokens, keys, raw memory, request bodies, or
+provider responses.
 
 `stop` first revalidates the retained binding and the exact adopted Edge
 container ID, revision, and security posture. It then sends `SIGTERM` only to

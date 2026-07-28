@@ -20,18 +20,21 @@ const {
   commandMatchesComponent,
   computeRuntimeAccepted,
   computeStackAccepted,
+  deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,
   exactKeys,
   extractEnvFileArgument,
   inspectEdgeContainer,
   inspectSourceCompatibility,
   isPidRunning,
+  loadManagedEnvironmentFile,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
   profileEdgeIdentityMatches,
+  projectHttpHealthPayload,
   safeCode,
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
@@ -86,7 +89,8 @@ function acceptedStack(overrides = {}) {
     httpHealth: {
       reachable: true,
       ok: true,
-      authRequired: true
+      authRequired: true,
+      policyAccepted: true
     },
     governance: { reachable: true },
     relay: { reachable: true },
@@ -227,6 +231,15 @@ test('PID and env-file parsing fail closed', () => {
   );
   assert.equal(
     extractEnvFileArgument(['node', '--env-file', '/owner/relay.env', 'runner.js']),
+    '/owner/relay.env'
+  );
+  assert.equal(
+    extractEnvFileArgument([
+      'node',
+      '/repo/scripts/codex-memory-stack.js',
+      '_run-relay',
+      '--stack-environment=/owner/relay.env'
+    ]),
     '/owner/relay.env'
   );
   assert.throws(
@@ -372,9 +385,9 @@ test('managed command matching binds exact executable, script, mode, and environ
   );
   assert.equal(commandMatchesComponent('governance', [
     process.execPath,
-    `--env-file=${governanceEnvironment}`,
     '/repo/scripts/codex-memory-stack.js',
-    '_run-governance'
+    '_run-governance',
+    `--stack-environment=${governanceEnvironment}`
   ], options), true);
   assert.equal(commandMatchesComponent('governance', [
     'node',
@@ -383,9 +396,9 @@ test('managed command matching binds exact executable, script, mode, and environ
   ], options), false);
   assert.equal(commandMatchesComponent('governance', [
     process.execPath,
-    '--env-file=/other/runtime.env',
     '/repo/scripts/codex-memory-stack.js',
-    '_run-governance'
+    '_run-governance',
+    '--stack-environment=/other/runtime.env'
   ], options), false);
   assert.equal(commandMatchesComponent('governance', legacy, {
     ...options,
@@ -432,10 +445,108 @@ test('managed command matching binds exact executable, script, mode, and environ
   ], options), true);
   assert.equal(commandMatchesComponent('relay', [
     process.execPath,
-    `--env-file=${relayEnvironment}`,
     '/repo/scripts/codex-memory-stack.js',
-    '_run-relay'
+    '_run-relay',
+    `--stack-environment=${relayEnvironment}`
   ], options), true);
+});
+
+test('runtime repository adoption accepts legacy and safe managed HTTP commands', () => {
+  const executable = fs.realpathSync(process.execPath);
+  const fsModule = {
+    realpathSync(value) {
+      if (value === process.execPath || value === executable) return executable;
+      return value;
+    },
+    statSync(value) {
+      if (value === '/repo') {
+        return {
+          isDirectory: () => true,
+          uid: process.getuid(),
+          mode: 0o40755
+        };
+      }
+      return {
+        isFile: () => true,
+        uid: process.getuid(),
+        mode: 0o100755
+      };
+    }
+  };
+  const identity = command => ({
+    executable,
+    cwd: '/repo',
+    command
+  });
+  assert.equal(
+    deriveRuntimeRepositoryFromHttpIdentity(identity([
+      process.execPath,
+      '/repo/src/http-index.js'
+    ]), { fsModule }),
+    '/repo'
+  );
+  assert.equal(
+    deriveRuntimeRepositoryFromHttpIdentity(identity([
+      process.execPath,
+      '--env-file=/owner/governance.env',
+      '/repo/scripts/codex-memory-stack.js',
+      '_run-http'
+    ]), { fsModule }),
+    '/repo'
+  );
+  assert.equal(
+    deriveRuntimeRepositoryFromHttpIdentity(identity([
+      process.execPath,
+      '/repo/scripts/codex-memory-stack.js',
+      '_run-http',
+      '--stack-environment=/owner/governance.env'
+    ]), { fsModule }),
+    '/repo'
+  );
+  assert.throws(
+    () => deriveRuntimeRepositoryFromHttpIdentity(identity([
+      process.execPath,
+      '/repo/scripts/codex-memory-stack.js',
+      '_run-http',
+      '--stack-environment=relative.env'
+    ]), { fsModule }),
+    { code: 'stack_process_env_file_invalid' }
+  );
+});
+
+test('managed environment files reject Node and non-governed startup keys', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-stack-env-'));
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'runtime.env');
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  fs.writeFileSync(
+    file,
+    'CODEX_MEMORY_R4_COUNTER_MODE=r4_session_scoped_live_read_v1\n',
+    { mode: 0o600 }
+  );
+  assert.deepEqual(loadManagedEnvironmentFile(file), {
+    CODEX_MEMORY_R4_COUNTER_MODE: 'r4_session_scoped_live_read_v1'
+  });
+
+  fs.writeFileSync(
+    file,
+    'CODEX_MEMORY_R4_COUNTER_MODE=r4_session_scoped_live_read_v1\n' +
+      'NODE_OPTIONS=--require=/untrusted.js\n',
+    { mode: 0o600 }
+  );
+  assert.throws(
+    () => loadManagedEnvironmentFile(file),
+    { code: 'stack_managed_environment_key_forbidden' }
+  );
+
+  fs.writeFileSync(file, 'CODEX_MEMORY_EXPOSE_WRITE_TOOLS=true\n', {
+    mode: 0o600
+  });
+  assert.throws(
+    () => loadManagedEnvironmentFile(file),
+    { code: 'stack_managed_environment_key_forbidden' }
+  );
 });
 
 test('managed child environments neutralize caller write, root, provider, and public-surface overrides', () => {
@@ -484,7 +595,12 @@ test('managed child environments neutralize caller write, root, provider, and pu
     token: 'synthetic-token',
     runtimeRoot: '/runtime/isolated',
     vcpRoot: '/workspace/runtime/VCPToolBox',
-    mappingPath: '/owner/mapping.json'
+    mappingPath: '/owner/mapping.json',
+    providerEnvironment: {
+      apiKey: 'synthetic-governed-provider-key',
+      model: 'synthetic-embedding-model',
+      dimension: '1024'
+    }
   });
   assert.equal(shim.ENABLE_REAL_ROOT_WRITE, '0');
   assert.equal(shim.KB_ROOT, '');
@@ -492,7 +608,10 @@ test('managed child environments neutralize caller write, root, provider, and pu
   assert.equal(shim.KNOWLEDGEBASE_STORE_PATH, '/runtime/isolated/store');
   assert.equal(shim.WSL_NEWAPI_HOST, '127.0.0.1');
   assert.equal(shim.CODEX_MEMORY_DIARY_SCOPE_MAPPING_PATH, '/owner/mapping.json');
-  assert.equal(Object.hasOwn(shim, 'API_Key'), false);
+  assert.equal(shim.API_Key, 'synthetic-governed-provider-key');
+  assert.equal(shim.API_URL, 'http://127.0.0.1:3000');
+  assert.equal(shim.WhitelistEmbeddingModel, 'synthetic-embedding-model');
+  assert.equal(shim.VECTORDB_DIMENSION, '1024');
 
   const http = buildHttpChildEnvironment(hostile, {
     token: 'synthetic-token',
@@ -500,6 +619,9 @@ test('managed child environments neutralize caller write, root, provider, and pu
   });
   assert.equal(http.CODEX_MEMORY_SECURITY_PROFILE, 'hardened');
   assert.equal(http.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER, 'false');
+  assert.equal(http.CODEX_MEMORY_ENABLE_SOFT_READ_POLICY, 'true');
+  assert.equal(http.CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY, 'true');
+  assert.equal(http.CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT, 'true');
   assert.equal(http.CODEX_MEMORY_EXPOSE_WRITE_TOOLS, 'false');
   assert.equal(http.CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE, 'off');
   assert.equal(http.CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE, 'read_only');
@@ -692,6 +814,16 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
   assert.equal(
     computeStackAccepted({
       ...accepted,
+      httpHealth: {
+        ...accepted.httpHealth,
+        policyAccepted: false
+      }
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
       retainedBindingMatch: false
     }),
     false
@@ -705,6 +837,81 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
       }
     }),
     false
+  );
+});
+
+test('authenticated HTTP health projection requires the full hardened policy shape', () => {
+  const payload = {
+    ok: true,
+    auth: {
+      required: true,
+      warning: null
+    },
+    access: {
+      mode: 'health_full',
+      selectedProjection: false,
+      selectedProjectionVersion: 1,
+      bearerTokenRequiredForMcpTools: true,
+      tokenMaterialReturned: false,
+      filesystemPathsReturned: false,
+      rawStoreFieldsReturned: false,
+      rawMemoryFieldsReturned: false,
+      embeddingFingerprintReturned: false,
+      runtimeDetailLevel: 'bounded'
+    },
+    policyGates: {
+      securityProfile: 'hardened',
+      softReadPolicyEnabled: true,
+      lifecycleReadPolicyEnabled: true,
+      writePreflightEnabled: true,
+      externalProviderAllowed: false,
+      governedNativeBridgeWarnings: []
+    }
+  };
+  const accepted = projectHttpHealthPayload(payload, 200);
+  assert.equal(accepted.reachable, true);
+  assert.equal(accepted.authRequired, true);
+  assert.equal(accepted.policyAccepted, true);
+  assert.equal(accepted.policyFailureCode, null);
+  assert.equal(
+    projectHttpHealthPayload({
+      ...payload,
+      policyGates: {
+        ...payload.policyGates,
+        externalProviderAllowed: true
+      }
+    }, 200).policyFailureCode,
+    'stack_http_external_provider_policy_invalid'
+  );
+  assert.equal(
+    projectHttpHealthPayload({
+      ...payload,
+      policyGates: {
+        ...payload.policyGates,
+        securityProfile: 'local'
+      }
+    }, 200).policyFailureCode,
+    'stack_http_security_profile_invalid'
+  );
+  assert.equal(
+    projectHttpHealthPayload({
+      ...payload,
+      access: {
+        ...payload.access,
+        rawMemoryFieldsReturned: true
+      }
+    }, 200).policyFailureCode,
+    'stack_http_access_policy_invalid'
+  );
+  assert.equal(
+    projectHttpHealthPayload({
+      ...payload,
+      auth: {
+        ...payload.auth,
+        token: 'must-not-be-accepted'
+      }
+    }, 200).policyFailureCode,
+    'stack_http_auth_shape_invalid'
   );
 });
 
