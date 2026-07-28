@@ -14,10 +14,10 @@
   },
   "activeTask": null,
   "lastCompleted": {
-    "taskId": "CM-2157",
-    "validationId": "CMV-2242",
+    "taskId": "CM-2158",
+    "validationId": "CMV-2243",
     "completedAt": "2026-07-28",
-    "scope": "canonical_relay_observer_wiring_source_only"
+    "scope": "v5_full_stack_controller_transition_closeout"
   },
   "acceptedProductBaseline": {
     "prNumber": 61,
