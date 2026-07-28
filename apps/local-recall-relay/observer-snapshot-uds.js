@@ -1,5 +1,6 @@
 'use strict';
 
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const net = require('node:net');
 const path = require('node:path');
@@ -13,6 +14,7 @@ const MAX_SNAPSHOT_RESPONSE_BYTES = 4096;
 const MAX_SNAPSHOT_CONNECTIONS = 4;
 const SNAPSHOT_SOCKET_TIMEOUT_MS = 5000;
 const STALE_SOCKET_PROBE_TIMEOUT_MS = 500;
+const MAX_STARTUP_LOCK_ADDRESS_BYTES = 100;
 const MAX_SNAPSHOT_SOCKET_PATH_BYTES = 100;
 const SNAPSHOT_REQUEST_KEYS = Object.freeze(['operation', 'schema_version']);
 
@@ -24,7 +26,8 @@ function createObserverSnapshotUdsServer({
   realpathSync = fs.realpathSync,
   statSync = fs.statSync,
   unlinkSync,
-  probeSocket = probeObserverSnapshotSocket
+  probeSocket = probeObserverSnapshotSocket,
+  acquireStartupLock = acquireObserverSnapshotStartupLock
 } = {}) {
   if (typeof readObservation !== 'function') {
     throw safeError('relay_observer_snapshot_reader_invalid');
@@ -118,12 +121,16 @@ function createObserverSnapshotUdsServer({
         statSync
       });
       let listening = false;
+      let startupLock = null;
       try {
+        startupLock = await acquireStartupLock(authority);
+        startupLock.assertHeld();
         await prepareObserverSnapshotSocketPath(authority, {
           lstatSync,
           probeSocket,
           unlinkSync
         });
+        startupLock.assertHeld();
         await new Promise((resolve, rejectStart) => {
           const onError = () => {
             server.off('listening', onListening);
@@ -144,6 +151,9 @@ function createObserverSnapshotUdsServer({
           realpathSync,
           statSync
         });
+        startupLock.assertHeld();
+        await startupLock.release();
+        startupLock = null;
       } catch (error) {
         for (const socket of openSockets) socket.destroy();
         if (listening) {
@@ -154,6 +164,8 @@ function createObserverSnapshotUdsServer({
             ? error.code
             : 'relay_observer_snapshot_start_failed'
         );
+      } finally {
+        await startupLock?.release();
       }
       started = true;
       return Object.freeze({
@@ -358,6 +370,69 @@ function probeObserverSnapshotSocket(socketPath, {
   });
 }
 
+function observerSnapshotStartupLockAddress(authority) {
+  if (process.platform !== 'linux' ||
+      !authority ||
+      !Number.isInteger(authority.ownerUid) ||
+      typeof authority.socketPath !== 'string') {
+    throw safeError('relay_observer_snapshot_startup_lock_unsupported');
+  }
+  const digest = crypto.createHash('sha256')
+    .update(`${authority.ownerUid}\0${authority.socketPath}`, 'utf8')
+    .digest('hex')
+    .slice(0, 32);
+  const lockAddress =
+    `\0codex-memory-r5-observer-start-${authority.ownerUid}-${digest}`;
+  if (Buffer.byteLength(lockAddress, 'utf8') > MAX_STARTUP_LOCK_ADDRESS_BYTES) {
+    throw safeError('relay_observer_snapshot_startup_lock_invalid');
+  }
+  return lockAddress;
+}
+
+async function acquireObserverSnapshotStartupLock(authority) {
+  const lockAddress = observerSnapshotStartupLockAddress(authority);
+  const lockServer = net.createServer(socket => socket.destroy());
+  lockServer.maxConnections = 1;
+  await new Promise((resolve, rejectLock) => {
+    const onError = error => {
+      lockServer.off('listening', onListening);
+      rejectLock(safeError(
+        error?.code === 'EADDRINUSE'
+          ? 'relay_observer_snapshot_startup_lock_busy'
+          : 'relay_observer_snapshot_startup_lock_failed'
+      ));
+    };
+    const onListening = () => {
+      lockServer.off('error', onError);
+      resolve();
+    };
+    lockServer.once('error', onError);
+    lockServer.once('listening', onListening);
+    lockServer.listen(lockAddress);
+  });
+  let released = false;
+  return Object.freeze({
+    assertHeld() {
+      if (released || lockServer.listening !== true) {
+        throw safeError('relay_observer_snapshot_startup_lock_lost');
+      }
+      return true;
+    },
+    async release() {
+      if (released) return;
+      try {
+        await new Promise((resolve, rejectRelease) => {
+          lockServer.close(error => error ? rejectRelease(error) : resolve());
+        });
+      } catch {
+        throw safeError('relay_observer_snapshot_startup_lock_release_failed');
+      } finally {
+        released = true;
+      }
+    }
+  });
+}
+
 function safeError(code) {
   return Object.assign(new Error(code), { code });
 }
@@ -367,9 +442,12 @@ module.exports = {
   MAX_SNAPSHOT_REQUEST_BYTES,
   MAX_SNAPSHOT_RESPONSE_BYTES,
   MAX_SNAPSHOT_SOCKET_PATH_BYTES,
+  MAX_STARTUP_LOCK_ADDRESS_BYTES,
   SNAPSHOT_SOCKET_TIMEOUT_MS,
   STALE_SOCKET_PROBE_TIMEOUT_MS,
+  acquireObserverSnapshotStartupLock,
   createObserverSnapshotUdsServer,
+  observerSnapshotStartupLockAddress,
   prepareObserverSnapshotSocketPath,
   probeObserverSnapshotSocket,
   readExistingSnapshotSocketStat,

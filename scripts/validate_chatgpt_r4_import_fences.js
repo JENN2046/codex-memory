@@ -62,7 +62,7 @@ const R4C_RUNTIME_FILE_POLICIES = Object.freeze({
     allowedRuntimeRules: Object.freeze(['runtime_process_access'])
   }),
   'apps/local-recall-relay/observer-snapshot-uds.js': Object.freeze({
-    allowedBuiltins: Object.freeze(['node:fs', 'node:net', 'node:path']),
+    allowedBuiltins: Object.freeze(['node:crypto', 'node:fs', 'node:net', 'node:path']),
     allowedRuntimeRules: Object.freeze([
       'runtime_process_access',
       'service_listener',
@@ -419,9 +419,13 @@ function validateComponentSource(component, { file, source }) {
     const exactLoopbackListen = /\bserver\s*\.\s*listen\s*\(\s*0\s*,\s*['"]127\.0\.0\.1['"]\s*\)/u;
     const exactExternalListen = /\bserver\s*\.\s*listen\s*\(\s*config\.bindPort\s*,\s*config\.bindHost\s*\)/u;
     const exactObserverSnapshotListen = /\bserver\s*\.\s*listen\s*\(\s*socketPath\s*\)/u;
+    const exactObserverStartupLockListen =
+      /\blockServer\s*\.\s*listen\s*\(\s*lockAddress\s*\)/u;
     const exactHttpServerCreation = /\bhttp\s*\.\s*createServer\s*\(/u;
     const exactUdsServerCreation = /\bnet\s*\.\s*createServer\s*\(/u;
     const listenerCalls = [...maskedSource.matchAll(/\bserver\s*\.\s*listen\s*\(/gu)].length;
+    const startupLockListenerCalls =
+      [...maskedSource.matchAll(/\blockServer\s*\.\s*listen\s*\(/gu)].length;
     const httpServerCreations = [...maskedSource.matchAll(/\bhttp\s*\.\s*createServer\s*\(/gu)].length;
     const udsServerCreations = [...maskedSource.matchAll(/\bnet\s*\.\s*createServer\s*\(/gu)].length;
     const observerSnapshotFile =
@@ -436,9 +440,17 @@ function validateComponentSource(component, { file, source }) {
         /\(\s*parentStat\.mode\s*&\s*0o077\s*\)\s*!==\s*0\b/u,
         /\bparentStat\.uid\s*!==\s*authority\.ownerUid\b/u,
         /\(\s*socketStat\.mode\s*&\s*0o777\s*\)\s*!==\s*0o600\b/u,
-        /\bsocketStat\.uid\s*!==\s*authority\.ownerUid\b/u
+        /\bsocketStat\.uid\s*!==\s*authority\.ownerUid\b/u,
+        /\bprocess\.platform\s*!==\s*['"]linux['"]/u,
+        /\bcrypto\.createHash\s*\(\s*['"]sha256['"]\s*\)/u,
+        /\bnet\.createServer\s*\(\s*socket\s*=>\s*socket\.destroy\s*\(\s*\)\s*\)/u,
+        /\blockServer\.maxConnections\s*=\s*1\b/u,
+        /\bstartupLock\s*=\s*await\s+acquireStartupLock\s*\(\s*authority\s*\)[\s\S]{0,240}\bawait\s+prepareObserverSnapshotSocketPath\b/u
       ];
-      if (ownerOnlySnapshotContracts.some(pattern => !pattern.test(source))) {
+      const startupLockAssertions =
+        [...maskedSource.matchAll(/\bstartupLock\s*\.\s*assertHeld\s*\(\s*\)/gu)].length;
+      if (ownerOnlySnapshotContracts.some(pattern => !pattern.test(source)) ||
+          startupLockAssertions !== 3) {
         throw new Error(`owner_only_snapshot_listener_contract_invalid:${relativeFile}`);
       }
     }
@@ -453,13 +465,25 @@ function validateComponentSource(component, { file, source }) {
     const creationCount = observerSnapshotFile
       ? udsServerCreations
       : httpServerCreations;
-    if (!listenPattern.test(source) || listenerCalls !== 1 || creationCount !== 1 ||
+    if (!listenPattern.test(source) ||
+        listenerCalls !== 1 ||
+        creationCount !== (observerSnapshotFile ? 2 : 1) ||
+        (observerSnapshotFile &&
+          (!exactObserverStartupLockListen.test(source) ||
+           startupLockListenerCalls !== 1)) ||
         (observerSnapshotFile ? httpServerCreations !== 0 : udsServerCreations !== 0)) {
       throw new Error(`loopback_listener_contract_invalid:${relativeFile}`);
     }
-    const withoutAllowedListeners = source
-      .replace(creationPattern, match => ' '.repeat(match.length))
-      .replace(listenPattern, match => ' '.repeat(match.length));
+    const withoutAllowedListeners = (
+      observerSnapshotFile
+        ? source
+          .replace(/\bnet\s*\.\s*createServer\s*\(/gu, match => ' '.repeat(match.length))
+          .replace(exactObserverSnapshotListen, match => ' '.repeat(match.length))
+          .replace(exactObserverStartupLockListen, match => ' '.repeat(match.length))
+        : source
+          .replace(creationPattern, match => ' '.repeat(match.length))
+          .replace(listenPattern, match => ' '.repeat(match.length))
+    );
     listenerCheckedSource = maskCommentsAndStringContents(withoutAllowedListeners);
   }
   if (runtimeFilePolicy?.allowedRuntimeRules.includes('stale_socket_cleanup')) {
@@ -570,6 +594,9 @@ function validateBoundaryManifests() {
       relay.observerSnapshotDurableStateImplemented !== false ||
       relay.observerSnapshotStaleSocketCleanupImplemented !== true ||
       relay.observerSnapshotStaleSocketCleanupRequiresInactiveProbe !== true ||
+      relay.observerSnapshotStartupSerialization !== 'linux_abstract_uds_lock' ||
+      relay.observerSnapshotStartupLockDurableStateImplemented !== false ||
+      relay.observerSnapshotStartupLockDataSurface !== false ||
       relay.observerSnapshotRequestIdentifiersRetained !== false ||
       relay.observerSnapshotBodiesRetained !== false ||
       relay.durableStateImplemented !== false) {

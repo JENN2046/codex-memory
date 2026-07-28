@@ -50,6 +50,13 @@ socket, a vanished path, identity drift, a non-socket, an ownership or mode
 mismatch, and every uncertain probe result are never unlinked. Active and
 uncertain collisions fail closed.
 
+The stale-path check, unlink, rebind, chmod, and post-bind validation are held
+under a deterministic per-UID/per-path Linux abstract UDS startup lock. The
+kernel releases that lock on process death, it carries no request or response
+surface, and the code releases it only after the snapshot socket is bound and
+validated. Concurrent recovery attempts therefore fail closed without
+unlinking the winner's live socket.
+
 The surface accepts exactly one newline-terminated request:
 
 ```json
@@ -105,6 +112,8 @@ Source validation covers:
 - permissive and symlinked parent rejection;
 - safe recovery from a synthetic crash-left stale socket, plus rejection of
   active, unsafe, identity-drifted, and probe-uncertain socket paths;
+- concurrent stale-socket recovery serialization, with exactly one live
+  rebound socket and no loser-side unlink;
 - canonical main factory wiring and snapshot-server lifecycle;
 - failure before secret-bound runtime loading when snapshot authority is
   missing or unsafe;

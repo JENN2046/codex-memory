@@ -199,44 +199,13 @@ test('Relay observer UDS removes only a probed-stale owner socket before rebindi
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-stale-'));
   fs.chmodSync(root, 0o700);
   const socketPath = path.join(root, 'observer.sock');
-  const child = childProcess.spawn(process.execPath, [
-    '-e',
-    [
-      "const fs = require('node:fs');",
-      "const net = require('node:net');",
-      'const socketPath = process.argv[1];',
-      'const server = net.createServer(socket => socket.destroy());',
-      'server.listen(socketPath, () => {',
-      '  fs.chmodSync(socketPath, 0o600);',
-      "  if (process.send) process.send('ready');",
-      '});'
-    ].join('\n'),
-    socketPath
-  ], {
-    stdio: ['ignore', 'ignore', 'ignore', 'ipc']
-  });
   let server = null;
   t.after(async () => {
-    if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
     await server?.stop().catch(() => {});
     fs.rmSync(root, { recursive: true, force: true });
   });
 
-  await new Promise((resolve, reject) => {
-    let ready = false;
-    child.once('message', message => {
-      if (message !== 'ready') return reject(new Error('stale fixture readiness invalid'));
-      ready = true;
-      resolve();
-    });
-    child.once('error', reject);
-    child.once('exit', () => {
-      if (!ready) reject(new Error('stale fixture exited before readiness'));
-    });
-  });
-  const childExit = once(child, 'exit');
-  child.kill('SIGKILL');
-  await childExit;
+  await leaveCrashLeftSocket(socketPath);
   const staleStat = fs.lstatSync(socketPath);
   assert.equal(staleStat.isSocket(), true);
   assert.equal(staleStat.uid, process.getuid());
@@ -252,6 +221,42 @@ test('Relay observer UDS removes only a probed-stale owner socket before rebindi
   assert.equal(reboundStat.isSocket(), true);
   assert.equal(reboundStat.uid, process.getuid());
   assert.equal(reboundStat.mode & 0o777, 0o600);
+  const response = await exchange(socketPath, {
+    schema_version: 1,
+    operation: 'snapshot'
+  });
+  assert.equal(JSON.parse(response.data).observation.completion_state, 'idle');
+});
+
+test('Relay observer UDS serializes concurrent stale-socket recovery', {
+  skip: process.platform !== 'linux' || typeof process.getuid !== 'function'
+}, async t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-relay-observer-race-'));
+  fs.chmodSync(root, 0o700);
+  const socketPath = path.join(root, 'observer.sock');
+  await leaveCrashLeftSocket(socketPath);
+  const candidates = [0, 1].map(() => createObserverSnapshotUdsServer({
+    socketPath,
+    readObservation: () => createLowDisclosureRelayObserver().snapshot()
+  }));
+  t.after(async () => {
+    await Promise.all(candidates.map(server => server.stop().catch(() => {})));
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  const results = await Promise.allSettled(candidates.map(server => server.start()));
+  const fulfilled = results.filter(result => result.status === 'fulfilled');
+  const rejected = results.filter(result => result.status === 'rejected');
+  assert.equal(fulfilled.length, 1);
+  assert.equal(rejected.length, 1);
+  assert.match(
+    rejected[0].reason?.code || '',
+    /^relay_observer_snapshot_(?:startup_lock_busy|socket_active)$/
+  );
+  const liveStat = fs.lstatSync(socketPath);
+  assert.equal(liveStat.isSocket(), true);
+  assert.equal(liveStat.uid, process.getuid());
+  assert.equal(liveStat.mode & 0o777, 0o600);
   const response = await exchange(socketPath, {
     schema_version: 1,
     operation: 'snapshot'
@@ -440,6 +445,45 @@ test('canonical outbound-main entrypoint cannot bypass observer wiring factory',
   assert.match(mainBody, /createCanonicalOutboundRelayService\(\)/u);
   assert.doesNotMatch(mainBody, /loadOutboundRelayRuntimeFromEnvironment/u);
 });
+
+async function leaveCrashLeftSocket(socketPath) {
+  const child = childProcess.spawn(process.execPath, [
+    '-e',
+    [
+      "const fs = require('node:fs');",
+      "const net = require('node:net');",
+      'const socketPath = process.argv[1];',
+      'const server = net.createServer(socket => socket.destroy());',
+      'server.listen(socketPath, () => {',
+      '  fs.chmodSync(socketPath, 0o600);',
+      "  if (process.send) process.send('ready');",
+      '});'
+    ].join('\n'),
+    socketPath
+  ], {
+    stdio: ['ignore', 'ignore', 'ignore', 'ipc']
+  });
+  await new Promise((resolve, reject) => {
+    let ready = false;
+    child.once('message', message => {
+      if (message !== 'ready') return reject(new Error('stale fixture readiness invalid'));
+      ready = true;
+      resolve();
+    });
+    child.once('error', reject);
+    child.once('exit', () => {
+      if (!ready) reject(new Error('stale fixture exited before readiness'));
+    });
+  });
+  if (child.exitCode !== null || child.signalCode !== null) {
+    throw new Error('stale fixture exited before crash simulation');
+  }
+  const childExit = once(child, 'exit');
+  if (!child.kill('SIGKILL')) {
+    throw new Error('stale fixture crash simulation failed');
+  }
+  await childExit;
+}
 
 function exchange(socketPath, payload) {
   return new Promise(resolve => {

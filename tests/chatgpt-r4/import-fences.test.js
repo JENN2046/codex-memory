@@ -176,6 +176,20 @@ test('R4-C listener and transport builtin exceptions are exact-file and exact-lo
     )
   }), /stale_socket_cleanup_contract_invalid/);
   assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'lockServer.listen(lockAddress)',
+      "lockServer.listen(8080, '0.0.0.0')"
+    )
+  }), /loopback_listener_contract_invalid|service_listener/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'startupLock.assertHeld();',
+      'startupLock.wasHeld();'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
     file: path.join(ROOTS.relay, 'copied-observer-snapshot-uds.js'),
     source: relayObserverSource
   }), /runtime_process_access|service_listener|builtin_import_forbidden/);
