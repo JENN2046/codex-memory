@@ -27,11 +27,14 @@ node scripts/codex-memory-stack.js adopt-running
 Adoption reads process command metadata and container security metadata. It
 does not read or copy environment-file values. It writes an owner-only profile
 containing the accepted Git baseline, exact retained Edge container identity,
-the independently accepted retained-binding source identity, and relative
-references to existing owner-only environment and binding files. The retained
-binding may predate the runtime baseline, but its accepted source identity
-cannot drift without a new adoption. Use `--replace` only after a newly
-provisioned stack has completed a fresh exact-baseline acceptance.
+the independently accepted retained-binding source identity, the exact
+accepted runtime repository, and relative references to existing owner-only
+environment and binding files. Before writing the profile, adoption validates
+the exact process executable, script, mode and environment-file identities and
+runs the complete low-disclosure runtime acceptance. The retained binding may
+predate the runtime baseline, but its accepted source identity cannot drift
+without a new adoption. Use `--replace` only after a newly provisioned stack
+has completed a fresh exact-baseline acceptance.
 
 ## Start Semantics
 
@@ -58,9 +61,12 @@ The controller never performs `record_memory`. HTTP write delegation, write
 tool exposure, candidate cache, shadow writes, vector-index writes, and
 automatic rebuilds are forced off by the managed HTTP child.
 Caller-supplied root, write-enable, provider, preload, Node option, and public
-tool-surface overrides are removed before managed children start; the shim is
-bound back to the canonical workspace runtime, isolated store, governed mapping,
-loopback provider dependency, and native-write-off posture.
+tool-surface overrides are removed before managed children start. Shell startup
+and trace injection variables such as `BASH_ENV`, `ENV`, `SHELLOPTS`, and `PS4`
+are also removed and `PATH` is pinned to system binaries before the shim
+launches Bash. The shim is bound back to the canonical workspace runtime,
+isolated store, governed mapping, loopback provider dependency, and
+native-write-off posture.
 
 If runtime-critical source, the accepted baseline, owner profile, or Edge
 container changes, startup fails closed. Reprovision and complete a fresh
@@ -74,6 +80,7 @@ values, tokens, keys, raw memory, request bodies, or provider responses.
 
 `stop` first revalidates the retained binding and the exact adopted Edge
 container ID, revision, and security posture. It then sends `SIGTERM` only to
-processes whose owner-only PID file and command identity match the managed
+processes whose owner-only PID file, Node executable, working directory, exact
+script/mode, and applicable environment-file identity match the adopted
 component. It stops but does not remove the retained Edge container. It never
 escalates to `SIGKILL`.

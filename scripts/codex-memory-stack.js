@@ -15,7 +15,7 @@ const {
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
-const PROFILE_SCHEMA_VERSION = 2;
+const PROFILE_SCHEMA_VERSION = 3;
 const PROFILE_FILENAME = 'full-stack-control.json';
 const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
 const EDGE_CONTAINER_DEFAULT = 'codex-memory-full-stack-001-edge';
@@ -28,34 +28,22 @@ const COMPONENTS = Object.freeze({
   shim: Object.freeze({
     pidFile: 'vcp-native-shim.pid',
     logFile: 'vcp-native-shim.log',
-    commandMarkers: Object.freeze([
-      'vcp-toolbox-native-mcp-shim.js',
-      '_run-shim'
-    ])
+    mode: '_run-shim'
   }),
   http: Object.freeze({
     pidFile: 'codex-memory-http.pid',
     logFile: 'codex-memory-http.log',
-    commandMarkers: Object.freeze([
-      'src/http-index.js',
-      '_run-http'
-    ])
+    mode: '_run-http'
   }),
   governance: Object.freeze({
     pidFile: 'governance.pid',
     logFile: 'governance.log',
-    commandMarkers: Object.freeze([
-      'governance-runner.js',
-      '_run-governance'
-    ])
+    mode: '_run-governance'
   }),
   relay: Object.freeze({
     pidFile: 'relay.pid',
     logFile: 'relay.log',
-    commandMarkers: Object.freeze([
-      'relay-runner.js',
-      '_run-relay'
-    ])
+    mode: '_run-relay'
   })
 });
 const PROFILE_KEYS = Object.freeze([
@@ -67,6 +55,7 @@ const PROFILE_KEYS = Object.freeze([
   'retainedBinding',
   'retainedBindingSource',
   'runtimeBaseline',
+  'runtimeRepository',
   'schemaVersion'
 ]);
 const PRIVATE_FILE_MAX_BYTES = 262_144;
@@ -74,6 +63,7 @@ const SAFE_GIT_OBJECT = /^[a-f0-9]{40}$/u;
 const SAFE_CONTAINER_ID = /^[a-f0-9]{64}$/u;
 const SAFE_CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u;
 const SAFE_CODE = /^[a-z][a-z0-9_]{0,95}$/u;
+const SAFE_CHILD_PATH = '/usr/bin:/bin';
 
 function codedError(code) {
   const safe = SAFE_CODE.test(code || '') ? code : 'codex_memory_stack_failed';
@@ -207,6 +197,27 @@ function assertOwnerOnlyDirectory(directory, {
   return resolved;
 }
 
+function assertOwnerRepositoryDirectory(directory, {
+  fsModule = fs
+} = {}) {
+  if (!path.isAbsolute(directory) || path.resolve(directory) !== directory) {
+    throw codedError('stack_runtime_repository_invalid');
+  }
+  let resolved;
+  let stat;
+  try {
+    resolved = fsModule.realpathSync(directory);
+    stat = fsModule.statSync(resolved);
+  } catch {
+    throw codedError('stack_runtime_repository_unavailable');
+  }
+  if (resolved !== directory || !stat.isDirectory() ||
+      stat.uid !== currentUid() || (stat.mode & 0o022) !== 0) {
+    throw codedError('stack_runtime_repository_security_invalid');
+  }
+  return resolved;
+}
+
 function assertOwnerOnlyFile(file, {
   maximumBytes = PRIVATE_FILE_MAX_BYTES,
   fsModule = fs
@@ -328,7 +339,10 @@ function validateProfile(value) {
       !SAFE_CONTAINER_ID.test(value.edgeContainerId || '') ||
       typeof value.privateRoot !== 'string' ||
       !path.isAbsolute(value.privateRoot) ||
-      path.resolve(value.privateRoot) !== value.privateRoot) {
+      path.resolve(value.privateRoot) !== value.privateRoot ||
+      typeof value.runtimeRepository !== 'string' ||
+      !path.isAbsolute(value.runtimeRepository) ||
+      path.resolve(value.runtimeRepository) !== value.runtimeRepository) {
     throw codedError('stack_profile_invalid');
   }
   assertRelativeReference(value.governanceEnvironment);
@@ -352,6 +366,7 @@ function readProfile({
   const profile = validateProfile(parsed);
   assertPrivateRootBoundary(profile.privateRoot, { environment, fsModule });
   assertOwnerOnlyDirectory(profile.privateRoot, { fsModule });
+  assertOwnerRepositoryDirectory(profile.runtimeRepository, { fsModule });
   resolvePrivateReference(profile, profile.governanceEnvironment, { fsModule });
   resolvePrivateReference(profile, profile.relayEnvironment, { fsModule });
   resolvePrivateReference(profile, profile.retainedBinding, { fsModule });
@@ -566,25 +581,186 @@ function readProcessCommand(pid, fsModule = fs) {
   }
 }
 
-function commandMatchesComponent(name, command) {
-  const component = COMPONENTS[name];
-  return Array.isArray(command) && component.commandMarkers.some(marker =>
-    command.some(argument => argument.includes(marker))
+function readProcessIdentity(pid, fsModule = fs) {
+  if (!isPidRunning(pid)) return null;
+  try {
+    const command = readProcessCommand(pid, fsModule);
+    const executable = fsModule.realpathSync(`/proc/${pid}/exe`);
+    const cwd = fsModule.realpathSync(`/proc/${pid}/cwd`);
+    if (command.length < 2 || !path.isAbsolute(executable) ||
+        !path.isAbsolute(cwd)) {
+      return null;
+    }
+    return Object.freeze({ command, executable, cwd });
+  } catch {
+    return null;
+  }
+}
+
+function nodeProcessIdentityMatches(identity, {
+  fsModule = fs
+} = {}) {
+  if (!identity) return false;
+  try {
+    return identity.executable === fsModule.realpathSync(process.execPath);
+  } catch {
+    return false;
+  }
+}
+
+function expectedComponentEnvironmentFile(name, profile) {
+  const reference = name === 'relay'
+    ? profile.relayEnvironment
+    : profile.governanceEnvironment;
+  const target = path.resolve(
+    profile.privateRoot,
+    assertRelativeReference(reference)
   );
+  const relation = path.relative(profile.privateRoot, target);
+  if (!relation || relation.startsWith('..') || path.isAbsolute(relation)) {
+    throw codedError('stack_profile_reference_outside_root');
+  }
+  return target;
+}
+
+function resolveCommandPath(value, cwd) {
+  if (typeof value !== 'string' || !value || value.includes('\0')) return null;
+  return path.resolve(cwd, value);
+}
+
+function commandMatchesComponent(name, command, {
+  executable,
+  cwd,
+  profile,
+  environment = process.env,
+  fsModule = fs
+} = {}) {
+  const component = COMPONENTS[name];
+  if (!component || !profile || !Array.isArray(command) ||
+      !command.every(value => typeof value === 'string') ||
+      cwd !== profile.runtimeRepository ||
+      !nodeProcessIdentityMatches({ executable, cwd, command }, { fsModule })) {
+    return false;
+  }
+  let environmentFile;
+  try {
+    environmentFile = expectedComponentEnvironmentFile(name, profile);
+  } catch {
+    return false;
+  }
+  const controllerCommand = [
+    command[0],
+    `--env-file=${environmentFile}`,
+    path.join(profile.runtimeRepository, 'scripts', 'codex-memory-stack.js'),
+    component.mode
+  ];
+  if (command.length === controllerCommand.length &&
+      command.every((value, index) => value === controllerCommand[index])) {
+    return true;
+  }
+  const runtimeRoot = runtimeDirectory(environment);
+  if (name === 'shim') {
+    const legacy = [
+      command[0],
+      path.join(
+        profile.runtimeRepository,
+        'src',
+        'cli',
+        'vcp-toolbox-native-mcp-shim.js'
+      ),
+      '--host',
+      '127.0.0.1',
+      '--port',
+      '7615',
+      '--vcp-root',
+      path.resolve(profile.runtimeRepository, '..', '..', 'runtime', 'VCPToolBox'),
+      '--kb-store',
+      path.join(runtimeRoot, 'store')
+    ];
+    return command.length === legacy.length &&
+      command.every((value, index) =>
+        index === 1
+          ? resolveCommandPath(value, cwd) === legacy[index]
+          : value === legacy[index]
+      );
+  }
+  if (name === 'http') {
+    return command.length === 2 &&
+      resolveCommandPath(command[1], cwd) ===
+        path.join(profile.runtimeRepository, 'src', 'http-index.js');
+  }
+  const legacyRunner = path.join(runtimeRoot, `${name}-runner.js`);
+  return command.length === 3 &&
+    command[1] === `--env-file=${environmentFile}` &&
+    resolveCommandPath(command[2], cwd) === legacyRunner;
+}
+
+function inspectProcessIdentity(name, {
+  environment = process.env,
+  fsModule = fs
+} = {}) {
+  if (!COMPONENTS[name]) throw codedError('stack_component_invalid');
+  const { pid: pidFile } = componentPaths(name, environment);
+  const pid = readPidFile(pidFile, fsModule);
+  const running = isPidRunning(pid);
+  const identity = running ? readProcessIdentity(pid, fsModule) : null;
+  return Object.freeze({
+    pid,
+    running,
+    identity
+  });
+}
+
+function deriveRuntimeRepositoryFromHttpIdentity(identity, {
+  fsModule = fs
+} = {}) {
+  if (!nodeProcessIdentityMatches(identity, { fsModule })) {
+    throw codedError('stack_adoption_http_identity_invalid');
+  }
+  const command = identity.command;
+  let script;
+  if (command.length === 2) {
+    script = resolveCommandPath(command[1], identity.cwd);
+    if (path.basename(script || '') !== 'http-index.js' ||
+        path.basename(path.dirname(script)) !== 'src') {
+      throw codedError('stack_adoption_http_identity_invalid');
+    }
+  } else if (command.length === 4 && command[3] === '_run-http') {
+    script = resolveCommandPath(command[2], identity.cwd);
+    if (path.basename(script || '') !== 'codex-memory-stack.js' ||
+        path.basename(path.dirname(script)) !== 'scripts') {
+      throw codedError('stack_adoption_http_identity_invalid');
+    }
+  } else {
+    throw codedError('stack_adoption_http_identity_invalid');
+  }
+  const repository = path.resolve(script, '..', '..');
+  if (identity.cwd !== repository) {
+    throw codedError('stack_adoption_http_identity_invalid');
+  }
+  return assertOwnerRepositoryDirectory(repository, { fsModule });
 }
 
 function inspectManagedProcess(name, {
   environment = process.env,
-  fsModule = fs
+  fsModule = fs,
+  profile
 } = {}) {
-  const { pid: pidFile } = componentPaths(name, environment);
-  const pid = readPidFile(pidFile, fsModule);
-  const running = isPidRunning(pid);
-  const command = running ? readProcessCommand(pid, fsModule) : [];
+  const state = inspectProcessIdentity(name, { environment, fsModule });
   return Object.freeze({
-    pid,
-    running,
-    managed: running && commandMatchesComponent(name, command)
+    pid: state.pid,
+    running: state.running,
+    managed: state.running && commandMatchesComponent(
+      name,
+      state.identity?.command,
+      {
+        executable: state.identity?.executable,
+        cwd: state.identity?.cwd,
+        profile,
+        environment,
+        fsModule
+      }
+    )
   });
 }
 
@@ -624,6 +800,7 @@ function gitText(args, {
 }
 
 function inspectSourceCompatibility(profile, options = {}) {
+  const inspectedRepository = path.resolve(options.repoRoot || REPO_ROOT);
   const head = gitText(['rev-parse', 'HEAD^{commit}'], options);
   const originMain = gitText(['rev-parse', 'origin/main^{commit}'], options);
   const clean = gitText(['status', '--porcelain', '--untracked-files=all'], options) === '';
@@ -645,14 +822,17 @@ function inspectSourceCompatibility(profile, options = {}) {
   }
   const controllerOnlyChanges = baselineExists &&
     changedPaths.every(candidate => CONTROLLER_CHANGE_PATHS.has(candidate));
+  const repositoryMatch = inspectedRepository === profile.runtimeRepository;
   return Object.freeze({
     head,
     originMain,
     clean,
     baselineExists,
     currentMain: head === originMain,
+    repositoryMatch,
     controllerOnlyChanges,
-    compatible: clean && baselineExists && head === originMain && controllerOnlyChanges
+    compatible: clean && baselineExists && head === originMain &&
+      repositoryMatch && controllerOnlyChanges
   });
 }
 
@@ -1029,9 +1209,8 @@ function lowDisclosureRelayProjection(value) {
   });
 }
 
-function computeStackAccepted({
+function computeRuntimeAccepted({
   profile,
-  source,
   processes,
   provider,
   shimPort,
@@ -1042,7 +1221,6 @@ function computeStackAccepted({
   retainedBindingMatch
 }) {
   return Boolean(
-    source?.compatible === true &&
     retainedBindingMatch === true &&
     provider === true &&
     processes?.shim?.managed === true && shimPort === true &&
@@ -1060,13 +1238,23 @@ function computeStackAccepted({
   );
 }
 
+function computeStackAccepted(options) {
+  return Boolean(
+    options?.source?.compatible === true &&
+    computeRuntimeAccepted(options)
+  );
+}
+
 async function inspectStack({
   environment = process.env,
   profile = readProfile({ environment })
 } = {}) {
   const source = inspectSourceCompatibility(profile);
   const processes = Object.fromEntries(
-    Object.keys(COMPONENTS).map(name => [name, inspectManagedProcess(name, { environment })])
+    Object.keys(COMPONENTS).map(name => [
+      name,
+      inspectManagedProcess(name, { environment, profile })
+    ])
   );
   const [provider, shimPort, httpHealth] = await Promise.all([
     portListening(3000),
@@ -1111,6 +1299,17 @@ async function inspectStack({
     ])
   );
   const retainedBindingMatch = profileRetainedBindingMatches(profile);
+  const runtimeAccepted = computeRuntimeAccepted({
+    profile,
+    processes,
+    provider,
+    shimPort,
+    httpHealth,
+    governance,
+    relay,
+    edge,
+    retainedBindingMatch
+  });
   const accepted = computeStackAccepted({
     profile,
     source,
@@ -1125,11 +1324,13 @@ async function inspectStack({
   });
   return Object.freeze({
     accepted,
+    runtimeAccepted,
     configured: true,
     runtimeBaseline: profile.runtimeBaseline,
     source: Object.freeze({
       clean: source.clean,
       currentMain: source.currentMain,
+      repositoryMatch: source.repositoryMatch,
       compatible: source.compatible
     }),
     retainedBinding: Object.freeze({ identityMatch: retainedBindingMatch }),
@@ -1174,7 +1375,7 @@ function spawnManaged(name, mode, environmentFile, {
   profile,
   environment = process.env
 }) {
-  const existing = inspectManagedProcess(name, { environment });
+  const existing = inspectManagedProcess(name, { environment, profile });
   if (existing.running) {
     if (!existing.managed) throw codedError('stack_unmanaged_process_detected');
     return Object.freeze({ started: false, pid: existing.pid });
@@ -1231,10 +1432,11 @@ async function waitFor(check, {
 }
 
 async function stopManaged(name, {
-  environment = process.env
+  environment = process.env,
+  profile
 } = {}) {
   const locations = componentPaths(name, environment);
-  const state = inspectManagedProcess(name, { environment });
+  const state = inspectManagedProcess(name, { environment, profile });
   if (!state.running) {
     try {
       fs.unlinkSync(locations.pid);
@@ -1242,12 +1444,16 @@ async function stopManaged(name, {
     return false;
   }
   if (!state.managed) throw codedError('stack_unmanaged_process_detected');
+  const current = inspectManagedProcess(name, { environment, profile });
+  if (!current.running || !current.managed || current.pid !== state.pid) {
+    throw codedError('stack_process_identity_changed');
+  }
   try {
-    process.kill(state.pid, 'SIGTERM');
+    process.kill(current.pid, 'SIGTERM');
   } catch {
     throw codedError('stack_process_stop_failed');
   }
-  await waitFor(() => !isPidRunning(state.pid), {
+  await waitFor(() => !isPidRunning(current.pid), {
     attempts: 50,
     intervalMs: 200,
     failureCode: 'stack_process_stop_timeout'
@@ -1263,7 +1469,7 @@ async function rollbackStarted(started, profile, environment) {
   for (const name of ['relay', 'governance', 'http', 'shim']) {
     if (!started.has(name)) continue;
     try {
-      await stopManaged(name, { environment });
+      await stopManaged(name, { environment, profile });
     } catch {
       failures.push(name);
     }
@@ -1309,7 +1515,7 @@ async function startStack({
     );
     const started = new Set();
     try {
-      const shimState = inspectManagedProcess('shim', { environment });
+      const shimState = inspectManagedProcess('shim', { environment, profile });
       if (!shimState.running && await portListening(7615)) {
         throw codedError('stack_unmanaged_shim_listener');
       }
@@ -1322,7 +1528,7 @@ async function startStack({
         failureCode: 'stack_shim_start_timeout'
       });
 
-      const httpState = inspectManagedProcess('http', { environment });
+      const httpState = inspectManagedProcess('http', { environment, profile });
       if (!httpState.running && await portListening(7605)) {
         throw codedError('stack_unmanaged_http_listener');
       }
@@ -1336,7 +1542,10 @@ async function startStack({
         return health.reachable && health.ok && health.authRequired;
       }, { failureCode: 'stack_http_start_timeout' });
 
-      const governanceState = inspectManagedProcess('governance', { environment });
+      const governanceState = inspectManagedProcess(
+        'governance',
+        { environment, profile }
+      );
       if (!governanceState.running) {
         const preparedSockets = runChildProbe(
           '_prepare-governance-sockets',
@@ -1426,7 +1635,7 @@ async function stopStack({
     requireProfileEdgeIdentity(profile, edge);
     const stopped = [];
     for (const name of ['relay', 'governance', 'http', 'shim']) {
-      if (await stopManaged(name, { environment })) stopped.push(name);
+      if (await stopManaged(name, { environment, profile })) stopped.push(name);
     }
     if (edge.running) {
       requireProfileEdgeIdentity(
@@ -1450,23 +1659,29 @@ async function stopStack({
   }
 }
 
-function adoptRunningStack({
+async function adoptRunningStack({
   environment = process.env,
   replace = false
 } = {}) {
   ensureRuntimeDirectories(environment);
   const lifecycleLock = acquireOwnerLock(lifecycleLockPath(environment));
   try {
-    const governance = inspectManagedProcess('governance', { environment });
-    const relay = inspectManagedProcess('relay', { environment });
-    if (!governance.managed || !relay.managed) {
+    const identities = Object.fromEntries(
+      Object.keys(COMPONENTS).map(name => [
+        name,
+        inspectProcessIdentity(name, { environment })
+      ])
+    );
+    if (Object.values(identities).some(value =>
+      !value.running || !value.identity
+    )) {
       throw codedError('stack_adoption_processes_unavailable');
     }
     const governanceFile = assertOwnerOnlyFile(
-      extractEnvFileArgument(readProcessCommand(governance.pid))
+      extractEnvFileArgument(identities.governance.identity.command)
     );
     const relayFile = assertOwnerOnlyFile(
-      extractEnvFileArgument(readProcessCommand(relay.pid))
+      extractEnvFileArgument(identities.relay.identity.command)
     );
     const privateRoot = discoverPrivateRoot(
       [governanceFile, relayFile],
@@ -1495,9 +1710,13 @@ function adoptRunningStack({
     if (!edge.secure || !edge.running || !edge.healthy) {
       throw codedError('stack_adoption_edge_invalid');
     }
+    const runtimeRepository = deriveRuntimeRepositoryFromHttpIdentity(
+      identities.http.identity
+    );
     const profile = validateProfile({
       schemaVersion: PROFILE_SCHEMA_VERSION,
       runtimeBaseline: edge.revision,
+      runtimeRepository,
       privateRoot,
       governanceEnvironment: relative(governanceFile),
       relayEnvironment: relative(relayFile),
@@ -1509,6 +1728,16 @@ function adoptRunningStack({
     const source = inspectSourceCompatibility(profile);
     if (!source.baselineExists || !source.controllerOnlyChanges) {
       throw codedError('stack_adoption_source_incompatible');
+    }
+    const runtimeSource = inspectSourceCompatibility(profile, {
+      repoRoot: runtimeRepository
+    });
+    if (!runtimeSource.compatible) {
+      throw codedError('stack_adoption_runtime_repository_incompatible');
+    }
+    const inspection = await inspectStack({ environment, profile });
+    if (!inspection.runtimeAccepted) {
+      throw codedError('stack_adoption_runtime_acceptance_failed');
     }
     writeProfile(profile, { environment, replace });
     return Object.freeze({
@@ -1546,10 +1775,18 @@ function childBaseEnvironment(environment = process.env) {
   const result = { ...environment };
   for (const name of Object.keys(result)) {
     if (name.startsWith('CODEX_MEMORY_') ||
+        name.startsWith('BASH_FUNC_') ||
         [
           'API_Key',
           'API_URL',
+          'BASHOPTS',
+          'BASH_ENV',
+          'BASH_XTRACEFD',
+          'CDPATH',
           'ENABLE_REAL_ROOT_WRITE',
+          'ENV',
+          'GLOBIGNORE',
+          'IFS',
           'KB_ROOT',
           'KNOWLEDGEBASE_ROOT_PATH',
           'KNOWLEDGEBASE_STORE_PATH',
@@ -1557,6 +1794,9 @@ function childBaseEnvironment(environment = process.env) {
           'LD_PRELOAD',
           'NODE_OPTIONS',
           'NODE_PATH',
+          'PROMPT_COMMAND',
+          'PS4',
+          'SHELLOPTS',
           'VCP_CONFIG_ENV',
           'VCP_ROOT',
           'VCPTOOLBOX_ROOT',
@@ -1567,6 +1807,7 @@ function childBaseEnvironment(environment = process.env) {
       delete result[name];
     }
   }
+  result.PATH = SAFE_CHILD_PATH;
   return result;
 }
 
@@ -1929,7 +2170,7 @@ function printJson(value) {
 
 function usage() {
   return [
-    'Usage: codex-memory-stack <start|status|stop|adopt-running> [--replace]',
+    'Usage: node scripts/codex-memory-stack.js <start|status|stop|adopt-running> [--replace]',
     '',
     'start         Start the adopted full stack and fail closed on validation errors.',
     'status        Print a low-disclosure health, socket, observer, and baseline summary.',
@@ -1957,7 +2198,9 @@ async function main(argv = process.argv.slice(2)) {
     if (extra.some(value => value !== '--replace')) {
       throw codedError('stack_cli_argument_invalid');
     }
-    return printJson(adoptRunningStack({ replace: extra.includes('--replace') }));
+    return printJson(await adoptRunningStack({
+      replace: extra.includes('--replace')
+    }));
   }
   if (command === '--help' || command === '-h' || command === 'help') {
     process.stdout.write(`${usage()}\n`);
@@ -1984,6 +2227,7 @@ module.exports = {
   buildShimChildEnvironment,
   childBaseEnvironment,
   commandMatchesComponent,
+  computeRuntimeAccepted,
   computeStackAccepted,
   discoverPrivateRoot,
   exactKeys,

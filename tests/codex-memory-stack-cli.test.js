@@ -17,6 +17,7 @@ const {
   buildShimChildEnvironment,
   childBaseEnvironment,
   commandMatchesComponent,
+  computeRuntimeAccepted,
   computeStackAccepted,
   discoverPrivateRoot,
   exactKeys,
@@ -42,8 +43,9 @@ const EDGE_CONTAINER_ID = 'ab'.repeat(32);
 
 function profile(overrides = {}) {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     runtimeBaseline: BASELINE,
+    runtimeRepository: '/repo',
     retainedBindingSource: RETAINED_BINDING_SOURCE,
     privateRoot: '/synthetic/owner-only',
     governanceEnvironment: 'governance/runtime.env',
@@ -111,6 +113,10 @@ test('profile contract is exact and stores references rather than secret values'
   );
   assert.throws(
     () => validateProfile(profile({ runtimeBaseline: 'main' })),
+    { code: 'stack_profile_invalid' }
+  );
+  assert.throws(
+    () => validateProfile(profile({ runtimeRepository: 'relative/repo' })),
     { code: 'stack_profile_invalid' }
   );
 });
@@ -343,20 +349,92 @@ test('governance stale-socket cleanup unlinks only a stable owner socket identit
   assert.equal(unlinked, socketPath);
 });
 
-test('managed command matching accepts current and persistent runners only', () => {
-  assert.equal(commandMatchesComponent('governance', [
+test('managed command matching binds exact executable, script, mode, and environment', () => {
+  const executable = fs.realpathSync(process.execPath);
+  const environment = { XDG_RUNTIME_DIR: '/runtime' };
+  const options = {
+    executable,
+    cwd: '/repo',
+    profile: profile(),
+    environment
+  };
+  const governanceEnvironment =
+    '/synthetic/owner-only/governance/runtime.env';
+  const legacy = [
     'node',
-    '/runtime/governance-runner.js'
-  ]), true);
+    `--env-file=${governanceEnvironment}`,
+    '/runtime/codex-memory-full-stack-001/governance-runner.js'
+  ];
+  assert.equal(
+    commandMatchesComponent('governance', legacy, options),
+    true
+  );
   assert.equal(commandMatchesComponent('governance', [
-    'node',
+    process.execPath,
+    `--env-file=${governanceEnvironment}`,
     '/repo/scripts/codex-memory-stack.js',
     '_run-governance'
-  ]), true);
+  ], options), true);
   assert.equal(commandMatchesComponent('governance', [
     'node',
-    '/other/unrelated.js'
-  ]), false);
+    `--env-file=${governanceEnvironment}`,
+    '/other/governance-runner.js'
+  ], options), false);
+  assert.equal(commandMatchesComponent('governance', [
+    process.execPath,
+    '--env-file=/other/runtime.env',
+    '/repo/scripts/codex-memory-stack.js',
+    '_run-governance'
+  ], options), false);
+  assert.equal(commandMatchesComponent('governance', legacy, {
+    ...options,
+    executable: '/other/node'
+  }), false);
+  assert.equal(commandMatchesComponent('governance', [
+    'node',
+    '/other/unrelated.js',
+    'text-with-_run-governance-inside'
+  ], options), false);
+  assert.equal(commandMatchesComponent('http', [
+    'node',
+    'src/http-index.js'
+  ], options), true);
+  assert.equal(commandMatchesComponent('shim', [
+    'node',
+    '/repo/src/cli/vcp-toolbox-native-mcp-shim.js',
+    '--host',
+    '127.0.0.1',
+    '--port',
+    '7615',
+    '--vcp-root',
+    '/runtime/VCPToolBox',
+    '--kb-store',
+    '/runtime/codex-memory-full-stack-001/store'
+  ], options), true);
+  assert.equal(commandMatchesComponent('shim', [
+    'node',
+    '/repo/src/cli/vcp-toolbox-native-mcp-shim.js',
+    '--host',
+    '127.0.0.1',
+    '--port',
+    '7616',
+    '--vcp-root',
+    '/runtime/VCPToolBox',
+    '--kb-store',
+    '/runtime/codex-memory-full-stack-001/store'
+  ], options), false);
+  const relayEnvironment = '/synthetic/owner-only/relay/runtime.env';
+  assert.equal(commandMatchesComponent('relay', [
+    'node',
+    `--env-file=${relayEnvironment}`,
+    '/runtime/codex-memory-full-stack-001/relay-runner.js'
+  ], options), true);
+  assert.equal(commandMatchesComponent('relay', [
+    process.execPath,
+    `--env-file=${relayEnvironment}`,
+    '/repo/scripts/codex-memory-stack.js',
+    '_run-relay'
+  ], options), true);
 });
 
 test('managed child environments neutralize caller write, root, provider, and public-surface overrides', () => {
@@ -368,6 +446,11 @@ test('managed child environments neutralize caller write, root, provider, and pu
     KNOWLEDGEBASE_ROOT_PATH: '/real/private/root',
     API_Key: 'synthetic-provider-key',
     API_URL: 'https://untrusted.invalid',
+    BASH_ENV: '/untrusted/bash-env',
+    'BASH_FUNC_node%%': '() { /untrusted/node; }',
+    ENV: '/untrusted/shell-env',
+    SHELLOPTS: 'xtrace',
+    PS4: 'token=${CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN}',
     NODE_OPTIONS: '--require=/untrusted.js',
     LD_PRELOAD: '/untrusted.so',
     CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE: 'full',
@@ -377,13 +460,18 @@ test('managed child environments neutralize caller write, root, provider, and pu
     CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST: digest
   };
   const base = childBaseEnvironment(hostile);
-  assert.equal(base.PATH, '/usr/bin');
+  assert.equal(base.PATH, '/usr/bin:/bin');
   for (const name of [
     'ENABLE_REAL_ROOT_WRITE',
     'KB_ROOT',
     'KNOWLEDGEBASE_ROOT_PATH',
     'API_Key',
     'API_URL',
+    'BASH_ENV',
+    'BASH_FUNC_node%%',
+    'ENV',
+    'SHELLOPTS',
+    'PS4',
     'NODE_OPTIONS',
     'LD_PRELOAD',
     'CODEX_MEMORY_EXPOSE_WRITE_TOOLS'
@@ -479,12 +567,16 @@ test('source compatibility allows only controller delivery paths over the accept
     }
     throw new Error('unexpected git call');
   };
-  const result = inspectSourceCompatibility(profile(), { exec: fakeExec });
+  const result = inspectSourceCompatibility(profile(), {
+    exec: fakeExec,
+    repoRoot: '/repo'
+  });
   assert.equal(result.compatible, true);
   assert.equal(result.controllerOnlyChanges, true);
   assert.ok(calls.length >= 5);
 
   const unsafe = inspectSourceCompatibility(profile(), {
+    repoRoot: '/repo',
     exec(_command, args) {
       if (args[0] === 'rev-parse') return `${BASELINE}\n`;
       if (args[0] === 'status' || args[0] === 'cat-file') return '';
@@ -572,7 +664,15 @@ test('Edge lifecycle identity requires the exact adopted container ID and revisi
 
 test('stack acceptance requires HTTP authentication and every pinned identity', () => {
   const accepted = acceptedStack();
+  assert.equal(computeRuntimeAccepted(accepted), true);
   assert.equal(computeStackAccepted(accepted), true);
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      source: { compatible: false }
+    }),
+    false
+  );
   assert.equal(
     computeStackAccepted({
       ...accepted,
