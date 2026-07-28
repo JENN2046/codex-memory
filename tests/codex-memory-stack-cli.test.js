@@ -1067,9 +1067,11 @@ test('managed environment files reject Node and non-governed startup keys', t =>
 test('managed environment identity pins non-secret configuration without key material', t => {
   const base = {
     CODEX_MEMORY_R4_CONTEXT_SIGNING_KEY_ID: 'owner-key-v1',
-    CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE: 'token/reference',
+    CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE:
+      'file:/synthetic/native-token-a',
     CODEX_MEMORY_R4_PUBLIC_ORIGIN: 'https://memory.example',
-    CODEX_MEMORY_R4_RELAY_AUTH_TOKEN: 'synthetic-secret-a'
+    CODEX_MEMORY_R4_RELAY_AUTH_TOKEN: 'file:/synthetic/relay-token-a',
+    CODEX_MEMORY_R4_SYNTHETIC_SECRET: 'synthetic-secret-a'
   };
   const digest = managedEnvironmentConfigDigest(base);
   assert.match(digest, /^sha256:[a-f0-9]{64}$/u);
@@ -1077,7 +1079,7 @@ test('managed environment identity pins non-secret configuration without key mat
     digest,
     managedEnvironmentConfigDigest({
       ...base,
-      CODEX_MEMORY_R4_RELAY_AUTH_TOKEN: 'synthetic-secret-b'
+      CODEX_MEMORY_R4_SYNTHETIC_SECRET: 'synthetic-secret-b'
     })
   );
   assert.notEqual(
@@ -1091,8 +1093,24 @@ test('managed environment identity pins non-secret configuration without key mat
     digest,
     managedEnvironmentConfigDigest({
       ...base,
-      CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE: 'other/reference'
+      CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE:
+        'file:/synthetic/native-token-b'
     })
+  );
+  assert.notEqual(
+    digest,
+    managedEnvironmentConfigDigest({
+      ...base,
+      CODEX_MEMORY_R4_RELAY_AUTH_TOKEN:
+        'file:/synthetic/relay-token-b'
+    })
+  );
+  assert.throws(
+    () => managedEnvironmentConfigDigest({
+      ...base,
+      CODEX_MEMORY_R4_RELAY_AUTH_TOKEN: 'synthetic-secret-value'
+    }),
+    { code: 'stack_managed_environment_invalid' }
   );
 
   const root = fs.mkdtempSync(path.join(

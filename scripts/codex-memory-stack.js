@@ -112,6 +112,10 @@ const RELAY_SECRET_REFERENCE_NAMES = Object.freeze({
   relaySigningPrivateKey: 'CODEX_MEMORY_R4_RELAY_SIGNING_PRIVATE_KEY',
   relaySigningPublicKey: 'CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY'
 });
+const MANAGED_PRIVATE_FILE_REFERENCE_NAMES = new Set([
+  ...Object.values(GOVERNANCE_PRIVATE_REFERENCE_NAMES),
+  ...Object.values(RELAY_SECRET_REFERENCE_NAMES)
+]);
 const VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE = Object.freeze({
   '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118':
     '555b3b538f6eb736e530c2912de678c5941f9985'
@@ -408,9 +412,17 @@ function managedEnvironmentConfigDigest(environment) {
         value.includes('\0')) {
       throw codedError('stack_managed_environment_invalid');
     }
+    const privateFileReference =
+      MANAGED_PRIVATE_FILE_REFERENCE_NAMES.has(name);
+    if (privateFileReference &&
+        (!value.startsWith('file:') ||
+          !path.isAbsolute(value.slice(5)))) {
+      throw codedError('stack_managed_environment_invalid');
+    }
     const sensitiveValue = SENSITIVE_MANAGED_ENVIRONMENT_NAME.test(name) &&
       !name.endsWith('_REFERENCE') &&
-      !name.endsWith('_KEY_ID');
+      !name.endsWith('_KEY_ID') &&
+      !privateFileReference;
     digestInput.push(
       `${name}\0${sensitiveValue ? '<secret-value-present>' : value}\n`
     );
