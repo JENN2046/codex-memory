@@ -847,11 +847,20 @@ test('HTTP MCP no-token loopback warning is explicit and non-loopback remains fa
 test('HTTP MCP policy gate summary is bounded and omits provider, path, and token material', () => {
   const summary = buildPolicyGateSummary({
     config: {
+      autoRebuildActiveMemoryOnStart: false,
+      autoRebuildShadowOnStart: false,
+      enableCandidateCache: false,
       securityProfile: 'hardened',
       enableSoftReadPolicy: true,
       enableLifecycleReadPolicy: false,
       enableWritePreflight: true,
+      enableShadowWrites: false,
+      enableVectorIndex: false,
+      exposeControlledMutationMcpTools: false,
+      exposeWriteMcpTools: false,
       allowExternalProvider: false,
+      mcpPublicToolSurface: 'read_only',
+      governedMcpVcpNativeWriteDelegationMode: 'off',
       embeddingUrl: 'https://provider.example.test/v1/embeddings',
       embeddingModel: 'private-model',
       httpLogPath: 'C:\\Users\\admin\\.env',
@@ -882,14 +891,26 @@ test('HTTP MCP policy gate summary is bounded and omits provider, path, and toke
   const serialized = JSON.stringify(summary);
 
   assert.deepEqual(Object.keys(summary).sort(), [
+    'activeMemoryAutoRebuildEnabled',
+    'candidateCacheEnabled',
+    'controlledMutationToolsExposed',
     'externalProviderAllowed',
     'governedNativeBridgeWarnings',
     'lifecycleReadPolicyEnabled',
+    'mcpPublicToolSurface',
+    'nativeWriteDelegationMode',
     'securityProfile',
+    'shadowAutoRebuildEnabled',
+    'shadowWritesEnabled',
     'softReadPolicyEnabled',
-    'writePreflightEnabled'
+    'vectorIndexEnabled',
+    'writePreflightEnabled',
+    'writeToolsExposed'
   ]);
   assert.deepEqual(summary, {
+    activeMemoryAutoRebuildEnabled: false,
+    candidateCacheEnabled: false,
+    controlledMutationToolsExposed: false,
     securityProfile: 'hardened',
     softReadPolicyEnabled: true,
     lifecycleReadPolicyEnabled: false,
@@ -911,7 +932,13 @@ test('HTTP MCP policy gate summary is bounded and omits provider, path, and toke
         effect: null,
         lowDisclosure: true
       }
-    ]
+    ],
+    mcpPublicToolSurface: 'read_only',
+    nativeWriteDelegationMode: 'off',
+    shadowAutoRebuildEnabled: false,
+    shadowWritesEnabled: false,
+    vectorIndexEnabled: false,
+    writeToolsExposed: false
   });
   assert.doesNotMatch(serialized, /provider\.example/i);
   assert.doesNotMatch(serialized, /private-model/i);
@@ -951,19 +978,43 @@ test('HTTP MCP bearer health returns full bounded payload with valid token only'
     assert.equal(healthPayload.auth.required, true);
     assert.equal(healthPayload.auth.warning, null);
     assert.deepEqual(Object.keys(healthPayload.policyGates).sort(), [
+      'activeMemoryAutoRebuildEnabled',
+      'candidateCacheEnabled',
+      'controlledMutationToolsExposed',
       'externalProviderAllowed',
       'governedNativeBridgeWarnings',
       'lifecycleReadPolicyEnabled',
+      'mcpPublicToolSurface',
+      'nativeWriteDelegationMode',
       'securityProfile',
+      'shadowAutoRebuildEnabled',
+      'shadowWritesEnabled',
       'softReadPolicyEnabled',
-      'writePreflightEnabled'
+      'vectorIndexEnabled',
+      'writePreflightEnabled',
+      'writeToolsExposed'
     ]);
+    assert.equal(
+      healthPayload.policyGates.activeMemoryAutoRebuildEnabled,
+      false
+    );
+    assert.equal(healthPayload.policyGates.candidateCacheEnabled, false);
+    assert.equal(
+      healthPayload.policyGates.controlledMutationToolsExposed,
+      false
+    );
     assert.equal(healthPayload.policyGates.securityProfile, 'hardened');
     assert.equal(healthPayload.policyGates.softReadPolicyEnabled, true);
     assert.equal(healthPayload.policyGates.lifecycleReadPolicyEnabled, false);
     assert.equal(healthPayload.policyGates.writePreflightEnabled, true);
     assert.equal(healthPayload.policyGates.externalProviderAllowed, false);
     assert.deepEqual(healthPayload.policyGates.governedNativeBridgeWarnings, []);
+    assert.equal(healthPayload.policyGates.mcpPublicToolSurface, 'read_only');
+    assert.equal(healthPayload.policyGates.nativeWriteDelegationMode, 'off');
+    assert.equal(healthPayload.policyGates.shadowAutoRebuildEnabled, false);
+    assert.equal(healthPayload.policyGates.shadowWritesEnabled, false);
+    assert.equal(healthPayload.policyGates.vectorIndexEnabled, false);
+    assert.equal(healthPayload.policyGates.writeToolsExposed, false);
     assert.deepEqual(Object.keys(healthPayload.runtime).sort(), [
       'governedNativeBridge',
       'writeReconcileWorker'
@@ -996,10 +1047,19 @@ test('HTTP MCP bearer health returns full bounded payload with valid token only'
     assert.doesNotMatch(serializedHealth, /memoryId/i);
     assert.doesNotMatch(serializedHealth, /auditLogPath/i);
   }, { bearerToken: 'test-token' }, {
+    autoRebuildActiveMemoryOnStart: false,
+    autoRebuildShadowOnStart: false,
+    enableCandidateCache: false,
     securityProfile: 'hardened',
     enableLifecycleReadPolicy: false,
     enableWritePreflight: true,
+    enableShadowWrites: false,
+    enableVectorIndex: false,
+    exposeControlledMutationMcpTools: false,
+    exposeWriteMcpTools: false,
     allowExternalProvider: false,
+    mcpPublicToolSurface: 'read_only',
+    governedMcpVcpNativeWriteDelegationMode: 'off',
     embeddingUrl: 'http://example.invalid',
     embeddingModel: 'private-model'
   });

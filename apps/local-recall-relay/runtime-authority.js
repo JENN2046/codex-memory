@@ -22,7 +22,9 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
   statSync = fs.statSync,
   realpathSync = fs.realpathSync,
   edgeRequest,
-  eventSink
+  eventSink,
+  verifyUdsListenerOwner,
+  verifyConnectedUdsPeer
 } = {}) {
   validateBindingEnvironment(environment);
   const counterMode = validateCounterMode(
@@ -98,7 +100,9 @@ function loadOutboundRelayRuntimeFromEnvironment(environment = process.env, {
     ),
     cancelPollMs: integerEnvironment(environment.CODEX_MEMORY_R4_RELAY_CANCEL_POLL_MS || '250', 1, 1000),
     edgeRequest,
-    eventSink
+    eventSink,
+    verifyUdsListenerOwner,
+    verifyConnectedUdsPeer
   });
 }
 

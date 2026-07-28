@@ -52,8 +52,10 @@ function createRelayRuntime({
   }
 
   return Object.freeze({
-    async processNext() {
-      const claim = await edgeClient.claim(relayId);
+    async processNext({ signal } = {}) {
+      validateAbortSignal(signal);
+      if (signal?.aborted) throw cancelledError();
+      const claim = await edgeClient.claim(relayId, { signal });
       if (!claim) return Object.freeze({ status: 'idle' });
       emit('claim_received', claim.request_id, { attempt: claim.attempt });
       function interrupted(status) {
@@ -135,7 +137,9 @@ function createRelayRuntime({
         }
         try {
           emit('edge_complete_started', claim.request_id, { attempt: claim.attempt });
-          await edgeClient.complete(claim, response);
+          await edgeClient.complete(claim, response, {
+            signal: cancellation.signal
+          });
         } catch (error) {
           return processingFailure(error, 'complete');
         }
@@ -148,6 +152,7 @@ function createRelayRuntime({
         });
       } finally {
         monitorStopped = true;
+        cancellation.abort();
         await monitor;
       }
     }
@@ -180,7 +185,9 @@ async function monitorCancellation({ edge, claim, cancellation, pollMs, isStoppe
     await delay(pollMs);
     if (isStopped() || cancellation.signal.aborted) return;
     try {
-      const current = await edge.state(claim);
+      const current = await edge.state(claim, {
+        signal: cancellation.signal
+      });
       if (current.status === 'cancelled' || current.status === 'expired') {
         onInterrupted(current.status);
         cancellation.abort();
@@ -197,6 +204,22 @@ async function monitorCancellation({ edge, claim, cancellation, pollMs, isStoppe
 
 function delay(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+function validateAbortSignal(signal) {
+  if (signal === undefined) return;
+  if (!signal || typeof signal !== 'object' ||
+      typeof signal.aborted !== 'boolean' ||
+      typeof signal.addEventListener !== 'function' ||
+      typeof signal.removeEventListener !== 'function') {
+    reject('relay_abort_signal_invalid');
+  }
+}
+
+function cancelledError() {
+  return Object.assign(new Error('relay_cancelled'), {
+    code: 'relay_cancelled'
+  });
 }
 
 module.exports = {

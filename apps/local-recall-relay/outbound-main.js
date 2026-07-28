@@ -22,10 +22,12 @@ function createOutboundRelayService({
   validateDelay(unavailableBackoffMs);
   let stopping = false;
   let running = false;
+  let activeCancellation = null;
 
   return Object.freeze({
     stop() {
       stopping = true;
+      activeCancellation?.abort();
     },
     async run() {
       if (running) throw safeError('relay_service_already_running');
@@ -34,18 +36,30 @@ function createOutboundRelayService({
       try {
         if (snapshotServer) await snapshotServer.start();
         while (!stopping) {
+          const cancellation = new AbortController();
+          activeCancellation = cancellation;
           try {
-            const result = await runtime.processNext();
+            const result = await runtime.processNext({
+              signal: cancellation.signal
+            });
             if (result.status === 'idle') await delay(idlePollMs);
           } catch (error) {
+            if (stopping && error?.code === 'relay_cancelled') break;
             if (!isAvailabilityError(error?.code)) throw safeError(error?.code);
+            if (stopping) break;
             await delay(unavailableBackoffMs);
+          } finally {
+            if (activeCancellation === cancellation) {
+              activeCancellation = null;
+            }
           }
         }
       } catch (error) {
         primaryFailure = true;
         throw error;
       } finally {
+        activeCancellation?.abort();
+        activeCancellation = null;
         try {
           await snapshotServer?.stop();
         } catch (error) {

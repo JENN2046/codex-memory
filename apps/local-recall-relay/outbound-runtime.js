@@ -14,6 +14,8 @@ function createOutboundRelayRuntime({
   relayId = 'local-relay-r4d',
   edgeTimeoutMs = 5_000,
   udsTimeoutMs = DEFAULT_UDS_TIMEOUT_MS,
+  verifyUdsListenerOwner,
+  verifyConnectedUdsPeer,
   edgeRequest,
   ...options
 } = {}) {
@@ -23,7 +25,12 @@ function createOutboundRelayRuntime({
     ...options,
     relayId,
     edgeClient: createOutboundEdgeClient(edgeOrigin, clientOptions),
-    forwardToUds: createUdsForwarder({ socketPath, timeoutMs: udsTimeoutMs }),
+    forwardToUds: createUdsForwarder({
+      socketPath,
+      timeoutMs: udsTimeoutMs,
+      verifyUdsListenerOwner,
+      verifyConnectedUdsPeer
+    }),
     eventComponent: 'outbound_relay'
   });
 }

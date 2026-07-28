@@ -415,6 +415,65 @@ test('R4-C UDS forwarding resolves a complete frame without waiting for peer EOF
   assert.deepEqual(await forward({ request: 'synthetic' }), expected);
 });
 
+test('R4-C UDS forwarding binds the connected peer before payload write', async t => {
+  const directory = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-r4c-owned-uds-'
+  ));
+  const socketPath = path.join(directory, 'governance.sock');
+  const sockets = new Set();
+  let receivedBytes = 0;
+  const server = net.createServer(socket => {
+    sockets.add(socket);
+    socket.on('data', chunk => {
+      receivedBytes += chunk.length;
+    });
+    socket.once('close', () => sockets.delete(socket));
+  });
+  t.after(async () => {
+    for (const socket of sockets) socket.destroy();
+    await new Promise(resolve => server.close(resolve));
+    fs.rmSync(directory, { recursive: true, force: true });
+  });
+  await new Promise((resolve, rejectListen) => {
+    server.once('error', rejectListen);
+    server.listen(socketPath, resolve);
+  });
+
+  assert.throws(
+    () => createUdsForwarder({
+      socketPath,
+      verifyUdsListenerOwner() {
+        return true;
+      }
+    }),
+    { code: 'relay_uds_identity_verifier_incomplete' }
+  );
+  let listenerChecks = 0;
+  let peerChecks = 0;
+  const forward = createUdsForwarder({
+    socketPath,
+    verifyUdsListenerOwner(candidate) {
+      listenerChecks += 1;
+      return candidate === socketPath;
+    },
+    verifyConnectedUdsPeer(socket, candidate) {
+      peerChecks += 1;
+      assert.equal(socket.destroyed, false);
+      assert.equal(candidate, socketPath);
+      return false;
+    }
+  });
+  await assert.rejects(
+    () => forward({ request: 'must-not-be-forwarded' }),
+    { code: 'relay_uds_listener_identity_mismatch' }
+  );
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(listenerChecks, 2);
+  assert.equal(peerChecks, 1);
+  assert.equal(receivedBytes, 0);
+});
+
 async function waitFor(predicate, timeoutMs = 1_000) {
   const started = Date.now();
   while (!predicate()) {
