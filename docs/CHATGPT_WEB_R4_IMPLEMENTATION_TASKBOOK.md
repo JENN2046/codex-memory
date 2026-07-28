@@ -368,8 +368,10 @@ Relay closure gates:
    progress across mixed success, failure, cancellation, and expiry sequences;
 5. an unobserved complete response is reported as locally unconfirmed, not as
    proof that the Edge rejected it;
-6. operational observer telemetry is not claimed until the canonical service
-   explicitly wires and exposes a governed snapshot surface.
+6. CM-2157 now wires the canonical source and exposes an owner-only, read-only
+   governed snapshot UDS; operational runtime telemetry is still not claimed
+   until real private configuration and exact-head runtime behavior are
+   separately authorized and verified.
 
 R5-O does not authorize or perform runtime activation, provider calls, memory
 reads/writes, private configuration mutation, release, deploy, cutover, or

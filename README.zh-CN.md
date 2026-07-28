@@ -32,15 +32,18 @@ VCPToolBox 仍然是 native memory behavior 的 owner。本仓库默认不修改
 - [ChatGPT Web R5-N runtime capability preflight 与确定性失败投影](docs/CHATGPT_WEB_R5N_RUNTIME_CAPABILITY_FAILURE_PROJECTION.md)
 - [ChatGPT Web R5-O Relay completion、工具路由与显式 visibility](docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md)
 - [ChatGPT Web R5-O public contract 独立 review](docs/CHATGPT_WEB_R5O_PUBLIC_CONTRACT_INDEPENDENT_REVIEW.md)
+- [CM-2157 canonical Relay observer 接线](docs/CM2157_CANONICAL_RELAY_OBSERVER_WIRING.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
 R5-O 将 Relay response expiry 限制在已接受 request 的 expiry 以内，把默认 UDS
 读取预算提高到 15 秒；不完整 UDS response 会保持 daemon 可用并进入
-backoff，但不会 replay 已 acknowledge 的一次性 read request。新增的
-low-disclosure observer library 能处理 mixed lifecycle sequence，不过
-canonical service 尚未接线或暴露它。模型可见路由只承诺各 public output
-schema 实际返回的字段。公共工具名称仍是六个，但
+backoff，但不会 replay 已 acknowledge 的一次性 read request。
+low-disclosure observer 能处理 mixed lifecycle sequence；CM-2157 已在
+source 层把它注入 canonical service，并通过 owner-only、read-only UDS
+暴露 exact-key snapshot，但没有配置真实路径，也没有启动或验证真实
+runtime。模型可见路由只承诺各 public output schema 实际返回的字段。
+公共工具名称仍是六个，但
 `resolve_memory_context` 的 public input schema 已有意收紧为必须提供
 `requested_visibility`，因此 schema digest 也发生变化。本阶段没有运行
 live runtime、调用 provider、修改 private config 或读写 memory。

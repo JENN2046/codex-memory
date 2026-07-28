@@ -35,7 +35,6 @@ future task.
 
 ## Open Blockers
 
-- `canonical_observer_not_wired` [open]: The canonical service does not wire or expose the low-disclosure observer.
 - `r5_h_matrix_incomplete` [open]: The R5-H private ChatGPT dogfood matrix is incomplete.
 - `r5_o_private_exact_head_runtime_unverified` [open]: R5-O private exact-head runtime behavior has not been verified.
 - `fresh_non_empty_task_context_relevance_unproven` [open]: Fresh non-empty task-context recall relevance has not been proven.
@@ -61,10 +60,14 @@ text, plans, checkpoints, handoffs, status archives, or prior conversation.
 
 ## Evidence And History
 
-Last completed: `CM-2156 / CMV-2241`.
+Last completed: `CM-2157 / CMV-2242`.
 
-- Source-only owner-only mapping package preflight completed without applying
-  real private configuration or starting runtime/provider/memory activity.
+- The canonical Relay source now injects the low-disclosure observer and
+  brackets an owner-only, read-only UDS snapshot surface.
+- Validation used only synthetic temporary UDS fixtures. No real private
+  configuration was changed and no real runtime/provider/memory activity was
+  started.
+- Delivery detail: `docs/CM2157_CANONICAL_RELAY_OBSERVER_WIRING.md`.
 - Compact machine snapshot: `.agent_board/CURRENT_FACTS.json`.
 - Historical recovery index:
   `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`.

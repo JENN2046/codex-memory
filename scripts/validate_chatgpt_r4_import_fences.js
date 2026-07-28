@@ -61,6 +61,10 @@ const R4C_RUNTIME_FILE_POLICIES = Object.freeze({
     allowedBuiltins: Object.freeze([]),
     allowedRuntimeRules: Object.freeze(['runtime_process_access'])
   }),
+  'apps/local-recall-relay/observer-snapshot-uds.js': Object.freeze({
+    allowedBuiltins: Object.freeze(['node:fs', 'node:net', 'node:path']),
+    allowedRuntimeRules: Object.freeze(['runtime_process_access', 'service_listener'])
+  }),
   'apps/local-recall-relay/uds-transport.js': Object.freeze({
     allowedBuiltins: Object.freeze(['node:net']),
     allowedRuntimeRules: Object.freeze([])
@@ -409,17 +413,47 @@ function validateComponentSource(component, { file, source }) {
   if (runtimeFilePolicy?.allowedRuntimeRules.includes('service_listener')) {
     const exactLoopbackListen = /\bserver\s*\.\s*listen\s*\(\s*0\s*,\s*['"]127\.0\.0\.1['"]\s*\)/u;
     const exactExternalListen = /\bserver\s*\.\s*listen\s*\(\s*config\.bindPort\s*,\s*config\.bindHost\s*\)/u;
-    const exactServerCreation = /\bhttp\s*\.\s*createServer\s*\(/u;
+    const exactObserverSnapshotListen = /\bserver\s*\.\s*listen\s*\(\s*socketPath\s*\)/u;
+    const exactHttpServerCreation = /\bhttp\s*\.\s*createServer\s*\(/u;
+    const exactUdsServerCreation = /\bnet\s*\.\s*createServer\s*\(/u;
     const listenerCalls = [...maskedSource.matchAll(/\bserver\s*\.\s*listen\s*\(/gu)].length;
-    const serverCreations = [...maskedSource.matchAll(/\bhttp\s*\.\s*createServer\s*\(/gu)].length;
-    const listenPattern = relativeFile === 'apps/chatgpt-edge/loopback-runtime.js'
-      ? exactLoopbackListen
-      : exactExternalListen;
-    if (!listenPattern.test(source) || listenerCalls !== 1 || serverCreations !== 1) {
+    const httpServerCreations = [...maskedSource.matchAll(/\bhttp\s*\.\s*createServer\s*\(/gu)].length;
+    const udsServerCreations = [...maskedSource.matchAll(/\bnet\s*\.\s*createServer\s*\(/gu)].length;
+    const observerSnapshotFile =
+      relativeFile === 'apps/local-recall-relay/observer-snapshot-uds.js';
+    if (observerSnapshotFile) {
+      const ownerOnlySnapshotContracts = [
+        /\bresolvedParent\s*!==\s*parentPath\b/u,
+        /\(\s*parentStat\.mode\s*&\s*0o077\s*\)\s*!==\s*0\b/u,
+        /\bparentStat\.uid\s*!==\s*currentUid\b/u,
+        /\bchmodSync\s*\(\s*socketPath\s*,\s*0o600\s*\)/u,
+        /\bboundParentPath\s*!==\s*authority\.parentPath\b/u,
+        /\(\s*parentStat\.mode\s*&\s*0o077\s*\)\s*!==\s*0\b/u,
+        /\bparentStat\.uid\s*!==\s*authority\.ownerUid\b/u,
+        /\(\s*socketStat\.mode\s*&\s*0o777\s*\)\s*!==\s*0o600\b/u,
+        /\bsocketStat\.uid\s*!==\s*authority\.ownerUid\b/u
+      ];
+      if (ownerOnlySnapshotContracts.some(pattern => !pattern.test(source))) {
+        throw new Error(`owner_only_snapshot_listener_contract_invalid:${relativeFile}`);
+      }
+    }
+    const listenPattern = observerSnapshotFile
+      ? exactObserverSnapshotListen
+      : relativeFile === 'apps/chatgpt-edge/loopback-runtime.js'
+        ? exactLoopbackListen
+        : exactExternalListen;
+    const creationPattern = observerSnapshotFile
+      ? exactUdsServerCreation
+      : exactHttpServerCreation;
+    const creationCount = observerSnapshotFile
+      ? udsServerCreations
+      : httpServerCreations;
+    if (!listenPattern.test(source) || listenerCalls !== 1 || creationCount !== 1 ||
+        (observerSnapshotFile ? httpServerCreations !== 0 : udsServerCreations !== 0)) {
       throw new Error(`loopback_listener_contract_invalid:${relativeFile}`);
     }
     const withoutAllowedListeners = source
-      .replace(exactServerCreation, match => ' '.repeat(match.length))
+      .replace(creationPattern, match => ' '.repeat(match.length))
       .replace(listenPattern, match => ' '.repeat(match.length));
     listenerCheckedSource = maskCommentsAndStringContents(withoutAllowedListeners);
   }
@@ -493,7 +527,17 @@ function validateBoundaryManifests() {
     if (!relay.forbiddenCapabilities.includes(capability)) throw new Error(`relay_capability_not_forbidden:${capability}`);
   }
   if (relay.loopbackHttpClientImplemented !== true || relay.temporaryUdsClientImplemented !== true ||
-      relay.serviceListenerImplemented !== false || relay.durableStateImplemented !== false) {
+      relay.serviceListenerImplemented !== true ||
+      relay.serviceListenerKind !== 'owner_only_readonly_observer_snapshot_uds' ||
+      relay.observerSnapshotUdsImplemented !== true ||
+      relay.observerSnapshotUdsActivated !== false ||
+      relay.observerSnapshotSocketMode !== '0600' ||
+      relay.observerSnapshotOwnerOnlyParentRequired !== true ||
+      relay.observerSnapshotReadOnly !== true ||
+      relay.observerSnapshotDurableStateImplemented !== false ||
+      relay.observerSnapshotRequestIdentifiersRetained !== false ||
+      relay.observerSnapshotBodiesRetained !== false ||
+      relay.durableStateImplemented !== false) {
     throw new Error('relay_loopback_boundary_invalid');
   }
   if (relay.outboundHttpsClientImplemented !== true ||

@@ -52,6 +52,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-N Runtime Capability Preflight And Deterministic Failure Projection](docs/CHATGPT_WEB_R5N_RUNTIME_CAPABILITY_FAILURE_PROJECTION.md)
 - [ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility](docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md)
 - [ChatGPT Web R5-O Public Contract Independent Review](docs/CHATGPT_WEB_R5O_PUBLIC_CONTRACT_INDEPENDENT_REVIEW.md)
+- [CM-2157 Canonical Relay Observer Wiring](docs/CM2157_CANONICAL_RELAY_OBSERVER_WIRING.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 
@@ -66,8 +67,11 @@ Current facts snapshot: `.agent_board/CURRENT_FACTS.json`.
 R5-O caps Relay response expiry at the accepted request expiry, raises the
 default UDS read budget to 15 seconds, and keeps the daemon alive after an
 incomplete UDS response without replaying the acknowledged one-read request.
-An injectable low-disclosure observer library now handles mixed lifecycle
-sequences, but the canonical service does not yet wire or expose it.
+The canonical Relay source now injects the low-disclosure lifecycle observer
+and exposes its exact-key snapshot through a required owner-only, read-only UDS.
+The source contract retains no request identifier, body, raw memory, or secret,
+but no real observer path was configured and no real runtime was started or
+verified.
 Model-visible routing is constrained to fields each public output schema
 actually returns: search guidance preserves `result_count`, returned
 `results[].summary`, and `results[].relevance`, while bounded-status tools use
@@ -80,6 +84,8 @@ schema and digest are intentionally tightened. This is source hardening and
 contract clarification only: no live runtime, provider, private configuration,
 or memory action ran. See
 `docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md`.
+The source-only observer follow-up is documented in
+`docs/CM2157_CANONICAL_RELAY_OBSERVER_WIRING.md`.
 
 R5-N requires an exact zero-read shim capability preflight before private
 runtime binding. It proves unauthenticated enforcement before sending a private

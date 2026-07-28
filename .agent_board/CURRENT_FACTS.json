@@ -14,10 +14,10 @@
   },
   "activeTask": null,
   "lastCompleted": {
-    "taskId": "CM-2156",
-    "validationId": "CMV-2241",
+    "taskId": "CM-2157",
+    "validationId": "CMV-2242",
     "completedAt": "2026-07-28",
-    "scope": "owner_only_mapping_package_preflight_v2"
+    "scope": "canonical_relay_observer_wiring_source_only"
   },
   "acceptedProductBaseline": {
     "prNumber": 61,
@@ -45,11 +45,6 @@
     }
   },
   "blockers": [
-    {
-      "id": "canonical_observer_not_wired",
-      "status": "open",
-      "summary": "The canonical service does not wire or expose the low-disclosure observer."
-    },
     {
       "id": "r5_h_matrix_incomplete",
       "status": "open",

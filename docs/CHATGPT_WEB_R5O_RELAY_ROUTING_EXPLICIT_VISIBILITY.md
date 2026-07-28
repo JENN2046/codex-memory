@@ -38,9 +38,14 @@ The injectable observer library distinguishes current in-flight, cancelled,
 expired, accepted, and locally unconfirmed completion states, including mixed
 request sequences. A complete-call timeout means only that the Relay did not
 observe Edge acceptance; the Edge may have accepted the response before its
-reply was lost. The canonical `outbound-main.js` process does not yet inject or
-expose this observer, so R5-O does not claim operational completion-stage
-telemetry. The library exposes no response and creates no authority surface.
+reply was lost. At the reviewed R5-O baseline, canonical `outbound-main.js`
+did not inject or expose this observer, so R5-O correctly made no operational
+completion-stage telemetry claim.
+
+CM-2157 later added source-only canonical injection and an exact-key,
+owner-only, read-only snapshot UDS. No real path was configured and no real
+runtime was started or verified. See
+`docs/CM2157_CANONICAL_RELAY_OBSERVER_WIRING.md`.
 
 ## Model-Visible Tool Routing
 
@@ -206,7 +211,7 @@ Independent review must cover:
 - no-replay semantics for incomplete UDS responses;
 - observer mixed-sequence state and completion-uncertainty semantics;
 - remaining-TTL response expiry and processing-time expiry classification;
-- the fact that the canonical service does not yet wire the observer;
+- the reviewed PR #61 head's lack of canonical observer wiring;
 - the intentional schema-v1 accepted-set break and Edge-first/Relay-last
   rollout order;
 - preservation of the six public tool names and zero-memory default;
@@ -224,7 +229,7 @@ R5-O does not claim:
 
 - live private-runtime verification;
 - automatic memory-tool selection in every ChatGPT session;
-- operational Relay observer telemetry;
+- operational Relay observer telemetry at a real private exact-head runtime;
 - replay of an acknowledged request after an incomplete UDS response;
 - a separate public tool-contract version or wire-version migration;
 - production, release, deploy, cutover, or RC readiness;

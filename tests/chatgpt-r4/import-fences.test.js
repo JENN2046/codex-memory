@@ -126,6 +126,45 @@ test('R4-C listener and transport builtin exceptions are exact-file and exact-lo
     file: path.join(ROOTS.relay, 'unexpected-http-client.js'),
     source: "require('node:http')"
   }), /builtin_import_forbidden/);
+
+  const relayObserverFile = path.join(ROOTS.relay, 'observer-snapshot-uds.js');
+  const relayObserverSource = require('node:fs').readFileSync(relayObserverFile, 'utf8');
+  assert.doesNotThrow(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource
+  }));
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'server.listen(socketPath)',
+      "server.listen(8080, '0.0.0.0')"
+    )
+  }), /loopback_listener_contract_invalid|service_listener/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'chmodSync(socketPath, 0o600)',
+      'chmodSync(socketPath, 0o666)'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'resolvedParent !== parentPath',
+      'resolvedParent === parentPath'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: relayObserverFile,
+    source: relayObserverSource.replace(
+      'parentStat.uid !== authority.ownerUid',
+      'parentStat.uid === authority.ownerUid'
+    )
+  }), /owner_only_snapshot_listener_contract_invalid/);
+  assert.throws(() => validateComponentSource('relay', {
+    file: path.join(ROOTS.relay, 'copied-observer-snapshot-uds.js'),
+    source: relayObserverSource
+  }), /runtime_process_access|service_listener|builtin_import_forbidden/);
 });
 
 test('public Edge cannot import local config, storage, recall, or arbitrary packages', () => {
