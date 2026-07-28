@@ -27,6 +27,7 @@ const {
   computeRuntimeAccepted,
   computeStackAccepted,
   connectOwnedLoopbackTcpListener,
+  connectedUnixPeerOwnedByPid,
   controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,
@@ -502,6 +503,91 @@ test('UDS listener ownership binds the exact path inode to the recorded process'
     }),
     false
   );
+});
+
+test('connected UDS peer identity binds the established socket to the recorded process', () => {
+  const socket = { _handle: { fd: 42 } };
+  const exec = (file, arguments_, options) => {
+    assert.equal(file, '/usr/bin/python3');
+    assert.deepEqual(arguments_.slice(0, 3), ['-I', '-S', '-c']);
+    assert.match(arguments_[3], /SO_PEERCRED/u);
+    assert.deepEqual(options.env, {
+      LC_ALL: 'C',
+      PATH: '/usr/bin:/bin'
+    });
+    assert.deepEqual(options.stdio, ['ignore', 'pipe', 'ignore', 42]);
+    return `4321:${process.getuid()}:${process.getgid()}\n`;
+  };
+  assert.equal(
+    connectedUnixPeerOwnedByPid(socket, 4321, { exec }),
+    true
+  );
+  assert.equal(
+    connectedUnixPeerOwnedByPid(socket, 4321, {
+      exec() {
+        return `9999:${process.getuid()}:${process.getgid()}\n`;
+      }
+    }),
+    false
+  );
+  assert.equal(
+    connectedUnixPeerOwnedByPid(socket, 4321, {
+      exec() {
+        return 'malformed\n';
+      }
+    }),
+    false
+  );
+});
+
+test('connected UDS peer helper reads kernel credentials without sending payload', async t => {
+  const root = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-stack-peercred-'
+  ));
+  const socketPath = path.join(root, 'peer.sock');
+  let acceptedSocket = null;
+  let receivedBytes = 0;
+  let acceptResolve;
+  const accepted = new Promise(resolve => {
+    acceptResolve = resolve;
+  });
+  const server = net.createServer(socket => {
+    acceptedSocket = socket;
+    socket.on('data', chunk => {
+      receivedBytes += chunk.length;
+    });
+    acceptResolve();
+  });
+  await new Promise((resolve, rejectListen) => {
+    server.once('error', rejectListen);
+    server.listen(socketPath, resolve);
+  });
+  const client = net.createConnection({ path: socketPath });
+  await Promise.all([
+    accepted,
+    new Promise((resolve, rejectConnect) => {
+      client.once('connect', resolve);
+      client.once('error', rejectConnect);
+    })
+  ]);
+  t.after(async () => {
+    client.destroy();
+    acceptedSocket?.destroy();
+    await new Promise(resolve => server.close(resolve));
+    fs.rmSync(root, { recursive: true, force: true });
+  });
+
+  assert.equal(
+    connectedUnixPeerOwnedByPid(client, process.pid),
+    true
+  );
+  assert.equal(
+    connectedUnixPeerOwnedByPid(client, 2_147_483_647),
+    false
+  );
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(receivedBytes, 0);
 });
 
 test('HTTP health sends bearer only on a preconnected recorded-PID listener', async t => {

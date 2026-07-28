@@ -130,7 +130,8 @@ stored, ordinary same-baseline restarts use only `start`.
    cache/shadow/vector-write-off, and automatic-rebuild-off policy;
 11. bind both the Governance control and Relay-data UDS path/inode to the
    recorded Governance PID, bind the Relay observer UDS to the recorded Relay
-   PID, revalidate Relay-data ownership before every payload write, then
+   PID, and bind the established Relay-data connection's Linux peer inode to
+   the exact Governance PID before every payload write, then
    validate schema-v3 governance observation, schema-v1 relay observation, and
    Edge health;
 12. stop only components newly started by that invocation if any gate fails.
@@ -164,9 +165,15 @@ provider/Governance/Relay private-file freshness, and native-write-off posture.
 The Relay child receives the controller-verified Governance PID, captures its
 Linux start identity before loading its runtime, and refuses to start unless
 that exact process owns the configured data UDS. Its forwarder checks the same
-ownership before connecting and again after connection but before writing the
-encoded request payload; identity drift is a terminal fail-closed error rather
-than a retryable availability condition.
+path ownership before connecting and again after connection. Before writing
+the encoded request payload, it also maps the established client socket to its
+Linux `SO_PEERCRED` identity through an isolated, fixed-source
+`/usr/bin/python3 -I -S` helper and requires the kernel-reported PID/UID/GID to
+match Governance. The helper receives only the connected socket descriptor;
+it receives no request payload, private path, token, key, or inherited runtime
+environment. A restored pathname therefore cannot authorize a connection
+already established to another local process. Identity drift is a terminal
+fail-closed error rather than a retryable availability condition.
 
 Each managed child is released from the controller's process handle only after
 its owner-only PID file is durably written. If PID persistence fails, the
@@ -202,5 +209,7 @@ perform that lifecycle transition.
 container ID, revision, and security posture. It then sends `SIGTERM` only to
 processes whose owner-only PID file, Node executable, working directory, exact
 script/mode, and applicable environment-file identity match the adopted
-component. It stops but does not remove the retained Edge container. It never
+component. Relay `SIGTERM` aborts its active Edge or UDS operation so the
+process can close within the controller's bounded shutdown wait. The
+controller stops but does not remove the retained Edge container, and it never
 escalates to `SIGKILL`.

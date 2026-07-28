@@ -15,6 +15,7 @@ function createOutboundRelayRuntime({
   edgeTimeoutMs = 5_000,
   udsTimeoutMs = DEFAULT_UDS_TIMEOUT_MS,
   verifyUdsListenerOwner,
+  verifyConnectedUdsPeer,
   edgeRequest,
   ...options
 } = {}) {
@@ -27,7 +28,8 @@ function createOutboundRelayRuntime({
     forwardToUds: createUdsForwarder({
       socketPath,
       timeoutMs: udsTimeoutMs,
-      verifyUdsListenerOwner
+      verifyUdsListenerOwner,
+      verifyConnectedUdsPeer
     }),
     eventComponent: 'outbound_relay'
   });

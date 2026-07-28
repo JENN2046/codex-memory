@@ -22,8 +22,17 @@ const PROFILE_FILENAME = 'full-stack-control.json';
 const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
 const EDGE_CONTAINER_DEFAULT = 'codex-memory-full-stack-001-edge';
 const PROVIDER_CONTAINER_DEFAULT = 'new-api-wsl';
+const UNIX_PEER_CREDENTIAL_HELPER_PATH = '/usr/bin/python3';
+const UNIX_PEER_CREDENTIAL_HELPER_SOURCE = [
+  'import socket,struct',
+  'peer=struct.unpack("3i",socket.socket(fileno=3).getsockopt(socket.SOL_SOCKET,socket.SO_PEERCRED,12))',
+  'print(f"{peer[0]}:{peer[1]}:{peer[2]}")'
+].join(';');
 const CONTROLLER_CHANGE_PATHS = new Set([
+  'apps/local-recall-relay/outbound-https-client.js',
+  'apps/local-recall-relay/outbound-main.js',
   'apps/local-recall-relay/outbound-runtime.js',
+  'apps/local-recall-relay/relay-runtime.js',
   'apps/local-recall-relay/runtime-authority.js',
   'apps/local-recall-relay/uds-transport.js',
   'docs/CODEX_MEMORY_FULL_STACK_CONTROL.md',
@@ -32,7 +41,8 @@ const CONTROLLER_CHANGE_PATHS = new Set([
   'src/cli/vcp-toolbox-native-mcp-shim.js',
   'tests/mcp-http.test.js',
   'tests/codex-memory-stack-cli.test.js',
-  'tests/chatgpt-r4/local-integration.test.js'
+  'tests/chatgpt-r4/local-integration.test.js',
+  'tests/chatgpt-r4/outbound-relay.test.js'
 ]);
 const COMPONENTS = Object.freeze({
   shim: Object.freeze({
@@ -2288,6 +2298,51 @@ function processOwnsUnixListener(pid, socketPath, {
   return [...listenerInodes].every(inode => ownedSocketInodes.has(inode));
 }
 
+function connectedUnixPeerOwnedByPid(socket, pid, {
+  exec = execFileSync
+} = {}) {
+  const normalizedPid = parsePid(pid);
+  const descriptor = socket?._handle?.fd;
+  if (normalizedPid === null ||
+      !Number.isSafeInteger(descriptor) ||
+      descriptor < 0 ||
+      typeof exec !== 'function' ||
+      typeof process.getuid !== 'function' ||
+      typeof process.getgid !== 'function') {
+    return false;
+  }
+  let peerCredentials;
+  try {
+    peerCredentials = String(exec(
+      UNIX_PEER_CREDENTIAL_HELPER_PATH,
+      [
+        '-I',
+        '-S',
+        '-c',
+        UNIX_PEER_CREDENTIAL_HELPER_SOURCE
+      ],
+      {
+        encoding: 'utf8',
+        env: Object.freeze({
+          LC_ALL: 'C',
+          PATH: '/usr/bin:/bin'
+        }),
+        maxBuffer: 4096,
+        stdio: ['ignore', 'pipe', 'ignore', descriptor],
+        timeout: 1000
+      }
+    ));
+  } catch {
+    return false;
+  }
+  const match = /^([1-9][0-9]{0,9}):([0-9]{1,10}):([0-9]{1,10})\n?$/u
+    .exec(peerCredentials);
+  return match !== null &&
+    parsePid(match[1]) === normalizedPid &&
+    Number(match[2]) === process.getuid() &&
+    Number(match[3]) === process.getgid();
+}
+
 function connectOwnedLoopbackTcpListener(pid, port, {
   timeoutMs = 1000,
   fsModule = fs
@@ -4338,6 +4393,16 @@ async function runRelayChild() {
       return false;
     }
   };
+  const verifyConnectedUdsPeer = (socket, candidate) => {
+    try {
+      return candidate === governanceDataSocket &&
+        readLinuxProcessStartTicks(governancePid) ===
+          governanceProcessStartTicks &&
+        connectedUnixPeerOwnedByPid(socket, governancePid);
+    } catch {
+      return false;
+    }
+  };
   if (!verifyUdsListenerOwner(governanceDataSocket)) {
     throw codedError('stack_governance_data_listener_identity_mismatch');
   }
@@ -4359,7 +4424,8 @@ async function runRelayChild() {
       return loadOutboundRelayRuntimeFromEnvironment(environment, {
         ...options,
         secretRoot: privateRoot,
-        verifyUdsListenerOwner
+        verifyUdsListenerOwner,
+        verifyConnectedUdsPeer
       });
     }
   });
@@ -4538,6 +4604,7 @@ module.exports = {
   computeRuntimeAccepted,
   computeStackAccepted,
   connectOwnedLoopbackTcpListener,
+  connectedUnixPeerOwnedByPid,
   controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,

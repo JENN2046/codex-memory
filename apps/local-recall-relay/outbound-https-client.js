@@ -25,27 +25,32 @@ function createOutboundEdgeClient(edgeOrigin, {
   }
   if (typeof request !== 'function') reject('relay_https_request_invalid');
 
-  const invoke = (pathname, body) => requestJson({
+  const invoke = (pathname, body, { signal } = {}) => requestJson({
     baseUrl,
     pathname,
     body,
     authToken,
     timeoutMs,
-    request
+    request,
+    signal
   });
 
   return Object.freeze({
-    claim(relayId) {
-      return invoke('/v1/relay/claim', { relay_id: relayId });
+    claim(relayId, options) {
+      return invoke('/v1/relay/claim', { relay_id: relayId }, options);
     },
-    acknowledge(claim) {
-      return invoke('/v1/relay/ack', claimControl(claim));
+    acknowledge(claim, options) {
+      return invoke('/v1/relay/ack', claimControl(claim), options);
     },
-    complete(claim, response) {
-      return invoke('/v1/relay/complete', { ...claimControl(claim), response });
+    complete(claim, response, options) {
+      return invoke(
+        '/v1/relay/complete',
+        { ...claimControl(claim), response },
+        options
+      );
     },
-    state(claim) {
-      return invoke('/v1/relay/state', claimControl(claim));
+    state(claim, options) {
+      return invoke('/v1/relay/state', claimControl(claim), options);
     }
   });
 }
@@ -58,13 +63,42 @@ function claimControl(claim) {
   return { request_id: claim.request_id, claim_token: claim.claim_token };
 }
 
-function requestJson({ baseUrl, pathname, body, authToken, timeoutMs, request }) {
+function requestJson({
+  baseUrl,
+  pathname,
+  body,
+  authToken,
+  timeoutMs,
+  request,
+  signal
+}) {
   return new Promise((resolve, rejectRequest) => {
     let settled = false;
+    let outgoing = null;
+    validateAbortSignal(signal);
+    function cleanup() {
+      signal?.removeEventListener('abort', onAbort);
+    }
     function fail(code) {
       if (settled) return;
       settled = true;
+      cleanup();
       rejectRequest(Object.assign(new Error(code), { code }));
+    }
+    function succeed(value) {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(value);
+    }
+    function onAbort() {
+      if (settled) return;
+      fail('relay_cancelled');
+      outgoing?.destroy();
+    }
+    if (signal?.aborted) {
+      fail('relay_cancelled');
+      return;
     }
     let encoded;
     try {
@@ -77,7 +111,7 @@ function requestJson({ baseUrl, pathname, body, authToken, timeoutMs, request })
       fail('relay_edge_request_too_large');
       return;
     }
-    const outgoing = request({
+    outgoing = request({
       protocol: 'https:',
       hostname: baseUrl.hostname,
       port: baseUrl.port || 443,
@@ -92,10 +126,13 @@ function requestJson({ baseUrl, pathname, body, authToken, timeoutMs, request })
       },
       agent: false
     }, incoming => {
+      if (settled) {
+        incoming.destroy();
+        return;
+      }
       if (incoming.statusCode === 204) {
-        settled = true;
         incoming.resume();
-        resolve(null);
+        succeed(null);
         return;
       }
       const chunks = [];
@@ -129,8 +166,7 @@ function requestJson({ baseUrl, pathname, body, authToken, timeoutMs, request })
           fail(/^[a-z][a-z0-9_]{0,79}$/u.test(code) ? code : 'relay_edge_rejected');
           return;
         }
-        settled = true;
-        resolve(parsed);
+        succeed(parsed);
       });
       incoming.on('error', () => fail('relay_edge_unavailable'));
     });
@@ -140,8 +176,23 @@ function requestJson({ baseUrl, pathname, body, authToken, timeoutMs, request })
     outgoing.setTimeout(timeoutMs, () => {
       outgoing.destroy(Object.assign(new Error('relay_edge_timeout'), { code: 'relay_edge_timeout' }));
     });
+    signal?.addEventListener('abort', onAbort, { once: true });
+    if (signal?.aborted) {
+      onAbort();
+      return;
+    }
     outgoing.end(encoded);
   });
+}
+
+function validateAbortSignal(signal) {
+  if (signal === undefined) return;
+  if (!signal || typeof signal !== 'object' ||
+      typeof signal.aborted !== 'boolean' ||
+      typeof signal.addEventListener !== 'function' ||
+      typeof signal.removeEventListener !== 'function') {
+    reject('relay_abort_signal_invalid');
+  }
 }
 
 module.exports = {

@@ -547,6 +547,113 @@ test('R4-D D2B retries a non-JSON 5xx gateway response but keeps malformed succe
   assert.equal(attempts, 2);
 });
 
+test('R4-D Relay stop aborts active work within the controller shutdown budget', async () => {
+  let observedSignal = null;
+  let startedResolve;
+  const started = new Promise(resolve => {
+    startedResolve = resolve;
+  });
+  const service = createOutboundRelayService({
+    runtime: {
+      async processNext({ signal }) {
+        observedSignal = signal;
+        startedResolve();
+        return new Promise((resolve, rejectProcess) => {
+          signal.addEventListener('abort', () => {
+            rejectProcess(Object.assign(new Error('relay_cancelled'), {
+              code: 'relay_cancelled'
+            }));
+          }, { once: true });
+        });
+      }
+    },
+    idlePollMs: 10,
+    unavailableBackoffMs: 10
+  });
+  const running = service.run();
+  await started;
+  service.stop();
+  let timeout;
+  try {
+    await Promise.race([
+      running,
+      new Promise((resolve, rejectTimeout) => {
+        timeout = setTimeout(
+          () => rejectTimeout(new Error('relay_stop_abort_timeout')),
+          500
+        );
+      })
+    ]);
+  } finally {
+    clearTimeout(timeout);
+  }
+  assert.equal(observedSignal?.aborted, true);
+  assert.equal(service.snapshot().running, false);
+});
+
+test('R4-D Relay runtime propagates shutdown cancellation to Edge claim', async () => {
+  let observedSignal = null;
+  const runtime = createRelayRuntime({
+    edgeClient: {
+      claim(_relayId, { signal }) {
+        observedSignal = signal;
+        return new Promise((resolve, rejectClaim) => {
+          signal.addEventListener('abort', () => {
+            rejectClaim(Object.assign(new Error('relay_cancelled'), {
+              code: 'relay_cancelled'
+            }));
+          }, { once: true });
+        });
+      },
+      async acknowledge() {},
+      async complete() {},
+      async state() {
+        return { status: 'claimed' };
+      }
+    },
+    async forwardToUds() {},
+    relayId: 'local-relay-r4d-stop-test',
+    expectedIssuer: ISSUER,
+    expectedAudience: MCP_RESOURCE,
+    resolveRequestPublicKey() {
+      return null;
+    },
+    resolvePrincipalPublicKey() {
+      return null;
+    },
+    responseSigning: {},
+    counterMode: 'zero_memory'
+  });
+  const cancellation = new AbortController();
+  const pending = runtime.processNext({ signal: cancellation.signal });
+  cancellation.abort();
+  await assert.rejects(pending, { code: 'relay_cancelled' });
+  assert.equal(observedSignal, cancellation.signal);
+});
+
+test('R4-D outbound Edge requests fail closed immediately when Relay stops', async () => {
+  let destroyed = false;
+  const client = createOutboundEdgeClient(ORIGIN, {
+    authToken: TOKEN,
+    request() {
+      const outgoing = new EventEmitter();
+      outgoing.setTimeout = () => outgoing;
+      outgoing.end = () => {};
+      outgoing.destroy = () => {
+        destroyed = true;
+      };
+      return outgoing;
+    }
+  });
+  const cancellation = new AbortController();
+  const pending = client.claim('local-relay-r4d-test', {
+    signal: cancellation.signal
+  });
+  cancellation.abort();
+  await assert.rejects(pending, { code: 'relay_cancelled' });
+  assert.equal(destroyed, true);
+});
+
 test('R4-D D2B runtime authority requires owner-only files and distinct Ed25519 authorities', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4d-d2b-authority-'));
   fs.chmodSync(root, 0o700);

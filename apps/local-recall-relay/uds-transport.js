@@ -12,7 +12,8 @@ function createUdsForwarder({
   socketPath,
   timeoutMs = DEFAULT_UDS_TIMEOUT_MS,
   maxResponseBytes = MAX_UDS_RESPONSE_BYTES,
-  verifyUdsListenerOwner = null
+  verifyUdsListenerOwner = null,
+  verifyConnectedUdsPeer = null
 } = {}) {
   if (typeof socketPath !== 'string' || !socketPath.startsWith('/') || socketPath.includes('\0')) {
     reject('relay_uds_path_invalid');
@@ -26,6 +27,14 @@ function createUdsForwarder({
   if (verifyUdsListenerOwner !== null &&
       typeof verifyUdsListenerOwner !== 'function') {
     reject('relay_uds_listener_verifier_invalid');
+  }
+  if (verifyConnectedUdsPeer !== null &&
+      typeof verifyConnectedUdsPeer !== 'function') {
+    reject('relay_uds_peer_verifier_invalid');
+  }
+  if ((verifyUdsListenerOwner === null) !==
+      (verifyConnectedUdsPeer === null)) {
+    reject('relay_uds_identity_verifier_incomplete');
   }
 
   return function forwardToUds(payload, { signal } = {}) {
@@ -96,7 +105,8 @@ function createUdsForwarder({
       }
       timer = setTimeout(() => fail('relay_uds_timeout'), timeoutMs);
       socket.on('connect', () => {
-        if (!listenerOwnerVerified()) {
+        if (!listenerOwnerVerified() ||
+            !connectedPeerVerified()) {
           fail('relay_uds_listener_identity_mismatch');
           return;
         }
@@ -121,6 +131,15 @@ function createUdsForwarder({
         if (verifyUdsListenerOwner === null) return true;
         try {
           return verifyUdsListenerOwner(socketPath) === true;
+        } catch {
+          return false;
+        }
+      }
+
+      function connectedPeerVerified() {
+        if (verifyConnectedUdsPeer === null) return true;
+        try {
+          return verifyConnectedUdsPeer(socket, socketPath) === true;
         } catch {
           return false;
         }
