@@ -899,7 +899,7 @@ test('managed spawn persists PID before unref and confirms failed spawns exit', 
   assert.equal(waits, 2);
 });
 
-test('managed stop wait budget covers the complete shim drain window', () => {
+test('managed stop wait budgets cover shim drain and Relay claim settlement', () => {
   const shim = managedStopWaitOptions('shim');
   assert.deepEqual(shim, {
     attempts: 226,
@@ -907,7 +907,9 @@ test('managed stop wait budget covers the complete shim drain window', () => {
     failureCode: 'stack_process_stop_timeout'
   });
   assert.equal((shim.attempts - 1) * shim.intervalMs, 45_000);
-  for (const name of ['http', 'governance', 'relay']) {
+  const relay = managedStopWaitOptions('relay');
+  assert.equal((relay.attempts - 1) * relay.intervalMs, 120_000);
+  for (const name of ['http', 'governance']) {
     const options = managedStopWaitOptions(name);
     assert.equal((options.attempts - 1) * options.intervalMs, 10_000);
     assert.equal(options.failureCode, 'stack_process_stop_timeout');

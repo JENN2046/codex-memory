@@ -70,7 +70,7 @@ const MANAGED_STOP_WAIT_MS = Object.freeze({
   shim: 45_000,
   http: 10_000,
   governance: 10_000,
-  relay: 10_000
+  relay: 120_000
 });
 const LEGACY_PROFILE_KEYS = Object.freeze([
   'edgeContainer',

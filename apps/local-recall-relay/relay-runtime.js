@@ -83,11 +83,8 @@ function createRelayRuntime({
         throw Object.assign(new Error(code), { code });
       }
       try {
-        await edgeClient.acknowledge(claim, { signal });
+        await edgeClient.acknowledge(claim);
       } catch (error) {
-        if (error?.code === 'relay_cancelled' || signal?.aborted) {
-          return interrupted('cancelled');
-        }
         const status = classifyEdgeInterruption(error);
         if (status) return interrupted(status);
         const code = safeErrorCode(error?.code);
@@ -101,12 +98,6 @@ function createRelayRuntime({
       emit('claim_acknowledged', claim.request_id, { attempt: claim.attempt });
 
       const cancellation = new AbortController();
-      const onExternalAbort = () => cancellation.abort();
-      if (signal?.aborted) {
-        cancellation.abort();
-      } else {
-        signal?.addEventListener('abort', onExternalAbort, { once: true });
-      }
       let interruptionStatus = null;
       let monitorStopped = false;
       const monitor = monitorCancellation({
@@ -162,7 +153,6 @@ function createRelayRuntime({
       } finally {
         monitorStopped = true;
         cancellation.abort();
-        signal?.removeEventListener('abort', onExternalAbort);
         await monitor;
       }
     }
