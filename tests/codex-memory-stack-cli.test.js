@@ -11,11 +11,14 @@ const test = require('node:test');
 const {
   CONTROLLER_CHANGE_PATHS,
   PROFILE_KEYS,
+  VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
+  VCP_RUNTIME_SOURCE_PATHS,
   acquireOwnerLock,
   adoptionSourceCompatible,
   assertAdoptionRepositoryMatch,
   assertPrivateRootBoundary,
   assertRelativeReference,
+  buildControllerChildEnvironment,
   buildHttpChildEnvironment,
   buildShimChildEnvironment,
   childBaseEnvironment,
@@ -32,7 +35,9 @@ const {
   inspectEdgeContainer,
   inspectProviderContainer,
   inspectSourceCompatibility,
+  inspectVcpRuntimeIdentity,
   isPidRunning,
+  legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
   loadManagedEnvironmentFile,
   lowDisclosureGovernanceProjection,
@@ -44,11 +49,14 @@ const {
   processOwnsLoopbackTcpListener,
   profileEdgeIdentityMatches,
   profileProviderIdentityMatches,
+  profileWithVcpRuntimeBinding,
+  profileVcpRuntimeIdentityMatches,
   projectHttpHealthPayload,
   safeCode,
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
   validateProfile,
+  vcpRuntimeRepository,
   waitForProcessGroupExit
 } = require('../scripts/codex-memory-stack');
 
@@ -58,10 +66,11 @@ const EDGE_CONTAINER_ID = 'ab'.repeat(32);
 const PROVIDER_CONTAINER_ID = 'cd'.repeat(32);
 const PROVIDER_IMAGE_ID = `sha256:${'ef'.repeat(32)}`;
 const PROVIDER_REVISION = '1234567890abcdef1234567890abcdef12345678';
+const VCP_SCOPE_DIGEST = `sha256:${'12'.repeat(32)}`;
 
 function profile(overrides = {}) {
   return {
-    schemaVersion: 4,
+    schemaVersion: 5,
     runtimeBaseline: BASELINE,
     runtimeRepository: '/repo',
     retainedBindingSource: RETAINED_BINDING_SOURCE,
@@ -75,6 +84,23 @@ function profile(overrides = {}) {
     retainedBinding: 'r5m-exact-head/private-binding.json',
     edgeContainer: 'codex-memory-full-stack-001-edge',
     edgeContainerId: EDGE_CONTAINER_ID,
+    vcpRuntimeBaseline: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
+    vcpRuntimeRepository: '/vcp',
+    vcpRuntimeScopeDigest: VCP_SCOPE_DIGEST,
+    ...overrides
+  };
+}
+
+function legacyProfile(overrides = {}) {
+  const {
+    vcpRuntimeBaseline: _vcpRuntimeBaseline,
+    vcpRuntimeRepository: _vcpRuntimeRepository,
+    vcpRuntimeScopeDigest: _vcpRuntimeScopeDigest,
+    ...legacy
+  } = profile();
+  return {
+    ...legacy,
+    schemaVersion: 4,
     ...overrides
   };
 }
@@ -111,7 +137,17 @@ function acceptedStack(overrides = {}) {
       imageId: PROVIDER_IMAGE_ID,
       revision: PROVIDER_REVISION
     },
-    shimPort: true,
+    vcpRuntime: {
+      recognized: true,
+      revision: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
+      repository: '/vcp',
+      currentMain: true,
+      repositoryMatch: true,
+      scopeClean: true,
+      scopeComplete: true,
+      scopeDigest: VCP_SCOPE_DIGEST
+    },
+    shimListenerOwned: true,
     httpListenerOwned: true,
     httpHealth: {
       reachable: true,
@@ -135,6 +171,7 @@ function acceptedStack(overrides = {}) {
 
 test('profile contract is exact and stores references rather than secret values', () => {
   assert.deepEqual(Object.keys(validateProfile(profile())).sort(), [...PROFILE_KEYS].sort());
+  assert.equal(validateProfile(legacyProfile()).schemaVersion, 4);
   assert.throws(
     () => validateProfile({ ...profile(), token: 'must-not-be-stored' }),
     { code: 'stack_profile_invalid' }
@@ -811,6 +848,70 @@ test('managed environment files reject Node and non-governed startup keys', t =>
   );
 });
 
+test('controller child environment binds the persisted v5 VCP identity', t => {
+  const root = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-stack-vcp-env-'
+  ));
+  const privateRoot = path.join(root, 'owner');
+  const environmentFile = path.join(privateRoot, 'runtime.env');
+  const retainedBindingFile = path.join(privateRoot, 'binding.json');
+  fs.chmodSync(root, 0o700);
+  fs.mkdirSync(privateRoot, { mode: 0o700 });
+  fs.writeFileSync(
+    environmentFile,
+    'CODEX_MEMORY_R4_COUNTER_MODE=r4_session_scoped_live_read_v1\n',
+    { mode: 0o600 }
+  );
+  fs.writeFileSync(retainedBindingFile, '{}\n', { mode: 0o600 });
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  const environment = {
+    XDG_RUNTIME_DIR: path.join(root, 'runtime')
+  };
+  const boundProfile = profile({
+    privateRoot,
+    governanceEnvironment: 'runtime.env',
+    relayEnvironment: 'runtime.env',
+    retainedBinding: 'binding.json'
+  });
+  const child = buildControllerChildEnvironment(environmentFile, {
+    profile: boundProfile,
+    environment
+  });
+  assert.equal(child.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION, '5');
+  assert.equal(
+    child.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE,
+    boundProfile.vcpRuntimeBaseline
+  );
+  assert.equal(
+    child.CODEX_MEMORY_STACK_VCP_RUNTIME_REPOSITORY,
+    boundProfile.vcpRuntimeRepository
+  );
+  assert.equal(
+    child.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST,
+    boundProfile.vcpRuntimeScopeDigest
+  );
+
+  const legacy = buildControllerChildEnvironment(environmentFile, {
+    profile: legacyProfile({
+      privateRoot,
+      governanceEnvironment: 'runtime.env',
+      relayEnvironment: 'runtime.env',
+      retainedBinding: 'binding.json'
+    }),
+    environment
+  });
+  assert.equal(
+    Object.hasOwn(legacy, 'CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION'),
+    false
+  );
+  assert.equal(
+    Object.hasOwn(legacy, 'CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE'),
+    false
+  );
+});
+
 test('managed child environments neutralize caller write, root, provider, and public-surface overrides', () => {
   const digest = `sha256:${'ab'.repeat(32)}`;
   const hostile = {
@@ -913,6 +1014,11 @@ test('managed child environments neutralize caller write, root, provider, and pu
   assert.equal(Object.hasOwn(http, 'API_Key'), false);
 });
 
+test('native shim exposes an in-process listener entry for the managed PID', () => {
+  const shimCli = require('../src/cli/vcp-toolbox-native-mcp-shim');
+  assert.equal(typeof shimCli.main, 'function');
+});
+
 test('HTTP child requires the exact governed mapping binding shape', () => {
   const valid = {
     CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE: 'jenn-vcp-diary-scope-v1',
@@ -1006,6 +1112,112 @@ test('source compatibility allows only controller delivery paths over the accept
   });
   assert.equal(unsafe.compatible, false);
   assert.equal(unsafe.controllerOnlyChanges, false);
+});
+
+test('VCP runtime identity is pinned to the profile-selected commit and clean source scope', () => {
+  const repoRoot = '/owner/VCPToolBox';
+  const revision = VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE];
+  const fsModule = {
+    realpathSync(value) {
+      return value;
+    },
+    statSync() {
+      return {
+        isDirectory: () => true,
+        uid: process.getuid(),
+        mode: 0o40755
+      };
+    }
+  };
+  const inspect = scopedStatus => inspectVcpRuntimeIdentity(profile(), {
+    repoRoot,
+    expectedRepository: repoRoot,
+    canonicalRepository: repoRoot,
+    fsModule,
+    exec(_command, args) {
+      if (args[0] === 'rev-parse' && args[1] === '--show-toplevel') {
+        return `${repoRoot}\n`;
+      }
+      if (args[0] === 'rev-parse' && args[1] === 'HEAD^{commit}') {
+        return `${revision}\n`;
+      }
+      if (args[0] === 'rev-parse' &&
+          args[1] === 'refs/remotes/origin/main^{commit}') {
+        return `${revision}\n`;
+      }
+      if (args[0] === 'status') {
+        assert.deepEqual(
+          args.slice(-VCP_RUNTIME_SOURCE_PATHS.length),
+          [...VCP_RUNTIME_SOURCE_PATHS]
+        );
+        return scopedStatus;
+      }
+      if (args[0] === 'rev-parse' && args[1].startsWith('HEAD:')) {
+        return `${'a'.repeat(40)}\n`;
+      }
+      throw new Error('unexpected git call');
+    }
+  });
+  const accepted = inspect('');
+  const boundProfile = profile({
+    vcpRuntimeBaseline: revision,
+    vcpRuntimeRepository: repoRoot,
+    vcpRuntimeScopeDigest: accepted.scopeDigest
+  });
+  assert.equal(
+    profileVcpRuntimeIdentityMatches(boundProfile, accepted),
+    true
+  );
+  assert.equal(accepted.scopeComplete, true);
+  assert.equal(
+    profileVcpRuntimeIdentityMatches(
+      boundProfile,
+      inspect(' M KnowledgeBaseManager.js\n')
+    ),
+    false
+  );
+  assert.equal(
+    profileVcpRuntimeIdentityMatches(
+      {
+        ...boundProfile,
+        vcpRuntimeBaseline: '0'.repeat(40)
+      },
+      accepted
+    ),
+    false
+  );
+});
+
+test('legacy profile can bootstrap only the reviewed VCP identity into an exact v5 binding', () => {
+  const identity = {
+    recognized: true,
+    revision: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
+    repository: vcpRuntimeRepository(),
+    currentMain: true,
+    repositoryMatch: true,
+    scopeClean: true,
+    scopeComplete: true,
+    scopeDigest: VCP_SCOPE_DIGEST
+  };
+  const legacy = legacyProfile();
+  assert.equal(legacyVcpRuntimeBootstrapMatches(legacy, identity), true);
+  const upgraded = profileWithVcpRuntimeBinding(legacy, identity);
+  assert.equal(upgraded.schemaVersion, 5);
+  assert.equal(upgraded.vcpRuntimeBaseline, identity.revision);
+  assert.equal(upgraded.vcpRuntimeRepository, identity.repository);
+  assert.equal(upgraded.vcpRuntimeScopeDigest, identity.scopeDigest);
+  assert.equal(profileVcpRuntimeIdentityMatches(upgraded, identity), true);
+  assert.equal(
+    legacyVcpRuntimeBootstrapMatches(upgraded, identity),
+    false
+  );
+  assert.throws(
+    () => profileWithVcpRuntimeBinding(legacy, {
+      ...identity,
+      scopeDigest: null
+    }),
+    { code: 'stack_vcp_runtime_identity_mismatch' }
+  );
 });
 
 test('adoption repository must be the repository bound to the running HTTP process', () => {
@@ -1190,6 +1402,23 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
       name
     );
   }
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      vcpRuntime: {
+        ...accepted.vcpRuntime,
+        scopeClean: false
+      }
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      shimListenerOwned: false
+    }),
+    false
+  );
   assert.equal(
     computeStackAccepted({
       ...accepted,

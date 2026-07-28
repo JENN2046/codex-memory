@@ -67,8 +67,11 @@ function normalizePort(value, fallback) {
   return Number.isInteger(parsed) && parsed >= 0 && parsed <= 65535 ? parsed : fallback;
 }
 
-async function main() {
-  const options = parseArgs(process.argv.slice(2), process.env);
+async function main(
+  argv = process.argv.slice(2),
+  environment = process.env
+) {
+  const options = parseArgs(argv, environment);
   options.expectedBearerToken = requireExpectedBearerToken(options.expectedBearerToken);
   const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options);
   await new Promise((resolve, reject) => {
@@ -149,6 +152,7 @@ function requireExpectedBearerToken(value) {
 }
 
 module.exports = {
+  main,
   normalizePort,
   parseArgs,
   requireExpectedBearerToken

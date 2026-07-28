@@ -57,6 +57,27 @@ runtime root and retained binding. No environment values are returned. For
 HTTP, these checks specifically keep legacy or substituted storage paths and
 initialization side effects outside the adoption boundary.
 
+The accepted codex-memory baseline also selects one fixed VCPToolBox Git
+revision. Before acceptance or shim launch, the controller requires that
+revision to equal the local `origin/main`, requires the canonical sibling
+repository identity, and requires the declared native-recall source scope to be
+tracked, present, and unchanged from that revision. Unrelated VCPToolBox plugin
+working-tree state is not executed by this shim and is outside the declared
+scope; any drift in the loaded source files, Rust module, or dependency
+manifests fails closed.
+
+Profile schema v5 persists the canonical VCPToolBox repository, selected commit,
+and declared-source digest alongside the codex-memory and container bindings.
+An existing schema-v4 profile remains readable for status, controlled shutdown,
+and only the reviewed baseline-to-VCP bootstrap; it cannot represent accepted
+runtime state. After this controller is merged, perform the one-time authorized
+transition with `stop`, then `start`, then `adopt-running --replace`. The
+transitioning `start` deliberately returns `accepted: false`,
+`transitionRuntimeAccepted: true`, and `profileUpgradeRequired: true`; it does
+not rewrite the owner profile. Adoption re-inspects the live process
+environments and all acceptance gates before atomically storing v5. Once v5 is
+stored, ordinary same-baseline restarts use only `start`.
+
 ## Start Semantics
 
 `start` is optimized for the normal same-baseline restart:
@@ -66,19 +87,24 @@ initialization side effects outside the adoption boundary.
    runtime baseline;
 3. require the existing provider dependency to match the adopted container,
    image, revision, Compose service, and loopback port identity;
-4. require the retained Edge container to match the accepted revision and
+4. require the profile-selected VCPToolBox revision and loaded source scope to
+   match its accepted identity;
+5. require the retained Edge container to match the accepted revision and
    retain its non-root, read-only, no-restart, no-log, read-only-secret-mount,
    host-loopback-only posture;
-5. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
+6. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
    retained Edge, and outbound Relay plus observer in order;
-6. prove through Linux `/proc` socket metadata that the recorded HTTP PID owns
+7. run the native shim in the controller-managed process itself and prove that
+   its recorded PID owns the 7615 loopback listener before any capability
+   preflight can send a bearer token;
+8. prove through Linux `/proc` socket metadata that the recorded HTTP PID owns
    the exact loopback listener before reading or sending its bearer token;
    validate authenticated full HTTP health and its hardened,
    no-external-provider, read-only public surface, native-write-off,
    cache/shadow/vector-write-off, and automatic-rebuild-off policy; then
    validate sockets, schema-v3 governance observation, schema-v1 relay
    observation, and Edge health;
-7. stop only components newly started by that invocation if any gate fails.
+9. stop only components newly started by that invocation if any gate fails.
 
 `start`, `stop`, and profile adoption share an owner-only atomic lifecycle
 lock. A concurrent lifecycle invocation fails closed, and a crash-left lock is
@@ -99,9 +125,10 @@ variables such as `LD_AUDIT`, and unrelated credential-bearing variables.
 Owner-only runtime environment files are parsed and allowlisted before child
 launch; they are not passed through Node's pre-bootstrap `--env-file` handling.
 The shim is launched directly with the controller's verified
-`process.execPath`, without a shell, and is bound back to the canonical
-workspace runtime, isolated store, governed mapping, loopback provider
-dependency, and native-write-off posture.
+`process.execPath`, without a shell or wrapper child; the managed PID owns the
+listener. It is bound back to the pinned canonical VCPToolBox runtime, isolated
+store, governed mapping, loopback provider dependency, and native-write-off
+posture.
 
 Each managed child is released from the controller's process handle only after
 its owner-only PID file is durably written. If PID persistence fails, the

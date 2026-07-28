@@ -16,7 +16,8 @@ const {
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
-const PROFILE_SCHEMA_VERSION = 4;
+const PROFILE_SCHEMA_VERSION = 5;
+const LEGACY_PROFILE_SCHEMA_VERSION = 4;
 const PROFILE_FILENAME = 'full-stack-control.json';
 const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
 const EDGE_CONTAINER_DEFAULT = 'codex-memory-full-stack-001-edge';
@@ -25,6 +26,7 @@ const CONTROLLER_CHANGE_PATHS = new Set([
   'docs/CODEX_MEMORY_FULL_STACK_CONTROL.md',
   'scripts/codex-memory-stack.js',
   'src/adapters/codex-mcp/http.js',
+  'src/cli/vcp-toolbox-native-mcp-shim.js',
   'tests/mcp-http.test.js',
   'tests/codex-memory-stack-cli.test.js'
 ]);
@@ -50,7 +52,7 @@ const COMPONENTS = Object.freeze({
     mode: '_run-relay'
   })
 });
-const PROFILE_KEYS = Object.freeze([
+const LEGACY_PROFILE_KEYS = Object.freeze([
   'edgeContainer',
   'edgeContainerId',
   'governanceEnvironment',
@@ -66,8 +68,15 @@ const PROFILE_KEYS = Object.freeze([
   'runtimeRepository',
   'schemaVersion'
 ]);
+const PROFILE_KEYS = Object.freeze([
+  ...LEGACY_PROFILE_KEYS,
+  'vcpRuntimeBaseline',
+  'vcpRuntimeRepository',
+  'vcpRuntimeScopeDigest'
+]);
 const PRIVATE_FILE_MAX_BYTES = 262_144;
 const SAFE_GIT_OBJECT = /^[a-f0-9]{40}$/u;
+const SAFE_SHA256_DIGEST = /^sha256:[a-f0-9]{64}$/u;
 const SAFE_CONTAINER_ID = /^[a-f0-9]{64}$/u;
 const SAFE_IMAGE_ID = /^sha256:[a-f0-9]{64}$/u;
 const SAFE_CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u;
@@ -75,6 +84,23 @@ const SAFE_CODE = /^[a-z][a-z0-9_]{0,95}$/u;
 const SAFE_CHILD_PATH = '/usr/bin:/bin';
 const SAFE_MANAGED_ENVIRONMENT_NAME =
   /^CODEX_MEMORY_R(?:4|5)_[A-Z0-9_]{1,96}$/u;
+const VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE = Object.freeze({
+  '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118':
+    '555b3b538f6eb736e530c2912de678c5941f9985'
+});
+const VCP_RUNTIME_SOURCE_PATHS = Object.freeze([
+  'EmbeddingUtils.js',
+  'EPAModule.js',
+  'KnowledgeBaseManager.js',
+  'ResultDeduplicator.js',
+  'ResidualPyramid.js',
+  'TagMemoEngine.js',
+  'TextChunker.js',
+  'package-lock.json',
+  'package.json',
+  'rag_params.json',
+  'rust-vexus-lite'
+]);
 
 function codedError(code) {
   const safe = SAFE_CODE.test(code || '') ? code : 'codex_memory_stack_failed';
@@ -393,8 +419,13 @@ function profileRetainedBindingMatches(profile, {
 }
 
 function validateProfile(value) {
-  if (!exactKeys(value, PROFILE_KEYS) ||
-      value.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+  const keys = value?.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION
+    ? LEGACY_PROFILE_KEYS
+    : PROFILE_KEYS;
+  if (!exactKeys(value, keys) ||
+      ![LEGACY_PROFILE_SCHEMA_VERSION, PROFILE_SCHEMA_VERSION].includes(
+        value.schemaVersion
+      ) ||
       !SAFE_GIT_OBJECT.test(value.runtimeBaseline || '') ||
       !SAFE_GIT_OBJECT.test(value.retainedBindingSource || '') ||
       !SAFE_CONTAINER_NAME.test(value.edgeContainer || '') ||
@@ -409,6 +440,17 @@ function validateProfile(value) {
       typeof value.runtimeRepository !== 'string' ||
       !path.isAbsolute(value.runtimeRepository) ||
       path.resolve(value.runtimeRepository) !== value.runtimeRepository) {
+    throw codedError('stack_profile_invalid');
+  }
+  if (value.schemaVersion === PROFILE_SCHEMA_VERSION &&
+      (
+        !SAFE_GIT_OBJECT.test(value.vcpRuntimeBaseline || '') ||
+        !SAFE_SHA256_DIGEST.test(value.vcpRuntimeScopeDigest || '') ||
+        typeof value.vcpRuntimeRepository !== 'string' ||
+        !path.isAbsolute(value.vcpRuntimeRepository) ||
+        path.resolve(value.vcpRuntimeRepository) !==
+          value.vcpRuntimeRepository
+      )) {
     throw codedError('stack_profile_invalid');
   }
   assertRelativeReference(value.governanceEnvironment);
@@ -962,6 +1004,165 @@ function gitText(args, {
   } catch {
     throw codedError('stack_git_preflight_failed');
   }
+}
+
+function vcpRuntimeRepository() {
+  return path.resolve(REPO_ROOT, '..', '..', 'runtime', 'VCPToolBox');
+}
+
+function inspectVcpRuntimeIdentity(profile, {
+  repoRoot = vcpRuntimeRepository(),
+  expectedRepository = null,
+  canonicalRepository = vcpRuntimeRepository(),
+  exec = execFileSync,
+  fsModule = fs
+} = {}) {
+  const expectedRevision = profile?.schemaVersion === PROFILE_SCHEMA_VERSION
+    ? profile.vcpRuntimeBaseline
+    : VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[profile?.runtimeBaseline] || null;
+  const boundRepository = expectedRepository ||
+    (
+      profile?.schemaVersion === PROFILE_SCHEMA_VERSION
+        ? profile.vcpRuntimeRepository
+        : canonicalRepository
+    );
+  const rejected = overrides => Object.freeze({
+    recognized: false,
+    revision: null,
+    repository: null,
+    currentMain: false,
+    repositoryMatch: false,
+    scopeClean: false,
+    scopeComplete: false,
+    scopeDigest: null,
+    ...overrides
+  });
+  if (!SAFE_GIT_OBJECT.test(expectedRevision || '') ||
+      typeof boundRepository !== 'string' ||
+      !path.isAbsolute(boundRepository) ||
+      path.resolve(boundRepository) !== boundRepository) {
+    return rejected();
+  }
+  let inspectedRepository;
+  try {
+    inspectedRepository = assertOwnerRepositoryDirectory(
+      path.resolve(repoRoot),
+      { fsModule }
+    );
+  } catch {
+    return rejected();
+  }
+  const options = { repoRoot: inspectedRepository, exec };
+  try {
+    const repositoryText = gitText(
+      ['rev-parse', '--show-toplevel'],
+      options
+    );
+    if (!path.isAbsolute(repositoryText)) return rejected();
+    const repository = path.resolve(repositoryText);
+    const head = gitText(['rev-parse', 'HEAD^{commit}'], options);
+    const originMain = gitText(
+      ['rev-parse', 'refs/remotes/origin/main^{commit}'],
+      options
+    );
+    const scopedStatus = gitText([
+      'status',
+      '--porcelain=v1',
+      '--untracked-files=all',
+      '--',
+      ...VCP_RUNTIME_SOURCE_PATHS
+    ], options);
+    const scopeObjects = [];
+    const scopeComplete = VCP_RUNTIME_SOURCE_PATHS.every(candidate => {
+      try {
+        const objectId = gitText(
+          ['rev-parse', `HEAD:${candidate}`],
+          options
+        );
+        if (!SAFE_GIT_OBJECT.test(objectId)) return false;
+        scopeObjects.push([candidate, objectId]);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+    const scopeDigest = scopeComplete
+      ? `sha256:${crypto.createHash('sha256').update(
+        scopeObjects
+          .map(([candidate, objectId]) => `${candidate}\0${objectId}\n`)
+          .join(''),
+        'utf8'
+      ).digest('hex')}`
+      : null;
+    const repositoryMatch = repository === inspectedRepository &&
+      inspectedRepository === path.resolve(boundRepository) &&
+      path.resolve(boundRepository) === path.resolve(canonicalRepository);
+    const currentMain = head === originMain;
+    const scopeClean = scopedStatus === '';
+    const recognized = repositoryMatch &&
+      currentMain &&
+      scopeClean &&
+      scopeComplete &&
+      head === expectedRevision;
+    return Object.freeze({
+      recognized,
+      revision: SAFE_GIT_OBJECT.test(head) ? head : null,
+      repository,
+      currentMain,
+      repositoryMatch,
+      scopeClean,
+      scopeComplete,
+      scopeDigest
+    });
+  } catch {
+    return rejected();
+  }
+}
+
+function profileVcpRuntimeIdentityMatches(profile, identity) {
+  return Boolean(
+    profile?.schemaVersion === PROFILE_SCHEMA_VERSION &&
+    SAFE_GIT_OBJECT.test(profile?.vcpRuntimeBaseline || '') &&
+    SAFE_SHA256_DIGEST.test(profile?.vcpRuntimeScopeDigest || '') &&
+    identity?.recognized === true &&
+    identity?.revision === profile.vcpRuntimeBaseline &&
+    identity?.repository === profile.vcpRuntimeRepository &&
+    identity?.scopeDigest === profile.vcpRuntimeScopeDigest &&
+    identity?.currentMain === true &&
+    identity?.repositoryMatch === true &&
+    identity?.scopeClean === true &&
+    identity?.scopeComplete === true
+  );
+}
+
+function legacyVcpRuntimeBootstrapMatches(profile, identity) {
+  const expectedRevision =
+    VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[profile?.runtimeBaseline] || null;
+  return Boolean(
+    profile?.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION &&
+    SAFE_GIT_OBJECT.test(expectedRevision || '') &&
+    identity?.recognized === true &&
+    identity?.revision === expectedRevision &&
+    identity?.repository === vcpRuntimeRepository() &&
+    identity?.currentMain === true &&
+    identity?.repositoryMatch === true &&
+    identity?.scopeClean === true &&
+    identity?.scopeComplete === true &&
+    SAFE_SHA256_DIGEST.test(identity?.scopeDigest || '')
+  );
+}
+
+function profileWithVcpRuntimeBinding(profile, identity) {
+  if (!legacyVcpRuntimeBootstrapMatches(profile, identity)) {
+    throw codedError('stack_vcp_runtime_identity_mismatch');
+  }
+  return validateProfile({
+    ...profile,
+    schemaVersion: PROFILE_SCHEMA_VERSION,
+    vcpRuntimeBaseline: identity.revision,
+    vcpRuntimeRepository: identity.repository,
+    vcpRuntimeScopeDigest: identity.scopeDigest
+  });
 }
 
 function inspectSourceCompatibility(profile, options = {}) {
@@ -1570,6 +1771,16 @@ function buildControllerChildEnvironment(environmentFile, {
     CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE:
       profile.retainedBindingSource
   };
+  if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+    childEnvironment.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION =
+      String(PROFILE_SCHEMA_VERSION);
+    childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE =
+      profile.vcpRuntimeBaseline;
+    childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_REPOSITORY =
+      profile.vcpRuntimeRepository;
+    childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST =
+      profile.vcpRuntimeScopeDigest;
+  }
   if (expectedHttpPid !== null) {
     const pid = parsePid(expectedHttpPid);
     if (pid === null) throw codedError('stack_http_listener_identity_missing');
@@ -1690,7 +1901,8 @@ function computeRuntimeAccepted({
   profile,
   processes,
   provider,
-  shimPort,
+  vcpRuntime,
+  shimListenerOwned,
   httpListenerOwned,
   httpHealth,
   governance,
@@ -1702,10 +1914,11 @@ function computeRuntimeAccepted({
     retainedBindingMatch === true &&
     provider?.reachable === true &&
     profileProviderIdentityMatches(profile, provider) &&
+    profileVcpRuntimeIdentityMatches(profile, vcpRuntime) &&
     Object.keys(COMPONENTS).every(name =>
       processes?.[name]?.controllerManaged === true
     ) &&
-    shimPort === true &&
+    shimListenerOwned === true &&
     httpListenerOwned === true &&
     httpHealth?.reachable === true &&
     httpHealth?.ok === true &&
@@ -1757,14 +1970,14 @@ async function inspectStack({
       recognized: false
     });
   }
-  const [providerPort, shimPort] = await Promise.all([
-    portListening(3000),
-    portListening(7615)
-  ]);
+  const providerPort = await portListening(3000);
   const provider = Object.freeze({
     ...providerContainer,
     reachable: providerPort
   });
+  const vcpRuntime = inspectVcpRuntimeIdentity(profile);
+  const shimListenerOwned = processes.shim.controllerManaged &&
+    processOwnsLoopbackTcpListener(processes.shim.pid, 7615);
   const httpListenerOwned = processes.http.controllerManaged &&
     processOwnsLoopbackTcpListener(processes.http.pid, 7605);
   const httpHealth = httpListenerOwned
@@ -1819,7 +2032,8 @@ async function inspectStack({
     profile,
     processes,
     provider,
-    shimPort,
+    vcpRuntime,
+    shimListenerOwned,
     httpListenerOwned,
     httpHealth,
     governance,
@@ -1832,7 +2046,8 @@ async function inspectStack({
     source,
     processes,
     provider,
-    shimPort,
+    vcpRuntime,
+    shimListenerOwned,
     httpListenerOwned,
     httpHealth,
     governance,
@@ -1860,7 +2075,16 @@ async function inspectStack({
       loopbackOnly: provider.hostLoopbackOnly,
       identityMatch: profileProviderIdentityMatches(profile, provider)
     }),
-    shim: Object.freeze({ reachable: shimPort }),
+    vcpRuntime: Object.freeze({
+      identityMatch: profileVcpRuntimeIdentityMatches(profile, vcpRuntime),
+      currentMain: vcpRuntime.currentMain,
+      scopeClean: vcpRuntime.scopeClean,
+      scopeComplete: vcpRuntime.scopeComplete
+    }),
+    shim: Object.freeze({
+      reachable: shimListenerOwned,
+      listenerIdentityMatch: shimListenerOwned
+    }),
     httpMcp: Object.freeze({
       reachable: httpHealth.reachable,
       healthy: httpHealth.ok,
@@ -2073,14 +2297,23 @@ async function rollbackStarted(started, profile, environment) {
 async function startStack({
   environment = process.env
 } = {}) {
-  const profile = readProfile({ environment });
-  const source = inspectSourceCompatibility(profile);
+  const storedProfile = readProfile({ environment });
+  let profile = storedProfile;
+  const source = inspectSourceCompatibility(storedProfile);
   if (!source.compatible) throw codedError('stack_source_compatibility_failed');
   ensureRuntimeDirectories(environment);
   const lifecycleLock = acquireOwnerLock(lifecycleLockPath(environment));
   try {
     if (!profileRetainedBindingMatches(profile)) {
       throw codedError('stack_retained_binding_identity_mismatch');
+    }
+    const vcpRuntime = inspectVcpRuntimeIdentity(profile);
+    if (profileVcpRuntimeIdentityMatches(profile, vcpRuntime)) {
+      profile = storedProfile;
+    } else if (legacyVcpRuntimeBootstrapMatches(profile, vcpRuntime)) {
+      profile = profileWithVcpRuntimeBinding(profile, vcpRuntime);
+    } else {
+      throw codedError('stack_vcp_runtime_identity_mismatch');
     }
     const provider = inspectProviderContainer(profile.providerContainer);
     if (!profileProviderIdentityMatches(profile, provider)) {
@@ -2116,7 +2349,12 @@ async function startStack({
         environment
       });
       if (shim.started) started.add('shim');
-      await waitFor(() => portListening(7615), {
+      await waitFor(() => {
+        const state = inspectManagedProcess('shim', { environment, profile });
+        return state.controllerManaged &&
+          state.pid === shim.pid &&
+          processOwnsLoopbackTcpListener(state.pid, 7615);
+      }, {
         failureCode: 'stack_shim_start_timeout'
       });
 
@@ -2155,6 +2393,15 @@ async function startStack({
         'governance',
         { environment, profile }
       );
+      const shimBeforeGovernance = inspectManagedProcess(
+        'shim',
+        { environment, profile }
+      );
+      if (!shimBeforeGovernance.controllerManaged ||
+          shimBeforeGovernance.pid !== shim.pid ||
+          !processOwnsLoopbackTcpListener(shimBeforeGovernance.pid, 7615)) {
+        throw codedError('stack_shim_listener_identity_mismatch');
+      }
       if (!governanceState.running) {
         const preparedSockets = runChildProbe(
           '_prepare-governance-sockets',
@@ -2215,6 +2462,19 @@ async function startStack({
 
       const result = await inspectStack({ environment, profile });
       if (!result.accepted) throw codedError('stack_final_acceptance_failed');
+      if (storedProfile.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION) {
+        return Object.freeze({
+          ...result,
+          accepted: false,
+          runtimeAccepted: false,
+          transitionRuntimeAccepted: true,
+          profileUpgradeRequired: true,
+          action: started.size === 0
+            ? 'profile_upgrade_required'
+            : 'started_profile_upgrade_required',
+          failClosedRollbackRequired: false
+        });
+      }
       return Object.freeze({
         ...result,
         action: started.size === 0 ? 'already_running' : 'started',
@@ -2330,6 +2590,17 @@ async function adoptRunningStack({
       identities.http.identity
     );
     assertAdoptionRepositoryMatch(runtimeRepository);
+    const vcpBootstrapProfile = {
+      schemaVersion: LEGACY_PROFILE_SCHEMA_VERSION,
+      runtimeBaseline: edge.revision
+    };
+    const vcpRuntime = inspectVcpRuntimeIdentity(vcpBootstrapProfile);
+    if (!legacyVcpRuntimeBootstrapMatches(
+      vcpBootstrapProfile,
+      vcpRuntime
+    )) {
+      throw codedError('stack_adoption_vcp_runtime_identity_unproven');
+    }
     const profile = validateProfile({
       schemaVersion: PROFILE_SCHEMA_VERSION,
       runtimeBaseline: edge.revision,
@@ -2344,8 +2615,14 @@ async function adoptRunningStack({
       retainedBinding,
       retainedBindingSource,
       edgeContainerId: edge.id,
-      edgeContainer: EDGE_CONTAINER_DEFAULT
+      edgeContainer: EDGE_CONTAINER_DEFAULT,
+      vcpRuntimeBaseline: vcpRuntime.revision,
+      vcpRuntimeRepository: vcpRuntime.repository,
+      vcpRuntimeScopeDigest: vcpRuntime.scopeDigest
     });
+    if (!profileVcpRuntimeIdentityMatches(profile, vcpRuntime)) {
+      throw codedError('stack_adoption_vcp_runtime_identity_unproven');
+    }
     for (const name of Object.keys(COMPONENTS)) {
       const managedState = inspectManagedProcess(
         name,
@@ -2522,28 +2799,24 @@ function assertChildMode() {
   process.umask(0o077);
 }
 
-function forwardChild(child) {
-  let stopping = false;
-  const stop = signal => {
-    if (stopping) return;
-    stopping = true;
-    try {
-      child.kill(signal);
-    } catch {}
-  };
-  process.once('SIGTERM', () => stop('SIGTERM'));
-  process.once('SIGINT', () => stop('SIGINT'));
-  child.once('error', () => {
-    process.exitCode = 1;
-  });
-  child.once('exit', (code, signal) => {
-    if (signal) process.exitCode = 1;
-    else process.exitCode = Number.isInteger(code) ? code : 1;
-  });
-}
-
 async function runShimChild() {
   assertChildMode();
+  const profile = {
+    schemaVersion: Number(
+      process.env.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION
+    ),
+    runtimeBaseline: process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE,
+    vcpRuntimeBaseline:
+      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE,
+    vcpRuntimeRepository:
+      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_REPOSITORY,
+    vcpRuntimeScopeDigest:
+      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST
+  };
+  const vcpRuntime = inspectVcpRuntimeIdentity(profile);
+  if (!profileVcpRuntimeIdentityMatches(profile, vcpRuntime)) {
+    throw codedError('stack_vcp_runtime_identity_mismatch');
+  }
   const privateRoot = childPrivateRoot();
   const token = singleLineSecret(readPrivateText(
     process.env.CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE,
@@ -2556,12 +2829,23 @@ async function runShimChild() {
     process.env.CODEX_MEMORY_R4_DIARY_SCOPE_MAPPING_REFERENCE,
     privateRoot
   );
-  const vcpRoot = path.resolve(REPO_ROOT, '..', '..', 'runtime', 'VCPToolBox');
+  const vcpRoot = vcpRuntimeRepository();
   const providerEnvironment = readVcpProviderEnvironment(
     path.join(vcpRoot, 'config.env')
   );
-  const child = spawn(process.execPath, [
-    path.join(REPO_ROOT, 'src', 'cli', 'vcp-toolbox-native-mcp-shim.js'),
+  const shimEnvironment = buildShimChildEnvironment(process.env, {
+    token,
+    runtimeRoot,
+    vcpRoot,
+    mappingPath,
+    providerEnvironment
+  });
+  for (const name of Object.keys(process.env)) delete process.env[name];
+  Object.assign(process.env, shimEnvironment);
+  const { main: runShim } = require(
+    '../src/cli/vcp-toolbox-native-mcp-shim'
+  );
+  await runShim([
     '--host',
     '127.0.0.1',
     '--port',
@@ -2570,18 +2854,7 @@ async function runShimChild() {
     vcpRoot,
     '--kb-store',
     path.join(runtimeRoot, 'store')
-  ], {
-    cwd: REPO_ROOT,
-    env: buildShimChildEnvironment(process.env, {
-      token,
-      runtimeRoot,
-      vcpRoot,
-      mappingPath,
-      providerEnvironment
-    }),
-    stdio: 'inherit'
-  });
-  forwardChild(child);
+  ], process.env);
 }
 
 function runHttpChild() {
@@ -2617,6 +2890,65 @@ function validateRetainedBinding(privateRoot) {
   );
 }
 
+function requireShimListenerForGovernanceChild(privateRoot) {
+  const runtimeRoot = assertOwnerOnlyDirectory(
+    process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
+  );
+  const inspectionEnvironment = {
+    ...process.env,
+    XDG_RUNTIME_DIR: path.dirname(runtimeRoot)
+  };
+  if (runtimeDirectory(inspectionEnvironment) !== runtimeRoot) {
+    throw codedError('stack_shim_listener_identity_mismatch');
+  }
+  const environmentFile = extractEnvFileArgument(process.argv);
+  const environmentReference = assertRelativeReference(
+    path.relative(privateRoot, environmentFile)
+  );
+  const retainedBindingFile = assertOwnerOnlyFile(
+    process.env.CODEX_MEMORY_STACK_RETAINED_BINDING_FILE || ''
+  );
+  const retainedBinding = assertRelativeReference(
+    path.relative(privateRoot, retainedBindingFile)
+  );
+  const schemaVersion = Number(
+    process.env.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION
+  );
+  const profile = {
+    governanceEnvironment: environmentReference,
+    privateRoot,
+    retainedBinding,
+    retainedBindingSource:
+      process.env.CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE,
+    runtimeBaseline: process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE,
+    runtimeRepository: REPO_ROOT,
+    schemaVersion,
+    vcpRuntimeBaseline:
+      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE,
+    vcpRuntimeRepository:
+      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_REPOSITORY,
+    vcpRuntimeScopeDigest:
+      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST
+  };
+  if (schemaVersion !== PROFILE_SCHEMA_VERSION ||
+      !SAFE_GIT_OBJECT.test(profile.runtimeBaseline || '') ||
+      !SAFE_GIT_OBJECT.test(profile.retainedBindingSource || '') ||
+      !SAFE_GIT_OBJECT.test(profile.vcpRuntimeBaseline || '') ||
+      !SAFE_SHA256_DIGEST.test(profile.vcpRuntimeScopeDigest || '') ||
+      profile.vcpRuntimeRepository !== vcpRuntimeRepository()) {
+    throw codedError('stack_shim_listener_identity_mismatch');
+  }
+  const state = inspectManagedProcess('shim', {
+    environment: inspectionEnvironment,
+    profile
+  });
+  if (!state.controllerManaged ||
+      !processOwnsLoopbackTcpListener(state.pid, 7615)) {
+    throw codedError('stack_shim_listener_identity_mismatch');
+  }
+  return state.pid;
+}
+
 async function runGovernanceChild() {
   assertChildMode();
   const privateRoot = childPrivateRoot();
@@ -2625,6 +2957,7 @@ async function runGovernanceChild() {
   if (!SAFE_GIT_OBJECT.test(baseline || '')) {
     throw codedError('stack_runtime_baseline_invalid');
   }
+  requireShimListenerForGovernanceChild(privateRoot);
   const token = singleLineSecret(readPrivateText(
     process.env.CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE,
     privateRoot
@@ -2868,6 +3201,8 @@ if (require.main === module) {
 module.exports = {
   CONTROLLER_CHANGE_PATHS,
   PROFILE_KEYS,
+  VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
+  VCP_RUNTIME_SOURCE_PATHS,
   acquireOwnerLock,
   adoptionSourceCompatible,
   adoptRunningStack,
@@ -2891,7 +3226,9 @@ module.exports = {
   inspectEdgeContainer,
   inspectProviderContainer,
   inspectSourceCompatibility,
+  inspectVcpRuntimeIdentity,
   isPidRunning,
+  legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
   loadManagedEnvironmentFile,
   lowDisclosureGovernanceProjection,
@@ -2903,6 +3240,8 @@ module.exports = {
   processOwnsLoopbackTcpListener,
   profileEdgeIdentityMatches,
   profileProviderIdentityMatches,
+  profileWithVcpRuntimeBinding,
+  profileVcpRuntimeIdentityMatches,
   projectHttpHealthPayload,
   probeUnixSocket,
   readPidFile,
@@ -2910,5 +3249,6 @@ module.exports = {
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
   validateProfile,
+  vcpRuntimeRepository,
   waitForProcessGroupExit
 };
