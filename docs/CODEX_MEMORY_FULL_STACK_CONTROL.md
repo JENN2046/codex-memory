@@ -107,7 +107,8 @@ stored, ordinary same-baseline restarts use only `start`.
 2. allow only this controller's delivery paths to differ from the accepted
    runtime baseline;
 3. require the existing provider dependency to match the adopted container,
-   image, revision, Compose service, and loopback port identity;
+   image, revision, Compose service, and exact
+   `127.0.0.1:3000` publication used by the shim;
 4. require Governance and Relay non-secret configuration to match their
    secret-redacted adopted digests;
 5. require the profile-selected VCPToolBox revision, loaded source scope,
@@ -222,6 +223,8 @@ acknowledged request. Its 120-second controller wait covers the configured
 30-second acknowledgement, 55-second UDS, and 30-second completion maxima plus
 bounded overhead. The shim receives a 45-second wait because its governed
 shutdown may sequentially wait up to 10 seconds for active derived work, close
-the knowledge-base manager, and drain for up to another 10 seconds. HTTP and
-Governance retain the 10-second wait. The controller stops but does not remove
+the knowledge-base manager, and drain for up to another 10 seconds. HTTP also
+receives 45 seconds so `server.close()` can settle the controller-pinned
+30-second maximum active request before application close. Governance retains
+the 10-second wait. The controller stops but does not remove
 the retained Edge container, and it never escalates to `SIGKILL`.

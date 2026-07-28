@@ -900,7 +900,7 @@ test('managed spawn persists PID before unref and confirms failed spawns exit', 
   assert.equal(waits, 2);
 });
 
-test('managed stop wait budgets cover shim drain and Relay claim settlement', () => {
+test('managed stop wait budgets cover active HTTP, shim, and Relay settlement', () => {
   const shim = managedStopWaitOptions('shim');
   assert.deepEqual(shim, {
     attempts: 226,
@@ -908,13 +908,18 @@ test('managed stop wait budgets cover shim drain and Relay claim settlement', ()
     failureCode: 'stack_process_stop_timeout'
   });
   assert.equal((shim.attempts - 1) * shim.intervalMs, 45_000);
+  const http = managedStopWaitOptions('http');
+  assert.equal((http.attempts - 1) * http.intervalMs, 45_000);
   const relay = managedStopWaitOptions('relay');
   assert.equal((relay.attempts - 1) * relay.intervalMs, 120_000);
-  for (const name of ['http', 'governance']) {
-    const options = managedStopWaitOptions(name);
-    assert.equal((options.attempts - 1) * options.intervalMs, 10_000);
-    assert.equal(options.failureCode, 'stack_process_stop_timeout');
-  }
+  const governance = managedStopWaitOptions('governance');
+  assert.equal(
+    (governance.attempts - 1) * governance.intervalMs,
+    10_000
+  );
+  assert.equal(http.failureCode, 'stack_process_stop_timeout');
+  assert.equal(relay.failureCode, 'stack_process_stop_timeout');
+  assert.equal(governance.failureCode, 'stack_process_stop_timeout');
   assert.throws(
     () => managedStopWaitOptions('unknown'),
     { code: 'stack_component_invalid' }
@@ -2085,6 +2090,13 @@ test('provider inspection pins the accepted container, image, revision, and loop
     '{{ json .NetworkSettings.Ports }}',
     JSON.stringify({
       '3000/tcp': [{ HostIp: '0.0.0.0', HostPort: '3000' }]
+    })
+  );
+  assert.equal(inspect().recognized, false);
+  values.set(
+    '{{ json .NetworkSettings.Ports }}',
+    JSON.stringify({
+      '3000/tcp': [{ HostIp: '::1', HostPort: '3000' }]
     })
   );
   assert.equal(inspect().recognized, false);

@@ -68,7 +68,7 @@ const COMPONENTS = Object.freeze({
 });
 const MANAGED_STOP_WAIT_MS = Object.freeze({
   shim: 45_000,
-  http: 10_000,
+  http: 45_000,
   governance: 10_000,
   relay: 120_000
 });
@@ -2007,6 +2007,7 @@ function dockerText(args, {
 function publishedPortsLoopbackOnly(portMap, {
   requiredContainerPort,
   requiredHostPort = null,
+  requiredHostIp = null,
   requireSingleBinding = false,
   allowEmptyHostPort = false
 } = {}) {
@@ -2015,6 +2016,10 @@ function publishedPortsLoopbackOnly(portMap, {
       Array.isArray(portMap) ||
       !/^[1-9][0-9]{0,4}\/(?:tcp|udp|sctp)$/u.test(
         requiredContainerPort || ''
+      ) ||
+      (
+        requiredHostIp !== null &&
+        !['127.0.0.1', '::1'].includes(requiredHostIp)
       )) {
     return false;
   }
@@ -2047,10 +2052,17 @@ function publishedPortsLoopbackOnly(portMap, {
       }
     }
   }
-  return requiredHostPort === null ||
+  return (
+    requiredHostPort === null ||
     requiredBindings.every(binding =>
       binding.HostPort === requiredHostPort
-    );
+    )
+  ) && (
+    requiredHostIp === null ||
+    requiredBindings.every(binding =>
+      binding.HostIp === requiredHostIp
+    )
+  );
 }
 
 function inspectProviderContainer(name, options = {}) {
@@ -2086,6 +2098,7 @@ function inspectProviderContainer(name, options = {}) {
   const hostLoopbackOnly = publishedPortsLoopbackOnly(portMap, {
     requiredContainerPort: '3000/tcp',
     requiredHostPort: '3000',
+    requiredHostIp: '127.0.0.1',
     requireSingleBinding: true
   });
   const running = query('{{ .State.Running }}') === 'true';
