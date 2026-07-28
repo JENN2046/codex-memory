@@ -92,8 +92,20 @@ const SENSITIVE_MANAGED_ENVIRONMENT_NAME =
   /(?:^|_)(?:PASSWORD|PRIVATE_KEY|SECRET|TOKEN)(?:_|$)/u;
 const PROVIDER_CONFIG_IDENTITY_FILENAME =
   'vcp-provider-config.identity.json';
+const GOVERNANCE_SECRET_IDENTITY_FILENAME =
+  'governance-private-files.identity.json';
 const RELAY_SECRET_IDENTITY_FILENAME =
   'relay-secret-files.identity.json';
+const GOVERNANCE_PRIVATE_REFERENCE_NAMES = Object.freeze({
+  contextSigningPrivateKey:
+    'CODEX_MEMORY_R4_CONTEXT_SIGNING_PRIVATE_KEY_REFERENCE',
+  diaryScopeMapping: 'CODEX_MEMORY_R4_DIARY_SCOPE_MAPPING_REFERENCE',
+  edgeSigningPublicKey: 'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY',
+  nativeHttpToken: 'CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE',
+  operatorSubjectFingerprint:
+    'CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT_REFERENCE',
+  projectRegistry: 'CODEX_MEMORY_R4_PROJECT_REGISTRY_REFERENCE'
+});
 const RELAY_SECRET_REFERENCE_NAMES = Object.freeze({
   edgeSigningPublicKey: 'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY',
   relayAuthToken: 'CODEX_MEMORY_R4_RELAY_AUTH_TOKEN',
@@ -565,7 +577,11 @@ function validateProviderConfigIdentityReceipt(value) {
 function ownerIdentityReceiptPath(runtimeRoot, filename, {
   fsModule = fs
 } = {}) {
-  if (![PROVIDER_CONFIG_IDENTITY_FILENAME, RELAY_SECRET_IDENTITY_FILENAME]
+  if (![
+    PROVIDER_CONFIG_IDENTITY_FILENAME,
+    GOVERNANCE_SECRET_IDENTITY_FILENAME,
+    RELAY_SECRET_IDENTITY_FILENAME
+  ]
     .includes(filename)) {
     throw codedError('stack_identity_receipt_name_invalid');
   }
@@ -699,21 +715,27 @@ function providerCredentialFreshnessMatches({
   }
 }
 
-function relaySecretFileIdentities(environment, privateRoot, {
-  fsModule = fs
-} = {}) {
+function privateReferenceFileIdentities(
+  environment,
+  privateRoot,
+  referenceNames,
+  {
+    fsModule = fs,
+    maximumBytes = 16_384
+  } = {}
+) {
   const identities = {};
   for (const [identityName, environmentName] of Object.entries(
-    RELAY_SECRET_REFERENCE_NAMES
+    referenceNames
   )) {
     const target = privateReferencePath(
       environment?.[environmentName],
       privateRoot,
-      { fsModule }
+      { fsModule, maximumBytes }
     );
     identities[identityName] = ownerFileIdentity(target, {
       fsModule,
-      maximumBytes: 16_384
+      maximumBytes
     });
   }
   return Object.freeze(Object.fromEntries(
@@ -724,15 +746,139 @@ function relaySecretFileIdentities(environment, privateRoot, {
   ));
 }
 
-function fileIdentitySetMatches(left, right) {
+function governancePrivateFileIdentities(environment, privateRoot, options = {}) {
+  return privateReferenceFileIdentities(
+    environment,
+    privateRoot,
+    GOVERNANCE_PRIVATE_REFERENCE_NAMES,
+    {
+      ...options,
+      maximumBytes: PRIVATE_FILE_MAX_BYTES
+    }
+  );
+}
+
+function relaySecretFileIdentities(environment, privateRoot, options = {}) {
+  return privateReferenceFileIdentities(
+    environment,
+    privateRoot,
+    RELAY_SECRET_REFERENCE_NAMES,
+    options
+  );
+}
+
+function fileIdentitySetMatches(
+  left,
+  right,
+  referenceNames = RELAY_SECRET_REFERENCE_NAMES
+) {
   return Boolean(
     left && right &&
-    exactKeys(left, Object.keys(RELAY_SECRET_REFERENCE_NAMES)) &&
-    exactKeys(right, Object.keys(RELAY_SECRET_REFERENCE_NAMES)) &&
-    Object.keys(RELAY_SECRET_REFERENCE_NAMES).every(name =>
+    exactKeys(left, Object.keys(referenceNames)) &&
+    exactKeys(right, Object.keys(referenceNames)) &&
+    Object.keys(referenceNames).every(name =>
       fileIdentityMatches(left[name], right[name])
     )
   );
+}
+
+function validateGovernancePrivateIdentityReceipt(value) {
+  const governancePid = parsePid(value?.governancePid);
+  if (!exactKeys(value, [
+    'controllerSourceCommit',
+    'governancePid',
+    'governanceProcessStartTicks',
+    'privateFileIdentities',
+    'schemaVersion'
+  ]) ||
+      value.schemaVersion !== 1 ||
+      !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') ||
+      governancePid === null ||
+      value.governancePid !== governancePid ||
+      !/^[1-9][0-9]{0,39}$/u.test(
+        value.governanceProcessStartTicks || ''
+      ) ||
+      !fileIdentitySetMatches(
+        value.privateFileIdentities,
+        value.privateFileIdentities,
+        GOVERNANCE_PRIVATE_REFERENCE_NAMES
+      )) {
+    throw codedError('stack_governance_private_receipt_invalid');
+  }
+  return Object.freeze({
+    controllerSourceCommit: value.controllerSourceCommit,
+    governancePid,
+    governanceProcessStartTicks: value.governanceProcessStartTicks,
+    privateFileIdentities: Object.freeze(Object.fromEntries(
+      Object.entries(value.privateFileIdentities).map(([name, identity]) => [
+        name,
+        Object.freeze({ ...identity })
+      ])
+    )),
+    schemaVersion: 1
+  });
+}
+
+function writeGovernancePrivateIdentityReceipt(
+  receipt,
+  runtimeRoot,
+  options = {}
+) {
+  return writeOwnerIdentityReceipt(receipt, runtimeRoot, {
+    ...options,
+    filename: GOVERNANCE_SECRET_IDENTITY_FILENAME,
+    validate: validateGovernancePrivateIdentityReceipt,
+    failureCode: 'stack_governance_private_receipt_write_failed'
+  });
+}
+
+function readGovernancePrivateIdentityReceipt(runtimeRoot, options = {}) {
+  return readOwnerIdentityReceipt(runtimeRoot, {
+    ...options,
+    filename: GOVERNANCE_SECRET_IDENTITY_FILENAME,
+    validate: validateGovernancePrivateIdentityReceipt,
+    failureCode: 'stack_governance_private_receipt_invalid'
+  });
+}
+
+function governanceCredentialFreshnessMatches({
+  governanceEnvironmentFile,
+  governancePid,
+  profile,
+  runtimeRoot
+}, {
+  fsModule = fs,
+  readStartTicks = readLinuxProcessStartTicks
+} = {}) {
+  try {
+    if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+        parsePid(governancePid) === null) {
+      return false;
+    }
+    const environment = loadManagedEnvironmentFile(
+      governanceEnvironmentFile,
+      { fsModule }
+    );
+    const receipt = readGovernancePrivateIdentityReceipt(
+      runtimeRoot,
+      { fsModule }
+    );
+    return receipt.controllerSourceCommit === profile.controllerSourceCommit &&
+      receipt.governancePid === governancePid &&
+      receipt.governanceProcessStartTicks ===
+        readStartTicks(governancePid, { fsModule }) &&
+      fileIdentitySetMatches(
+        receipt.privateFileIdentities,
+        governancePrivateFileIdentities(
+          environment,
+          profile.privateRoot,
+          { fsModule }
+        ),
+        GOVERNANCE_PRIVATE_REFERENCE_NAMES
+      );
+  } catch {
+    return false;
+  }
 }
 
 function validateRelaySecretIdentityReceipt(value) {
@@ -2626,6 +2772,7 @@ function computeRuntimeAccepted({
   relayListenerOwned,
   httpHealth,
   governance,
+  governanceCredentialFresh,
   relay,
   relayCredentialFresh,
   edge,
@@ -2652,6 +2799,7 @@ function computeRuntimeAccepted({
     httpHealth?.policyAccepted === true &&
     processes?.governance?.managed === true &&
     governance?.reachable === true &&
+    governanceCredentialFresh === true &&
     processes?.relay?.managed === true &&
     relay?.reachable === true &&
     relayCredentialFresh === true &&
@@ -2775,6 +2923,12 @@ async function inspectStack({
       processes.governance.pid,
       governanceSocketPath
     );
+  const governanceCredentialFresh = governanceCredentialFreshnessMatches({
+    governanceEnvironmentFile: governanceEnvironment,
+    governancePid: processes.governance.pid,
+    profile,
+    runtimeRoot: runtimeDirectory(environment)
+  });
   const governance = Object.freeze({
     ...(
       governanceListenerOwned
@@ -2787,7 +2941,8 @@ async function inspectStack({
         ))
         : lowDisclosureGovernanceProjection(null)
     ),
-    listenerIdentityMatch: governanceListenerOwned
+    listenerIdentityMatch: governanceListenerOwned,
+    credentialFresh: governanceCredentialFresh
   });
   const relaySocketPath = path.join(
     runtimeDirectory(environment),
@@ -2853,6 +3008,7 @@ async function inspectStack({
     relayListenerOwned,
     httpHealth,
     governance,
+    governanceCredentialFresh,
     relay,
     relayCredentialFresh,
     edge,
@@ -2873,6 +3029,7 @@ async function inspectStack({
     relayListenerOwned,
     httpHealth,
     governance,
+    governanceCredentialFresh,
     relay,
     relayCredentialFresh,
     edge,
@@ -3213,6 +3370,19 @@ async function startStack({
     })) {
       throw codedError('stack_controlled_transition_required');
     }
+    const governanceBefore = inspectManagedProcess(
+      'governance',
+      { environment, profile }
+    );
+    if (governanceBefore.running &&
+        !governanceCredentialFreshnessMatches({
+          governanceEnvironmentFile: governanceEnvironment,
+          governancePid: governanceBefore.pid,
+          profile,
+          runtimeRoot: runtimeDirectory(environment)
+        })) {
+      throw codedError('stack_governance_credential_stale');
+    }
     const relayBefore = inspectManagedProcess(
       'relay',
       { environment, profile }
@@ -3336,6 +3506,14 @@ async function startStack({
         );
         return lowDisclosureGovernanceProjection(result).reachable;
       }, { failureCode: 'stack_governance_start_timeout' });
+      if (!governanceCredentialFreshnessMatches({
+        governanceEnvironmentFile: governanceEnvironment,
+        governancePid: governanceProcess.pid,
+        profile,
+        runtimeRoot: runtimeDirectory(environment)
+      })) {
+        throw codedError('stack_governance_credential_stale');
+      }
 
       if (!edgeBefore.running) {
         runDocker(['start', profile.edgeContainerId]);
@@ -3936,12 +4114,19 @@ function requireShimListenerForGovernanceChild(privateRoot) {
 async function runGovernanceChild() {
   assertChildMode();
   const privateRoot = childPrivateRoot();
+  const runtimeRoot = assertOwnerOnlyDirectory(
+    process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
+  );
   validateRetainedBinding(privateRoot);
   const baseline = process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE;
   if (!SAFE_GIT_OBJECT.test(baseline || '')) {
     throw codedError('stack_runtime_baseline_invalid');
   }
   requireShimListenerForGovernanceChild(privateRoot);
+  const privateFileIdentitiesBefore = governancePrivateFileIdentities(
+    process.env,
+    privateRoot
+  );
   const token = singleLineSecret(readPrivateText(
     process.env.CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE,
     privateRoot
@@ -3984,6 +4169,17 @@ async function runGovernanceChild() {
     prepared.private_environment,
     { privateRoot }
   );
+  const privateFileIdentitiesAfter = governancePrivateFileIdentities(
+    prepared.private_environment,
+    privateRoot
+  );
+  if (!fileIdentitySetMatches(
+    privateFileIdentitiesBefore,
+    privateFileIdentitiesAfter,
+    GOVERNANCE_PRIVATE_REFERENCE_NAMES
+  )) {
+    throw codedError('stack_governance_private_identity_changed');
+  }
   const started = await runtime.start();
   const snapshot = runtime.snapshot();
   const observation = snapshot.session_control?.private_dogfood_observation;
@@ -3997,6 +4193,19 @@ async function runGovernanceChild() {
       observation?.unrestricted_native_searches !== 0) {
     await runtime.stop().catch(() => {});
     throw codedError('stack_governance_default_closed_invalid');
+  }
+  try {
+    writeGovernancePrivateIdentityReceipt({
+      controllerSourceCommit:
+        process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT,
+      governancePid: process.pid,
+      governanceProcessStartTicks: readLinuxProcessStartTicks(process.pid),
+      privateFileIdentities: privateFileIdentitiesAfter,
+      schemaVersion: 1
+    }, runtimeRoot);
+  } catch (error) {
+    await runtime.stop().catch(() => {});
+    throw error;
   }
   process.stdout.write(`${JSON.stringify({
     accepted: true,
@@ -4254,6 +4463,8 @@ module.exports = {
   profileVcpProviderConfigMatches,
   profileWithVcpRuntimeBinding,
   profileVcpRuntimeIdentityMatches,
+  governanceCredentialFreshnessMatches,
+  governancePrivateFileIdentities,
   providerCredentialFreshnessMatches,
   projectHttpHealthPayload,
   probeUnixSocket,
@@ -4268,6 +4479,7 @@ module.exports = {
   validateProfile,
   vcpProviderConfigDigest,
   vcpRuntimeRepository,
+  writeGovernancePrivateIdentityReceipt,
   writeProviderConfigIdentityReceipt,
   writeRelaySecretIdentityReceipt,
   waitForProcessGroupExit

@@ -75,11 +75,14 @@ canonical VCPToolBox repository, selected VCP commit, declared-source digest,
 the non-secret Governance/Relay configuration digests, and a digest of the
 selected embedding model plus vector dimension alongside the container
 bindings. The API key and other secret-bearing values are neither included in
-those digests nor stored in the profile. The shim and Relay each write an
-owner-only freshness receipt containing only their PID/start identity and the
-device/inode/size/time identity of the secret-bearing files they loaded. Relay
-binds its auth token and three signing-key files as one identity set. These
-receipts contain no path, key, key digest, or environment value. A bound-file
+those digests nor stored in the profile. The shim, Governance, and Relay each
+write an owner-only freshness receipt containing only their PID/start identity
+and the device/inode/size/time identity of the private files they loaded.
+Governance binds its context signing private key, diary-scope mapping, Edge
+signing public key, native HTTP token, operator-subject fingerprint, and
+project registry as one identity set. Relay binds its auth token and three
+signing-key files as another identity set. These receipts contain no path,
+private content, secret digest, key digest, or environment value. A bound-file
 identity change therefore marks the corresponding running process unaccepted
 until a controlled stop/start refreshes it. Later changes to any controller
 allowlisted path or non-secret managed runtime configuration require new
@@ -109,8 +112,9 @@ stored, ordinary same-baseline restarts use only `start`.
    secret-redacted adopted digests;
 5. require the profile-selected VCPToolBox revision, loaded source scope,
    embedding model, and dimension to match their accepted identities;
-6. require running shim and Relay owner-only freshness receipts to match their
-   process start identities and current provider/token/signing file identities;
+6. require running shim, Governance, and Relay owner-only freshness receipts
+   to match their process start identities and current provider/private-file
+   identities;
 7. require the retained Edge container to match the accepted revision and
    retain its non-root, read-only, no-restart, no-log, read-only-secret-mount,
    host-loopback-only posture across every published container port;
@@ -154,8 +158,8 @@ launch; they are not passed through Node's pre-bootstrap `--env-file` handling.
 The shim is launched directly with the controller's verified
 `process.execPath`, without a shell or wrapper child; the managed PID owns the
 listener. It is bound back to the pinned canonical VCPToolBox runtime, isolated
-store, governed mapping, loopback provider dependency, provider/Relay
-secret-file freshness, and native-write-off posture.
+store, governed mapping, loopback provider dependency,
+provider/Governance/Relay private-file freshness, and native-write-off posture.
 
 Each managed child is released from the controller's process handle only after
 its owner-only PID file is durably written. If PID persistence fails, the
@@ -173,7 +177,7 @@ exact-baseline acceptance instead of using `--force`.
 `status` performs the same authenticated, full hardened-policy HTTP probe used
 by startup and adoption, but only after the HTTP command is controller-managed
 and the loopback listener belongs to its recorded PID. It returns only
-booleans for managed-configuration, provider-credential, and Relay-credential
+booleans for managed-configuration and provider/Governance/Relay credential
 freshness alongside counters, schema versions, baseline identity, and bounded
 policy failure codes. It does not return private paths, file identities,
 environment values, tokens, keys, key digests, raw memory, request bodies, or

@@ -40,6 +40,8 @@ const {
   isPidRunning,
   legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
+  governanceCredentialFreshnessMatches,
+  governancePrivateFileIdentities,
   loadManagedEnvironmentFile,
   managedEnvironmentConfigDigest,
   lowDisclosureGovernanceProjection,
@@ -69,6 +71,7 @@ const {
   validateProfile,
   vcpProviderConfigDigest,
   vcpRuntimeRepository,
+  writeGovernancePrivateIdentityReceipt,
   writeProviderConfigIdentityReceipt,
   writeRelaySecretIdentityReceipt,
   waitForProcessGroupExit
@@ -203,6 +206,7 @@ function acceptedStack(overrides = {}) {
       policyAccepted: true
     },
     governance: { reachable: true },
+    governanceCredentialFresh: true,
     relay: { reachable: true },
     relayCredentialFresh: true,
     edge: {
@@ -1634,6 +1638,98 @@ test('provider key rotation invalidates the running shim without persisting key 
   );
 });
 
+test('Governance private-file rotation invalidates the running process without private disclosure', t => {
+  const root = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-stack-governance-freshness-'
+  ));
+  const privateRoot = path.join(root, 'private');
+  const runtimeRoot = path.join(root, 'runtime');
+  const pidDirectory = path.join(runtimeRoot, 'pids');
+  fs.chmodSync(root, 0o700);
+  fs.mkdirSync(privateRoot, { mode: 0o700 });
+  fs.mkdirSync(runtimeRoot, { mode: 0o700 });
+  fs.mkdirSync(pidDirectory, { mode: 0o700 });
+  const files = {
+    contextSigningPrivateKey: path.join(privateRoot, 'context-private.pem'),
+    diaryScopeMapping: path.join(privateRoot, 'mapping.json'),
+    edgeSigningPublicKey: path.join(privateRoot, 'edge-public.pem'),
+    nativeHttpToken: path.join(privateRoot, 'native-token'),
+    operatorSubjectFingerprint: path.join(
+      privateRoot,
+      'operator-fingerprint'
+    ),
+    projectRegistry: path.join(privateRoot, 'registry.json')
+  };
+  for (const [name, file] of Object.entries(files)) {
+    fs.writeFileSync(file, `synthetic-${name}-material\n`, { mode: 0o600 });
+  }
+  const governanceEnvironmentFile = path.join(
+    privateRoot,
+    'governance.env'
+  );
+  fs.writeFileSync(
+    governanceEnvironmentFile,
+    [
+      `CODEX_MEMORY_R4_CONTEXT_SIGNING_PRIVATE_KEY_REFERENCE=file:${files.contextSigningPrivateKey}`,
+      `CODEX_MEMORY_R4_DIARY_SCOPE_MAPPING_REFERENCE=file:${files.diaryScopeMapping}`,
+      `CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY=file:${files.edgeSigningPublicKey}`,
+      `CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE=file:${files.nativeHttpToken}`,
+      `CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT_REFERENCE=file:${files.operatorSubjectFingerprint}`,
+      `CODEX_MEMORY_R4_PROJECT_REGISTRY_REFERENCE=file:${files.projectRegistry}`
+    ].join('\n') + '\n',
+    { mode: 0o600 }
+  );
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+
+  const governanceEnvironment = loadManagedEnvironmentFile(
+    governanceEnvironmentFile
+  );
+  const identities = governancePrivateFileIdentities(
+    governanceEnvironment,
+    privateRoot
+  );
+  writeGovernancePrivateIdentityReceipt({
+    controllerSourceCommit: CONTROLLER_SOURCE_COMMIT,
+    governancePid: process.pid,
+    governanceProcessStartTicks: readLinuxProcessStartTicks(process.pid),
+    privateFileIdentities: identities,
+    schemaVersion: 1
+  }, runtimeRoot);
+  const receiptText = fs.readFileSync(
+    path.join(pidDirectory, 'governance-private-files.identity.json'),
+    'utf8'
+  );
+  assert.equal(receiptText.includes('synthetic-'), false);
+  assert.equal(receiptText.includes(privateRoot), false);
+  assert.equal(receiptText.includes('sha256:'), false);
+  const boundProfile = profile({ privateRoot });
+  assert.equal(
+    governanceCredentialFreshnessMatches({
+      governanceEnvironmentFile,
+      governancePid: process.pid,
+      profile: boundProfile,
+      runtimeRoot
+    }),
+    true
+  );
+
+  fs.writeFileSync(
+    files.operatorSubjectFingerprint,
+    'rotated-synthetic-operator-fingerprint-material-longer\n',
+    { mode: 0o600 }
+  );
+  assert.equal(
+    governanceCredentialFreshnessMatches({
+      governanceEnvironmentFile,
+      governancePid: process.pid,
+      profile: boundProfile,
+      runtimeRoot
+    }),
+    false
+  );
+});
+
 test('Relay secret-file rotation invalidates the running process without secret disclosure', t => {
   const root = fs.mkdtempSync(path.join(
     os.tmpdir(),
@@ -2002,6 +2098,13 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
     computeStackAccepted({
       ...accepted,
       vcpProviderCredentialFresh: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      governanceCredentialFresh: false
     }),
     false
   );
