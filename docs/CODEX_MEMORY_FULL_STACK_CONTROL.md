@@ -27,17 +27,18 @@ node scripts/codex-memory-stack.js adopt-running
 Adoption reads process command metadata, container security metadata, and the
 minimum owner-only references needed for governed probes. It does not store,
 return, or copy environment values into the profile. The profile contains the
-accepted Git baseline, exact retained Edge container identity, the
-independently accepted retained-binding source identity, the exact accepted
-runtime repository, and relative references to existing owner-only environment
-and binding files. Before writing the profile, adoption validates the exact
-process executable, script, mode and environment-file identities, restricts
-managed environment files to governed `CODEX_MEMORY_R4_*` and
-`CODEX_MEMORY_R5_*` names, and runs the complete low-disclosure runtime
-acceptance. The retained binding may predate the runtime baseline, but its
-accepted source identity cannot drift without a new adoption. Use `--replace`
-only after a newly provisioned stack has completed a fresh exact-baseline
-acceptance.
+accepted Git baseline, exact retained Edge container identity, exact accepted
+NewAPI container/image/revision identity, the independently accepted
+retained-binding source identity, the exact accepted runtime repository, and
+relative references to existing owner-only environment and binding files.
+Before writing the profile, adoption validates the exact process executable,
+script, mode and environment-file identities, restricts managed environment
+files to governed `CODEX_MEMORY_R4_*` and `CODEX_MEMORY_R5_*` names, validates
+the provider container's recognized image metadata and exact loopback port
+binding, and runs the complete low-disclosure runtime acceptance. The retained
+binding may predate the runtime baseline, but its accepted source identity
+cannot drift without a new adoption. Use `--replace` only after a newly
+provisioned stack has completed a fresh exact-baseline acceptance.
 
 ## Start Semantics
 
@@ -46,7 +47,8 @@ acceptance.
 1. require a clean local `main` equal to the locally known `origin/main`;
 2. allow only this controller's delivery paths to differ from the accepted
    runtime baseline;
-3. require the existing provider dependency;
+3. require the existing provider dependency to match the adopted container,
+   image, revision, Compose service, and loopback port identity;
 4. require the retained Edge container to match the accepted revision and
    retain its non-root, read-only, no-restart, no-log, read-only-secret-mount,
    host-loopback-only posture;
@@ -66,15 +68,21 @@ tool exposure, candidate cache, shadow writes, vector-index writes, and
 automatic rebuilds are forced off by the managed HTTP child.
 Hardened soft-read, lifecycle-read, and write-preflight policy checks are
 forced on even though no public or delegated write path is enabled.
-Caller-supplied root, write-enable, provider, preload, Node option, and public
-tool-surface overrides are removed before managed children start. Shell startup
-and trace injection variables such as `BASH_ENV`, `ENV`, `SHELLOPTS`, and `PS4`
-are also removed and `PATH` is pinned to system binaries. Owner-only runtime
-environment files are parsed and allowlisted before child launch; they are not
-passed through Node's pre-bootstrap `--env-file` handling. The shim is launched
-directly with the controller's verified `process.execPath`, without a shell,
-and is bound back to the canonical workspace runtime, isolated store, governed
-mapping, loopback provider dependency, and native-write-off posture.
+Caller-supplied root, write-enable, provider, preload, Node option/debug/trace,
+and public tool-surface overrides are removed before managed children start.
+Shell startup and trace injection variables such as `BASH_ENV`, `ENV`,
+`SHELLOPTS`, and `PS4` are also removed and `PATH` is pinned to system
+binaries. Owner-only runtime environment files are parsed and allowlisted
+before child launch; they are not passed through Node's pre-bootstrap
+`--env-file` handling. The shim is launched directly with the controller's
+verified `process.execPath`, without a shell, and is bound back to the canonical
+workspace runtime, isolated store, governed mapping, loopback provider
+dependency, and native-write-off posture.
+
+Each managed child is released from the controller's process handle only after
+its owner-only PID file is durably written. If PID persistence fails, the
+controller terminates the newly created process group and reports a fail-closed
+error instead of leaving an unmanaged listener.
 
 If runtime-critical source, the accepted baseline, owner profile, or Edge
 container changes, startup fails closed. Reprovision and complete a fresh

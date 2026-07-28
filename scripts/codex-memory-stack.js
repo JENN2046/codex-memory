@@ -16,10 +16,11 @@ const {
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
-const PROFILE_SCHEMA_VERSION = 3;
+const PROFILE_SCHEMA_VERSION = 4;
 const PROFILE_FILENAME = 'full-stack-control.json';
 const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
 const EDGE_CONTAINER_DEFAULT = 'codex-memory-full-stack-001-edge';
+const PROVIDER_CONTAINER_DEFAULT = 'new-api-wsl';
 const CONTROLLER_CHANGE_PATHS = new Set([
   'docs/CODEX_MEMORY_FULL_STACK_CONTROL.md',
   'scripts/codex-memory-stack.js',
@@ -52,6 +53,10 @@ const PROFILE_KEYS = Object.freeze([
   'edgeContainerId',
   'governanceEnvironment',
   'privateRoot',
+  'providerContainer',
+  'providerContainerId',
+  'providerImageId',
+  'providerRevision',
   'relayEnvironment',
   'retainedBinding',
   'retainedBindingSource',
@@ -62,6 +67,7 @@ const PROFILE_KEYS = Object.freeze([
 const PRIVATE_FILE_MAX_BYTES = 262_144;
 const SAFE_GIT_OBJECT = /^[a-f0-9]{40}$/u;
 const SAFE_CONTAINER_ID = /^[a-f0-9]{64}$/u;
+const SAFE_IMAGE_ID = /^sha256:[a-f0-9]{64}$/u;
 const SAFE_CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u;
 const SAFE_CODE = /^[a-z][a-z0-9_]{0,95}$/u;
 const SAFE_CHILD_PATH = '/usr/bin:/bin';
@@ -391,6 +397,10 @@ function validateProfile(value) {
       !SAFE_GIT_OBJECT.test(value.retainedBindingSource || '') ||
       !SAFE_CONTAINER_NAME.test(value.edgeContainer || '') ||
       !SAFE_CONTAINER_ID.test(value.edgeContainerId || '') ||
+      value.providerContainer !== PROVIDER_CONTAINER_DEFAULT ||
+      !SAFE_CONTAINER_ID.test(value.providerContainerId || '') ||
+      !SAFE_IMAGE_ID.test(value.providerImageId || '') ||
+      !SAFE_GIT_OBJECT.test(value.providerRevision || '') ||
       typeof value.privateRoot !== 'string' ||
       !path.isAbsolute(value.privateRoot) ||
       path.resolve(value.privateRoot) !== value.privateRoot ||
@@ -913,7 +923,8 @@ function adoptionSourceCompatible(source) {
 }
 
 function dockerText(args, {
-  exec = execFileSync
+  exec = execFileSync,
+  failureCode = 'stack_docker_inspection_failed'
 } = {}) {
   try {
     return String(exec('docker', args, {
@@ -921,15 +932,83 @@ function dockerText(args, {
       stdio: ['ignore', 'pipe', 'pipe']
     })).trim();
   } catch {
-    throw codedError('stack_edge_container_unavailable');
+    throw codedError(failureCode);
   }
+}
+
+function inspectProviderContainer(name, options = {}) {
+  if (name !== PROVIDER_CONTAINER_DEFAULT) {
+    throw codedError('stack_provider_container_name_invalid');
+  }
+  const query = format => dockerText(
+    ['inspect', '--format', format, name],
+    { ...options, failureCode: 'stack_provider_container_unavailable' }
+  );
+  const id = query('{{ .Id }}');
+  const imageId = query('{{ .Image }}');
+  const imageName = query('{{ .Config.Image }}');
+  const revision = query(
+    '{{ index .Config.Labels "org.opencontainers.image.revision" }}'
+  );
+  const source = query(
+    '{{ index .Config.Labels "org.opencontainers.image.source" }}'
+  );
+  const composeProject = query(
+    '{{ index .Config.Labels "com.docker.compose.project" }}'
+  );
+  const composeService = query(
+    '{{ index .Config.Labels "com.docker.compose.service" }}'
+  );
+  const portBindingsText = query(
+    '{{ json (index .NetworkSettings.Ports "3000/tcp") }}'
+  );
+  let portBindings;
+  try {
+    portBindings = JSON.parse(portBindingsText);
+  } catch {
+    portBindings = null;
+  }
+  const hostLoopbackOnly = Array.isArray(portBindings) &&
+    portBindings.length === 1 &&
+    ['127.0.0.1', '::1'].includes(portBindings[0]?.HostIp) &&
+    portBindings[0]?.HostPort === '3000';
+  const running = query('{{ .State.Running }}') === 'true';
+  const recognized = SAFE_CONTAINER_ID.test(id) &&
+    SAFE_IMAGE_ID.test(imageId) &&
+    SAFE_GIT_OBJECT.test(revision) &&
+    imageName === 'calciumion/new-api:latest' &&
+    source === 'https://github.com/QuantumNous/new-api' &&
+    composeProject === 'new-api-wsl' &&
+    composeService === 'new-api' &&
+    hostLoopbackOnly;
+  return Object.freeze({
+    id,
+    imageId,
+    revision,
+    running,
+    hostLoopbackOnly,
+    recognized
+  });
+}
+
+function profileProviderIdentityMatches(profile, provider) {
+  return Boolean(
+    provider?.recognized === true &&
+    provider?.running === true &&
+    provider?.id === profile?.providerContainerId &&
+    provider?.imageId === profile?.providerImageId &&
+    provider?.revision === profile?.providerRevision
+  );
 }
 
 function inspectEdgeContainer(name, options = {}) {
   if (!SAFE_CONTAINER_NAME.test(name || '')) {
     throw codedError('stack_edge_container_name_invalid');
   }
-  const query = format => dockerText(['inspect', '--format', format, name], options);
+  const query = format => dockerText(
+    ['inspect', '--format', format, name],
+    { ...options, failureCode: 'stack_edge_container_unavailable' }
+  );
   const id = query('{{ .Id }}');
   const revision = query('{{ index .Config.Labels "org.opencontainers.image.revision" }}');
   const user = query('{{ .Config.User }}');
@@ -1385,7 +1464,8 @@ function computeRuntimeAccepted({
 }) {
   return Boolean(
     retainedBindingMatch === true &&
-    provider === true &&
+    provider?.reachable === true &&
+    profileProviderIdentityMatches(profile, provider) &&
     processes?.shim?.managed === true && shimPort === true &&
     processes?.http?.managed === true &&
     httpHealth?.reachable === true &&
@@ -1425,10 +1505,27 @@ async function inspectStack({
     profile.governanceEnvironment
   );
   const relayEnvironment = resolvePrivateReference(profile, profile.relayEnvironment);
-  const [provider, shimPort] = await Promise.all([
+  let providerContainer;
+  try {
+    providerContainer = inspectProviderContainer(profile.providerContainer);
+  } catch {
+    providerContainer = Object.freeze({
+      id: null,
+      imageId: null,
+      revision: null,
+      running: false,
+      hostLoopbackOnly: false,
+      recognized: false
+    });
+  }
+  const [providerPort, shimPort] = await Promise.all([
     portListening(3000),
     portListening(7615)
   ]);
+  const provider = Object.freeze({
+    ...providerContainer,
+    reachable: providerPort
+  });
   const httpHealth = processes.http.managed
     ? lowDisclosureHttpProjection(runChildProbe(
       '_probe-http',
@@ -1505,7 +1602,13 @@ async function inspectStack({
     }),
     retainedBinding: Object.freeze({ identityMatch: retainedBindingMatch }),
     processes: Object.freeze(processProjection),
-    provider: Object.freeze({ reachable: provider }),
+    provider: Object.freeze({
+      reachable: provider.reachable,
+      running: provider.running,
+      recognized: provider.recognized,
+      loopbackOnly: provider.hostLoopbackOnly,
+      identityMatch: profileProviderIdentityMatches(profile, provider)
+    }),
     shim: Object.freeze({ reachable: shimPort }),
     httpMcp: Object.freeze({
       reachable: httpHealth.reachable,
@@ -1529,9 +1632,16 @@ async function inspectStack({
 }
 
 function writePidFile(file, pid) {
+  if (!Number.isSafeInteger(pid) || pid <= 1) {
+    throw codedError('stack_pid_invalid');
+  }
   const descriptor = fs.openSync(
     file,
-    fs.constants.O_CREAT | fs.constants.O_TRUNC | fs.constants.O_WRONLY,
+    fs.constants.O_CREAT |
+      fs.constants.O_TRUNC |
+      fs.constants.O_WRONLY |
+      (fs.constants.O_CLOEXEC || 0) |
+      (fs.constants.O_NOFOLLOW || 0),
     0o600
   );
   try {
@@ -1541,6 +1651,38 @@ function writePidFile(file, pid) {
     fs.closeSync(descriptor);
   }
   fs.chmodSync(file, 0o600);
+}
+
+function finalizeManagedSpawn(child, pidFile, {
+  writePid = writePidFile,
+  kill = process.kill
+} = {}) {
+  try {
+    writePid(pidFile, child?.pid);
+  } catch {
+    let terminated = false;
+    if (Number.isSafeInteger(child?.pid) && child.pid > 1) {
+      try {
+        kill(-child.pid, 'SIGTERM');
+        terminated = true;
+      } catch (error) {
+        terminated = error?.code === 'ESRCH';
+      }
+    }
+    if (!terminated && typeof child?.kill === 'function') {
+      try {
+        terminated = child.kill('SIGTERM') === true;
+      } catch {}
+    }
+    if (!terminated &&
+        child?.exitCode === null &&
+        child?.signalCode === null) {
+      throw codedError('stack_pid_file_cleanup_failed');
+    }
+    throw codedError('stack_pid_file_write_failed');
+  }
+  child.unref();
+  return true;
 }
 
 function spawnManaged(name, mode, environmentFile, {
@@ -1588,8 +1730,7 @@ function spawnManaged(name, mode, environmentFile, {
   } finally {
     fs.closeSync(logDescriptor);
   }
-  child.unref();
-  writePidFile(locations.pid, child.pid);
+  finalizeManagedSpawn(child, locations.pid);
   return Object.freeze({ started: true, pid: child.pid });
 }
 
@@ -1673,6 +1814,10 @@ async function startStack({
   try {
     if (!profileRetainedBindingMatches(profile)) {
       throw codedError('stack_retained_binding_identity_mismatch');
+    }
+    const provider = inspectProviderContainer(profile.providerContainer);
+    if (!profileProviderIdentityMatches(profile, provider)) {
+      throw codedError('stack_provider_dependency_identity_mismatch');
     }
     if (!await portListening(3000)) {
       throw codedError('stack_provider_dependency_unavailable');
@@ -1885,6 +2030,11 @@ async function adoptRunningStack({
       retainedBindingPayload,
       retainedBindingSource
     );
+    const provider = inspectProviderContainer(PROVIDER_CONTAINER_DEFAULT);
+    if (!provider.recognized || !provider.running ||
+        !await portListening(3000)) {
+      throw codedError('stack_adoption_provider_invalid');
+    }
     const edge = inspectEdgeContainer(EDGE_CONTAINER_DEFAULT);
     if (!edge.secure || !edge.running || !edge.healthy) {
       throw codedError('stack_adoption_edge_invalid');
@@ -1897,6 +2047,10 @@ async function adoptRunningStack({
       runtimeBaseline: edge.revision,
       runtimeRepository,
       privateRoot,
+      providerContainer: PROVIDER_CONTAINER_DEFAULT,
+      providerContainerId: provider.id,
+      providerImageId: provider.imageId,
+      providerRevision: provider.revision,
       governanceEnvironment: relative(governanceFile),
       relayEnvironment: relative(relayFile),
       retainedBinding,
@@ -1955,6 +2109,7 @@ function childBaseEnvironment(environment = process.env) {
   for (const name of Object.keys(result)) {
     if (name.startsWith('CODEX_MEMORY_') ||
         name.startsWith('BASH_FUNC_') ||
+        name.startsWith('NODE_') ||
         [
           'API_Key',
           'API_URL',
@@ -1971,8 +2126,6 @@ function childBaseEnvironment(environment = process.env) {
           'KNOWLEDGEBASE_STORE_PATH',
           'LD_LIBRARY_PATH',
           'LD_PRELOAD',
-          'NODE_OPTIONS',
-          'NODE_PATH',
           'PROMPT_COMMAND',
           'PS4',
           'SHELLOPTS',
@@ -2452,7 +2605,9 @@ module.exports = {
   discoverPrivateRoot,
   exactKeys,
   extractEnvFileArgument,
+  finalizeManagedSpawn,
   inspectEdgeContainer,
+  inspectProviderContainer,
   inspectSourceCompatibility,
   isPidRunning,
   loadManagedEnvironmentFile,
@@ -2462,6 +2617,7 @@ module.exports = {
   prepareStaleOwnerSocket,
   privateReferencePath,
   profileEdgeIdentityMatches,
+  profileProviderIdentityMatches,
   projectHttpHealthPayload,
   probeUnixSocket,
   readPidFile,

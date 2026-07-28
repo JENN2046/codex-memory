@@ -24,7 +24,9 @@ const {
   discoverPrivateRoot,
   exactKeys,
   extractEnvFileArgument,
+  finalizeManagedSpawn,
   inspectEdgeContainer,
+  inspectProviderContainer,
   inspectSourceCompatibility,
   isPidRunning,
   loadManagedEnvironmentFile,
@@ -34,6 +36,7 @@ const {
   prepareStaleOwnerSocket,
   privateReferencePath,
   profileEdgeIdentityMatches,
+  profileProviderIdentityMatches,
   projectHttpHealthPayload,
   safeCode,
   validateExpectedMappingEnvironment,
@@ -44,14 +47,21 @@ const {
 const BASELINE = '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118';
 const RETAINED_BINDING_SOURCE = 'f1dea016a7a167898d77be6575403e7a7d28c8d5';
 const EDGE_CONTAINER_ID = 'ab'.repeat(32);
+const PROVIDER_CONTAINER_ID = 'cd'.repeat(32);
+const PROVIDER_IMAGE_ID = `sha256:${'ef'.repeat(32)}`;
+const PROVIDER_REVISION = '1234567890abcdef1234567890abcdef12345678';
 
 function profile(overrides = {}) {
   return {
-    schemaVersion: 3,
+    schemaVersion: 4,
     runtimeBaseline: BASELINE,
     runtimeRepository: '/repo',
     retainedBindingSource: RETAINED_BINDING_SOURCE,
     privateRoot: '/synthetic/owner-only',
+    providerContainer: 'new-api-wsl',
+    providerContainerId: PROVIDER_CONTAINER_ID,
+    providerImageId: PROVIDER_IMAGE_ID,
+    providerRevision: PROVIDER_REVISION,
     governanceEnvironment: 'governance/runtime.env',
     relayEnvironment: 'relay/runtime.env',
     retainedBinding: 'r5m-exact-head/private-binding.json',
@@ -84,7 +94,15 @@ function acceptedStack(overrides = {}) {
       governance: { managed: true },
       relay: { managed: true }
     },
-    provider: true,
+    provider: {
+      reachable: true,
+      running: true,
+      recognized: true,
+      hostLoopbackOnly: true,
+      id: PROVIDER_CONTAINER_ID,
+      imageId: PROVIDER_IMAGE_ID,
+      revision: PROVIDER_REVISION
+    },
     shimPort: true,
     httpHealth: {
       reachable: true,
@@ -122,6 +140,10 @@ test('profile contract is exact and stores references rather than secret values'
   );
   assert.throws(
     () => validateProfile(profile({ runtimeRepository: 'relative/repo' })),
+    { code: 'stack_profile_invalid' }
+  );
+  assert.throws(
+    () => validateProfile(profile({ providerContainer: 'unrelated-provider' })),
     { code: 'stack_profile_invalid' }
   );
 });
@@ -304,6 +326,64 @@ test('lifecycle lock recovers only a well-formed dead-owner lock', t => {
     { code: 'stack_lifecycle_lock_invalid' }
   );
   assert.equal(fs.readFileSync(file, 'utf8'), 'not-a-pid\n');
+});
+
+test('managed spawn persists PID before unref and terminates its process group on failure', () => {
+  let written = null;
+  let unreferenced = false;
+  const child = {
+    pid: 4321,
+    exitCode: null,
+    signalCode: null,
+    unref() {
+      unreferenced = true;
+    }
+  };
+  assert.equal(finalizeManagedSpawn(child, '/owner/component.pid', {
+    writePid(file, pid) {
+      written = { file, pid };
+    }
+  }), true);
+  assert.deepEqual(written, {
+    file: '/owner/component.pid',
+    pid: 4321
+  });
+  assert.equal(unreferenced, true);
+
+  unreferenced = false;
+  let signal = null;
+  assert.throws(
+    () => finalizeManagedSpawn(child, '/owner/component.pid', {
+      writePid() {
+        throw new Error('synthetic write failure');
+      },
+      kill(pid, sentSignal) {
+        signal = { pid, sentSignal };
+      }
+    }),
+    { code: 'stack_pid_file_write_failed' }
+  );
+  assert.deepEqual(signal, { pid: -4321, sentSignal: 'SIGTERM' });
+  assert.equal(unreferenced, false);
+
+  assert.throws(
+    () => finalizeManagedSpawn({
+      ...child,
+      kill() {
+        return false;
+      }
+    }, '/owner/component.pid', {
+      writePid() {
+        throw new Error('synthetic write failure');
+      },
+      kill() {
+        const error = new Error('not permitted');
+        error.code = 'EPERM';
+        throw error;
+      }
+    }),
+    { code: 'stack_pid_file_cleanup_failed' }
+  );
 });
 
 test('governance stale-socket cleanup rejects active sockets and never unlinks them', async t => {
@@ -564,6 +644,9 @@ test('managed child environments neutralize caller write, root, provider, and pu
     SHELLOPTS: 'xtrace',
     PS4: 'token=${CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN}',
     NODE_OPTIONS: '--require=/untrusted.js',
+    NODE_DEBUG: 'http',
+    NODE_DEBUG_NATIVE: 'http',
+    NODE_V8_COVERAGE: '/untrusted/coverage',
     LD_PRELOAD: '/untrusted.so',
     CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE: 'full',
     CODEX_MEMORY_EXPOSE_WRITE_TOOLS: 'true',
@@ -585,6 +668,9 @@ test('managed child environments neutralize caller write, root, provider, and pu
     'SHELLOPTS',
     'PS4',
     'NODE_OPTIONS',
+    'NODE_DEBUG',
+    'NODE_DEBUG_NATIVE',
+    'NODE_V8_COVERAGE',
     'LD_PRELOAD',
     'CODEX_MEMORY_EXPOSE_WRITE_TOOLS'
   ]) {
@@ -716,6 +802,61 @@ test('source compatibility allows only controller delivery paths over the accept
   assert.equal(unsafe.controllerOnlyChanges, false);
 });
 
+test('provider inspection pins the accepted container, image, revision, and loopback port', () => {
+  const values = new Map([
+    ['{{ .Id }}', PROVIDER_CONTAINER_ID],
+    ['{{ .Image }}', PROVIDER_IMAGE_ID],
+    ['{{ .Config.Image }}', 'calciumion/new-api:latest'],
+    [
+      '{{ index .Config.Labels "org.opencontainers.image.revision" }}',
+      PROVIDER_REVISION
+    ],
+    [
+      '{{ index .Config.Labels "org.opencontainers.image.source" }}',
+      'https://github.com/QuantumNous/new-api'
+    ],
+    [
+      '{{ index .Config.Labels "com.docker.compose.project" }}',
+      'new-api-wsl'
+    ],
+    [
+      '{{ index .Config.Labels "com.docker.compose.service" }}',
+      'new-api'
+    ],
+    [
+      '{{ json (index .NetworkSettings.Ports "3000/tcp") }}',
+      JSON.stringify([{ HostIp: '127.0.0.1', HostPort: '3000' }])
+    ],
+    ['{{ .State.Running }}', 'true']
+  ]);
+  const inspect = () => inspectProviderContainer('new-api-wsl', {
+    exec(_command, args) {
+      const format = args[2];
+      if (!values.has(format)) throw new Error(`unexpected format: ${format}`);
+      return `${values.get(format)}\n`;
+    }
+  });
+  const provider = inspect();
+  assert.equal(provider.recognized, true);
+  assert.equal(provider.running, true);
+  assert.equal(profileProviderIdentityMatches(profile(), provider), true);
+
+  values.set(
+    '{{ json (index .NetworkSettings.Ports "3000/tcp") }}',
+    JSON.stringify([{ HostIp: '0.0.0.0', HostPort: '3000' }])
+  );
+  assert.equal(inspect().recognized, false);
+  values.set(
+    '{{ json (index .NetworkSettings.Ports "3000/tcp") }}',
+    JSON.stringify([{ HostIp: '127.0.0.1', HostPort: '3000' }])
+  );
+  values.set('{{ .Image }}', `sha256:${'01'.repeat(32)}`);
+  assert.equal(
+    profileProviderIdentityMatches(profile(), inspect()),
+    false
+  );
+});
+
 test('Edge inspection validates non-root, read-only, non-restarting, logless loopback posture', () => {
   const values = new Map([
     ['{{ .Id }}', EDGE_CONTAINER_ID],
@@ -798,6 +939,16 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
     computeStackAccepted({
       ...accepted,
       source: { compatible: false }
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      provider: {
+        ...accepted.provider,
+        id: '01'.repeat(32)
+      }
     }),
     false
   );
