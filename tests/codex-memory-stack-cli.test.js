@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const http = require('node:http');
 const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
@@ -21,6 +22,8 @@ const {
   commandMatchesComponent,
   computeRuntimeAccepted,
   computeStackAccepted,
+  connectOwnedLoopbackTcpListener,
+  controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,
   exactKeys,
@@ -30,12 +33,14 @@ const {
   inspectProviderContainer,
   inspectSourceCompatibility,
   isPidRunning,
+  getJsonHealth,
   loadManagedEnvironmentFile,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
+  processOwnsLoopbackTcpListener,
   profileEdgeIdentityMatches,
   profileProviderIdentityMatches,
   projectHttpHealthPayload,
@@ -90,10 +95,10 @@ function acceptedStack(overrides = {}) {
     profile: profile(),
     source: { compatible: true },
     processes: {
-      shim: { managed: true },
-      http: { managed: true },
-      governance: { managed: true },
-      relay: { managed: true }
+      shim: { managed: true, controllerManaged: true },
+      http: { managed: true, controllerManaged: true },
+      governance: { managed: true, controllerManaged: true },
+      relay: { managed: true, controllerManaged: true }
     },
     provider: {
       reachable: true,
@@ -105,6 +110,7 @@ function acceptedStack(overrides = {}) {
       revision: PROVIDER_REVISION
     },
     shimPort: true,
+    httpListenerOwned: true,
     httpHealth: {
       reachable: true,
       ok: true,
@@ -242,6 +248,88 @@ test('PID liveness treats a successful kill zero probe as alive', () => {
   assert.equal(isPidRunning(1, () => {
     throw new Error('must not run');
   }), false);
+});
+
+test('HTTP listener ownership binds loopback port to the recorded process socket', () => {
+  const tcp = [
+    '  sl  local_address rem_address   st tx_queue rx_queue tr tm->when retrnsmt   uid  timeout inode',
+    '   0: 0100007F:1DB5 00000000:0000 0A 00000000:00000000 00:00000000 00000000  1000        0 4242'
+  ].join('\n');
+  const fsModule = {
+    readFileSync(file) {
+      assert.equal(file, '/proc/net/tcp');
+      return tcp;
+    },
+    readdirSync(directory) {
+      assert.equal(directory, '/proc/4321/fd');
+      return ['0', '7'];
+    },
+    readlinkSync(file) {
+      return file.endsWith('/7') ? 'socket:[4242]' : '/dev/null';
+    }
+  };
+  assert.equal(
+    processOwnsLoopbackTcpListener(4321, 7605, { fsModule }),
+    true
+  );
+  assert.equal(
+    processOwnsLoopbackTcpListener(4321, 7606, { fsModule }),
+    false
+  );
+  assert.equal(
+    processOwnsLoopbackTcpListener(4321, 7605, {
+      fsModule: {
+        ...fsModule,
+        readlinkSync() {
+          return 'socket:[9999]';
+        }
+      }
+    }),
+    false
+  );
+  assert.equal(
+    processOwnsLoopbackTcpListener(0, 7605, { fsModule }),
+    false
+  );
+});
+
+test('HTTP health sends bearer only on a preconnected recorded-PID listener', async t => {
+  let observedAuthorization = null;
+  const server = http.createServer((request, response) => {
+    observedAuthorization = request.headers.authorization || null;
+    response.writeHead(200, {
+      'Content-Type': 'application/json',
+      Connection: 'close'
+    });
+    response.end(JSON.stringify({ ok: true }));
+  });
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(0, '127.0.0.1', resolve);
+  });
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const address = server.address();
+  await assert.rejects(
+    connectOwnedLoopbackTcpListener(2_147_483_647, address.port),
+    { code: 'stack_http_listener_identity_mismatch' }
+  );
+  assert.equal(observedAuthorization, null);
+  const connectedSocket = await connectOwnedLoopbackTcpListener(
+    process.pid,
+    address.port
+  );
+  const health = await getJsonHealth({
+    port: address.port,
+    bearerToken: 'synthetic-test-token',
+    connectedSocket
+  });
+  assert.equal(health.reachable, true);
+  assert.equal(health.statusCode, 200);
+  assert.equal(observedAuthorization, 'Bearer synthetic-test-token');
+  await assert.rejects(
+    connectOwnedLoopbackTcpListener(process.pid, address.port + 1),
+    { code: 'stack_http_listener_identity_mismatch' }
+  );
 });
 
 test('PID and env-file parsing fail closed', () => {
@@ -494,6 +582,16 @@ test('managed command matching binds exact executable, script, mode, and environ
     'node',
     'src/http-index.js'
   ], options), true);
+  assert.equal(controllerCommandMatchesComponent('http', [
+    'node',
+    'src/http-index.js'
+  ], options), false);
+  assert.equal(controllerCommandMatchesComponent('http', [
+    process.execPath,
+    '/repo/scripts/codex-memory-stack.js',
+    '_run-http',
+    `--stack-environment=${governanceEnvironment}`
+  ], options), true);
   assert.equal(commandMatchesComponent('shim', [
     'node',
     '/repo/src/cli/vcp-toolbox-native-mcp-shim.js',
@@ -532,7 +630,7 @@ test('managed command matching binds exact executable, script, mode, and environ
   ], options), true);
 });
 
-test('runtime repository adoption accepts legacy and safe managed HTTP commands', () => {
+test('runtime repository adoption derivation rejects every legacy HTTP entrypoint', () => {
   const executable = fs.realpathSync(process.execPath);
   const fsModule = {
     realpathSync(value) {
@@ -559,21 +657,21 @@ test('runtime repository adoption accepts legacy and safe managed HTTP commands'
     cwd: '/repo',
     command
   });
-  assert.equal(
-    deriveRuntimeRepositoryFromHttpIdentity(identity([
+  assert.throws(
+    () => deriveRuntimeRepositoryFromHttpIdentity(identity([
       process.execPath,
       '/repo/src/http-index.js'
     ]), { fsModule }),
-    '/repo'
+    { code: 'stack_adoption_http_identity_invalid' }
   );
-  assert.equal(
-    deriveRuntimeRepositoryFromHttpIdentity(identity([
+  assert.throws(
+    () => deriveRuntimeRepositoryFromHttpIdentity(identity([
       process.execPath,
       '--env-file=/owner/governance.env',
       '/repo/scripts/codex-memory-stack.js',
       '_run-http'
     ]), { fsModule }),
-    '/repo'
+    { code: 'stack_adoption_http_identity_invalid' }
   );
   assert.equal(
     deriveRuntimeRepositoryFromHttpIdentity(identity([
@@ -648,7 +746,13 @@ test('managed child environments neutralize caller write, root, provider, and pu
     NODE_DEBUG: 'http',
     NODE_DEBUG_NATIVE: 'http',
     NODE_V8_COVERAGE: '/untrusted/coverage',
+    GCONV_PATH: '/untrusted/gconv',
+    GLIBC_TUNABLES: 'glibc.malloc.check=3',
+    LD_AUDIT: '/untrusted/audit.so',
+    LD_PROFILE: '/untrusted/profile.so',
     LD_PRELOAD: '/untrusted.so',
+    PYTHONPATH: '/untrusted/python',
+    UNRELATED_SECRET: 'must-not-be-inherited',
     CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE: 'full',
     CODEX_MEMORY_EXPOSE_WRITE_TOOLS: 'true',
     CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
@@ -656,7 +760,7 @@ test('managed child environments neutralize caller write, root, provider, and pu
     CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST: digest
   };
   const base = childBaseEnvironment(hostile);
-  assert.equal(base.PATH, '/usr/bin:/bin');
+  assert.deepEqual(base, { PATH: '/usr/bin:/bin' });
   for (const name of [
     'ENABLE_REAL_ROOT_WRITE',
     'KB_ROOT',
@@ -672,7 +776,13 @@ test('managed child environments neutralize caller write, root, provider, and pu
     'NODE_DEBUG',
     'NODE_DEBUG_NATIVE',
     'NODE_V8_COVERAGE',
+    'GCONV_PATH',
+    'GLIBC_TUNABLES',
+    'LD_AUDIT',
+    'LD_PROFILE',
     'LD_PRELOAD',
+    'PYTHONPATH',
+    'UNRELATED_SECRET',
     'CODEX_MEMORY_EXPOSE_WRITE_TOOLS'
   ]) {
     assert.equal(Object.hasOwn(base, name), false);
@@ -978,6 +1088,29 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
         ...accepted.provider,
         id: '01'.repeat(32)
       }
+    }),
+    false
+  );
+  for (const name of ['shim', 'http', 'governance', 'relay']) {
+    assert.equal(
+      computeStackAccepted({
+        ...accepted,
+        processes: {
+          ...accepted.processes,
+          [name]: {
+            ...accepted.processes[name],
+            controllerManaged: false
+          }
+        }
+      }),
+      false,
+      name
+    );
+  }
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      httpListenerOwned: false
     }),
     false
   );

@@ -47,6 +47,13 @@ owned by another checkout. Adoption writes the profile only when the complete
 inspection is immediately accepted, including source identity and all runtime
 gates.
 
+Adoption accepts only processes launched through this controller's exact
+`_run-* --stack-environment=...` commands. Legacy process identities remain
+recognizable only for a controlled shutdown of an already adopted stack; they
+cannot become a new accepted profile or be mixed into an accepted restart.
+For HTTP, this specifically keeps legacy storage paths and initialization side
+effects outside the adoption boundary.
+
 ## Start Semantics
 
 `start` is optimized for the normal same-baseline restart:
@@ -61,7 +68,9 @@ gates.
    host-loopback-only posture;
 5. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
    retained Edge, and outbound Relay plus observer in order;
-6. validate authenticated full HTTP health and its hardened,
+6. prove through Linux `/proc` socket metadata that the recorded HTTP PID owns
+   the exact loopback listener before reading or sending its bearer token;
+   validate authenticated full HTTP health and its hardened,
    no-external-provider, read-only public surface, native-write-off,
    cache/shadow/vector-write-off, and automatic-rebuild-off policy; then
    validate sockets, schema-v3 governance observation, schema-v1 relay
@@ -79,12 +88,15 @@ Hardened soft-read, lifecycle-read, and write-preflight policy checks are
 forced on even though no public or delegated write path is enabled.
 Caller-supplied root, write-enable, provider, preload, Node option/debug/trace,
 and public tool-surface overrides are removed before managed children start.
-Shell startup and trace injection variables such as `BASH_ENV`, `ENV`,
-`SHELLOPTS`, and `PS4` are also removed and `PATH` is pinned to system
-binaries. Owner-only runtime environment files are parsed and allowlisted
-before child launch; they are not passed through Node's pre-bootstrap
-`--env-file` handling. The shim is launched directly with the controller's
-verified `process.execPath`, without a shell, and is bound back to the canonical
+Managed children inherit no caller environment except a system-only pinned
+`PATH`; every required runtime value is then added explicitly from an
+allowlisted owner environment or the controller itself. This also excludes
+shell startup hooks, Node preload/debug settings, dynamic-linker injection
+variables such as `LD_AUDIT`, and unrelated credential-bearing variables.
+Owner-only runtime environment files are parsed and allowlisted before child
+launch; they are not passed through Node's pre-bootstrap `--env-file` handling.
+The shim is launched directly with the controller's verified
+`process.execPath`, without a shell, and is bound back to the canonical
 workspace runtime, isolated store, governed mapping, loopback provider
 dependency, and native-write-off posture.
 
@@ -100,17 +112,19 @@ exact-baseline acceptance instead of using `--force`.
 ## Status And Stop
 
 `status` performs the same authenticated, full hardened-policy HTTP probe used
-by startup and adoption. It returns only booleans, counters, schema versions,
-baseline identity, and bounded policy failure codes. It does not return private
-paths, environment values, tokens, keys, raw memory, request bodies, or
-provider responses.
+by startup and adoption, but only after the HTTP command is controller-managed
+and the loopback listener belongs to its recorded PID. It returns only
+booleans, counters, schema versions, baseline identity, and bounded policy
+failure codes. It does not return private paths, environment values, tokens,
+keys, raw memory, request bodies, or provider responses.
 
-An already running HTTP process from a revision that predates these bounded
-policy fields remains running, but a newer controller reports its policy shape
-as unaccepted. After this controller is merged, restoring exact-head acceptance
-requires a separately authorized `stop` and `start` from canonical `main`,
-followed by `adopt-running --replace`. PR validation does not perform that
-lifecycle transition.
+A legacy HTTP process remains running, but a newer controller marks it
+`controllerManaged: false` and does not read or send its bearer token. A
+controller-managed process from a revision that predates the bounded policy
+fields is likewise unaccepted. After this controller is merged, restoring
+exact-head acceptance requires a separately authorized `stop` and `start` from
+canonical `main`, followed by `adopt-running --replace`. PR validation does not
+perform that lifecycle transition.
 
 `stop` first revalidates the retained binding and the exact adopted Edge
 container ID, revision, and security posture. It then sends `SIGTERM` only to

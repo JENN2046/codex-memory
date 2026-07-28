@@ -694,7 +694,7 @@ function resolveCommandPath(value, cwd) {
   return path.resolve(cwd, value);
 }
 
-function commandMatchesComponent(name, command, {
+function componentCommandKind(name, command, {
   executable,
   cwd,
   profile,
@@ -706,13 +706,13 @@ function commandMatchesComponent(name, command, {
       !command.every(value => typeof value === 'string') ||
       cwd !== profile.runtimeRepository ||
       !nodeProcessIdentityMatches({ executable, cwd, command }, { fsModule })) {
-    return false;
+    return null;
   }
   let environmentFile;
   try {
     environmentFile = expectedComponentEnvironmentFile(name, profile);
   } catch {
-    return false;
+    return null;
   }
   const controllerCommand = [
     command[0],
@@ -722,7 +722,7 @@ function commandMatchesComponent(name, command, {
   ];
   if (command.length === controllerCommand.length &&
       command.every((value, index) => value === controllerCommand[index])) {
-    return true;
+    return 'controller';
   }
   const runtimeRoot = runtimeDirectory(environment);
   if (name === 'shim') {
@@ -748,17 +748,31 @@ function commandMatchesComponent(name, command, {
         index === 1
           ? resolveCommandPath(value, cwd) === legacy[index]
           : value === legacy[index]
-      );
+      )
+      ? 'legacy'
+      : null;
   }
   if (name === 'http') {
     return command.length === 2 &&
       resolveCommandPath(command[1], cwd) ===
-        path.join(profile.runtimeRepository, 'src', 'http-index.js');
+        path.join(profile.runtimeRepository, 'src', 'http-index.js')
+      ? 'legacy'
+      : null;
   }
   const legacyRunner = path.join(runtimeRoot, `${name}-runner.js`);
   return command.length === 3 &&
     command[1] === `--env-file=${environmentFile}` &&
-    resolveCommandPath(command[2], cwd) === legacyRunner;
+    resolveCommandPath(command[2], cwd) === legacyRunner
+    ? 'legacy'
+    : null;
+}
+
+function commandMatchesComponent(name, command, options = {}) {
+  return componentCommandKind(name, command, options) !== null;
+}
+
+function controllerCommandMatchesComponent(name, command, options = {}) {
+  return componentCommandKind(name, command, options) === 'controller';
 }
 
 function inspectProcessIdentity(name, {
@@ -784,29 +798,15 @@ function deriveRuntimeRepositoryFromHttpIdentity(identity, {
     throw codedError('stack_adoption_http_identity_invalid');
   }
   const command = identity.command;
-  let script;
-  if (command.length === 2) {
-    script = resolveCommandPath(command[1], identity.cwd);
-    if (path.basename(script || '') !== 'http-index.js' ||
-        path.basename(path.dirname(script)) !== 'src') {
-      throw codedError('stack_adoption_http_identity_invalid');
-    }
-  } else if (command.length === 4 && command[3] === '_run-http') {
-    script = resolveCommandPath(command[2], identity.cwd);
-    if (path.basename(script || '') !== 'codex-memory-stack.js' ||
-        path.basename(path.dirname(script)) !== 'scripts') {
-      throw codedError('stack_adoption_http_identity_invalid');
-    }
-  } else if (command.length === 4 &&
-      command[2] === '_run-http' &&
-      command[3].startsWith('--stack-environment=')) {
-    extractEnvFileArgument(command);
-    script = resolveCommandPath(command[1], identity.cwd);
-    if (path.basename(script || '') !== 'codex-memory-stack.js' ||
-        path.basename(path.dirname(script)) !== 'scripts') {
-      throw codedError('stack_adoption_http_identity_invalid');
-    }
-  } else {
+  if (command.length !== 4 ||
+      command[2] !== '_run-http' ||
+      !command[3].startsWith('--stack-environment=')) {
+    throw codedError('stack_adoption_http_identity_invalid');
+  }
+  extractEnvFileArgument(command);
+  const script = resolveCommandPath(command[1], identity.cwd);
+  if (path.basename(script || '') !== 'codex-memory-stack.js' ||
+      path.basename(path.dirname(script)) !== 'scripts') {
     throw codedError('stack_adoption_http_identity_invalid');
   }
   const repository = path.resolve(script, '..', '..');
@@ -836,10 +836,8 @@ function inspectManagedProcess(name, {
   profile
 } = {}) {
   const state = inspectProcessIdentity(name, { environment, fsModule });
-  return Object.freeze({
-    pid: state.pid,
-    running: state.running,
-    managed: state.running && commandMatchesComponent(
+  const commandKind = state.running
+    ? componentCommandKind(
       name,
       state.identity?.command,
       {
@@ -850,6 +848,12 @@ function inspectManagedProcess(name, {
         fsModule
       }
     )
+    : null;
+  return Object.freeze({
+    pid: state.pid,
+    running: state.running,
+    managed: state.running && commandKind !== null,
+    controllerManaged: state.running && commandKind === 'controller'
   });
 }
 
@@ -1114,6 +1118,82 @@ function portListening(port, host = '127.0.0.1', timeoutMs = 500) {
   });
 }
 
+function processOwnsLoopbackTcpListener(pid, port, {
+  fsModule = fs
+} = {}) {
+  const normalizedPid = parsePid(pid);
+  if (normalizedPid === null ||
+      !Number.isInteger(port) ||
+      port < 1 ||
+      port > 65_535) {
+    return false;
+  }
+  const portHex = port.toString(16).toUpperCase().padStart(4, '0');
+  const expectedAddress = `0100007F:${portHex}`;
+  let table;
+  let descriptorNames;
+  try {
+    table = String(fsModule.readFileSync('/proc/net/tcp', 'utf8'));
+    descriptorNames = fsModule.readdirSync(`/proc/${normalizedPid}/fd`);
+  } catch {
+    return false;
+  }
+  const listenerInodes = new Set();
+  for (const line of table.split('\n')) {
+    const fields = line.trim().split(/\s+/u);
+    if (fields.length < 10 ||
+        fields[1] !== expectedAddress ||
+        fields[3] !== '0A' ||
+        !/^[1-9][0-9]*$/u.test(fields[9])) {
+      continue;
+    }
+    listenerInodes.add(fields[9]);
+  }
+  if (listenerInodes.size === 0) return false;
+  const ownedSocketInodes = new Set();
+  for (const descriptorName of descriptorNames) {
+    if (!/^[0-9]+$/u.test(String(descriptorName))) continue;
+    try {
+      const target = String(fsModule.readlinkSync(
+        `/proc/${normalizedPid}/fd/${descriptorName}`
+      ));
+      const match = /^socket:\[([1-9][0-9]*)\]$/u.exec(target);
+      if (match) ownedSocketInodes.add(match[1]);
+    } catch {}
+  }
+  return [...listenerInodes].every(inode => ownedSocketInodes.has(inode));
+}
+
+function connectOwnedLoopbackTcpListener(pid, port, {
+  timeoutMs = 1000,
+  fsModule = fs
+} = {}) {
+  if (!processOwnsLoopbackTcpListener(pid, port, { fsModule })) {
+    return Promise.reject(codedError('stack_http_listener_identity_mismatch'));
+  }
+  return new Promise((resolve, reject) => {
+    const socket = net.createConnection({ host: '127.0.0.1', port });
+    let settled = false;
+    const fail = () => {
+      if (settled) return;
+      settled = true;
+      socket.destroy();
+      reject(codedError('stack_http_listener_identity_mismatch'));
+    };
+    socket.once('connect', () => {
+      if (!processOwnsLoopbackTcpListener(pid, port, { fsModule })) {
+        fail();
+        return;
+      }
+      settled = true;
+      socket.setTimeout(0);
+      resolve(socket);
+    });
+    socket.once('error', fail);
+    socket.setTimeout(timeoutMs, fail);
+  });
+}
+
 function httpPolicyFailureCode(value) {
   const access = value?.access;
   const auth = value?.auth;
@@ -1222,10 +1302,19 @@ function getJsonHealth({
   port,
   pathname = '/health',
   timeoutMs = 1000,
-  bearerToken = ''
+  bearerToken = '',
+  connectedSocket = null
 }) {
   return new Promise(resolve => {
-    const request = http.get({
+    let connectionAgent = null;
+    let settled = false;
+    const finish = value => {
+      if (settled) return;
+      settled = true;
+      connectionAgent?.destroy();
+      resolve(value);
+    };
+    const options = {
       host,
       port,
       path: pathname,
@@ -1233,29 +1322,41 @@ function getJsonHealth({
       headers: bearerToken
         ? { Authorization: `Bearer ${bearerToken}` }
         : undefined
-    }, response => {
-      let bytes = 0;
-      const chunks = [];
-      response.on('data', chunk => {
-        bytes += chunk.length;
-        if (bytes > 32_768) {
-          request.destroy();
-          return;
-        }
-        chunks.push(chunk);
+    };
+    if (connectedSocket) {
+      connectionAgent = new http.Agent({ keepAlive: false });
+      connectionAgent.createConnection = () => connectedSocket;
+      options.agent = connectionAgent;
+    }
+    let request;
+    try {
+      request = http.get(options, response => {
+        let bytes = 0;
+        const chunks = [];
+        response.on('data', chunk => {
+          bytes += chunk.length;
+          if (bytes > 32_768) {
+            request.destroy();
+            return;
+          }
+          chunks.push(chunk);
+        });
+        response.once('end', () => {
+          try {
+            const value = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+            finish(projectHttpHealthPayload(value, response.statusCode));
+          } catch {
+            finish(projectHttpHealthPayload(null, response.statusCode));
+          }
+        });
       });
-      response.once('end', () => {
-        try {
-          const value = JSON.parse(Buffer.concat(chunks).toString('utf8'));
-          resolve(projectHttpHealthPayload(value, response.statusCode));
-        } catch {
-          resolve(projectHttpHealthPayload(null, response.statusCode));
-        }
-      });
-    });
+    } catch {
+      finish(projectHttpHealthPayload(null, null));
+      return;
+    }
     request.once('timeout', () => request.destroy());
     request.once('error', () =>
-      resolve(projectHttpHealthPayload(null, null)));
+      finish(projectHttpHealthPayload(null, null)));
   });
 }
 
@@ -1383,6 +1484,7 @@ async function prepareStaleOwnerSocket(socketPath, privateRoot, {
 function runChildProbe(mode, environmentFile, {
   profile,
   environment = process.env,
+  expectedHttpPid = null,
   exec = execFileSync
 } = {}) {
   const managedEnvironment = loadManagedEnvironmentFile(environmentFile);
@@ -1398,6 +1500,11 @@ function runChildProbe(mode, environmentFile, {
     CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE:
       profile.retainedBindingSource
   };
+  if (mode === '_probe-http') {
+    const pid = parsePid(expectedHttpPid);
+    if (pid === null) throw codedError('stack_http_listener_identity_missing');
+    childEnvironment.CODEX_MEMORY_STACK_EXPECTED_HTTP_PID = String(pid);
+  }
   try {
     const output = exec(process.execPath, [
       SCRIPT_PATH,
@@ -1497,6 +1604,7 @@ function computeRuntimeAccepted({
   processes,
   provider,
   shimPort,
+  httpListenerOwned,
   httpHealth,
   governance,
   relay,
@@ -1507,8 +1615,11 @@ function computeRuntimeAccepted({
     retainedBindingMatch === true &&
     provider?.reachable === true &&
     profileProviderIdentityMatches(profile, provider) &&
-    processes?.shim?.managed === true && shimPort === true &&
-    processes?.http?.managed === true &&
+    Object.keys(COMPONENTS).every(name =>
+      processes?.[name]?.controllerManaged === true
+    ) &&
+    shimPort === true &&
+    httpListenerOwned === true &&
     httpHealth?.reachable === true &&
     httpHealth?.ok === true &&
     httpHealth?.authRequired === true &&
@@ -1567,11 +1678,17 @@ async function inspectStack({
     ...providerContainer,
     reachable: providerPort
   });
-  const httpHealth = processes.http.managed
+  const httpListenerOwned = processes.http.controllerManaged &&
+    processOwnsLoopbackTcpListener(processes.http.pid, 7605);
+  const httpHealth = httpListenerOwned
     ? lowDisclosureHttpProjection(runChildProbe(
       '_probe-http',
       governanceEnvironment,
-      { profile, environment }
+      {
+        profile,
+        environment,
+        expectedHttpPid: processes.http.pid
+      }
     ))
     : lowDisclosureHttpProjection(null);
   const governance = processes.governance.managed
@@ -1603,7 +1720,11 @@ async function inspectStack({
   const processProjection = Object.fromEntries(
     Object.entries(processes).map(([name, value]) => [
       name,
-      Object.freeze({ running: value.running, managed: value.managed })
+      Object.freeze({
+        running: value.running,
+        managed: value.managed,
+        controllerManaged: value.controllerManaged
+      })
     ])
   );
   const retainedBindingMatch = profileRetainedBindingMatches(profile);
@@ -1612,6 +1733,7 @@ async function inspectStack({
     processes,
     provider,
     shimPort,
+    httpListenerOwned,
     httpHealth,
     governance,
     relay,
@@ -1624,6 +1746,7 @@ async function inspectStack({
     processes,
     provider,
     shimPort,
+    httpListenerOwned,
     httpHealth,
     governance,
     relay,
@@ -1655,6 +1778,7 @@ async function inspectStack({
       reachable: httpHealth.reachable,
       healthy: httpHealth.ok,
       authRequired: httpHealth.authRequired,
+      listenerIdentityMatch: httpListenerOwned,
       policyAccepted: httpHealth.policyAccepted,
       policyFailureCode: httpHealth.policyFailureCode
     }),
@@ -1873,6 +1997,12 @@ async function startStack({
       profile,
       profile.relayEnvironment
     );
+    if (Object.keys(COMPONENTS).some(name => {
+      const state = inspectManagedProcess(name, { environment, profile });
+      return state.running && !state.controllerManaged;
+    })) {
+      throw codedError('stack_controlled_transition_required');
+    }
     const started = new Set();
     try {
       const shimState = inspectManagedProcess('shim', { environment, profile });
@@ -1898,10 +2028,20 @@ async function startStack({
       });
       if (httpProcess.started) started.add('http');
       await waitFor(() => {
+        const state = inspectManagedProcess('http', { environment, profile });
+        if (!state.controllerManaged ||
+            state.pid !== httpProcess.pid ||
+            !processOwnsLoopbackTcpListener(state.pid, 7605)) {
+          return false;
+        }
         const health = lowDisclosureHttpProjection(runChildProbe(
           '_probe-http',
           governanceEnvironment,
-          { profile, environment }
+          {
+            profile,
+            environment,
+            expectedHttpPid: state.pid
+          }
         ));
         return health.reachable && health.ok && health.authRequired &&
           health.policyAccepted;
@@ -2100,6 +2240,25 @@ async function adoptRunningStack({
       edgeContainerId: edge.id,
       edgeContainer: EDGE_CONTAINER_DEFAULT
     });
+    for (const name of Object.keys(COMPONENTS)) {
+      const identity = identities[name].identity;
+      if (!controllerCommandMatchesComponent(
+        name,
+        identity.command,
+        {
+          executable: identity.executable,
+          cwd: identity.cwd,
+          profile,
+          environment
+        }
+      )) {
+        throw codedError(
+          name === 'http'
+            ? 'stack_adoption_http_storage_binding_unproven'
+            : 'stack_adoption_controller_binding_unproven'
+        );
+      }
+    }
     const source = inspectSourceCompatibility(profile);
     if (!adoptionSourceCompatible(source)) {
       throw codedError('stack_adoption_source_incompatible');
@@ -2146,43 +2305,8 @@ function readPrivateText(reference, privateRoot, maximumBytes = 16_384) {
   return value;
 }
 
-function childBaseEnvironment(environment = process.env) {
-  const result = { ...environment };
-  for (const name of Object.keys(result)) {
-    if (name.startsWith('CODEX_MEMORY_') ||
-        name.startsWith('BASH_FUNC_') ||
-        name.startsWith('NODE_') ||
-        [
-          'API_Key',
-          'API_URL',
-          'BASHOPTS',
-          'BASH_ENV',
-          'BASH_XTRACEFD',
-          'CDPATH',
-          'ENABLE_REAL_ROOT_WRITE',
-          'ENV',
-          'GLOBIGNORE',
-          'IFS',
-          'KB_ROOT',
-          'KNOWLEDGEBASE_ROOT_PATH',
-          'KNOWLEDGEBASE_STORE_PATH',
-          'LD_LIBRARY_PATH',
-          'LD_PRELOAD',
-          'PROMPT_COMMAND',
-          'PS4',
-          'SHELLOPTS',
-          'VCP_CONFIG_ENV',
-          'VCP_ROOT',
-          'VCPTOOLBOX_ROOT',
-          'VECTORDB_DIMENSION',
-          'WhitelistEmbeddingModel',
-          'WSL_NEWAPI_HOST'
-        ].includes(name)) {
-      delete result[name];
-    }
-  }
-  result.PATH = SAFE_CHILD_PATH;
-  return result;
+function childBaseEnvironment() {
+  return { PATH: SAFE_CHILD_PATH };
 }
 
 function buildShimChildEnvironment(environment, {
@@ -2517,6 +2641,16 @@ async function runRelayChild() {
 
 async function probeHttpChild() {
   assertChildMode();
+  const expectedHttpPid = parsePid(
+    process.env.CODEX_MEMORY_STACK_EXPECTED_HTTP_PID
+  );
+  if (expectedHttpPid === null) {
+    throw codedError('stack_http_listener_identity_mismatch');
+  }
+  const connectedSocket = await connectOwnedLoopbackTcpListener(
+    expectedHttpPid,
+    7605
+  );
   const privateRoot = childPrivateRoot();
   const token = singleLineSecret(readPrivateText(
     process.env.CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE,
@@ -2524,7 +2658,8 @@ async function probeHttpChild() {
   ));
   const health = await getJsonHealth({
     port: 7605,
-    bearerToken: token
+    bearerToken: token,
+    connectedSocket
   });
   process.stdout.write(`${JSON.stringify(health)}\n`);
 }
@@ -2644,6 +2779,8 @@ module.exports = {
   commandMatchesComponent,
   computeRuntimeAccepted,
   computeStackAccepted,
+  connectOwnedLoopbackTcpListener,
+  controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,
   exactKeys,
@@ -2653,12 +2790,14 @@ module.exports = {
   inspectProviderContainer,
   inspectSourceCompatibility,
   isPidRunning,
+  getJsonHealth,
   loadManagedEnvironmentFile,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,
   parsePid,
   prepareStaleOwnerSocket,
   privateReferencePath,
+  processOwnsLoopbackTcpListener,
   profileEdgeIdentityMatches,
   profileProviderIdentityMatches,
   projectHttpHealthPayload,
