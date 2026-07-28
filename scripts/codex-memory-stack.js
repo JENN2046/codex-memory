@@ -101,6 +101,25 @@ function defaultPrivateRoot(environment = process.env) {
   return path.resolve(dataHome, 'codex-memory');
 }
 
+function assertPrivateRootBoundary(privateRoot, {
+  environment = process.env,
+  fsModule = fs
+} = {}) {
+  let boundary;
+  let resolvedPrivateRoot;
+  try {
+    boundary = fsModule.realpathSync(defaultPrivateRoot(environment));
+    resolvedPrivateRoot = fsModule.realpathSync(privateRoot);
+  } catch {
+    throw codedError('stack_private_root_boundary_unavailable');
+  }
+  const relation = path.relative(boundary, resolvedPrivateRoot);
+  if (!relation || relation.startsWith('..') || path.isAbsolute(relation)) {
+    throw codedError('stack_private_root_outside_boundary');
+  }
+  return resolvedPrivateRoot;
+}
+
 function discoverPrivateRoot(files, {
   environment = process.env,
   fsModule = fs
@@ -108,7 +127,12 @@ function discoverPrivateRoot(files, {
   if (!Array.isArray(files) || files.length < 1) {
     throw codedError('stack_private_root_discovery_invalid');
   }
-  const searchBoundary = defaultPrivateRoot(environment);
+  let searchBoundary;
+  try {
+    searchBoundary = fsModule.realpathSync(defaultPrivateRoot(environment));
+  } catch {
+    throw codedError('stack_private_root_boundary_unavailable');
+  }
   const resolvedFiles = files.map(file => assertOwnerOnlyFile(file, { fsModule }));
   if (resolvedFiles.some(file => {
     const relation = path.relative(searchBoundary, file);
@@ -225,6 +249,23 @@ function resolvePrivateReference(profile, reference, options = {}) {
   return assertOwnerOnlyFile(target, options);
 }
 
+function privateReferencePath(reference, privateRoot) {
+  if (typeof reference !== 'string' || !reference.startsWith('file:')) {
+    throw codedError('stack_private_reference_invalid');
+  }
+  const requested = reference.slice(5);
+  if (!path.isAbsolute(requested)) {
+    throw codedError('stack_private_reference_invalid');
+  }
+  const root = assertOwnerOnlyDirectory(privateRoot);
+  const target = path.resolve(requested);
+  const relation = path.relative(root, target);
+  if (!relation || relation.startsWith('..') || path.isAbsolute(relation)) {
+    throw codedError('stack_private_reference_outside_root');
+  }
+  return assertOwnerOnlyFile(target);
+}
+
 function validateProfile(value) {
   if (!exactKeys(value, PROFILE_KEYS) ||
       value.schemaVersion !== PROFILE_SCHEMA_VERSION ||
@@ -254,6 +295,7 @@ function readProfile({
     throw codedError('stack_profile_json_invalid');
   }
   const profile = validateProfile(parsed);
+  assertPrivateRootBoundary(profile.privateRoot, { environment, fsModule });
   assertOwnerOnlyDirectory(profile.privateRoot, { fsModule });
   resolvePrivateReference(profile, profile.governanceEnvironment, { fsModule });
   resolvePrivateReference(profile, profile.relayEnvironment, { fsModule });
@@ -267,6 +309,7 @@ function writeProfile(profile, {
   replace = false
 } = {}) {
   const validated = validateProfile(profile);
+  assertPrivateRootBoundary(validated.privateRoot, { environment, fsModule });
   const file = profilePath(environment);
   const directory = path.dirname(file);
   assertOwnerOnlyDirectory(directory, { create: true, fsModule });
@@ -723,7 +766,7 @@ function runChildProbe(mode, environmentFile, {
   exec = execFileSync
 } = {}) {
   const childEnvironment = {
-    ...environment,
+    ...childBaseEnvironment(environment),
     CODEX_MEMORY_STACK_CHILD: '1',
     CODEX_MEMORY_STACK_PRIVATE_ROOT: profile.privateRoot,
     CODEX_MEMORY_STACK_RUNTIME_BASELINE: profile.runtimeBaseline,
@@ -930,7 +973,7 @@ function spawnManaged(name, mode, environmentFile, {
   );
   fs.chmodSync(locations.log, 0o600);
   const childEnvironment = {
-    ...environment,
+    ...childBaseEnvironment(environment),
     CODEX_MEMORY_STACK_CHILD: '1',
     CODEX_MEMORY_STACK_PRIVATE_ROOT: profile.privateRoot,
     CODEX_MEMORY_STACK_RUNTIME_BASELINE: profile.runtimeBaseline,
@@ -1237,6 +1280,113 @@ function readPrivateText(reference, privateRoot, maximumBytes = 16_384) {
   return value;
 }
 
+function childBaseEnvironment(environment = process.env) {
+  const result = { ...environment };
+  for (const name of Object.keys(result)) {
+    if (name.startsWith('CODEX_MEMORY_') ||
+        [
+          'API_Key',
+          'API_URL',
+          'ENABLE_REAL_ROOT_WRITE',
+          'KB_ROOT',
+          'KNOWLEDGEBASE_ROOT_PATH',
+          'KNOWLEDGEBASE_STORE_PATH',
+          'LD_LIBRARY_PATH',
+          'LD_PRELOAD',
+          'NODE_OPTIONS',
+          'NODE_PATH',
+          'VCP_CONFIG_ENV',
+          'VCP_ROOT',
+          'VCPTOOLBOX_ROOT',
+          'VECTORDB_DIMENSION',
+          'WhitelistEmbeddingModel',
+          'WSL_NEWAPI_HOST'
+        ].includes(name)) {
+      delete result[name];
+    }
+  }
+  return result;
+}
+
+function buildShimChildEnvironment(environment, {
+  token,
+  runtimeRoot,
+  vcpRoot,
+  mappingPath
+}) {
+  return {
+    ...childBaseEnvironment(environment),
+    SHIM_HOST: '127.0.0.1',
+    SHIM_PORT: '7615',
+    WSL_NEWAPI_HOST: '127.0.0.1',
+    VCP_ROOT: vcpRoot,
+    VCPTOOLBOX_ROOT: vcpRoot,
+    VCP_CONFIG_ENV: path.join(vcpRoot, 'config.env'),
+    KB_ROOT: '',
+    KNOWLEDGEBASE_ROOT_PATH: '',
+    KB_STORE: path.join(runtimeRoot, 'store'),
+    KNOWLEDGEBASE_STORE_PATH: path.join(runtimeRoot, 'store'),
+    CODEX_MEMORY_DIARY_SCOPE_MAPPING_PATH: mappingPath,
+    CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN: token,
+    CODEX_MEMORY_DERIVED_RUNTIME_MUTATION_POLICY:
+      'isolated_derived_runtime_mutation_v1',
+    ENABLE_REAL_ROOT_WRITE: '0'
+  };
+}
+
+function buildHttpChildEnvironment(environment, {
+  token,
+  runtimeRoot
+}) {
+  const isolatedDiaryRoot = path.join(runtimeRoot, 'data', 'no-primary-memory');
+  return {
+    ...childBaseEnvironment(environment),
+    CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
+    CODEX_MEMORY_HTTP_PORT: '7605',
+    CODEX_MEMORY_HTTP_TOKEN: token,
+    CODEX_MEMORY_BASE_PATH: runtimeRoot,
+    CODEX_MEMORY_DATA_DIR: path.join(runtimeRoot, 'data'),
+    CODEX_MEMORY_LOGS_DIR: path.join(runtimeRoot, 'logs'),
+    CODEX_MEMORY_DIARY_PATH: isolatedDiaryRoot,
+    CODEX_MEMORY_ACTIVE_MEMORY_ROOT: '',
+    CODEX_MEMORY_VCHAT_DATA_ROOT: '',
+    CODEX_MEMORY_SECURITY_PROFILE: 'hardened',
+    CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false',
+    CODEX_MEMORY_ENABLE_CANDIDATE_CACHE: 'false',
+    CODEX_MEMORY_ENABLE_SHADOW_WRITES: 'false',
+    CODEX_MEMORY_ENABLE_VECTOR_INDEX: 'false',
+    CODEX_MEMORY_AUTO_REBUILD: 'false',
+    CODEX_MEMORY_AUTO_REBUILD_ACTIVE_MEMORY: 'false',
+    CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE: 'off',
+    CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE: 'read_only',
+    CODEX_MEMORY_MCP_PUBLIC_TOOLS: '',
+    CODEX_MEMORY_EXPOSE_CONTROLLED_MUTATION_TOOLS: 'false',
+    CODEX_MEMORY_EXPOSE_WRITE_TOOLS: 'false',
+    CODEX_MEMORY_VCP_NATIVE_RUNTIME_PROFILE: 'wsl-newapi-prod',
+    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT:
+      'http://127.0.0.1:7615/mcp/vcp-native',
+    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN: token,
+    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE: 'strict',
+    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE: 'primary',
+    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE: 'off',
+    CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_REFERENCE:
+      environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE || '',
+    CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_DIGEST:
+      environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST || ''
+  };
+}
+
+function validateExpectedMappingEnvironment(environment) {
+  const reference = environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE;
+  const digest = environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST;
+  if (reference !== 'jenn-vcp-diary-scope-v1' ||
+      !/^sha256:[a-f0-9]{64}$/u.test(digest || '') ||
+      /^(.)\1+$/u.test(String(digest).slice(7))) {
+    throw codedError('stack_expected_mapping_binding_invalid');
+  }
+  return true;
+}
+
 function singleLineSecret(value) {
   const normalized = value.endsWith('\n') ? value.slice(0, -1) : value;
   if (!normalized || normalized.includes('\r') || normalized.includes('\n') ||
@@ -1287,17 +1437,22 @@ async function runShimChild() {
   const runtimeRoot = assertOwnerOnlyDirectory(
     process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
   );
+  const mappingPath = privateReferencePath(
+    process.env.CODEX_MEMORY_R4_DIARY_SCOPE_MAPPING_REFERENCE,
+    privateRoot
+  );
+  const vcpRoot = path.resolve(REPO_ROOT, '..', '..', 'runtime', 'VCPToolBox');
+  assertOwnerOnlyFile(path.join(vcpRoot, 'config.env'));
   const child = spawn('bash', [
     path.join(REPO_ROOT, 'scripts', 'start-vcp-native-shim-wsl-newapi.sh')
   ], {
     cwd: REPO_ROOT,
-    env: {
-      ...process.env,
-      SHIM_HOST: '127.0.0.1',
-      SHIM_PORT: '7615',
-      CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN: token,
-      KB_STORE: path.join(runtimeRoot, 'store')
-    },
+    env: buildShimChildEnvironment(process.env, {
+      token,
+      runtimeRoot,
+      vcpRoot,
+      mappingPath
+    }),
     stdio: 'inherit'
   });
   forwardChild(child);
@@ -1313,29 +1468,16 @@ function runHttpChild() {
   const runtimeRoot = assertOwnerOnlyDirectory(
     process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
   );
-  Object.assign(process.env, {
-    CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
-    CODEX_MEMORY_HTTP_PORT: '7605',
-    CODEX_MEMORY_HTTP_TOKEN: token,
-    CODEX_MEMORY_DATA_DIR: path.join(runtimeRoot, 'data'),
-    CODEX_MEMORY_LOGS_DIR: path.join(runtimeRoot, 'logs'),
-    CODEX_MEMORY_SECURITY_PROFILE: 'hardened',
-    CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false',
-    CODEX_MEMORY_ENABLE_CANDIDATE_CACHE: 'false',
-    CODEX_MEMORY_ENABLE_SHADOW_WRITES: 'false',
-    CODEX_MEMORY_ENABLE_VECTOR_INDEX: 'false',
-    CODEX_MEMORY_AUTO_REBUILD: 'false',
-    CODEX_MEMORY_AUTO_REBUILD_ACTIVE_MEMORY: 'false',
-    CODEX_MEMORY_EXPOSE_CONTROLLED_MUTATION_TOOLS: 'false',
-    CODEX_MEMORY_EXPOSE_WRITE_TOOLS: 'false',
-    CODEX_MEMORY_VCP_NATIVE_RUNTIME_PROFILE: 'wsl-newapi-prod',
-    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT:
-      'http://127.0.0.1:7615/mcp/vcp-native',
-    CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN: token,
-    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE: 'strict',
-    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE: 'primary',
-    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE: 'off'
+  const isolatedDiaryRoot = path.join(runtimeRoot, 'data', 'no-primary-memory');
+  assertOwnerOnlyDirectory(isolatedDiaryRoot, { create: true });
+  const loadedEnvironment = { ...process.env };
+  validateExpectedMappingEnvironment(loadedEnvironment);
+  const safeEnvironment = buildHttpChildEnvironment(loadedEnvironment, {
+    token,
+    runtimeRoot
   });
+  for (const name of Object.keys(process.env)) delete process.env[name];
+  Object.assign(process.env, safeEnvironment);
   require('../src/http-index.js');
 }
 
@@ -1584,7 +1726,11 @@ module.exports = {
   CONTROLLER_CHANGE_PATHS,
   PROFILE_KEYS,
   adoptRunningStack,
+  assertPrivateRootBoundary,
   assertRelativeReference,
+  buildHttpChildEnvironment,
+  buildShimChildEnvironment,
+  childBaseEnvironment,
   commandMatchesComponent,
   discoverPrivateRoot,
   exactKeys,
@@ -1596,8 +1742,10 @@ module.exports = {
   lowDisclosureRelayProjection,
   parsePid,
   prepareStaleOwnerSocket,
+  privateReferencePath,
   probeUnixSocket,
   readPidFile,
   safeCode,
+  validateExpectedMappingEnvironment,
   validateProfile
 };

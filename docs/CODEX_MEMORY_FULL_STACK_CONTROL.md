@@ -50,6 +50,10 @@ provisioned stack has completed a fresh exact-baseline acceptance.
 The controller never performs `record_memory`. HTTP write delegation, write
 tool exposure, candidate cache, shadow writes, vector-index writes, and
 automatic rebuilds are forced off by the managed HTTP child.
+Caller-supplied root, write-enable, provider, preload, Node option, and public
+tool-surface overrides are removed before managed children start; the shim is
+bound back to the canonical workspace runtime, isolated store, governed mapping,
+loopback provider dependency, and native-write-off posture.
 
 If runtime-critical source, the accepted baseline, owner profile, or Edge
 container changes, startup fails closed. Reprovision and complete a fresh

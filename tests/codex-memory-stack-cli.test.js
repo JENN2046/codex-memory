@@ -10,7 +10,11 @@ const test = require('node:test');
 const {
   CONTROLLER_CHANGE_PATHS,
   PROFILE_KEYS,
+  assertPrivateRootBoundary,
   assertRelativeReference,
+  buildHttpChildEnvironment,
+  buildShimChildEnvironment,
+  childBaseEnvironment,
   commandMatchesComponent,
   discoverPrivateRoot,
   exactKeys,
@@ -22,7 +26,9 @@ const {
   lowDisclosureRelayProjection,
   parsePid,
   prepareStaleOwnerSocket,
+  privateReferencePath,
   safeCode,
+  validateExpectedMappingEnvironment,
   validateProfile
 } = require('../scripts/codex-memory-stack');
 
@@ -73,6 +79,17 @@ test('relative profile references reject traversal, absolutes, and normalization
   }
 });
 
+test('runtime file references must use absolute file targets', () => {
+  assert.throws(
+    () => privateReferencePath('file:relative/private.json', '/owner'),
+    { code: 'stack_private_reference_invalid' }
+  );
+  assert.throws(
+    () => privateReferencePath('env:PRIVATE_VALUE', '/owner'),
+    { code: 'stack_private_reference_invalid' }
+  );
+});
+
 test('private-root discovery fails closed when references leave the owner data boundary', () => {
   assert.throws(
     () => discoverPrivateRoot(['/outside/governance.env'], {
@@ -99,6 +116,28 @@ test('private-root discovery fails closed when references leave the owner data b
       }
     }),
     { code: 'stack_private_root_discovery_outside_boundary' }
+  );
+});
+
+test('profile private root must remain below the canonical owner data boundary', () => {
+  const fsModule = {
+    realpathSync(value) {
+      return value;
+    }
+  };
+  assert.equal(
+    assertPrivateRootBoundary('/synthetic/data/codex-memory/r4-owner', {
+      environment: { XDG_DATA_HOME: '/synthetic/data' },
+      fsModule
+    }),
+    '/synthetic/data/codex-memory/r4-owner'
+  );
+  assert.throws(
+    () => assertPrivateRootBoundary('/synthetic/state-private', {
+      environment: { XDG_DATA_HOME: '/synthetic/data' },
+      fsModule
+    }),
+    { code: 'stack_private_root_outside_boundary' }
   );
 });
 
@@ -212,6 +251,91 @@ test('managed command matching accepts current and persistent runners only', () 
     'node',
     '/other/unrelated.js'
   ]), false);
+});
+
+test('managed child environments neutralize caller write, root, provider, and public-surface overrides', () => {
+  const digest = `sha256:${'ab'.repeat(32)}`;
+  const hostile = {
+    PATH: '/usr/bin',
+    ENABLE_REAL_ROOT_WRITE: '1',
+    KB_ROOT: '/real/private/root',
+    KNOWLEDGEBASE_ROOT_PATH: '/real/private/root',
+    API_Key: 'synthetic-provider-key',
+    API_URL: 'https://untrusted.invalid',
+    NODE_OPTIONS: '--require=/untrusted.js',
+    LD_PRELOAD: '/untrusted.so',
+    CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE: 'full',
+    CODEX_MEMORY_EXPOSE_WRITE_TOOLS: 'true',
+    CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
+    CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE: 'jenn-vcp-diary-scope-v1',
+    CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST: digest
+  };
+  const base = childBaseEnvironment(hostile);
+  assert.equal(base.PATH, '/usr/bin');
+  for (const name of [
+    'ENABLE_REAL_ROOT_WRITE',
+    'KB_ROOT',
+    'KNOWLEDGEBASE_ROOT_PATH',
+    'API_Key',
+    'API_URL',
+    'NODE_OPTIONS',
+    'LD_PRELOAD',
+    'CODEX_MEMORY_EXPOSE_WRITE_TOOLS'
+  ]) {
+    assert.equal(Object.hasOwn(base, name), false);
+  }
+
+  const shim = buildShimChildEnvironment(hostile, {
+    token: 'synthetic-token',
+    runtimeRoot: '/runtime/isolated',
+    vcpRoot: '/workspace/runtime/VCPToolBox',
+    mappingPath: '/owner/mapping.json'
+  });
+  assert.equal(shim.ENABLE_REAL_ROOT_WRITE, '0');
+  assert.equal(shim.KB_ROOT, '');
+  assert.equal(shim.KNOWLEDGEBASE_ROOT_PATH, '');
+  assert.equal(shim.KNOWLEDGEBASE_STORE_PATH, '/runtime/isolated/store');
+  assert.equal(shim.WSL_NEWAPI_HOST, '127.0.0.1');
+  assert.equal(shim.CODEX_MEMORY_DIARY_SCOPE_MAPPING_PATH, '/owner/mapping.json');
+  assert.equal(Object.hasOwn(shim, 'API_Key'), false);
+
+  const http = buildHttpChildEnvironment(hostile, {
+    token: 'synthetic-token',
+    runtimeRoot: '/runtime/isolated'
+  });
+  assert.equal(http.CODEX_MEMORY_SECURITY_PROFILE, 'hardened');
+  assert.equal(http.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER, 'false');
+  assert.equal(http.CODEX_MEMORY_EXPOSE_WRITE_TOOLS, 'false');
+  assert.equal(http.CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE, 'off');
+  assert.equal(http.CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE, 'read_only');
+  assert.equal(
+    http.CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_REFERENCE,
+    'jenn-vcp-diary-scope-v1'
+  );
+  assert.equal(http.CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_DIGEST, digest);
+  assert.equal(Object.hasOwn(http, 'API_Key'), false);
+});
+
+test('HTTP child requires the exact governed mapping binding shape', () => {
+  const valid = {
+    CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE: 'jenn-vcp-diary-scope-v1',
+    CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST: `sha256:${'ab'.repeat(32)}`
+  };
+  assert.equal(validateExpectedMappingEnvironment(valid), true);
+  assert.throws(
+    () => validateExpectedMappingEnvironment({
+      ...valid,
+      CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST: `sha256:${'a'.repeat(64)}`
+    }),
+    { code: 'stack_expected_mapping_binding_invalid' }
+  );
+  assert.throws(
+    () => validateExpectedMappingEnvironment({
+      ...valid,
+      CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE: 'other-mapping'
+    }),
+    { code: 'stack_expected_mapping_binding_invalid' }
+  );
 });
 
 test('source compatibility allows only controller delivery paths over the accepted runtime baseline', () => {
