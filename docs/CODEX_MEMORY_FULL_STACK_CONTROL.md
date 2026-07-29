@@ -15,6 +15,45 @@ policy, tunnel, deployment, release, migration, import, export, rebuild, or
 public MCP expansion. An agent must still have current authorization for any
 P3 startup or shutdown action before invoking it.
 
+## Canonical Codex MCP Endpoint
+
+The endpoint role is schema-bound:
+
+```text
+schema v6        -> canonical Codex MCP on loopback port 7625
+schema v4 or v5  -> historical/rollback HTTP MCP on loopback port 7605
+```
+
+Both roles use `/mcp/codex-memory`, but they are not interchangeable runtime
+authorities. The older standalone `7625` launcher inherited caller environment
+and defaulted to the local/observe/fallback policy. The schema-v6 controller
+instead launches the canonical endpoint from a clean allowlisted environment
+and forces the hardened, authenticated, strict-primary, write-free policy.
+The common source tool contract therefore does not make the two launch
+policies equivalent.
+
+During the v5-to-v6 transition, `stop` continues to recognize and stop the
+adopted `7605` process. The transitional `start` uses an in-memory v6 binding
+and launches the controller-owned HTTP child on `7625`. It fails closed if
+that port is already occupied; it never kills, adopts, or reuses an unknown or
+standalone listener. `adopt-running --replace` can persist schema v6 only after
+the canonical listener, authentication, exact five-tool read/proposal surface,
+and complete hardened policy pass acceptance.
+
+The historical supervisor cannot start or restart either its MCP or shim role
+on `7625`. Its only startable compatibility topology is exact loopback MCP
+`7605` plus shim `7615`. Its stop path must bind the owner PID file, process
+owner, exact executable, process group, working directory, exact supervisor
+command, stable pre-signal start ticks, and an unchanged PID-file inode before
+sending a signal. This is an identity-checked compatibility stop, not a
+schema-v6 lifecycle or listener-acceptance authority.
+
+Authenticated health exposes only the bounded policy facts needed by the
+controller, including bridge gate mode, native read-delegation mode, and the
+public tool names/count. Acceptance requires `strict`, `primary`, and exactly
+the five canonical read/proposal tools; `observe`, local fallback, missing or
+extra tools, and reordered/substituted tool names fail closed.
+
 ## One-Time Adoption
 
 After a full stack has passed its exact-baseline acceptance, bind the controller
@@ -231,6 +270,12 @@ provider/Governance/Relay credential freshness alongside counters, schema
 versions, baseline identity, and bounded policy failure codes. It does not
 return private paths, file identities, environment values, tokens, keys, key
 digests, raw memory, request bodies, or provider responses.
+
+A v4/v5 profile makes `status` inspect the historical `7605` role so that
+controlled transition and shutdown remain possible. A v6 profile makes it
+inspect the canonical `7625` role and reports that role in the low-disclosure
+HTTP projection. Consequently, a healthy v5 status is not evidence that a
+separate Codex client target on `7625` is reachable.
 
 A legacy HTTP process remains running, but a newer controller marks it
 `controllerManaged: false` and does not read or send its bearer token. A

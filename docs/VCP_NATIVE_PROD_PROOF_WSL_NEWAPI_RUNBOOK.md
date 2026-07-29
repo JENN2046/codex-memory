@@ -1,5 +1,10 @@
 # VCP Native Production Proof Runbook for WSL-local NewAPI
 
+Current lifecycle authority: `CURRENT_STATE.md` and
+`docs/CODEX_MEMORY_FULL_STACK_CONTROL.md`. The proof commands below do not
+authorize provider calls, real-root writes, runtime startup, or configuration
+access. Each such action still requires its applicable current authority.
+
 This runbook captures the production proof path where `codex-memory` runs in
 WSL and NewAPI also runs in WSL.
 
@@ -75,31 +80,28 @@ the real-root write proof before invoking the proof CLI.
 
 ## Codex MCP Runtime Target Profile
 
-After the proof path is accepted, the same target can be exposed to Codex MCP as
-an optional runtime profile.
-
-Start the managed WSL-local service pair:
+The schema-v6 full-stack controller is the canonical lifecycle authority.
+Under a current exact runtime authorization, use:
 
 ```bash
-npm run --silent vcp-native:codex-mcp:wsl-newapi:start
+node scripts/codex-memory-stack.js status
+node scripts/codex-memory-stack.js start
+node scripts/codex-memory-stack.js stop
+node scripts/codex-memory-stack.js adopt-running --replace
 ```
 
-This starts:
-
-- VCP native shim on `http://127.0.0.1:7615/mcp/vcp-native`
-- Codex MCP on `http://127.0.0.1:7625/mcp/codex-memory`
-
-It stores local pids, logs, and the HTTP bearer token under
-`/home/jenn/AGENTS_OS_Workspace/runtime/codex-memory-vcp-native-mcp`.
-
-Check or stop it with:
-
-```bash
-npm run --silent vcp-native:codex-mcp:wsl-newapi:status
-npm run --silent vcp-native:codex-mcp:wsl-newapi:stop
-```
-
-The managed service keeps native write delegation off by default.
+Schema v6 owns the canonical loopback `7625` Codex MCP role. Schema v4/v5
+profiles retain `7605` only for compatibility status, controlled stop, and
+bounded rollback. The old `vcp-native:codex-mcp:wsl-newapi:*` supervisor is not
+policy-equivalent and accepts only exact loopback MCP `7605` plus shim `7615`
+for start/restart; either role on canonical `7625` is rejected. Its status/stop
+commands are retained only as compatibility surfaces. The stop guard binds the
+owner PID file and stable inode, PID/PGID, process owner, exact executable,
+working directory, exact supervisor command, and stable pre-signal process
+start ticks, but a real transition must also verify the listener identity; the
+old supervisor is not sufficient endpoint evidence by itself.
+The controller forces bearer authentication and a hardened, strict-primary,
+write-free five-tool read/proposal surface.
 
 Start the stable VCP native shim:
 

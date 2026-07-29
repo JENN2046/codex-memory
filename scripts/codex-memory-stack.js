@@ -27,6 +27,25 @@ const PROFILE_FILENAME = 'full-stack-control.json';
 const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
 const EDGE_CONTAINER_DEFAULT = 'codex-memory-full-stack-001-edge';
 const PROVIDER_CONTAINER_DEFAULT = 'new-api-wsl';
+const CANONICAL_CODEX_MCP_ENDPOINT = Object.freeze({
+  host: '127.0.0.1',
+  path: '/mcp/codex-memory',
+  port: 7625,
+  role: 'canonical_client'
+});
+const LEGACY_ROLLBACK_MCP_ENDPOINT = Object.freeze({
+  host: '127.0.0.1',
+  path: '/mcp/codex-memory',
+  port: 7605,
+  role: 'legacy_rollback'
+});
+const CANONICAL_CODEX_MCP_TOOL_NAMES = Object.freeze([
+  'audit_memory',
+  'memory_overview',
+  'prepare_memory_context',
+  'propose_memory_delta',
+  'search_memory'
+]);
 const UNIX_PEER_CREDENTIAL_HELPER_PATH = '/usr/bin/python3';
 const UNIX_PEER_CREDENTIAL_HELPER_SOURCE = [
   'import socket,struct',
@@ -182,6 +201,35 @@ function codedError(code) {
 function safeCode(error, fallback = 'codex_memory_stack_failed') {
   const candidate = error?.code || error?.message;
   return SAFE_CODE.test(candidate || '') ? candidate : fallback;
+}
+
+function profileHttpEndpoint(profile) {
+  if (profile?.schemaVersion === PROFILE_SCHEMA_VERSION) {
+    return CANONICAL_CODEX_MCP_ENDPOINT;
+  }
+  if ([
+    LEGACY_PROFILE_SCHEMA_VERSION,
+    EXACT_HEAD_PROFILE_SCHEMA_VERSION
+  ].includes(profile?.schemaVersion)) {
+    return LEGACY_ROLLBACK_MCP_ENDPOINT;
+  }
+  throw codedError('stack_profile_http_endpoint_invalid');
+}
+
+function childProfileSchemaVersion(environment = process.env) {
+  const rawSchemaVersion =
+    environment.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION;
+  const schemaVersion = rawSchemaVersion === undefined
+    ? LEGACY_PROFILE_SCHEMA_VERSION
+    : Number(rawSchemaVersion);
+  profileHttpEndpoint({ schemaVersion });
+  return schemaVersion;
+}
+
+function childHttpEndpoint(environment = process.env) {
+  return profileHttpEndpoint({
+    schemaVersion: childProfileSchemaVersion(environment)
+  });
 }
 
 function exactKeys(value, expected) {
@@ -2704,6 +2752,7 @@ function httpPolicyFailureCode(value) {
   }
   if (!exactKeys(policy, [
     'activeMemoryAutoRebuildEnabled',
+    'bridgeGateMode',
     'candidateCacheEnabled',
     'controlledMutationToolsExposed',
     'securityProfile',
@@ -2713,7 +2762,10 @@ function httpPolicyFailureCode(value) {
     'externalProviderAllowed',
     'governedNativeBridgeWarnings',
     'mcpPublicToolSurface',
+    'nativeReadDelegationMode',
     'nativeWriteDelegationMode',
+    'publicToolCount',
+    'publicToolNames',
     'shadowAutoRebuildEnabled',
     'shadowWritesEnabled',
     'vectorIndexEnabled',
@@ -2760,6 +2812,19 @@ function httpPolicyFailureCode(value) {
       policy.writeToolsExposed !== false ||
       policy.nativeWriteDelegationMode !== 'off') {
     return 'stack_http_write_surface_policy_invalid';
+  }
+  if (policy.bridgeGateMode !== 'strict' ||
+      policy.nativeReadDelegationMode !== 'primary') {
+    return 'stack_http_native_read_policy_invalid';
+  }
+  if (policy.publicToolCount !== CANONICAL_CODEX_MCP_TOOL_NAMES.length ||
+      !Array.isArray(policy.publicToolNames) ||
+      policy.publicToolNames.length !== CANONICAL_CODEX_MCP_TOOL_NAMES.length ||
+      !policy.publicToolNames.every(
+        (toolName, index) =>
+          toolName === CANONICAL_CODEX_MCP_TOOL_NAMES[index]
+      )) {
+    return 'stack_http_public_tool_contract_invalid';
   }
   if (policy.externalProviderAllowed !== false) {
     return 'stack_http_external_provider_policy_invalid';
@@ -3237,6 +3302,7 @@ async function inspectStack({
   environment = process.env,
   profile = readProfile({ environment })
 } = {}) {
+  const httpEndpoint = profileHttpEndpoint(profile);
   const source = inspectSourceCompatibility(profile);
   const processes = Object.fromEntries(
     Object.keys(COMPONENTS).map(name => [
@@ -3314,7 +3380,10 @@ async function inspectStack({
   const shimListenerOwned = processes.shim.controllerManaged &&
     processOwnsLoopbackTcpListener(processes.shim.pid, 7615);
   const httpListenerOwned = processes.http.controllerManaged &&
-    processOwnsLoopbackTcpListener(processes.http.pid, 7605);
+    processOwnsLoopbackTcpListener(
+      processes.http.pid,
+      httpEndpoint.port
+    );
   const httpHealth = httpListenerOwned
     ? lowDisclosureHttpProjection(runChildProbe(
       '_probe-http',
@@ -3522,6 +3591,9 @@ async function inspectStack({
       healthy: httpHealth.ok,
       authRequired: httpHealth.authRequired,
       listenerIdentityMatch: httpListenerOwned,
+      endpointRole: httpEndpoint.role,
+      canonicalClientEndpoint:
+        httpEndpoint === CANONICAL_CODEX_MCP_ENDPOINT,
       policyAccepted: httpHealth.policyAccepted,
       policyFailureCode: httpHealth.policyFailureCode
     }),
@@ -3858,6 +3930,22 @@ async function startStack({
     if (relayDataSocket !== governanceDataSocket) {
       throw codedError('stack_relay_data_socket_binding_mismatch');
     }
+    const httpEndpoint = profileHttpEndpoint(profile);
+    const httpPreflightState = inspectManagedProcess(
+      'http',
+      { environment, profile }
+    );
+    if (httpPreflightState.controllerManaged &&
+        !processOwnsLoopbackTcpListener(
+          httpPreflightState.pid,
+          httpEndpoint.port
+        )) {
+      throw codedError('stack_http_listener_identity_mismatch');
+    }
+    if (!httpPreflightState.running &&
+        await portListening(httpEndpoint.port)) {
+      throw codedError('stack_unmanaged_http_listener');
+    }
     const relayObserverSocket = path.join(
       runtimeDirectory(environment),
       'relay-observer.sock'
@@ -3926,7 +4014,7 @@ async function startStack({
       }
 
       const httpState = inspectManagedProcess('http', { environment, profile });
-      if (!httpState.running && await portListening(7605)) {
+      if (!httpState.running && await portListening(httpEndpoint.port)) {
         throw codedError('stack_unmanaged_http_listener');
       }
       const httpProcess = await spawnManaged(
@@ -3940,7 +4028,10 @@ async function startStack({
         const state = inspectManagedProcess('http', { environment, profile });
         if (!state.controllerManaged ||
             state.pid !== httpProcess.pid ||
-            !processOwnsLoopbackTcpListener(state.pid, 7605)) {
+            !processOwnsLoopbackTcpListener(
+              state.pid,
+              httpEndpoint.port
+            )) {
           return false;
         }
         const health = lowDisclosureHttpProjection(runChildProbe(
@@ -4380,13 +4471,18 @@ function buildShimChildEnvironment(environment, {
 
 function buildHttpChildEnvironment(environment, {
   token,
-  runtimeRoot
+  runtimeRoot,
+  profileSchemaVersion = PROFILE_SCHEMA_VERSION
 }) {
+  const httpEndpoint = profileHttpEndpoint({
+    schemaVersion: profileSchemaVersion
+  });
   const isolatedDiaryRoot = path.join(runtimeRoot, 'data', 'no-primary-memory');
   return {
     ...childBaseEnvironment(environment),
-    CODEX_MEMORY_HTTP_HOST: '127.0.0.1',
-    CODEX_MEMORY_HTTP_PORT: '7605',
+    CODEX_MEMORY_HTTP_HOST: httpEndpoint.host,
+    CODEX_MEMORY_HTTP_PORT: String(httpEndpoint.port),
+    CODEX_MEMORY_HTTP_PATH: httpEndpoint.path,
     CODEX_MEMORY_HTTP_TOKEN: token,
     CODEX_MEMORY_BASE_PATH: runtimeRoot,
     CODEX_MEMORY_DATA_DIR: path.join(runtimeRoot, 'data'),
@@ -4565,7 +4661,8 @@ function runHttpChild() {
   validateExpectedMappingEnvironment(loadedEnvironment);
   const safeEnvironment = buildHttpChildEnvironment(loadedEnvironment, {
     token,
-    runtimeRoot
+    runtimeRoot,
+    profileSchemaVersion: childProfileSchemaVersion(loadedEnvironment)
   });
   for (const name of Object.keys(process.env)) delete process.env[name];
   Object.assign(process.env, safeEnvironment);
@@ -4866,9 +4963,10 @@ async function probeHttpChild() {
   if (expectedHttpPid === null) {
     throw codedError('stack_http_listener_identity_mismatch');
   }
+  const httpEndpoint = childHttpEndpoint(process.env);
   const connectedSocket = await connectOwnedLoopbackTcpListener(
     expectedHttpPid,
-    7605
+    httpEndpoint.port
   );
   const privateRoot = childPrivateRoot();
   const token = singleLineSecret(readPrivateText(
@@ -4876,7 +4974,7 @@ async function probeHttpChild() {
     privateRoot
   ));
   const health = await getJsonHealth({
-    port: 7605,
+    port: httpEndpoint.port,
     bearerToken: token,
     connectedSocket
   });
@@ -4984,10 +5082,13 @@ if (require.main === module) {
 }
 
 module.exports = {
+  CANONICAL_CODEX_MCP_TOOL_NAMES,
+  CANONICAL_CODEX_MCP_ENDPOINT,
   CONTROLLER_CHANGE_PATHS,
   EXACT_HEAD_PROFILE_SCHEMA_VERSION,
   PROFILE_KEYS,
   PROFILE_SCHEMA_VERSION,
+  LEGACY_ROLLBACK_MCP_ENDPOINT,
   V5_CONTROLLER_SOURCE_UPGRADE_COMMITS,
   V5_PROFILE_KEYS,
   VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
@@ -5003,6 +5104,8 @@ module.exports = {
   buildShimChildEnvironment,
   buildControllerChildEnvironment,
   childBaseEnvironment,
+  childHttpEndpoint,
+  childProfileSchemaVersion,
   commandMatchesComponent,
   computeRuntimeAccepted,
   computeStackAccepted,
@@ -5033,6 +5136,7 @@ module.exports = {
   processEnvironmentExactlyMatches,
   processOwnsLoopbackTcpListener,
   processOwnsUnixListener,
+  profileHttpEndpoint,
   profileEdgeIdentityMatches,
   profileEdgeLifecycleIdentityMatches,
   profileManagedEnvironmentConfigMatches,

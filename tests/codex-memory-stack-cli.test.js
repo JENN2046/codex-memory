@@ -9,8 +9,11 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
+  CANONICAL_CODEX_MCP_ENDPOINT,
+  CANONICAL_CODEX_MCP_TOOL_NAMES,
   CONTROLLER_CHANGE_PATHS,
   EXACT_HEAD_PROFILE_SCHEMA_VERSION,
+  LEGACY_ROLLBACK_MCP_ENDPOINT,
   PROFILE_KEYS,
   PROFILE_SCHEMA_VERSION,
   V5_PROFILE_KEYS,
@@ -26,6 +29,8 @@ const {
   buildHttpChildEnvironment,
   buildShimChildEnvironment,
   childBaseEnvironment,
+  childHttpEndpoint,
+  childProfileSchemaVersion,
   commandMatchesComponent,
   computeRuntimeAccepted,
   computeStackAccepted,
@@ -58,6 +63,7 @@ const {
   processEnvironmentExactlyMatches,
   processOwnsLoopbackTcpListener,
   processOwnsUnixListener,
+  profileHttpEndpoint,
   profileEdgeIdentityMatches,
   profileEdgeLifecycleIdentityMatches,
   profileManagedEnvironmentConfigMatches,
@@ -82,6 +88,9 @@ const {
   writeRelaySecretIdentityReceipt,
   waitForProcessGroupExit
 } = require('../scripts/codex-memory-stack');
+const {
+  getPublicToolDefinitions
+} = require('../src/adapters/codex-mcp/server');
 
 const BASELINE = '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118';
 const CONTROLLER_SOURCE_COMMIT =
@@ -293,6 +302,51 @@ test('profile contract is exact and stores references rather than secret values'
       controllerSourceManifestVersion: 2
     })),
     { code: 'stack_profile_invalid' }
+  );
+});
+
+test('schema v6 owns canonical 7625 while v4/v5 retain 7605 compatibility', () => {
+  assert.deepEqual(
+    profileHttpEndpoint(profile()),
+    CANONICAL_CODEX_MCP_ENDPOINT
+  );
+  assert.deepEqual(
+    profileHttpEndpoint(v5Profile()),
+    LEGACY_ROLLBACK_MCP_ENDPOINT
+  );
+  assert.deepEqual(
+    profileHttpEndpoint(legacyProfile()),
+    LEGACY_ROLLBACK_MCP_ENDPOINT
+  );
+  assert.equal(
+    childHttpEndpoint({
+      CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION: '6'
+    }).port,
+    7625
+  );
+  assert.equal(
+    childHttpEndpoint({
+      CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION: '5',
+      CODEX_MEMORY_HTTP_PORT: '9999'
+    }).port,
+    7605
+  );
+  assert.equal(childHttpEndpoint({}).port, 7605);
+  assert.equal(
+    childProfileSchemaVersion({
+      CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION: '6'
+    }),
+    6
+  );
+  assert.throws(
+    () => profileHttpEndpoint({ schemaVersion: 7 }),
+    { code: 'stack_profile_http_endpoint_invalid' }
+  );
+  assert.throws(
+    () => childHttpEndpoint({
+      CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION: 'unexpected'
+    }),
+    { code: 'stack_profile_http_endpoint_invalid' }
   );
 });
 
@@ -1092,6 +1146,15 @@ test('managed command matching binds exact executable, script, mode, and environ
     '_run-http',
     `--stack-environment=${governanceEnvironment}`
   ], options), true);
+  assert.equal(controllerCommandMatchesComponent('http', [
+    process.execPath,
+    '/repo/scripts/codex-memory-stack.js',
+    '_run-http',
+    `--stack-environment=${governanceEnvironment}`
+  ], {
+    ...options,
+    profile: v5Profile()
+  }), true);
   assert.equal(commandMatchesComponent('shim', [
     'node',
     '/repo/src/cli/vcp-toolbox-native-mcp-shim.js',
@@ -1474,6 +1537,10 @@ test('managed child environments neutralize caller write, root, provider, and pu
     LD_PRELOAD: '/untrusted.so',
     PYTHONPATH: '/untrusted/python',
     UNRELATED_SECRET: 'must-not-be-inherited',
+    CODEX_MEMORY_HTTP_HOST: '0.0.0.0',
+    CODEX_MEMORY_HTTP_PORT: '9999',
+    CODEX_MEMORY_HTTP_PATH: '/untrusted',
+    CODEX_MEMORY_HTTP_TOKEN: 'untrusted-token',
     CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE: 'full',
     CODEX_MEMORY_EXPOSE_WRITE_TOOLS: 'true',
     CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
@@ -1535,6 +1602,10 @@ test('managed child environments neutralize caller write, root, provider, and pu
     token: 'synthetic-token',
     runtimeRoot: '/runtime/isolated'
   });
+  assert.equal(http.CODEX_MEMORY_HTTP_HOST, '127.0.0.1');
+  assert.equal(http.CODEX_MEMORY_HTTP_PORT, '7625');
+  assert.equal(http.CODEX_MEMORY_HTTP_PATH, '/mcp/codex-memory');
+  assert.equal(http.CODEX_MEMORY_HTTP_TOKEN, 'synthetic-token');
   assert.equal(http.CODEX_MEMORY_SECURITY_PROFILE, 'hardened');
   assert.equal(http.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER, 'false');
   assert.equal(http.CODEX_MEMORY_ENABLE_SOFT_READ_POLICY, 'true');
@@ -1543,6 +1614,51 @@ test('managed child environments neutralize caller write, root, provider, and pu
   assert.equal(http.CODEX_MEMORY_EXPOSE_WRITE_TOOLS, 'false');
   assert.equal(http.CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE, 'off');
   assert.equal(http.CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE, 'read_only');
+  assert.equal(http.CODEX_MEMORY_MCP_PUBLIC_TOOLS, '');
+  assert.equal(
+    http.CODEX_MEMORY_EXPOSE_CONTROLLED_MUTATION_TOOLS,
+    'false'
+  );
+  assert.equal(http.CODEX_MEMORY_ENABLE_CANDIDATE_CACHE, 'false');
+  assert.equal(http.CODEX_MEMORY_ENABLE_SHADOW_WRITES, 'false');
+  assert.equal(http.CODEX_MEMORY_ENABLE_VECTOR_INDEX, 'false');
+  assert.equal(http.CODEX_MEMORY_AUTO_REBUILD, 'false');
+  assert.equal(http.CODEX_MEMORY_AUTO_REBUILD_ACTIVE_MEMORY, 'false');
+  assert.equal(
+    http.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE,
+    'strict'
+  );
+  assert.equal(
+    http.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE,
+    'primary'
+  );
+  assert.equal(
+    http.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE,
+    'off'
+  );
+  assert.deepEqual(
+    getPublicToolDefinitions({
+      securityProfile: http.CODEX_MEMORY_SECURITY_PROFILE,
+      mcpPublicToolSurface: http.CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE,
+      mcpPublicToolNames: ['record_memory'],
+      exposeControlledMutationMcpTools: true,
+      exposeWriteMcpTools: true
+    }).map(tool => tool.name).sort(),
+    [
+      'audit_memory',
+      'memory_overview',
+      'prepare_memory_context',
+      'propose_memory_delta',
+      'search_memory'
+    ]
+  );
+  const legacyHttp = buildHttpChildEnvironment(hostile, {
+    token: 'synthetic-token',
+    runtimeRoot: '/runtime/isolated',
+    profileSchemaVersion: EXACT_HEAD_PROFILE_SCHEMA_VERSION
+  });
+  assert.equal(legacyHttp.CODEX_MEMORY_HTTP_PORT, '7605');
+  assert.equal(legacyHttp.CODEX_MEMORY_SECURITY_PROFILE, 'hardened');
   assert.equal(
     http.CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_REFERENCE,
     'jenn-vcp-diary-scope-v1'
@@ -1772,6 +1888,19 @@ test('transition lifecycle keeps profile persistence inside adoption only', () =
     start.includes('profileWithControllerManifestBinding('),
     true
   );
+  const unmanagedHttpPreflight = start.indexOf(
+    "const httpPreflightState = inspectManagedProcess("
+  );
+  const ownedHttpPreflight = start.indexOf(
+    'if (httpPreflightState.controllerManaged &&'
+  );
+  const firstChildSpawn = start.indexOf(
+    "const shim = await spawnManaged("
+  );
+  assert.ok(unmanagedHttpPreflight >= 0);
+  assert.ok(ownedHttpPreflight > unmanagedHttpPreflight);
+  assert.ok(firstChildSpawn > ownedHttpPreflight);
+  assert.ok(firstChildSpawn > unmanagedHttpPreflight);
   for (const contract of [
     'accepted: false',
     'transitionRuntimeAccepted: true',
@@ -2765,6 +2894,7 @@ test('authenticated HTTP health projection requires the full hardened policy sha
     },
     policyGates: {
       activeMemoryAutoRebuildEnabled: false,
+      bridgeGateMode: 'strict',
       candidateCacheEnabled: false,
       controlledMutationToolsExposed: false,
       securityProfile: 'hardened',
@@ -2774,7 +2904,10 @@ test('authenticated HTTP health projection requires the full hardened policy sha
       externalProviderAllowed: false,
       governedNativeBridgeWarnings: [],
       mcpPublicToolSurface: 'read_only',
+      nativeReadDelegationMode: 'primary',
       nativeWriteDelegationMode: 'off',
+      publicToolCount: CANONICAL_CODEX_MCP_TOOL_NAMES.length,
+      publicToolNames: [...CANONICAL_CODEX_MCP_TOOL_NAMES],
       shadowAutoRebuildEnabled: false,
       shadowWritesEnabled: false,
       vectorIndexEnabled: false,
@@ -2841,6 +2974,47 @@ test('authenticated HTTP health projection requires the full hardened policy sha
       }, 200).policyFailureCode,
       'stack_http_write_surface_policy_invalid',
       key
+    );
+  }
+  for (const [key, value] of [
+    ['bridgeGateMode', 'observe'],
+    ['nativeReadDelegationMode', 'primary_with_local_fallback']
+  ]) {
+    assert.equal(
+      projectHttpHealthPayload({
+        ...payload,
+        policyGates: {
+          ...payload.policyGates,
+          [key]: value
+        }
+      }, 200).policyFailureCode,
+      'stack_http_native_read_policy_invalid',
+      key
+    );
+  }
+  for (const policyGates of [
+    {
+      ...payload.policyGates,
+      publicToolCount: 4
+    },
+    {
+      ...payload.policyGates,
+      publicToolNames: payload.policyGates.publicToolNames.slice(0, 4)
+    },
+    {
+      ...payload.policyGates,
+      publicToolNames: [
+        ...payload.policyGates.publicToolNames.slice(0, 4),
+        'record_memory'
+      ]
+    }
+  ]) {
+    assert.equal(
+      projectHttpHealthPayload({
+        ...payload,
+        policyGates
+      }, 200).policyFailureCode,
+      'stack_http_public_tool_contract_invalid'
     );
   }
   assert.equal(
