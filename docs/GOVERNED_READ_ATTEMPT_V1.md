@@ -110,9 +110,11 @@ fallback: { attempts }
 ```
 
 Each field is a non-negative integer or `null`. Missing evidence stays `null`.
-When a provider or native triple is complete,
-`started = succeeded + failed`; both started counters are bounded to at most
-one. Primary write and fallback values, when known, must be zero.
+Every known subset of a provider or native triple must be compatible with one
+complete tuple where `started = succeeded + failed` and `started` is at most
+one. For example, `{ started: 0, succeeded: null, failed: 1 }` is rejected even
+though one field is unknown. Primary write and fallback values, when known,
+must be zero.
 
 Derived transaction evidence permits only:
 
@@ -121,6 +123,9 @@ started=1, committed=1, rolled_back=0
 started=1, committed=0, rolled_back=1
 started=0, committed=0, rolled_back=0
 ```
+
+Partial derived-transaction evidence must likewise be compatible with at least
+one of those complete tuples.
 
 Complete success requires complete evidence, no `null`, no provider/native
 failure, zero primary writes, and zero fallback attempts.
@@ -136,6 +141,9 @@ CAS:
   `attempt_terminal_already_committed`, even if it is a late completion;
 - timeout and cancellation commit failure with
   `evidence_complete: false`;
+- `maxAttempts` bounds active non-terminal attempts; a committed terminal
+  remains addressable for protocol projection and late-candidate rejection but
+  immediately releases its admission slot;
 - coordinator loss emits `terminal_missing` for independent observation and
   clears the transient record without fabricating a terminal.
 

@@ -381,6 +381,7 @@ function createGovernedReadAttemptCoordinator({
   }
 
   const attempts = new Map();
+  let activeAttempts = 0;
 
   function nowMs() {
     const value = clock();
@@ -415,7 +416,9 @@ function createGovernedReadAttemptCoordinator({
     validateAttemptHeader(header);
     if (Date.parse(header.deadline_at) <= nowMs()) reject('attempt_deadline_expired');
     if (attempts.has(header.attempt_ref)) reject('attempt_ref_replay');
-    if (attempts.size >= maxAttempts) reject('attempt_coordinator_capacity_exceeded');
+    if (activeAttempts >= maxAttempts) {
+      reject('attempt_coordinator_capacity_exceeded');
+    }
     const acceptedHeader = structuredClone(header);
     const record = {
       header: acceptedHeader,
@@ -423,6 +426,7 @@ function createGovernedReadAttemptCoordinator({
       terminal: null
     };
     attempts.set(header.attempt_ref, record);
+    activeAttempts += 1;
     emit('attempt_accepted', { header: structuredClone(acceptedHeader) });
 
     const created = createStageReceipt({
@@ -475,6 +479,7 @@ function createGovernedReadAttemptCoordinator({
       receipts: record.receipts
     });
     record.terminal = structuredClone(terminal);
+    activeAttempts -= 1;
     emit('attempt_terminal_committed', {
       attempt_ref: attemptRef,
       terminal: structuredClone(terminal)
@@ -550,6 +555,7 @@ function createGovernedReadAttemptCoordinator({
       missing += 1;
     }
     attempts.clear();
+    activeAttempts = 0;
     return Object.freeze({
       active_attempts_lost: missing,
       terminals_fabricated: 0

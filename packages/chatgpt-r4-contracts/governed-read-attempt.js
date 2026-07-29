@@ -96,6 +96,11 @@ const GOVERNED_READ_ATTEMPT_COUNTER_ORIGINS = deepFreeze({
 const ALL_COUNTER_GROUPS = Object.freeze(
   Object.keys(GOVERNED_READ_ATTEMPT_COUNTER_FIELDS)
 );
+const SINGLE_OPERATION_COUNTER_TRIPLES = deepFreeze([
+  [0, 0, 0],
+  [1, 1, 0],
+  [1, 0, 1]
+]);
 
 function failure({
   category,
@@ -649,6 +654,14 @@ function groupHasUnknown(counters, group) {
   return Object.values(counters[group]).some(value => value === null);
 }
 
+function matchesKnownCounterTriple(value, fields) {
+  return SINGLE_OPERATION_COUNTER_TRIPLES.some(triple =>
+    fields.every((field, index) =>
+      value[field] === null || value[field] === triple[index]
+    )
+  );
+}
+
 function validateAttemptCounters(counters, {
   outcome,
   evidenceComplete,
@@ -669,14 +682,16 @@ function validateAttemptCounters(counters, {
 
   for (const group of ['provider', 'native_invocation']) {
     const value = counters[group];
-    if ([value.started, value.succeeded, value.failed].every(Number.isInteger)) {
-      if (value.started !== value.succeeded + value.failed ||
-          value.started > 1) {
-        reject('attempt_counter_reconciliation_invalid');
-      }
-      if (outcome === 'success' && value.failed !== 0) {
-        reject('attempt_success_counter_invalid');
-      }
+    if (!matchesKnownCounterTriple(
+      value,
+      ['started', 'succeeded', 'failed']
+    )) {
+      reject('attempt_counter_reconciliation_invalid');
+    }
+    if (outcome === 'success' &&
+        value.failed !== null &&
+        value.failed !== 0) {
+      reject('attempt_success_counter_invalid');
     }
   }
   const primary = counters.primary_memory;
@@ -688,22 +703,11 @@ function validateAttemptCounters(counters, {
     reject('attempt_fallback_forbidden');
   }
   const derived = counters.derived_transaction;
-  if ([derived.started, derived.committed, derived.rolled_back]
-    .every(Number.isInteger)) {
-    const allowed = (
-      derived.started === 0 &&
-      derived.committed === 0 &&
-      derived.rolled_back === 0
-    ) || (
-      derived.started === 1 &&
-      derived.committed === 1 &&
-      derived.rolled_back === 0
-    ) || (
-      derived.started === 1 &&
-      derived.committed === 0 &&
-      derived.rolled_back === 1
-    );
-    if (!allowed) reject('attempt_derived_transaction_invalid');
+  if (!matchesKnownCounterTriple(
+    derived,
+    ['started', 'committed', 'rolled_back']
+  )) {
+    reject('attempt_derived_transaction_invalid');
   }
   if (outcome === 'success' && evidenceComplete !== true) {
     reject('attempt_success_evidence_incomplete');

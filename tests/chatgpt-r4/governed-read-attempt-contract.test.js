@@ -381,6 +381,125 @@ test('counter reconciliation rejects provider duplication, primary writes, fallb
   }
 });
 
+test('partial counter triples reject known contradictions while preserving consistent unknown evidence', () => {
+  const impossibleProviderHeader = header('L');
+  const impossibleProviderReceipts = appendThrough(
+    impossibleProviderHeader,
+    'PROVIDER_EMBEDDING',
+    {
+      outcome: 'failed',
+      reasonCode: 'provider_embedding_failed',
+      finalCounterFacts: {
+        provider: { started: 0, failed: 1 }
+      }
+    }
+  );
+  assert.throws(() => createTerminalEnvelope({
+    header: impossibleProviderHeader,
+    receipts: impossibleProviderReceipts,
+    outcome: 'failure',
+    reasonCode: 'provider_embedding_failed',
+    evidenceComplete: false
+  }), { code: 'attempt_counter_reconciliation_invalid' });
+
+  const consistentProviderHeader = header('M');
+  const consistentProviderReceipts = appendThrough(
+    consistentProviderHeader,
+    'PROVIDER_EMBEDDING',
+    {
+      outcome: 'failed',
+      reasonCode: 'provider_embedding_failed',
+      finalCounterFacts: {
+        provider: { started: 1, failed: 1 }
+      }
+    }
+  );
+  const consistentProviderTerminal = createTerminalEnvelope({
+    header: consistentProviderHeader,
+    receipts: consistentProviderReceipts,
+    outcome: 'failure',
+    reasonCode: 'provider_embedding_failed',
+    evidenceComplete: false
+  });
+  assert.deepEqual(consistentProviderTerminal.counters.provider, {
+    started: 1,
+    succeeded: null,
+    failed: 1
+  });
+
+  const impossibleDerivedHeader = header('N');
+  const impossibleDerivedReceipts = appendThrough(
+    impossibleDerivedHeader,
+    'HYDRATION',
+    {
+      outcome: 'failed',
+      reasonCode: 'hydration_failed',
+      finalCounterFacts: {
+        derived_transaction: { started: 0, rolled_back: 1 }
+      }
+    }
+  );
+  assert.throws(() => createTerminalEnvelope({
+    header: impossibleDerivedHeader,
+    receipts: impossibleDerivedReceipts,
+    outcome: 'failure',
+    reasonCode: 'hydration_failed',
+    evidenceComplete: false
+  }), { code: 'attempt_derived_transaction_invalid' });
+});
+
+test('Edge capacity is reusable after cancelled, timed-out, and completed attempts', () => {
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => NOW,
+    maxAttempts: 1
+  });
+  const cancelled = header('O');
+  const timedOut = header('P');
+  const completed = header('Q');
+  const active = header('R');
+  const blocked = header('S');
+
+  coordinator.acceptAttempt(cancelled);
+  assert.throws(
+    () => coordinator.acceptAttempt(timedOut),
+    { code: 'attempt_coordinator_capacity_exceeded' }
+  );
+
+  coordinator.cancelAttempt(cancelled.attempt_ref);
+  assert.doesNotThrow(() => coordinator.acceptAttempt(timedOut));
+  coordinator.timeoutAttempt(timedOut.attempt_ref);
+  assert.doesNotThrow(() => coordinator.acceptAttempt(completed));
+
+  const receipts = completedReceipts(completed);
+  for (const receipt of receipts.slice(1)) {
+    coordinator.appendReceipt(completed.attempt_ref, receipt);
+  }
+  coordinator.commitTerminal(completed.attempt_ref, createTerminalEnvelope({
+    header: completed,
+    receipts,
+    outcome: 'success',
+    evidenceComplete: true
+  }));
+
+  assert.doesNotThrow(() => coordinator.acceptAttempt(active));
+  assert.throws(
+    () => coordinator.acceptAttempt(blocked),
+    { code: 'attempt_coordinator_capacity_exceeded' }
+  );
+  assert.equal(
+    coordinator.protocol(cancelled.attempt_ref).terminal.reason_code,
+    'attempt_cancelled'
+  );
+  assert.equal(
+    coordinator.protocol(timedOut.attempt_ref).terminal.reason_code,
+    'attempt_timeout'
+  );
+  assert.equal(
+    coordinator.protocol(completed.attempt_ref).terminal.outcome,
+    'success'
+  );
+});
+
 test('Edge terminal CAS is first-terminal-wins for timeout against late completion', () => {
   const value = header('G');
   const observer = createGovernedReadAttemptObserver();
