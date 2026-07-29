@@ -17,15 +17,15 @@ deploy, cutover, complete-V8, or readiness claim.
 
 `activeTask: CM-2159`
 
-`activePhase: r5_o_selected_diary_hydrator_delivery`
+`activePhase: r5_o_schema_v6_source_manifest_rebind_delivery`
 
-The schema-v6 canonical endpoint transition completed under its exact
-authorization. The first separately authorized R5-O attempt then failed closed
-because the production shim had no selected-diary hydrator. `CM-2159` now owns
-the source/test delivery of that missing wiring and remains active until a new
-exact-authorized R5-O proof and governance closeout succeed. This declaration
-does not authorize a runtime probe, provider call, private configuration
-access, lifecycle action, or profile replacement.
+PR `#70` delivered the production selected-diary hydrator. The next exact
+R5-O authorization failed closed before lifecycle or memory access because the
+existing schema-v6 profile could not rebind its changed runtime-source manifest.
+`CM-2159` now owns a fail-closed same-schema rebind path and remains active until
+a new exact-authorized R5-O proof and governance closeout succeed. This
+declaration does not authorize a runtime probe, provider call, private
+configuration access, lifecycle action, or profile replacement.
 
 ## Last Accepted Product Baseline
 
@@ -43,15 +43,15 @@ future task.
 ## Open Blockers
 
 - `r5_h_matrix_incomplete` [open]: The R5-H private ChatGPT dogfood matrix is incomplete.
-- `r5_o_private_exact_head_runtime_unverified` [open]: The first authorized R5-O attempt failed closed at native vector-receipt validation; no successful post-hydrator exact-head proof exists.
+- `r5_o_private_exact_head_runtime_unverified` [open]: Post-hydrator R5-O remained unverified after schema-v6 source-manifest preflight failed closed.
 - `fresh_non_empty_task_context_relevance_unproven` [open]: Fresh non-empty task-context recall relevance has not been proven.
 
 ## Next Safe Action
 
-Re-query live delivery facts. Require the production selected-diary hydrator
-source on canonical `main` with successful CI before preparing one new,
-single-use R5-O P3 authorization package bound to that exact baseline and the
-existing low-disclosure boundaries. Do not start the stack, read private
+Deliver the explicit schema-v6-to-v6 source-manifest rebind path through PR and
+successful merged-main CI. Then prepare one new single-use R5-O P3 package that
+authorizes the stopped-stack rebind and one bounded private read against that
+exact baseline. Do not start the stack, replace its profile, read private
 memory, or retry R5-O from this committed declaration alone.
 
 ## Authority Boundaries
@@ -93,10 +93,10 @@ Last completed: `CM-2158 / CMV-2243`.
 - The first `CODEX_MEMORY_R5O_PRIVATE_EXACT_HEAD_VERIFY_001` attempt resolved
   its governed context but the single search failed closed with invalid native
   vector-receipt evidence. It did not establish R5-O success or readiness.
-- The production selected-diary hydrator source now uses an exact, read-only
-  primary SQLite projection into the isolated store with fail-closed
-  contamination and stale-state checks. Source tests are not private runtime
-  proof; live delivery and CI facts must be queried fresh.
+- PR `#70` merged the exact read-only selected-diary hydrator as `bd21ae50...`;
+  merged-main CI `30422647557` passed. Authorization `_002` then stopped at
+  schema-v6 source-manifest mismatch with zero provider/native/memory calls.
+  No successful post-hydrator private runtime proof exists.
 - PR `#65` delivered the governed full-stack lifecycle controller and merged as
   `48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e`.
 - Under the exact `CODEX_MEMORY_V5_TRANSITION_001` authorization, the transition

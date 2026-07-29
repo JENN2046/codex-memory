@@ -53,7 +53,7 @@
     {
       "id": "r5_o_private_exact_head_runtime_unverified",
       "status": "open",
-      "summary": "The first authorized R5-O attempt failed closed at native vector-receipt validation; no successful post-hydrator exact-head proof exists."
+      "summary": "Post-hydrator R5-O remained unverified after schema-v6 source-manifest preflight failed closed."
     },
     {
       "id": "fresh_non_empty_task_context_relevance_unproven",
