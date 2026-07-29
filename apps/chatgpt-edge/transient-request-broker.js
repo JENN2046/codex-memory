@@ -1,6 +1,15 @@
 'use strict';
 
 const {
+  GOVERNED_READ_ATTEMPT_LIMITS,
+  aggregateAttemptCounters,
+  createGovernedReadAttemptProtocol,
+  createStageReceipt,
+  createTerminalEnvelope,
+  validateAttemptCounterRelationships,
+  validateAttemptHeader,
+  validateStageReceipt,
+  validateTerminalEnvelope,
   InMemoryReplayGuard,
   createOpaqueId,
   reject
@@ -356,7 +365,311 @@ function createTransientRequestBroker({
   });
 }
 
+function createGovernedReadAttemptCoordinator({
+  clock = () => new Date(),
+  maxAttempts = 64,
+  maxRetainedAttempts = Math.max(maxAttempts, 256),
+  eventSink,
+  eventComponent = 'transient_edge_broker'
+} = {}) {
+  if (typeof clock !== 'function') reject('attempt_coordinator_clock_invalid');
+  if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 1024) {
+    reject('attempt_coordinator_capacity_invalid');
+  }
+  if (!Number.isInteger(maxRetainedAttempts) ||
+      maxRetainedAttempts < maxAttempts ||
+      maxRetainedAttempts > 4096) {
+    reject('attempt_coordinator_retention_capacity_invalid');
+  }
+  if (eventSink !== undefined && typeof eventSink !== 'function') {
+    reject('attempt_coordinator_event_sink_invalid');
+  }
+  if (typeof eventComponent !== 'string' ||
+      !/^[a-z][a-z0-9_]{0,79}$/u.test(eventComponent)) {
+    reject('attempt_coordinator_event_component_invalid');
+  }
+
+  const attempts = new Map();
+  let activeAttempts = 0;
+  let eventDispatchDepth = 0;
+
+  function nowMs() {
+    const value = clock();
+    const milliseconds = value instanceof Date
+      ? value.getTime()
+      : new Date(value).getTime();
+    if (!Number.isFinite(milliseconds)) reject('attempt_coordinator_clock_invalid');
+    return milliseconds;
+  }
+
+  function deadlineReached(record) {
+    return Date.parse(record.header.deadline_at) <= nowMs();
+  }
+
+  function pruneExpiredTerminalAttempts(currentMs) {
+    for (const [attemptRef, record] of attempts) {
+      if (record.terminal &&
+          Number.isFinite(record.purge_after_ms) &&
+          record.purge_after_ms <= currentMs) {
+        attempts.delete(attemptRef);
+      }
+    }
+  }
+
+  function emit(event, payload = {}) {
+    if (!eventSink) return;
+    eventDispatchDepth += 1;
+    try {
+      const pending = eventSink(Object.freeze({
+        component: eventComponent,
+        event,
+        ...payload
+      }));
+      if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+    } catch {
+      // Protocol observation is independent from the coordinator's CAS state.
+    } finally {
+      eventDispatchDepth -= 1;
+    }
+  }
+
+  function guardMutation(operation) {
+    return (...args) => {
+      if (eventDispatchDepth > 0) {
+        reject('attempt_coordinator_reentrant_mutation');
+      }
+      return operation(...args);
+    };
+  }
+
+  function requireAttempt(attemptRef) {
+    const record = attempts.get(attemptRef);
+    if (!record) reject('attempt_not_found');
+    return record;
+  }
+
+  function acceptAttempt(header) {
+    validateAttemptHeader(header);
+    const acceptedAtMs = nowMs();
+    pruneExpiredTerminalAttempts(acceptedAtMs);
+    if (Date.parse(header.created_at) > acceptedAtMs) {
+      reject('attempt_created_at_in_future');
+    }
+    if (Date.parse(header.deadline_at) <= acceptedAtMs) {
+      reject('attempt_deadline_expired');
+    }
+    if (attempts.has(header.attempt_ref)) reject('attempt_ref_replay');
+    if (activeAttempts >= maxAttempts) {
+      reject('attempt_coordinator_capacity_exceeded');
+    }
+    if (attempts.size >= maxRetainedAttempts) {
+      reject('attempt_coordinator_retention_capacity_exceeded');
+    }
+    const acceptedHeader = structuredClone(header);
+    const created = createStageReceipt({
+      header: acceptedHeader,
+      receipts: [],
+      stage: 'CREATED'
+    });
+    const record = {
+      header: acceptedHeader,
+      receipts: [structuredClone(created)],
+      terminal: null,
+      purge_after_ms: null
+    };
+    attempts.set(header.attempt_ref, record);
+    activeAttempts += 1;
+    emit('attempt_accepted', { header: structuredClone(acceptedHeader) });
+
+    emit('attempt_receipt_appended', {
+      attempt_ref: header.attempt_ref,
+      receipt: structuredClone(created)
+    });
+    return Object.freeze({
+      attempt_ref: header.attempt_ref,
+      header_digest: created.previous_digest,
+      created_receipt_digest: created.receipt_digest
+    });
+  }
+
+  function appendReceipt(attemptRef, receipt) {
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) reject('attempt_terminal_already_committed');
+    if (deadlineReached(record)) {
+      commitCoordinatorFailure(attemptRef, 'attempt_timeout');
+      reject('attempt_receipt_after_deadline');
+    }
+    validateStageReceipt(receipt, {
+      header: record.header,
+      receipts: record.receipts
+    });
+    const prospectiveReceipts = [
+      ...record.receipts,
+      receipt
+    ];
+    validateAttemptCounterRelationships(
+      aggregateAttemptCounters(prospectiveReceipts)
+    );
+    if (receipt.outcome === 'failed') {
+      createTerminalEnvelope({
+        header: record.header,
+        receipts: prospectiveReceipts,
+        outcome: 'failure',
+        reasonCode: receipt.reason_code,
+        evidenceComplete: false,
+        failureOrigin: receipt.origin
+      });
+    }
+    record.receipts.push(structuredClone(receipt));
+    emit('attempt_receipt_appended', {
+      attempt_ref: attemptRef,
+      receipt: structuredClone(receipt)
+    });
+    return Object.freeze({
+      attempt_ref: attemptRef,
+      sequence: receipt.sequence,
+      receipt_digest: receipt.receipt_digest
+    });
+  }
+
+  function rejectTerminalCandidate(attemptRef) {
+    emit('attempt_terminal_rejected', {
+      attempt_ref: attemptRef,
+      rejection_code: 'attempt_terminal_already_committed'
+    });
+    reject('attempt_terminal_already_committed');
+  }
+
+  function acceptTerminalCandidate(attemptRef, record, terminal) {
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
+    validateTerminalEnvelope(terminal, {
+      header: record.header,
+      receipts: record.receipts
+    });
+    const purgeAfterMs = Math.max(
+      Date.parse(record.header.deadline_at),
+      nowMs() + GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000
+    );
+    record.terminal = structuredClone(terminal);
+    record.purge_after_ms = purgeAfterMs;
+    activeAttempts -= 1;
+    emit('attempt_terminal_committed', {
+      attempt_ref: attemptRef,
+      terminal: structuredClone(terminal)
+    });
+    return Object.freeze({
+      attempt_ref: attemptRef,
+      outcome: terminal.outcome,
+      terminal_digest: terminal.terminal_digest,
+      accepted: true
+    });
+  }
+
+  function commitCoordinatorFailure(attemptRef, reasonCode) {
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
+    const lastReceipt = record.receipts.at(-1) || null;
+    const failedReceipt = lastReceipt?.outcome === 'failed'
+      ? lastReceipt
+      : null;
+    const terminal = createTerminalEnvelope({
+      header: record.header,
+      receipts: record.receipts,
+      outcome: 'failure',
+      reasonCode: failedReceipt?.reason_code || reasonCode,
+      evidenceComplete: false,
+      failureOrigin: failedReceipt?.origin || 'edge_broker'
+    });
+    return acceptTerminalCandidate(attemptRef, record, terminal);
+  }
+
+  function commitTerminal(attemptRef, terminal) {
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
+    if (deadlineReached(record)) {
+      commitCoordinatorFailure(attemptRef, 'attempt_timeout');
+      rejectTerminalCandidate(attemptRef);
+    }
+    return acceptTerminalCandidate(attemptRef, record, terminal);
+  }
+
+  function timeoutAttempt(attemptRef) {
+    return commitCoordinatorFailure(attemptRef, 'attempt_timeout');
+  }
+
+  function cancelAttempt(attemptRef) {
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
+    return commitCoordinatorFailure(
+      attemptRef,
+      deadlineReached(record) ? 'attempt_timeout' : 'attempt_cancelled'
+    );
+  }
+
+  function expireDueAttempts() {
+    const currentMs = nowMs();
+    let committed = 0;
+    for (const [attemptRef, record] of attempts) {
+      if (record.terminal || Date.parse(record.header.deadline_at) > currentMs) continue;
+      timeoutAttempt(attemptRef);
+      committed += 1;
+    }
+    return committed;
+  }
+
+  function snapshot(attemptRef) {
+    const record = requireAttempt(attemptRef);
+    const lastReceipt = record.receipts.at(-1) || null;
+    return Object.freeze({
+      attempt_ref: attemptRef,
+      receipt_count: record.receipts.length,
+      last_stage: lastReceipt?.stage || null,
+      terminal_committed: record.terminal !== null,
+      terminal_outcome: record.terminal?.outcome || null,
+      in_memory_only: true
+    });
+  }
+
+  function protocol(attemptRef) {
+    const record = requireAttempt(attemptRef);
+    if (!record.terminal) reject('attempt_terminal_missing');
+    return createGovernedReadAttemptProtocol({
+      header: record.header,
+      receipts: record.receipts,
+      terminal: record.terminal
+    });
+  }
+
+  function reportCoordinatorLoss() {
+    let missing = 0;
+    for (const [attemptRef, record] of attempts) {
+      if (record.terminal) continue;
+      emit('attempt_terminal_missing', { attempt_ref: attemptRef });
+      missing += 1;
+    }
+    attempts.clear();
+    activeAttempts = 0;
+    return Object.freeze({
+      active_attempts_lost: missing,
+      terminals_fabricated: 0
+    });
+  }
+
+  return Object.freeze({
+    acceptAttempt: guardMutation(acceptAttempt),
+    appendReceipt: guardMutation(appendReceipt),
+    cancelAttempt: guardMutation(cancelAttempt),
+    commitTerminal: guardMutation(commitTerminal),
+    expireDueAttempts: guardMutation(expireDueAttempts),
+    protocol,
+    reportCoordinatorLoss: guardMutation(reportCoordinatorLoss),
+    snapshot,
+    timeoutAttempt: guardMutation(timeoutAttempt)
+  });
+}
+
 module.exports = {
   TERMINAL_STATES,
+  createGovernedReadAttemptCoordinator,
   createTransientRequestBroker
 };

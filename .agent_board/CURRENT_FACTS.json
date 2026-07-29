@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
   "factsMode": "committed_status_snapshot",
-  "updatedAt": "2026-07-29",
+  "updatedAt": "2026-07-30",
   "baseBranch": "main",
   "status": {
     "project": "NOT_READY_BLOCKED",
@@ -53,7 +53,7 @@
     {
       "id": "r5_o_private_exact_head_runtime_unverified",
       "status": "open",
-      "summary": "R5-O _003 reached exact-head runtime acceptance but its single search failed closed before a receipt-bound result."
+      "summary": "R5-O _004 failed closed without an acceptable governed-read terminal envelope; no private exact-head result is established."
     },
     {
       "id": "fresh_non_empty_task_context_relevance_unproven",
