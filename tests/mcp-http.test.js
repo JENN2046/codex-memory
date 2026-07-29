@@ -860,6 +860,9 @@ test('HTTP MCP policy gate summary is bounded and omits provider, path, and toke
       exposeWriteMcpTools: false,
       allowExternalProvider: false,
       mcpPublicToolSurface: 'read_only',
+      governedMcpVcpNativeBridgeGateMode: 'observe',
+      governedMcpVcpNativeReadDelegationMode:
+        'primary_with_local_fallback',
       governedMcpVcpNativeWriteDelegationMode: 'off',
       embeddingUrl: 'https://provider.example.test/v1/embeddings',
       embeddingModel: 'private-model',
@@ -892,13 +895,17 @@ test('HTTP MCP policy gate summary is bounded and omits provider, path, and toke
 
   assert.deepEqual(Object.keys(summary).sort(), [
     'activeMemoryAutoRebuildEnabled',
+    'bridgeGateMode',
     'candidateCacheEnabled',
     'controlledMutationToolsExposed',
     'externalProviderAllowed',
     'governedNativeBridgeWarnings',
     'lifecycleReadPolicyEnabled',
     'mcpPublicToolSurface',
+    'nativeReadDelegationMode',
     'nativeWriteDelegationMode',
+    'publicToolCount',
+    'publicToolNames',
     'securityProfile',
     'shadowAutoRebuildEnabled',
     'shadowWritesEnabled',
@@ -909,6 +916,7 @@ test('HTTP MCP policy gate summary is bounded and omits provider, path, and toke
   ]);
   assert.deepEqual(summary, {
     activeMemoryAutoRebuildEnabled: false,
+    bridgeGateMode: 'observe',
     candidateCacheEnabled: false,
     controlledMutationToolsExposed: false,
     securityProfile: 'hardened',
@@ -934,7 +942,16 @@ test('HTTP MCP policy gate summary is bounded and omits provider, path, and toke
       }
     ],
     mcpPublicToolSurface: 'read_only',
+    nativeReadDelegationMode: 'primary_with_local_fallback',
     nativeWriteDelegationMode: 'off',
+    publicToolCount: 5,
+    publicToolNames: [
+      'audit_memory',
+      'memory_overview',
+      'prepare_memory_context',
+      'propose_memory_delta',
+      'search_memory'
+    ],
     shadowAutoRebuildEnabled: false,
     shadowWritesEnabled: false,
     vectorIndexEnabled: false,
@@ -979,13 +996,17 @@ test('HTTP MCP bearer health returns full bounded payload with valid token only'
     assert.equal(healthPayload.auth.warning, null);
     assert.deepEqual(Object.keys(healthPayload.policyGates).sort(), [
       'activeMemoryAutoRebuildEnabled',
+      'bridgeGateMode',
       'candidateCacheEnabled',
       'controlledMutationToolsExposed',
       'externalProviderAllowed',
       'governedNativeBridgeWarnings',
       'lifecycleReadPolicyEnabled',
       'mcpPublicToolSurface',
+      'nativeReadDelegationMode',
       'nativeWriteDelegationMode',
+      'publicToolCount',
+      'publicToolNames',
       'securityProfile',
       'shadowAutoRebuildEnabled',
       'shadowWritesEnabled',
@@ -998,6 +1019,7 @@ test('HTTP MCP bearer health returns full bounded payload with valid token only'
       healthPayload.policyGates.activeMemoryAutoRebuildEnabled,
       false
     );
+    assert.equal(healthPayload.policyGates.bridgeGateMode, 'off');
     assert.equal(healthPayload.policyGates.candidateCacheEnabled, false);
     assert.equal(
       healthPayload.policyGates.controlledMutationToolsExposed,
@@ -1010,7 +1032,19 @@ test('HTTP MCP bearer health returns full bounded payload with valid token only'
     assert.equal(healthPayload.policyGates.externalProviderAllowed, false);
     assert.deepEqual(healthPayload.policyGates.governedNativeBridgeWarnings, []);
     assert.equal(healthPayload.policyGates.mcpPublicToolSurface, 'read_only');
+    assert.equal(
+      healthPayload.policyGates.nativeReadDelegationMode,
+      'off'
+    );
     assert.equal(healthPayload.policyGates.nativeWriteDelegationMode, 'off');
+    assert.equal(healthPayload.policyGates.publicToolCount, 5);
+    assert.deepEqual(healthPayload.policyGates.publicToolNames, [
+      'audit_memory',
+      'memory_overview',
+      'prepare_memory_context',
+      'propose_memory_delta',
+      'search_memory'
+    ]);
     assert.equal(healthPayload.policyGates.shadowAutoRebuildEnabled, false);
     assert.equal(healthPayload.policyGates.shadowWritesEnabled, false);
     assert.equal(healthPayload.policyGates.vectorIndexEnabled, false);

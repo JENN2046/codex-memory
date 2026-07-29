@@ -4,6 +4,11 @@ This document is the historical runtime ledger for `codex-memory`: governance
 details, proof notes, runbooks, compatibility notes, and old integration
 records that used to live in the project README.
 
+It is not a current runtime or lifecycle authority. Start current work from
+`CURRENT_STATE.md`; use `docs/CODEX_MEMORY_FULL_STACK_CONTROL.md` for the
+schema-v6 controller contract. Port, tool-surface, authentication, and policy
+claims below are historical point-in-time evidence unless revalidated there.
+
 `codex-memory` 当前正在从独立 `vcp_codex_memory` 实现路线，转入
 VCPToolBox-native-first governed memory bridge 路线。
 

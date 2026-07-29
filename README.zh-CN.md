@@ -2,6 +2,10 @@
 
 [English summary](README.md)
 
+默认工作入口是 [CURRENT_STATE.md](CURRENT_STATE.md)。它是唯一默认的当前
+工作权威；本说明书中的历史运行记录、观察结论和兼容命令不能替代 fresh
+Git、GitHub 与受授权的低披露 runtime 查询。
+
 `codex-memory` 是 Codex 与 Claude 访问 VCPToolBox 原生记忆的受治理 MCP 桥。
 
 它的核心不是重做一套记忆智能，而是把 Codex / Claude 对原生记忆的访问放进治理边界里：
@@ -80,10 +84,11 @@ Edge/Relay/Governance 注入边界和零记忆 synthetic harness。它不包含�
 listener、OAuth 配置、公共工具注册、provider/VCP 调用或真实 memory read；
 下一阶段是临时 loopback/UDS 的 R4-C 合成集成。
 
-## 当前受治理候选路径
+## Canonical Codex 客户端目标
 
-当前候选路径是 `7625` 上的 governed MCP 服务。它仍需要 fresh live proof，
-不应据此宣称 production、release 或正式 cutover ready：
+schema-v6 controller 将 `7625` 定义为 canonical Codex MCP endpoint。实际
+运行态接管仍须在 exact HEAD 上经过单独授权并完成低披露验证；源码合同本身
+不证明服务当前可达，也不构成 production、release 或 cutover ready：
 
 ```text
 Codex 或 Claude
@@ -106,22 +111,28 @@ http://127.0.0.1:3000
 - Codex client dogfood 已调用 `search_memory`
 - Codex client dogfood 已调用 `memory_overview`
 - Codex client dogfood 已调用 `audit_memory`
-- `7625` 已作为新 runtime target 进入真实使用观察期
+- 独立 `7625` runtime 曾进入真实使用观察；该历史观察不等于 schema-v6
+  controller 已正式接管
 
-当前 runtime 状态：
+当前源码合同：
 
 - Codex client surface：read-only
 - server exposed MCP tools：默认 read-only + proposal-only，列出 `search_memory` / `memory_overview` / `audit_memory` / `prepare_memory_context` / `propose_memory_delta`
 - adapter-level `tools/call`：默认拒绝未暴露工具，即使 core 内部仍保留对应 handler
 - controlled mutation tools：默认隐藏；只有 operator 显式配置后才暴露
 - native write proof：不属于默认 runtime
-- 旧 `7605`：rollback only
-- 新 `7625`：观察中；fresh gates 通过前不宣称正式替换完成
+- schema-v4/v5 profile：只在 `7605` 做历史兼容 status 与受控 stop
+- schema-v6 profile：由 lifecycle controller 在 `7625` 提供 canonical client
+  role
+- 独立旧 supervisor：不得 start/restart `7625`
 
-仍然保留的回滚路径：
+兼容和回滚边界：
 
-- 旧 `7605` 服务暂时保留
-- `7625` 稳定观察后，再决定是否正式替换旧服务和清理旧配置
+- `7605` 只保留为 v4/v5 transition/rollback role，不是 canonical client target
+- v6 `start` 遇到未知或独立 `7625` listener 时 fail closed，不会杀死、接管
+  或复用未知进程
+- `7625` 是否已正式接管必须由 schema-v6 profile、受管进程身份、bearer
+  authentication、精确五工具和 hardened policy 在同一证据时间点共同证明
 
 ## 支持的操作系统形态
 
@@ -167,45 +178,36 @@ npm install
 
 ## WSL-local 受治理路径（operator 操作）
 
-启动 governed MCP 服务和 native shim：
+schema-v6 canonical 生命周期只通过 controller 管理。以下真实命令涉及
+owner-only profile、runtime config/secret identity 和服务生命周期，执行前
+必须具备当前、精确的 P3 授权：
 
 ```bash
-npm run --silent vcp-native:codex-mcp:wsl-newapi:start
+node scripts/codex-memory-stack.js status
+node scripts/codex-memory-stack.js start
+node scripts/codex-memory-stack.js stop
+node scripts/codex-memory-stack.js adopt-running --replace
 ```
 
-查看状态：
-
-```bash
-npm run --silent vcp-native:codex-mcp:wsl-newapi:status
-```
-
-停止服务：
-
-```bash
-npm run --silent vcp-native:codex-mcp:wsl-newapi:stop
-```
-
-这个 managed service 默认会启动或检查：
+controller 管理或核对：
 
 - VCP native shim：`http://127.0.0.1:7615/mcp/vcp-native`
-- Codex MCP：`http://127.0.0.1:7625/mcp/codex-memory`
+- schema-v6 canonical Codex MCP：`http://127.0.0.1:7625/mcp/codex-memory`
+- schema-v4/v5 compatibility Codex MCP：`http://127.0.0.1:7605/mcp/codex-memory`
 - WSL-local NewAPI：`http://127.0.0.1:3000`
+- Governance UDS、Local Recall Relay、observer UDS 与 retained ChatGPT Edge
 
-运行态目录默认是：
+旧 `vcp-native:codex-mcp:wsl-newapi:*` supervisor 仅保留 historical
+compatibility/rollback 的 status/controlled-stop 能力；它会拒绝
+start/restart canonical `7625`，也不是 schema-v6 生命周期权威。
 
-```text
-/home/jenn/AGENTS_OS_Workspace/runtime/codex-memory-vcp-native-mcp
-```
-
-里面包含 pid、日志、数据目录和 HTTP bearer token 文件。不要打印、提交或复制 token 内容到日志里。
-
-## 常用环境变量
+## 历史 compatibility helper 环境变量
 
 | 变量 | 默认值 | 用途 |
 | --- | --- | --- |
-| `CODEX_MEMORY_VCP_NATIVE_SERVICE_DIR` | `/home/jenn/AGENTS_OS_Workspace/runtime/codex-memory-vcp-native-mcp` | managed service 运行态目录 |
-| `CODEX_MEMORY_HTTP_HOST` | `127.0.0.1` | Codex MCP 监听 host |
-| `CODEX_MEMORY_HTTP_PORT` | `7625` | Codex MCP 监听 port |
+| `CODEX_MEMORY_VCP_NATIVE_SERVICE_DIR` | compatibility runtime dir | 旧 supervisor 的运行态目录 |
+| `CODEX_MEMORY_HTTP_HOST` | `127.0.0.1` | 旧 helper 的 Codex MCP 监听 host |
+| `CODEX_MEMORY_HTTP_PORT` | `7625`（会拒绝启动） | 旧 helper 仅允许显式 `7605` compatibility port |
 | `SHIM_HOST` | `127.0.0.1` | native shim 监听 host |
 | `SHIM_PORT` | `7615` | native shim 监听 port |
 | `NEWAPI_WSL_DIR` | `/home/jenn/new-api-wsl` | WSL-local NewAPI docker compose 目录 |
@@ -216,7 +218,11 @@ npm run --silent vcp-native:codex-mcp:wsl-newapi:stop
 | `EVIDENCE_OUTPUT` | `/tmp/...json` | proof evidence 输出路径 |
 | `QUERY` | 内置 proof query | proof 查询文本 |
 
-如果修改了 `SHIM_HOST` 或 `SHIM_PORT`，managed service 会把正确的 shim endpoint 写入 `CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT`，Codex MCP 进程会使用这个配置键。
+旧 helper 的 start/restart 只接受精确 loopback `7605` MCP + `7615` shim
+拓扑；任一角色使用 `7625` 或非 loopback host 都会 fail closed。这些变量不是
+schema-v6 controller 的配置接口。controller 从 owner-only profile 和受管
+environment reference 构造 allowlisted child environment，并强制 loopback、
+bearer auth、hardened/strict/primary 与 write-free policy。
 
 ## Codex 客户端配置
 
@@ -369,7 +375,8 @@ agent 不能因为“访问自己的记忆”就读取完整记忆。它仍然�
 | `validate_memory` / `tombstone_memory` / `supersede_memory` | 默认不暴露于 MCP server surface | operator 显式配置后才可作为受控 mutation preflight 暴露 |
 | native write delegation | 已实现但默认不开放 | 需要 explicit operator approval、rollback posture 和 operator surface |
 | tombstone / supersede | 受控 mutation | 必须显式 `dry_run === false` 且 `confirm === true` 才能委托真实写 |
-| 旧 `7605` | 保留观察 | rollback target，不是当前推荐新默认 |
+| `7605` compatibility role | 受控保留 | 仅用于 v4/v5 status、stop 与 rollback，不是 canonical client target |
+| `7625` canonical role | schema-v6 绑定 | 只有 controller acceptance 与 fresh runtime evidence 才能证明已接管 |
 
 可选 operator surface：
 
@@ -514,7 +521,7 @@ Windows 路径不能直接写成 WSL 路径。需要使用 `/mnt/c/...` 或把�
 检查：
 
 ```bash
-npm run --silent vcp-native:codex-mcp:wsl-newapi:status
+node scripts/codex-memory-stack.js status
 ```
 
 然后确认：
@@ -573,15 +580,17 @@ bridge 会拒绝这次 read delegation。read_allowed 不能产生 native write 
 
 当前建议：
 
-1. 默认使用新 `7625` runtime。
-2. 保留旧 `7605` 一段观察窗口。
-3. 观察真实 Codex 使用里的 read 成功率、fallback、audit receipt 和 provider 稳定性。
-4. 通过后再正式替换旧服务配置。
-5. 再决定是否删除旧分支或旧服务配置。
+1. 在 exact HEAD 与当前授权下检查 v5 `7605` 和独立 `7625` 的低披露身份。
+2. 对已验证的旧 listener 做受控停止，不盲目复用或 kill 未知进程。
+3. 由 schema-v6 controller 在 `7625` 启动完整受管栈。
+4. 执行 `adopt-running --replace`，再核对 canonical endpoint、认证、精确五工具
+   和 hardened policy。
+5. 完成真实 Codex app-server bootstrap 后，再进入后续观察与产品验证。
 
 回滚原则：
 
-- 不删除旧 `7605`，直到 `7625` 真实使用稳定
+- `7605` 只作为有边界的 compatibility/rollback role，不与 `7625` 双 canonical
+- 未知 `7625` listener 必须 fail closed
 - 不把 fixture proof 当 production proof
 - 不把 read proof 当 write proof
 - 不在没有 operator approval 的情况下打开 native write

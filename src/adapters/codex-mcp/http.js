@@ -3,7 +3,11 @@
 const http = require('node:http');
 const crypto = require('node:crypto');
 
-const { CodexMemoryMcpServer, jsonRpcError } = require('./server');
+const {
+  CodexMemoryMcpServer,
+  getPublicToolDefinitions,
+  jsonRpcError
+} = require('./server');
 const {
   buildRecordMemoryTrustedExecutionContext
 } = require('../../core/RecordMemoryTrustedExecutionContext');
@@ -260,9 +264,16 @@ function buildRuntimeFreshness(freshness = {}) {
 
 function buildPolicyGateSummary(app) {
   const config = app?.config || {};
+  const publicToolNames = getPublicToolDefinitions(config)
+    .map(tool => tool.name)
+    .sort();
   return {
     activeMemoryAutoRebuildEnabled:
       config.autoRebuildActiveMemoryOnStart === true,
+    bridgeGateMode:
+      typeof config.governedMcpVcpNativeBridgeGateMode === 'string'
+        ? config.governedMcpVcpNativeBridgeGateMode
+        : 'unknown',
     candidateCacheEnabled: config.enableCandidateCache === true,
     controlledMutationToolsExposed:
       config.exposeControlledMutationMcpTools === true,
@@ -277,10 +288,16 @@ function buildPolicyGateSummary(app) {
     mcpPublicToolSurface: typeof config.mcpPublicToolSurface === 'string'
       ? config.mcpPublicToolSurface
       : 'unknown',
+    nativeReadDelegationMode:
+      typeof config.governedMcpVcpNativeReadDelegationMode === 'string'
+        ? config.governedMcpVcpNativeReadDelegationMode
+        : 'unknown',
     nativeWriteDelegationMode:
       typeof config.governedMcpVcpNativeWriteDelegationMode === 'string'
         ? config.governedMcpVcpNativeWriteDelegationMode
         : 'unknown',
+    publicToolCount: publicToolNames.length,
+    publicToolNames,
     shadowAutoRebuildEnabled: config.autoRebuildShadowOnStart === true,
     shadowWritesEnabled: config.enableShadowWrites === true,
     vectorIndexEnabled: config.enableVectorIndex === true,

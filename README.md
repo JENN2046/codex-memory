@@ -198,7 +198,7 @@ write, native write, durable mutation, public MCP expansion, provider/API call,
 real/private memory read, tag, release, deploy, cutover, push, or readiness
 action.
 
-Current active path:
+Canonical Codex client target:
 
 ```text
 Codex or Claude
@@ -221,8 +221,12 @@ called:
 
 Those tools are currently exposed as read-only. `prepare_memory_context` is
 also exposed as a default read-only context package tool, and
-`propose_memory_delta` is exposed as a default proposal-only tool. The legacy
-`7605` service is kept as rollback while `7625` is observed in real use.
+`propose_memory_delta` is exposed as a default proposal-only tool. The
+schema-v6 lifecycle controller binds `7625` as the canonical client role.
+Schema-v4/v5 status and controlled stop retain `7605` as the historical
+rollback role until the separately authorized v6 transition completes. A
+healthy v5 controller status on `7605` is not evidence that an independently
+launched `7625` service is reachable.
 
 The governed contract includes both Codex and Claude. Diary-partition v1 has a
 low-disclosure Stage 3B live proof for both clients across private, project,
@@ -259,12 +263,20 @@ and [Stage 4B closeout](docs/DIARY_SCOPE_STAGE4B_CLOSEOUT.md).
 
 ## Quick Start
 
-Start or inspect the managed WSL-local native bridge:
+The governed lifecycle controller is the only schema-v6 canonical entrypoint.
+Its real status/start/stop/adoption commands require the applicable current P3
+authority:
 
 ```bash
-npm run --silent vcp-native:codex-mcp:wsl-newapi:start
-npm run --silent vcp-native:codex-mcp:wsl-newapi:status
+node scripts/codex-memory-stack.js status
+node scripts/codex-memory-stack.js start
 ```
+
+The older `vcp-native:codex-mcp:wsl-newapi:*` supervisor remains a historical
+compatibility/rollback surface. It is not policy-equivalent to the schema-v6
+controller and must not be treated as the canonical lifecycle authority. Its
+start/restart path accepts only the exact loopback `7605` MCP plus `7615` shim
+compatibility topology and refuses either role on canonical `7625`.
 
 Run the production-provider read proof:
 
@@ -375,11 +387,15 @@ rechecked with `validateGovernedVcpNativeAcceptanceEvidenceArtifact`.
 
 低披露要求：不写 endpoint、token、raw request/response、raw memory、raw audit 或 output path；不会返回 rollback plan reference 或 raw rollback plan。
 
-Stop the managed bridge:
+Historical compatibility stop entrypoint:
 
 ```bash
 npm run --silent vcp-native:codex-mcp:wsl-newapi:stop
 ```
+
+Do not use this command against a schema-v6 controller-owned canonical
+listener. A real handoff or rollback requires exact process-identity preflight
+and current lifecycle authorization.
 
 ## Codex MCP Config
 
@@ -412,8 +428,10 @@ approval_mode = "approve"
 approval_mode = "approve"
 ```
 
-`CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` should be loaded from the managed runtime
-token file. Do not print or commit token material.
+`CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN` must resolve to the same owner-controlled
+secret identity used by the schema-v6 canonical listener. Token equivalence is
+an execution-time precondition and must be proved without printing or copying
+token material.
 
 ## Governance Model
 

@@ -2,6 +2,13 @@
 
 Status: Phase H no-apply runbook and acceptance preflight.
 
+Historical compatibility notice: this Phase H fixture is not the current
+operational authority. Its frozen `7605` templates and three-tool assumptions
+remain only for reproducing the historical acceptance preflight. New runtime
+work must enter through `CURRENT_STATE.md` and use the schema-bound endpoint
+contract in `docs/CODEX_MEMORY_FULL_STACK_CONTROL.md`; schema v6 assigns the
+canonical Codex client role to controller-owned `7625`.
+
 This document describes the client integration path for `codex-memory` without
 executing it. It is a local source/test slice, not a runtime acceptance record.
 
