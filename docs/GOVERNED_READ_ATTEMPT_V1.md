@@ -147,6 +147,8 @@ failure, zero primary writes, and zero fallback attempts.
 terminal coordinator. Its terminal commit is a synchronous first-terminal-wins
 CAS:
 
+- admission rejects a header created after the coordinator's current clock
+  sample, so a future-dated TTL cannot occupy active capacity;
 - the first valid downstream candidate, timeout, or cancellation commits;
 - every later candidate is rejected as
   `attempt_terminal_already_committed`, even if it is a late completion;

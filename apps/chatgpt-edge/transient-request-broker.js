@@ -420,7 +420,13 @@ function createGovernedReadAttemptCoordinator({
 
   function acceptAttempt(header) {
     validateAttemptHeader(header);
-    if (Date.parse(header.deadline_at) <= nowMs()) reject('attempt_deadline_expired');
+    const acceptedAtMs = nowMs();
+    if (Date.parse(header.created_at) > acceptedAtMs) {
+      reject('attempt_created_at_in_future');
+    }
+    if (Date.parse(header.deadline_at) <= acceptedAtMs) {
+      reject('attempt_deadline_expired');
+    }
     if (attempts.has(header.attempt_ref)) reject('attempt_ref_replay');
     if (activeAttempts >= maxAttempts) {
       reject('attempt_coordinator_capacity_exceeded');

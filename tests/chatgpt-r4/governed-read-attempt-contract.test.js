@@ -665,6 +665,21 @@ test('Edge capacity is reusable after cancelled, timed-out, and completed attemp
   );
 });
 
+test('Edge rejects future-dated headers without consuming active capacity', () => {
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => NOW,
+    maxAttempts: 1
+  });
+  const future = header('6', new Date(NOW.getTime() + 60_000));
+  const current = header('7');
+
+  assert.throws(
+    () => coordinator.acceptAttempt(future),
+    { code: 'attempt_created_at_in_future' }
+  );
+  assert.doesNotThrow(() => coordinator.acceptAttempt(current));
+});
+
 test('Edge cancellation and expiry close an existing failed receipt without replacing its evidence', () => {
   for (const [suffix, trigger] of [
     ['T', 'cancel'],
