@@ -122,6 +122,13 @@ function appendThrough(value, finalStage, {
   return receipts;
 }
 
+function seedCoordinator(coordinator, value, receipts) {
+  coordinator.acceptAttempt(value);
+  for (const receipt of receipts.slice(1)) {
+    coordinator.appendReceipt(value.attempt_ref, receipt);
+  }
+}
+
 test('AttemptHeader is immutable, bounded, and contains no mutable state identity', () => {
   const value = header();
   assert.equal(Object.isFrozen(value), true);
@@ -501,6 +508,90 @@ test('Edge capacity is reusable after cancelled, timed-out, and completed attemp
     coordinator.protocol(completed.attempt_ref).terminal.outcome,
     'success'
   );
+});
+
+test('Edge cancellation and expiry close an existing failed receipt without replacing its evidence', () => {
+  for (const [suffix, trigger] of [
+    ['T', 'cancel'],
+    ['U', 'expire']
+  ]) {
+    let clockNow = NOW;
+    const coordinator = createGovernedReadAttemptCoordinator({
+      clock: () => clockNow
+    });
+    const value = header(suffix);
+    const receipts = appendThrough(value, 'PROVIDER_EMBEDDING', {
+      outcome: 'failed',
+      reasonCode: 'provider_embedding_failed',
+      finalCounterFacts: {
+        provider: { started: 1, failed: 1 }
+      }
+    });
+    seedCoordinator(coordinator, value, receipts);
+
+    if (trigger === 'cancel') {
+      assert.doesNotThrow(() => coordinator.cancelAttempt(value.attempt_ref));
+    } else {
+      const subsequent = header('X');
+      coordinator.acceptAttempt(subsequent);
+      clockNow = new Date(NOW.getTime() + 30_000);
+      assert.equal(coordinator.expireDueAttempts(), 2);
+      assert.equal(
+        coordinator.protocol(subsequent.attempt_ref).terminal.reason_code,
+        'attempt_timeout'
+      );
+    }
+
+    const terminal = coordinator.protocol(value.attempt_ref).terminal;
+    assert.equal(terminal.outcome, 'failure');
+    assert.equal(terminal.reason_code, 'provider_embedding_failed');
+    assert.equal(terminal.failed_stage, 'PROVIDER_EMBEDDING');
+    assert.equal(terminal.failure_origin, 'provider_wrapper');
+    assert.equal(terminal.evidence_complete, false);
+    assert.deepEqual(terminal.counters.provider, {
+      started: 1,
+      succeeded: null,
+      failed: 1
+    });
+  }
+});
+
+test('Edge terminal CAS gives the deadline precedence at the exact boundary', () => {
+  for (const [suffix, offsetMs, expectedOutcome] of [
+    ['V', 29_999, 'success'],
+    ['W', 30_000, 'failure']
+  ]) {
+    let clockNow = NOW;
+    const coordinator = createGovernedReadAttemptCoordinator({
+      clock: () => clockNow
+    });
+    const value = header(suffix);
+    const receipts = completedReceipts(value);
+    seedCoordinator(coordinator, value, receipts);
+    const success = createTerminalEnvelope({
+      header: value,
+      receipts,
+      outcome: 'success',
+      evidenceComplete: true
+    });
+    clockNow = new Date(NOW.getTime() + offsetMs);
+
+    if (expectedOutcome === 'success') {
+      assert.equal(
+        coordinator.commitTerminal(value.attempt_ref, success).outcome,
+        'success'
+      );
+    } else {
+      assert.throws(
+        () => coordinator.commitTerminal(value.attempt_ref, success),
+        { code: 'attempt_terminal_already_committed' }
+      );
+      const terminal = coordinator.protocol(value.attempt_ref).terminal;
+      assert.equal(terminal.outcome, 'failure');
+      assert.equal(terminal.reason_code, 'attempt_timeout');
+      assert.equal(terminal.evidence_complete, false);
+    }
+  }
 });
 
 test('Edge terminal CAS is first-terminal-wins for timeout against late completion', () => {

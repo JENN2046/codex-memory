@@ -465,15 +465,16 @@ function createGovernedReadAttemptCoordinator({
     });
   }
 
-  function commitTerminal(attemptRef, terminal) {
-    const record = requireAttempt(attemptRef);
-    if (record.terminal) {
-      emit('attempt_terminal_rejected', {
-        attempt_ref: attemptRef,
-        rejection_code: 'attempt_terminal_already_committed'
-      });
-      reject('attempt_terminal_already_committed');
-    }
+  function rejectTerminalCandidate(attemptRef) {
+    emit('attempt_terminal_rejected', {
+      attempt_ref: attemptRef,
+      rejection_code: 'attempt_terminal_already_committed'
+    });
+    reject('attempt_terminal_already_committed');
+  }
+
+  function acceptTerminalCandidate(attemptRef, record, terminal) {
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
     validateTerminalEnvelope(terminal, {
       header: record.header,
       receipts: record.receipts
@@ -494,15 +495,30 @@ function createGovernedReadAttemptCoordinator({
 
   function commitCoordinatorFailure(attemptRef, reasonCode) {
     const record = requireAttempt(attemptRef);
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
+    const lastReceipt = record.receipts.at(-1) || null;
+    const failedReceipt = lastReceipt?.outcome === 'failed'
+      ? lastReceipt
+      : null;
     const terminal = createTerminalEnvelope({
       header: record.header,
       receipts: record.receipts,
       outcome: 'failure',
-      reasonCode,
+      reasonCode: failedReceipt?.reason_code || reasonCode,
       evidenceComplete: false,
-      failureOrigin: 'edge_broker'
+      failureOrigin: failedReceipt?.origin || 'edge_broker'
     });
-    return commitTerminal(attemptRef, terminal);
+    return acceptTerminalCandidate(attemptRef, record, terminal);
+  }
+
+  function commitTerminal(attemptRef, terminal) {
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
+    if (Date.parse(record.header.deadline_at) <= nowMs()) {
+      commitCoordinatorFailure(attemptRef, 'attempt_timeout');
+      rejectTerminalCandidate(attemptRef);
+    }
+    return acceptTerminalCandidate(attemptRef, record, terminal);
   }
 
   function timeoutAttempt(attemptRef) {

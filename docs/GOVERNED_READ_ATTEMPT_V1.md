@@ -139,8 +139,14 @@ CAS:
 - the first valid downstream candidate, timeout, or cancellation commits;
 - every later candidate is rejected as
   `attempt_terminal_already_committed`, even if it is a late completion;
+- candidate admission checks the immutable deadline in the same synchronous CAS
+  step; at or after the deadline, the broker commits timeout first and rejects
+  the candidate as already terminal;
 - timeout and cancellation commit failure with
   `evidence_complete: false`;
+- if a validated failed receipt already exists, timeout or cancellation closes
+  the attempt with that receipt's canonical reason, stage, and origin instead
+  of replacing its downstream failure evidence;
 - `maxAttempts` bounds active non-terminal attempts; a committed terminal
   remains addressable for protocol projection and late-candidate rejection but
   immediately releases its admission slot;
