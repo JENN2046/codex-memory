@@ -149,6 +149,8 @@ CAS:
 
 - admission rejects a header created after the coordinator's current clock
   sample, so a future-dated TTL cannot occupy active capacity;
+- admission stores the canonical `CREATED` receipt before dispatching Observer
+  events, and synchronous event callbacks cannot reenter coordinator mutations;
 - the first valid downstream candidate, timeout, or cancellation commits;
 - every later candidate is rejected as
   `attempt_terminal_already_committed`, even if it is a late completion;
@@ -166,8 +168,12 @@ CAS:
   the attempt with that receipt's canonical reason, stage, and origin instead
   of replacing its downstream failure evidence;
 - `maxAttempts` bounds active non-terminal attempts; a committed terminal
-  remains addressable for protocol projection and late-candidate rejection but
   immediately releases its admission slot;
+- `maxRetainedAttempts` separately bounds active plus retained terminal records.
+  A terminal remains addressable for protocol projection, replay rejection, and
+  late-candidate rejection through a short retention window of at least one
+  protocol TTL; expired terminals are pruned on admission, and retention
+  saturation fails closed instead of growing memory without bound;
 - coordinator loss emits `terminal_missing` for independent observation and
   clears the transient record without fabricating a terminal.
 

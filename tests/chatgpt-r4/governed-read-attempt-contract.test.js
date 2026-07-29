@@ -680,6 +680,88 @@ test('Edge rejects future-dated headers without consuming active capacity', () =
   assert.doesNotThrow(() => coordinator.acceptAttempt(current));
 });
 
+test('Edge finalizes admission before events and rejects synchronous sink reentrancy', () => {
+  const events = [];
+  let reentrantCode = null;
+  let coordinator;
+  coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => NOW,
+    eventSink(event) {
+      events.push(event.event);
+      if (event.event !== 'attempt_accepted') return;
+      assert.equal(
+        coordinator.snapshot(event.header.attempt_ref).receipt_count,
+        1
+      );
+      try {
+        coordinator.cancelAttempt(event.header.attempt_ref);
+      } catch (error) {
+        reentrantCode = error.code;
+      }
+    }
+  });
+  const value = header('8');
+
+  coordinator.acceptAttempt(value);
+  assert.equal(reentrantCode, 'attempt_coordinator_reentrant_mutation');
+  assert.deepEqual(events, [
+    'attempt_accepted',
+    'attempt_receipt_appended'
+  ]);
+  assert.equal(
+    coordinator.snapshot(value.attempt_ref).terminal_committed,
+    false
+  );
+
+  coordinator.cancelAttempt(value.attempt_ref);
+  assert.equal(
+    coordinator.protocol(value.attempt_ref).terminal.reason_code,
+    'attempt_cancelled'
+  );
+  assert.deepEqual(events, [
+    'attempt_accepted',
+    'attempt_receipt_appended',
+    'attempt_terminal_committed'
+  ]);
+});
+
+test('Edge bounds terminal retention while preserving replay and short lookup', () => {
+  let clockNow = NOW;
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => clockNow,
+    maxAttempts: 1,
+    maxRetainedAttempts: 2
+  });
+  const first = header('a');
+  const second = header('b');
+  const blocked = header('c');
+
+  for (const value of [first, second]) {
+    coordinator.acceptAttempt(value);
+    coordinator.cancelAttempt(value.attempt_ref);
+  }
+  assert.equal(
+    coordinator.protocol(first.attempt_ref).terminal.reason_code,
+    'attempt_cancelled'
+  );
+  assert.throws(
+    () => coordinator.acceptAttempt(first),
+    { code: 'attempt_ref_replay' }
+  );
+  assert.throws(
+    () => coordinator.acceptAttempt(blocked),
+    { code: 'attempt_coordinator_retention_capacity_exceeded' }
+  );
+
+  clockNow = new Date(NOW.getTime() + 60_000);
+  const fresh = header('d', clockNow);
+  assert.doesNotThrow(() => coordinator.acceptAttempt(fresh));
+  assert.throws(
+    () => coordinator.protocol(first.attempt_ref),
+    { code: 'attempt_not_found' }
+  );
+});
+
 test('Edge cancellation and expiry close an existing failed receipt without replacing its evidence', () => {
   for (const [suffix, trigger] of [
     ['T', 'cancel'],

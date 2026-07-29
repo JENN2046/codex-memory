@@ -1,6 +1,7 @@
 'use strict';
 
 const {
+  GOVERNED_READ_ATTEMPT_LIMITS,
   aggregateAttemptCounters,
   createGovernedReadAttemptProtocol,
   createStageReceipt,
@@ -367,12 +368,18 @@ function createTransientRequestBroker({
 function createGovernedReadAttemptCoordinator({
   clock = () => new Date(),
   maxAttempts = 64,
+  maxRetainedAttempts = Math.max(maxAttempts, 256),
   eventSink,
   eventComponent = 'transient_edge_broker'
 } = {}) {
   if (typeof clock !== 'function') reject('attempt_coordinator_clock_invalid');
   if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 1024) {
     reject('attempt_coordinator_capacity_invalid');
+  }
+  if (!Number.isInteger(maxRetainedAttempts) ||
+      maxRetainedAttempts < maxAttempts ||
+      maxRetainedAttempts > 4096) {
+    reject('attempt_coordinator_retention_capacity_invalid');
   }
   if (eventSink !== undefined && typeof eventSink !== 'function') {
     reject('attempt_coordinator_event_sink_invalid');
@@ -384,6 +391,7 @@ function createGovernedReadAttemptCoordinator({
 
   const attempts = new Map();
   let activeAttempts = 0;
+  let eventDispatchDepth = 0;
 
   function nowMs() {
     const value = clock();
@@ -398,8 +406,19 @@ function createGovernedReadAttemptCoordinator({
     return Date.parse(record.header.deadline_at) <= nowMs();
   }
 
+  function pruneExpiredTerminalAttempts(currentMs) {
+    for (const [attemptRef, record] of attempts) {
+      if (record.terminal &&
+          Number.isFinite(record.purge_after_ms) &&
+          record.purge_after_ms <= currentMs) {
+        attempts.delete(attemptRef);
+      }
+    }
+  }
+
   function emit(event, payload = {}) {
     if (!eventSink) return;
+    eventDispatchDepth += 1;
     try {
       const pending = eventSink(Object.freeze({
         component: eventComponent,
@@ -409,7 +428,18 @@ function createGovernedReadAttemptCoordinator({
       if (pending && typeof pending.catch === 'function') pending.catch(() => {});
     } catch {
       // Protocol observation is independent from the coordinator's CAS state.
+    } finally {
+      eventDispatchDepth -= 1;
     }
+  }
+
+  function guardMutation(operation) {
+    return (...args) => {
+      if (eventDispatchDepth > 0) {
+        reject('attempt_coordinator_reentrant_mutation');
+      }
+      return operation(...args);
+    };
   }
 
   function requireAttempt(attemptRef) {
@@ -421,6 +451,7 @@ function createGovernedReadAttemptCoordinator({
   function acceptAttempt(header) {
     validateAttemptHeader(header);
     const acceptedAtMs = nowMs();
+    pruneExpiredTerminalAttempts(acceptedAtMs);
     if (Date.parse(header.created_at) > acceptedAtMs) {
       reject('attempt_created_at_in_future');
     }
@@ -431,22 +462,25 @@ function createGovernedReadAttemptCoordinator({
     if (activeAttempts >= maxAttempts) {
       reject('attempt_coordinator_capacity_exceeded');
     }
+    if (attempts.size >= maxRetainedAttempts) {
+      reject('attempt_coordinator_retention_capacity_exceeded');
+    }
     const acceptedHeader = structuredClone(header);
-    const record = {
-      header: acceptedHeader,
-      receipts: [],
-      terminal: null
-    };
-    attempts.set(header.attempt_ref, record);
-    activeAttempts += 1;
-    emit('attempt_accepted', { header: structuredClone(acceptedHeader) });
-
     const created = createStageReceipt({
       header: acceptedHeader,
       receipts: [],
       stage: 'CREATED'
     });
-    record.receipts.push(structuredClone(created));
+    const record = {
+      header: acceptedHeader,
+      receipts: [structuredClone(created)],
+      terminal: null,
+      purge_after_ms: null
+    };
+    attempts.set(header.attempt_ref, record);
+    activeAttempts += 1;
+    emit('attempt_accepted', { header: structuredClone(acceptedHeader) });
+
     emit('attempt_receipt_appended', {
       attempt_ref: header.attempt_ref,
       receipt: structuredClone(created)
@@ -512,7 +546,12 @@ function createGovernedReadAttemptCoordinator({
       header: record.header,
       receipts: record.receipts
     });
+    const purgeAfterMs = Math.max(
+      Date.parse(record.header.deadline_at),
+      nowMs() + GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000
+    );
     record.terminal = structuredClone(terminal);
+    record.purge_after_ms = purgeAfterMs;
     activeAttempts -= 1;
     emit('attempt_terminal_committed', {
       attempt_ref: attemptRef,
@@ -617,15 +656,15 @@ function createGovernedReadAttemptCoordinator({
   }
 
   return Object.freeze({
-    acceptAttempt,
-    appendReceipt,
-    cancelAttempt,
-    commitTerminal,
-    expireDueAttempts,
+    acceptAttempt: guardMutation(acceptAttempt),
+    appendReceipt: guardMutation(appendReceipt),
+    cancelAttempt: guardMutation(cancelAttempt),
+    commitTerminal: guardMutation(commitTerminal),
+    expireDueAttempts: guardMutation(expireDueAttempts),
     protocol,
-    reportCoordinatorLoss,
+    reportCoordinatorLoss: guardMutation(reportCoordinatorLoss),
     snapshot,
-    timeoutAttempt
+    timeoutAttempt: guardMutation(timeoutAttempt)
   });
 }
 
