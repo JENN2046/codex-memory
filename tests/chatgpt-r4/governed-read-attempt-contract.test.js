@@ -31,13 +31,13 @@ const {
 
 const NOW = new Date('2026-07-30T00:00:00.000Z');
 
-function header(suffix = 'A') {
+function header(suffix = 'A', now = NOW) {
   return createAttemptHeader({
     attemptRef: `grat_${suffix.repeat(32)}`,
     toolName: 'search_memory',
     requestDigest: digestObject(`request-${suffix}`),
     contextBindingDigest: digestObject(`context-${suffix}`),
-    now: NOW,
+    now,
     ttlSeconds: 30
   });
 }
@@ -449,15 +449,13 @@ test('partial counter triples reject known contradictions while preserving consi
 });
 
 test('Edge capacity is reusable after cancelled, timed-out, and completed attempts', () => {
+  let clockNow = NOW;
   const coordinator = createGovernedReadAttemptCoordinator({
-    clock: () => NOW,
+    clock: () => clockNow,
     maxAttempts: 1
   });
   const cancelled = header('O');
   const timedOut = header('P');
-  const completed = header('Q');
-  const active = header('R');
-  const blocked = header('S');
 
   coordinator.acceptAttempt(cancelled);
   assert.throws(
@@ -467,7 +465,12 @@ test('Edge capacity is reusable after cancelled, timed-out, and completed attemp
 
   coordinator.cancelAttempt(cancelled.attempt_ref);
   assert.doesNotThrow(() => coordinator.acceptAttempt(timedOut));
-  coordinator.timeoutAttempt(timedOut.attempt_ref);
+  clockNow = new Date(NOW.getTime() + 30_000);
+  assert.equal(coordinator.expireDueAttempts(), 1);
+
+  const completed = header('Q', clockNow);
+  const active = header('R', clockNow);
+  const blocked = header('S', clockNow);
   assert.doesNotThrow(() => coordinator.acceptAttempt(completed));
 
   const receipts = completedReceipts(completed);
