@@ -423,16 +423,20 @@ function readSelectedProjection(database, allowedDiaryNames, dimension, {
   `, [...allowedDiaryNames, MAX_SELECTED_CHUNKS + 1], errorCode);
   if (chunks.length !== budget.chunkCount) throw codedError(errorCode);
   const chunkIds = new Set();
-  const nextChunkIndex = new Map();
+  const lastChunkIndex = new Map();
   let contentBytes = 0;
   const normalizedChunks = chunks.map(row => {
-    const expectedChunkIndex = nextChunkIndex.get(row?.fileId) || 0;
+    // VCP retains the source chunk index while skipping chunks without a usable
+    // vector, so gaps are valid; ordering and uniqueness remain mandatory.
+    const previousChunkIndex = lastChunkIndex.get(row?.fileId);
     if (!Number.isSafeInteger(row?.id) ||
         row.id < 1 ||
         chunkIds.has(row.id) ||
         !fileIds.has(row.fileId) ||
         !Number.isSafeInteger(row.chunkIndex) ||
-        row.chunkIndex !== expectedChunkIndex ||
+        row.chunkIndex < 0 ||
+        (previousChunkIndex !== undefined &&
+          row.chunkIndex <= previousChunkIndex) ||
         typeof row.content !== 'string') {
       throw codedError(errorCode);
     }
@@ -441,7 +445,7 @@ function readSelectedProjection(database, allowedDiaryNames, dimension, {
       throw codedError(errorCode);
     }
     chunkIds.add(row.id);
-    nextChunkIndex.set(row.fileId, expectedChunkIndex + 1);
+    lastChunkIndex.set(row.fileId, row.chunkIndex);
     return Object.freeze({
       id: row.id,
       fileId: row.fileId,

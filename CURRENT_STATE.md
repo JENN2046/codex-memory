@@ -17,15 +17,15 @@ deploy, cutover, complete-V8, or readiness claim.
 
 `activeTask: CM-2159`
 
-`activePhase: r5_o_schema_v6_source_manifest_rebind_delivery`
+`activePhase: r5_o_invalid_argument_source_fix_delivery`
 
-PR `#70` delivered the production selected-diary hydrator. The next exact
-R5-O authorization failed closed before lifecycle or memory access because the
-existing schema-v6 profile could not rebind its changed runtime-source manifest.
-`CM-2159` now owns a fail-closed same-schema rebind path and remains active until
-a new exact-authorized R5-O proof and governance closeout succeed. This
-declaration does not authorize a runtime probe, provider call, private
-configuration access, lifecycle action, or profile replacement.
+PR `#71` delivered the safe same-schema source rebind path. Under single-use
+authorization `_003`, rebind and exact-head runtime acceptance succeeded, but
+the one authorized `search_memory` call failed closed as `INVALID_ARGUMENT`.
+`CM-2159` now owns the source/test fix and remains active until a new
+exact-authorized R5-O proof and governance closeout succeed. This declaration
+does not authorize a runtime probe, provider call, private configuration
+access, lifecycle action, profile replacement, or retry of `_003`.
 
 ## Last Accepted Product Baseline
 
@@ -43,16 +43,16 @@ future task.
 ## Open Blockers
 
 - `r5_h_matrix_incomplete` [open]: The R5-H private ChatGPT dogfood matrix is incomplete.
-- `r5_o_private_exact_head_runtime_unverified` [open]: Post-hydrator R5-O remained unverified after schema-v6 source-manifest preflight failed closed.
+- `r5_o_private_exact_head_runtime_unverified` [open]: R5-O _003 reached exact-head runtime acceptance but its single search failed closed before a receipt-bound result.
 - `fresh_non_empty_task_context_relevance_unproven` [open]: Fresh non-empty task-context recall relevance has not been proven.
 
 ## Next Safe Action
 
-Deliver the explicit schema-v6-to-v6 source-manifest rebind path through PR and
-successful merged-main CI. Then prepare one new single-use R5-O P3 package that
-authorizes the stopped-stack rebind and one bounded private read against that
-exact baseline. Do not start the stack, replace its profile, read private
-memory, or retry R5-O from this committed declaration alone.
+Deliver the `_003` `INVALID_ARGUMENT` source/test fix through PR and successful
+merged-main CI. Then prepare a separate exact authorization for the existing
+safe source rebind and a new single-use R5-O `_004` read against that exact
+baseline. Do not start the stack, replace its profile, read private memory, or
+retry `_003` from this committed declaration alone.
 
 ## Authority Boundaries
 
@@ -79,37 +79,31 @@ Last completed: `CM-2158 / CMV-2243`.
 - Active task: `CM-2159`; its validation receipt will not replace
   the unique completed ledger/validation pair until the successful R5-O
   verification and governance closeout are complete.
-- PR `#67` delivered manifest-v1 controller source identity and schema-v6
-  compatibility, merging as
-  `70a85d56c78caa895df50954ce107f504493b5ec`. Its merged-main CI completed
-  successfully. This is a governance/controller delivery anchor, not a new
-  accepted product baseline or current runtime-health claim.
-- PR `#68` entered `CM-2159`; PR `#69` bound schema v6 to the canonical
-  endpoint and merged as
-  `31f94d93d8c50569846090501cf95db77d513f72`.
-- Under `CODEX_MEMORY_SCHEMA_V6_CANONICAL_TAKEOVER_001`, the controller
-  performed the authorized v5-to-v6 canonical takeover, stored the owner-only
-  schema-v6 profile, and accepted a no-tool-call app-server bootstrap.
-- The first `CODEX_MEMORY_R5O_PRIVATE_EXACT_HEAD_VERIFY_001` attempt resolved
-  its governed context but the single search failed closed with invalid native
-  vector-receipt evidence. It did not establish R5-O success or readiness.
+- PRs `#67`-`#69` delivered manifest-v1 source identity, entered `CM-2159`,
+  and bound schema v6 to the canonical endpoint at `31f94d93...`. The exact
+  canonical takeover stored the owner-only schema-v6 profile; `_001` later
+  failed closed without establishing R5-O success.
 - PR `#70` merged the exact read-only selected-diary hydrator as `bd21ae50...`;
   merged-main CI `30422647557` passed. Authorization `_002` then stopped at
   schema-v6 source-manifest mismatch with zero provider/native/memory calls.
-  No successful post-hydrator private runtime proof exists.
-- PR `#65` delivered the governed full-stack lifecycle controller and merged as
-  `48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e`.
-- Under the exact `CODEX_MEMORY_V5_TRANSITION_001` authorization, the transition
-  ran `stop` -> `start` -> `adopt-running --replace` -> low-disclosure `status`
-  against that baseline. The transitional start required the intended profile
-  upgrade; adoption stored one owner-only, reference-only schema-v5 controller
-  profile; final inspection returned accepted runtime/controller bindings.
-- Those results are closeout-time evidence only, not committed current health.
-  No PID, socket, secret reference, raw log, provider response, or raw memory is
-  stored here.
-- The transition did not call `record_memory`, modify `.env` or real
-  configuration, run migration/import/export/rebuild, expand public MCP,
-  deploy, release, or claim readiness.
+- PR `#71` merged the safe schema-v6-to-v6 source rebind as `de36d4bc...`;
+  merged-main CI `30453986741` passed.
+- Single-use authorization `_003` was consumed. Its stopped-stack
+  `rebind-source` succeeded and status accepted the exact source/runtime
+  binding. The governed context resolved once; the one permitted search then
+  failed closed as `INVALID_ARGUMENT`, produced no result or relevance proof,
+  and terminally emergency-stopped the observation. Accepted evidence counted
+  zero provider calls, native invocations, primary writes, and derived writes;
+  the identity-matched stack was stopped without retry.
+- Source-only investigation found a reachable implementation defect consistent
+  with that terminal boundary: VCP can preserve non-contiguous source
+  `chunk_index` values when vectorless chunks are skipped, while the production
+  hydrator required a contiguous sequence. Hydration failures were also
+  collapsed to a generic runtime reason. No private database, configuration,
+  raw log, provider response, or raw memory was inspected to make this finding.
+- PR `#65` and the exact V5 transition are historical closeout evidence only.
+  They store no live locator or private payload and do not claim current health
+  or authorize runtime, mutation, release, or deploy work.
 - Controller contract detail: `docs/CODEX_MEMORY_FULL_STACK_CONTROL.md`.
 - Compact machine snapshot: `.agent_board/CURRENT_FACTS.json`.
 - Historical recovery index:

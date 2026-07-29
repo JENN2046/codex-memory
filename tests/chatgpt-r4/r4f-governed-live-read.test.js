@@ -16,6 +16,7 @@ const {
   sha256,
   validateCounters,
   validateResponseEnvelope,
+  validateToolArguments,
   validateToolStructuredContent
 } = require('../../packages/chatgpt-r4-contracts');
 const { createRelayProcessor } = require('../../apps/local-recall-relay');
@@ -37,6 +38,8 @@ const { resolveRead } = require('../../src/core/DiaryScopeMapping');
 const NOW = new Date('2026-07-20T10:00:00.000Z');
 const ISSUER = 'https://tenant.r4f.example.dev/';
 const AUDIENCE = 'https://edge.r4f.example.dev/mcp';
+const R5O_003_QUERY =
+  'codex-memory current governed product goal and remaining blockers';
 
 function identity(keyId) {
   const pair = crypto.generateKeyPairSync('ed25519');
@@ -571,7 +574,7 @@ test('R4-F rejects mapping reference and digest disclosure in native summaries',
   }
 });
 
-test('R4-F resolves an explicit project then returns a bounded live read through signed Relay response', async () => {
+test('R5-O _003 exact search arguments cross Edge, Relay, and Governance unchanged', async () => {
   const edge = identity('r4f-edge');
   const context = identity('r4f-context');
   const relay = identity('r4f-relay');
@@ -595,7 +598,12 @@ test('R4-F resolves an explicit project then returns a bounded live read through
     async callGovernedTool(toolName, args, requestContext) {
       governedCalls += 1;
       assert.equal(toolName, 'search_memory');
-      assert.equal(args.include_content, false);
+      assert.deepEqual(args, {
+        query: R5O_003_QUERY,
+        target: 'both',
+        limit: 1,
+        include_content: false
+      });
       assert.equal(Object.hasOwn(args, 'scope'), false);
       assert.equal(requestContext.executionContext.clientId, 'Codex');
       assert.equal(requestContext.executionContext.projectId, 'project-alpha');
@@ -634,7 +642,7 @@ test('R4-F resolves an explicit project then returns a bounded live read through
 
   const searchRequest = requestFixture(edge, principal, 'search_memory', {
     project_context_ref: resolveResponse.structured_content.project_context_ref,
-    query: 'governed project fact',
+    query: R5O_003_QUERY,
     limit: 1
   }, 2);
   const searchResponse = await processor.handle(searchRequest);
@@ -670,6 +678,14 @@ test('R4-F resolves an explicit project then returns a bounded live read through
     expectedRequest: searchRequest,
     requireZeroCounters: true
   }), { code: 'zero_memory_counter_nonzero' });
+});
+
+test('R5-O _003 rejects a string limit before Relay or Governance dispatch', () => {
+  assert.throws(() => validateToolArguments('search_memory', {
+    project_context_ref: `pctx_${'a'.repeat(32)}`,
+    query: R5O_003_QUERY,
+    limit: '1'
+  }), { code: 'search_limit_invalid' });
 });
 
 test('R4-F denies unregistered context before provider/native and rejects mapping disclosure', async () => {

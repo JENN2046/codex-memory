@@ -342,9 +342,17 @@ The boundary is exact rather than best-effort:
 - the allowlist is bounded to eight exact diary names, and every selected path
   and vector must match its diary, dimension, finite-value, count, and byte
   budgets;
+- selected `chunk_index` values must be non-negative, unique, and strictly
+  ordered per file, but may be non-contiguous because VCP retains the source
+  index while omitting chunks without a usable vector;
 - any cross-scope row, secondary tag/cache/migration state, partial write,
   changed database handle, or stale isolated projection fails closed instead
   of being overwritten.
+
+A hydration-stage failure is preserved only as
+`native_selected_diary_hydration_failed` /
+`selected_diary_hydration_failed`; raw database or runtime detail is discarded,
+and local memory fallback remains forbidden.
 
 The returned receipt contains only acceptance booleans and aggregate
 diary/file/chunk counts. It contains no diary name, path, content, vector,

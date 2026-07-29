@@ -38,6 +38,7 @@ const ALLOWED_FAILURE_CATEGORIES = Object.freeze([
   'scope_binding_rejected',
   'provider_embedding_failed',
   'invalid_query_vector',
+  'selected_diary_hydration_failed',
   'index_recovery_failed',
   'vector_search_failed',
   'native_runtime_initialization_failed',
@@ -75,6 +76,7 @@ const ALLOWED_JSON_RPC_ERROR_REASON_CODES = Object.freeze([
   'native_query_vector_dimension_mismatch',
   'native_query_vector_non_finite',
   'native_query_vector_zero_norm',
+  'native_selected_diary_hydration_failed',
   'native_selected_diary_index_recovery_failed',
   'native_selected_diary_index_empty_after_hydration',
   'native_vector_search_not_executed',
@@ -851,6 +853,9 @@ function jsonRpcErrorReasonCode(jsonRpcResponse = {}) {
 function failureCategoryFromJsonRpcReasonCode(reasonCode) {
   if (reasonCode === 'native_provider_embedding_failed') return 'provider_embedding_failed';
   if (reasonCode?.startsWith('native_query_vector_')) return 'invalid_query_vector';
+  if (reasonCode === 'native_selected_diary_hydration_failed') {
+    return 'selected_diary_hydration_failed';
+  }
   if (reasonCode?.startsWith('native_selected_diary_index_')) return 'index_recovery_failed';
   if (reasonCode?.startsWith('native_vector_search_')) return 'vector_search_failed';
   if (reasonCode === 'native_runtime_initialization_failed') return 'native_runtime_initialization_failed';
