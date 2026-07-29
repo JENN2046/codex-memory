@@ -4572,6 +4572,30 @@ function childControllerProfileFields() {
   });
 }
 
+function managedShimArguments({ vcpRoot, runtimeRoot } = {}) {
+  if (typeof vcpRoot !== 'string' ||
+      !path.isAbsolute(vcpRoot) ||
+      typeof runtimeRoot !== 'string' ||
+      !path.isAbsolute(runtimeRoot)) {
+    throw codedError('stack_shim_runtime_paths_invalid');
+  }
+  return Object.freeze([
+    '--host',
+    '127.0.0.1',
+    '--port',
+    '7615',
+    '--vcp-root',
+    vcpRoot,
+    '--kb-root',
+    path.join(vcpRoot, 'dailynote'),
+    '--kb-store',
+    path.join(runtimeRoot, 'store'),
+    '--source-kb-store',
+    path.join(vcpRoot, 'VectorStore'),
+    '--selected-diary-hydration'
+  ]);
+}
+
 async function runShimChild() {
   assertChildMode();
   const profile = {
@@ -4633,16 +4657,7 @@ async function runShimChild() {
   const { main: runShim } = require(
     '../src/cli/vcp-toolbox-native-mcp-shim'
   );
-  await runShim([
-    '--host',
-    '127.0.0.1',
-    '--port',
-    '7615',
-    '--vcp-root',
-    vcpRoot,
-    '--kb-store',
-    path.join(runtimeRoot, 'store')
-  ], process.env);
+  await runShim(managedShimArguments({ vcpRoot, runtimeRoot }), process.env);
 }
 
 function runHttpChild() {
@@ -5126,6 +5141,7 @@ module.exports = {
   getJsonHealth,
   loadManagedEnvironmentFile,
   managedStopWaitOptions,
+  managedShimArguments,
   managedEnvironmentConfigDigest,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,

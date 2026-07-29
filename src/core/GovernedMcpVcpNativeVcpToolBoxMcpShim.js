@@ -328,7 +328,11 @@ function jsonRpcResult(id, structuredContent, runtimeReceipt = null) {
   };
 }
 
-function lowDisclosureShimMeta(enableWrite = false, mappingState = null) {
+function lowDisclosureShimMeta(
+  enableWrite = false,
+  mappingState = null,
+  { selectedDiaryHydrationConfigured = false } = {}
+) {
   const mappingBindingFingerprint = mappingState?.accepted === true
     ? diaryScopeMappingBindingFingerprint(
         mappingState.mappingReference,
@@ -350,6 +354,8 @@ function lowDisclosureShimMeta(enableWrite = false, mappingState = null) {
     providerApiCalled: false,
     nativeRuntimeCalled: false,
     scopeEnforcementMode: 'diary_allowlist_v1',
+    selectedDiaryHydrationConfigured:
+      selectedDiaryHydrationConfigured === true,
     mappingConfigured: mappingState?.configured === true,
     mappingReferenceBound: mappingState?.accepted === true,
     mappingDigestBound: mappingState?.accepted === true,
@@ -473,7 +479,11 @@ function nativeToolDescriptors(enableWrite = false) {
   return descriptors;
 }
 
-function initializeResult(enableWrite = false, mappingState = null) {
+function initializeResult(
+  enableWrite = false,
+  mappingState = null,
+  runtimeCapabilities = {}
+) {
   return {
     protocolVersion: SHIM_PROTOCOL_VERSION,
     serverInfo: {
@@ -485,14 +495,26 @@ function initializeResult(enableWrite = false, mappingState = null) {
         listChanged: false
       }
     },
-    _meta: lowDisclosureShimMeta(enableWrite, mappingState)
+    _meta: lowDisclosureShimMeta(
+      enableWrite,
+      mappingState,
+      runtimeCapabilities
+    )
   };
 }
 
-function toolsListResult(enableWrite = false, mappingState = null) {
+function toolsListResult(
+  enableWrite = false,
+  mappingState = null,
+  runtimeCapabilities = {}
+) {
   return {
     tools: nativeToolDescriptors(enableWrite),
-    _meta: lowDisclosureShimMeta(enableWrite, mappingState)
+    _meta: lowDisclosureShimMeta(
+      enableWrite,
+      mappingState,
+      runtimeCapabilities
+    )
   };
 }
 
@@ -1586,6 +1608,10 @@ function createVcpToolBoxNativeMemoryAdapter(options = {}) {
 function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
   const adapter = options.adapter || createVcpToolBoxNativeMemoryAdapter(options);
   const enableWrite = options.enableWrite === true;
+  const runtimeCapabilities = Object.freeze({
+    selectedDiaryHydrationConfigured:
+      typeof options.selectedDiaryRuntimeHydrator === 'function'
+  });
   const mappingState = loadDiaryScopeMapping({
     mapping: options.diaryScopeMapping,
     mappingPath: options.diaryScopeMappingPath,
@@ -1600,14 +1626,22 @@ function createGovernedMcpVcpNativeVcpToolBoxMcpShimHandler(options = {}) {
       return {
         jsonrpc: '2.0',
         id: body.id,
-        result: initializeResult(enableWrite, mappingState)
+        result: initializeResult(
+          enableWrite,
+          mappingState,
+          runtimeCapabilities
+        )
       };
     }
     if (body.method === 'tools/list') {
       return {
         jsonrpc: '2.0',
         id: body.id,
-        result: toolsListResult(enableWrite, mappingState)
+        result: toolsListResult(
+          enableWrite,
+          mappingState,
+          runtimeCapabilities
+        )
       };
     }
     if (body.method !== 'tools/call') {

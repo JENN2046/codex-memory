@@ -17,14 +17,15 @@ deploy, cutover, complete-V8, or readiness claim.
 
 `activeTask: CM-2159`
 
-`activePhase: runtime_transition_authorization_pending`
+`activePhase: r5_o_selected_diary_hydrator_delivery`
 
-The manifest-v1 and schema-v6 source implementation, deterministic validation,
-independent governance review, PR follow-through, and merged-main CI are
-complete. `CM-2159` remains active until a separately exact-authorized runtime
-transition is accepted and its governance closeout is delivered. This
-committed phase declaration does not authorize a runtime probe, lifecycle
-action, provider call, private configuration access, or profile replacement.
+The schema-v6 canonical endpoint transition completed under its exact
+authorization. The first separately authorized R5-O attempt then failed closed
+because the production shim had no selected-diary hydrator. `CM-2159` now owns
+the source/test delivery of that missing wiring and remains active until a new
+exact-authorized R5-O proof and governance closeout succeed. This declaration
+does not authorize a runtime probe, provider call, private configuration
+access, lifecycle action, or profile replacement.
 
 ## Last Accepted Product Baseline
 
@@ -41,19 +42,17 @@ future task.
 
 ## Open Blockers
 
-- `controller_runtime_profile_transition_pending` [open]: The manifest-v1 and schema-v6 source implementation is merged, but the owner-only runtime profile has not yet been transitioned and re-adopted under exact authorization.
 - `r5_h_matrix_incomplete` [open]: The R5-H private ChatGPT dogfood matrix is incomplete.
-- `r5_o_private_exact_head_runtime_unverified` [open]: R5-O private exact-head runtime behavior has not been verified.
+- `r5_o_private_exact_head_runtime_unverified` [open]: The first authorized R5-O attempt failed closed at native vector-receipt validation; no successful post-hydrator exact-head proof exists.
 - `fresh_non_empty_task_context_relevance_unproven` [open]: Fresh non-empty task-context recall relevance has not been proven.
 
 ## Next Safe Action
 
-Prepare one exact P3 authorization package bound to freshly queried `main`,
-manifest identity, and runtime boundaries for low-disclosure `status` ->
-controlled `stop` -> controlled `start` -> `adopt-running --replace` ->
-low-disclosure `status`. Re-query current Git, GitHub, CI, and allowed
-low-disclosure runtime facts at execution time. Do not run the transition from
-this committed phase declaration alone.
+Re-query live delivery facts. Require the production selected-diary hydrator
+source on canonical `main` with successful CI before preparing one new,
+single-use R5-O P3 authorization package bound to that exact baseline and the
+existing low-disclosure boundaries. Do not start the stack, read private
+memory, or retry R5-O from this committed declaration alone.
 
 ## Authority Boundaries
 
@@ -65,11 +64,11 @@ this committed phase declaration alone.
 - P3, secrets, raw memory, raw audit/log, runtime/provider configuration,
   production, release, deploy, public MCP expansion, and durable mutation
   boundaries remain unchanged.
-- The completed V5 transition is historical point-in-time evidence. It does not
-  authorize another status probe, lifecycle action, provider call, private
-  runtime verification, real memory read or write, release, deploy, cutover, or
-  readiness claim.
-- The completed source delivery does not change the public MCP surface,
+- Completed V5 and schema-v6 transitions are historical point-in-time evidence.
+  They do not authorize another status probe, lifecycle action, provider call,
+  private runtime verification, real memory read or write, release, deploy,
+  cutover, or readiness claim.
+- The current source delivery does not change the public MCP surface,
   dependencies, CI workflow, runtime/provider configuration, retained product
   baseline, or readiness status.
 
@@ -78,14 +77,26 @@ this committed phase declaration alone.
 Last completed: `CM-2158 / CMV-2243`.
 
 - Active task: `CM-2159`; its validation receipt will not replace
-  the unique completed ledger/validation pair until the authorized runtime
-  transition and governance closeout are complete.
-
+  the unique completed ledger/validation pair until the successful R5-O
+  verification and governance closeout are complete.
 - PR `#67` delivered manifest-v1 controller source identity and schema-v6
   compatibility, merging as
   `70a85d56c78caa895df50954ce107f504493b5ec`. Its merged-main CI completed
   successfully. This is a governance/controller delivery anchor, not a new
   accepted product baseline or current runtime-health claim.
+- PR `#68` entered `CM-2159`; PR `#69` bound schema v6 to the canonical
+  endpoint and merged as
+  `31f94d93d8c50569846090501cf95db77d513f72`.
+- Under `CODEX_MEMORY_SCHEMA_V6_CANONICAL_TAKEOVER_001`, the controller
+  performed the authorized v5-to-v6 canonical takeover, stored the owner-only
+  schema-v6 profile, and accepted a no-tool-call app-server bootstrap.
+- The first `CODEX_MEMORY_R5O_PRIVATE_EXACT_HEAD_VERIFY_001` attempt resolved
+  its governed context but the single search failed closed with invalid native
+  vector-receipt evidence. It did not establish R5-O success or readiness.
+- The production selected-diary hydrator source now uses an exact, read-only
+  primary SQLite projection into the isolated store with fail-closed
+  contamination and stale-state checks. Source tests are not private runtime
+  proof; live delivery and CI facts must be queried fresh.
 - PR `#65` delivered the governed full-stack lifecycle controller and merged as
   `48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e`.
 - Under the exact `CODEX_MEMORY_V5_TRANSITION_001` authorization, the transition

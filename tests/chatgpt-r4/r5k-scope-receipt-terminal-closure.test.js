@@ -293,9 +293,12 @@ function capabilityFetch(environment) {
         }
       };
     }
+    const runtimeCapabilities = {
+      selectedDiaryHydrationConfigured: true
+    };
     const result = body.method === 'initialize'
-      ? initializeResult(false, mappingState)
-      : toolsListResult(false, mappingState);
+      ? initializeResult(false, mappingState, runtimeCapabilities)
+      : toolsListResult(false, mappingState, runtimeCapabilities);
     return {
       ok: true,
       status: 200,
