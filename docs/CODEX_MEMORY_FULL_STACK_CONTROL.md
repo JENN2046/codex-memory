@@ -206,12 +206,14 @@ acceptance are checked again. Only then is the owner-only profile atomically
 replaced.
 
 If candidate startup fails, ordinary startup rollback stops only components
-started by that invocation. If the candidate runtime is not exactly accepted
-or profile persistence fails, `rebind-source` stops the candidate-managed
-stack and retains the prior profile. A rollback failure is terminal and
-reported separately. A process that appeared after the stopped-stack
-preflight but was not proven to be started by this transition is not
-terminated by the coordinator.
+started by that invocation. On successful startup, the internal start path
+returns the exact component-name set it actually started to the rebind
+coordinator; this evidence is not added to the public CLI result. If the
+candidate runtime is not exactly accepted or profile persistence fails,
+`rebind-source` rolls back only that returned set and retains the prior
+profile. A rollback failure is terminal and reported separately. A process
+that appeared after the stopped-stack preflight but was not proven to be
+started by this transition is not terminated by the coordinator.
 
 This command requires current P3 lifecycle authorization. Source tests and CI
 do not execute it, access private configuration, start services, call a

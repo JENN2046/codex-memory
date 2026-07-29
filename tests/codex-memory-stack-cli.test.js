@@ -2053,7 +2053,10 @@ test('accepted source-manifest rebind persists only after runtime acceptance', a
     ),
     async startCandidate() {
       calls.push('start');
-      return started;
+      return {
+        outcome: started,
+        startedComponents: ['shim', 'http']
+      };
     },
     async persistCandidate() {
       calls.push('persist');
@@ -2070,6 +2073,10 @@ test('accepted source-manifest rebind persists only after runtime acceptance', a
   assert.equal(result.profileStored, true);
   assert.equal(result.sourceManifestRebound, true);
   assert.equal(result.failClosedRollbackRequired, false);
+  assert.equal(
+    Object.hasOwn(result, 'startedComponents'),
+    false
+  );
   await assert.rejects(
     () => coordinateSourceManifestRebind({
       candidateProfile: { schemaVersion: PROFILE_SCHEMA_VERSION },
@@ -2097,21 +2104,26 @@ test('source-manifest rebind rolls back an unaccepted runtime or profile commit 
       async startCandidate() {
         rejectedCalls.push('start');
         return {
-          accepted: false,
-          runtimeAccepted: true,
-          action: 'started',
-          profileSchemaVersion: PROFILE_SCHEMA_VERSION,
-          source: {
-            controllerIdentityMatch: true,
-            compatible: true
-          }
+          outcome: {
+            accepted: false,
+            runtimeAccepted: true,
+            action: 'started',
+            profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+            source: {
+              controllerIdentityMatch: true,
+              compatible: true
+            }
+          },
+          startedComponents: ['shim']
         };
       },
       async persistCandidate() {
         rejectedCalls.push('persist');
       },
-      async rollbackCandidate() {
+      async rollbackCandidate(_profile, startedComponents) {
         rejectedCalls.push('rollback');
+        assert.deepEqual(startedComponents, ['shim']);
+        assert.equal(Object.isFrozen(startedComponents), true);
         return [];
       }
     }),
@@ -2126,14 +2138,17 @@ test('source-manifest rebind rolls back an unaccepted runtime or profile commit 
       async startCandidate() {
         racedCalls.push('start');
         return {
-          accepted: true,
-          runtimeAccepted: true,
-          action: 'already_running',
-          profileSchemaVersion: PROFILE_SCHEMA_VERSION,
-          source: {
-            controllerIdentityMatch: true,
-            compatible: true
-          }
+          outcome: {
+            accepted: true,
+            runtimeAccepted: true,
+            action: 'already_running',
+            profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+            source: {
+              controllerIdentityMatch: true,
+              compatible: true
+            }
+          },
+          startedComponents: []
         };
       },
       async persistCandidate() {
@@ -2155,22 +2170,32 @@ test('source-manifest rebind rolls back an unaccepted runtime or profile commit 
       async startCandidate() {
         commitCalls.push('start');
         return {
-          accepted: true,
-          runtimeAccepted: true,
-          action: 'started',
-          profileSchemaVersion: PROFILE_SCHEMA_VERSION,
-          source: {
-            controllerIdentityMatch: true,
-            compatible: true
-          }
+          outcome: {
+            accepted: true,
+            runtimeAccepted: true,
+            action: 'started',
+            profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+            source: {
+              controllerIdentityMatch: true,
+              compatible: true
+            }
+          },
+          startedComponents: ['shim', 'relay']
         };
       },
       async persistCandidate() {
         commitCalls.push('persist');
         throw new Error('synthetic profile write failure');
       },
-      async rollbackCandidate() {
+      async rollbackCandidate(_profile, startedComponents) {
         commitCalls.push('rollback');
+        assert.deepEqual(startedComponents, ['shim', 'relay']);
+        assert.equal(
+          startedComponents.some(name =>
+            ['http', 'governance', 'edge'].includes(name)
+          ),
+          false
+        );
         return [];
       }
     }),
@@ -2183,25 +2208,95 @@ test('source-manifest rebind rolls back an unaccepted runtime or profile commit 
       candidateProfile,
       async startCandidate() {
         return {
-          accepted: true,
-          runtimeAccepted: true,
-          action: 'started',
-          profileSchemaVersion: PROFILE_SCHEMA_VERSION,
-          source: {
-            controllerIdentityMatch: true,
-            compatible: true
-          }
+          outcome: {
+            accepted: true,
+            runtimeAccepted: true,
+            action: 'started',
+            profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+            source: {
+              controllerIdentityMatch: true,
+              compatible: true
+            }
+          },
+          startedComponents: ['governance']
         };
       },
       async persistCandidate() {
         throw new Error('synthetic profile write failure');
       },
-      async rollbackCandidate() {
+      async rollbackCandidate(_profile, startedComponents) {
+        assert.deepEqual(startedComponents, ['governance']);
         return ['governance'];
       }
     }),
     { code: 'stack_source_manifest_rebind_rollback_incomplete' }
   );
+});
+
+test('source-manifest rebind rejects untrusted start evidence without broad rollback', async () => {
+  const candidateProfile = profileWithSourceManifestRebinding(
+    profile(),
+    sourceManifestRebind()
+  );
+  const acceptedOutcome = {
+    accepted: true,
+    runtimeAccepted: true,
+    action: 'started',
+    profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+    source: {
+      controllerIdentityMatch: true,
+      compatible: true
+    }
+  };
+  for (const startedComponents of [
+    ['shim', 'shim'],
+    ['shim', 'outside'],
+    'shim'
+  ]) {
+    let rolledBack = false;
+    await assert.rejects(
+      () => coordinateSourceManifestRebind({
+        candidateProfile,
+        async startCandidate() {
+          return {
+            outcome: acceptedOutcome,
+            startedComponents
+          };
+        },
+        async persistCandidate() {
+          throw new Error('must not persist');
+        },
+        async rollbackCandidate() {
+          rolledBack = true;
+          return [];
+        }
+      }),
+      { code: 'stack_source_manifest_rebind_contract_invalid' }
+    );
+    assert.equal(rolledBack, false);
+  }
+
+  let emptyEvidenceRollback = false;
+  await assert.rejects(
+    () => coordinateSourceManifestRebind({
+      candidateProfile,
+      async startCandidate() {
+        return {
+          outcome: acceptedOutcome,
+          startedComponents: []
+        };
+      },
+      async persistCandidate() {
+        throw new Error('must not persist');
+      },
+      async rollbackCandidate() {
+        emptyEvidenceRollback = true;
+        return [];
+      }
+    }),
+    { code: 'stack_source_manifest_rebind_runtime_rejected' }
+  );
+  assert.equal(emptyEvidenceRollback, false);
 });
 
 test('source compatibility retains exact-head v5 semantics and exposes only the reviewed upgrade path', () => {
@@ -2342,6 +2437,20 @@ test('transition lifecycle keeps ordinary start profile-free and gates source re
   assert.equal(
     rebind.indexOf('inspectStack({') <
       rebind.indexOf('return writeProfile('),
+    true
+  );
+  assert.equal(
+    rebind.includes('new Set(startedComponents)'),
+    true
+  );
+  assert.equal(
+    rebind.includes(
+      "new Set(['shim', 'http', 'governance', 'relay', 'edge'])"
+    ),
+    false
+  );
+  assert.equal(
+    start.includes('return startRecord.outcome;'),
     true
   );
   const unmanagedHttpPreflight = start.indexOf(

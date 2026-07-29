@@ -3850,6 +3850,13 @@ async function rollbackStarted(started, profile, environment) {
   return failures;
 }
 
+function startOutcomeWithEvidence(outcome, started) {
+  return Object.freeze({
+    outcome,
+    startedComponents: Object.freeze([...started])
+  });
+}
+
 async function startStackWithProfile(storedProfile, {
   environment = process.env
 } = {}) {
@@ -4198,23 +4205,29 @@ async function startStackWithProfile(storedProfile, {
       const result = await inspectStack({ environment, profile });
       if (!result.accepted) throw codedError('stack_final_acceptance_failed');
       if (transitionRequired) {
-        return Object.freeze({
-          ...result,
-          accepted: false,
-          runtimeAccepted: false,
-          transitionRuntimeAccepted: true,
-          profileUpgradeRequired: true,
-          action: started.size === 0
-            ? 'profile_upgrade_required'
-            : 'started_profile_upgrade_required',
-          failClosedRollbackRequired: false
-        });
+        return startOutcomeWithEvidence(
+          Object.freeze({
+            ...result,
+            accepted: false,
+            runtimeAccepted: false,
+            transitionRuntimeAccepted: true,
+            profileUpgradeRequired: true,
+            action: started.size === 0
+              ? 'profile_upgrade_required'
+              : 'started_profile_upgrade_required',
+            failClosedRollbackRequired: false
+          }),
+          started
+        );
       }
-      return Object.freeze({
-        ...result,
-        action: started.size === 0 ? 'already_running' : 'started',
-        failClosedRollbackRequired: false
-      });
+      return startOutcomeWithEvidence(
+        Object.freeze({
+          ...result,
+          action: started.size === 0 ? 'already_running' : 'started',
+          failClosedRollbackRequired: false
+        }),
+        started
+      );
     } catch (error) {
       const rollbackFailures = await rollbackStarted(started, profile, environment);
       if (rollbackFailures.length > 0) {
@@ -4229,10 +4242,11 @@ async function startStack({
 } = {}) {
   const lifecycle = acquireLifecycleProfile({ environment });
   try {
-    return await startStackWithProfile(
+    const startRecord = await startStackWithProfile(
       lifecycle.profile,
       { environment }
     );
+    return startRecord.outcome;
   } finally {
     lifecycle.release();
   }
@@ -4495,22 +4509,47 @@ async function coordinateSourceManifestRebind({
   } catch {
     throw codedError('stack_source_manifest_rebind_contract_invalid');
   }
+  const startRecord = await startCandidate(validatedCandidate);
+  const allowedStartedComponents = new Set([
+    ...Object.keys(COMPONENTS),
+    'edge'
+  ]);
+  if (!exactKeys(startRecord, ['outcome', 'startedComponents']) ||
+      !startRecord.outcome ||
+      typeof startRecord.outcome !== 'object' ||
+      Array.isArray(startRecord.outcome) ||
+      !Array.isArray(startRecord.startedComponents) ||
+      new Set(startRecord.startedComponents).size !==
+        startRecord.startedComponents.length ||
+      startRecord.startedComponents.some(name =>
+        typeof name !== 'string' ||
+        !allowedStartedComponents.has(name)
+      )) {
+    throw codedError('stack_source_manifest_rebind_contract_invalid');
+  }
+  const outcome = startRecord.outcome;
+  const startedComponents = Object.freeze([
+    ...startRecord.startedComponents
+  ]);
   const rollback = async () => {
     try {
-      const failures = await rollbackCandidate(validatedCandidate);
+      const failures = await rollbackCandidate(
+        validatedCandidate,
+        startedComponents
+      );
       return Array.isArray(failures) && failures.length === 0;
     } catch {
       return false;
     }
   };
-  const started = await startCandidate(validatedCandidate);
-  if (started?.accepted !== true ||
-      started?.runtimeAccepted !== true ||
-      started?.action !== 'started' ||
-      started?.profileSchemaVersion !== PROFILE_SCHEMA_VERSION ||
-      started?.source?.controllerIdentityMatch !== true ||
-      started?.source?.compatible !== true) {
-    if (started?.action === 'started' && !await rollback()) {
+  if (outcome.accepted !== true ||
+      outcome.runtimeAccepted !== true ||
+      outcome.action !== 'started' ||
+      startedComponents.length === 0 ||
+      outcome.profileSchemaVersion !== PROFILE_SCHEMA_VERSION ||
+      outcome.source?.controllerIdentityMatch !== true ||
+      outcome.source?.compatible !== true) {
+    if (startedComponents.length > 0 && !await rollback()) {
       throw codedError('stack_source_manifest_rebind_rollback_incomplete');
     }
     throw codedError('stack_source_manifest_rebind_runtime_rejected');
@@ -4524,7 +4563,7 @@ async function coordinateSourceManifestRebind({
     throw codedError('stack_source_manifest_rebind_profile_commit_failed');
   }
   return Object.freeze({
-    ...started,
+    ...outcome,
     action: 'source_manifest_rebound',
     profileStored: true,
     sourceManifestRebound: true,
@@ -4583,8 +4622,8 @@ async function rebindSourceManifestStack({
           { environment, replace: true }
         );
       },
-      rollbackCandidate: () => rollbackStarted(
-        new Set(['shim', 'http', 'governance', 'relay', 'edge']),
+      rollbackCandidate: (_profile, startedComponents) => rollbackStarted(
+        new Set(startedComponents),
         candidateProfile,
         environment
       )
