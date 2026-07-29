@@ -14,6 +14,7 @@ const {
   createStageReceipt,
   createTerminalEnvelope,
   digestObject,
+  failureRegistryEntry,
   projectGovernedReadAttemptOwner,
   projectGovernedReadAttemptPublic,
   validateAttemptHeader,
@@ -275,6 +276,10 @@ test('receipt validation rejects unknown reasons, tampering, and oversize record
     outcome: 'failed',
     reasonCode: 'not_registered'
   }), { code: 'attempt_reason_unknown' });
+  assert.throws(
+    () => failureRegistryEntry('constructor'),
+    { code: 'attempt_reason_unknown' }
+  );
 
   const edgeValidated = createStageReceipt({
     header: value,
@@ -994,6 +999,88 @@ test('coordinator loss records terminal_missing and never fabricates a terminal'
     evidenceComplete: false,
     failureOrigin: 'observer'
   }), { code: 'attempt_terminal_reason_forbidden' });
+});
+
+test('Observer bounds terminal and missing retention across sustained turnover', () => {
+  let clockNow = NOW;
+  const observer = createGovernedReadAttemptObserver({
+    clock: () => clockNow,
+    maxRetainedAttempts: 2
+  });
+
+  function acceptObserved(value) {
+    const created = createStageReceipt({ header: value, stage: 'CREATED' });
+    assert.equal(observer.observe({
+      component: 'transient_edge_broker',
+      event: 'attempt_accepted',
+      header: value
+    }), true);
+    assert.equal(observer.observe({
+      component: 'transient_edge_broker',
+      event: 'attempt_receipt_appended',
+      attempt_ref: value.attempt_ref,
+      receipt: created
+    }), true);
+    return [created];
+  }
+
+  function observeCancelled(value, receipts) {
+    const terminal = createTerminalEnvelope({
+      header: value,
+      receipts,
+      outcome: 'failure',
+      reasonCode: 'attempt_cancelled',
+      evidenceComplete: false,
+      failureOrigin: 'edge_broker'
+    });
+    assert.equal(observer.observe({
+      component: 'transient_edge_broker',
+      event: 'attempt_terminal_committed',
+      attempt_ref: value.attempt_ref,
+      terminal
+    }), true);
+  }
+
+  const terminalValue = header('e');
+  const terminalReceipts = acceptObserved(terminalValue);
+  observeCancelled(terminalValue, terminalReceipts);
+  assert.equal(observer.observe({
+    component: 'transient_edge_broker',
+    event: 'attempt_terminal_rejected',
+    attempt_ref: terminalValue.attempt_ref,
+    rejection_code: 'attempt_terminal_already_committed'
+  }), true);
+
+  const missingValue = header('f');
+  acceptObserved(missingValue);
+  assert.equal(observer.observe({
+    component: 'transient_edge_broker',
+    event: 'attempt_terminal_missing',
+    attempt_ref: missingValue.attempt_ref
+  }), false);
+
+  assert.equal(observer.observe({
+    component: 'transient_edge_broker',
+    event: 'attempt_accepted',
+    header: header('g')
+  }), false);
+  assert.equal(
+    observer.snapshot().last_violation_code,
+    'attempt_observer_retention_capacity_exceeded'
+  );
+
+  clockNow = new Date(NOW.getTime() + 60_000);
+  const fresh = header('h', clockNow);
+  const freshReceipts = acceptObserved(fresh);
+  observeCancelled(fresh, freshReceipts);
+
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.attempts_accepted, 3);
+  assert.equal(snapshot.receipts_accepted, 3);
+  assert.equal(snapshot.terminal_failures, 2);
+  assert.equal(snapshot.terminals_rejected, 1);
+  assert.equal(snapshot.terminals_missing, 1);
+  assert.equal(snapshot.protocol_violations, 2);
 });
 
 test('Observer independently rejects a tampered receipt chain without exposing identifiers', () => {

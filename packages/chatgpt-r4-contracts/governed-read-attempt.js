@@ -450,9 +450,10 @@ function validateAttemptHeader(header) {
 
 function failureRegistryEntry(reasonCode) {
   assertSafeCode(reasonCode, 'attempt_reason_invalid');
-  const entry = GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY[reasonCode];
-  if (!entry) reject('attempt_reason_unknown');
-  return entry;
+  if (!Object.hasOwn(GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY, reasonCode)) {
+    reject('attempt_reason_unknown');
+  }
+  return GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY[reasonCode];
 }
 
 function validateCounterFacts(

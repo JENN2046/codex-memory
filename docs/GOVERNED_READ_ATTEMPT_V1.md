@@ -85,7 +85,8 @@ layers.
 attempt-v1 reason code, category, stage, origin, fallback policy, and
 may-have-occurred metadata. Runtime layers must import or generate from this
 registry when they are migrated; they must not maintain a second attempt-v1
-allowlist.
+allowlist. Registry lookup accepts only own properties, so JavaScript prototype
+names such as `constructor` remain unregistered and fail closed.
 
 Every registered attempt-v1 failure has `fallback_policy: forbidden`.
 Attempt-v1 therefore never invokes local fallback. Legacy non-attempt calls are
@@ -197,6 +198,12 @@ Its projection contains aggregate counts and a safe protocol-violation code
 only. It retains no attempt identifier in the projection, response body, raw
 memory, provider response, or secret. `terminal_missing` increments a protocol
 violation and does not create success or failure evidence.
+
+Observer working state is also bounded. Active plus retained terminal/missing
+records cannot exceed its configured retention capacity; terminal and missing
+records keep a short late-event window of at least one protocol TTL, are pruned
+on later observation, and saturation records a protocol violation rather than
+growing memory without bound.
 
 ## Projections
 
