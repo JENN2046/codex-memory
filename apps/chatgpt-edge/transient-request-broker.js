@@ -1,6 +1,12 @@
 'use strict';
 
 const {
+  createGovernedReadAttemptProtocol,
+  createStageReceipt,
+  createTerminalEnvelope,
+  validateAttemptHeader,
+  validateStageReceipt,
+  validateTerminalEnvelope,
   InMemoryReplayGuard,
   createOpaqueId,
   reject
@@ -356,7 +362,215 @@ function createTransientRequestBroker({
   });
 }
 
+function createGovernedReadAttemptCoordinator({
+  clock = () => new Date(),
+  maxAttempts = 64,
+  eventSink,
+  eventComponent = 'transient_edge_broker'
+} = {}) {
+  if (typeof clock !== 'function') reject('attempt_coordinator_clock_invalid');
+  if (!Number.isInteger(maxAttempts) || maxAttempts < 1 || maxAttempts > 1024) {
+    reject('attempt_coordinator_capacity_invalid');
+  }
+  if (eventSink !== undefined && typeof eventSink !== 'function') {
+    reject('attempt_coordinator_event_sink_invalid');
+  }
+  if (typeof eventComponent !== 'string' ||
+      !/^[a-z][a-z0-9_]{0,79}$/u.test(eventComponent)) {
+    reject('attempt_coordinator_event_component_invalid');
+  }
+
+  const attempts = new Map();
+
+  function nowMs() {
+    const value = clock();
+    const milliseconds = value instanceof Date
+      ? value.getTime()
+      : new Date(value).getTime();
+    if (!Number.isFinite(milliseconds)) reject('attempt_coordinator_clock_invalid');
+    return milliseconds;
+  }
+
+  function emit(event, payload = {}) {
+    if (!eventSink) return;
+    try {
+      const pending = eventSink(Object.freeze({
+        component: eventComponent,
+        event,
+        ...payload
+      }));
+      if (pending && typeof pending.catch === 'function') pending.catch(() => {});
+    } catch {
+      // Protocol observation is independent from the coordinator's CAS state.
+    }
+  }
+
+  function requireAttempt(attemptRef) {
+    const record = attempts.get(attemptRef);
+    if (!record) reject('attempt_not_found');
+    return record;
+  }
+
+  function acceptAttempt(header) {
+    validateAttemptHeader(header);
+    if (Date.parse(header.deadline_at) <= nowMs()) reject('attempt_deadline_expired');
+    if (attempts.has(header.attempt_ref)) reject('attempt_ref_replay');
+    if (attempts.size >= maxAttempts) reject('attempt_coordinator_capacity_exceeded');
+    const acceptedHeader = structuredClone(header);
+    const record = {
+      header: acceptedHeader,
+      receipts: [],
+      terminal: null
+    };
+    attempts.set(header.attempt_ref, record);
+    emit('attempt_accepted', { header: structuredClone(acceptedHeader) });
+
+    const created = createStageReceipt({
+      header: acceptedHeader,
+      receipts: [],
+      stage: 'CREATED'
+    });
+    record.receipts.push(structuredClone(created));
+    emit('attempt_receipt_appended', {
+      attempt_ref: header.attempt_ref,
+      receipt: structuredClone(created)
+    });
+    return Object.freeze({
+      attempt_ref: header.attempt_ref,
+      header_digest: created.previous_digest,
+      created_receipt_digest: created.receipt_digest
+    });
+  }
+
+  function appendReceipt(attemptRef, receipt) {
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) reject('attempt_terminal_already_committed');
+    validateStageReceipt(receipt, {
+      header: record.header,
+      receipts: record.receipts
+    });
+    record.receipts.push(structuredClone(receipt));
+    emit('attempt_receipt_appended', {
+      attempt_ref: attemptRef,
+      receipt: structuredClone(receipt)
+    });
+    return Object.freeze({
+      attempt_ref: attemptRef,
+      sequence: receipt.sequence,
+      receipt_digest: receipt.receipt_digest
+    });
+  }
+
+  function commitTerminal(attemptRef, terminal) {
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) {
+      emit('attempt_terminal_rejected', {
+        attempt_ref: attemptRef,
+        rejection_code: 'attempt_terminal_already_committed'
+      });
+      reject('attempt_terminal_already_committed');
+    }
+    validateTerminalEnvelope(terminal, {
+      header: record.header,
+      receipts: record.receipts
+    });
+    record.terminal = structuredClone(terminal);
+    emit('attempt_terminal_committed', {
+      attempt_ref: attemptRef,
+      terminal: structuredClone(terminal)
+    });
+    return Object.freeze({
+      attempt_ref: attemptRef,
+      outcome: terminal.outcome,
+      terminal_digest: terminal.terminal_digest,
+      accepted: true
+    });
+  }
+
+  function commitCoordinatorFailure(attemptRef, reasonCode) {
+    const record = requireAttempt(attemptRef);
+    const terminal = createTerminalEnvelope({
+      header: record.header,
+      receipts: record.receipts,
+      outcome: 'failure',
+      reasonCode,
+      evidenceComplete: false,
+      failureOrigin: 'edge_broker'
+    });
+    return commitTerminal(attemptRef, terminal);
+  }
+
+  function timeoutAttempt(attemptRef) {
+    return commitCoordinatorFailure(attemptRef, 'attempt_timeout');
+  }
+
+  function cancelAttempt(attemptRef) {
+    return commitCoordinatorFailure(attemptRef, 'attempt_cancelled');
+  }
+
+  function expireDueAttempts() {
+    const currentMs = nowMs();
+    let committed = 0;
+    for (const [attemptRef, record] of attempts) {
+      if (record.terminal || Date.parse(record.header.deadline_at) > currentMs) continue;
+      timeoutAttempt(attemptRef);
+      committed += 1;
+    }
+    return committed;
+  }
+
+  function snapshot(attemptRef) {
+    const record = requireAttempt(attemptRef);
+    const lastReceipt = record.receipts.at(-1) || null;
+    return Object.freeze({
+      attempt_ref: attemptRef,
+      receipt_count: record.receipts.length,
+      last_stage: lastReceipt?.stage || null,
+      terminal_committed: record.terminal !== null,
+      terminal_outcome: record.terminal?.outcome || null,
+      in_memory_only: true
+    });
+  }
+
+  function protocol(attemptRef) {
+    const record = requireAttempt(attemptRef);
+    if (!record.terminal) reject('attempt_terminal_missing');
+    return createGovernedReadAttemptProtocol({
+      header: record.header,
+      receipts: record.receipts,
+      terminal: record.terminal
+    });
+  }
+
+  function reportCoordinatorLoss() {
+    let missing = 0;
+    for (const [attemptRef, record] of attempts) {
+      if (record.terminal) continue;
+      emit('attempt_terminal_missing', { attempt_ref: attemptRef });
+      missing += 1;
+    }
+    attempts.clear();
+    return Object.freeze({
+      active_attempts_lost: missing,
+      terminals_fabricated: 0
+    });
+  }
+
+  return Object.freeze({
+    acceptAttempt,
+    appendReceipt,
+    cancelAttempt,
+    commitTerminal,
+    expireDueAttempts,
+    protocol,
+    reportCoordinatorLoss,
+    snapshot,
+    timeoutAttempt
+  });
+}
+
 module.exports = {
   TERMINAL_STATES,
+  createGovernedReadAttemptCoordinator,
   createTransientRequestBroker
 };

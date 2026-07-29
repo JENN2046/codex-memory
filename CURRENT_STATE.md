@@ -17,15 +17,18 @@ deploy, cutover, complete-V8, or readiness claim.
 
 `activeTask: CM-2159`
 
-`activePhase: r5_o_invalid_argument_source_fix_delivery`
+`activePhase: governed_read_attempt_refactor`
 
-PR `#71` delivered the safe same-schema source rebind path. Under single-use
-authorization `_003`, rebind and exact-head runtime acceptance succeeded, but
-the one authorized `search_memory` call failed closed as `INVALID_ARGUMENT`.
-`CM-2159` now owns the source/test fix and remains active until a new
-exact-authorized R5-O proof and governance closeout succeed. This declaration
-does not authorize a runtime probe, provider call, private configuration
-access, lifecycle action, profile replacement, or retry of `_003`.
+PR `#72` delivered the `_003` `INVALID_ARGUMENT` source/test repair. The later
+single-use `_004` observation failed closed without producing one
+attempt-scoped, stage-ordered, counter-reconciled terminal envelope acceptable
+as R5-O evidence. `_004` is consumed and must not be retried or reconstructed
+from legacy error mappings. `CM-2159` therefore remains active under the
+`governed_read_attempt_refactor` route. The current schema-v6 stack was
+separately authorized to stop before source construction and is being held
+stopped. This declaration does not authorize restart, rebind, provider or
+memory-tool execution, private configuration access, `_005`, cutover, or
+readiness claims.
 
 ## Last Accepted Product Baseline
 
@@ -43,16 +46,18 @@ future task.
 ## Open Blockers
 
 - `r5_h_matrix_incomplete` [open]: The R5-H private ChatGPT dogfood matrix is incomplete.
-- `r5_o_private_exact_head_runtime_unverified` [open]: R5-O _003 reached exact-head runtime acceptance but its single search failed closed before a receipt-bound result.
+- `r5_o_private_exact_head_runtime_unverified` [open]: R5-O _004 failed closed without an acceptable governed-read terminal envelope; no private exact-head result is established.
 - `fresh_non_empty_task_context_relevance_unproven` [open]: Fresh non-empty task-context recall relevance has not been proven.
 
 ## Next Safe Action
 
-Deliver the `_003` `INVALID_ARGUMENT` source/test fix through PR and successful
-merged-main CI. Then prepare a separate exact authorization for the existing
-safe source rebind and a new single-use R5-O `_004` read against that exact
-baseline. Do not start the stack, replace its profile, read private memory, or
-retry `_003` from this committed declaration alone.
+Deliver the four ordered CM-2159 source PRs for the attempt contract, two-pass
+source projection, vertical runtime, and Edge data-response v2 hard cut. Keep
+the schema-v6 stack stopped throughout construction. Only after all four
+deliveries are merged and merged-main CI succeeds may a separate stopped-state
+`rebind-source` authorization be requested, followed by a distinct single-use
+R5-O `_005` authorization. Do not start or rebind the stack, read private
+memory, invoke a provider, or run `_005` from this committed declaration alone.
 
 ## Authority Boundaries
 
@@ -68,9 +73,10 @@ retry `_003` from this committed declaration alone.
   They do not authorize another status probe, lifecycle action, provider call,
   private runtime verification, real memory read or write, release, deploy,
   cutover, or readiness claim.
-- The current source delivery does not change the public MCP surface,
-  dependencies, CI workflow, runtime/provider configuration, retained product
-  baseline, or readiness status.
+- The first refactor delivery is dormant. It does not change the public MCP
+  surface, active Edge response schema, dependencies, CI workflow,
+  runtime/provider configuration, retained product baseline, or readiness
+  status.
 
 ## Evidence And History
 
@@ -79,28 +85,25 @@ Last completed: `CM-2158 / CMV-2243`.
 - Active task: `CM-2159`; its validation receipt will not replace
   the unique completed ledger/validation pair until the successful R5-O
   verification and governance closeout are complete.
-- PRs `#67`-`#69` delivered manifest-v1 source identity, entered `CM-2159`,
-  and bound schema v6 to the canonical endpoint at `31f94d93...`. The exact
-  canonical takeover stored the owner-only schema-v6 profile; `_001` later
-  failed closed without establishing R5-O success.
-- PR `#70` merged the exact read-only selected-diary hydrator as `bd21ae50...`;
-  merged-main CI `30422647557` passed. Authorization `_002` then stopped at
-  schema-v6 source-manifest mismatch with zero provider/native/memory calls.
-- PR `#71` merged the safe schema-v6-to-v6 source rebind as `de36d4bc...`;
-  merged-main CI `30453986741` passed.
-- Single-use authorization `_003` was consumed. Its stopped-stack
-  `rebind-source` succeeded and status accepted the exact source/runtime
-  binding. The governed context resolved once; the one permitted search then
-  failed closed as `INVALID_ARGUMENT`, produced no result or relevance proof,
-  and terminally emergency-stopped the observation. Accepted evidence counted
-  zero provider calls, native invocations, primary writes, and derived writes;
-  the identity-matched stack was stopped without retry.
-- Source-only investigation found a reachable implementation defect consistent
-  with that terminal boundary: VCP can preserve non-contiguous source
-  `chunk_index` values when vectorless chunks are skipped, while the production
-  hydrator required a contiguous sequence. Hydration failures were also
-  collapsed to a generic runtime reason. No private database, configuration,
-  raw log, provider response, or raw memory was inspected to make this finding.
+- PRs `#67`-`#71` delivered source-manifest identity, canonical schema-v6
+  binding, selected-diary hydration, and stopped-state rebind. `_001` and
+  `_002` failed closed; `_003` exposed the sparse `chunk_index` and collapsed
+  hydration-reason defect without an accepted result.
+- PR `#72` merged that source/test repair as `e07d3f15...`.
+- Single-use authorization `_004` was consumed and failed closed. It did not
+  establish a receipt-bound R5-O result. Exact stage and counter facts that
+  were not present in component evidence remain unknown and are not inferred
+  from legacy reason codes. No `_004` retry is authorized.
+- Under the separate
+  `AUTHORIZE_CM2159_SCHEMA_V6_SAFE_STOP_AND_HOLD_E07D3F15` authorization, the
+  controller stopped Relay, Governance, HTTP, Shim, and the retained Edge
+  container. A single low-disclosure status confirmed schema v6 and the stopped
+  state. No restart, rebind, provider call, memory-tool call, raw log read, or
+  raw memory read occurred. The stack must remain stopped during construction.
+- The current contract delivery introduces the dormant
+  `governed_read_attempt.v1` source and synthetic Edge-to-Observer validation
+  only. It neither activates attempt-v1 in the live path nor performs the
+  public response-v2 cutover.
 - PR `#65` and the exact V5 transition are historical closeout evidence only.
   They store no live locator or private payload and do not claim current health
   or authorize runtime, mutation, release, or deploy work.
