@@ -543,6 +543,40 @@ function runIsolatedTransaction(database, operation) {
   }
 }
 
+function assertIsolatedTransactionState(
+  database,
+  expectedFileCount,
+  expectedChunkCount
+) {
+  const errorCode = 'selected_diary_hydration_isolated_store_changed';
+  const currentFiles = queryCount(
+    database,
+    'SELECT COUNT(*) AS count FROM files',
+    [],
+    errorCode
+  );
+  const currentChunks = queryCount(
+    database,
+    'SELECT COUNT(*) AS count FROM chunks',
+    [],
+    errorCode
+  );
+  if (currentFiles !== expectedFileCount ||
+      currentChunks !== expectedChunkCount) {
+    throw codedError(errorCode);
+  }
+  for (const table of SECONDARY_TABLES) {
+    if (queryCount(
+      database,
+      `SELECT COUNT(*) AS count FROM ${table}`,
+      [],
+      errorCode
+    ) !== 0) {
+      throw codedError(errorCode);
+    }
+  }
+}
+
 function insertProjection(database, projection) {
   const insertFile = database.prepare(`
     INSERT INTO files
@@ -555,21 +589,7 @@ function insertProjection(database, projection) {
     VALUES (?, ?, ?, ?, ?)
   `);
   runIsolatedTransaction(database, () => {
-    const currentFiles = queryCount(
-      database,
-      'SELECT COUNT(*) AS count FROM files',
-      [],
-      'selected_diary_hydration_isolated_store_invalid'
-    );
-    const currentChunks = queryCount(
-      database,
-      'SELECT COUNT(*) AS count FROM chunks',
-      [],
-      'selected_diary_hydration_isolated_store_invalid'
-    );
-    if (currentFiles !== 0 || currentChunks !== 0) {
-      throw codedError('selected_diary_hydration_isolated_store_changed');
-    }
+    assertIsolatedTransactionState(database, 0, 0);
     for (const file of projection.files) {
       insertFile.run(
         file.id,
@@ -590,6 +610,11 @@ function insertProjection(database, projection) {
         chunk.vector
       );
     }
+    assertIsolatedTransactionState(
+      database,
+      projection.files.length,
+      projection.chunks.length
+    );
   });
 }
 

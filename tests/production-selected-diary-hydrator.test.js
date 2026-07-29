@@ -412,6 +412,29 @@ test('production hydrator rejects malformed source vectors without partial write
   );
 });
 
+test('production hydrator rolls back trigger-created secondary state atomically', async t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.isolated.exec(`
+    CREATE TRIGGER contaminate_hydration
+    AFTER INSERT ON files
+    BEGIN
+      INSERT INTO tags (name, vector) VALUES ('synthetic-trigger-tag', NULL);
+    END
+  `);
+  value.closeSource();
+  await assert.rejects(
+    () => value.hydrator()(hydrationInput(value)),
+    { code: 'selected_diary_hydration_isolated_store_changed' }
+  );
+  for (const table of ['files', 'chunks', 'tags']) {
+    assert.equal(
+      value.isolated.prepare(`SELECT COUNT(*) AS count FROM ${table}`).get().count,
+      0
+    );
+  }
+});
+
 test('production hydrator rejects cross-scope isolated rows', async t => {
   const value = fixture(t);
   insertMemory(value.source);
