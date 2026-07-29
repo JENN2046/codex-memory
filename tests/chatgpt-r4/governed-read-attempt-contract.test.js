@@ -129,6 +129,18 @@ function seedCoordinator(coordinator, value, receipts) {
   }
 }
 
+function withCounterFacts(receipt, counterFacts) {
+  const { receipt_digest: ignored, ...base } = receipt;
+  const changed = {
+    ...base,
+    counter_facts: counterFacts
+  };
+  return {
+    ...changed,
+    receipt_digest: digestObject(changed)
+  };
+}
+
 test('AttemptHeader is immutable, bounded, and contains no mutable state identity', () => {
   const value = header();
   assert.equal(Object.isFrozen(value), true);
@@ -455,6 +467,149 @@ test('partial counter triples reject known contradictions while preserving consi
   }), { code: 'attempt_derived_transaction_invalid' });
 });
 
+test('completed pre-dispatch zero attestation cannot survive into timeout counters', () => {
+  let clockNow = NOW;
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => clockNow
+  });
+  const value = header('Y');
+  const receipts = appendThrough(value, 'SOURCE_PREFLIGHT');
+  seedCoordinator(coordinator, value, receipts.slice(0, -1));
+  const staleZero = withCounterFacts(receipts.at(-1), {
+    provider: { started: 0, succeeded: 0, failed: 0 }
+  });
+
+  assert.throws(
+    () => coordinator.appendReceipt(value.attempt_ref, staleZero),
+    { code: 'attempt_counter_facts_origin_invalid' }
+  );
+  assert.equal(
+    coordinator.snapshot(value.attempt_ref).receipt_count,
+    receipts.length - 1
+  );
+
+  clockNow = new Date(NOW.getTime() + 30_000);
+  assert.equal(coordinator.expireDueAttempts(), 1);
+  assert.deepEqual(
+    coordinator.protocol(value.attempt_ref).terminal.counters.provider,
+    { started: null, succeeded: null, failed: null }
+  );
+});
+
+test('Edge rejects unreconcilable receipt chains before storing and retains terminal closure', () => {
+  for (const [suffix, trigger] of [
+    ['Z', 'cancel'],
+    ['0', 'expire']
+  ]) {
+    let clockNow = NOW;
+    const coordinator = createGovernedReadAttemptCoordinator({
+      clock: () => clockNow
+    });
+    const value = header(suffix);
+    const receipts = appendThrough(value, 'PROVIDER_EMBEDDING', {
+      outcome: 'failed',
+      reasonCode: 'provider_embedding_failed',
+      finalCounterFacts: {
+        provider: { started: 0, failed: 1 }
+      }
+    });
+    seedCoordinator(coordinator, value, receipts.slice(0, -1));
+
+    assert.throws(
+      () => coordinator.appendReceipt(value.attempt_ref, receipts.at(-1)),
+      { code: 'attempt_counter_reconciliation_invalid' }
+    );
+    assert.equal(
+      coordinator.snapshot(value.attempt_ref).receipt_count,
+      receipts.length - 1
+    );
+
+    if (trigger === 'cancel') {
+      assert.doesNotThrow(() => coordinator.cancelAttempt(value.attempt_ref));
+    } else {
+      const subsequent = header('1');
+      coordinator.acceptAttempt(subsequent);
+      clockNow = new Date(NOW.getTime() + 30_000);
+      assert.equal(coordinator.expireDueAttempts(), 2);
+      assert.equal(
+        coordinator.protocol(subsequent.attempt_ref).terminal.reason_code,
+        'attempt_timeout'
+      );
+    }
+
+    const terminal = coordinator.protocol(value.attempt_ref).terminal;
+    assert.equal(
+      terminal.reason_code,
+      trigger === 'cancel' ? 'attempt_cancelled' : 'attempt_timeout'
+    );
+    assert.deepEqual(terminal.counters.provider, {
+      started: null,
+      succeeded: null,
+      failed: null
+    });
+  }
+});
+
+test('Edge and Observer reject a failed receipt that cannot form its required terminal evidence', () => {
+  let clockNow = NOW;
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => clockNow
+  });
+  const value = header('4');
+  const receipts = appendThrough(value, 'SOURCE_PREFLIGHT', {
+    outcome: 'failed',
+    reasonCode: 'source_preflight_failed',
+    finalCounterFacts: {
+      native_invocation: { succeeded: 0, failed: 1 },
+      primary_memory: { write_attempts: 0, writes_committed: 0 }
+    }
+  });
+  seedCoordinator(coordinator, value, receipts.slice(0, -1));
+  assert.throws(
+    () => coordinator.appendReceipt(value.attempt_ref, receipts.at(-1)),
+    { code: 'attempt_counter_evidence_incomplete' }
+  );
+  assert.equal(
+    coordinator.snapshot(value.attempt_ref).receipt_count,
+    receipts.length - 1
+  );
+
+  const observer = createGovernedReadAttemptObserver();
+  assert.equal(observer.observe({
+    component: 'transient_edge_broker',
+    event: 'attempt_accepted',
+    header: value
+  }), true);
+  for (const receipt of receipts.slice(0, -1)) {
+    assert.equal(observer.observe({
+      component: 'transient_edge_broker',
+      event: 'attempt_receipt_appended',
+      attempt_ref: value.attempt_ref,
+      receipt
+    }), true);
+  }
+  assert.equal(observer.observe({
+    component: 'transient_edge_broker',
+    event: 'attempt_receipt_appended',
+    attempt_ref: value.attempt_ref,
+    receipt: receipts.at(-1)
+  }), false);
+  assert.equal(
+    observer.snapshot().last_violation_code,
+    'attempt_counter_evidence_incomplete'
+  );
+
+  clockNow = new Date(NOW.getTime() + 30_000);
+  assert.equal(coordinator.expireDueAttempts(), 1);
+  const terminal = coordinator.protocol(value.attempt_ref).terminal;
+  assert.equal(terminal.reason_code, 'attempt_timeout');
+  assert.deepEqual(terminal.counters.provider, {
+    started: null,
+    succeeded: null,
+    failed: null
+  });
+});
+
 test('Edge capacity is reusable after cancelled, timed-out, and completed attempts', () => {
   let clockNow = NOW;
   const coordinator = createGovernedReadAttemptCoordinator({
@@ -594,6 +749,60 @@ test('Edge terminal CAS gives the deadline precedence at the exact boundary', ()
   }
 });
 
+test('Edge cancellation at the deadline resolves as timeout', () => {
+  let clockNow = NOW;
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => clockNow
+  });
+  const value = header('5');
+  coordinator.acceptAttempt(value);
+  clockNow = new Date(NOW.getTime() + 30_000);
+  assert.equal(
+    coordinator.cancelAttempt(value.attempt_ref).outcome,
+    'failure'
+  );
+  assert.equal(
+    coordinator.protocol(value.attempt_ref).terminal.reason_code,
+    'attempt_timeout'
+  );
+});
+
+test('Edge receipt admission gives the deadline precedence over a late failed receipt', () => {
+  let clockNow = NOW;
+  const observer = createGovernedReadAttemptObserver();
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => clockNow,
+    eventSink: observer.observe
+  });
+  const value = header('2');
+  const receipts = appendThrough(value, 'PROVIDER_EMBEDDING', {
+    outcome: 'failed',
+    reasonCode: 'provider_embedding_failed',
+    finalCounterFacts: {
+      provider: { started: 1, failed: 1 }
+    }
+  });
+  seedCoordinator(coordinator, value, receipts.slice(0, -1));
+  clockNow = new Date(NOW.getTime() + 30_000);
+
+  assert.throws(
+    () => coordinator.appendReceipt(value.attempt_ref, receipts.at(-1)),
+    { code: 'attempt_receipt_after_deadline' }
+  );
+  const terminal = coordinator.protocol(value.attempt_ref).terminal;
+  assert.equal(terminal.reason_code, 'attempt_timeout');
+  assert.equal(terminal.receipt_count, receipts.length - 1);
+  assert.deepEqual(terminal.counters.provider, {
+    started: null,
+    succeeded: null,
+    failed: null
+  });
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.receipts_accepted, receipts.length - 1);
+  assert.equal(snapshot.terminal_failures, 1);
+  assert.equal(snapshot.protocol_violations, 0);
+});
+
 test('Edge terminal CAS is first-terminal-wins for timeout against late completion', () => {
   const value = header('G');
   const observer = createGovernedReadAttemptObserver();
@@ -712,6 +921,44 @@ test('Observer independently rejects a tampered receipt chain without exposing i
   assert.equal(snapshot.protocol_violations, 1);
   assert.equal(snapshot.last_violation_code, 'attempt_receipt_digest_invalid');
   assert.equal(canonicalJson(snapshot).includes(value.attempt_ref), false);
+});
+
+test('Observer independently rejects an unreconcilable receipt aggregate before retaining it', () => {
+  const value = header('3');
+  const observer = createGovernedReadAttemptObserver();
+  const receipts = appendThrough(value, 'PROVIDER_EMBEDDING', {
+    outcome: 'failed',
+    reasonCode: 'provider_embedding_failed',
+    finalCounterFacts: {
+      provider: { started: 0, failed: 1 }
+    }
+  });
+  assert.equal(observer.observe({
+    component: 'transient_edge_broker',
+    event: 'attempt_accepted',
+    header: value
+  }), true);
+  for (const receipt of receipts.slice(0, -1)) {
+    assert.equal(observer.observe({
+      component: 'transient_edge_broker',
+      event: 'attempt_receipt_appended',
+      attempt_ref: value.attempt_ref,
+      receipt
+    }), true);
+  }
+  assert.equal(observer.observe({
+    component: 'transient_edge_broker',
+    event: 'attempt_receipt_appended',
+    attempt_ref: value.attempt_ref,
+    receipt: receipts.at(-1)
+  }), false);
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.receipts_accepted, receipts.length - 1);
+  assert.equal(snapshot.protocol_violations, 1);
+  assert.equal(
+    snapshot.last_violation_code,
+    'attempt_counter_reconciliation_invalid'
+  );
 });
 
 test('terminal validation rejects digest tampering and duplicate terminal state in protocol objects', () => {

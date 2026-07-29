@@ -455,7 +455,12 @@ function failureRegistryEntry(reasonCode) {
   return entry;
 }
 
-function validateCounterFacts(counterFacts, origin, stage = null) {
+function validateCounterFacts(
+  counterFacts,
+  origin,
+  stage = null,
+  outcome = null
+) {
   if (!isPlainObject(counterFacts)) reject('attempt_counter_facts_invalid');
   for (const [group, fields] of Object.entries(counterFacts)) {
     if (!Object.hasOwn(GOVERNED_READ_ATTEMPT_COUNTER_FIELDS, group) ||
@@ -467,20 +472,22 @@ function validateCounterFacts(counterFacts, origin, stage = null) {
       .includes(origin);
     const stageIndex =
       GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES.indexOf(stage);
-    const zeroPreDispatchAttestation = (
-      group === 'provider' &&
-      stageIndex >= 0 &&
-      stageIndex <
-        GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES.indexOf('PROVIDER_EMBEDDING') &&
-      Object.keys(fields).length === allowed.length &&
-      Object.values(fields).every(value => value === 0)
-    ) || (
-      group === 'native_invocation' &&
-      stageIndex >= 0 &&
-      stageIndex <
-        GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES.indexOf('NATIVE_DISPATCHED') &&
-      Object.keys(fields).length === allowed.length &&
-      Object.values(fields).every(value => value === 0)
+    const zeroPreDispatchAttestation = outcome === 'failed' && (
+      (
+        group === 'provider' &&
+        stageIndex >= 0 &&
+        stageIndex <
+          GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES.indexOf('PROVIDER_EMBEDDING') &&
+        Object.keys(fields).length === allowed.length &&
+        Object.values(fields).every(value => value === 0)
+      ) || (
+        group === 'native_invocation' &&
+        stageIndex >= 0 &&
+        stageIndex <
+          GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES.indexOf('NATIVE_DISPATCHED') &&
+        Object.keys(fields).length === allowed.length &&
+        Object.values(fields).every(value => value === 0)
+      )
     );
     if (!ownerOrigin && !zeroPreDispatchAttestation) {
       reject('attempt_counter_facts_origin_invalid');
@@ -577,7 +584,12 @@ function validateStageReceipt(receipt, { header, receipts = [] } = {}) {
   if (!['completed', 'failed'].includes(receipt.outcome)) {
     reject('attempt_receipt_outcome_invalid');
   }
-  validateCounterFacts(receipt.counter_facts, receipt.origin, receipt.stage);
+  validateCounterFacts(
+    receipt.counter_facts,
+    receipt.origin,
+    receipt.stage,
+    receipt.outcome
+  );
   if (receipt.outcome === 'completed') {
     if (receipt.reason_code !== null) reject('attempt_receipt_reason_invalid');
   } else {
@@ -662,24 +674,8 @@ function matchesKnownCounterTriple(value, fields) {
   );
 }
 
-function validateAttemptCounters(counters, {
-  outcome,
-  evidenceComplete,
-  failureEntry = null
-} = {}) {
+function validateAttemptCounterRelationships(counters, { outcome = null } = {}) {
   validateTerminalCounterShape(counters);
-  for (const group of ALL_COUNTER_GROUPS) {
-    if (!groupHasUnknown(counters, group)) continue;
-    const registryAllowsUnknown = group === 'provider'
-      ? failureEntry?.provider_may_have_occurred === true
-      : group === 'native_invocation'
-        ? failureEntry?.native_may_have_occurred === true
-        : failureEntry?.unknown_counter_groups.includes(group) === true;
-    if (evidenceComplete || !registryAllowsUnknown) {
-      reject('attempt_counter_evidence_incomplete');
-    }
-  }
-
   for (const group of ['provider', 'native_invocation']) {
     const value = counters[group];
     if (!matchesKnownCounterTriple(
@@ -708,6 +704,26 @@ function validateAttemptCounters(counters, {
     ['started', 'committed', 'rolled_back']
   )) {
     reject('attempt_derived_transaction_invalid');
+  }
+  return counters;
+}
+
+function validateAttemptCounters(counters, {
+  outcome,
+  evidenceComplete,
+  failureEntry = null
+} = {}) {
+  validateAttemptCounterRelationships(counters, { outcome });
+  for (const group of ALL_COUNTER_GROUPS) {
+    if (!groupHasUnknown(counters, group)) continue;
+    const registryAllowsUnknown = group === 'provider'
+      ? failureEntry?.provider_may_have_occurred === true
+      : group === 'native_invocation'
+        ? failureEntry?.native_may_have_occurred === true
+        : failureEntry?.unknown_counter_groups.includes(group) === true;
+    if (evidenceComplete || !registryAllowsUnknown) {
+      reject('attempt_counter_evidence_incomplete');
+    }
   }
   if (outcome === 'success' && evidenceComplete !== true) {
     reject('attempt_success_evidence_incomplete');
@@ -931,6 +947,7 @@ module.exports = {
   failureRegistryEntry,
   projectGovernedReadAttemptOwner,
   projectGovernedReadAttemptPublic,
+  validateAttemptCounterRelationships,
   validateAttemptCounters,
   validateAttemptHeader,
   validateCounterFacts,

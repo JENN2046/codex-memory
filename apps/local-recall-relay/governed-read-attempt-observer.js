@@ -1,6 +1,9 @@
 'use strict';
 
 const {
+  aggregateAttemptCounters,
+  createTerminalEnvelope,
+  validateAttemptCounterRelationships,
   validateAttemptHeader,
   validateStageReceipt,
   validateTerminalEnvelope
@@ -58,6 +61,23 @@ function createGovernedReadAttemptObserver() {
           header: record.header,
           receipts: record.receipts
         });
+        const prospectiveReceipts = [
+          ...record.receipts,
+          event.receipt
+        ];
+        validateAttemptCounterRelationships(
+          aggregateAttemptCounters(prospectiveReceipts)
+        );
+        if (event.receipt.outcome === 'failed') {
+          createTerminalEnvelope({
+            header: record.header,
+            receipts: prospectiveReceipts,
+            outcome: 'failure',
+            reasonCode: event.receipt.reason_code,
+            evidenceComplete: false,
+            failureOrigin: event.receipt.origin
+          });
+        }
         record.receipts.push(structuredClone(event.receipt));
         counters.receipts_accepted += 1;
         return true;

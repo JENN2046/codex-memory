@@ -94,8 +94,9 @@ unchanged by this dormant delivery.
 `provider_may_have_occurred` and `native_may_have_occurred` only control whether
 missing evidence may remain `null`. They never create a zero, one, success, or
 failure counter. A pre-provider failure must carry an explicit zero attestation
-from the stage that observed the pre-dispatch boundary; otherwise terminal
-validation fails closed.
+from the failed receipt that observes and closes the pre-dispatch boundary;
+completed receipts cannot leave a non-owner zero attestation for later stages.
+Otherwise terminal validation fails closed.
 
 ## Counter reconciliation
 
@@ -127,6 +128,16 @@ started=0, committed=0, rolled_back=0
 Partial derived-transaction evidence must likewise be compatible with at least
 one of those complete tuples.
 
+Before mutating coordinator or Observer state, receipt admission reconciles the
+prospective aggregate of all known counter fields. A receipt that would make
+the accumulated evidence incompatible with any permitted complete tuple is
+rejected without being stored.
+
+A failed receipt must also be able to form its canonical
+`evidence_complete: false` failure terminal before it is stored. This applies
+the failure registry's unknown-evidence policy at the chain-closing boundary
+and prevents an unterminable failed record.
+
 Complete success requires complete evidence, no `null`, no provider/native
 failure, zero primary writes, and zero fallback attempts.
 
@@ -142,8 +153,13 @@ CAS:
 - candidate admission checks the immutable deadline in the same synchronous CAS
   step; at or after the deadline, the broker commits timeout first and rejects
   the candidate as already terminal;
+- receipt admission applies the same deadline ordering before validation or
+  storage; a late receipt cannot replace the already-due timeout reason;
 - timeout and cancellation commit failure with
   `evidence_complete: false`;
+- when no failed receipt already closes the chain, cancellation at or after the
+  immutable deadline resolves as timeout; an earlier cancellation remains
+  `attempt_cancelled`;
 - if a validated failed receipt already exists, timeout or cancellation closes
   the attempt with that receipt's canonical reason, stage, and origin instead
   of replacing its downstream failure evidence;

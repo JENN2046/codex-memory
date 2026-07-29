@@ -1,9 +1,11 @@
 'use strict';
 
 const {
+  aggregateAttemptCounters,
   createGovernedReadAttemptProtocol,
   createStageReceipt,
   createTerminalEnvelope,
+  validateAttemptCounterRelationships,
   validateAttemptHeader,
   validateStageReceipt,
   validateTerminalEnvelope,
@@ -392,6 +394,10 @@ function createGovernedReadAttemptCoordinator({
     return milliseconds;
   }
 
+  function deadlineReached(record) {
+    return Date.parse(record.header.deadline_at) <= nowMs();
+  }
+
   function emit(event, payload = {}) {
     if (!eventSink) return;
     try {
@@ -449,10 +455,31 @@ function createGovernedReadAttemptCoordinator({
   function appendReceipt(attemptRef, receipt) {
     const record = requireAttempt(attemptRef);
     if (record.terminal) reject('attempt_terminal_already_committed');
+    if (deadlineReached(record)) {
+      commitCoordinatorFailure(attemptRef, 'attempt_timeout');
+      reject('attempt_receipt_after_deadline');
+    }
     validateStageReceipt(receipt, {
       header: record.header,
       receipts: record.receipts
     });
+    const prospectiveReceipts = [
+      ...record.receipts,
+      receipt
+    ];
+    validateAttemptCounterRelationships(
+      aggregateAttemptCounters(prospectiveReceipts)
+    );
+    if (receipt.outcome === 'failed') {
+      createTerminalEnvelope({
+        header: record.header,
+        receipts: prospectiveReceipts,
+        outcome: 'failure',
+        reasonCode: receipt.reason_code,
+        evidenceComplete: false,
+        failureOrigin: receipt.origin
+      });
+    }
     record.receipts.push(structuredClone(receipt));
     emit('attempt_receipt_appended', {
       attempt_ref: attemptRef,
@@ -514,7 +541,7 @@ function createGovernedReadAttemptCoordinator({
   function commitTerminal(attemptRef, terminal) {
     const record = requireAttempt(attemptRef);
     if (record.terminal) rejectTerminalCandidate(attemptRef);
-    if (Date.parse(record.header.deadline_at) <= nowMs()) {
+    if (deadlineReached(record)) {
       commitCoordinatorFailure(attemptRef, 'attempt_timeout');
       rejectTerminalCandidate(attemptRef);
     }
@@ -526,7 +553,12 @@ function createGovernedReadAttemptCoordinator({
   }
 
   function cancelAttempt(attemptRef) {
-    return commitCoordinatorFailure(attemptRef, 'attempt_cancelled');
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
+    return commitCoordinatorFailure(
+      attemptRef,
+      deadlineReached(record) ? 'attempt_timeout' : 'attempt_cancelled'
+    );
   }
 
   function expireDueAttempts() {
