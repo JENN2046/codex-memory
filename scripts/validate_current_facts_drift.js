@@ -24,6 +24,7 @@ const HISTORY_BASELINE_COMMIT = "ef62d4819ece3d93cb90e2d55fa84973cf43b7d1";
 const SHA40_RE = /^[0-9a-f]{40}$/;
 const CM_RE = /^CM-\d{4}$/;
 const CMV_RE = /^CMV-\d{4}$/;
+const ACTIVE_PHASE_RE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
 const BLOCKER_ID_RE = /^[a-z][a-z0-9]*(?:_[a-z0-9]+)*$/;
 const BLOCKER_STATUS_RE = /^[a-z][a-z0-9_]*$/;
 
@@ -53,6 +54,65 @@ const POINTER_FILES = Object.freeze([
   "ROADMAP.md",
   "CODEX_MEMORY_NEXT_PHASE_PLAN.md"
 ]);
+
+const PURE_POINTER_TEMPLATES = Object.freeze({
+  "STATUS.md": [
+    "# Status",
+    "",
+    "> Non-authoritative pointer. Start and resume work only from",
+    "> `CURRENT_STATE.md`.",
+    "",
+    "## Pointer",
+    "",
+    "- Current authority: `CURRENT_STATE.md`",
+    "- Machine companion: `.agent_board/CURRENT_FACTS.json`",
+    "- Live Git, GitHub, CI, and runtime facts must be collected fresh under their",
+    "  applicable authority boundaries.",
+    "- Historical recovery:",
+    "  `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`",
+    ""
+  ].join("\n"),
+  ".agent_board/RUN_STATE.md": [
+    "# RUN_STATE.md - codex-memory",
+    "",
+    "> Non-authoritative pointer. Start and resume work only from",
+    "> `CURRENT_STATE.md`.",
+    "",
+    "- Machine companion: `.agent_board/CURRENT_FACTS.json`",
+    "- Live Git, GitHub, CI, and runtime facts are not stored here.",
+    "- Historical recovery:",
+    "  `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`",
+    ""
+  ].join("\n"),
+  ".agent_board/HANDOFF.md": [
+    "# HANDOFF.md - codex-memory",
+    "",
+    "> Non-authoritative pointer. A receiving agent starts and resumes work only",
+    "> from `CURRENT_STATE.md`.",
+    "",
+    "- Machine companion: `.agent_board/CURRENT_FACTS.json`",
+    "- Do not infer a task, phase, blocker, receipt, or action from this file.",
+    "- Collect live Git, GitHub, CI, and runtime facts fresh under the applicable",
+    "  authority boundaries.",
+    "- Historical recovery:",
+    "  `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`",
+    ""
+  ].join("\n"),
+  ".agent_board/CHECKPOINT.md": [
+    "# CHECKPOINT.md - codex-memory",
+    "",
+    "> Non-authoritative pointer. Start and resume work only from",
+    "> `CURRENT_STATE.md`.",
+    "",
+    "- Machine companion: `.agent_board/CURRENT_FACTS.json`",
+    "- This file owns no task, phase, receipt, blocker, or execution instruction.",
+    "- Live Git, GitHub, CI, and runtime facts must be collected fresh.",
+    "- Historical recovery:",
+    "  `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`",
+    ""
+  ].join("\n")
+});
+const PURE_POINTER_FILES = Object.freeze(Object.keys(PURE_POINTER_TEMPLATES));
 
 const ACTIVE_SURFACE_FILES = Object.freeze([
   "CURRENT_STATE.md",
@@ -394,6 +454,29 @@ function validateAuthoritySurfaces(root, facts, failures) {
     failures.push("CURRENT_STATE activeTask must match CURRENT_FACTS.activeTask");
   }
 
+  const statePhaseDeclarationLines = active
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) =>
+      !line.startsWith("<!--") && /\bactivePhase\s*:/i.test(line)
+    );
+  const statePhaseMatch = statePhaseDeclarationLines.length === 1
+    ? statePhaseDeclarationLines[0].match(
+      /^(`?)activePhase:\s*(null|[a-z][a-z0-9]*(?:_[a-z0-9]+)*)\1$/
+    )
+    : null;
+  const stateActivePhase = statePhaseMatch && statePhaseMatch[2] !== "null"
+    ? statePhaseMatch[2]
+    : null;
+  if (!statePhaseMatch ||
+      (stateActivePhase !== null && !ACTIVE_PHASE_RE.test(stateActivePhase))) {
+    failures.push("CURRENT_STATE must declare exactly one canonical activePhase");
+  } else if (facts.activeTask === null && stateActivePhase !== null) {
+    failures.push("CURRENT_STATE activePhase must be null when activeTask is null");
+  } else if (facts.activeTask !== null && stateActivePhase === null) {
+    failures.push("CURRENT_STATE activePhase must be non-null when activeTask is selected");
+  }
+
   const stateCloseoutDeclarationLines = active
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -487,6 +570,13 @@ function validateAuthoritySurfaces(root, facts, failures) {
     }
     if (text.includes(ACTIVE_START) || text.includes(ACTIVE_END)) {
       failures.push(`${relativePath} must not own a current-facts active block`);
+    }
+  }
+
+  for (const relativePath of PURE_POINTER_FILES) {
+    const text = readText(root, relativePath, failures);
+    if (text !== PURE_POINTER_TEMPLATES[relativePath]) {
+      failures.push(`${relativePath} must match its canonical pure-pointer template`);
     }
   }
 
@@ -786,6 +876,8 @@ module.exports = {
   HISTORY_RECOVERY_PATHS,
   HISTORY_RESET_CLOSEOUT,
   POINTER_FILES,
+  PURE_POINTER_FILES,
+  PURE_POINTER_TEMPLATES,
   REQUIRED_ACTIVE_FILES,
   REQUIRED_DOC_REFERENCES,
   SIZE_BUDGETS,

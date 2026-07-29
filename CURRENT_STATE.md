@@ -17,10 +17,14 @@ deploy, cutover, complete-V8, or readiness claim.
 
 `activeTask: CM-2159`
 
-`CM-2159` repairs the controller source-identity granularity by replacing the
-schema-v5 whole-HEAD gate with a versioned runtime-source manifest and a
-fail-closed schema-v6 transition. The current phase is source/test/docs only;
-it does not authorize a runtime probe or lifecycle action.
+`activePhase: runtime_transition_authorization_pending`
+
+The manifest-v1 and schema-v6 source implementation, deterministic validation,
+independent governance review, PR follow-through, and merged-main CI are
+complete. `CM-2159` remains active until a separately exact-authorized runtime
+transition is accepted and its governance closeout is delivered. This
+committed phase declaration does not authorize a runtime probe, lifecycle
+action, provider call, private configuration access, or profile replacement.
 
 ## Last Accepted Product Baseline
 
@@ -37,18 +41,19 @@ future task.
 
 ## Open Blockers
 
-- `controller_source_identity_granularity_pending` [open]: The schema-v5 whole-HEAD controller binding must transition to a runtime-source manifest before another accepted lifecycle start.
+- `controller_runtime_profile_transition_pending` [open]: The manifest-v1 and schema-v6 source implementation is merged, but the owner-only runtime profile has not yet been transitioned and re-adopted under exact authorization.
 - `r5_h_matrix_incomplete` [open]: The R5-H private ChatGPT dogfood matrix is incomplete.
 - `r5_o_private_exact_head_runtime_unverified` [open]: R5-O private exact-head runtime behavior has not been verified.
 - `fresh_non_empty_task_context_relevance_unproven` [open]: Fresh non-empty task-context recall relevance has not been proven.
 
 ## Next Safe Action
 
-Complete the `CM-2159` source/test/docs implementation, deterministic
-validation, independent governance review, and implementation PR. After that PR
-is merged and local `main` is fast-forwarded, prepare a separately bound P3
-authorization package for `status -> stop -> start -> adopt-running --replace
--> status`. Do not run that transition from this source-only task authority.
+Prepare one exact P3 authorization package bound to freshly queried `main`,
+manifest identity, and runtime boundaries for low-disclosure `status` ->
+controlled `stop` -> controlled `start` -> `adopt-running --replace` ->
+low-disclosure `status`. Re-query current Git, GitHub, CI, and allowed
+low-disclosure runtime facts at execution time. Do not run the transition from
+this committed phase declaration alone.
 
 ## Authority Boundaries
 
@@ -64,18 +69,23 @@ authorization package for `status -> stop -> start -> adopt-running --replace
   authorize another status probe, lifecycle action, provider call, private
   runtime verification, real memory read or write, release, deploy, cutover, or
   readiness claim.
-- `CM-2159` does not change the public MCP surface, dependencies, CI workflow,
-  runtime/provider configuration, retained product baseline, or readiness
-  status.
+- The completed source delivery does not change the public MCP surface,
+  dependencies, CI workflow, runtime/provider configuration, retained product
+  baseline, or readiness status.
 
 ## Evidence And History
 
 Last completed: `CM-2158 / CMV-2243`.
 
-- Active implementation: `CM-2159`; its validation receipt will not replace
+- Active task: `CM-2159`; its validation receipt will not replace
   the unique completed ledger/validation pair until the authorized runtime
   transition and governance closeout are complete.
 
+- PR `#67` delivered manifest-v1 controller source identity and schema-v6
+  compatibility, merging as
+  `70a85d56c78caa895df50954ce107f504493b5ec`. Its merged-main CI completed
+  successfully. This is a governance/controller delivery anchor, not a new
+  accepted product baseline or current runtime-health claim.
 - PR `#65` delivered the governed full-stack lifecycle controller and merged as
   `48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e`.
 - Under the exact `CODEX_MEMORY_V5_TRANSITION_001` authorization, the transition
