@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const net = require('node:net');
@@ -25,6 +26,7 @@ const {
   assertAdoptionRepositoryMatch,
   assertPrivateRootBoundary,
   assertRelativeReference,
+  assertSourceManifestRebindStopped,
   buildControllerChildEnvironment,
   buildHttpChildEnvironment,
   buildShimChildEnvironment,
@@ -36,6 +38,7 @@ const {
   computeStackAccepted,
   connectOwnedLoopbackTcpListener,
   connectedUnixPeerOwnedByPid,
+  coordinateSourceManifestRebind,
   controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,
@@ -71,6 +74,7 @@ const {
   profileProviderIdentityMatches,
   profileVcpProviderConfigMatches,
   profileWithControllerManifestBinding,
+  profileWithSourceManifestRebinding,
   profileVcpRuntimeIdentityMatches,
   providerCredentialFreshnessMatches,
   projectHttpHealthPayload,
@@ -79,6 +83,7 @@ const {
   readLinuxProcessStartTicks,
   readVcpProviderEnvironmentSnapshot,
   safeCode,
+  sourceManifestRebindEligible,
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
   validateProfile,
@@ -99,6 +104,8 @@ const CONTROLLER_SOURCE_COMMIT =
 const V5_CONTROLLER_SOURCE_COMMIT =
   '48ecfe1c74e1cf5b6be9a56ffa82998eeb26567e';
 const CONTROLLER_SOURCE_MANIFEST_DIGEST = `sha256:${'34'.repeat(32)}`;
+const REBOUND_SOURCE_HEAD = '45'.repeat(20);
+const REBOUND_SOURCE_MANIFEST_DIGEST = `sha256:${'56'.repeat(32)}`;
 const RETAINED_BINDING_SOURCE = 'f1dea016a7a167898d77be6575403e7a7d28c8d5';
 const EDGE_CONTAINER_ID = 'ab'.repeat(32);
 const PROVIDER_CONTAINER_ID = 'cd'.repeat(32);
@@ -130,6 +137,29 @@ function manifestInspection(overrides = {}) {
     manifestComplete: true,
     manifestScopeClean: true,
     fileCount: 738,
+    ...overrides
+  };
+}
+
+function sourceManifestRebind(overrides = {}) {
+  return {
+    head: REBOUND_SOURCE_HEAD,
+    clean: true,
+    baselineExists: true,
+    currentMain: true,
+    repositoryMatch: true,
+    controllerOnlyChanges: false,
+    controllerSourceMatch: false,
+    identityMode: 'manifest_v1',
+    manifestRecognized: true,
+    manifestVersion: 1,
+    manifestDigest: REBOUND_SOURCE_MANIFEST_DIGEST,
+    manifestComplete: true,
+    manifestScopeClean: true,
+    adoptedHeadReadable: true,
+    adoptedHeadAncestor: true,
+    upgradeEligible: false,
+    compatible: false,
     ...overrides
   };
 }
@@ -304,6 +334,63 @@ test('profile contract is exact and stores references rather than secret values'
     })),
     { code: 'stack_profile_invalid' }
   );
+});
+
+test('profile replacement makes rename the final fallible commit operation', () => {
+  const source = fs.readFileSync(
+    path.join(__dirname, '..', 'scripts', 'codex-memory-stack.js'),
+    'utf8'
+  );
+  const writer = source.slice(
+    source.indexOf('function writeProfile('),
+    source.indexOf('function ensureRuntimeDirectories(')
+  );
+  const chmodTemporary = writer.indexOf(
+    'fsModule.chmodSync(temporary, 0o600);'
+  );
+  const renameCommit = writer.indexOf(
+    'fsModule.renameSync(temporary, file);'
+  );
+  const catchBoundary = writer.indexOf('} catch (error) {');
+  assert.ok(chmodTemporary >= 0);
+  assert.ok(renameCommit > chmodTemporary);
+  assert.ok(catchBoundary > renameCommit);
+  assert.equal(
+    writer.slice(renameCommit, catchBoundary).match(
+      /fsModule\.[A-Za-z]+\(/gu
+    )?.length,
+    1
+  );
+});
+
+test('controller CLI exposes an explicit rebind command and rejects ignored lifecycle arguments', () => {
+  const script = path.join(
+    __dirname,
+    '..',
+    'scripts',
+    'codex-memory-stack.js'
+  );
+  const help = spawnSync(
+    process.execPath,
+    [script, '--help'],
+    { encoding: 'utf8' }
+  );
+  assert.equal(help.status, 0);
+  assert.match(help.stdout, /\brebind-source\b/u);
+  for (const command of ['start', 'status', 'stop', 'rebind-source']) {
+    const rejected = spawnSync(
+      process.execPath,
+      [script, command, '--unexpected'],
+      { encoding: 'utf8' }
+    );
+    assert.equal(rejected.status, 1, command);
+    assert.equal(
+      rejected.stderr.trim(),
+      'stack_cli_argument_invalid',
+      command
+    );
+    assert.equal(rejected.stdout, '', command);
+  }
 });
 
 test('schema v6 owns canonical 7625 while v4/v5 retain 7605 compatibility', () => {
@@ -1804,6 +1891,414 @@ test('source compatibility accepts a governance-only descendant when the v6 mani
   assert.ok(calls.length >= 5);
 });
 
+test('schema-v6 source-manifest rebind accepts only a clean descendant with a changed complete manifest', () => {
+  const stored = profile();
+  const source = sourceManifestRebind();
+  assert.equal(sourceManifestRebindEligible(stored, source), true);
+  const rebound = profileWithSourceManifestRebinding(stored, source);
+  assert.equal(rebound.schemaVersion, PROFILE_SCHEMA_VERSION);
+  assert.equal(rebound.adoptedRepositoryHead, REBOUND_SOURCE_HEAD);
+  assert.equal(
+    rebound.controllerSourceManifestDigest,
+    REBOUND_SOURCE_MANIFEST_DIGEST
+  );
+  assert.equal(rebound.controllerSourceManifestVersion, 1);
+  for (const key of PROFILE_KEYS) {
+    if ([
+      'adoptedRepositoryHead',
+      'controllerSourceManifestDigest',
+      'controllerSourceManifestVersion'
+    ].includes(key)) continue;
+    assert.deepEqual(rebound[key], stored[key], key);
+  }
+
+  for (const rejected of [
+    [v5Profile(), source],
+    [stored, sourceManifestRebind({ identityMode: 'exact_commit_v5' })],
+    [stored, sourceManifestRebind({ clean: false })],
+    [stored, sourceManifestRebind({ baselineExists: false })],
+    [stored, sourceManifestRebind({ currentMain: false })],
+    [stored, sourceManifestRebind({ repositoryMatch: false })],
+    [stored, sourceManifestRebind({ manifestRecognized: false })],
+    [stored, sourceManifestRebind({ manifestComplete: false })],
+    [stored, sourceManifestRebind({ manifestScopeClean: false })],
+    [stored, sourceManifestRebind({ adoptedHeadReadable: false })],
+    [stored, sourceManifestRebind({ adoptedHeadAncestor: false })],
+    [stored, sourceManifestRebind({
+      head: stored.adoptedRepositoryHead
+    })],
+    [stored, sourceManifestRebind({
+      manifestDigest: stored.controllerSourceManifestDigest
+    })],
+    [stored, sourceManifestRebind({ controllerSourceMatch: true })],
+    [stored, sourceManifestRebind({ compatible: true })]
+  ]) {
+    assert.equal(sourceManifestRebindEligible(...rejected), false);
+    assert.throws(
+      () => profileWithSourceManifestRebinding(...rejected),
+      { code: 'stack_source_manifest_rebind_ineligible' }
+    );
+  }
+});
+
+test('source compatibility projects a runtime-manifest descendant as rebind-eligible but not start-compatible', () => {
+  const inspected = inspectSourceCompatibility(profile(), {
+    repoRoot: '/repo',
+    inspectControllerManifest: () => manifestInspection({
+      manifestDigest: REBOUND_SOURCE_MANIFEST_DIGEST
+    }),
+    exec(_command, args) {
+      if (args[0] === 'rev-parse') return `${REBOUND_SOURCE_HEAD}\n`;
+      if (args[0] === 'status' ||
+          args[0] === 'cat-file' ||
+          args[0] === 'merge-base') return '';
+      if (args[0] === 'diff') {
+        return 'scripts/codex-memory-stack.js\n';
+      }
+      throw new Error('unexpected git call');
+    }
+  });
+  assert.equal(inspected.controllerSourceMatch, false);
+  assert.equal(inspected.compatible, false);
+  assert.equal(
+    sourceManifestRebindEligible(profile(), inspected),
+    true
+  );
+  assert.equal(
+    profileWithSourceManifestRebinding(
+      profile(),
+      inspected
+    ).adoptedRepositoryHead,
+    REBOUND_SOURCE_HEAD
+  );
+});
+
+test('source-manifest rebind requires every managed process and retained Edge to be stopped', () => {
+  const processIdentities = Object.fromEntries(
+    ['shim', 'http', 'governance', 'relay'].map(name => [
+      name,
+      { running: false, identity: null }
+    ])
+  );
+  const edge = {
+    id: EDGE_CONTAINER_ID,
+    revision: BASELINE,
+    configurationSecure: true,
+    secure: true,
+    running: false
+  };
+  assert.equal(
+    assertSourceManifestRebindStopped(
+      profile(),
+      processIdentities,
+      edge
+    ),
+    true
+  );
+  assert.throws(
+    () => assertSourceManifestRebindStopped(profile(), {
+      ...processIdentities,
+      shim: { running: true, identity: {} }
+    }, edge),
+    { code: 'stack_source_manifest_rebind_stack_not_stopped' }
+  );
+  const {
+    relay: _relay,
+    ...missingRelay
+  } = processIdentities;
+  assert.throws(
+    () => assertSourceManifestRebindStopped(
+      profile(),
+      missingRelay,
+      edge
+    ),
+    { code: 'stack_source_manifest_rebind_stack_not_stopped' }
+  );
+  assert.throws(
+    () => assertSourceManifestRebindStopped(
+      profile(),
+      processIdentities,
+      { ...edge, running: true }
+    ),
+    { code: 'stack_source_manifest_rebind_stack_not_stopped' }
+  );
+  assert.throws(
+    () => assertSourceManifestRebindStopped(
+      profile(),
+      processIdentities,
+      { ...edge, id: '01'.repeat(32) }
+    ),
+    { code: 'stack_source_manifest_rebind_stack_not_stopped' }
+  );
+});
+
+test('accepted source-manifest rebind persists only after runtime acceptance', async () => {
+  const calls = [];
+  const started = {
+    accepted: true,
+    runtimeAccepted: true,
+    action: 'started',
+    profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+    source: {
+      controllerIdentityMatch: true,
+      compatible: true
+    },
+    secretValuesReturned: false,
+    rawMemoryReturned: false
+  };
+  const result = await coordinateSourceManifestRebind({
+    candidateProfile: profileWithSourceManifestRebinding(
+      profile(),
+      sourceManifestRebind()
+    ),
+    async startCandidate() {
+      calls.push('start');
+      return {
+        outcome: started,
+        startedComponents: ['shim', 'http']
+      };
+    },
+    async persistCandidate() {
+      calls.push('persist');
+    },
+    async rollbackCandidate() {
+      calls.push('rollback');
+      return [];
+    }
+  });
+  assert.deepEqual(calls, ['start', 'persist']);
+  assert.equal(result.accepted, true);
+  assert.equal(result.runtimeAccepted, true);
+  assert.equal(result.action, 'source_manifest_rebound');
+  assert.equal(result.profileStored, true);
+  assert.equal(result.sourceManifestRebound, true);
+  assert.equal(result.failClosedRollbackRequired, false);
+  assert.equal(
+    Object.hasOwn(result, 'startedComponents'),
+    false
+  );
+  await assert.rejects(
+    () => coordinateSourceManifestRebind({
+      candidateProfile: { schemaVersion: PROFILE_SCHEMA_VERSION },
+      async startCandidate() {
+        throw new Error('must not run');
+      },
+      async persistCandidate() {},
+      async rollbackCandidate() {
+        return [];
+      }
+    }),
+    { code: 'stack_source_manifest_rebind_contract_invalid' }
+  );
+});
+
+test('source-manifest rebind rolls back an unaccepted runtime or profile commit failure', async () => {
+  const candidateProfile = profileWithSourceManifestRebinding(
+    profile(),
+    sourceManifestRebind()
+  );
+  const rejectedCalls = [];
+  await assert.rejects(
+    () => coordinateSourceManifestRebind({
+      candidateProfile,
+      async startCandidate() {
+        rejectedCalls.push('start');
+        return {
+          outcome: {
+            accepted: false,
+            runtimeAccepted: true,
+            action: 'started',
+            profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+            source: {
+              controllerIdentityMatch: true,
+              compatible: true
+            }
+          },
+          startedComponents: ['shim']
+        };
+      },
+      async persistCandidate() {
+        rejectedCalls.push('persist');
+      },
+      async rollbackCandidate(_profile, startedComponents) {
+        rejectedCalls.push('rollback');
+        assert.deepEqual(startedComponents, ['shim']);
+        assert.equal(Object.isFrozen(startedComponents), true);
+        return [];
+      }
+    }),
+    { code: 'stack_source_manifest_rebind_runtime_rejected' }
+  );
+  assert.deepEqual(rejectedCalls, ['start', 'rollback']);
+
+  const racedCalls = [];
+  await assert.rejects(
+    () => coordinateSourceManifestRebind({
+      candidateProfile,
+      async startCandidate() {
+        racedCalls.push('start');
+        return {
+          outcome: {
+            accepted: true,
+            runtimeAccepted: true,
+            action: 'already_running',
+            profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+            source: {
+              controllerIdentityMatch: true,
+              compatible: true
+            }
+          },
+          startedComponents: []
+        };
+      },
+      async persistCandidate() {
+        racedCalls.push('persist');
+      },
+      async rollbackCandidate() {
+        racedCalls.push('rollback');
+        return [];
+      }
+    }),
+    { code: 'stack_source_manifest_rebind_runtime_rejected' }
+  );
+  assert.deepEqual(racedCalls, ['start']);
+
+  const commitCalls = [];
+  await assert.rejects(
+    () => coordinateSourceManifestRebind({
+      candidateProfile,
+      async startCandidate() {
+        commitCalls.push('start');
+        return {
+          outcome: {
+            accepted: true,
+            runtimeAccepted: true,
+            action: 'started',
+            profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+            source: {
+              controllerIdentityMatch: true,
+              compatible: true
+            }
+          },
+          startedComponents: ['shim', 'relay']
+        };
+      },
+      async persistCandidate() {
+        commitCalls.push('persist');
+        throw new Error('synthetic profile write failure');
+      },
+      async rollbackCandidate(_profile, startedComponents) {
+        commitCalls.push('rollback');
+        assert.deepEqual(startedComponents, ['shim', 'relay']);
+        assert.equal(
+          startedComponents.some(name =>
+            ['http', 'governance', 'edge'].includes(name)
+          ),
+          false
+        );
+        return [];
+      }
+    }),
+    { code: 'stack_source_manifest_rebind_profile_commit_failed' }
+  );
+  assert.deepEqual(commitCalls, ['start', 'persist', 'rollback']);
+
+  await assert.rejects(
+    () => coordinateSourceManifestRebind({
+      candidateProfile,
+      async startCandidate() {
+        return {
+          outcome: {
+            accepted: true,
+            runtimeAccepted: true,
+            action: 'started',
+            profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+            source: {
+              controllerIdentityMatch: true,
+              compatible: true
+            }
+          },
+          startedComponents: ['governance']
+        };
+      },
+      async persistCandidate() {
+        throw new Error('synthetic profile write failure');
+      },
+      async rollbackCandidate(_profile, startedComponents) {
+        assert.deepEqual(startedComponents, ['governance']);
+        return ['governance'];
+      }
+    }),
+    { code: 'stack_source_manifest_rebind_rollback_incomplete' }
+  );
+});
+
+test('source-manifest rebind rejects untrusted start evidence without broad rollback', async () => {
+  const candidateProfile = profileWithSourceManifestRebinding(
+    profile(),
+    sourceManifestRebind()
+  );
+  const acceptedOutcome = {
+    accepted: true,
+    runtimeAccepted: true,
+    action: 'started',
+    profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+    source: {
+      controllerIdentityMatch: true,
+      compatible: true
+    }
+  };
+  for (const startedComponents of [
+    ['shim', 'shim'],
+    ['shim', 'outside'],
+    'shim'
+  ]) {
+    let rolledBack = false;
+    await assert.rejects(
+      () => coordinateSourceManifestRebind({
+        candidateProfile,
+        async startCandidate() {
+          return {
+            outcome: acceptedOutcome,
+            startedComponents
+          };
+        },
+        async persistCandidate() {
+          throw new Error('must not persist');
+        },
+        async rollbackCandidate() {
+          rolledBack = true;
+          return [];
+        }
+      }),
+      { code: 'stack_source_manifest_rebind_contract_invalid' }
+    );
+    assert.equal(rolledBack, false);
+  }
+
+  let emptyEvidenceRollback = false;
+  await assert.rejects(
+    () => coordinateSourceManifestRebind({
+      candidateProfile,
+      async startCandidate() {
+        return {
+          outcome: acceptedOutcome,
+          startedComponents: []
+        };
+      },
+      async persistCandidate() {
+        throw new Error('must not persist');
+      },
+      async rollbackCandidate() {
+        emptyEvidenceRollback = true;
+        return [];
+      }
+    }),
+    { code: 'stack_source_manifest_rebind_runtime_rejected' }
+  );
+  assert.equal(emptyEvidenceRollback, false);
+});
+
 test('source compatibility retains exact-head v5 semantics and exposes only the reviewed upgrade path', () => {
   const fakeManifest = () => manifestInspection();
   const exactExec = (_command, args) => {
@@ -1900,13 +2395,13 @@ test('external VCP dynamic module targets remain inside the bound VCP source sco
   }
 });
 
-test('transition lifecycle keeps profile persistence inside adoption only', () => {
+test('transition lifecycle keeps ordinary start profile-free and gates source rebind persistence', () => {
   const source = fs.readFileSync(
     path.join(__dirname, '..', 'scripts', 'codex-memory-stack.js'),
     'utf8'
   );
   const start = source.slice(
-    source.indexOf('async function startStack('),
+    source.indexOf('async function startStackWithProfile('),
     source.indexOf('async function stopStack(')
   );
   const stop = source.slice(
@@ -1915,6 +2410,10 @@ test('transition lifecycle keeps profile persistence inside adoption only', () =
   );
   const adopt = source.slice(
     source.indexOf('async function adoptRunningStack('),
+    source.indexOf('function assertSourceManifestRebindStopped(')
+  );
+  const rebind = source.slice(
+    source.indexOf('async function rebindSourceManifestStack('),
     source.indexOf('function readPrivateText(')
   );
   assert.equal(start.includes('writeProfile('), false);
@@ -1924,7 +2423,34 @@ test('transition lifecycle keeps profile persistence inside adoption only', () =
     1
   );
   assert.equal(
+    [...rebind.matchAll(/\bwriteProfile\s*\(/gu)].length,
+    1
+  );
+  assert.equal(
     start.includes('profileWithControllerManifestBinding('),
+    true
+  );
+  assert.equal(
+    rebind.includes('profileWithSourceManifestRebinding('),
+    true
+  );
+  assert.equal(
+    rebind.indexOf('inspectStack({') <
+      rebind.indexOf('return writeProfile('),
+    true
+  );
+  assert.equal(
+    rebind.includes('new Set(startedComponents)'),
+    true
+  );
+  assert.equal(
+    rebind.includes(
+      "new Set(['shim', 'http', 'governance', 'relay', 'edge'])"
+    ),
+    false
+  );
+  assert.equal(
+    start.includes('return startRecord.outcome;'),
     true
   );
   const unmanagedHttpPreflight = start.indexOf(

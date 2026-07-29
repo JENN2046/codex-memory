@@ -7,6 +7,7 @@ entrypoint for the already provisioned owner runtime:
 node scripts/codex-memory-stack.js start
 node scripts/codex-memory-stack.js status
 node scripts/codex-memory-stack.js stop
+node scripts/codex-memory-stack.js rebind-source
 ```
 
 The command is intentionally a controller, not a provisioning or authorization
@@ -167,6 +168,57 @@ not rewrite the owner profile. Adoption re-inspects the live process
 environments and all acceptance gates before atomically storing v6. Once v6 is
 stored, ordinary manifest-matched restarts use only `start`.
 
+## Schema-V6 Source-Manifest Rebind
+
+An existing schema-v6 profile intentionally rejects ordinary `start` after a
+runtime-source manifest change. The explicit same-schema transition is:
+
+```bash
+node scripts/codex-memory-stack.js stop
+node scripts/codex-memory-stack.js rebind-source
+node scripts/codex-memory-stack.js status
+```
+
+`rebind-source` is not a source override and does not weaken normal `start`.
+It accepts only an existing schema-v6 profile whose adopted repository head is
+readable and ancestral to a clean canonical `main == origin/main`, whose
+current manifest is complete and scope-clean, and whose manifest digest and
+repository head have both advanced. An unchanged manifest, dirty worktree,
+non-main checkout, non-descendant history, missing manifest path, untracked
+runtime source, legacy profile, or incomplete manifest fails before startup.
+Low-disclosure `status` reports only the categorical
+`sourceManifestRebindEligible` result alongside the existing source facts; it
+does not return either manifest digest.
+
+The command also requires every managed process and the retained Edge
+container to be stopped. It preserves the existing provider, VCPToolBox,
+retained binding, owner-only environment references, non-secret configuration
+digests, container identities, model/dimension binding, and runtime baseline.
+It changes only the schema-v6 profile's adopted repository head and controller
+source-manifest identity.
+
+The candidate profile remains in memory while the controller starts the
+fully stopped stack. The candidate runtime must pass the same complete source,
+process, listener, authenticated HTTP policy, private-file freshness,
+Governance, Relay, provider, VCPToolBox, and Edge acceptance used by normal
+startup. Immediately before persistence, source compatibility and full runtime
+acceptance are checked again. Only then is the owner-only profile atomically
+replaced.
+
+If candidate startup fails, ordinary startup rollback stops only components
+started by that invocation. On successful startup, the internal start path
+returns the exact component-name set it actually started to the rebind
+coordinator; this evidence is not added to the public CLI result. If the
+candidate runtime is not exactly accepted or profile persistence fails,
+`rebind-source` rolls back only that returned set and retains the prior
+profile. A rollback failure is terminal and reported separately. A process
+that appeared after the stopped-stack preflight but was not proven to be
+started by this transition is not terminated by the coordinator.
+
+This command requires current P3 lifecycle authorization. Source tests and CI
+do not execute it, access private configuration, start services, call a
+provider, or prove a live exact-head runtime.
+
 ## Start Semantics
 
 `start` is optimized for the normal manifest-matched restart:
@@ -322,9 +374,11 @@ A legacy HTTP process remains running, but a newer controller marks it
 `controllerManaged: false` and does not read or send its bearer token. A
 controller-managed process from a revision that predates the bounded policy
 fields is likewise unaccepted. After this controller is merged, restoring
-exact-head acceptance requires a separately authorized `stop` and `start` from
-canonical `main`, followed by `adopt-running --replace`. PR validation does not
-perform that lifecycle transition.
+exact-head acceptance from schema v4/v5 requires a separately authorized
+`stop` and `start` from canonical `main`, followed by
+`adopt-running --replace`. A schema-v6 profile with a changed source manifest
+instead requires the separately authorized stopped-stack `rebind-source`
+transition above. PR validation performs neither lifecycle transition.
 
 `stop` first revalidates the retained binding and the exact adopted Edge
 container ID, revision, and security posture. A later `start` validates the

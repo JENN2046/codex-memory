@@ -1363,8 +1363,8 @@ function writeProfile(profile, {
     fsModule.fsyncSync(descriptor);
     fsModule.closeSync(descriptor);
     descriptor = undefined;
+    fsModule.chmodSync(temporary, 0o600);
     fsModule.renameSync(temporary, file);
-    fsModule.chmodSync(file, 0o600);
   } catch (error) {
     if (descriptor !== undefined) {
       try {
@@ -2149,6 +2149,41 @@ function profileWithControllerManifestBinding(
     vcpRuntimeBaseline: identity.revision,
     vcpRuntimeRepository: identity.repository,
     vcpRuntimeScopeDigest: identity.scopeDigest
+  });
+}
+
+function sourceManifestRebindEligible(profile, source) {
+  return Boolean(
+    profile?.schemaVersion === PROFILE_SCHEMA_VERSION &&
+    source?.identityMode === 'manifest_v1' &&
+    source?.clean === true &&
+    source?.baselineExists === true &&
+    source?.currentMain === true &&
+    source?.repositoryMatch === true &&
+    source?.manifestRecognized === true &&
+    source?.manifestVersion === MANIFEST_SCHEMA_VERSION &&
+    SAFE_SHA256_DIGEST.test(source?.manifestDigest || '') &&
+    source?.manifestComplete === true &&
+    source?.manifestScopeClean === true &&
+    source?.adoptedHeadReadable === true &&
+    source?.adoptedHeadAncestor === true &&
+    SAFE_GIT_OBJECT.test(source?.head || '') &&
+    source.head !== profile.adoptedRepositoryHead &&
+    source.manifestDigest !== profile.controllerSourceManifestDigest &&
+    source?.controllerSourceMatch === false &&
+    source?.compatible === false
+  );
+}
+
+function profileWithSourceManifestRebinding(profile, source) {
+  if (!sourceManifestRebindEligible(profile, source)) {
+    throw codedError('stack_source_manifest_rebind_ineligible');
+  }
+  return validateProfile({
+    ...profile,
+    adoptedRepositoryHead: source.head,
+    controllerSourceManifestDigest: source.manifestDigest,
+    controllerSourceManifestVersion: source.manifestVersion
   });
 }
 
@@ -3558,6 +3593,8 @@ async function inspectStack({
       adoptedHeadReadable: source.adoptedHeadReadable,
       adoptedHeadAncestor: source.adoptedHeadAncestor,
       upgradeEligible: source.upgradeEligible,
+      sourceManifestRebindEligible:
+        sourceManifestRebindEligible(profile, source),
       repositoryMatch: source.repositoryMatch,
       compatible: source.compatible
     }),
@@ -3813,25 +3850,29 @@ async function rollbackStarted(started, profile, environment) {
   return failures;
 }
 
-async function startStack({
+function startOutcomeWithEvidence(outcome, started) {
+  return Object.freeze({
+    outcome,
+    startedComponents: Object.freeze([...started])
+  });
+}
+
+async function startStackWithProfile(storedProfile, {
   environment = process.env
 } = {}) {
-  const lifecycle = acquireLifecycleProfile({ environment });
-  const storedProfile = lifecycle.profile;
-  try {
-    let profile = storedProfile;
-    const source = inspectSourceCompatibility(storedProfile);
-    const transitionRequired =
-      storedProfile.schemaVersion !== PROFILE_SCHEMA_VERSION;
-    if (
-      (!transitionRequired && !source.compatible) ||
-      (transitionRequired && !source.upgradeEligible)
-    ) {
-      throw codedError('stack_source_compatibility_failed');
-    }
-    if (!profileRetainedBindingMatches(profile)) {
-      throw codedError('stack_retained_binding_identity_mismatch');
-    }
+  let profile = storedProfile;
+  const source = inspectSourceCompatibility(storedProfile);
+  const transitionRequired =
+    storedProfile.schemaVersion !== PROFILE_SCHEMA_VERSION;
+  if (
+    (!transitionRequired && !source.compatible) ||
+    (transitionRequired && !source.upgradeEligible)
+  ) {
+    throw codedError('stack_source_compatibility_failed');
+  }
+  if (!profileRetainedBindingMatches(profile)) {
+    throw codedError('stack_retained_binding_identity_mismatch');
+  }
     const governanceEnvironment = resolvePrivateReference(
       profile,
       profile.governanceEnvironment
@@ -4164,23 +4205,29 @@ async function startStack({
       const result = await inspectStack({ environment, profile });
       if (!result.accepted) throw codedError('stack_final_acceptance_failed');
       if (transitionRequired) {
-        return Object.freeze({
-          ...result,
-          accepted: false,
-          runtimeAccepted: false,
-          transitionRuntimeAccepted: true,
-          profileUpgradeRequired: true,
-          action: started.size === 0
-            ? 'profile_upgrade_required'
-            : 'started_profile_upgrade_required',
-          failClosedRollbackRequired: false
-        });
+        return startOutcomeWithEvidence(
+          Object.freeze({
+            ...result,
+            accepted: false,
+            runtimeAccepted: false,
+            transitionRuntimeAccepted: true,
+            profileUpgradeRequired: true,
+            action: started.size === 0
+              ? 'profile_upgrade_required'
+              : 'started_profile_upgrade_required',
+            failClosedRollbackRequired: false
+          }),
+          started
+        );
       }
-      return Object.freeze({
-        ...result,
-        action: started.size === 0 ? 'already_running' : 'started',
-        failClosedRollbackRequired: false
-      });
+      return startOutcomeWithEvidence(
+        Object.freeze({
+          ...result,
+          action: started.size === 0 ? 'already_running' : 'started',
+          failClosedRollbackRequired: false
+        }),
+        started
+      );
     } catch (error) {
       const rollbackFailures = await rollbackStarted(started, profile, environment);
       if (rollbackFailures.length > 0) {
@@ -4188,6 +4235,18 @@ async function startStack({
       }
       throw error;
     }
+}
+
+async function startStack({
+  environment = process.env
+} = {}) {
+  const lifecycle = acquireLifecycleProfile({ environment });
+  try {
+    const startRecord = await startStackWithProfile(
+      lifecycle.profile,
+      { environment }
+    );
+    return startRecord.outcome;
   } finally {
     lifecycle.release();
   }
@@ -4410,6 +4469,167 @@ async function adoptRunningStack({
     });
   } finally {
     lifecycleLock.release();
+  }
+}
+
+function assertSourceManifestRebindStopped(
+  profile,
+  processIdentities,
+  edge
+) {
+  const componentNames = Object.keys(COMPONENTS);
+  if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+      !processIdentities ||
+      !exactKeys(processIdentities, componentNames) ||
+      componentNames.some(name =>
+        typeof processIdentities[name]?.running !== 'boolean'
+      ) ||
+      componentNames.some(name => processIdentities[name].running) ||
+      !profileEdgeLifecycleIdentityMatches(profile, edge) ||
+      edge?.running !== false) {
+    throw codedError('stack_source_manifest_rebind_stack_not_stopped');
+  }
+  return true;
+}
+
+async function coordinateSourceManifestRebind({
+  candidateProfile,
+  persistCandidate,
+  rollbackCandidate,
+  startCandidate
+}) {
+  if (typeof persistCandidate !== 'function' ||
+      typeof rollbackCandidate !== 'function' ||
+      typeof startCandidate !== 'function') {
+    throw codedError('stack_source_manifest_rebind_contract_invalid');
+  }
+  let validatedCandidate;
+  try {
+    validatedCandidate = validateProfile(candidateProfile);
+  } catch {
+    throw codedError('stack_source_manifest_rebind_contract_invalid');
+  }
+  const startRecord = await startCandidate(validatedCandidate);
+  const allowedStartedComponents = new Set([
+    ...Object.keys(COMPONENTS),
+    'edge'
+  ]);
+  if (!exactKeys(startRecord, ['outcome', 'startedComponents']) ||
+      !startRecord.outcome ||
+      typeof startRecord.outcome !== 'object' ||
+      Array.isArray(startRecord.outcome) ||
+      !Array.isArray(startRecord.startedComponents) ||
+      new Set(startRecord.startedComponents).size !==
+        startRecord.startedComponents.length ||
+      startRecord.startedComponents.some(name =>
+        typeof name !== 'string' ||
+        !allowedStartedComponents.has(name)
+      )) {
+    throw codedError('stack_source_manifest_rebind_contract_invalid');
+  }
+  const outcome = startRecord.outcome;
+  const startedComponents = Object.freeze([
+    ...startRecord.startedComponents
+  ]);
+  const rollback = async () => {
+    try {
+      const failures = await rollbackCandidate(
+        validatedCandidate,
+        startedComponents
+      );
+      return Array.isArray(failures) && failures.length === 0;
+    } catch {
+      return false;
+    }
+  };
+  if (outcome.accepted !== true ||
+      outcome.runtimeAccepted !== true ||
+      outcome.action !== 'started' ||
+      startedComponents.length === 0 ||
+      outcome.profileSchemaVersion !== PROFILE_SCHEMA_VERSION ||
+      outcome.source?.controllerIdentityMatch !== true ||
+      outcome.source?.compatible !== true) {
+    if (startedComponents.length > 0 && !await rollback()) {
+      throw codedError('stack_source_manifest_rebind_rollback_incomplete');
+    }
+    throw codedError('stack_source_manifest_rebind_runtime_rejected');
+  }
+  try {
+    await persistCandidate(validatedCandidate);
+  } catch {
+    if (!await rollback()) {
+      throw codedError('stack_source_manifest_rebind_rollback_incomplete');
+    }
+    throw codedError('stack_source_manifest_rebind_profile_commit_failed');
+  }
+  return Object.freeze({
+    ...outcome,
+    action: 'source_manifest_rebound',
+    profileStored: true,
+    sourceManifestRebound: true,
+    failClosedRollbackRequired: false
+  });
+}
+
+async function rebindSourceManifestStack({
+  environment = process.env
+} = {}) {
+  const lifecycle = acquireLifecycleProfile({ environment });
+  try {
+    const storedProfile = lifecycle.profile;
+    const source = inspectSourceCompatibility(storedProfile);
+    const candidateProfile = profileWithSourceManifestRebinding(
+      storedProfile,
+      source
+    );
+    const processIdentities = Object.fromEntries(
+      Object.keys(COMPONENTS).map(name => [
+        name,
+        inspectProcessIdentity(name, { environment })
+      ])
+    );
+    const edge = inspectEdgeContainer(storedProfile.edgeContainer);
+    assertSourceManifestRebindStopped(
+      storedProfile,
+      processIdentities,
+      edge
+    );
+    return await coordinateSourceManifestRebind({
+      candidateProfile,
+      startCandidate: () => startStackWithProfile(
+        candidateProfile,
+        { environment }
+      ),
+      persistCandidate: async () => {
+        const finalSource = inspectSourceCompatibility(candidateProfile);
+        if (!adoptionSourceCompatible(finalSource)) {
+          throw codedError(
+            'stack_source_manifest_rebind_source_changed'
+          );
+        }
+        const finalInspection = await inspectStack({
+          environment,
+          profile: candidateProfile
+        });
+        if (!finalInspection.accepted ||
+            !finalInspection.runtimeAccepted) {
+          throw codedError(
+            'stack_source_manifest_rebind_runtime_changed'
+          );
+        }
+        return writeProfile(
+          candidateProfile,
+          { environment, replace: true }
+        );
+      },
+      rollbackCandidate: (_profile, startedComponents) => rollbackStarted(
+        new Set(startedComponents),
+        candidateProfile,
+        environment
+      )
+    });
+  } finally {
+    lifecycle.release();
   }
 }
 
@@ -5049,11 +5269,13 @@ function printJson(value) {
 
 function usage() {
   return [
-    'Usage: node scripts/codex-memory-stack.js <start|status|stop|adopt-running> [--replace]',
+    'Usage: node scripts/codex-memory-stack.js <start|status|stop|rebind-source>',
+    '       node scripts/codex-memory-stack.js adopt-running [--replace]',
     '',
     'start         Start the adopted full stack and fail closed on validation errors.',
     'status        Print a low-disclosure health, socket, observer, and baseline summary.',
     'stop          Stop only managed processes and the retained Edge container.',
+    'rebind-source Start a stopped schema-v6 stack under a new accepted source manifest and atomically replace its profile.',
     'adopt-running Create an owner-only, reference-only profile from the live accepted stack.'
   ].join('\n');
 }
@@ -5070,9 +5292,22 @@ async function main(argv = process.argv.slice(2)) {
   if (command === '_prepare-governance-sockets') {
     return prepareGovernanceSocketsChild();
   }
-  if (command === 'start') return printJson(await startStack());
-  if (command === 'status') return printJson(await inspectStack());
-  if (command === 'stop') return printJson(await stopStack());
+  if (command === 'start') {
+    if (argv.length !== 1) throw codedError('stack_cli_argument_invalid');
+    return printJson(await startStack());
+  }
+  if (command === 'status') {
+    if (argv.length !== 1) throw codedError('stack_cli_argument_invalid');
+    return printJson(await inspectStack());
+  }
+  if (command === 'stop') {
+    if (argv.length !== 1) throw codedError('stack_cli_argument_invalid');
+    return printJson(await stopStack());
+  }
+  if (command === 'rebind-source') {
+    if (argv.length !== 1) throw codedError('stack_cli_argument_invalid');
+    return printJson(await rebindSourceManifestStack());
+  }
   if (command === 'adopt-running') {
     const extra = argv.slice(1);
     if (extra.some(value => value !== '--replace')) {
@@ -5115,6 +5350,7 @@ module.exports = {
   assertAdoptionRepositoryMatch,
   assertPrivateRootBoundary,
   assertRelativeReference,
+  assertSourceManifestRebindStopped,
   buildHttpChildEnvironment,
   buildShimChildEnvironment,
   buildControllerChildEnvironment,
@@ -5126,6 +5362,7 @@ module.exports = {
   computeStackAccepted,
   connectOwnedLoopbackTcpListener,
   connectedUnixPeerOwnedByPid,
+  coordinateSourceManifestRebind,
   controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,
@@ -5159,6 +5396,7 @@ module.exports = {
   profileProviderIdentityMatches,
   profileVcpProviderConfigMatches,
   profileWithControllerManifestBinding,
+  profileWithSourceManifestRebinding,
   profileVcpRuntimeIdentityMatches,
   governanceCredentialFreshnessMatches,
   governancePrivateFileIdentities,
@@ -5167,10 +5405,12 @@ module.exports = {
   probeUnixSocket,
   relayCredentialFreshnessMatches,
   relaySecretFileIdentities,
+  rebindSourceManifestStack,
   readLinuxProcessStartTicks,
   readPidFile,
   readVcpProviderEnvironmentSnapshot,
   safeCode,
+  sourceManifestRebindEligible,
   validateExpectedMappingEnvironment,
   validateRetainedBindingPayload,
   validateProfile,
