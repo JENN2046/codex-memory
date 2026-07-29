@@ -94,6 +94,7 @@ const NATIVE_RUNTIME_FAILURE_REASON_CODES = Object.freeze(new Set([
   'native_query_vector_dimension_mismatch',
   'native_query_vector_non_finite',
   'native_query_vector_zero_norm',
+  'native_selected_diary_hydration_failed',
   'native_selected_diary_index_recovery_failed',
   'native_selected_diary_index_empty_after_hydration',
   'native_vector_search_not_executed',

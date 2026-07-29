@@ -96,6 +96,7 @@ function createSchema(database) {
 
 function insertMemory(database, {
   chunkId = 11,
+  chunkIndex = 0,
   checksum = 'synthetic-checksum',
   content = 'synthetic governed memory',
   diaryName = 'PROJECT_ALPHA',
@@ -120,7 +121,7 @@ function insertMemory(database, {
     INSERT INTO chunks
       (id, file_id, chunk_index, content, vector)
     VALUES (?, ?, ?, ?, ?)
-  `).run(chunkId, fileId, 0, content, vectorValue);
+  `).run(chunkId, fileId, chunkIndex, content, vectorValue);
 }
 
 function fixture(t) {
@@ -257,6 +258,45 @@ test('production hydrator projects only selected source rows into the isolated s
   assert.equal(
     value.isolated.prepare('SELECT COUNT(*) AS count FROM chunks').get().count,
     1
+  );
+});
+
+test('production hydrator preserves writer-compatible non-contiguous chunk indexes', async t => {
+  const value = fixture(t);
+  insertMemory(value.source, {
+    chunkIndex: 2,
+    content: 'codex-memory current governed product goal and remaining blockers'
+  });
+  value.closeSource();
+
+  const receipt = await value.hydrator()(hydrationInput(value));
+  assert.equal(receipt.accepted, true);
+  assert.equal(receipt.hydratedChunkCount, 1);
+  assert.deepEqual(
+    value.isolated.prepare(
+      'SELECT chunk_index AS chunkIndex FROM chunks ORDER BY id'
+    ).all().map(row => ({ ...row })),
+    [{ chunkIndex: 2 }]
+  );
+});
+
+test('production hydrator rejects duplicate sparse chunk indexes', async t => {
+  const value = fixture(t);
+  insertMemory(value.source, { chunkIndex: 2 });
+  value.source.prepare(`
+    INSERT INTO chunks
+      (id, file_id, chunk_index, content, vector)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(12, 7, 2, 'synthetic duplicate sparse chunk', vector());
+  value.closeSource();
+
+  await assert.rejects(
+    () => value.hydrator()(hydrationInput(value)),
+    { code: 'selected_diary_hydration_source_projection_invalid' }
+  );
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM chunks').get().count,
+    0
   );
 });
 

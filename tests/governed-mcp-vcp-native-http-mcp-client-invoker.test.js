@@ -1275,6 +1275,7 @@ test('HTTP MCP tool caller preserves R5-E fail-closed reasons as low-disclosure 
       ['native_query_vector_dimension_mismatch', 'invalid_query_vector'],
       ['native_query_vector_non_finite', 'invalid_query_vector'],
       ['native_query_vector_zero_norm', 'invalid_query_vector'],
+      ['native_selected_diary_hydration_failed', 'selected_diary_hydration_failed'],
       ['native_selected_diary_index_recovery_failed', 'index_recovery_failed'],
       ['native_selected_diary_index_empty_after_hydration', 'index_recovery_failed'],
       ['native_vector_search_not_executed', 'vector_search_failed'],

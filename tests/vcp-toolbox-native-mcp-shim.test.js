@@ -41,28 +41,30 @@ const SYNTHETIC_DIARY_SCOPE_MAPPING = Object.freeze({
   }]
 });
 const SYNTHETIC_MAPPING_BINDING = validateMapping(SYNTHETIC_DIARY_SCOPE_MAPPING);
+const R5O_003_QUERY =
+  'codex-memory current governed product goal and remaining blockers';
 
-test('native read initializes the selected-diary runtime before provider and scoped search', async () => {
+test('R5-O _003 exact search arguments reach the native adapter unchanged', async () => {
   const calls = [];
   const adapter = createVcpToolBoxNativeMemoryAdapter({
     knowledgeBaseManager: {
       async initialize() {
         calls.push('initialize');
       },
-      async search(diaryNames) {
-        calls.push(['search', diaryNames]);
+      async search(diaryNames, vector, limit) {
+        calls.push(['search', diaryNames, vector, limit]);
         return [{ fullPath: 'SYNTHETIC_CODEX_PRIVATE/bootstrap.md', score: 0.9 }];
       }
     },
     embeddingUtils: {
-      async getEmbeddingsBatch() {
-        calls.push('embedding');
+      async getEmbeddingsBatch(queries) {
+        calls.push(['embedding', queries]);
         return [[0.1, 0.2]];
       }
     }
   });
 
-  const result = await adapter.search({ query: 'governed read', limit: 1 }, {
+  const result = await adapter.search({ query: R5O_003_QUERY, limit: 1 }, {
     authorization: {
       accepted: true,
       allowedDiaryNames: ['SYNTHETIC_CODEX_PRIVATE'],
@@ -74,8 +76,8 @@ test('native read initializes the selected-diary runtime before provider and sco
 
   assert.deepEqual(calls, [
     'initialize',
-    'embedding',
-    ['search', ['SYNTHETIC_CODEX_PRIVATE']]
+    ['embedding', [R5O_003_QUERY]],
+    ['search', ['SYNTHETIC_CODEX_PRIVATE'], [0.1, 0.2], 1]
   ]);
   assert.equal(result._nativeRuntimeReceipt.nativeRuntimeInitialized, true);
   assert.equal(result._nativeRuntimeReceipt.derivedIndexWritePerformed, false);
@@ -213,7 +215,8 @@ test('selected-diary hydrator fails closed on invalid receipts and missing isola
 
   await assert.rejects(
     adapter.search({ query: 'governed read', limit: 1 }, { authorization }),
-    error => error.reasonCode === 'native_runtime_call_failed'
+    error => error.reasonCode === 'native_selected_diary_hydration_failed' &&
+      !String(error.message).includes('selected_diary_hydration_receipt_invalid')
   );
   assert.equal(embeddingCalls, 1);
   assert.equal(hydrationCalls, 1);
@@ -1710,6 +1713,43 @@ test('VCPToolBox native MCP shim fails closed when native read cannot produce a 
     assert.equal(result.error.data.reasonCode, 'native_runtime_call_failed');
     assert.equal(result.error.data.lowDisclosure, true);
     assert.equal(result.error.data.rawErrorDisclosed, false);
+  } finally {
+    await shim.close();
+  }
+});
+
+test('VCPToolBox native MCP shim preserves hydration failure as a bounded reason', async () => {
+  const shim = await withShimServer({
+    adapter: {
+      async search() {
+        const error = new Error('RAW_SELECTED_DIARY_DETAIL_MUST_NOT_ESCAPE');
+        error.reasonCode = 'native_selected_diary_hydration_failed';
+        throw error;
+      }
+    }
+  });
+  try {
+    const result = await postJson(shim.url, {
+      jsonrpc: '2.0',
+      id: 'native-hydration-fails',
+      method: 'tools/call',
+      params: {
+        name: 'knowledge_base.search',
+        arguments: { query: R5O_003_QUERY, limit: 1 },
+        _meta: {
+          codexMemoryGovernance: governanceMeta('search_memory')
+        }
+      }
+    });
+    const serialized = JSON.stringify(result);
+
+    assert.equal(result.error.code, -32000);
+    assert.equal(
+      result.error.data.reasonCode,
+      'native_selected_diary_hydration_failed'
+    );
+    assert.equal(result.error.data.lowDisclosure, true);
+    assert.doesNotMatch(serialized, /RAW_SELECTED_DIARY_DETAIL_MUST_NOT_ESCAPE/u);
   } finally {
     await shim.close();
   }

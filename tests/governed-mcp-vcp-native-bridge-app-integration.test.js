@@ -1719,8 +1719,8 @@ test('bridge observation preserves bounded native runtime failure reason codes',
         statusClass: 'client_error',
         httpStatusClass: 'success',
         jsonRpcErrorPresent: true,
-        jsonRpcErrorReasonCode: 'native_diary_search_failed',
-        failureCategory: 'native_scoped_search_failed',
+        jsonRpcErrorReasonCode: 'native_selected_diary_hydration_failed',
+        failureCategory: 'selected_diary_hydration_failed',
         responseShapeCategory: 'not_consumed',
         topLevelKindCategory: 'not_consumed'
       });
@@ -1738,11 +1738,11 @@ test('bridge observation preserves bounded native runtime failure reason codes',
     assert.equal(observations.length, 1);
     assert.equal(
       observations[0].readDelegationResult.receipt.nativeInvocationReceipt.jsonRpcErrorReasonCode,
-      'native_diary_search_failed'
+      'native_selected_diary_hydration_failed'
     );
     assert.equal(
       observations[0].readDelegationResult.receipt.nativeInvocationReceipt.failureCategory,
-      'native_scoped_search_failed'
+      'selected_diary_hydration_failed'
     );
     assert.equal(serialized.includes(rawError), false);
   });

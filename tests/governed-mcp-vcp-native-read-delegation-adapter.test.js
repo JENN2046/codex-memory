@@ -1326,6 +1326,7 @@ test('governance and R5-E fail-closed categories are never eligible for local fa
     'scope_binding_rejected',
     'result_scope_postcheck_failed',
     'invalid_query_vector',
+    'selected_diary_hydration_failed',
     'index_recovery_failed',
     'vector_search_failed'
   ]) {
