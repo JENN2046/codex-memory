@@ -9,7 +9,8 @@ const test = require('node:test');
 
 const {
   createGovernedMcpVcpNativeVcpToolBoxMcpShimServer,
-  createVcpToolBoxNativeMemoryAdapter
+  createVcpToolBoxNativeMemoryAdapter,
+  initializeResult
 } = require('../src/core/GovernedMcpVcpNativeVcpToolBoxMcpShim');
 const {
   GOVERNANCE_METADATA_SCHEMA_VERSION
@@ -18,6 +19,7 @@ const {
   runGovernedVcpNativeAcceptance
 } = require('../src/cli/governed-vcp-native-acceptance');
 const {
+  configureSelectedDiaryHydration,
   parseArgs,
   requireExpectedBearerToken
 } = require('../src/cli/vcp-toolbox-native-mcp-shim');
@@ -1288,6 +1290,89 @@ test('VCPToolBox native MCP shim CLI accepts isolated knowledge-base store path 
       /vcp_native_mcp_shim_bearer_token_required/u
     );
   }
+});
+
+test('VCPToolBox native MCP shim CLI wires selected-diary hydration only for explicit read-only isolation', () => {
+  const options = parseArgs([
+    '--vcp-root',
+    '/PRIVATE/VCPToolBox',
+    '--kb-root',
+    '/PRIVATE/VCPToolBox/dailynote',
+    '--kb-store',
+    '/PRIVATE/codex-memory-isolated-vector-store',
+    '--source-kb-store',
+    '/PRIVATE/VCPToolBox/VectorStore',
+    '--diary-scope-mapping',
+    '/PRIVATE/codex-memory-diary-scope-mapping.json',
+    '--selected-diary-hydration'
+  ], {
+    CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN: 'synthetic-cli-transport-token'
+  });
+  let factoryOptions = null;
+  const expectedHydrator = async () => ({ accepted: true });
+  configureSelectedDiaryHydration(options, {
+    createHydrator(value) {
+      factoryOptions = value;
+      return expectedHydrator;
+    }
+  });
+  assert.equal(options.selectedDiaryHydrationEnabled, true);
+  assert.equal(
+    options.sourceKnowledgeBaseStorePath,
+    '/PRIVATE/VCPToolBox/VectorStore'
+  );
+  assert.equal(options.selectedDiaryRuntimeHydrator, expectedHydrator);
+  assert.deepEqual(factoryOptions, {
+    sourceKnowledgeBaseStorePath: '/PRIVATE/VCPToolBox/VectorStore',
+    vcpToolBoxRoot: '/PRIVATE/VCPToolBox'
+  });
+  assert.equal(
+    initializeResult(false, null, {
+      selectedDiaryHydrationConfigured: true
+    })._meta.selectedDiaryHydrationConfigured,
+    true
+  );
+  assert.equal(
+    initializeResult(false)._meta.selectedDiaryHydrationConfigured,
+    false
+  );
+
+  assert.throws(
+    () => configureSelectedDiaryHydration(parseArgs([
+      '--source-kb-store',
+      '/PRIVATE/VCPToolBox/VectorStore'
+    ])),
+    /selected_diary_hydration_cli_flag_required/u
+  );
+  assert.throws(
+    () => configureSelectedDiaryHydration(parseArgs([
+      '--vcp-root',
+      '/PRIVATE/VCPToolBox',
+      '--kb-root',
+      '/PRIVATE/VCPToolBox/dailynote',
+      '--kb-store',
+      '/PRIVATE/codex-memory-isolated-vector-store',
+      '--source-kb-store',
+      '/PRIVATE/VCPToolBox/VectorStore',
+      '--selected-diary-hydration',
+      '--enable-write'
+    ])),
+    /selected_diary_hydration_cli_boundary_invalid/u
+  );
+  assert.throws(
+    () => configureSelectedDiaryHydration(parseArgs([
+      '--vcp-root',
+      '/PRIVATE/VCPToolBox',
+      '--kb-store',
+      '/PRIVATE/codex-memory-isolated-vector-store',
+      '--source-kb-store',
+      '/PRIVATE/VCPToolBox/VectorStore',
+      '--selected-diary-hydration'
+    ], {
+      KNOWLEDGEBASE_ROOT_PATH: ''
+    })),
+    /selected_diary_hydration_cli_boundary_invalid/u
+  );
 });
 
 function governanceMeta(toolName = 'search_memory') {

@@ -1,12 +1,17 @@
 #!/usr/bin/env node
 'use strict';
 
+const path = require('node:path');
+
 const {
   createGovernedMcpVcpNativeVcpToolBoxMcpShimServer
 } = require('../core/GovernedMcpVcpNativeVcpToolBoxMcpShim');
 const {
   DERIVED_RUNTIME_MUTATION_POLICY
 } = require('../core/DerivedRuntimeMutationLifecycle');
+const {
+  createProductionSelectedDiaryRuntimeHydrator
+} = require('../runtime/vcp-native/production-selected-diary-hydrator');
 
 function parseArgs(argv = [], env = process.env) {
   const options = {
@@ -15,10 +20,13 @@ function parseArgs(argv = [], env = process.env) {
     vcpToolBoxRoot: env.VCPTOOLBOX_ROOT || '/home/jenn/AGENTS_OS_Workspace/runtime/VCPToolBox',
     knowledgeBaseRootPath: env.KNOWLEDGEBASE_ROOT_PATH || '',
     knowledgeBaseStorePath: env.KNOWLEDGEBASE_STORE_PATH || '',
+    sourceKnowledgeBaseStorePath:
+      env.CODEX_MEMORY_VCP_SOURCE_KB_STORE_PATH || '',
     diaryScopeMappingPath: env.CODEX_MEMORY_DIARY_SCOPE_MAPPING_PATH || '',
     expectedBearerToken: env.CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN || '',
     derivedRuntimeMutationPolicy: env.CODEX_MEMORY_DERIVED_RUNTIME_MUTATION_POLICY ||
       DERIVED_RUNTIME_MUTATION_POLICY,
+    selectedDiaryHydrationEnabled: false,
     enableWrite: false
   };
 
@@ -49,9 +57,19 @@ function parseArgs(argv = [], env = process.env) {
       index += 1;
       continue;
     }
+    if (token === '--source-kb-store') {
+      options.sourceKnowledgeBaseStorePath =
+        argv[index + 1] || options.sourceKnowledgeBaseStorePath;
+      index += 1;
+      continue;
+    }
     if (token === '--diary-scope-mapping') {
       options.diaryScopeMappingPath = argv[index + 1] || options.diaryScopeMappingPath;
       index += 1;
+      continue;
+    }
+    if (token === '--selected-diary-hydration') {
+      options.selectedDiaryHydrationEnabled = true;
       continue;
     }
     if (token === '--enable-write') {
@@ -60,6 +78,42 @@ function parseArgs(argv = [], env = process.env) {
   }
 
   return options;
+}
+
+function configureSelectedDiaryHydration(options, {
+  createHydrator = createProductionSelectedDiaryRuntimeHydrator
+} = {}) {
+  if (!options || typeof options !== 'object' || typeof createHydrator !== 'function') {
+    throw new Error('selected_diary_hydration_cli_invalid');
+  }
+  if (options.selectedDiaryHydrationEnabled !== true) {
+    if (options.sourceKnowledgeBaseStorePath) {
+      throw new Error('selected_diary_hydration_cli_flag_required');
+    }
+    return options;
+  }
+  if (options.enableWrite === true ||
+      !pathIsAbsoluteDirectoryReference(options.vcpToolBoxRoot) ||
+      !pathIsAbsoluteDirectoryReference(options.knowledgeBaseRootPath) ||
+      !pathIsAbsoluteDirectoryReference(options.knowledgeBaseStorePath) ||
+      !pathIsAbsoluteDirectoryReference(options.sourceKnowledgeBaseStorePath)) {
+    throw new Error('selected_diary_hydration_cli_boundary_invalid');
+  }
+  options.selectedDiaryRuntimeHydrator = createHydrator({
+    sourceKnowledgeBaseStorePath: options.sourceKnowledgeBaseStorePath,
+    vcpToolBoxRoot: options.vcpToolBoxRoot
+  });
+  if (typeof options.selectedDiaryRuntimeHydrator !== 'function') {
+    throw new Error('selected_diary_hydration_cli_factory_invalid');
+  }
+  return options;
+}
+
+function pathIsAbsoluteDirectoryReference(value) {
+  return typeof value === 'string' &&
+    value.length > 1 &&
+    path.isAbsolute(value) &&
+    !value.includes('\u0000');
 }
 
 function normalizePort(value, fallback) {
@@ -71,7 +125,7 @@ async function main(
   argv = process.argv.slice(2),
   environment = process.env
 ) {
-  const options = parseArgs(argv, environment);
+  const options = configureSelectedDiaryHydration(parseArgs(argv, environment));
   options.expectedBearerToken = requireExpectedBearerToken(options.expectedBearerToken);
   const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options);
   await new Promise((resolve, reject) => {
@@ -95,6 +149,8 @@ async function main(
     ],
     endpointDisclosed: true,
     isolatedRuntimeStoreConfigured: Boolean(options.knowledgeBaseStorePath),
+    selectedDiaryHydrationConfigured:
+      typeof options.selectedDiaryRuntimeHydrator === 'function',
     diaryScopeMappingConfigured: Boolean(options.diaryScopeMappingPath),
     runtimeStorePathDisclosed: false,
     tokenMaterialDisclosed: false,
@@ -152,6 +208,7 @@ function requireExpectedBearerToken(value) {
 }
 
 module.exports = {
+  configureSelectedDiaryHydration,
   main,
   normalizePort,
   parseArgs,

@@ -46,11 +46,6 @@
   },
   "blockers": [
     {
-      "id": "controller_runtime_profile_transition_pending",
-      "status": "open",
-      "summary": "The manifest-v1 and schema-v6 source implementation is merged, but the owner-only runtime profile has not yet been transitioned and re-adopted under exact authorization."
-    },
-    {
       "id": "r5_h_matrix_incomplete",
       "status": "open",
       "summary": "The R5-H private ChatGPT dogfood matrix is incomplete."
@@ -58,7 +53,7 @@
     {
       "id": "r5_o_private_exact_head_runtime_unverified",
       "status": "open",
-      "summary": "R5-O private exact-head runtime behavior has not been verified."
+      "summary": "The first authorized R5-O attempt failed closed at native vector-receipt validation; no successful post-hydrator exact-head proof exists."
     },
     {
       "id": "fresh_non_empty_task_context_relevance_unproven",

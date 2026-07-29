@@ -52,8 +52,9 @@ const {
   governanceCredentialFreshnessMatches,
   governancePrivateFileIdentities,
   loadManagedEnvironmentFile,
-  managedStopWaitOptions,
   managedEnvironmentConfigDigest,
+  managedShimArguments,
+  managedStopWaitOptions,
   lowDisclosureGovernanceProjection,
   lowDisclosureRelayProjection,
   ownerFileIdentity,
@@ -1670,6 +1671,44 @@ test('managed child environments neutralize caller write, root, provider, and pu
 test('native shim exposes an in-process listener entry for the managed PID', () => {
   const shimCli = require('../src/cli/vcp-toolbox-native-mcp-shim');
   assert.equal(typeof shimCli.main, 'function');
+});
+
+test('managed shim arguments bind production selected-diary hydration', () => {
+  assert.deepEqual(
+    managedShimArguments({
+      vcpRoot: '/runtime/VCPToolBox',
+      runtimeRoot: '/runtime/codex-memory-full-stack-001'
+    }),
+    [
+      '--host',
+      '127.0.0.1',
+      '--port',
+      '7615',
+      '--vcp-root',
+      '/runtime/VCPToolBox',
+      '--kb-root',
+      '/runtime/VCPToolBox/dailynote',
+      '--kb-store',
+      '/runtime/codex-memory-full-stack-001/store',
+      '--source-kb-store',
+      '/runtime/VCPToolBox/VectorStore',
+      '--selected-diary-hydration'
+    ]
+  );
+  assert.throws(
+    () => managedShimArguments({
+      vcpRoot: 'relative/VCPToolBox',
+      runtimeRoot: '/runtime/codex-memory-full-stack-001'
+    }),
+    { code: 'stack_shim_runtime_paths_invalid' }
+  );
+  assert.throws(
+    () => managedShimArguments({
+      vcpRoot: '/runtime/VCPToolBox',
+      runtimeRoot: 'relative/runtime'
+    }),
+    { code: 'stack_shim_runtime_paths_invalid' }
+  );
 });
 
 test('HTTP child requires the exact governed mapping binding shape', () => {

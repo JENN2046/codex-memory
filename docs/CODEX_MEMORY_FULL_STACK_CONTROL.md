@@ -260,6 +260,47 @@ If runtime-critical source, the accepted baseline, owner profile, or Edge
 container changes, startup fails closed. Reprovision and complete a fresh
 exact-baseline acceptance instead of using `--force`.
 
+## Selected-Diary Production Hydration
+
+The schema-v6 managed shim is launched with the canonical VCPToolBox
+`dailynote` root, its canonical primary `VectorStore`, a controller-owned
+isolated store, and an explicit `--selected-diary-hydration` gate. The shim
+advertises `selectedDiaryHydrationConfigured: true` in low-disclosure
+`initialize` and `tools/list` metadata only when that production hydrator is
+actually installed. R5-N capability preparation requires the flag on both
+responses; an older or substitute shim fails before native execution.
+
+After the governed mapping has resolved an exact diary allowlist, the
+production hydrator opens only the primary `knowledge_base.sqlite` database in
+read-only, `query_only` mode. Inside one read transaction it selects only the
+matching `files` and `chunks` rows and atomically projects that already-derived
+vector data into the isolated database. It does not scan diary files,
+re-embed stored content, read tags, call the provider, or modify the primary
+database. Query embedding remains the single provider stage owned by the
+governed native read; hydration occurs after that vector is validated and
+before selected-index recovery and search.
+
+The boundary is exact rather than best-effort:
+
+- the VCP root, canonical `dailynote`, canonical `VectorStore`, isolated store,
+  and both opened SQLite handles must resolve to their expected non-symlink
+  locations;
+- the isolated store must remain outside the VCP source tree and must not
+  overlap the primary store;
+- the allowlist is bounded to eight exact diary names, and every selected path
+  and vector must match its diary, dimension, finite-value, count, and byte
+  budgets;
+- any cross-scope row, secondary tag/cache/migration state, partial write,
+  changed database handle, or stale isolated projection fails closed instead
+  of being overwritten.
+
+The returned receipt contains only acceptance booleans and aggregate
+diary/file/chunk counts. It contains no diary name, path, content, vector,
+token, provider response, or raw database output. This wiring neither changes
+the public MCP tool surface nor authorizes a private read. Source and fixture
+tests establish the contract; a successful exact-head private runtime proof
+still requires separate, current P3 authorization.
+
 ## Status And Stop
 
 `status` performs the same authenticated, full hardened-policy HTTP probe used

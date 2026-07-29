@@ -79,6 +79,7 @@ test('R5-N probes initialize and tools/list before binding an exact mapping-capa
   assert.equal(prepared.receipt.diary_scope_mapping_loaded, true);
   assert.equal(prepared.receipt.mapping_binding_fingerprint_matched, true);
   assert.equal(prepared.receipt.selected_diary_search_supported, true);
+  assert.equal(prepared.receipt.selected_diary_hydration_configured, true);
   assert.equal(prepared.receipt.provider_calls_during_preflight, 0);
   assert.equal(prepared.receipt.native_invocations_during_preflight, 0);
   assert.equal(prepared.receipt.primary_memory_writes_during_preflight, 0);
@@ -105,6 +106,9 @@ test('R5-N rejects missing, mismatched, writable, and malformed shim capabilitie
     }, 'r5n_shim_initialize_capability_rejected'],
     [{
       enableWrite: true
+    }, 'r5n_shim_initialize_capability_rejected'],
+    [{
+      selectedDiaryHydrationConfigured: false
     }, 'r5n_shim_initialize_capability_rejected'],
     [{
       mutate(method, result) {
@@ -447,6 +451,7 @@ function capabilityFetch({
   environment,
   mappingState = acceptedMappingState(environment),
   enableWrite = false,
+  selectedDiaryHydrationConfigured = true,
   calls = [],
   expectedBearerToken = 'synthetic-r5n-capability-token',
   authorizationRequired = true,
@@ -464,8 +469,12 @@ function capabilityFetch({
       calls.push(body.method);
     }
     const raw = body.method === 'initialize'
-      ? initializeResult(enableWrite, mappingState)
-      : toolsListResult(enableWrite, mappingState);
+      ? initializeResult(enableWrite, mappingState, {
+          selectedDiaryHydrationConfigured
+        })
+      : toolsListResult(enableWrite, mappingState, {
+          selectedDiaryHydrationConfigured
+        });
     const result = structuredClone(raw);
     mutate(body.method, result);
     return {

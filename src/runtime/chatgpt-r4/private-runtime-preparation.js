@@ -109,6 +109,8 @@ async function preparePrivateRuntimeEnvironment({
         capability.mapping_binding_fingerprint_matched,
       selected_diary_search_supported:
         capability.selected_diary_search_supported,
+      selected_diary_hydration_configured:
+        capability.selected_diary_hydration_configured,
       provider_calls_during_preflight: 0,
       native_invocations_during_preflight: 0,
       primary_memory_writes_during_preflight: 0,
@@ -210,6 +212,7 @@ async function probeIsolatedShimCapabilities({
     diary_scope_mapping_loaded: true,
     mapping_binding_fingerprint_matched: true,
     selected_diary_search_supported: true,
+    selected_diary_hydration_configured: true,
     native_write_enabled: false,
     provider_calls: 0,
     native_invocations: 0,
@@ -366,6 +369,7 @@ function validCapabilityMetadata(metadata, expectedFingerprint) {
     metadata.providerApiCalled === false &&
     metadata.nativeRuntimeCalled === false &&
     metadata.scopeEnforcementMode === 'diary_allowlist_v1' &&
+    metadata.selectedDiaryHydrationConfigured === true &&
     metadata.mappingConfigured === true &&
     metadata.mappingReferenceBound === true &&
     metadata.mappingDigestBound === true &&
