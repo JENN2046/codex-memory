@@ -1188,10 +1188,19 @@ function executeSourceSnapshot({
   let activeError = null;
   let operationResult;
   try {
-    sourceDatabase = openSourceDatabase(
-      boundary.sourceDatabase,
-      knowledgeBaseManager
-    );
+    try {
+      sourceDatabase = openSourceDatabase(
+        boundary.sourceDatabase,
+        knowledgeBaseManager
+      );
+    } catch (error) {
+      if (preflight) throw error;
+      throw codedError(
+        'selected_diary_hydration_source_database_open_failed',
+        'hydration_failed',
+        { counterFacts: zeroDerivedCounterFacts() }
+      );
+    }
     if (!sourceDatabase ||
         typeof sourceDatabase.prepare !== 'function' ||
         typeof sourceDatabase.exec !== 'function' ||

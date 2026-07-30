@@ -11,7 +11,8 @@ const {
   GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES,
   createAttemptHeader,
   createStageReceipt,
-  digestObject
+  digestObject,
+  failureRegistryEntry
 } = require('../packages/chatgpt-r4-contracts');
 const {
   MAX_PROJECTION_PLAN_BYTES,
@@ -446,6 +447,67 @@ test('production hydrator rejects a source driver without read-only attestation'
     { code: 'selected_diary_hydration_source_database_driver_invalid' }
   );
   assert.equal(closed, true);
+});
+
+test('materialization classifies a second source-open failure after provider as hydration', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      openCount += 1;
+      if (openCount === 2) {
+        throw new Error('synthetic transient source-open failure');
+      }
+      return openReadOnlyDatabase(file);
+    }
+  });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  assert.equal(openCount, 1);
+
+  assert.throws(
+    () => hydrate.materialize({
+      ...hydrationInput(value),
+      projectionPlan: plan
+    }),
+    error => {
+      assert.equal(
+        error.code,
+        'selected_diary_hydration_source_database_open_failed'
+      );
+      assert.equal(error.reasonCode, 'hydration_failed');
+      assert.deepEqual(error.counterFacts, {
+        primary_memory: {
+          write_attempts: 0,
+          writes_committed: 0
+        },
+        derived_transaction: {
+          started: 0,
+          committed: 0,
+          rolled_back: 0
+        }
+      });
+      const failure = failureRegistryEntry(error.reasonCode);
+      assert.equal(failure.stage, 'HYDRATION');
+      assert.equal(failure.provider_may_have_occurred, true);
+      const stageReceipt = hydrationAttemptReceipt(error.counterFacts, {
+        outcome: 'failed',
+        reasonCode: error.reasonCode
+      });
+      assert.equal(stageReceipt.stage, 'HYDRATION');
+      assert.equal(stageReceipt.reason_code, 'hydration_failed');
+      return true;
+    }
+  );
+  assert.equal(openCount, 2);
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
 });
 
 test('projection byte budgets reject before selected rows are materialized', () => {
