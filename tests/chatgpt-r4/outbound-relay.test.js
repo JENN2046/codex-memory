@@ -37,7 +37,7 @@ const ORIGIN = 'https://memory.jenn.dev';
 const MCP_RESOURCE = `${ORIGIN}/mcp`;
 const TOKEN = 'r'.repeat(48);
 
-test('R4-D Relay default UDS budget covers governed provider reads', () => {
+test('R4-D Relay preserves the legacy non-attempt UDS timeout', () => {
   assert.equal(DEFAULT_UDS_TIMEOUT_MS, 15_000);
 });
 

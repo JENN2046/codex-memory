@@ -16,6 +16,7 @@ const {
   createTerminalEnvelope,
   digestObject,
   failureRegistryEntry,
+  governedReadAttemptDeadlineBudgetMs,
   governedReadAttemptResponseBindingDigest,
   isGovernedReadAttemptWorkingSetExtension,
   projectGovernedReadAttemptOwner,
@@ -170,6 +171,44 @@ test('AttemptHeader is immutable, bounded, and contains no mutable state identit
     ...value,
     current_stage: 'CREATED'
   }), { code: 'attempt_header_shape_invalid' });
+});
+
+test('attempt deadline budgets preserve one absolute deadline with bounded transport margin', () => {
+  const value = header('D');
+  assert.equal(
+    governedReadAttemptDeadlineBudgetMs(value, {
+      now: new Date(NOW.getTime() + 10_000),
+      marginMs: 3_000
+    }),
+    23_000
+  );
+  assert.equal(
+    governedReadAttemptDeadlineBudgetMs(value, {
+      now: new Date(NOW.getTime() - 30_000),
+      marginMs: 3_000
+    }),
+    GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000 +
+      3_000
+  );
+  assert.equal(
+    governedReadAttemptDeadlineBudgetMs(value, {
+      now: new Date(NOW.getTime() + 30_000),
+      marginMs: 3_000
+    }),
+    0
+  );
+  assert.throws(
+    () => governedReadAttemptDeadlineBudgetMs(value, {
+      now: 'not-a-clock'
+    }),
+    { code: 'attempt_deadline_clock_invalid' }
+  );
+  assert.throws(
+    () => governedReadAttemptDeadlineBudgetMs(value, {
+      marginMs: 10_001
+    }),
+    { code: 'attempt_deadline_margin_invalid' }
+  );
 });
 
 test('working-set extension requires an exact immutable header and receipt prefix', () => {

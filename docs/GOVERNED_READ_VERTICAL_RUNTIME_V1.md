@@ -94,6 +94,32 @@ created attempt directory cannot be removed; a failure that created no
 resource, or whose partial resource was removed, does not poison later
 admission.
 
+## One absolute transport deadline
+
+Attempt-v1 does not reuse the legacy nested transport timeouts as end-to-end
+budgets. The Bridge HTTP client, Governance UDS server, and Relay UDS client
+all derive their timer from the immutable `AttemptHeader.deadline_at`.
+Successive bounded reconciliation margins are applied after that same absolute
+deadline:
+
+```text
+Bridge HTTP       deadline_at + 1 second
+Governance UDS    deadline_at + 2 seconds
+Relay UDS         deadline_at + 3 seconds
+```
+
+This ordering lets the downstream provider/worker finish within the attempt
+lease and gives a completed continuation time to travel outward. Edge
+cancellation still aborts Relay UDS at the attempt deadline and first-terminal
+wins; if Edge is unavailable, the bounded nested timers eventually fail
+closed. A request first presented at or after `deadline_at` is rejected before
+opening a new downstream connection.
+
+The existing 20-second Bridge, 30-second Governance UDS, and 15-second Relay
+UDS defaults remain unchanged for non-attempt traffic. No environment
+variable, public tool, input schema, signing authority, or live configuration
+is added.
+
 ## Lease child
 
 The default runner forks
@@ -151,7 +177,10 @@ signed request
 It uses a temporary SQLite primary, production two-pass projection, a
 synthetic provider wrapper, and a controller-owned derived store. It retains no
 request or response bodies in observations and verifies the primary database
-bytes are unchanged.
+bytes are unchanged. A focused negative path configures every legacy nested
+timeout below the synthetic downstream latency and proves that the attempt
+still uses its absolute deadline budget; once that deadline is reached, neither
+Relay UDS nor Bridge HTTP opens a new downstream connection.
 
 The exact-writer authority job separately checks out and verifies unmodified
 VCP commit `555b3b538f6eb736e530c2912de678c5941f9985`. Real

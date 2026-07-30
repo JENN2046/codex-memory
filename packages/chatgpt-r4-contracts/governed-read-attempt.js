@@ -452,6 +452,34 @@ function validateAttemptHeader(header) {
   return header;
 }
 
+function governedReadAttemptDeadlineBudgetMs(
+  header,
+  {
+    now = new Date(),
+    marginMs = 0
+  } = {}
+) {
+  validateAttemptHeader(header);
+  const current = now instanceof Date
+    ? new Date(now.getTime())
+    : new Date(now);
+  if (!Number.isFinite(current.getTime())) {
+    reject('attempt_deadline_clock_invalid');
+  }
+  if (!Number.isInteger(marginMs) ||
+      marginMs < 0 ||
+      marginMs > 10_000) {
+    reject('attempt_deadline_margin_invalid');
+  }
+  const remainingMs =
+    Date.parse(header.deadline_at) - current.getTime();
+  if (remainingMs <= 0) return 0;
+  return Math.min(
+    remainingMs + marginMs,
+    GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000 + marginMs
+  );
+}
+
 function failureRegistryEntry(reasonCode) {
   assertSafeCode(reasonCode, 'attempt_reason_invalid');
   if (!Object.hasOwn(GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY, reasonCode)) {
@@ -1028,6 +1056,7 @@ module.exports = {
   createStageReceipt,
   createTerminalEnvelope,
   failureRegistryEntry,
+  governedReadAttemptDeadlineBudgetMs,
   governedReadAttemptResponseBindingDigest,
   isGovernedReadAttemptWorkingSetExtension,
   projectGovernedReadAttemptOwner,

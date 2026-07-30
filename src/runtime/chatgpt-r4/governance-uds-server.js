@@ -7,6 +7,7 @@ const path = require('node:path');
 const {
   GOVERNED_READ_ATTEMPT_LIMITS,
   LIMITS,
+  governedReadAttemptDeadlineBudgetMs,
   reject
 } = require('../../../packages/chatgpt-r4-contracts');
 
@@ -16,6 +17,7 @@ const MAX_RESPONSE_BYTES = LIMITS.maxResponseBytes +
   GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes;
 const MAX_CONCURRENT_CONNECTIONS = 32;
 const SOCKET_IDLE_TIMEOUT_MS = 30_000;
+const GOVERNANCE_UDS_ATTEMPT_DEADLINE_MARGIN_MS = 2_000;
 
 function validateSocketAuthority(socketPath, { statSync = fs.statSync } = {}) {
   if (typeof socketPath !== 'string' || !path.isAbsolute(socketPath) ||
@@ -38,11 +40,19 @@ function createGovernanceUdsServer({
   socketPath,
   governanceRuntime,
   chmodSync = fs.chmodSync,
-  statSync = fs.statSync
+  statSync = fs.statSync,
+  socketIdleTimeoutMs = SOCKET_IDLE_TIMEOUT_MS,
+  clock = () => new Date()
 } = {}) {
   validateSocketAuthority(socketPath, { statSync });
   if (!governanceRuntime || typeof governanceRuntime.handle !== 'function') {
     reject('r4_governance_runtime_invalid');
+  }
+  if (!Number.isInteger(socketIdleTimeoutMs) ||
+      socketIdleTimeoutMs < 10 ||
+      socketIdleTimeoutMs > 60_000 ||
+      typeof clock !== 'function') {
+    reject('r4_governance_uds_timeout_invalid');
   }
   const observations = {
     connections: 0,
@@ -72,7 +82,7 @@ function createGovernanceUdsServer({
       openSockets.delete(socket);
     };
     socket.once('close', releaseConnection);
-    socket.setTimeout(SOCKET_IDLE_TIMEOUT_MS, () => rejectFrame());
+    socket.setTimeout(socketIdleTimeoutMs, () => rejectFrame());
     let bytes = 0;
     const chunks = [];
     let handled = false;
@@ -112,6 +122,30 @@ function createGovernanceUdsServer({
         observations.rejected_frames += 1;
         socket.destroy();
         return;
+      }
+      if (payload.governedReadAttempt) {
+        let governedTimeoutMs;
+        try {
+          governedTimeoutMs =
+            governedReadAttemptDeadlineBudgetMs(
+              payload.governedReadAttempt.header,
+              {
+                now: clock(),
+                marginMs:
+                  GOVERNANCE_UDS_ATTEMPT_DEADLINE_MARGIN_MS
+              }
+            );
+        } catch {
+          observations.rejected_frames += 1;
+          socket.destroy();
+          return;
+        }
+        if (governedTimeoutMs === 0) {
+          observations.rejected_frames += 1;
+          socket.destroy();
+          return;
+        }
+        socket.setTimeout(governedTimeoutMs, () => rejectFrame());
       }
       try {
         const result = await governanceRuntime.handle(payload);
@@ -183,6 +217,7 @@ function createGovernanceUdsServer({
 }
 
 module.exports = {
+  GOVERNANCE_UDS_ATTEMPT_DEADLINE_MARGIN_MS,
   MAX_REQUEST_BYTES,
   MAX_RESPONSE_BYTES,
   MAX_CONCURRENT_CONNECTIONS,

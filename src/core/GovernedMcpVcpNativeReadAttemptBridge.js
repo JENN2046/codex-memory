@@ -5,6 +5,7 @@ const http = require('node:http');
 const {
   LIMITS,
   appendGovernedReadAttemptStage,
+  governedReadAttemptDeadlineBudgetMs,
   isGovernedReadAttemptWorkingSetExtension,
   validateGovernedReadAttemptWorkingSet
 } = require('../../packages/chatgpt-r4-contracts');
@@ -12,6 +13,7 @@ const {
 const MAX_HTTP_BODY_BYTES =
   LIMITS.maxRequestBytes + LIMITS.maxResponseBytes + 64 * 1024;
 const DEFAULT_HTTP_TIMEOUT_MS = 20_000;
+const GOVERNED_READ_BRIDGE_DEADLINE_MARGIN_MS = 1_000;
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 
 function codedError(code) {
@@ -114,7 +116,8 @@ function createGovernedReadShimHttpClient({
   endpoint,
   runtimeBindingDigest,
   timeoutMs = DEFAULT_HTTP_TIMEOUT_MS,
-  request = http.request
+  request = http.request,
+  clock = () => new Date()
 } = {}) {
   const target = validateLoopbackEndpoint(endpoint);
   if (typeof runtimeBindingDigest !== 'string' ||
@@ -124,13 +127,30 @@ function createGovernedReadShimHttpClient({
   if (!Number.isInteger(timeoutMs) ||
       timeoutMs < 10 ||
       timeoutMs > 60_000 ||
-      typeof request !== 'function') {
+      typeof request !== 'function' ||
+      typeof clock !== 'function') {
     throw codedError('governed_read_bridge_http_config_invalid');
   }
 
   return function invokeShim(input) {
+    let requestTimeoutMs = timeoutMs;
     let encoded;
     try {
+      if (input?.workingSet?.header) {
+        requestTimeoutMs = governedReadAttemptDeadlineBudgetMs(
+          input.workingSet.header,
+          {
+            now: clock(),
+            marginMs:
+              GOVERNED_READ_BRIDGE_DEADLINE_MARGIN_MS
+          }
+        );
+        if (requestTimeoutMs === 0) {
+          return Promise.reject(
+            codedError('governed_read_bridge_attempt_expired')
+          );
+        }
+      }
       encoded = Buffer.from(JSON.stringify({
         authorization: input.authorization,
         limit: input.limit,
@@ -213,7 +233,7 @@ function createGovernedReadShimHttpClient({
           );
         }
       });
-      outgoing.setTimeout(timeoutMs, () => {
+      outgoing.setTimeout(requestTimeoutMs, () => {
         outgoing.destroy();
         if (!settled) {
           settled = true;
@@ -229,6 +249,7 @@ function createGovernedReadShimHttpClient({
 
 module.exports = {
   DEFAULT_HTTP_TIMEOUT_MS,
+  GOVERNED_READ_BRIDGE_DEADLINE_MARGIN_MS,
   MAX_HTTP_BODY_BYTES,
   createGovernedReadAttemptBridge,
   createGovernedReadShimHttpClient,

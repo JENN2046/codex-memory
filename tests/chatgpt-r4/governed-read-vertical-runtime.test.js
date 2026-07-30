@@ -3,6 +3,7 @@
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
+const http = require('node:http');
 const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
@@ -41,6 +42,9 @@ const {
 const {
   createLoopbackRelayRuntime
 } = require('../../apps/local-recall-relay/loopback-runtime');
+const {
+  createUdsForwarder
+} = require('../../apps/local-recall-relay/uds-transport');
 const {
   createRelayProcessor,
   validateInvocationCounterAgreement
@@ -381,6 +385,117 @@ function bridgeWorkingSet(suffix) {
   return { header, receipts };
 }
 
+test('attempt deadline outranks legacy Bridge and UDS transport timeouts', async t => {
+  const workingSet = bridgeWorkingSet('d');
+  const nearDeadline = new Date(
+    Date.parse(workingSet.header.deadline_at) - 100
+  );
+  const udsRoot = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-governed-deadline-'
+  ));
+  fs.chmodSync(udsRoot, 0o700);
+  const socketPath = path.join(udsRoot, 'governance.sock');
+  const udsServer = createGovernanceUdsServer({
+    socketPath,
+    socketIdleTimeoutMs: 10,
+    clock: () => nearDeadline,
+    governanceRuntime: {
+      async handle() {
+        await new Promise(resolve => setTimeout(resolve, 30));
+        return { accepted: true };
+      }
+    }
+  });
+  await udsServer.start();
+  t.after(async () => {
+    await udsServer.stop();
+    fs.rmSync(udsRoot, { recursive: true, force: true });
+  });
+  const forward = createUdsForwarder({
+    socketPath,
+    timeoutMs: 10,
+    clock: () => nearDeadline
+  });
+  assert.deepEqual(await forward({
+    governedReadAttempt: workingSet,
+    relayReceipt: { safe: true },
+    request: { safe: true }
+  }), { accepted: true });
+  assert.equal(udsServer.snapshot().accepted_frames, 1);
+
+  let httpRequests = 0;
+  const shimServer = http.createServer((incoming, outgoing) => {
+    httpRequests += 1;
+    incoming.resume();
+    incoming.once('end', () => {
+      setTimeout(() => {
+        outgoing.writeHead(200, {
+          'content-type': 'application/json'
+        });
+        outgoing.end(JSON.stringify({ accepted: true }));
+      }, 30);
+    });
+  });
+  await new Promise((resolve, rejectListen) => {
+    shimServer.once('error', rejectListen);
+    shimServer.listen(0, '127.0.0.1', resolve);
+  });
+  t.after(() => new Promise(resolve =>
+    shimServer.close(() => resolve())
+  ));
+  const shimAddress = shimServer.address();
+  const invokeShim = createGovernedReadShimHttpClient({
+    endpoint:
+      `http://127.0.0.1:${shimAddress.port}/v1/governed-read-attempt`,
+    runtimeBindingDigest: digestObject('deadline-runtime-binding'),
+    timeoutMs: 10,
+    clock: () => nearDeadline
+  });
+  assert.deepEqual(await invokeShim({
+    workingSet,
+    authorization: { accepted: true },
+    query: 'bounded deadline query',
+    limit: 1
+  }), { accepted: true });
+  assert.equal(httpRequests, 1);
+
+  const expired = new Date(
+    Date.parse(workingSet.header.deadline_at)
+  );
+  const expiredForward = createUdsForwarder({
+    socketPath,
+    timeoutMs: 10,
+    clock: () => expired
+  });
+  await assert.rejects(
+    expiredForward({
+      governedReadAttempt: workingSet,
+      relayReceipt: { safe: true },
+      request: { safe: true }
+    }),
+    { code: 'relay_request_expired_before_response' }
+  );
+  const expiredShim = createGovernedReadShimHttpClient({
+    endpoint:
+      `http://127.0.0.1:${shimAddress.port}/v1/governed-read-attempt`,
+    runtimeBindingDigest: digestObject('deadline-runtime-binding'),
+    timeoutMs: 10,
+    clock: () => expired
+  });
+  await assert.rejects(
+    expiredShim({
+      workingSet,
+      authorization: { accepted: true },
+      query: 'expired deadline query',
+      limit: 1
+    }),
+    { code: 'governed_read_bridge_attempt_expired' }
+  );
+  assert.equal(httpRequests, 1);
+  assert.equal(udsServer.snapshot().connections, 1);
+});
+
 function successfulWorkerExecution(task, {
   shutdownComplete = true
 } = {}) {
@@ -506,13 +621,15 @@ test('full real transport replay commits one canonical terminal and cleans its l
   const bridge = createGovernedReadAttemptBridge({
     invokeShim: createGovernedReadShimHttpClient({
       endpoint: shimAddress.endpoint,
-      runtimeBindingDigest
+      runtimeBindingDigest,
+      clock: () => NOW
     })
   });
 
   const governance = createGovernedReadAttemptGovernanceRuntime({
     async authorizeRead({ request }) {
       assert.equal(request.tool_request.name, 'search_memory');
+      await new Promise(resolve => setTimeout(resolve, 30));
       return {
         accepted: true,
         authorization: {
@@ -569,7 +686,8 @@ test('full real transport replay commits one canonical terminal and cleans its l
   const socketPath = path.join(fixture.udsRoot, 'governance.sock');
   const uds = createGovernanceUdsServer({
     socketPath,
-    governanceRuntime: governance
+    governanceRuntime: governance,
+    clock: () => NOW
   });
   await uds.start();
   t.after(() => uds.stop());
@@ -673,7 +791,8 @@ test('full real transport replay commits one canonical terminal and cleans its l
     responseSigning: signing(relayIdentity),
     counterMode: COUNTER_MODES.governedLiveReadV1,
     clock: () => NOW,
-    cancelPollMs: 1
+    cancelPollMs: 1,
+    udsTimeoutMs: 10
   });
 
   await edgeClient.submit(request, { attemptHeader: header });
