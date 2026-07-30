@@ -130,6 +130,111 @@ async function runStageHook(stageHooks, stage, input) {
   await hook(input);
 }
 
+function recordIndexCandidates(accounting, value) {
+  const candidates = Array.isArray(value) ? value : [];
+  accounting.rawCandidateCount += candidates.length;
+  for (const candidate of candidates) {
+    const chunkId = Number(candidate?.id);
+    if (Number.isSafeInteger(chunkId) && chunkId >= 0) {
+      accounting.candidateChunkIds.add(chunkId);
+    }
+  }
+}
+
+function instrumentDiaryIndex(
+  index,
+  accounting,
+  instrumentedIndexes,
+  restoreHooks
+) {
+  if (!index ||
+      (typeof index !== 'object' && typeof index !== 'function') ||
+      typeof index.search !== 'function') {
+    throw new Error('lease_index_search_unavailable');
+  }
+  if (instrumentedIndexes.has(index)) return;
+  const originalSearch = index.search;
+  index.search = function governedReadLeaseIndexSearch(...args) {
+    accounting.indexSearchCallCount += 1;
+    try {
+      const value = originalSearch.apply(this, args);
+      if (value && typeof value.then === 'function') {
+        return Promise.resolve(value).then(result => {
+          accounting.indexSearchSuccessCount += 1;
+          recordIndexCandidates(accounting, result);
+          return result;
+        }, error => {
+          accounting.indexSearchFailureCount += 1;
+          throw error;
+        });
+      }
+      accounting.indexSearchSuccessCount += 1;
+      recordIndexCandidates(accounting, value);
+      return value;
+    } catch (error) {
+      accounting.indexSearchFailureCount += 1;
+      throw error;
+    }
+  };
+  restoreHooks.push(() => {
+    index.search = originalSearch;
+  });
+  if (typeof index.remove === 'function') {
+    const originalRemove = index.remove;
+    index.remove = function governedReadLeaseGhostRemoval(...args) {
+      accounting.ghostCandidateCount += 1;
+      return originalRemove.apply(this, args);
+    };
+    restoreHooks.push(() => {
+      index.remove = originalRemove;
+    });
+  }
+  instrumentedIndexes.add(index);
+}
+
+function restoreDiaryIndexHooks(restoreHooks) {
+  let restored = true;
+  while (restoreHooks.length > 0) {
+    try {
+      restoreHooks.pop()();
+    } catch {
+      restored = false;
+    }
+  }
+  return restored;
+}
+
+function validateVectorSearchEvidence({
+  accounting,
+  loadedVectorCount,
+  rawResults
+}) {
+  if (accounting.indexSearchFailureCount > 0 ||
+      accounting.indexSearchSuccessCount !==
+        accounting.indexSearchCallCount ||
+      accounting.ghostCandidateCount > 0 ||
+      (loadedVectorCount > 0 &&
+        accounting.indexSearchCallCount === 0) ||
+      (loadedVectorCount === 0 && (
+        rawResults.length > 0 ||
+        accounting.rawCandidateCount > 0
+      )) ||
+      rawResults.length > accounting.rawCandidateCount ||
+      rawResults.some(result => {
+        if (!result ||
+            typeof result !== 'object' ||
+            !Object.hasOwn(result, 'chunkId')) {
+          return false;
+        }
+        const chunkId = Number(result.chunkId);
+        return !Number.isSafeInteger(chunkId) ||
+          chunkId < 0 ||
+          !accounting.candidateChunkIds.has(chunkId);
+      })) {
+    throw new Error('lease_vector_search_evidence_invalid');
+  }
+}
+
 function projectReadResults(results) {
   if (!Array.isArray(results)) return [];
   return results.slice(0, MAX_RESULT_LIMIT).map((item, index) => {
@@ -171,6 +276,17 @@ async function executeGovernedReadLeaseTask(input = {}) {
   const queryVector = Float32Array.from(input.queryVector);
   let workingSet = input.workingSet;
   let hydration;
+  let loadedVectorCount = 0;
+  const instrumentedIndexes = new Set();
+  const restoreIndexHooks = [];
+  const vectorSearchAccounting = {
+    indexSearchCallCount: 0,
+    indexSearchSuccessCount: 0,
+    indexSearchFailureCount: 0,
+    rawCandidateCount: 0,
+    ghostCandidateCount: 0,
+    candidateChunkIds: new Set()
+  };
 
   try {
     await runStageHook(stageHooks, 'HYDRATION', {
@@ -208,9 +324,14 @@ async function executeGovernedReadLeaseTask(input = {}) {
     await runStageHook(stageHooks, 'INDEX_RECOVERY', {
       attempt_ref: workingSet.header.attempt_ref
     });
-    let loadedVectorCount = 0;
     for (const diaryName of authorization.allowedDiaryNames) {
       const index = await knowledgeBaseManager._getOrLoadDiaryIndex(diaryName);
+      instrumentDiaryIndex(
+        index,
+        vectorSearchAccounting,
+        instrumentedIndexes,
+        restoreIndexHooks
+      );
       if (!index || typeof index.stats !== 'function') {
         throw new Error('lease_index_stats_unavailable');
       }
@@ -229,6 +350,7 @@ async function executeGovernedReadLeaseTask(input = {}) {
     }
     workingSet = completeStage(workingSet, 'INDEX_RECOVERY');
   } catch {
+    restoreDiaryIndexHooks(restoreIndexHooks);
     return failStage(
       workingSet,
       'INDEX_RECOVERY',
@@ -254,6 +376,14 @@ async function executeGovernedReadLeaseTask(input = {}) {
         rawResults.length > MAX_RESULT_LIMIT) {
       throw new Error('lease_vector_search_result_invalid');
     }
+    validateVectorSearchEvidence({
+      accounting: vectorSearchAccounting,
+      loadedVectorCount,
+      rawResults
+    });
+    if (!restoreDiaryIndexHooks(restoreIndexHooks)) {
+      throw new Error('lease_index_hook_restore_failed');
+    }
     workingSet = completeStage(workingSet, 'VECTOR_SEARCH', {
       native_invocation: {
         succeeded: 1,
@@ -261,6 +391,7 @@ async function executeGovernedReadLeaseTask(input = {}) {
       }
     });
   } catch {
+    restoreDiaryIndexHooks(restoreIndexHooks);
     return failStage(
       workingSet,
       'VECTOR_SEARCH',
@@ -308,6 +439,9 @@ module.exports = {
   MAX_QUERY_VECTOR_DIMENSION,
   MAX_RESULT_LIMIT,
   executeGovernedReadLeaseTask,
+  instrumentDiaryIndex,
   projectReadResults,
+  restoreDiaryIndexHooks,
+  validateVectorSearchEvidence,
   validateLeaseTaskInput
 };

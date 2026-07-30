@@ -8,6 +8,7 @@ const {
   createResponseEnvelope,
   createTerminalEnvelope,
   digestObject,
+  failureRegistryEntry,
   governedReadAttemptResponseBindingDigest,
   isGovernedReadAttemptWorkingSetExtension,
   validateCounters,
@@ -195,6 +196,7 @@ function createRelayProcessor({
         }
       }
 
+      validateTerminalResponseAgreement(responseStatus, terminal);
       validateInvocationCounterAgreement(
         invocation.counters,
         terminal.counters
@@ -233,6 +235,18 @@ function createRelayProcessor({
       });
     }
   });
+}
+
+function validateTerminalResponseAgreement(responseStatus, terminal) {
+  if (terminal?.outcome !== 'failure') return terminal;
+  const expectedStatus =
+    failureRegistryEntry(terminal.reason_code).category === 'authorization'
+      ? 'denied'
+      : 'unavailable';
+  if (responseStatus !== expectedStatus) {
+    reject('relay_attempt_response_terminal_mismatch');
+  }
+  return terminal;
 }
 
 function validateInvocationCounterAgreement(invocation, terminal) {
@@ -337,5 +351,6 @@ module.exports = {
   unavailableStructuredContent,
   validateAttemptContinuation,
   validateInvocationCounterAgreement,
+  validateTerminalResponseAgreement,
   validateInvocation
 };

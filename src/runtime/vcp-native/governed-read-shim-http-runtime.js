@@ -90,6 +90,15 @@ function createGovernedReadShimHttpRuntime({
   let rejectedRequests = 0;
   const openSockets = new Set();
   const server = http.createServer(async (incoming, outgoing) => {
+    const cancellation = new AbortController();
+    const abortRequest = () => {
+      if (!cancellation.signal.aborted) cancellation.abort();
+    };
+    const abortClosedResponse = () => {
+      if (!outgoing.writableFinished) abortRequest();
+    };
+    incoming.once('aborted', abortRequest);
+    outgoing.once('close', abortClosedResponse);
     try {
       if (incoming.method !== 'POST' ||
           incoming.url !== '/v1/governed-read-attempt' ||
@@ -113,8 +122,12 @@ function createGovernedReadShimHttpRuntime({
         workingSet: body.working_set,
         authorization: body.authorization,
         query: body.query,
-        limit: body.limit
+        limit: body.limit,
+        signal: cancellation.signal
       });
+      if (cancellation.signal.aborted) {
+        throw codedError('governed_read_shim_request_cancelled');
+      }
       acceptedRequests += 1;
       sendJson(outgoing, 200, result);
     } catch {
@@ -122,6 +135,9 @@ function createGovernedReadShimHttpRuntime({
       sendJson(outgoing, 400, {
         error: 'governed_read_shim_request_rejected'
       });
+    } finally {
+      incoming.off('aborted', abortRequest);
+      outgoing.off('close', abortClosedResponse);
     }
   });
   server.on('connection', socket => {

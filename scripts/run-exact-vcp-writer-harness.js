@@ -278,7 +278,15 @@ async function run(options) {
     assert.equal(childResult.writer.unauthorized_diary_generated, true);
     assert.equal(childResult.projection.unauthorized_diary_excluded, true);
     assert.equal(
+      childResult.projection.derived_scope_directly_verified,
+      true
+    );
+    assert.equal(
       childResult.native_search.unauthorized_diary_excluded,
+      true
+    );
+    assert.equal(
+      childResult.native_search.derived_scope_directly_verified,
       true
     );
     assert.equal(

@@ -20,6 +20,17 @@ function codedError(code) {
   return Object.assign(new Error(code), { code });
 }
 
+function validateAbortSignal(signal) {
+  if (signal === undefined) return;
+  if (!signal ||
+      typeof signal !== 'object' ||
+      typeof signal.aborted !== 'boolean' ||
+      typeof signal.addEventListener !== 'function' ||
+      typeof signal.removeEventListener !== 'function') {
+    throw codedError('governed_read_bridge_abort_signal_invalid');
+  }
+}
+
 function failedDelegation(workingSet) {
   return Object.freeze({
     accepted: false,
@@ -50,8 +61,10 @@ function createGovernedReadAttemptBridge({
       workingSet,
       authorization,
       query,
-      limit
+      limit,
+      signal
     } = {}) {
+      validateAbortSignal(signal);
       validateGovernedReadAttemptWorkingSet(workingSet);
       const lastReceipt = workingSet.receipts.at(-1);
       if (lastReceipt?.stage !== 'AUTHORIZED' ||
@@ -69,7 +82,8 @@ function createGovernedReadAttemptBridge({
           workingSet: delegated,
           authorization,
           query,
-          limit
+          limit,
+          signal
         });
         if (!response ||
             typeof response !== 'object' ||
@@ -133,9 +147,16 @@ function createGovernedReadShimHttpClient({
   }
 
   return function invokeShim(input) {
+    const signal = input?.signal;
     let requestTimeoutMs = timeoutMs;
     let encoded;
     try {
+      validateAbortSignal(signal);
+      if (signal?.aborted) {
+        return Promise.reject(
+          codedError('governed_read_bridge_cancelled')
+        );
+      }
       if (input?.workingSet?.header) {
         requestTimeoutMs = governedReadAttemptDeadlineBudgetMs(
           input.workingSet.header,
@@ -169,7 +190,21 @@ function createGovernedReadShimHttpClient({
     }
     return new Promise((resolve, rejectRequest) => {
       let settled = false;
-      const outgoing = request({
+      let outgoing = null;
+      const cleanup = () => {
+        signal?.removeEventListener('abort', onAbort);
+      };
+      const fail = code => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        outgoing?.destroy();
+        rejectRequest(codedError(code));
+      };
+      function onAbort() {
+        fail('governed_read_bridge_cancelled');
+      }
+      outgoing = request({
         protocol: target.protocol,
         hostname: target.hostname,
         port: target.port,
@@ -189,11 +224,8 @@ function createGovernedReadShimHttpClient({
           if (settled) return;
           bytes += chunk.length;
           if (bytes > MAX_HTTP_BODY_BYTES) {
-            settled = true;
             incoming.destroy();
-            rejectRequest(
-              codedError('governed_read_bridge_response_too_large')
-            );
+            fail('governed_read_bridge_response_too_large');
             return;
           }
           chunks.push(chunk);
@@ -201,6 +233,7 @@ function createGovernedReadShimHttpClient({
         incoming.on('end', () => {
           if (settled) return;
           settled = true;
+          cleanup();
           try {
             const value = JSON.parse(
               Buffer.concat(chunks, bytes).toString('utf8')
@@ -217,31 +250,20 @@ function createGovernedReadShimHttpClient({
           }
         });
         incoming.on('error', () => {
-          if (!settled) {
-            settled = true;
-            rejectRequest(
-              codedError('governed_read_bridge_http_unavailable')
-            );
-          }
+          fail('governed_read_bridge_http_unavailable');
         });
       });
       outgoing.on('error', () => {
-        if (!settled) {
-          settled = true;
-          rejectRequest(
-            codedError('governed_read_bridge_http_unavailable')
-          );
-        }
+        fail('governed_read_bridge_http_unavailable');
       });
       outgoing.setTimeout(requestTimeoutMs, () => {
-        outgoing.destroy();
-        if (!settled) {
-          settled = true;
-          rejectRequest(
-            codedError('governed_read_bridge_http_timeout')
-          );
-        }
+        fail('governed_read_bridge_http_timeout');
       });
+      signal?.addEventListener('abort', onAbort, { once: true });
+      if (signal?.aborted) {
+        onAbort();
+        return;
+      }
       outgoing.end(encoded);
     });
   };
@@ -253,5 +275,6 @@ module.exports = {
   MAX_HTTP_BODY_BYTES,
   createGovernedReadAttemptBridge,
   createGovernedReadShimHttpClient,
+  validateAbortSignal,
   validateLoopbackEndpoint
 };

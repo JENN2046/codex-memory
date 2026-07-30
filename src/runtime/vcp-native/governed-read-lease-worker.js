@@ -62,6 +62,21 @@ function validatePositiveInteger(value, minimum, maximum, code) {
   return value;
 }
 
+function validateAbortSignal(signal) {
+  if (signal === undefined) return;
+  if (!signal ||
+      typeof signal !== 'object' ||
+      typeof signal.aborted !== 'boolean' ||
+      typeof signal.addEventListener !== 'function' ||
+      typeof signal.removeEventListener !== 'function') {
+    throw codedError('lease_worker_abort_signal_invalid');
+  }
+}
+
+function throwIfAborted(signal) {
+  if (signal?.aborted) throw codedError('lease_worker_cancelled');
+}
+
 function validateOwnerOnlyLeaseRoot(leaseRoot, fsModule = fs) {
   if (typeof leaseRoot !== 'string' ||
       !path.isAbsolute(leaseRoot) ||
@@ -329,7 +344,8 @@ function runLeaseWorkerProcess(task, {
   childWorkerPath = CHILD_WORKER_PATH,
   workerTimeoutMs = DEFAULT_WORKER_TIMEOUT_MS,
   terminationGraceMs = DEFAULT_TERMINATION_GRACE_MS,
-  forkProcess = fork
+  forkProcess = fork,
+  signal
 } = {}) {
   validatePositiveInteger(
     workerTimeoutMs,
@@ -343,6 +359,7 @@ function runLeaseWorkerProcess(task, {
     10_000,
     'lease_worker_termination_grace_invalid'
   );
+  validateAbortSignal(signal);
   return new Promise(resolve => {
     let child;
     let message = null;
@@ -352,12 +369,14 @@ function runLeaseWorkerProcess(task, {
     let termination = null;
     let sigtermSent = false;
     let terminationStarted = false;
+    let cancelled = false;
 
     function finish(value) {
       if (settled) return;
       settled = true;
       if (timeout !== null) clearTimeout(timeout);
       if (termination !== null) clearTimeout(termination);
+      signal?.removeEventListener('abort', onAbort);
       resolve(value);
     }
 
@@ -367,19 +386,22 @@ function runLeaseWorkerProcess(task, {
         finish({
           response: message,
           shutdown_complete: message.shutdown_complete === true,
-          sigterm_sent: sigtermSent
+          sigterm_sent: sigtermSent,
+          cancelled
         });
         return;
       }
       finish({
         response: message,
         shutdown_complete: false,
-        sigterm_sent: sigtermSent
+        sigterm_sent: sigtermSent,
+        cancelled
       });
     }
 
-    function beginTermination() {
+    function beginTermination({ cancelledByCaller = false } = {}) {
       if (settled || exited || terminationStarted) return;
+      cancelled = cancelled || cancelledByCaller;
       terminationStarted = true;
       let signalSent = false;
       try {
@@ -390,7 +412,8 @@ function runLeaseWorkerProcess(task, {
         finish({
           response: message,
           shutdown_complete: false,
-          sigterm_sent: sigtermSent
+          sigterm_sent: sigtermSent,
+          cancelled
         });
         return;
       }
@@ -403,9 +426,24 @@ function runLeaseWorkerProcess(task, {
         finish({
           response: message,
           shutdown_complete: false,
-          sigterm_sent: sigtermSent
+          sigterm_sent: sigtermSent,
+          cancelled
         });
       }, terminationGraceMs);
+    }
+
+    function onAbort() {
+      beginTermination({ cancelledByCaller: true });
+    }
+
+    if (signal?.aborted) {
+      finish({
+        response: null,
+        shutdown_complete: true,
+        sigterm_sent: false,
+        cancelled: true
+      });
+      return;
     }
 
     try {
@@ -415,6 +453,7 @@ function runLeaseWorkerProcess(task, {
           LC_ALL: 'C.UTF-8',
           TZ: 'UTC'
         },
+        execArgv: [],
         serialization: 'advanced',
         stdio: ['ignore', 'ignore', 'ignore', 'ipc']
       });
@@ -422,7 +461,8 @@ function runLeaseWorkerProcess(task, {
       finish({
         response: null,
         shutdown_complete: false,
-        sigterm_sent: false
+        sigterm_sent: false,
+        cancelled: false
       });
       return;
     }
@@ -440,6 +480,8 @@ function runLeaseWorkerProcess(task, {
     timeout = setTimeout(() => {
       beginTermination();
     }, workerTimeoutMs);
+    signal?.addEventListener('abort', onAbort, { once: true });
+    if (signal?.aborted) onAbort();
 
     try {
       child.send({
@@ -570,8 +612,11 @@ function createGovernedReadLeaseWorker({
     workingSet,
     authorization,
     query,
-    limit
+    limit,
+    signal
   } = {}) {
+    validateAbortSignal(signal);
+    throwIfAborted(signal);
     validateGovernedReadAttemptWorkingSet(workingSet);
     const lastReceipt = workingSet.receipts.at(-1);
     if (lastReceipt?.stage !== 'BRIDGE_DELEGATED' ||
@@ -610,8 +655,10 @@ function createGovernedReadLeaseWorker({
     try {
       try {
         await invokeHook(stageHooks, 'NATIVE_DISPATCHED', {
-          attempt_ref: current.header.attempt_ref
+          attempt_ref: current.header.attempt_ref,
+          signal
         });
+        throwIfAborted(signal);
       } catch {
         return failedContinuation(
           current,
@@ -645,8 +692,10 @@ function createGovernedReadLeaseWorker({
       let projectionPlan;
       try {
         await invokeHook(stageHooks, 'SOURCE_PREFLIGHT', {
-          attempt_ref: current.header.attempt_ref
+          attempt_ref: current.header.attempt_ref,
+          signal
         });
+        throwIfAborted(signal);
         projectionPlan = sourceProjection.preflight({
           allowedDiaryNames: authorization.allowedDiaryNames,
           dimension
@@ -702,6 +751,24 @@ function createGovernedReadLeaseWorker({
         providerInvocations += 1;
         providerStarted = true;
         const providerAbortController = new AbortController();
+        let rejectProviderCancellation = null;
+        const providerCancellation = signal
+          ? new Promise((_, rejectCancellation) => {
+              rejectProviderCancellation = rejectCancellation;
+            })
+          : null;
+        const onProviderCancellation = () => {
+          const cancellationError =
+            codedError('lease_worker_cancelled');
+          providerAbortController.abort(cancellationError);
+          rejectProviderCancellation?.(cancellationError);
+        };
+        signal?.addEventListener(
+          'abort',
+          onProviderCancellation,
+          { once: true }
+        );
+        if (signal?.aborted) onProviderCancellation();
         const providerTask = Promise.resolve().then(() =>
           providerWrapper({
             query: selectedQuery,
@@ -736,11 +803,17 @@ function createGovernedReadLeaseWorker({
         try {
           providerResult = await Promise.race([
             providerTask,
-            providerTimeout
+            providerTimeout,
+            ...(providerCancellation ? [providerCancellation] : [])
           ]);
         } finally {
           clearTimeout(providerTimer);
+          signal?.removeEventListener(
+            'abort',
+            onProviderCancellation
+          );
         }
+        throwIfAborted(signal);
         vector = normalizeVector(
           providerResult?.vector ?? providerResult,
           dimension
@@ -773,6 +846,7 @@ function createGovernedReadLeaseWorker({
         );
       }
 
+      throwIfAborted(signal);
       try {
         attemptStore = createAttemptStore(root, fsModule);
         storesCreated += 1;
@@ -808,7 +882,8 @@ function createGovernedReadLeaseWorker({
           working_set: structuredClone(current)
         }, {
           workerTimeoutMs,
-          terminationGraceMs
+          terminationGraceMs,
+          signal
         });
       } catch {
         workerExecution = {
@@ -818,6 +893,21 @@ function createGovernedReadLeaseWorker({
         };
       }
       if (workerExecution?.sigterm_sent === true) sigtermCount += 1;
+      if (workerExecution?.cancelled === true || signal?.aborted) {
+        if (workerExecution?.shutdown_complete !== true) {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        try {
+          removeAttemptStore(root, attemptStore.attemptRoot, fsModule);
+          storesRemoved += 1;
+          attemptStore = null;
+        } catch {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        throw codedError('lease_worker_cancelled');
+      }
       let response = null;
       try {
         if (workerExecution?.response) {
@@ -894,6 +984,7 @@ module.exports = {
   createGovernedReadLeaseWorker,
   normalizeVector,
   runLeaseWorkerProcess,
+  validateAbortSignal,
   validateOwnerOnlyLeaseRoot,
   validateWorkerResponse
 };

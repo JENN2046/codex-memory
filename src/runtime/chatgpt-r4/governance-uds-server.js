@@ -42,6 +42,8 @@ function createGovernanceUdsServer({
   chmodSync = fs.chmodSync,
   statSync = fs.statSync,
   socketIdleTimeoutMs = SOCKET_IDLE_TIMEOUT_MS,
+  attemptDeadlineMarginMs =
+    GOVERNANCE_UDS_ATTEMPT_DEADLINE_MARGIN_MS,
   clock = () => new Date()
 } = {}) {
   validateSocketAuthority(socketPath, { statSync });
@@ -51,6 +53,9 @@ function createGovernanceUdsServer({
   if (!Number.isInteger(socketIdleTimeoutMs) ||
       socketIdleTimeoutMs < 10 ||
       socketIdleTimeoutMs > 60_000 ||
+      !Number.isInteger(attemptDeadlineMarginMs) ||
+      attemptDeadlineMarginMs < 0 ||
+      attemptDeadlineMarginMs > 10_000 ||
       typeof clock !== 'function') {
     reject('r4_governance_uds_timeout_invalid');
   }
@@ -81,19 +86,29 @@ function createGovernanceUdsServer({
       activeConnections -= 1;
       openSockets.delete(socket);
     };
-    socket.once('close', releaseConnection);
-    socket.setTimeout(socketIdleTimeoutMs, () => rejectFrame());
     let bytes = 0;
     const chunks = [];
     let handled = false;
+    let settled = false;
+    let processingAbortController = null;
 
-    function rejectFrame() {
-      if (handled) return;
+    function rejectFrame({ destroy = true } = {}) {
+      if (settled) return;
+      settled = true;
       handled = true;
+      if (processingAbortController !== null &&
+          !processingAbortController.signal.aborted) {
+        processingAbortController.abort();
+      }
       observations.rejected_frames += 1;
-      socket.destroy();
+      if (destroy) socket.destroy();
     }
 
+    socket.once('close', () => {
+      releaseConnection();
+      rejectFrame({ destroy: false });
+    });
+    socket.setTimeout(socketIdleTimeoutMs, () => rejectFrame());
     socket.on('data', async chunk => {
       if (handled) return;
       bytes += chunk.length;
@@ -108,9 +123,7 @@ function createGovernanceUdsServer({
       try {
         payload = JSON.parse(frame.subarray(0, newline).toString('utf8'));
       } catch {
-        observations.rejected_frames += 1;
-        socket.destroy();
-        return;
+        return rejectFrame();
       }
       const payloadKeys = payload && typeof payload === 'object' &&
         !Array.isArray(payload)
@@ -119,9 +132,7 @@ function createGovernanceUdsServer({
       if (payloadKeys !== 'relayReceipt,request' &&
           payloadKeys !==
             'governedReadAttempt,relayReceipt,request') {
-        observations.rejected_frames += 1;
-        socket.destroy();
-        return;
+        return rejectFrame();
       }
       if (payload.governedReadAttempt) {
         let governedTimeoutMs;
@@ -131,40 +142,39 @@ function createGovernanceUdsServer({
               payload.governedReadAttempt.header,
               {
                 now: clock(),
-                marginMs:
-                  GOVERNANCE_UDS_ATTEMPT_DEADLINE_MARGIN_MS
+                marginMs: attemptDeadlineMarginMs
               }
             );
         } catch {
-          observations.rejected_frames += 1;
-          socket.destroy();
-          return;
+          return rejectFrame();
         }
         if (governedTimeoutMs === 0) {
-          observations.rejected_frames += 1;
-          socket.destroy();
-          return;
+          return rejectFrame();
         }
         socket.setTimeout(governedTimeoutMs, () => rejectFrame());
       }
+      processingAbortController = new AbortController();
       try {
-        const result = await governanceRuntime.handle(payload);
+        const result = await governanceRuntime.handle(payload, {
+          signal: processingAbortController.signal
+        });
+        if (settled) return;
         const encoded = Buffer.from(`${JSON.stringify(result)}\n`, 'utf8');
         if (encoded.length > MAX_RESPONSE_BYTES) {
-          observations.rejected_frames += 1;
-          socket.destroy();
-          return;
+          return rejectFrame();
         }
+        settled = true;
+        processingAbortController = null;
+        socket.setTimeout(0);
         observations.accepted_frames += 1;
         socket.end(encoded);
       } catch {
-        observations.rejected_frames += 1;
-        socket.destroy();
+        rejectFrame();
       }
     });
     socket.on('error', () => {});
     socket.on('end', () => {
-      if (!handled) rejectFrame();
+      if (!settled) rejectFrame();
     });
   });
 

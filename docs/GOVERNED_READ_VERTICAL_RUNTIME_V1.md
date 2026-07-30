@@ -47,7 +47,7 @@ public response field is introduced.
 |---|---|---|
 | `CREATED`, `EDGE_VALIDATED` | Edge broker | Admit one immutable attempt and bind it to the validated request/context digests. |
 | `RELAY_CLAIMED` | Relay | Preserve the attempt working set over actual Edge HTTP claim transport. |
-| `AUTHORIZED` | Governance | Resolve the injected trusted scope before bridge/provider/native work. |
+| `AUTHORIZED` | Governance | Resolve the injected trusted scope and require its query plus the deterministic native limit derived from the signed request (`min(requested-or-5, 5)`) before bridge/provider/native work. |
 | `BRIDGE_DELEGATED` | Bridge | Attest `fallback.attempts=0` and forward over the bound loopback Shim HTTP transport. |
 | `NATIVE_DISPATCHED`, `SOURCE_PREFLIGHT` | Persistent Shim | Enforce the single-active-attempt lock and run the first source pass before provider execution. |
 | `PROVIDER_EMBEDDING` | Provider wrapper | Make at most one parent-owned query embedding call and validate the returned finite exact-dimension vector. |
@@ -61,6 +61,11 @@ stage failure, response-finalization failure, timeout, cancellation, and
 cleanup failure all use the canonical contract registry. Upper layers forward
 the canonical continuation or terminal failure; they do not maintain a second
 reason/category/fallback mapping.
+
+A failure terminal must agree with the signed public response: authorization
+failures require `denied`; every other canonical failure requires
+`unavailable`. Relay rejects a projected success response paired with any
+failure continuation rather than signing contradictory evidence.
 
 ## Parent-owned preflight and provider
 
@@ -115,6 +120,18 @@ wins; if Edge is unavailable, the bounded nested timers eventually fail
 closed. A request first presented at or after `deadline_at` is rejected before
 opening a new downstream connection.
 
+Governance UDS tracks frame admission separately from processing completion.
+Its deadline or a peer disconnect aborts the in-progress frame exactly once,
+destroys the socket, and propagates one internal `AbortSignal` through
+Governance, Bridge HTTP, Shim, the provider wrapper, and the controller-owned
+child handle. A late handler result cannot increment accepted-frame counters or
+write a response. If exact child shutdown cannot be proven after cancellation,
+the existing cleanup latch retains the store and blocks later reads.
+
+The controller also launches the lease child with an empty `execArgv` list, so
+parent `--env-file`, `--require`, and `--import` startup authority cannot cross
+the process boundary before the child's minimal-environment checks.
+
 Before acknowledgement, the short Edge claim lease still permits safe reclaim
 of an abandoned Relay claim. Acknowledgement of an attempt claim atomically
 extends that exact claim to `deadline_at`; Edge also evaluates the attempt
@@ -152,6 +169,12 @@ watchers/background source work, runs production second-pass materialization,
 loads the selected diary indexes, executes exactly one vector search, performs
 the scope postcheck, creates a low-disclosure result projection, shuts down the
 manager, and then exits.
+
+Before recording `VECTOR_SEARCH` success, the child instruments every recovered
+allowed-diary index. It requires actual index search calls when vectors are
+loaded, reconciles call/success/failure and candidate counts, rejects ghost
+candidate removal, and rejects returned chunk identifiers not seen in index
+candidates. A manager-level result array cannot substitute for index evidence.
 
 The parent accepts only an exact child response shape whose working set extends
 the parent prefix, counters reconcile, success ends at a completed
@@ -200,6 +223,8 @@ child process. The job proves:
 - primary writes and fallback attempts are zero;
 - hydration is one committed derived transaction;
 - scope postcheck excludes the writer-created unauthorized diary;
+- a direct read-only query of the still-live derived SQLite proves that neither
+  an unauthorized diary row nor its sentinel chunk was materialized;
 - the child has no provider authority;
 - the derived store is removed after shutdown;
 - no `SIGKILL` occurs;

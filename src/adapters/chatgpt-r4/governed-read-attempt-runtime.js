@@ -1,9 +1,12 @@
 'use strict';
 
 const {
+  LIMITS,
   appendGovernedReadAttemptStage,
   validateGovernedReadAttemptWorkingSet
 } = require('../../../packages/chatgpt-r4-contracts');
+
+const MAX_NATIVE_RESULT_LIMIT = 5;
 
 function codedError(code) {
   return Object.assign(new Error(code), { code });
@@ -29,7 +32,7 @@ function validateInvocation(value) {
   return value;
 }
 
-function validateAuthorizationDecision(decision) {
+function validateAuthorizationDecision(decision, request) {
   if (!decision ||
       typeof decision !== 'object' ||
       Array.isArray(decision) ||
@@ -37,16 +40,71 @@ function validateAuthorizationDecision(decision) {
     throw codedError('governed_read_authorization_invalid');
   }
   if (decision.accepted === true) {
+    const requestArguments = request?.tool_request?.arguments;
+    const requestedLimit = requestArguments?.limit;
+    if (requestedLimit !== undefined &&
+        (!Number.isInteger(requestedLimit) ||
+          requestedLimit < 1 ||
+          requestedLimit > LIMITS.maxResultLimit)) {
+      throw codedError('governed_read_authorization_invalid');
+    }
+    const effectiveLimit = Math.min(
+      requestedLimit ?? MAX_NATIVE_RESULT_LIMIT,
+      MAX_NATIVE_RESULT_LIMIT
+    );
     if (!decision.authorization ||
         decision.authorization.accepted !== true ||
         typeof decision.query !== 'string' ||
-        !Number.isInteger(decision.limit)) {
+        !Number.isInteger(decision.limit) ||
+        decision.query !== requestArguments?.query ||
+        decision.limit !== effectiveLimit) {
       throw codedError('governed_read_authorization_invalid');
     }
   } else {
     validateInvocation(decision.invocation);
   }
   return decision;
+}
+
+function validateAbortSignal(signal) {
+  if (signal === undefined) return;
+  if (!signal ||
+      typeof signal !== 'object' ||
+      typeof signal.aborted !== 'boolean' ||
+      typeof signal.addEventListener !== 'function' ||
+      typeof signal.removeEventListener !== 'function') {
+    throw codedError('governed_read_abort_signal_invalid');
+  }
+}
+
+function invokeWithSignal(operation, signal) {
+  validateAbortSignal(signal);
+  if (signal === undefined) return Promise.resolve().then(operation);
+  if (signal.aborted) {
+    return Promise.reject(codedError('governed_read_attempt_cancelled'));
+  }
+  return new Promise((resolve, rejectInvocation) => {
+    let settled = false;
+    const finish = (callback, value) => {
+      if (settled) return;
+      settled = true;
+      signal.removeEventListener('abort', onAbort);
+      callback(value);
+    };
+    const onAbort = () => finish(
+      rejectInvocation,
+      codedError('governed_read_attempt_cancelled')
+    );
+    signal.addEventListener('abort', onAbort, { once: true });
+    if (signal.aborted) {
+      onAbort();
+      return;
+    }
+    Promise.resolve().then(operation).then(
+      value => finish(resolve, value),
+      error => finish(rejectInvocation, error)
+    );
+  });
 }
 
 function createGovernedReadAttemptGovernanceRuntime({
@@ -65,7 +123,8 @@ function createGovernedReadAttemptGovernanceRuntime({
       request,
       relayReceipt,
       governedReadAttempt
-    } = {}) {
+    } = {}, { signal } = {}) {
+      validateAbortSignal(signal);
       validateGovernedReadAttemptWorkingSet(governedReadAttempt);
       const lastReceipt = governedReadAttempt.receipts.at(-1);
       if (lastReceipt?.stage !== 'RELAY_CLAIMED' ||
@@ -76,11 +135,13 @@ function createGovernedReadAttemptGovernanceRuntime({
       }
 
       const decision = validateAuthorizationDecision(
-        await authorizeRead({
+        await invokeWithSignal(() => authorizeRead({
           request,
           relayReceipt,
-          attemptRef: governedReadAttempt.header.attempt_ref
-        })
+          attemptRef: governedReadAttempt.header.attempt_ref,
+          signal
+        }), signal),
+        request
       );
       if (decision.accepted !== true) {
         const denied = appendGovernedReadAttemptStage(
@@ -113,12 +174,13 @@ function createGovernedReadAttemptGovernanceRuntime({
         governedReadAttempt,
         { stage: 'AUTHORIZED' }
       );
-      const bridgeResult = await invokeBridge({
+      const bridgeResult = await invokeWithSignal(() => invokeBridge({
         workingSet: authorized,
         authorization: decision.authorization,
         query: decision.query,
-        limit: decision.limit
-      });
+        limit: decision.limit,
+        signal
+      }), signal);
       if (!bridgeResult ||
           typeof bridgeResult !== 'object' ||
           Array.isArray(bridgeResult) ||
@@ -127,11 +189,12 @@ function createGovernedReadAttemptGovernanceRuntime({
         throw codedError('governed_read_bridge_result_invalid');
       }
       const invocation = validateInvocation(
-        await projectInvocation({
+        await invokeWithSignal(() => projectInvocation({
           request,
           authorization: decision.authorization,
-          bridgeResult
-        })
+          bridgeResult,
+          signal
+        }), signal)
       );
       return Object.freeze({
         ...invocation,
@@ -146,7 +209,10 @@ function createGovernedReadAttemptGovernanceRuntime({
 }
 
 module.exports = {
+  MAX_NATIVE_RESULT_LIMIT,
   createGovernedReadAttemptGovernanceRuntime,
+  invokeWithSignal,
   validateAuthorizationDecision,
+  validateAbortSignal,
   validateInvocation
 };

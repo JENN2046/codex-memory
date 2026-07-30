@@ -326,7 +326,8 @@ async function run() {
   });
   const exactEmbeddingUtils = loadFreshEmbeddingUtils(vcpRoot);
   const {
-    createGovernedReadLeaseWorker
+    createGovernedReadLeaseWorker,
+    runLeaseWorkerProcess
   } = require(path.join(
     codexRoot,
     'src/runtime/vcp-native/governed-read-lease-worker.js'
@@ -350,6 +351,44 @@ async function run() {
       .digest('hex')}`
   });
   let providerInvocationCount = 0;
+  let derivedScopeDirectlyVerified = false;
+  const runWorkerWithDerivedScopeGate = async (task, options) => {
+    const execution = await runLeaseWorkerProcess(task, options);
+    if (execution?.response?.result?.accepted !== true ||
+        execution.shutdown_complete !== true) {
+      return execution;
+    }
+    const derivedDatabase = new Database(path.join(
+      task.derived_store_path,
+      'knowledge_base.sqlite'
+    ), {
+      readonly: true,
+      fileMustExist: true
+    });
+    try {
+      const placeholders = task.authorization.allowedDiaryNames
+        .map(() => '?')
+        .join(', ');
+      const unauthorizedDiaryRows = derivedDatabase.prepare(`
+        SELECT COUNT(*) AS count
+        FROM files
+        WHERE diary_name NOT IN (${placeholders})
+      `).get(...task.authorization.allowedDiaryNames).count;
+      const unauthorizedSentinelRows = derivedDatabase.prepare(`
+        SELECT COUNT(*) AS count
+        FROM chunks c
+        INNER JOIN files f ON f.id = c.file_id
+        WHERE f.diary_name = 'PROJECT_DENIED'
+           OR c.content LIKE ?
+      `).get('%unauthorized diary sentinel%').count;
+      assert.equal(unauthorizedDiaryRows, 0);
+      assert.equal(unauthorizedSentinelRows, 0);
+      derivedScopeDirectlyVerified = true;
+    } finally {
+      derivedDatabase.close();
+    }
+    return execution;
+  };
   const leaseWorker = createGovernedReadLeaseWorker({
     clock: () => new Date('2026-07-30T00:00:00.000Z'),
     sourceProjection: projection,
@@ -371,6 +410,7 @@ async function run() {
     sourceRuntimeRoot: runtimeRoot,
     sourceKnowledgeBaseStorePath: primaryStore,
     knowledgeBaseRootPath: memoryRoot,
+    workerRunner: runWorkerWithDerivedScopeGate,
     workerTimeoutMs: 60_000,
     terminationGraceMs: 5_000
   });
@@ -416,6 +456,7 @@ async function run() {
   assert.equal(workerSnapshot.sigkill_count, 0);
   assert.equal(workerSnapshot.provider_authority_in_child, false);
   assert.equal(providerInvocationCount, 1);
+  assert.equal(derivedScopeDirectlyVerified, true);
   assert.equal(searchResult.result.result_count, 1);
   assert.equal(
     searchResult.result.raw_memory_content_disclosed,
@@ -652,6 +693,8 @@ async function run() {
       source_snapshot_stable: true,
       primary_source_unchanged_after_negatives: true,
       unauthorized_diary_excluded: true,
+      derived_scope_directly_verified:
+        derivedScopeDirectlyVerified,
       primary_write_attempts:
         attemptCounters.primary_memory.write_attempts,
       derived_transaction: attemptCounters.derived_transaction
@@ -662,6 +705,8 @@ async function run() {
       result_count: searchResult.result.result_count,
       scope_postcheck_passed: true,
       unauthorized_diary_excluded: true,
+      derived_scope_directly_verified:
+        derivedScopeDirectlyVerified,
       lease_scoped_child_exercised: true,
       child_provider_authority_present: false,
       derived_store_removed: true,

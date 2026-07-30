@@ -47,10 +47,12 @@ const {
 } = require('../../apps/local-recall-relay/uds-transport');
 const {
   createRelayProcessor,
-  validateInvocationCounterAgreement
+  validateInvocationCounterAgreement,
+  validateTerminalResponseAgreement
 } = require('../../apps/local-recall-relay/relay-processor');
 const {
-  createGovernedReadAttemptGovernanceRuntime
+  createGovernedReadAttemptGovernanceRuntime,
+  validateAuthorizationDecision
 } = require('../../src/adapters/chatgpt-r4/governed-read-attempt-runtime');
 const {
   createGovernedReadAttemptBridge,
@@ -252,7 +254,9 @@ function createSqliteFixture(t) {
 }
 
 function createSyntheticWorkerRunner(sourceProjection, {
-  stageHooks
+  stageHooks,
+  bypassIndexSearch = false,
+  ghostCandidate = false
 } = {}) {
   return async task => {
     assert.deepEqual(Object.keys(task.authorization).sort(), [
@@ -267,6 +271,22 @@ function createSyntheticWorkerRunner(sourceProjection, {
     const database = new DatabaseSync(databaseFile);
     createSchema(database);
     let searchCalls = 0;
+    const index = {
+      async stats() {
+        return {
+          totalVectors: database.prepare(
+            'SELECT COUNT(*) AS count FROM chunks'
+          ).get().count
+        };
+      },
+      search() {
+        const row = database.prepare(
+          'SELECT id FROM chunks ORDER BY id LIMIT 1'
+        ).get();
+        return row ? [{ id: row.id }] : [];
+      },
+      remove() {}
+    };
     const manager = {
       initialized: true,
       db: database,
@@ -285,29 +305,35 @@ function createSyntheticWorkerRunner(sourceProjection, {
       rustWriteLease: null,
       diaryIndices: new Map(),
       async _getOrLoadDiaryIndex() {
-        return {
-          async stats() {
-            return {
-              totalVectors: database.prepare(
-                'SELECT COUNT(*) AS count FROM chunks'
-              ).get().count
-            };
-          }
-        };
+        return index;
       },
       async search(allowedDiaryNames) {
         searchCalls += 1;
+        const candidates = bypassIndexSearch
+          ? null
+          : await index.search();
+        if (ghostCandidate && candidates?.length > 0) {
+          index.remove(candidates[0].id);
+          return [];
+        }
+        const candidateId = candidates?.[0]?.id;
         const row = database.prepare(`
-          SELECT f.diary_name AS diaryName,
+          SELECT c.id AS chunkId,
+                 f.diary_name AS diaryName,
                  f.path AS fullPath,
                  c.content
           FROM chunks c
           INNER JOIN files f ON f.id = c.file_id
           WHERE f.diary_name = ?
+            ${candidateId === undefined ? '' : 'AND c.id = ?'}
           LIMIT 1
-        `).get(allowedDiaryNames[0]);
+        `).get(
+          allowedDiaryNames[0],
+          ...(candidateId === undefined ? [] : [candidateId])
+        );
         return row
           ? [{
+              chunkId: row.chunkId,
               diaryName: row.diaryName,
               fullPath: row.fullPath,
               sourceFile: row.fullPath,
@@ -337,7 +363,9 @@ function createSyntheticWorkerRunner(sourceProjection, {
       assert.equal(
         searchCalls,
         result.accepted === true ||
-          failedStage === 'SCOPE_POSTCHECK'
+          failedStage === 'SCOPE_POSTCHECK' ||
+          (failedStage === 'VECTOR_SEARCH' &&
+            (bypassIndexSearch || ghostCandidate))
           ? 1
           : 0
       );
@@ -494,6 +522,143 @@ test('attempt deadline outranks legacy Bridge and UDS transport timeouts', async
   );
   assert.equal(httpRequests, 1);
   assert.equal(udsServer.snapshot().connections, 1);
+});
+
+test('Governance UDS deadline aborts an in-progress frame exactly once', async t => {
+  const workingSet = bridgeWorkingSet('u');
+  const nearDeadline = new Date(
+    Date.parse(workingSet.header.deadline_at) - 30
+  );
+  const udsRoot = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-governed-processing-deadline-'
+  ));
+  fs.chmodSync(udsRoot, 0o700);
+  const socketPath = path.join(udsRoot, 'governance.sock');
+  let observedSignal = null;
+  let handleSettled = false;
+  const udsServer = createGovernanceUdsServer({
+    socketPath,
+    socketIdleTimeoutMs: 1_000,
+    attemptDeadlineMarginMs: 0,
+    clock: () => nearDeadline,
+    governanceRuntime: {
+      async handle(_payload, { signal }) {
+        observedSignal = signal;
+        await new Promise(resolve => {
+          signal.addEventListener('abort', resolve, { once: true });
+        });
+        handleSettled = true;
+        return { late_result: true };
+      }
+    }
+  });
+  await udsServer.start();
+  t.after(async () => {
+    await udsServer.stop();
+    fs.rmSync(udsRoot, { recursive: true, force: true });
+  });
+  const forward = createUdsForwarder({
+    socketPath,
+    timeoutMs: 1_000,
+    clock: () => nearDeadline
+  });
+  await assert.rejects(
+    forward({
+      governedReadAttempt: workingSet,
+      relayReceipt: { safe: true },
+      request: { safe: true }
+    }),
+    error => [
+      'relay_uds_response_incomplete',
+      'relay_uds_unavailable'
+    ].includes(error?.code)
+  );
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(observedSignal?.aborted, true);
+  assert.equal(handleSettled, true);
+  assert.equal(udsServer.snapshot().accepted_frames, 0);
+  assert.equal(udsServer.snapshot().rejected_frames, 1);
+});
+
+test('Bridge cancellation reaches the Shim lease worker', async t => {
+  let workerSignal = null;
+  let markWorkerStarted;
+  const workerStarted = new Promise(resolve => {
+    markWorkerStarted = resolve;
+  });
+  let markWorkerAborted;
+  const workerAborted = new Promise(resolve => {
+    markWorkerAborted = resolve;
+  });
+  const runtimeBindingDigest = digestObject(
+    'synthetic-cancel-runtime-binding'
+  );
+  const shim = createGovernedReadShimHttpRuntime({
+    runtimeBindingDigest,
+    leaseWorker: {
+      async execute({ signal }) {
+        workerSignal = signal;
+        markWorkerStarted();
+        await new Promise((resolve, rejectExecution) => {
+          signal.addEventListener('abort', () => {
+            markWorkerAborted();
+            rejectExecution(new Error('synthetic_worker_cancelled'));
+          }, { once: true });
+        });
+      },
+      snapshot() {
+        return { active_attempts: workerSignal?.aborted ? 0 : 1 };
+      }
+    }
+  });
+  const address = await shim.start();
+  t.after(() => shim.stop());
+  const invokeShim = createGovernedReadShimHttpClient({
+    endpoint: address.endpoint,
+    runtimeBindingDigest,
+    clock: () => NOW
+  });
+  const cancellation = new AbortController();
+  const pending = invokeShim({
+    workingSet: bridgeWorkingSet('c'),
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'synthetic cancellation query',
+    limit: 1,
+    signal: cancellation.signal
+  });
+  await workerStarted;
+  cancellation.abort();
+  await assert.rejects(
+    pending,
+    { code: 'governed_read_bridge_cancelled' }
+  );
+  let abortWaitTimer;
+  try {
+    await Promise.race([
+      workerAborted,
+      new Promise((_, rejectWait) => {
+        abortWaitTimer = setTimeout(
+          () => rejectWait(new Error('synthetic_worker_abort_missing')),
+          1_000
+        );
+      })
+    ]);
+  } finally {
+    clearTimeout(abortWaitTimer);
+  }
+  for (let index = 0;
+    index < 10 && shim.snapshot().rejected_requests === 0;
+    index += 1) {
+    await new Promise(resolve => setImmediate(resolve));
+  }
+  assert.equal(workerSignal?.aborted, true);
+  assert.equal(shim.snapshot().accepted_requests, 0);
+  assert.equal(shim.snapshot().rejected_requests, 1);
 });
 
 function successfulWorkerExecution(task, {
@@ -1141,6 +1306,92 @@ test('Governance denial emits the canonical AUTHORIZED failure without bridge di
   );
 });
 
+test('Governance binds authorized query and limit to the signed request', async () => {
+  const header = createAttemptHeader({
+    attemptRef: `grat_${'a'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject('authorization-binding-request'),
+    contextBindingDigest: digestObject('authorization-binding-context'),
+    now: NOW
+  });
+  const receipts = [];
+  for (const stage of [
+    'CREATED',
+    'EDGE_VALIDATED',
+    'RELAY_CLAIMED'
+  ]) {
+    receipts.push(createStageReceipt({ header, receipts, stage }));
+  }
+  const request = {
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: `pctx_${'a'.repeat(32)}`,
+        query: 'signed authorization query',
+        limit: 1
+      }
+    }
+  };
+  for (const decisionOverride of [
+    { query: 'different execution query' },
+    { limit: 2 }
+  ]) {
+    let bridgeCalls = 0;
+    const runtime = createGovernedReadAttemptGovernanceRuntime({
+      async authorizeRead() {
+        return {
+          accepted: true,
+          authorization: { accepted: true },
+          query: request.tool_request.arguments.query,
+          limit: request.tool_request.arguments.limit,
+          ...decisionOverride
+        };
+      },
+      async invokeBridge() {
+        bridgeCalls += 1;
+      },
+      async projectInvocation() {
+        throw new Error('projector_must_not_run');
+      }
+    });
+    await assert.rejects(
+      runtime.handle({
+        request,
+        relayReceipt: {},
+        governedReadAttempt: { header, receipts }
+      }),
+      { code: 'governed_read_authorization_invalid' }
+    );
+    assert.equal(bridgeCalls, 0);
+  }
+
+  const requestWithoutLimit = structuredClone(request);
+  delete requestWithoutLimit.tool_request.arguments.limit;
+  assert.doesNotThrow(() => validateAuthorizationDecision({
+    accepted: true,
+    authorization: { accepted: true },
+    query: request.tool_request.arguments.query,
+    limit: 5
+  }, requestWithoutLimit));
+  assert.throws(() => validateAuthorizationDecision({
+    accepted: true,
+    authorization: { accepted: true },
+    query: request.tool_request.arguments.query,
+    limit: 8
+  }, requestWithoutLimit), {
+    code: 'governed_read_authorization_invalid'
+  });
+
+  const requestAboveNativeLimit = structuredClone(request);
+  requestAboveNativeLimit.tool_request.arguments.limit = 8;
+  assert.doesNotThrow(() => validateAuthorizationDecision({
+    accepted: true,
+    authorization: { accepted: true },
+    query: request.tool_request.arguments.query,
+    limit: 5
+  }, requestAboveNativeLimit));
+});
+
 test('Bridge transport failure preserves unknown downstream counters', async () => {
   const authorized = bridgeWorkingSet('e');
   authorized.receipts.pop();
@@ -1484,6 +1735,58 @@ test('lease task failure injection binds every child stage to its canonical reas
   }
 });
 
+test('lease task rejects skipped index search and ghost candidates', async t => {
+  const fixture = createSqliteFixture(t);
+  const cases = [
+    { bypassIndexSearch: true },
+    { ghostCandidate: true }
+  ];
+  for (let index = 0; index < cases.length; index += 1) {
+    let providerCalls = 0;
+    const worker = createGovernedReadLeaseWorker({
+      clock: () => NOW,
+      sourceProjection: fixture.sourceProjection,
+      async providerWrapper() {
+        providerCalls += 1;
+        return [0.75, 0.25];
+      },
+      dimension: 2,
+      leaseRoot: fixture.leaseRoot,
+      vcpCodeRoot: fixture.root,
+      sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+      sourceKnowledgeBaseStorePath: fixture.sourceStore,
+      knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+      workerRunner: createSyntheticWorkerRunner(
+        fixture.sourceProjection,
+        cases[index]
+      )
+    });
+    const result = await worker.execute({
+      workingSet: bridgeWorkingSet(
+        String.fromCharCode('v'.charCodeAt(0) + index)
+      ),
+      authorization: {
+        accepted: true,
+        allowedDiaryNames: ['PROJECT_ALPHA'],
+        allowedDiaryCount: 1
+      },
+      query: 'synthetic index evidence query',
+      limit: 1
+    });
+    const receipt = result.working_set.receipts.at(-1);
+    assert.equal(result.accepted, false);
+    assert.equal(receipt.stage, 'VECTOR_SEARCH');
+    assert.equal(receipt.reason_code, 'vector_search_failed');
+    assert.deepEqual(receipt.counter_facts.native_invocation, {
+      failed: 1
+    });
+    assert.equal(providerCalls, 1);
+    assert.equal(worker.snapshot().stores_created, 1);
+    assert.equal(worker.snapshot().stores_removed, 1);
+    assert.equal(worker.snapshot().cleanup_blocked, false);
+  }
+});
+
 test('shutdown failure retains the exact store and blocks the next provider call', async t => {
   const fixture = createSqliteFixture(t);
   let providerCalls = 0;
@@ -1820,7 +2123,7 @@ test('store creation latches cleanup only when a partial resource cannot be remo
   assert.equal(fs.readdirSync(residueFixture.leaseRoot).length, 1);
 });
 
-test('lease process timeout signals only its exact child with SIGTERM', async () => {
+test('lease process strips inherited env and execArgv before exact-child timeout', async () => {
   class SyntheticChild extends EventEmitter {
     constructor() {
       super();
@@ -1869,6 +2172,7 @@ test('lease process timeout signals only its exact child with SIGTERM', async ()
     ),
     false
   );
+  assert.deepEqual(forkOptions.execArgv, []);
 });
 
 test('lease process IPC failure retains control of and terminates its exact child', async () => {
@@ -1912,6 +2216,47 @@ test('lease process IPC failure retains control of and terminates its exact chil
   assert.deepEqual(child.signals, ['SIGTERM']);
   assert.equal(child.signals.includes('SIGKILL'), false);
   assert.equal(child.unrefCalls, 1);
+  assert.equal(result.shutdown_complete, false);
+  assert.equal(result.sigterm_sent, true);
+});
+
+test('lease process cancellation terminates only its exact child', async () => {
+  class SyntheticCancelledChild extends EventEmitter {
+    constructor() {
+      super();
+      this.connected = true;
+      this.pid = 43210;
+      this.signals = [];
+    }
+
+    send() {}
+
+    kill(signal) {
+      this.signals.push(signal);
+      queueMicrotask(() => this.emit('exit', null));
+      return true;
+    }
+
+    disconnect() {
+      this.connected = false;
+    }
+
+    unref() {}
+  }
+  const child = new SyntheticCancelledChild();
+  const cancellation = new AbortController();
+  const pending = runLeaseWorkerProcess({}, {
+    workerTimeoutMs: 60_000,
+    terminationGraceMs: 100,
+    signal: cancellation.signal,
+    forkProcess() {
+      return child;
+    }
+  });
+  cancellation.abort();
+  const result = await pending;
+  assert.deepEqual(child.signals, ['SIGTERM']);
+  assert.equal(result.cancelled, true);
   assert.equal(result.shutdown_complete, false);
   assert.equal(result.sigterm_sent, true);
 });
@@ -2069,6 +2414,38 @@ test('Relay finalization failure forms a signed unavailable response and canonic
       counterMode: COUNTER_MODES.governedLiveReadV1
     }
   ));
+});
+
+test('Relay rejects success responses paired with failure terminals', () => {
+  const nativeFailure = {
+    outcome: 'failure',
+    reason_code: 'vector_search_failed'
+  };
+  const authorizationFailure = {
+    outcome: 'failure',
+    reason_code: 'governance_denied'
+  };
+  assert.throws(
+    () => validateTerminalResponseAgreement('ok', nativeFailure),
+    { code: 'relay_attempt_response_terminal_mismatch' }
+  );
+  assert.throws(
+    () => validateTerminalResponseAgreement('denied', nativeFailure),
+    { code: 'relay_attempt_response_terminal_mismatch' }
+  );
+  assert.throws(
+    () => validateTerminalResponseAgreement(
+      'unavailable',
+      authorizationFailure
+    ),
+    { code: 'relay_attempt_response_terminal_mismatch' }
+  );
+  assert.doesNotThrow(() =>
+    validateTerminalResponseAgreement('unavailable', nativeFailure)
+  );
+  assert.doesNotThrow(() =>
+    validateTerminalResponseAgreement('denied', authorizationFailure)
+  );
 });
 
 test('Relay rejects legacy counters that contradict known terminal facts', () => {
