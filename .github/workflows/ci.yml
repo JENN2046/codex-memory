@@ -43,3 +43,50 @@ jobs:
           npm run profile-health
           npm run profile-gate -- --json --summary-only
           npm run v8-diagnose -- --query "[[checkpoint vector schema migration]] ::TagMemo+1.5"
+
+  exact-vcp-writer:
+    name: Exact VCP writer authority
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout codex-memory
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Checkout exact VCPToolBox baseline
+        uses: actions/checkout@v6
+        with:
+          repository: lioensky/VCPToolBox
+          ref: 555b3b538f6eb736e530c2912de678c5941f9985
+          path: .exact-vcp/VCPToolBox
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install codex-memory dependencies
+        run: npm ci
+
+      - name: Install exact VCP writer dependencies
+        working-directory: .exact-vcp/VCPToolBox
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+        run: |
+          npm ci --ignore-scripts --omit=optional
+          npm rebuild better-sqlite3
+
+      - name: Run exact VCP writer authority harness
+        run: |
+          node scripts/run-exact-vcp-writer-harness.js \
+            --vcp-root "$GITHUB_WORKSPACE/.exact-vcp/VCPToolBox" \
+            --expected-sha 555b3b538f6eb736e530c2912de678c5941f9985 \
+            --json

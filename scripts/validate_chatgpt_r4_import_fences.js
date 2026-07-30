@@ -107,6 +107,14 @@ const ACTIVE_RUNTIME_DYNAMIC_REQUIRE_ALLOWLIST = Object.freeze({
     embeddingUtilsPath: 'EmbeddingUtils.js'
   })
 });
+const ACTIVE_RUNTIME_PASSIVE_CONTRACT_IMPORT_ALLOWLIST = Object.freeze({
+  'src/runtime/vcp-native/production-selected-diary-hydrator.js': Object.freeze({
+    '../../../packages/chatgpt-r4-contracts/canonical':
+      'packages/chatgpt-r4-contracts/canonical.js',
+    '../../../packages/chatgpt-r4-contracts/governed-read-attempt':
+      'packages/chatgpt-r4-contracts/governed-read-attempt.js'
+  })
+});
 
 const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
   { pattern: /\bprocess\b/u, code: 'runtime_process_access' },
@@ -382,6 +390,20 @@ function isFile(file) {
   }
 }
 
+function isCanonicalRegularFile(file, {
+  lstatSync = target => fs.lstatSync(target),
+  realpathSync = target => fs.realpathSync(target)
+} = {}) {
+  try {
+    const stat = lstatSync(file);
+    return stat.isFile() &&
+      !stat.isSymbolicLink() &&
+      realpathSync(file) === file;
+  } catch {
+    return false;
+  }
+}
+
 function resolveRuntimeModuleFile(file, specifier, { fileExists = isFile } = {}) {
   if (!specifier.startsWith('.') && !specifier.startsWith('/')) return null;
   const base = path.resolve(path.dirname(file), specifier);
@@ -391,6 +413,22 @@ function resolveRuntimeModuleFile(file, specifier, { fileExists = isFile } = {})
     candidates.push(path.join(base, 'index.js'), path.join(base, 'index.cjs'), path.join(base, 'index.mjs'));
   }
   return candidates.find(candidate => fileExists(candidate)) || null;
+}
+
+function isAllowedPassiveContractImport({
+  relativeFile,
+  resolved,
+  specifier,
+  moduleRoot,
+  lstatSync,
+  realpathSync
+}) {
+  const allowed =
+    ACTIVE_RUNTIME_PASSIVE_CONTRACT_IMPORT_ALLOWLIST[relativeFile];
+  if (!allowed || !Object.hasOwn(allowed, specifier) || !resolved) return false;
+  const expected = path.resolve(moduleRoot, allowed[specifier]);
+  return resolved === expected &&
+    isCanonicalRegularFile(expected, { lstatSync, realpathSync });
 }
 
 function validateComponent(component, root = ROOTS[component]) {
@@ -670,12 +708,15 @@ function validateNotActivated({
   entrypoints,
   readFileSync = file => fs.readFileSync(file, 'utf8'),
   fileExists = isFile,
-  moduleRoot = path.dirname(runtimeRoot)
+  moduleRoot = path.dirname(runtimeRoot),
+  lstatSync = file => fs.lstatSync(file),
+  realpathSync = file => fs.realpathSync(file)
 } = {}) {
   const activeEntrypoints = (entrypoints || discoverPackageRuntimeEntrypoints({ fileExists }))
     .filter(fileExists);
   const queue = [...activeEntrypoints];
   const visited = new Set();
+  let passiveContractBindingCount = 0;
   while (queue.length > 0) {
     const file = queue.shift();
     if (visited.has(file)) continue;
@@ -685,6 +726,17 @@ function validateNotActivated({
     assertNoDynamicRuntimeImports(source, relativeFile);
     for (const specifier of extractStaticRuntimeImports(source)) {
       const resolved = resolveRuntimeModuleFile(file, specifier, { fileExists });
+      if (isAllowedPassiveContractImport({
+        relativeFile,
+        resolved,
+        specifier,
+        moduleRoot,
+        lstatSync,
+        realpathSync
+      })) {
+        passiveContractBindingCount += 1;
+        continue;
+      }
       if (CANDIDATE_RUNTIME_PATTERN.test(specifier) ||
           (resolved && CANDIDATE_RUNTIME_PATTERN.test(resolved.split(path.sep).join('/')))) {
         throw new Error(`candidate_runtime_activated:${relativeFile}:${specifier}`);
@@ -692,7 +744,11 @@ function validateNotActivated({
       if (resolved && isWithin(resolved, moduleRoot) && !visited.has(resolved)) queue.push(resolved);
     }
   }
-  return { entrypointCount: activeEntrypoints.length, moduleCount: visited.size };
+  return {
+    entrypointCount: activeEntrypoints.length,
+    moduleCount: visited.size,
+    passiveContractBindingCount
+  };
 }
 
 function validateImportFences() {
@@ -710,6 +766,7 @@ function validateImportFences() {
     externalRuntimeActivated: false,
     activationEntrypointCount: activation.entrypointCount,
     activationModuleCount: activation.moduleCount,
+    passiveContractBindingCount: activation.passiveContractBindingCount,
     externalRuntimeUsed: false,
     durableRemoteStateAllowed: false,
     publicToolSurfaceExpanded: false
@@ -731,6 +788,7 @@ module.exports = {
   ROOT,
   ROOTS,
   COMPONENT_POLICIES,
+  ACTIVE_RUNTIME_PASSIVE_CONTRACT_IMPORT_ALLOWLIST,
   R4C_RUNTIME_FILE_POLICIES,
   extractImports,
   extractStaticRuntimeImports,

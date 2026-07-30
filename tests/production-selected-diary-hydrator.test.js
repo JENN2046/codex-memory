@@ -8,11 +8,21 @@ const test = require('node:test');
 const { DatabaseSync } = require('node:sqlite');
 
 const {
+  GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES,
+  createAttemptHeader,
+  createStageReceipt,
+  digestObject,
+  failureRegistryEntry
+} = require('../packages/chatgpt-r4-contracts');
+const {
+  MAX_PROJECTION_PLAN_BYTES,
   MAX_SELECTED_CONTENT_BYTES,
   MAX_SELECTED_METADATA_BYTES,
   MAX_SELECTED_VECTOR_BYTES,
   createProductionSelectedDiaryRuntimeHydrator,
-  readSelectedProjection
+  createProductionSelectedDiarySourceProjection,
+  scanSelectedProjection,
+  validateProjectionPlan
 } = require('../src/runtime/vcp-native/production-selected-diary-hydrator');
 
 function vector(values = [0.25, 0.75]) {
@@ -208,6 +218,59 @@ function hydrationInput(value, allowedDiaryNames = ['PROJECT_ALPHA']) {
   };
 }
 
+function zeroDerivedCounterFactsFixture() {
+  return {
+    primary_memory: {
+      write_attempts: 0,
+      writes_committed: 0
+    },
+    derived_transaction: {
+      started: 0,
+      committed: 0,
+      rolled_back: 0
+    }
+  };
+}
+
+function hydrationAttemptReceipt(counterFacts, {
+  outcome = 'completed',
+  reasonCode = null
+} = {}) {
+  const header = createAttemptHeader({
+    attemptRef: `grat_${'H'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject('source-projection-request'),
+    contextBindingDigest: digestObject('source-projection-context'),
+    now: new Date('2026-07-30T00:00:00.000Z')
+  });
+  const receipts = [];
+  for (const stage of GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES) {
+    const hydration = stage === 'HYDRATION';
+    receipts.push(createStageReceipt({
+      header,
+      receipts,
+      stage,
+      counterFacts: hydration ? counterFacts : {},
+      outcome: hydration ? outcome : 'completed',
+      reasonCode: hydration ? reasonCode : null
+    }));
+    if (hydration) return receipts.at(-1);
+  }
+  throw new Error('HYDRATION stage unavailable');
+}
+
+function proxyReadOnlyDatabase(database, prepare) {
+  return {
+    readonly: true,
+    close: database.close.bind(database),
+    exec: database.exec.bind(database),
+    prepare(sql) {
+      const statement = database.prepare(sql);
+      return prepare(sql, statement);
+    }
+  };
+}
+
 test('production hydrator projects only selected source rows into the isolated store', async t => {
   const value = fixture(t);
   insertMemory(value.source);
@@ -228,9 +291,22 @@ test('production hydrator projects only selected source rows into the isolated s
     sourcePartitionMutationPerformed: false,
     primaryMemoryWritePerformed: false,
     unauthorizedSourceRowsRead: false,
+    sourceSnapshotStable: true,
+    selectedProjectionDigestMatched: true,
     hydratedDiaryCount: 1,
     hydratedFileCount: 1,
-    hydratedChunkCount: 1
+    hydratedChunkCount: 1,
+    counterFacts: {
+      primary_memory: {
+        write_attempts: 0,
+        writes_committed: 0
+      },
+      derived_transaction: {
+        started: 1,
+        committed: 1,
+        rolled_back: 0
+      }
+    }
   });
   assert.deepEqual(
     value.isolated.prepare(
@@ -248,9 +324,26 @@ test('production hydrator projects only selected source rows into the isolated s
     JSON.stringify(receipt),
     /PROJECT_ALPHA|memory\.md|synthetic governed memory/u
   );
+  assert.deepEqual(
+    hydrationAttemptReceipt(receipt.counterFacts).counter_facts,
+    receipt.counterFacts
+  );
 
   const second = await hydrate(hydrationInput(value));
-  assert.deepEqual(second, receipt);
+  assert.deepEqual(second, {
+    ...receipt,
+    counterFacts: {
+      primary_memory: {
+        write_attempts: 0,
+        writes_committed: 0
+      },
+      derived_transaction: {
+        started: 0,
+        committed: 0,
+        rolled_back: 0
+      }
+    }
+  });
   assert.equal(
     value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
     1
@@ -320,6 +413,38 @@ test('production hydrator supports the exact root diary without widening its pat
   );
 });
 
+test('source projection preflight uses its injected production database constructor', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  function SourceDatabase(file, options) {
+    openCount += 1;
+    assert.equal(file, value.sourceFile);
+    assert.deepEqual(options, {
+      fileMustExist: true,
+      readonly: true
+    });
+    return openReadOnlyDatabase(file);
+  }
+  const projection = createProductionSelectedDiarySourceProjection({
+    sourceKnowledgeBaseStorePath: value.sourceStore,
+    vcpToolBoxRoot: value.vcpRoot,
+    sourceDatabaseConstructor: SourceDatabase
+  });
+
+  const plan = projection.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+
+  assert.equal(openCount, 1);
+  assert.deepEqual(plan.allowed_diary_names, ['PROJECT_ALPHA']);
+  assert.equal(plan.dimension, 2);
+  assert.equal(plan.budget.file_count, 1);
+  assert.equal(plan.budget.chunk_count, 1);
+});
+
 test('production hydrator rejects invalid allowlists before opening source state', async t => {
   const value = fixture(t);
   value.closeSource();
@@ -334,11 +459,18 @@ test('production hydrator rejects invalid allowlists before opening source state
     [],
     ['../PROJECT_ALPHA'],
     ['PROJECT_ALPHA', 'PROJECT_ALPHA'],
-    ['PROJECT/ALPHA']
+    ['PROJECT/ALPHA'],
+    Array.from(
+      { length: 8 },
+      (_, index) => `${'界'.repeat(254)}${index}`
+    )
   ]) {
     await assert.rejects(
       () => hydrate(hydrationInput(value, allowlist)),
-      { code: 'selected_diary_hydration_allowlist_invalid' }
+      {
+        code: 'selected_diary_hydration_allowlist_invalid',
+        reasonCode: 'source_scope_invalid'
+      }
     );
   }
   assert.equal(opened, false);
@@ -371,7 +503,283 @@ test('production hydrator rejects a source driver without read-only attestation'
   assert.equal(closed, true);
 });
 
+test('materialization classifies a second source-open failure after provider as hydration', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      openCount += 1;
+      if (openCount === 2) {
+        throw new Error('synthetic transient source-open failure');
+      }
+      return openReadOnlyDatabase(file);
+    }
+  });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  assert.equal(openCount, 1);
+
+  assert.throws(
+    () => hydrate.materialize({
+      ...hydrationInput(value),
+      projectionPlan: plan
+    }),
+    error => {
+      assert.equal(
+        error.code,
+        'selected_diary_hydration_source_database_open_failed'
+      );
+      assert.equal(error.reasonCode, 'hydration_failed');
+      assert.deepEqual(error.counterFacts, zeroDerivedCounterFactsFixture());
+      const failure = failureRegistryEntry(error.reasonCode);
+      assert.equal(failure.stage, 'HYDRATION');
+      assert.equal(failure.provider_may_have_occurred, true);
+      const stageReceipt = hydrationAttemptReceipt(error.counterFacts, {
+        outcome: 'failed',
+        reasonCode: error.reasonCode
+      });
+      assert.equal(stageReceipt.stage, 'HYDRATION');
+      assert.equal(stageReceipt.reason_code, 'hydration_failed');
+      return true;
+    }
+  );
+  assert.equal(openCount, 2);
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
+test('materialization classifies a missing source boundary after provider as hydration', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      openCount += 1;
+      return openReadOnlyDatabase(file);
+    }
+  });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  assert.equal(openCount, 1);
+  fs.unlinkSync(value.sourceFile);
+
+  assert.throws(
+    () => hydrate.materialize({
+      ...hydrationInput(value),
+      projectionPlan: plan
+    }),
+    error => {
+      assert.equal(
+        error.code,
+        'selected_diary_hydration_source_database_invalid'
+      );
+      assert.equal(error.reasonCode, 'hydration_failed');
+      assert.deepEqual(error.counterFacts, zeroDerivedCounterFactsFixture());
+      const failure = failureRegistryEntry(error.reasonCode);
+      assert.equal(failure.stage, 'HYDRATION');
+      assert.equal(failure.provider_may_have_occurred, true);
+      return true;
+    }
+  );
+  assert.equal(openCount, 1);
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
+test('materialization classifies an unreadable source boundary after provider as hydration', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let denySourceAccess = false;
+  const fsModule = {
+    ...fs,
+    lstatSync(file) {
+      if (denySourceAccess && file === value.sourceFile) {
+        const error = new Error('synthetic source permission change');
+        error.code = 'EACCES';
+        throw error;
+      }
+      return fs.lstatSync(file);
+    }
+  };
+  const hydrate = value.hydrator({ fsModule });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  denySourceAccess = true;
+
+  assert.throws(
+    () => hydrate.materialize({
+      ...hydrationInput(value),
+      projectionPlan: plan
+    }),
+    error => {
+      assert.equal(
+        error.code,
+        'selected_diary_hydration_source_database_invalid'
+      );
+      assert.equal(error.reasonCode, 'hydration_failed');
+      assert.deepEqual(error.counterFacts, zeroDerivedCounterFactsFixture());
+      return true;
+    }
+  );
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
+test('preflight identity replacement stays a SOURCE_PREFLIGHT failure', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+
+  const replacementFile = path.join(
+    value.sourceStore,
+    'knowledge_base.replacement.sqlite'
+  );
+  const replacement = new DatabaseSync(replacementFile);
+  createSchema(replacement);
+  insertMemory(replacement, {
+    checksum: 'replacement-checksum',
+    content: 'synthetic replacement memory'
+  });
+  replacement.close();
+
+  let sourceLstatCount = 0;
+  let replaced = false;
+  const fsModule = {
+    ...fs,
+    lstatSync(file) {
+      const stat = fs.lstatSync(file);
+      if (file === value.sourceFile) {
+        sourceLstatCount += 1;
+        if (sourceLstatCount === 3) {
+          fs.renameSync(replacementFile, value.sourceFile);
+          replaced = true;
+        }
+      }
+      return stat;
+    }
+  };
+  let opened = false;
+  const hydrate = value.hydrator({
+    fsModule,
+    openSourceDatabase() {
+      opened = true;
+      throw new Error('must not open a replaced preflight source');
+    }
+  });
+
+  assert.throws(
+    () => hydrate.preflight({
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      dimension: 2
+    }),
+    error => {
+      assert.equal(
+        error.code,
+        'selected_diary_hydration_source_database_invalid'
+      );
+      assert.equal(error.reasonCode, 'source_identity_invalid');
+      assert.equal(error.counterFacts, undefined);
+      const failure = failureRegistryEntry(error.reasonCode);
+      assert.equal(failure.stage, 'SOURCE_PREFLIGHT');
+      assert.equal(failure.provider_may_have_occurred, false);
+      return true;
+    }
+  );
+  assert.equal(replaced, true);
+  assert.equal(opened, false);
+});
+
+test('materialization invalid allowlists become HYDRATION failures', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      openCount += 1;
+      return openReadOnlyDatabase(file);
+    }
+  });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  assert.equal(openCount, 1);
+
+  for (const allowedDiaryNames of [
+    [],
+    ['PROJECT_ALPHA', 'PROJECT_ALPHA'],
+    ['../PROJECT_ALPHA'],
+    Array.from(
+      { length: 8 },
+      (_, index) => `${'界'.repeat(254)}${index}`
+    )
+  ]) {
+    assert.throws(
+      () => hydrate.materialize({
+        ...hydrationInput(value),
+        allowedDiaryNames,
+        projectionPlan: plan
+      }),
+      error => {
+        assert.equal(
+          error.code,
+          'selected_diary_hydration_allowlist_invalid'
+        );
+        assert.equal(error.reasonCode, 'hydration_failed');
+        assert.deepEqual(
+          error.counterFacts,
+          zeroDerivedCounterFactsFixture()
+        );
+        const failure = failureRegistryEntry(error.reasonCode);
+        assert.equal(failure.stage, 'HYDRATION');
+        assert.equal(failure.provider_may_have_occurred, true);
+        return true;
+      }
+    );
+  }
+  assert.equal(openCount, 1);
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
 test('projection byte budgets reject before selected rows are materialized', () => {
+  const schema = {
+    files: [
+      ['id', 'INTEGER', 0, 1],
+      ['path', 'TEXT', 1, 0],
+      ['diary_name', 'TEXT', 1, 0],
+      ['checksum', 'TEXT', 1, 0],
+      ['mtime', 'INTEGER', 1, 0],
+      ['size', 'INTEGER', 1, 0],
+      ['updated_at', 'INTEGER', 0, 0]
+    ],
+    chunks: [
+      ['id', 'INTEGER', 0, 1],
+      ['file_id', 'INTEGER', 1, 0],
+      ['chunk_index', 'INTEGER', 1, 0],
+      ['content', 'TEXT', 1, 0],
+      ['vector', 'BLOB', 0, 0]
+    ]
+  };
   for (const summaryPatch of [
     { metadataBytes: MAX_SELECTED_METADATA_BYTES + 1 },
     { contentBytes: MAX_SELECTED_CONTENT_BYTES + 1 },
@@ -380,6 +788,34 @@ test('projection byte budgets reject before selected rows are materialized', () 
     let selectedRowsMaterialized = false;
     const database = {
       prepare(sql) {
+        if (sql.includes('PRAGMA table_info(files)')) {
+          return {
+            all() {
+              return schema.files.map(([name, type, notnull, pk], cid) => ({
+                cid,
+                name,
+                type,
+                notnull,
+                dflt_value: null,
+                pk
+              }));
+            }
+          };
+        }
+        if (sql.includes('PRAGMA table_info(chunks)')) {
+          return {
+            all() {
+              return schema.chunks.map(([name, type, notnull, pk], cid) => ({
+                cid,
+                name,
+                type,
+                notnull,
+                dflt_value: null,
+                pk
+              }));
+            }
+          };
+        }
         if (sql.includes('AS metadataBytes')) {
           return {
             get() {
@@ -408,8 +844,11 @@ test('projection byte budgets reject before selected rows are materialized', () 
       }
     };
     assert.throws(
-      () => readSelectedProjection(database, ['PROJECT_ALPHA'], 2),
-      { code: 'selected_diary_hydration_source_projection_invalid' }
+      () => scanSelectedProjection(database, ['PROJECT_ALPHA'], 2),
+      {
+        code: 'selected_diary_hydration_source_projection_invalid',
+        reasonCode: 'source_budget_exceeded'
+      }
     );
     assert.equal(selectedRowsMaterialized, false);
   }
@@ -465,7 +904,31 @@ test('production hydrator rolls back trigger-created secondary state atomically'
   value.closeSource();
   await assert.rejects(
     () => value.hydrator()(hydrationInput(value)),
-    { code: 'selected_diary_hydration_isolated_store_changed' }
+    error => {
+      assert.equal(
+        error.code,
+        'selected_diary_hydration_isolated_store_changed'
+      );
+      assert.equal(error.reasonCode, 'hydration_failed');
+      assert.deepEqual(error.counterFacts, {
+        primary_memory: {
+          write_attempts: 0,
+          writes_committed: 0
+        },
+        derived_transaction: {
+          started: 1,
+          committed: 0,
+          rolled_back: 1
+        }
+      });
+      const stageReceipt = hydrationAttemptReceipt(error.counterFacts, {
+        outcome: 'failed',
+        reasonCode: error.reasonCode
+      });
+      assert.equal(stageReceipt.stage, 'HYDRATION');
+      assert.equal(stageReceipt.reason_code, 'hydration_failed');
+      return true;
+    }
   );
   for (const table of ['files', 'chunks', 'tags']) {
     assert.equal(
@@ -586,4 +1049,387 @@ test('production hydrator binds canonical stores and both exact database handles
     () => wrongSourceHydrator(hydrationInput(value)),
     { code: 'selected_diary_hydration_source_database_binding_invalid' }
   );
+});
+
+test('two-phase source projection returns a bounded immutable plan and streams multiple exact diaries', t => {
+  const value = fixture(t);
+  insertMemory(value.source, {
+    chunkId: 11,
+    diaryName: 'PROJECT_ALPHA',
+    fileId: 7,
+    filePath: 'PROJECT_ALPHA/alpha.md'
+  });
+  insertMemory(value.source, {
+    chunkId: 12,
+    content: 'synthetic beta memory',
+    diaryName: 'PROJECT_BETA',
+    fileId: 8,
+    filePath: 'PROJECT_BETA/beta.md'
+  });
+  insertMemory(value.source, {
+    chunkId: 13,
+    content: 'synthetic root memory',
+    diaryName: 'Root',
+    fileId: 9,
+    filePath: 'root.md'
+  });
+  value.closeSource();
+
+  const hydrate = value.hydrator();
+  const allowedDiaryNames = ['Root', 'PROJECT_BETA', 'PROJECT_ALPHA'];
+  const plan = hydrate.preflight({
+    allowedDiaryNames,
+    dimension: 2
+  });
+  assert.equal(validateProjectionPlan(plan), plan);
+  assert.equal(Object.isFrozen(plan), true);
+  assert.equal(Object.isFrozen(plan.budget), true);
+  assert.ok(Buffer.byteLength(JSON.stringify(plan)) <= MAX_PROJECTION_PLAN_BYTES);
+  assert.deepEqual(plan.allowed_diary_names, [
+    'PROJECT_ALPHA',
+    'PROJECT_BETA',
+    'Root'
+  ]);
+  assert.deepEqual(plan.budget, {
+    file_count: 3,
+    chunk_count: 3,
+    metadata_bytes: 132,
+    content_bytes: 67,
+    vector_bytes: 24
+  });
+  assert.match(plan.source_identity_digest, /^sha256:[a-f0-9]{64}$/u);
+  assert.match(plan.selected_projection_digest, /^sha256:[a-f0-9]{64}$/u);
+  assert.doesNotMatch(
+    JSON.stringify(plan),
+    /synthetic governed memory|synthetic beta memory|synthetic root memory/u
+  );
+
+  const receipt = hydrate.materialize({
+    ...hydrationInput(value, allowedDiaryNames),
+    projectionPlan: plan
+  });
+  assert.equal(receipt.hydratedDiaryCount, 3);
+  assert.equal(receipt.hydratedFileCount, 3);
+  assert.equal(receipt.hydratedChunkCount, 3);
+  assert.deepEqual(receipt.counterFacts.derived_transaction, {
+    started: 1,
+    committed: 1,
+    rolled_back: 0
+  });
+});
+
+test('preflight digest is deterministic and selected rows never use all()', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let selectedIterators = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      const database = openReadOnlyDatabase(file);
+      return proxyReadOnlyDatabase(database, (sql, statement) => ({
+        all(...args) {
+          if (sql.includes('ORDER BY path, id') ||
+              sql.includes('ORDER BY c.file_id')) {
+            throw new Error('selected rows must stream');
+          }
+          return statement.all(...args);
+        },
+        get: statement.get.bind(statement),
+        iterate(...args) {
+          if (sql.includes('ORDER BY path, id') ||
+              sql.includes('ORDER BY c.file_id')) {
+            selectedIterators += 1;
+          }
+          return statement.iterate(...args);
+        }
+      }));
+    }
+  });
+  const first = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  const second = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  assert.equal(
+    first.selected_projection_digest,
+    second.selected_projection_digest
+  );
+  assert.equal(first.plan_digest, second.plan_digest);
+  assert.equal(selectedIterators, 4);
+});
+
+test('materialization rejects source mutation between digest passes before starting a derived transaction', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  const hydrate = value.hydrator();
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  const writer = new DatabaseSync(value.sourceFile);
+  writer.prepare(
+    'UPDATE chunks SET content = ? WHERE id = ?'
+  ).run('synthetic source changed after preflight', 11);
+  writer.close();
+
+  assert.throws(
+    () => hydrate.materialize({
+      ...hydrationInput(value),
+      projectionPlan: plan
+    }),
+    error => {
+      assert.equal(error.code, 'source_snapshot_changed_after_preflight');
+      assert.equal(error.reasonCode, 'source_snapshot_changed_after_preflight');
+      assert.deepEqual(error.counterFacts, {
+        primary_memory: {
+          write_attempts: 0,
+          writes_committed: 0
+        },
+        derived_transaction: {
+          started: 0,
+          committed: 0,
+          rolled_back: 0
+        }
+      });
+      const stageReceipt = hydrationAttemptReceipt(error.counterFacts, {
+        outcome: 'failed',
+        reasonCode: error.reasonCode
+      });
+      assert.equal(stageReceipt.stage, 'HYDRATION');
+      assert.equal(
+        stageReceipt.reason_code,
+        'source_snapshot_changed_after_preflight'
+      );
+      return true;
+    }
+  );
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM chunks').get().count,
+    0
+  );
+});
+
+test('materialization keeps the verified second-pass snapshot while streaming into the derived transaction', t => {
+  const value = fixture(t);
+  value.source.exec('PRAGMA journal_mode = WAL');
+  insertMemory(value.source, {
+    content: 'synthetic stable snapshot memory'
+  });
+  value.closeSource();
+  let openCount = 0;
+  let selectedFileScans = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      openCount += 1;
+      const database = openReadOnlyDatabase(file);
+      if (openCount !== 2) return database;
+      return proxyReadOnlyDatabase(database, (sql, statement) => ({
+        all: statement.all.bind(statement),
+        get: statement.get.bind(statement),
+        iterate(...args) {
+          if (sql.includes('ORDER BY path, id')) {
+            selectedFileScans += 1;
+            if (selectedFileScans === 2) {
+              const writer = new DatabaseSync(value.sourceFile);
+              writer.prepare(
+                'UPDATE chunks SET content = ? WHERE id = ?'
+              ).run('synthetic mutation after second digest', 11);
+              writer.close();
+            }
+          }
+          return statement.iterate(...args);
+        }
+      }));
+    }
+  });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  const receipt = hydrate.materialize({
+    ...hydrationInput(value),
+    projectionPlan: plan
+  });
+  assert.equal(receipt.accepted, true);
+  assert.deepEqual(
+    {
+      ...value.isolated.prepare('SELECT content FROM chunks').get()
+    },
+    { content: 'synthetic stable snapshot memory' }
+  );
+  const sourceAfter = new DatabaseSync(value.sourceFile, { readOnly: true });
+  assert.deepEqual(
+    {
+      ...sourceAfter.prepare('SELECT content FROM chunks').get()
+    },
+    { content: 'synthetic mutation after second digest' }
+  );
+  sourceAfter.close();
+});
+
+test('source replacement after preflight fails closed as a snapshot change', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  const hydrate = value.hydrator();
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  const replacedFile = `${value.sourceFile}.preflight`;
+  fs.renameSync(value.sourceFile, replacedFile);
+  const replacement = new DatabaseSync(value.sourceFile);
+  createSchema(replacement);
+  insertMemory(replacement);
+  replacement.close();
+
+  assert.throws(
+    () => hydrate.materialize({
+      ...hydrationInput(value),
+      projectionPlan: plan
+    }),
+    {
+      code: 'source_snapshot_changed_after_preflight',
+      reasonCode: 'source_snapshot_changed_after_preflight'
+    }
+  );
+});
+
+test('projection plan tamper is rejected without opening a derived transaction', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  const hydrate = value.hydrator();
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  const tampered = structuredClone(plan);
+  tampered.budget.file_count += 1;
+  assert.throws(
+    () => hydrate.materialize({
+      ...hydrationInput(value),
+      projectionPlan: tampered
+    }),
+    {
+      code: 'selected_diary_hydration_projection_plan_invalid',
+      reasonCode: 'hydration_failed'
+    }
+  );
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
+test('projection plan canonicalization failures become controlled hydration evidence', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      openCount += 1;
+      return openReadOnlyDatabase(file);
+    }
+  });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  assert.equal(openCount, 1);
+
+  const cyclic = structuredClone(plan);
+  cyclic.budget.cycle = cyclic.budget;
+  const bigint = structuredClone(plan);
+  bigint.budget.file_count = 1n;
+  for (const malformed of [cyclic, bigint]) {
+    assert.throws(
+      () => hydrate.materialize({
+        ...hydrationInput(value),
+        projectionPlan: malformed
+      }),
+      error => {
+        assert.equal(
+          error.code,
+          'selected_diary_hydration_projection_plan_invalid'
+        );
+        assert.equal(error.reasonCode, 'hydration_failed');
+        assert.deepEqual(error.counterFacts, {
+          primary_memory: {
+            write_attempts: 0,
+            writes_committed: 0
+          },
+          derived_transaction: {
+            started: 0,
+            committed: 0,
+            rolled_back: 0
+          }
+        });
+        return true;
+      }
+    );
+  }
+  assert.equal(openCount, 1);
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
+test('source schema validation rejects drift before selected row iteration', t => {
+  const value = fixture(t);
+  value.source.exec('ALTER TABLE chunks RENAME TO chunks_old');
+  value.source.exec(`
+    CREATE TABLE chunks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      file_id INTEGER NOT NULL,
+      chunk_index INTEGER NOT NULL,
+      content TEXT NOT NULL
+    )
+  `);
+  value.closeSource();
+  assert.throws(
+    () => value.hydrator().preflight({
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      dimension: 2
+    }),
+    {
+      code: 'selected_diary_hydration_source_schema_invalid',
+      reasonCode: 'source_schema_invalid'
+    }
+  );
+});
+
+test('source preflight rejects vectorless and non-finite writer corruption', async t => {
+  const cases = [
+    ['vectorless', null],
+    ['nan', vector([Number.NaN, 0.5])],
+    ['infinity', vector([Number.POSITIVE_INFINITY, 0.5])]
+  ];
+  for (const [name, vectorValue] of cases) {
+    await t.test(name, child => {
+      const value = fixture(child);
+      insertMemory(value.source, { vectorValue });
+      value.closeSource();
+      assert.throws(
+        () => value.hydrator().preflight({
+          allowedDiaryNames: ['PROJECT_ALPHA'],
+          dimension: 2
+        }),
+        {
+          code: 'selected_diary_hydration_source_projection_invalid',
+          reasonCode: 'source_vector_invalid'
+        }
+      );
+    });
+  }
 });

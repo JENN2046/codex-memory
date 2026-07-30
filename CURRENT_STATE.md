@@ -19,7 +19,8 @@ deploy, cutover, complete-V8, or readiness claim.
 
 `activePhase: governed_read_attempt_refactor`
 
-PR `#72` delivered the `_003` `INVALID_ARGUMENT` source/test repair. The later
+PR `#72` delivered the `_003` `INVALID_ARGUMENT` repair; PR `#73` delivered the
+dormant governed-read-attempt contract and terminal CAS without live activation. The later
 single-use `_004` observation failed closed without producing one
 attempt-scoped, stage-ordered, counter-reconciled terminal envelope acceptable
 as R5-O evidence. `_004` is consumed and must not be retried or reconstructed
@@ -51,13 +52,13 @@ future task.
 
 ## Next Safe Action
 
-Deliver the four ordered CM-2159 source PRs for the attempt contract, two-pass
-source projection, vertical runtime, and Edge data-response v2 hard cut. Keep
-the schema-v6 stack stopped throughout construction. Only after all four
-deliveries are merged and merged-main CI succeeds may a separate stopped-state
-`rebind-source` authorization be requested, followed by a distinct single-use
-R5-O `_005` authorization. Do not start or rebind the stack, read private
-memory, invoke a provider, or run `_005` from this committed declaration alone.
+Deliver the remaining three ordered CM-2159 PRs for source projection, vertical
+runtime, and Edge response v2; source projection based on PR `#73`'s merged main
+is current. Keep schema v6 stopped. Only after all four deliveries merge and
+merged-main CI succeeds may stopped-state `rebind-source` authorization be
+requested, followed by distinct single-use R5-O `_005` authorization. Do not
+start or rebind the stack, read private memory, invoke a provider, or run `_005`
+from this declaration alone.
 
 ## Authority Boundaries
 
@@ -73,10 +74,8 @@ memory, invoke a provider, or run `_005` from this committed declaration alone.
   They do not authorize another status probe, lifecycle action, provider call,
   private runtime verification, real memory read or write, release, deploy,
   cutover, or readiness claim.
-- The first refactor delivery is dormant. It does not change the public MCP
-  surface, active Edge response schema, dependencies, CI workflow,
-  runtime/provider configuration, retained product baseline, or readiness
-  status.
+- PR `#73` remains dormant; it changes no public MCP surface, active Edge
+  response, dependency, CI, runtime/provider configuration, baseline, or status.
 
 ## Evidence And History
 
@@ -90,6 +89,8 @@ Last completed: `CM-2158 / CMV-2243`.
   `_002` failed closed; `_003` exposed the sparse `chunk_index` and collapsed
   hydration-reason defect without an accepted result.
 - PR `#72` merged that source/test repair as `e07d3f15...`.
+- PR `#73` merged dormant attempt-v1 and the synthetic Edge-to-Observer slice as
+  `6fe2b532...`; merged-main CI run `30501105867` passed.
 - Single-use authorization `_004` was consumed and failed closed. It did not
   establish a receipt-bound R5-O result. Exact stage and counter facts that
   were not present in component evidence remain unknown and are not inferred
@@ -100,10 +101,10 @@ Last completed: `CM-2158 / CMV-2243`.
   container. A single low-disclosure status confirmed schema v6 and the stopped
   state. No restart, rebind, provider call, memory-tool call, raw log read, or
   raw memory read occurred. The stack must remain stopped during construction.
-- The current contract delivery introduces the dormant
-  `governed_read_attempt.v1` source and synthetic Edge-to-Observer validation
-  only. It neither activates attempt-v1 in the live path nor performs the
-  public response-v2 cutover.
+- The current source-projection construction adds two-pass digest validation,
+  streaming derived materialization, strict transaction counters, and an exact
+  VCP writer authority harness. It neither activates attempt-v1 in the live
+  path nor performs the public response-v2 cutover.
 - PR `#65` and the exact V5 transition are historical closeout evidence only.
   They store no live locator or private payload and do not claim current health
   or authorize runtime, mutation, release, or deploy work.
