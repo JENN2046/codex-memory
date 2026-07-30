@@ -69,7 +69,10 @@ match that derivation exactly:
 
 The fixed overview/audit/default-context queries are runtime constants, not
 new public arguments. Extra tool arguments, an altered query, or an altered
-limit fail before Bridge/provider dispatch.
+limit fail before Bridge/provider dispatch. The lease worker reuses the public
+contract's `LIMITS.maxQueryCharacters` bound, so a query or task summary
+accepted at the signed 2,000-character boundary is not rejected by a narrower
+downstream limit.
 
 Governance denial, bridge failure, preflight failure, provider failure, child
 stage failure, response-finalization failure, timeout, cancellation, and

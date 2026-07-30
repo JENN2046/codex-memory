@@ -5,6 +5,7 @@ const path = require('node:path');
 const { fork } = require('node:child_process');
 
 const {
+  LIMITS,
   aggregateAttemptCounters,
   appendGovernedReadAttemptStage,
   failureRegistryEntry,
@@ -16,7 +17,6 @@ const {
 const DEFAULT_WORKER_TIMEOUT_MS = 20_000;
 const DEFAULT_TERMINATION_GRACE_MS = 2_000;
 const DEFAULT_PROVIDER_TIMEOUT_MS = 15_000;
-const MAX_QUERY_CHARACTERS = 1_000;
 const MAX_VECTOR_DIMENSION = 65_536;
 const CHILD_FAILURE_STAGES = Object.freeze([
   'HYDRATION',
@@ -114,7 +114,7 @@ function validateOwnerOnlyLeaseRoot(leaseRoot, fsModule = fs) {
 function normalizeQuery(value) {
   if (typeof value !== 'string' ||
       value.length < 1 ||
-      value.length > MAX_QUERY_CHARACTERS ||
+      value.length > LIMITS.maxQueryCharacters ||
       value.trim() !== value) {
     throw codedError('lease_worker_query_invalid');
   }

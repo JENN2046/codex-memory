@@ -12,6 +12,7 @@ const { DatabaseSync } = require('node:sqlite');
 
 const {
   COUNTER_MODES,
+  LIMITS,
   InMemoryReplayGuard,
   aggregateAttemptCounters,
   appendGovernedReadAttemptStage,
@@ -2151,6 +2152,62 @@ test('dispatch, preflight, and provider failures close before creating a derived
   );
   assert.equal(providerCalls, 2);
   assert.equal(lateWorker.snapshot().stores_created, 0);
+});
+
+test('lease worker shares the signed public query character limit', async t => {
+  const fixture = createSqliteFixture(t);
+  let dispatchCalls = 0;
+  let providerCalls = 0;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      providerCalls += 1;
+      return [0.75, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    workerRunner:
+      createSyntheticWorkerRunner(fixture.sourceProjection),
+    stageHooks: {
+      async NATIVE_DISPATCHED() {
+        dispatchCalls += 1;
+        throw new Error('synthetic_dispatch_stop');
+      }
+    }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    allowedDiaryCount: 1
+  };
+  const atPublicLimit = await worker.execute({
+    workingSet: bridgeWorkingSet('4'),
+    authorization,
+    query: 'q'.repeat(LIMITS.maxQueryCharacters),
+    limit: 1
+  });
+  assert.equal(
+    atPublicLimit.working_set.receipts.at(-1).reason_code,
+    'native_dispatch_failed'
+  );
+  assert.equal(dispatchCalls, 1);
+  assert.equal(providerCalls, 0);
+
+  await assert.rejects(worker.execute({
+    workingSet: bridgeWorkingSet('5'),
+    authorization,
+    query: 'q'.repeat(LIMITS.maxQueryCharacters + 1),
+    limit: 1
+  }), {
+    code: 'lease_worker_query_invalid'
+  });
+  assert.equal(dispatchCalls, 1);
+  assert.equal(providerCalls, 0);
 });
 
 test('lease task failure injection binds every child stage to its canonical reason', async t => {
