@@ -17,7 +17,11 @@ provider-between-passes runtime wiring belong to the next ordered delivery.
 
 ```js
 const projection =
-  createProductionSelectedDiarySourceProjection(options);
+  createProductionSelectedDiarySourceProjection({
+    sourceKnowledgeBaseStorePath,
+    vcpToolBoxRoot,
+    sourceDatabaseConstructor: ExactVcpDatabase
+  });
 
 const projectionPlan = projection.preflight({
   allowedDiaryNames,
@@ -34,6 +38,10 @@ const receipt = projection.materialize({
   projectionPlan
 });
 ```
+
+The controller injects the exact VCP SQLite constructor at factory creation.
+`preflight()` therefore opens the canonical source independently and does not
+require the later controller-owned derived `knowledgeBaseManager`.
 
 `createProductionSelectedDiaryRuntimeHydrator()` remains as a compatibility
 adapter. It executes the same preflight and materialization methods back to

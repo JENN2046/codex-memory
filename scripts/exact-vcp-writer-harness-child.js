@@ -83,13 +83,6 @@ function exactDatabaseConstructor(vcpRoot) {
   return require(modulePath);
 }
 
-function openReadOnlyDatabase(Database, file) {
-  return new Database(file, {
-    fileMustExist: true,
-    readonly: true
-  });
-}
-
 function loadFreshKnowledgeBaseManager(vcpRoot) {
   const modulePath = path.join(vcpRoot, 'KnowledgeBaseManager.js');
   delete require.cache[require.resolve(modulePath)];
@@ -164,9 +157,7 @@ function expectPreflightFailure({
   const projection = createProductionSelectedDiarySourceProjection({
     sourceKnowledgeBaseStorePath: copied.storePath,
     vcpToolBoxRoot: caseRoot,
-    openSourceDatabase(file) {
-      return openReadOnlyDatabase(Database, file);
-    }
+    sourceDatabaseConstructor: Database
   });
   assert.throws(
     () => projection.preflight({
@@ -301,9 +292,7 @@ async function run() {
   const projection = createProductionSelectedDiarySourceProjection({
     sourceKnowledgeBaseStorePath: primaryStore,
     vcpToolBoxRoot: runtimeRoot,
-    openSourceDatabase(file) {
-      return openReadOnlyDatabase(Database, file);
-    }
+    sourceDatabaseConstructor: Database
   });
   const plan = projection.preflight({
     allowedDiaryNames: ['PROJECT_ALPHA', 'PROJECT_BETA', 'Root'],
@@ -575,9 +564,7 @@ async function run() {
     createProductionSelectedDiarySourceProjection({
       sourceKnowledgeBaseStorePath: mutationCopy.storePath,
       vcpToolBoxRoot: mutationCaseRoot,
-      openSourceDatabase(file) {
-        return openReadOnlyDatabase(Database, file);
-      }
+      sourceDatabaseConstructor: Database
     });
   const mutationPlan = mutationProjection.preflight({
     allowedDiaryNames: ['PROJECT_ALPHA', 'PROJECT_BETA', 'Root'],

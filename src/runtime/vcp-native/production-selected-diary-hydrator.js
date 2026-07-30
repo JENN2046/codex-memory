@@ -1125,8 +1125,14 @@ function runDerivedTransaction(database, operation) {
   }
 }
 
-function defaultOpenSourceDatabase(file, knowledgeBaseManager) {
-  const Database = knowledgeBaseManager?.db?.constructor;
+function defaultOpenSourceDatabase(
+  file,
+  knowledgeBaseManager,
+  sourceDatabaseConstructor
+) {
+  const Database = sourceDatabaseConstructor === undefined
+    ? knowledgeBaseManager?.db?.constructor
+    : sourceDatabaseConstructor;
   if (typeof Database !== 'function') {
     throw codedError(
       'selected_diary_hydration_source_database_driver_invalid',
@@ -1301,9 +1307,17 @@ function createProductionSelectedDiarySourceProjection({
   sourceKnowledgeBaseStorePath,
   vcpToolBoxRoot,
   fsModule = fs,
-  openSourceDatabase = defaultOpenSourceDatabase
+  openSourceDatabase,
+  sourceDatabaseConstructor
 } = {}) {
-  if (typeof openSourceDatabase !== 'function') {
+  const sourceDatabaseOpener = openSourceDatabase === undefined
+    ? (file, knowledgeBaseManager) => defaultOpenSourceDatabase(
+      file,
+      knowledgeBaseManager,
+      sourceDatabaseConstructor
+    )
+    : openSourceDatabase;
+  if (typeof sourceDatabaseOpener !== 'function') {
     throw codedError(
       'selected_diary_hydration_source_database_driver_invalid',
       'source_identity_invalid'
@@ -1332,7 +1346,7 @@ function createProductionSelectedDiarySourceProjection({
       expectedSourceIdentity: sourceIdentity,
       fsModule,
       knowledgeBaseManager,
-      openSourceDatabase,
+      openSourceDatabase: sourceDatabaseOpener,
       phase: 'preflight',
       operation(sourceDatabase) {
         return scanSelectedProjection(
@@ -1416,7 +1430,7 @@ function createProductionSelectedDiarySourceProjection({
       expectedSourceIdentity: projectionPlan.source_identity_digest,
       fsModule,
       knowledgeBaseManager,
-      openSourceDatabase,
+      openSourceDatabase: sourceDatabaseOpener,
       phase: 'materialization',
       operation(sourceDatabase) {
         let selected;

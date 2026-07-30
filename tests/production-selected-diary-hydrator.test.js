@@ -20,6 +20,7 @@ const {
   MAX_SELECTED_METADATA_BYTES,
   MAX_SELECTED_VECTOR_BYTES,
   createProductionSelectedDiaryRuntimeHydrator,
+  createProductionSelectedDiarySourceProjection,
   scanSelectedProjection,
   validateProjectionPlan
 } = require('../src/runtime/vcp-native/production-selected-diary-hydrator');
@@ -410,6 +411,38 @@ test('production hydrator supports the exact root diary without widening its pat
     ).all().map(row => ({ ...row })),
     [{ path: 'memory.md', diaryName: 'Root' }]
   );
+});
+
+test('source projection preflight uses its injected production database constructor', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  function SourceDatabase(file, options) {
+    openCount += 1;
+    assert.equal(file, value.sourceFile);
+    assert.deepEqual(options, {
+      fileMustExist: true,
+      readonly: true
+    });
+    return openReadOnlyDatabase(file);
+  }
+  const projection = createProductionSelectedDiarySourceProjection({
+    sourceKnowledgeBaseStorePath: value.sourceStore,
+    vcpToolBoxRoot: value.vcpRoot,
+    sourceDatabaseConstructor: SourceDatabase
+  });
+
+  const plan = projection.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+
+  assert.equal(openCount, 1);
+  assert.deepEqual(plan.allowed_diary_names, ['PROJECT_ALPHA']);
+  assert.equal(plan.dimension, 2);
+  assert.equal(plan.budget.file_count, 1);
+  assert.equal(plan.budget.chunk_count, 1);
 });
 
 test('production hydrator rejects invalid allowlists before opening source state', async t => {
