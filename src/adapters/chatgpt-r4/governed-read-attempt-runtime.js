@@ -4,6 +4,7 @@ const {
   appendGovernedReadAttemptStage,
   digestObject,
   isGovernedReadAttemptWorkingSetExtension,
+  validateGovernedReadTerminalFailureCandidate,
   validateGovernedReadAttemptWorkingSet,
   validateToolRequest
 } = require('../../../packages/chatgpt-r4-contracts');
@@ -44,32 +45,59 @@ function validateInvocation(value) {
 
 function deriveExpectedPublicProjection(request, bridgeResult) {
   const lastReceipt = bridgeResult.working_set.receipts.at(-1);
-  if (bridgeResult.accepted !== true) return null;
-  if (bridgeResult.evidence_complete !== true ||
-      bridgeResult.terminal_failure !== null ||
-      !bridgeResult.result ||
-      typeof bridgeResult.result !== 'object' ||
-      Array.isArray(bridgeResult.result) ||
-      lastReceipt?.stage !== 'SCOPE_POSTCHECK' ||
-      lastReceipt.outcome !== 'completed') {
+  if (bridgeResult.accepted === true) {
+    if (bridgeResult.evidence_complete !== true ||
+        bridgeResult.terminal_failure !== null ||
+        !bridgeResult.result ||
+        typeof bridgeResult.result !== 'object' ||
+        Array.isArray(bridgeResult.result) ||
+        lastReceipt?.stage !== 'SCOPE_POSTCHECK' ||
+        lastReceipt.outcome !== 'completed') {
+      throw codedError('governed_read_bridge_result_invalid');
+    }
+    try {
+      return structuredProjection(
+        request.tool_request.name,
+        bridgeResult.result,
+        request.tool_request.arguments.project_context_ref
+      );
+    } catch {
+      throw codedError('governed_read_projection_binding_invalid');
+    }
+  }
+
+  const hasFailedReceipt = lastReceipt?.outcome === 'failed';
+  const hasTerminalFailure = bridgeResult.terminal_failure !== null;
+  if (bridgeResult.result !== null ||
+      hasFailedReceipt === hasTerminalFailure) {
     throw codedError('governed_read_bridge_result_invalid');
   }
-  try {
-    return structuredProjection(
-      request.tool_request.name,
-      bridgeResult.result,
-      request.tool_request.arguments.project_context_ref
-    );
-  } catch {
-    throw codedError('governed_read_projection_binding_invalid');
+  if (hasTerminalFailure) {
+    try {
+      validateGovernedReadTerminalFailureCandidate(
+        bridgeResult.terminal_failure
+      );
+      if (bridgeResult.terminal_failure.failure_origin !==
+          'lease_worker') {
+        throw codedError('governed_read_bridge_result_invalid');
+      }
+    } catch {
+      throw codedError('governed_read_bridge_result_invalid');
+    }
   }
+  return null;
 }
 
 function validateInvocationProjectionBinding(
   invocation,
   expectedProjection
 ) {
-  if (expectedProjection === null) return invocation;
+  if (expectedProjection === null) {
+    if (invocation.status !== 'unavailable') {
+      throw codedError('governed_read_projection_binding_invalid');
+    }
+    return invocation;
+  }
   try {
     if (invocation.status !== 'ok' ||
         digestObject(invocation.structured_content) !==

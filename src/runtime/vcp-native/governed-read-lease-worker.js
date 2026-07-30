@@ -780,11 +780,21 @@ function createGovernedReadLeaseWorker({
           attempt_ref: current.header.attempt_ref,
           signal
         });
-        throwIfAborted(signal);
+        const assertReadDeadline = () => {
+          throwIfAborted(signal);
+          if (attemptDeadlineMs <= nowMs()) {
+            throw codedError(
+              'lease_worker_source_preflight_deadline_exceeded'
+            );
+          }
+        };
+        assertReadDeadline();
         projectionPlan = sourceProjection.preflight({
+          assertReadDeadline,
           allowedDiaryNames: authorization.allowedDiaryNames,
           dimension
         });
+        assertReadDeadline();
         current = appendGovernedReadAttemptStage(current, {
           stage: 'SOURCE_PREFLIGHT',
           counterFacts: {

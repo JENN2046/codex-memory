@@ -496,6 +496,21 @@ function failureRegistryEntry(reasonCode) {
   return GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY[reasonCode];
 }
 
+function validateGovernedReadTerminalFailureCandidate(value) {
+  assertExactKeys(
+    value,
+    ['reason_code', 'failure_origin'],
+    'attempt_terminal_failure_candidate_invalid'
+  );
+  const entry = failureRegistryEntry(value.reason_code);
+  if (entry.stage !== 'TERMINAL_FAILURE' ||
+      entry.terminal_candidate_allowed !== true ||
+      value.failure_origin !== entry.origin) {
+    reject('attempt_terminal_failure_candidate_invalid');
+  }
+  return value;
+}
+
 function validateCounterFacts(
   counterFacts,
   origin,
@@ -1074,6 +1089,7 @@ module.exports = {
   validateAttemptHeader,
   validateCounterFacts,
   validateGovernedReadAttemptProtocol,
+  validateGovernedReadTerminalFailureCandidate,
   validateGovernedReadAttemptWorkingSet,
   validateAttemptReceiptChain,
   validateStageReceipt,

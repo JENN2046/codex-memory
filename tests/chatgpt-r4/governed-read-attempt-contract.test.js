@@ -23,6 +23,7 @@ const {
   projectGovernedReadAttemptPublic,
   validateAttemptHeader,
   validateGovernedReadAttemptProtocol,
+  validateGovernedReadTerminalFailureCandidate,
   validateStageReceipt,
   validateTerminalEnvelope,
   utf8ByteLength
@@ -248,6 +249,44 @@ test('working-set extension requires an exact immutable header and receipt prefi
     ),
     false
   );
+});
+
+test('terminal failure candidates are registry-bound terminal reasons', () => {
+  const candidate = {
+    reason_code: 'worker_execution_terminated',
+    failure_origin: 'lease_worker'
+  };
+  assert.equal(
+    validateGovernedReadTerminalFailureCandidate(candidate),
+    candidate
+  );
+  for (const invalid of [
+    {
+      reason_code: 'worker_execution_terminated',
+      failure_origin: 'bridge'
+    },
+    {
+      reason_code: 'provider_embedding_failed',
+      failure_origin: 'provider_wrapper'
+    },
+    {
+      reason_code: 'terminal_missing',
+      failure_origin: 'observer'
+    },
+    {
+      reason_code: 'unknown_terminal_reason',
+      failure_origin: 'lease_worker'
+    },
+    {
+      reason_code: 'worker_execution_terminated',
+      failure_origin: 'lease_worker',
+      extra: true
+    }
+  ]) {
+    assert.throws(
+      () => validateGovernedReadTerminalFailureCandidate(invalid)
+    );
+  }
 });
 
 test('signed response binding changes with either request or terminal digest', () => {

@@ -90,6 +90,13 @@ different statement while retaining native-success receipts. The comparison
 adds no raw result or projection digest to receipts, logs, or the public
 response.
 
+An unaccepted Bridge continuation must carry exactly one canonical failure
+form: either a final failed receipt or a registry-bound lease-worker terminal
+failure candidate. Its result must be `null`, and its projected invocation
+must be `unavailable`. An unaccepted continuation ending in a completed
+`SCOPE_POSTCHECK`, conflicting failure forms, or a success-shaped projector
+result is rejected before Relay finalization.
+
 Governance denial, bridge failure, preflight failure, provider failure, child
 stage failure, response-finalization failure, timeout, cancellation, and
 cleanup failure all use the canonical contract registry. Upper layers forward
@@ -113,7 +120,9 @@ cutover that can transport those `null` counters.
 
 1. rejects a second attempt before provider execution;
 2. appends `NATIVE_DISPATCHED` with one native start and zero primary writes;
-3. runs production `preflight()` against the canonical read-only source;
+3. runs production `preflight()` against the canonical read-only source while
+   injecting the immutable attempt deadline as a synchronous assertion around
+   every source boundary and streamed budget/selected row;
 4. rechecks the attempt deadline and races the injected provider wrapper
    against the smaller of its timeout cap and remaining attempt TTL, passing
    an `AbortSignal` and calling the wrapper at most once;

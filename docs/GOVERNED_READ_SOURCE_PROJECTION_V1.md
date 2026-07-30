@@ -25,6 +25,7 @@ const projection =
   });
 
 const projectionPlan = projection.preflight({
+  assertReadDeadline,
   allowedDiaryNames,
   dimension
 });
@@ -42,7 +43,11 @@ const receipt = projection.materialize({
 
 The controller injects the exact VCP SQLite constructor at factory creation.
 `preflight()` therefore opens the canonical source independently and does not
-require the later controller-owned derived `knowledgeBaseManager`.
+require the later controller-owned derived `knowledgeBaseManager`. The
+controller also injects a synchronous absolute-deadline assertion. Preflight
+calls it around source identity/open/transaction boundaries, each schema
+query, every streamed budget row, every selected row, and bounded vector
+validation work.
 
 `createProductionSelectedDiaryRuntimeHydrator()` remains as a compatibility
 adapter. It executes the same preflight and materialization methods back to
@@ -80,7 +85,8 @@ Preflight:
 4. begins a read transaction;
 5. validates the exact `files` and `chunks` schema;
 6. applies the exact diary allowlist in every selected-row query;
-7. checks file/chunk/metadata/content/vector budgets before row streaming;
+7. streams bounded per-row byte lengths to reject
+   file/chunk/metadata/content/vector budgets before selected values stream;
 8. streams files and chunks in stable order;
 9. validates path scope, sparse-but-strict `chunk_index`, vector dimension,
    finite values, and nonzero vectors;
@@ -90,6 +96,10 @@ Preflight:
 The maximum approximately 272 MiB selected projection is never represented as
 resident `files[]` / `chunks[]` arrays. Only bounded counters, file ids, the
 last chunk index per selected file, and the current streamed row are retained.
+No whole-table `COUNT`/`SUM` aggregate can hide the attempt deadline during
+budget calculation. An expired assertion closes the read transaction and
+returns canonical `source_preflight_failed` evidence before provider
+admission.
 
 ## Second pass and materialization
 

@@ -2215,6 +2215,136 @@ test('Governance binds public projection content to the successful lease result'
   );
 });
 
+test('Governance rejects an unaccepted Bridge result without canonical failure evidence', async () => {
+  const contextRef = `pctx_${'u'.repeat(32)}`;
+  const request = {
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: contextRef,
+        query: 'reject unaccepted success-shaped bridge result',
+        limit: 1
+      }
+    }
+  };
+  const header = createAttemptHeader({
+    attemptRef: `grat_${'u'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject(request),
+    contextBindingDigest: digestObject(contextRef),
+    now: NOW
+  });
+  const receipts = [];
+  for (const stage of [
+    'CREATED',
+    'EDGE_VALIDATED',
+    'RELAY_CLAIMED'
+  ]) {
+    receipts.push(createStageReceipt({ header, receipts, stage }));
+  }
+  let projectorCalls = 0;
+  const runtime = createGovernedReadAttemptGovernanceRuntime({
+    async authorizeRead() {
+      return {
+        accepted: true,
+        authorization: { accepted: true },
+        query: request.tool_request.arguments.query,
+        limit: request.tool_request.arguments.limit
+      };
+    },
+    async invokeBridge({ workingSet }) {
+      const completed = successfulGovernanceBridgeResult(
+        workingSet,
+        {
+          results: [],
+          result_count: 0,
+          raw_memory_content_disclosed: false,
+          raw_vector_disclosed: false,
+          source_path_disclosed: false,
+          provider_response_disclosed: false
+        }
+      );
+      return {
+        ...completed,
+        accepted: false,
+        result: null
+      };
+    },
+    async projectInvocation() {
+      projectorCalls += 1;
+      return unavailableInvocation(header.attempt_ref);
+    }
+  });
+
+  await assert.rejects(
+    runtime.handle({
+      request,
+      relayReceipt: {},
+      governedReadAttempt: { header, receipts }
+    }),
+    { code: 'governed_read_bridge_result_invalid' }
+  );
+  assert.equal(projectorCalls, 0);
+
+  const failedReceiptRuntime =
+    createGovernedReadAttemptGovernanceRuntime({
+      async authorizeRead() {
+        return {
+          accepted: true,
+          authorization: { accepted: true },
+          query: request.tool_request.arguments.query,
+          limit: request.tool_request.arguments.limit
+        };
+      },
+      async invokeBridge({ workingSet }) {
+        let current = appendGovernedReadAttemptStage(workingSet, {
+          stage: 'BRIDGE_DELEGATED',
+          counterFacts: {
+            fallback: { attempts: 0 }
+          }
+        });
+        current = appendGovernedReadAttemptStage(current, {
+          stage: 'NATIVE_DISPATCHED',
+          outcome: 'failed',
+          reasonCode: 'native_dispatch_failed',
+          counterFacts: {
+            provider: { started: 0, succeeded: 0, failed: 0 },
+            native_invocation: {
+              started: 0,
+              succeeded: 0,
+              failed: 0
+            },
+            primary_memory: {
+              write_attempts: 0,
+              writes_committed: 0
+            }
+          }
+        });
+        return {
+          accepted: false,
+          working_set: current,
+          evidence_complete: false,
+          result: null,
+          terminal_failure: null
+        };
+      },
+      async projectInvocation() {
+        const forged = unavailableInvocation(header.attempt_ref);
+        forged.status = 'ok';
+        forged.structured_content.status = 'ok';
+        return forged;
+      }
+    });
+  await assert.rejects(
+    failedReceiptRuntime.handle({
+      request,
+      relayReceipt: {},
+      governedReadAttempt: { header, receipts }
+    }),
+    { code: 'governed_read_projection_binding_invalid' }
+  );
+});
+
 test('Bridge transport failure preserves unknown downstream counters', async () => {
   const authorized = bridgeWorkingSet('e');
   authorized.receipts.pop();
@@ -2471,10 +2601,10 @@ test('dispatch, preflight, and provider failures close before creating a derived
   });
   const expiredReceipt =
     expiredFailure.working_set.receipts.at(-1);
-  assert.equal(expiredReceipt.stage, 'PROVIDER_EMBEDDING');
+  assert.equal(expiredReceipt.stage, 'SOURCE_PREFLIGHT');
   assert.equal(
     expiredReceipt.reason_code,
-    'provider_embedding_failed'
+    'source_preflight_failed'
   );
   assert.deepEqual(expiredReceipt.counter_facts.provider, {
     started: 0,
@@ -2523,6 +2653,57 @@ test('dispatch, preflight, and provider failures close before creating a derived
   );
   assert.equal(providerCalls, 2);
   assert.equal(lateWorker.snapshot().stores_created, 0);
+});
+
+test('source preflight enforces the attempt deadline before provider admission', async t => {
+  const fixture = createSqliteFixture(t);
+  const workingSet = bridgeWorkingSet('j');
+  let current = NOW;
+  let deadlineChecks = 0;
+  let providerCalls = 0;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => current,
+    sourceProjection: {
+      preflight({ assertReadDeadline }) {
+        assert.equal(typeof assertReadDeadline, 'function');
+        deadlineChecks += 1;
+        current = new Date(workingSet.header.deadline_at);
+        assertReadDeadline();
+        throw new Error('deadline guard must terminate preflight');
+      }
+    },
+    async providerWrapper() {
+      providerCalls += 1;
+      return [0.75, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    workerRunner:
+      createSyntheticWorkerRunner(fixture.sourceProjection)
+  });
+
+  const result = await worker.execute({
+    workingSet,
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'deadline-bound source preflight',
+    limit: 1
+  });
+
+  const receipt = result.working_set.receipts.at(-1);
+  assert.equal(result.accepted, false);
+  assert.equal(receipt.stage, 'SOURCE_PREFLIGHT');
+  assert.equal(receipt.reason_code, 'source_preflight_failed');
+  assert.equal(deadlineChecks, 1);
+  assert.equal(providerCalls, 0);
+  assert.equal(worker.snapshot().stores_created, 0);
 });
 
 test('lease worker shares the signed public query character limit', async t => {
