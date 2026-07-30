@@ -271,6 +271,10 @@ async function run(options) {
     assert.equal(childResult.exact_vcp_sha_verified, true);
     assert.equal(childResult.native_search.provider_invocations, 1);
     assert.equal(childResult.native_search.invocations, 1);
+    assert.equal(
+      childResult.projection.primary_source_unchanged_after_negatives,
+      true
+    );
     assert.ok(counters.requests >= 1);
     assert.ok(counters.items >= 1);
     assert.ok(counters.omitted >= 1);

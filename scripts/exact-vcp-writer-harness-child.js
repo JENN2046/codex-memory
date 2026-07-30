@@ -508,45 +508,83 @@ async function run() {
     }
   });
 
-  derivedManager.diaryIndices.clear();
-  derivedManager.diaryIndexLastUsed.clear();
-  derivedManager.diaryDateIndexCache.clear();
-  const mutationPlan = projection.preflight({
+  await adapter.shutdown();
+
+  const mutationCaseRoot = path.join(
+    runtimeRoot,
+    'corruption-between-pass'
+  );
+  const mutationCopy = copyWriterDatabase({
+    Database,
+    sourceFile: originalSourceCopy,
+    targetRoot: mutationCaseRoot
+  });
+  mutationCopy.database.close();
+  const mutationProjection =
+    createProductionSelectedDiarySourceProjection({
+      sourceKnowledgeBaseStorePath: mutationCopy.storePath,
+      vcpToolBoxRoot: mutationCaseRoot,
+      openSourceDatabase(file) {
+        return openReadOnlyDatabase(Database, file);
+      }
+    });
+  const mutationPlan = mutationProjection.preflight({
     allowedDiaryNames: ['PROJECT_ALPHA', 'PROJECT_BETA', 'Root'],
     dimension: 4
   });
-  const sourceMutation = new Database(sourceFile);
+  const sourceMutation = new Database(mutationCopy.targetFile);
   sourceMutation.prepare(`
     UPDATE chunks
     SET content = content || ' test-only-between-pass-mutation'
     WHERE id = (SELECT MIN(id) FROM chunks)
   `).run();
   sourceMutation.close();
-  assert.throws(
-    () => projection.materialize({
-      allowedDiaryNames: ['PROJECT_ALPHA', 'PROJECT_BETA', 'Root'],
-      knowledgeBaseManager: derivedManager,
-      knowledgeBaseRootPath: memoryRoot,
-      knowledgeBaseStorePath: derivedStore,
-      projectionPlan: mutationPlan
-    }),
-    error => {
-      assert.equal(
-        error.reasonCode,
-        'source_snapshot_changed_after_preflight'
-      );
-      assert.deepEqual(error.counterFacts.derived_transaction, {
-        started: 0,
-        committed: 0,
-        rolled_back: 0
-      });
-      return true;
-    }
+
+  const mutationDerivedStore = path.join(
+    workspaceRoot,
+    'between-pass-derived-store'
   );
+  fs.mkdirSync(mutationDerivedStore, { recursive: true });
+  setRuntimeEnvironment({
+    memoryRoot: mutationCopy.memoryRoot,
+    storePath: mutationDerivedStore
+  });
+  const mutationManager = loadFreshKnowledgeBaseManager(vcpRoot);
+  let mutationManagerInitialized = false;
+  try {
+    await mutationManager.initialize();
+    mutationManagerInitialized = true;
+    await quiesceManager(mutationManager);
+    assert.throws(
+      () => mutationProjection.materialize({
+        allowedDiaryNames: ['PROJECT_ALPHA', 'PROJECT_BETA', 'Root'],
+        knowledgeBaseManager: mutationManager,
+        knowledgeBaseRootPath: mutationCopy.memoryRoot,
+        knowledgeBaseStorePath: mutationDerivedStore,
+        projectionPlan: mutationPlan
+      }),
+      error => {
+        assert.equal(
+          error.reasonCode,
+          'source_snapshot_changed_after_preflight'
+        );
+        assert.deepEqual(error.counterFacts.derived_transaction, {
+          started: 0,
+          committed: 0,
+          rolled_back: 0
+        });
+        return true;
+      }
+    );
+  } finally {
+    if (mutationManagerInitialized) {
+      await quiesceManager(mutationManager);
+      await mutationManager.shutdown();
+    }
+  }
   negativeReasons.between_pass =
     'source_snapshot_changed_after_preflight';
-
-  await adapter.shutdown();
+  assert.equal(sha256File(sourceFile), sourceBeforeRead);
 
   return {
     schema_version: 1,
@@ -564,6 +602,7 @@ async function run() {
     projection: {
       preflight_passed: true,
       source_snapshot_stable: hydration.sourceSnapshotStable,
+      primary_source_unchanged_after_negatives: true,
       primary_write_attempts: hydration.counterFacts.primary_memory.write_attempts,
       derived_transaction: hydration.counterFacts.derived_transaction
     },

@@ -56,6 +56,11 @@ response, secret, token, or separate workflow/attempt identity. It is internal
 execution state and must not be copied into public output, Observer records, or
 logs.
 
+Preflight also limits the canonical UTF-8 representation of the complete diary
+scope to 3 KiB. Oversized multi-byte or heavily escaped allowlists fail at
+`SOURCE_PREFLIGHT` as `source_scope_invalid`, before source open or provider
+execution, so the internally generated plan cannot cross its 4 KiB limit.
+
 ## First pass: preflight
 
 Preflight:

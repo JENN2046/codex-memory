@@ -412,11 +412,18 @@ test('production hydrator rejects invalid allowlists before opening source state
     [],
     ['../PROJECT_ALPHA'],
     ['PROJECT_ALPHA', 'PROJECT_ALPHA'],
-    ['PROJECT/ALPHA']
+    ['PROJECT/ALPHA'],
+    Array.from(
+      { length: 8 },
+      (_, index) => `${'界'.repeat(254)}${index}`
+    )
   ]) {
     await assert.rejects(
       () => hydrate(hydrationInput(value, allowlist)),
-      { code: 'selected_diary_hydration_allowlist_invalid' }
+      {
+        code: 'selected_diary_hydration_allowlist_invalid',
+        reasonCode: 'source_scope_invalid'
+      }
     );
   }
   assert.equal(opened, false);

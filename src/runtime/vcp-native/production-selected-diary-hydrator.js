@@ -15,6 +15,7 @@ const {
 } = require('../../../packages/chatgpt-r4-contracts/governed-read-attempt');
 
 const MAX_SELECTED_DIARIES = 8;
+const MAX_SELECTED_DIARY_SCOPE_BYTES = 3 * 1024;
 const MAX_SELECTED_FILES = 10_000;
 const MAX_SELECTED_CHUNKS = 250_000;
 const MAX_SELECTED_METADATA_BYTES = 16 * 1024 * 1024;
@@ -129,6 +130,12 @@ function normalizeSelectedDiaryNames(value) {
   });
   const unique = [...new Set(names)].sort();
   if (unique.length !== names.length) {
+    throw codedError(
+      'selected_diary_hydration_allowlist_invalid',
+      'source_scope_invalid'
+    );
+  }
+  if (utf8ByteLength(unique) > MAX_SELECTED_DIARY_SCOPE_BYTES) {
     throw codedError(
       'selected_diary_hydration_allowlist_invalid',
       'source_scope_invalid'
@@ -1543,6 +1550,7 @@ module.exports = {
   MAX_SELECTED_CHUNKS,
   MAX_SELECTED_CONTENT_BYTES,
   MAX_SELECTED_DIARIES,
+  MAX_SELECTED_DIARY_SCOPE_BYTES,
   MAX_SELECTED_FILES,
   MAX_SELECTED_METADATA_BYTES,
   MAX_SELECTED_VECTOR_BYTES,
