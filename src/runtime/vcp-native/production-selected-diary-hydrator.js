@@ -890,50 +890,43 @@ function createProjectionPlan({
 }
 
 function validateProjectionPlan(plan) {
-  if (!exactKeys(plan, PROJECTION_PLAN_KEYS) ||
-      utf8ByteLength(plan) > MAX_PROJECTION_PLAN_BYTES ||
-      plan.schema_version !== 1 ||
-      plan.protocol !== SOURCE_PROJECTION_PROTOCOL ||
-      !Array.isArray(plan.allowed_diary_names) ||
-      !validateProjectionBudget(plan.budget) ||
-      typeof plan.source_identity_digest !== 'string' ||
-      !DIGEST_PATTERN.test(plan.source_identity_digest) ||
-      typeof plan.selected_projection_digest !== 'string' ||
-      !DIGEST_PATTERN.test(plan.selected_projection_digest) ||
-      typeof plan.plan_digest !== 'string' ||
-      !DIGEST_PATTERN.test(plan.plan_digest)) {
-    throw codedError(
-      'selected_diary_hydration_projection_plan_invalid',
-      'hydration_failed'
-    );
-  }
-  let allowed;
   try {
-    allowed = normalizeSelectedDiaryNames(plan.allowed_diary_names);
+    if (!exactKeys(plan, PROJECTION_PLAN_KEYS) ||
+        utf8ByteLength(plan) > MAX_PROJECTION_PLAN_BYTES ||
+        plan.schema_version !== 1 ||
+        plan.protocol !== SOURCE_PROJECTION_PROTOCOL ||
+        !Array.isArray(plan.allowed_diary_names) ||
+        !validateProjectionBudget(plan.budget) ||
+        typeof plan.source_identity_digest !== 'string' ||
+        !DIGEST_PATTERN.test(plan.source_identity_digest) ||
+        typeof plan.selected_projection_digest !== 'string' ||
+        !DIGEST_PATTERN.test(plan.selected_projection_digest) ||
+        typeof plan.plan_digest !== 'string' ||
+        !DIGEST_PATTERN.test(plan.plan_digest)) {
+      throw new TypeError('projection_plan_shape_invalid');
+    }
+    const allowed = normalizeSelectedDiaryNames(plan.allowed_diary_names);
     normalizeDimension(plan.dimension, {
       errorCode: 'selected_diary_hydration_projection_plan_invalid',
       reasonCode: 'hydration_failed'
     });
+    if (allowed.some(
+      (name, index) => name !== plan.allowed_diary_names[index]
+    )) {
+      throw new TypeError('projection_plan_scope_invalid');
+    }
+    const { plan_digest: ignored, ...base } = plan;
+    if (plan.plan_digest !== digestObject(base)) {
+      throw new TypeError('projection_plan_digest_invalid');
+    }
+    return plan;
   } catch {
     throw codedError(
       'selected_diary_hydration_projection_plan_invalid',
-      'hydration_failed'
+      'hydration_failed',
+      { counterFacts: zeroDerivedCounterFacts() }
     );
   }
-  if (allowed.some((name, index) => name !== plan.allowed_diary_names[index])) {
-    throw codedError(
-      'selected_diary_hydration_projection_plan_invalid',
-      'hydration_failed'
-    );
-  }
-  const { plan_digest: ignored, ...base } = plan;
-  if (plan.plan_digest !== digestObject(base)) {
-    throw codedError(
-      'selected_diary_hydration_projection_plan_invalid',
-      'hydration_failed'
-    );
-  }
-  return plan;
 }
 
 function zeroDerivedCounterFacts() {

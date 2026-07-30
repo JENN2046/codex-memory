@@ -1079,6 +1079,61 @@ test('projection plan tamper is rejected without opening a derived transaction',
   );
 });
 
+test('projection plan canonicalization failures become controlled hydration evidence', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      openCount += 1;
+      return openReadOnlyDatabase(file);
+    }
+  });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  assert.equal(openCount, 1);
+
+  const cyclic = structuredClone(plan);
+  cyclic.budget.cycle = cyclic.budget;
+  const bigint = structuredClone(plan);
+  bigint.budget.file_count = 1n;
+  for (const malformed of [cyclic, bigint]) {
+    assert.throws(
+      () => hydrate.materialize({
+        ...hydrationInput(value),
+        projectionPlan: malformed
+      }),
+      error => {
+        assert.equal(
+          error.code,
+          'selected_diary_hydration_projection_plan_invalid'
+        );
+        assert.equal(error.reasonCode, 'hydration_failed');
+        assert.deepEqual(error.counterFacts, {
+          primary_memory: {
+            write_attempts: 0,
+            writes_committed: 0
+          },
+          derived_transaction: {
+            started: 0,
+            committed: 0,
+            rolled_back: 0
+          }
+        });
+        return true;
+      }
+    );
+  }
+  assert.equal(openCount, 1);
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
 test('source schema validation rejects drift before selected row iteration', t => {
   const value = fixture(t);
   value.source.exec('ALTER TABLE chunks RENAME TO chunks_old');
