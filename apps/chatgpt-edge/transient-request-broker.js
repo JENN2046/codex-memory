@@ -551,25 +551,56 @@ function createGovernedReadAttemptCoordinator({
     reject('attempt_terminal_already_committed');
   }
 
-  function acceptTerminalCandidate(attemptRef, record, terminal) {
+  function finalizeTerminalCandidate(
+    attemptRef,
+    record,
+    terminal,
+    committedAtMs
+  ) {
     if (record.terminal) rejectTerminalCandidate(attemptRef);
-    validateTerminalEnvelope(terminal, {
-      header: record.header,
-      receipts: record.receipts
-    });
     record.terminal = structuredClone(terminal);
-    record.purge_after_ms = nowMs() + terminalRetentionMs;
+    record.purge_after_ms = committedAtMs + terminalRetentionMs;
     activeAttempts -= 1;
-    emit('attempt_terminal_committed', {
-      attempt_ref: attemptRef,
-      terminal: structuredClone(terminal)
-    });
     return Object.freeze({
       attempt_ref: attemptRef,
       outcome: terminal.outcome,
       terminal_digest: terminal.terminal_digest,
       accepted: true
     });
+  }
+
+  function emitTerminalCommitted(attemptRef, terminal) {
+    emit('attempt_terminal_committed', {
+      attempt_ref: attemptRef,
+      terminal: structuredClone(terminal)
+    });
+  }
+
+  function acceptTerminalCandidate(
+    attemptRef,
+    record,
+    terminal,
+    { deadlineWins = false } = {}
+  ) {
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
+    validateTerminalEnvelope(terminal, {
+      header: record.header,
+      receipts: record.receipts
+    });
+    const committedAtMs = nowMs();
+    if (deadlineWins &&
+        Date.parse(record.header.deadline_at) <= committedAtMs) {
+      commitCoordinatorFailure(attemptRef, 'attempt_timeout');
+      rejectTerminalCandidate(attemptRef);
+    }
+    const acceptance = finalizeTerminalCandidate(
+      attemptRef,
+      record,
+      terminal,
+      committedAtMs
+    );
+    emitTerminalCommitted(attemptRef, terminal);
+    return acceptance;
   }
 
   function commitCoordinatorFailure(attemptRef, reasonCode) {
@@ -597,7 +628,12 @@ function createGovernedReadAttemptCoordinator({
       commitCoordinatorFailure(attemptRef, 'attempt_timeout');
       rejectTerminalCandidate(attemptRef);
     }
-    return acceptTerminalCandidate(attemptRef, record, terminal);
+    return acceptTerminalCandidate(
+      attemptRef,
+      record,
+      terminal,
+      { deadlineWins: true }
+    );
   }
 
   function commitProtocolCandidate(attemptRef, candidate) {
@@ -637,18 +673,29 @@ function createGovernedReadAttemptCoordinator({
       header: record.header,
       receipts: acceptedReceipts
     });
-    for (const receipt of candidate.receipts.slice(record.receipts.length)) {
-      record.receipts.push(structuredClone(receipt));
+    const committedAtMs = nowMs();
+    if (Date.parse(record.header.deadline_at) <= committedAtMs) {
+      commitCoordinatorFailure(attemptRef, 'attempt_timeout');
+      rejectTerminalCandidate(attemptRef);
+    }
+    const appendedReceipts =
+      candidate.receipts.slice(record.receipts.length)
+        .map(receipt => structuredClone(receipt));
+    record.receipts.push(...appendedReceipts);
+    const acceptance = finalizeTerminalCandidate(
+      attemptRef,
+      record,
+      candidate.terminal,
+      committedAtMs
+    );
+    for (const receipt of appendedReceipts) {
       emit('attempt_receipt_appended', {
         attempt_ref: attemptRef,
         receipt: structuredClone(receipt)
       });
     }
-    return acceptTerminalCandidate(
-      attemptRef,
-      record,
-      candidate.terminal
-    );
+    emitTerminalCommitted(attemptRef, candidate.terminal);
+    return acceptance;
   }
 
   function timeoutAttempt(attemptRef) {

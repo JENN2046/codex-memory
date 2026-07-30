@@ -218,6 +218,11 @@ wins; if Edge is unavailable, the bounded nested timers eventually fail
 closed. A request first presented at or after `deadline_at` is rejected before
 opening a new downstream connection.
 
+Bridge HTTP uses an independent wall-clock timer for its derived budget in
+addition to the socket idle guard. Response bytes cannot refresh that absolute
+timer, and every success, failure, cancellation, or parse outcome clears it
+before the request settles.
+
 Governance UDS tracks frame admission separately from processing completion.
 After an attempt frame is admitted, an independent wall-clock timer enforces
 the derived deadline; later socket activity cannot refresh or extend it. That
@@ -270,6 +275,13 @@ retry reconciliation without orphaning an active attempt. Expiring a full
 terminal record therefore restores admission capacity without making an
 accepted identity replayable or leaving hidden coordinator-only retention
 pressure.
+For a downstream protocol candidate, the coordinator validates the complete
+prospective receipt chain and terminal without mutating its record, then
+samples the deadline again immediately before its single synchronous commit.
+If validation crossed `deadline_at`, the coordinator commits
+`attempt_timeout`; none of the candidate receipts or success terminal enter the
+record.
+
 Submission identities are held in a rollback-capable replay reservation while
 the coordinator admits the attempt. A coordinator rejection releases that
 reservation, so a still-valid signed envelope can retry after transient

@@ -1026,6 +1026,52 @@ test('Edge terminal CAS gives the deadline precedence at the exact boundary', ()
   }
 });
 
+test('Edge protocol candidate validation cannot cross the deadline into success', () => {
+  let commitPhase = false;
+  let commitClockCalls = 0;
+  const observer = createGovernedReadAttemptObserver();
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock() {
+      if (!commitPhase) return NOW;
+      commitClockCalls += 1;
+      return new Date(
+        NOW.getTime() + (commitClockCalls === 1 ? 29_999 : 30_000)
+      );
+    },
+    eventSink: observer.observe
+  });
+  const value = header('9');
+  coordinator.acceptAttempt(value);
+  const receipts = completedReceipts(value);
+  const candidate = createGovernedReadAttemptProtocol({
+    header: value,
+    receipts,
+    terminal: createTerminalEnvelope({
+      header: value,
+      receipts,
+      outcome: 'success',
+      evidenceComplete: true
+    })
+  });
+
+  commitPhase = true;
+  assert.throws(
+    () => coordinator.commitProtocolCandidate(
+      value.attempt_ref,
+      candidate
+    ),
+    { code: 'attempt_terminal_already_committed' }
+  );
+  assert.ok(commitClockCalls >= 2);
+  assert.equal(coordinator.snapshot(value.attempt_ref).receipt_count, 1);
+  const terminal = coordinator.protocol(value.attempt_ref).terminal;
+  assert.equal(terminal.outcome, 'failure');
+  assert.equal(terminal.reason_code, 'attempt_timeout');
+  assert.equal(terminal.receipt_count, 1);
+  assert.equal(observer.snapshot().receipts_accepted, 1);
+  assert.equal(observer.snapshot().terminal_failures, 1);
+});
+
 test('Edge cancellation at the deadline resolves as timeout', () => {
   let clockNow = NOW;
   const coordinator = createGovernedReadAttemptCoordinator({

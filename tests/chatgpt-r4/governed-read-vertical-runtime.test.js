@@ -567,6 +567,75 @@ test('attempt deadline outranks legacy Bridge and UDS transport timeouts', async
   assert.equal(udsServer.snapshot().connections, 1);
 });
 
+test('Bridge HTTP attempt deadline is absolute despite response activity', async t => {
+  const workingSet = bridgeWorkingSet('j');
+  const nearDeadline = new Date(
+    Date.parse(workingSet.header.deadline_at) - 5
+  );
+  let dripWrites = 0;
+  const dripTimers = new Set();
+  const shimServer = http.createServer((incoming, outgoing) => {
+    incoming.resume();
+    incoming.once('end', () => {
+      outgoing.writeHead(200, {
+        'content-type': 'application/json'
+      });
+      outgoing.write(' ');
+      dripWrites += 1;
+      const dripTimer = setInterval(() => {
+        if (outgoing.destroyed) return;
+        outgoing.write(' ');
+        dripWrites += 1;
+      }, 20);
+      dripTimers.add(dripTimer);
+      outgoing.once('close', () => {
+        clearInterval(dripTimer);
+        dripTimers.delete(dripTimer);
+      });
+    });
+  });
+  await new Promise((resolve, rejectListen) => {
+    shimServer.once('error', rejectListen);
+    shimServer.listen(0, '127.0.0.1', resolve);
+  });
+  t.after(async () => {
+    for (const dripTimer of dripTimers) clearInterval(dripTimer);
+    dripTimers.clear();
+    shimServer.closeAllConnections();
+    await new Promise(resolve => shimServer.close(() => resolve()));
+  });
+  const address = shimServer.address();
+  const invokeShim = createGovernedReadShimHttpClient({
+    endpoint:
+      `http://127.0.0.1:${address.port}/v1/governed-read-attempt`,
+    runtimeBindingDigest: digestObject(
+      'absolute-bridge-http-deadline-binding'
+    ),
+    timeoutMs: 10,
+    clock: () => nearDeadline
+  });
+  const cancellation = new AbortController();
+  const startedAtMs = Date.now();
+  const safetyTimer = setTimeout(() => cancellation.abort(), 1_800);
+  try {
+    await assert.rejects(
+      invokeShim({
+        workingSet,
+        authorization: { accepted: true },
+        query: 'drip response must not refresh the bridge deadline',
+        limit: 1,
+        signal: cancellation.signal
+      }),
+      { code: 'governed_read_bridge_http_timeout' }
+    );
+  } finally {
+    clearTimeout(safetyTimer);
+    cancellation.abort();
+  }
+  assert.ok(Date.now() - startedAtMs < 1_800);
+  assert.ok(dripWrites > 10);
+});
+
 test('Governance UDS deadline aborts an in-progress frame exactly once', async t => {
   const workingSet = bridgeWorkingSet('u');
   const nearDeadline = new Date(

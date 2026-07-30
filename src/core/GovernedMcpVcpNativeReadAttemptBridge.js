@@ -235,7 +235,12 @@ function createGovernedReadShimHttpClient({
     return new Promise((resolve, rejectRequest) => {
       let settled = false;
       let outgoing = null;
+      let requestDeadline = null;
       const cleanup = () => {
+        if (requestDeadline !== null) {
+          clearTimeout(requestDeadline);
+          requestDeadline = null;
+        }
         signal?.removeEventListener('abort', onAbort);
       };
       const fail = code => {
@@ -303,6 +308,9 @@ function createGovernedReadShimHttpClient({
       outgoing.setTimeout(requestTimeoutMs, () => {
         fail('governed_read_bridge_http_timeout');
       });
+      requestDeadline = setTimeout(() => {
+        fail('governed_read_bridge_http_timeout');
+      }, requestTimeoutMs);
       signal?.addEventListener('abort', onAbort, { once: true });
       if (signal?.aborted) {
         onAbort();
