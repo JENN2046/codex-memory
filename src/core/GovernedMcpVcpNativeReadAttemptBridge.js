@@ -60,6 +60,30 @@ function isLeaseTerminalFailure(value) {
   }
 }
 
+function isExactLeaseResponse(value) {
+  if (!value ||
+      typeof value !== 'object' ||
+      Array.isArray(value)) {
+    return false;
+  }
+  const expected = [
+    'accepted',
+    'cleanup_complete',
+    'evidence_complete',
+    'result',
+    'terminal_failure',
+    'working_set'
+  ];
+  const actual = Object.keys(value).sort();
+  return actual.length === expected.length &&
+    actual.every((key, index) => key === expected[index]) &&
+    typeof value.accepted === 'boolean' &&
+    typeof value.cleanup_complete === 'boolean' &&
+    typeof value.evidence_complete === 'boolean' &&
+    Object.hasOwn(value, 'result') &&
+    Object.hasOwn(value, 'terminal_failure');
+}
+
 function createGovernedReadAttemptBridge({
   invokeShim
 } = {}) {
@@ -96,15 +120,15 @@ function createGovernedReadAttemptBridge({
           limit,
           signal
         });
-        if (!response ||
-            typeof response !== 'object' ||
-            Array.isArray(response) ||
+        if (!isExactLeaseResponse(response) ||
             !response.working_set ||
             !isGovernedReadAttemptWorkingSetExtension(
               delegated,
               response.working_set
             ) ||
-            !isLeaseTerminalFailure(response.terminal_failure)) {
+            !isLeaseTerminalFailure(response.terminal_failure) ||
+            (response.accepted === true &&
+              response.cleanup_complete !== true)) {
           throw codedError('governed_read_bridge_response_invalid');
         }
         return response;

@@ -133,7 +133,12 @@ function normalizeVector(value, dimension) {
         !Number.isFinite(item))) {
     throw codedError('lease_worker_provider_vector_invalid');
   }
-  return Object.freeze([...vector]);
+  const normalized = [...vector];
+  const float32 = Float32Array.from(normalized);
+  if (float32.some(item => !Number.isFinite(item))) {
+    throw codedError('lease_worker_provider_vector_invalid');
+  }
+  return Object.freeze(normalized);
 }
 
 function normalizeLimit(value) {
@@ -965,7 +970,6 @@ function createGovernedReadLeaseWorker({
           cleanupBlocked = true;
           return shutdownFailure(current);
         }
-        attemptsCompleted += 1;
         return terminatedFailure(current);
       }
       const effectiveWorkerTimeoutMs = Math.min(
@@ -1036,7 +1040,6 @@ function createGovernedReadLeaseWorker({
           cleanupBlocked = true;
           return shutdownFailure(current);
         }
-        attemptsCompleted += 1;
         return failedContinuation(
           current,
           'HYDRATION',
@@ -1073,7 +1076,6 @@ function createGovernedReadLeaseWorker({
           cleanupBlocked = true;
           return shutdownFailure(current);
         }
-        attemptsCompleted += 1;
         return terminatedFailure(current);
       }
       if (attemptDeadlineMs <= nowMs()) {
@@ -1089,7 +1091,6 @@ function createGovernedReadLeaseWorker({
           cleanupBlocked = true;
           return shutdownFailure(current);
         }
-        attemptsCompleted += 1;
         return terminatedFailure(current);
       }
       let response = null;
@@ -1120,7 +1121,6 @@ function createGovernedReadLeaseWorker({
         cleanupBlocked = true;
         return shutdownFailure(current);
       }
-      attemptsCompleted += 1;
       if (attemptDeadlineMs <= nowMs()) {
         return terminatedFailure(current);
       }
@@ -1130,6 +1130,7 @@ function createGovernedReadLeaseWorker({
         cleanup_complete: true
       });
     } finally {
+      attemptsCompleted += 1;
       active = false;
     }
   }

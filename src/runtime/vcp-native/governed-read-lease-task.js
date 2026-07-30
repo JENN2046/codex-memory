@@ -357,6 +357,12 @@ async function executeGovernedReadLeaseTask(input = {}) {
     stageHooks
   } = input;
   const queryVector = Float32Array.from(input.queryVector);
+  if (queryVector.some(value => !Number.isFinite(value))) {
+    throw Object.assign(
+      new Error('lease_task_query_vector_invalid'),
+      { code: 'lease_task_query_vector_invalid' }
+    );
+  }
   let workingSet = input.workingSet;
   let hydration;
   let loadedVectorCount = 0;

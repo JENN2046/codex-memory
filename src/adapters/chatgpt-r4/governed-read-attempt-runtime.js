@@ -114,6 +114,65 @@ function validateInvocationProjectionBinding(
   return invocation;
 }
 
+function deriveGovernedReadReceiptDigests({
+  request,
+  relayReceipt,
+  decision,
+  governedReadAttempt
+}) {
+  const header = governedReadAttempt.header;
+  const contextReference =
+    request?.tool_request?.arguments?.project_context_ref;
+  try {
+    if (header.request_digest !== digestObject(request) ||
+        typeof contextReference !== 'string' ||
+        header.context_binding_digest !==
+          digestObject(contextReference)) {
+      throw codedError('governed_read_receipt_binding_invalid');
+    }
+    const contextDigest = header.context_binding_digest;
+    const governanceReceipt = {
+      schema_version: 1,
+      kind: 'governed_read_attempt_governance_receipt',
+      attempt_ref: header.attempt_ref,
+      request_digest: header.request_digest,
+      relay_receipt_digest: digestObject(relayReceipt),
+      authorization_digest:
+        digestObject(decision.authorization),
+      context_receipt_digest: contextDigest,
+      tool_name: header.tool_name
+    };
+    return Object.freeze({
+      governance: digestObject(governanceReceipt),
+      context: contextDigest
+    });
+  } catch (error) {
+    if (error?.code ===
+        'governed_read_receipt_binding_invalid') {
+      throw error;
+    }
+    throw codedError('governed_read_receipt_binding_invalid');
+  }
+}
+
+function validateInvocationReceiptBinding(
+  invocation,
+  expectedReceiptDigests
+) {
+  const receiptDigests = invocation.receipt_digests;
+  if (!receiptDigests ||
+      typeof receiptDigests !== 'object' ||
+      Array.isArray(receiptDigests) ||
+      Object.keys(receiptDigests).sort().join(',') !==
+        'context,governance' ||
+      receiptDigests.governance !==
+        expectedReceiptDigests.governance ||
+      receiptDigests.context !== expectedReceiptDigests.context) {
+    throw codedError('governed_read_receipt_binding_invalid');
+  }
+  return invocation;
+}
+
 function deriveGovernedReadExecutionParameters(request) {
   try {
     validateToolRequest(request?.tool_request);
@@ -284,6 +343,13 @@ function createGovernedReadAttemptGovernanceRuntime({
         });
       }
 
+      const expectedReceiptDigests =
+        deriveGovernedReadReceiptDigests({
+          request,
+          relayReceipt,
+          decision,
+          governedReadAttempt
+        });
       const authorized = appendGovernedReadAttemptStage(
         governedReadAttempt,
         { stage: 'AUTHORIZED' }
@@ -301,8 +367,11 @@ function createGovernedReadAttemptGovernanceRuntime({
           typeof bridgeResult.accepted !== 'boolean' ||
           !bridgeResult.working_set ||
           typeof bridgeResult.evidence_complete !== 'boolean' ||
+          typeof bridgeResult.cleanup_complete !== 'boolean' ||
           !Object.hasOwn(bridgeResult, 'result') ||
-          !Object.hasOwn(bridgeResult, 'terminal_failure')) {
+          !Object.hasOwn(bridgeResult, 'terminal_failure') ||
+          (bridgeResult.accepted === true &&
+            bridgeResult.cleanup_complete !== true)) {
         throw codedError('governed_read_bridge_result_invalid');
       }
       try {
@@ -320,16 +389,20 @@ function createGovernedReadAttemptGovernanceRuntime({
       }
       const expectedProjection =
         deriveExpectedPublicProjection(request, bridgeResult);
-      const invocation = validateInvocationProjectionBinding(
-        validateInvocation(
-          await invokeWithSignal(() => projectInvocation({
-            request,
-            authorization: decision.authorization,
-            bridgeResult,
-            signal
-          }), signal)
+      const invocation = validateInvocationReceiptBinding(
+        validateInvocationProjectionBinding(
+          validateInvocation(
+            await invokeWithSignal(() => projectInvocation({
+              request,
+              authorization: decision.authorization,
+              bridgeResult,
+              receiptDigests: expectedReceiptDigests,
+              signal
+            }), signal)
+          ),
+          expectedProjection
         ),
-        expectedProjection
+        expectedReceiptDigests
       );
       return Object.freeze({
         ...invocation,

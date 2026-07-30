@@ -913,7 +913,11 @@ test('full real transport replay commits one canonical terminal and cleans its l
       };
     },
     invokeBridge: input => bridge.invoke(input),
-    async projectInvocation({ request, bridgeResult }) {
+    async projectInvocation({
+      request,
+      bridgeResult,
+      receiptDigests
+    }) {
       const failed = bridgeResult.accepted !== true ||
         bridgeResult.terminal_failure !== null;
       return {
@@ -930,16 +934,7 @@ test('full real transport replay commits one canonical terminal and cleans its l
               request.tool_request.arguments.project_context_ref
             ),
         counters: liveCounters(bridgeResult.working_set),
-        receipt_digests: {
-          governance: digestObject({
-            attemptRef:
-              bridgeResult.working_set.header.attempt_ref,
-            status: failed ? 'unavailable' : 'ok'
-          }),
-          context: digestObject(
-            request.tool_request.arguments.project_context_ref
-          )
-        }
+        receipt_digests: receiptDigests
       };
     }
   });
@@ -1125,6 +1120,72 @@ test('full real transport replay commits one canonical terminal and cleans its l
   assert.equal(observer.snapshot().terminal_successes, 1);
   assert.equal(shim.snapshot().request_bodies_logged, 0);
   assert.equal(uds.snapshot().request_bodies_logged, 0);
+});
+
+test('Edge keeps context setup outside governed attempt admission', async t => {
+  const principal = signingIdentity('context-setup-principal');
+  const edgeIdentity = signingIdentity('context-setup-edge');
+  const principalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('context-setup-principal'),
+    now: NOW,
+    nonce: 'principal_nonce_context_setup_01',
+    signing: signing(principal)
+  });
+  const runtime = createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => NOW,
+    governedReadAttempts: true
+  });
+  const address = await runtime.start();
+  t.after(() => runtime.stop());
+  const client = createLoopbackEdgeClient(address.url, {
+    timeoutMs: 1_000
+  });
+  const resolveRequest = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'resolve_memory_context',
+    toolArguments: {
+      project_alias: 'project-alpha',
+      requested_visibility: 'project'
+    },
+    now: NOW,
+    requestId: 'req_context_setup_no_attempt_00001',
+    nonce: 'request_nonce_context_setup_no_attempt_01',
+    signing: signing(edgeIdentity)
+  });
+  assert.deepEqual(await client.submit(resolveRequest), {
+    request_id: resolveRequest.request_id,
+    status: 'queued'
+  });
+  const claim = await client.claim('context-setup-relay');
+  assert.equal(claim.request_id, resolveRequest.request_id);
+  assert.equal(
+    Object.hasOwn(claim, 'governed_read_attempt'),
+    false
+  );
+  await client.cancel(resolveRequest.request_id);
+
+  const contextRef = `pctx_${'c'.repeat(32)}`;
+  const readRequest = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: contextRef,
+      query: 'attempt header remains mandatory for governed reads',
+      limit: 1
+    },
+    now: NOW,
+    requestId: 'req_context_setup_read_000000001',
+    nonce: 'request_nonce_context_setup_read_01',
+    signing: signing(edgeIdentity)
+  });
+  await assert.rejects(
+    client.submit(readRequest),
+    { code: 'edge_attempt_header_required' }
+  );
 });
 
 test('Edge acknowledged attempt claim lasts until the attempt deadline', async t => {
@@ -2204,7 +2265,11 @@ test('Governance binds public projection content to the successful lease result'
     result_count: 0
   };
 
-  function createRuntime(nativeResult, project) {
+  function createRuntime(
+    nativeResult,
+    project,
+    { projectReceiptDigests = value => value } = {}
+  ) {
     return createGovernedReadAttemptGovernanceRuntime({
       async authorizeRead() {
         return {
@@ -2220,16 +2285,16 @@ test('Governance binds public projection content to the successful lease result'
           nativeResult
         );
       },
-      async projectInvocation({ bridgeResult }) {
+      async projectInvocation({
+        bridgeResult,
+        receiptDigests
+      }) {
         return {
           status: 'ok',
           structured_content: project(bridgeResult),
           counters: liveCounters(bridgeResult.working_set),
-          receipt_digests: {
-            governance:
-              digestObject('projection-binding-governance'),
-            context: digestObject(contextRef)
-          }
+          receipt_digests:
+            projectReceiptDigests(receiptDigests)
         };
       }
     });
@@ -2276,6 +2341,32 @@ test('Governance binds public projection content to the successful lease result'
       governedReadAttempt: { header, receipts }
     }),
     { code: 'governed_read_projection_binding_invalid' }
+  );
+
+  const forgedReceipt = createRuntime(
+    resultWithHit,
+    bridgeResult => structuredProjection(
+      request.tool_request.name,
+      bridgeResult.result,
+      contextRef
+    ),
+    {
+      projectReceiptDigests(receiptDigests) {
+        return {
+          ...receiptDigests,
+          governance:
+            digestObject('forged-governance-receipt')
+        };
+      }
+    }
+  );
+  await assert.rejects(
+    forgedReceipt.handle({
+      request,
+      relayReceipt: {},
+      governedReadAttempt: { header, receipts }
+    }),
+    { code: 'governed_read_receipt_binding_invalid' }
   );
 
   const canonical = createRuntime(
@@ -2407,7 +2498,8 @@ test('Governance rejects an unaccepted Bridge result without canonical failure e
           working_set: current,
           evidence_complete: false,
           result: null,
-          terminal_failure: null
+          terminal_failure: null,
+          cleanup_complete: true
         };
       },
       async projectInvocation() {
@@ -2512,6 +2604,47 @@ test('Bridge transport failure preserves unknown downstream counters', async () 
     evidenceComplete: terminalResult.evidence_complete,
     failureOrigin: terminalResult.terminal_failure.failure_origin
   }));
+
+  const incompleteCleanupBridge =
+    createGovernedReadAttemptBridge({
+      async invokeShim({ workingSet }) {
+        const authorizedPrefix = {
+          header: workingSet.header,
+          receipts: workingSet.receipts.slice(0, -1)
+        };
+        return {
+          ...successfulGovernanceBridgeResult(
+            authorizedPrefix,
+            {
+              results: [],
+              result_count: 0,
+              raw_memory_content_disclosed: false,
+              raw_vector_disclosed: false,
+              source_path_disclosed: false,
+              provider_response_disclosed: false
+            }
+          ),
+          cleanup_complete: false
+        };
+      }
+    });
+  const incompleteCleanup =
+    await incompleteCleanupBridge.invoke({
+      workingSet: authorized,
+      authorization: {
+        accepted: true,
+        allowedDiaryNames: ['PROJECT_ALPHA'],
+        allowedDiaryCount: 1
+      },
+      query: 'synthetic incomplete cleanup',
+      limit: 1
+    });
+  assert.equal(incompleteCleanup.accepted, false);
+  assert.equal(incompleteCleanup.cleanup_complete, false);
+  assert.equal(
+    incompleteCleanup.working_set.receipts.at(-1).reason_code,
+    'bridge_delegation_failed'
+  );
 });
 
 test('dispatch, preflight, and provider failures close before creating a derived store', async t => {
@@ -2567,6 +2700,8 @@ test('dispatch, preflight, and provider failures close before creating a derived
   assert.equal(providerCalls, 0);
   assert.equal(dispatchWorker.snapshot().native_invocations, 0);
   assert.equal(dispatchWorker.snapshot().stores_created, 0);
+  assert.equal(dispatchWorker.snapshot().attempts_started, 1);
+  assert.equal(dispatchWorker.snapshot().attempts_completed, 1);
 
   const preflightWorker = createGovernedReadLeaseWorker({
     clock: () => NOW,
@@ -2605,6 +2740,8 @@ test('dispatch, preflight, and provider failures close before creating a derived
   );
   assert.equal(providerCalls, 0);
   assert.equal(preflightWorker.snapshot().stores_created, 0);
+  assert.equal(preflightWorker.snapshot().attempts_started, 1);
+  assert.equal(preflightWorker.snapshot().attempts_completed, 1);
   assert.doesNotThrow(() => createTerminalEnvelope({
     header: preflightFailure.working_set.header,
     receipts: preflightFailure.working_set.receipts,
@@ -2654,6 +2791,53 @@ test('dispatch, preflight, and provider failures close before creating a derived
   });
   assert.equal(providerWorker.snapshot().stores_created, 0);
   assert.equal(providerCalls, 1);
+  assert.equal(providerWorker.snapshot().attempts_started, 1);
+  assert.equal(providerWorker.snapshot().attempts_completed, 1);
+
+  let overflowProviderCalls = 0;
+  let overflowChildCalls = 0;
+  const overflowWorker = createGovernedReadLeaseWorker({
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      overflowProviderCalls += 1;
+      return [1e39, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    async workerRunner() {
+      overflowChildCalls += 1;
+      throw new Error('float32 overflow reached child');
+    }
+  });
+  const overflowFailure = await overflowWorker.execute({
+    workingSet: bridgeWorkingSet('3'),
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'provider vector outside float32 range',
+    limit: 1
+  });
+  assert.equal(
+    overflowFailure.working_set.receipts.at(-1).reason_code,
+    'provider_embedding_failed'
+  );
+  assert.deepEqual(
+    overflowFailure.working_set.receipts.at(-1)
+      .counter_facts.provider,
+    { started: 1, succeeded: 0, failed: 1 }
+  );
+  assert.equal(overflowProviderCalls, 1);
+  assert.equal(overflowChildCalls, 0);
+  assert.equal(overflowWorker.snapshot().stores_created, 0);
+  assert.equal(overflowWorker.snapshot().attempts_started, 1);
+  assert.equal(overflowWorker.snapshot().attempts_completed, 1);
 
   const expiredWorker = createGovernedReadLeaseWorker({
     clock: () => new Date(NOW.getTime() + 60_000),
@@ -2695,6 +2879,8 @@ test('dispatch, preflight, and provider failures close before creating a derived
   });
   assert.equal(providerCalls, 1);
   assert.equal(expiredWorker.snapshot().stores_created, 0);
+  assert.equal(expiredWorker.snapshot().attempts_started, 1);
+  assert.equal(expiredWorker.snapshot().attempts_completed, 1);
 
   let lateClock = NOW;
   const lateWorker = createGovernedReadLeaseWorker({
@@ -2735,6 +2921,63 @@ test('dispatch, preflight, and provider failures close before creating a derived
   );
   assert.equal(providerCalls, 2);
   assert.equal(lateWorker.snapshot().stores_created, 0);
+  assert.equal(lateWorker.snapshot().attempts_started, 1);
+  assert.equal(lateWorker.snapshot().attempts_completed, 1);
+
+  const preStoreWorkingSet = bridgeWorkingSet('2');
+  const preStoreDeadline =
+    Date.parse(preStoreWorkingSet.header.deadline_at);
+  let providerReturned = false;
+  let postProviderClockReads = 0;
+  let preStoreChildCalls = 0;
+  const preStoreWorker = createGovernedReadLeaseWorker({
+    clock() {
+      if (!providerReturned) return NOW;
+      postProviderClockReads += 1;
+      return postProviderClockReads === 1
+        ? NOW
+        : new Date(preStoreDeadline);
+    },
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      providerReturned = true;
+      return [0.75, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    async workerRunner() {
+      preStoreChildCalls += 1;
+      throw new Error('expired pre-store attempt reached child');
+    }
+  });
+  const preStoreFailure = await preStoreWorker.execute({
+    workingSet: preStoreWorkingSet,
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'deadline reached before store creation',
+    limit: 1
+  });
+  assert.equal(preStoreFailure.accepted, false);
+  assert.equal(preStoreFailure.cleanup_complete, true);
+  assert.deepEqual(preStoreFailure.terminal_failure, {
+    reason_code: 'worker_execution_terminated',
+    failure_origin: 'lease_worker'
+  });
+  assert.equal(
+    preStoreFailure.working_set.receipts.at(-1).stage,
+    'PROVIDER_EMBEDDING'
+  );
+  assert.equal(preStoreChildCalls, 0);
+  assert.equal(preStoreWorker.snapshot().stores_created, 0);
+  assert.equal(preStoreWorker.snapshot().attempts_started, 1);
+  assert.equal(preStoreWorker.snapshot().attempts_completed, 1);
 });
 
 test('source preflight enforces the attempt deadline before provider admission', async t => {
@@ -2842,6 +3085,43 @@ test('lease worker shares the signed public query character limit', async t => {
   });
   assert.equal(dispatchCalls, 1);
   assert.equal(providerCalls, 0);
+});
+
+test('lease task rejects a vector that becomes non-finite in Float32', async () => {
+  let materializeCalls = 0;
+  let searchCalls = 0;
+  await assert.rejects(
+    executeGovernedReadLeaseTask({
+      workingSet: leaseTaskWorkingSet('1'),
+      projection: {
+        async materialize() {
+          materializeCalls += 1;
+        }
+      },
+      projectionPlan: { dimension: 1 },
+      authorization: {
+        accepted: true,
+        allowedDiaryNames: ['PROJECT_ALPHA'],
+        allowedDiaryCount: 1
+      },
+      queryVector: [1e39],
+      queryLimit: 1,
+      knowledgeBaseManager: {
+        async search() {
+          searchCalls += 1;
+          return [];
+        },
+        async _getOrLoadDiaryIndex() {
+          return null;
+        }
+      },
+      knowledgeBaseRootPath: '/synthetic/knowledge-base',
+      knowledgeBaseStorePath: '/synthetic/derived-store'
+    }),
+    { code: 'lease_task_query_vector_invalid' }
+  );
+  assert.equal(materializeCalls, 0);
+  assert.equal(searchCalls, 0);
 });
 
 test('lease task failure injection binds every child stage to its canonical reason', async t => {

@@ -35,6 +35,12 @@ does it append the suffix and atomically accept the terminal. A divergent
 prefix changes nothing. Timeout or cancellation that wins first rejects every
 late candidate.
 
+Attempt admission applies only to the four canonical governed data-read tools.
+`resolve_memory_context` remains the preceding context-setup operation and is
+queued without an attempt header even while dormant attempt mode is enabled.
+The four governed reads still fail closed when their header is absent; importing
+the contract package's canonical read-tool list avoids a second Edge allowlist.
+
 The Relay response signature also binds the candidate. In attempt mode, the
 existing signed `receipt_chain.relay` carries a canonical digest of the request
 digest and terminal digest. Edge recomputes that binding after response
@@ -90,12 +96,23 @@ different statement while retaining native-success receipts. The comparison
 adds no raw result or projection digest to receipts, logs, or the public
 response.
 
+Governance also derives the context digest from the attempt header's validated
+context binding and derives the governance digest from the actual signed
+request, Relay receipt, accepted authorization, context digest, tool, and
+attempt identity. An injectable projector receives those canonical digests but
+cannot replace either value with another format-valid digest.
+
 An unaccepted Bridge continuation must carry exactly one canonical failure
 form: either a final failed receipt or a registry-bound lease-worker terminal
 failure candidate. Its result must be `null`, and its projected invocation
 must be `unavailable`. An unaccepted continuation ending in a completed
 `SCOPE_POSTCHECK`, conflicting failure forms, or a success-shaped projector
 result is rejected before Relay finalization.
+
+Bridge accepts only the exact six-field lease response. A response that claims
+success is valid only when exact-store cleanup is explicitly complete;
+`cleanup_complete=false` or an omitted cleanup fact becomes a Bridge failure
+and cannot reach public success or terminal success.
 
 Governance denial, bridge failure, preflight failure, provider failure, child
 stage failure, response-finalization failure, timeout, cancellation, and
@@ -127,7 +144,7 @@ cutover that can transport those `null` counters.
    against the smaller of its timeout cap and remaining attempt TTL, passing
    an `AbortSignal` and calling the wrapper at most once;
 5. validates a finite vector whose dimension exactly matches the projection
-   plan;
+   plan and remains finite after conversion to the child's `Float32Array`;
 6. rechecks the remaining attempt TTL before store creation and again before
    child launch;
 7. creates one owner-only attempt directory and fresh derived store;
@@ -137,6 +154,12 @@ cutover that can transport those `null` counters.
 9. accepts only a response whose receipt chain has the parent prefix and that
    returned before `deadline_at`;
 10. deletes the exact attempt directory only after child shutdown is proven.
+
+Once controller admission increments `attempts_started`, one shared `finally`
+path increments `attempts_completed` exactly once for every resolved or rejected
+execution, including dispatch, preflight, provider, pre-store deadline, cleanup,
+and child failures. The snapshot therefore cannot retain false unfinished
+attempts after a terminal return.
 
 No local fallback exists. A pre-provider rejection carries explicit zero
 provider evidence only where the origin can prove downstream dispatch did not

@@ -3,6 +3,7 @@
 const http = require('node:http');
 
 const {
+  GOVERNED_READ_ATTEMPT_READ_TOOLS,
   InMemoryReplayGuard,
   LIMITS,
   createOpaqueId,
@@ -195,7 +196,13 @@ function createLoopbackEdgeRuntime({
 
   async function submit(request, attemptHeader = null) {
     await verifyRequest(request);
-    if ((attemptHeader === null) !== (governedCoordinator === null)) {
+    const attemptTool =
+      GOVERNED_READ_ATTEMPT_READ_TOOLS.includes(
+        request?.tool_request?.name
+      );
+    const attemptHeaderRequired =
+      governedCoordinator !== null && attemptTool;
+    if ((attemptHeader !== null) !== attemptHeaderRequired) {
       reject('edge_attempt_header_required');
     }
     if (attemptHeader !== null) {
