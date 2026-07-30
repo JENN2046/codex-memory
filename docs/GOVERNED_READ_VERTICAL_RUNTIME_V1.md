@@ -211,8 +211,12 @@ the parent prefix, counters reconcile, success ends at a completed
 projection. A normal child failure ends at its canonical failed stage; a
 proven post-termination exit instead uses the terminal-level
 `worker_execution_terminated` reason without asserting an unknown child stage.
-Invalid child evidence is treated as incomplete shutdown evidence; its store
-is retained and later reads remain blocked.
+A natural PID-bearing exit also proves process shutdown. If that exit is
+nonzero or its result is missing, invalid, or reports incomplete shutdown, the
+parent discards the result, removes only that child's exact store, and returns
+the same evidence-incomplete `worker_execution_terminated` failure. Invalid
+runner evidence without an observed process exit remains incomplete shutdown
+evidence; its store is retained and later reads remain blocked.
 
 If graceful completion misses its deadline, the parent may send `SIGTERM` only
 to the child handle it created. It never uses `SIGKILL` and never enumerates or

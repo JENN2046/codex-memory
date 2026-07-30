@@ -2607,6 +2607,114 @@ test('pre-start child failures clean empty stores and reuse capacity', async t =
   assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
 });
 
+test('natural child exit cleans its exact store and reuses capacity', async t => {
+  const fixture = createSqliteFixture(t);
+  const successfulRunner =
+    createSyntheticWorkerRunner(fixture.sourceProjection);
+  let failedChild = null;
+  let failedExecution = null;
+  let runnerCalls = 0;
+  let providerCalls = 0;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      providerCalls += 1;
+      return [0.75, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    async workerRunner(task, options) {
+      runnerCalls += 1;
+      if (runnerCalls !== 1) {
+        return successfulRunner(task, options);
+      }
+      class SyntheticNonzeroExitChild extends EventEmitter {
+        constructor() {
+          super();
+          this.connected = true;
+          this.pid = 13579;
+          this.killCalls = 0;
+        }
+
+        send() {
+          queueMicrotask(() => {
+            this.connected = false;
+            this.emit('exit', 1);
+          });
+        }
+
+        kill() {
+          this.killCalls += 1;
+          return false;
+        }
+
+        disconnect() {
+          this.connected = false;
+        }
+
+        unref() {}
+      }
+      failedChild = new SyntheticNonzeroExitChild();
+      failedExecution = await runLeaseWorkerProcess(task, {
+        ...options,
+        forkProcess() {
+          return failedChild;
+        }
+      });
+      return failedExecution;
+    }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    allowedDiaryCount: 1
+  };
+  const failed = await worker.execute({
+    workingSet: bridgeWorkingSet('n'),
+    authorization,
+    query: 'natural nonzero child exit',
+    limit: 1
+  });
+  assert.equal(failed.accepted, false);
+  assert.equal(failed.cleanup_complete, true);
+  assert.equal(failed.evidence_complete, false);
+  assert.deepEqual(failed.terminal_failure, {
+    reason_code: 'worker_execution_terminated',
+    failure_origin: 'lease_worker'
+  });
+  assert.equal(
+    failed.working_set.receipts.at(-1).stage,
+    'PROVIDER_EMBEDDING'
+  );
+  assert.equal(failedChild.killCalls, 0);
+  assert.equal(failedExecution.response, null);
+  assert.equal(failedExecution.shutdown_complete, true);
+  assert.equal(failedExecution.termination_reason, 'child_error');
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+  assert.equal(worker.snapshot().stores_created, 1);
+  assert.equal(worker.snapshot().stores_removed, 1);
+  assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
+
+  const recovered = await worker.execute({
+    workingSet: bridgeWorkingSet('o'),
+    authorization,
+    query: 'capacity reused after natural child exit',
+    limit: 1
+  });
+  assert.equal(recovered.accepted, true);
+  assert.equal(providerCalls, 2);
+  assert.equal(worker.snapshot().attempts_completed, 2);
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+  assert.equal(worker.snapshot().stores_created, 2);
+  assert.equal(worker.snapshot().stores_removed, 2);
+  assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
+});
+
 test('lease timeout rejects late success and reuses capacity after exit', async t => {
   const fixture = createSqliteFixture(t);
   const successfulRunner =

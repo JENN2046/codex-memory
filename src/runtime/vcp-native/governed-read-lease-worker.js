@@ -435,10 +435,19 @@ function runLeaseWorkerProcess(task, {
         });
         return;
       }
+      let validatedResponse = null;
       if (message && code === 0) {
+        try {
+          validatedResponse = validateWorkerResponse(
+            message,
+            task.working_set
+          );
+        } catch {}
+      }
+      if (validatedResponse?.shutdown_complete === true) {
         finish({
-          response: message,
-          shutdown_complete: message.shutdown_complete === true,
+          response: validatedResponse,
+          shutdown_complete: true,
           sigterm_sent: sigtermSent,
           cancelled,
           child_started: true
@@ -446,11 +455,12 @@ function runLeaseWorkerProcess(task, {
         return;
       }
       finish({
-        response: message,
-        shutdown_complete: false,
+        response: null,
+        shutdown_complete: true,
         sigterm_sent: sigtermSent,
         cancelled,
-        child_started: true
+        child_started: true,
+        termination_reason: 'child_error'
       });
     }
 
