@@ -2,9 +2,14 @@
 
 const {
   appendGovernedReadAttemptStage,
+  digestObject,
+  isGovernedReadAttemptWorkingSetExtension,
   validateGovernedReadAttemptWorkingSet,
   validateToolRequest
 } = require('../../../packages/chatgpt-r4-contracts');
+const {
+  structuredProjection
+} = require('./governed-read-public-projection');
 
 const MAX_NATIVE_RESULT_LIMIT = 5;
 const GOVERNED_READ_DEFAULT_QUERIES = Object.freeze({
@@ -35,6 +40,50 @@ function validateInvocation(value) {
     throw codedError('governed_read_invocation_invalid');
   }
   return value;
+}
+
+function deriveExpectedPublicProjection(request, bridgeResult) {
+  const lastReceipt = bridgeResult.working_set.receipts.at(-1);
+  if (bridgeResult.accepted !== true) return null;
+  if (bridgeResult.evidence_complete !== true ||
+      bridgeResult.terminal_failure !== null ||
+      !bridgeResult.result ||
+      typeof bridgeResult.result !== 'object' ||
+      Array.isArray(bridgeResult.result) ||
+      lastReceipt?.stage !== 'SCOPE_POSTCHECK' ||
+      lastReceipt.outcome !== 'completed') {
+    throw codedError('governed_read_bridge_result_invalid');
+  }
+  try {
+    return structuredProjection(
+      request.tool_request.name,
+      bridgeResult.result,
+      request.tool_request.arguments.project_context_ref
+    );
+  } catch {
+    throw codedError('governed_read_projection_binding_invalid');
+  }
+}
+
+function validateInvocationProjectionBinding(
+  invocation,
+  expectedProjection
+) {
+  if (expectedProjection === null) return invocation;
+  try {
+    if (invocation.status !== 'ok' ||
+        digestObject(invocation.structured_content) !==
+          digestObject(expectedProjection)) {
+      throw codedError('governed_read_projection_binding_invalid');
+    }
+  } catch (error) {
+    if (error?.code ===
+        'governed_read_projection_binding_invalid') {
+      throw error;
+    }
+    throw codedError('governed_read_projection_binding_invalid');
+  }
+  return invocation;
 }
 
 function deriveGovernedReadExecutionParameters(request) {
@@ -221,17 +270,38 @@ function createGovernedReadAttemptGovernanceRuntime({
       if (!bridgeResult ||
           typeof bridgeResult !== 'object' ||
           Array.isArray(bridgeResult) ||
+          typeof bridgeResult.accepted !== 'boolean' ||
           !bridgeResult.working_set ||
-          typeof bridgeResult.evidence_complete !== 'boolean') {
+          typeof bridgeResult.evidence_complete !== 'boolean' ||
+          !Object.hasOwn(bridgeResult, 'result') ||
+          !Object.hasOwn(bridgeResult, 'terminal_failure')) {
         throw codedError('governed_read_bridge_result_invalid');
       }
-      const invocation = validateInvocation(
-        await invokeWithSignal(() => projectInvocation({
-          request,
-          authorization: decision.authorization,
-          bridgeResult,
-          signal
-        }), signal)
+      try {
+        validateGovernedReadAttemptWorkingSet(
+          bridgeResult.working_set
+        );
+        if (!isGovernedReadAttemptWorkingSetExtension(
+          authorized,
+          bridgeResult.working_set
+        )) {
+          throw codedError('governed_read_bridge_result_invalid');
+        }
+      } catch {
+        throw codedError('governed_read_bridge_result_invalid');
+      }
+      const expectedProjection =
+        deriveExpectedPublicProjection(request, bridgeResult);
+      const invocation = validateInvocationProjectionBinding(
+        validateInvocation(
+          await invokeWithSignal(() => projectInvocation({
+            request,
+            authorization: decision.authorization,
+            bridgeResult,
+            signal
+          }), signal)
+        ),
+        expectedProjection
       );
       return Object.freeze({
         ...invocation,

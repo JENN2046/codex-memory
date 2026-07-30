@@ -81,6 +81,15 @@ contract's `LIMITS.maxQueryCharacters` bound, so a query or task summary
 accepted at the signed 2,000-character boundary is not rejected by a narrower
 downstream limit.
 
+For a successful lease continuation, Governance independently derives the
+canonical public low-disclosure projection from the validated lease result
+before invoking the injectable response projector. The returned public
+structured content must match that precomputed projection exactly. A zero-hit
+lease cannot become a projected result, and a projector cannot substitute a
+different statement while retaining native-success receipts. The comparison
+adds no raw result or projection digest to receipts, logs, or the public
+response.
+
 Governance denial, bridge failure, preflight failure, provider failure, child
 stage failure, response-finalization failure, timeout, cancellation, and
 cleanup failure all use the canonical contract registry. Upper layers forward

@@ -57,6 +57,11 @@ const {
   validateAuthorizationDecision
 } = require('../../src/adapters/chatgpt-r4/governed-read-attempt-runtime');
 const {
+  structuredProjection
+} = require(
+  '../../src/adapters/chatgpt-r4/governed-read-public-projection'
+);
+const {
   createGovernedReadAttemptBridge,
   createGovernedReadShimHttpClient
 } = require(
@@ -760,6 +765,74 @@ function liveCounters(workingSet) {
   };
 }
 
+function successfulGovernanceBridgeResult(
+  workingSet,
+  result
+) {
+  let current = appendGovernedReadAttemptStage(workingSet, {
+    stage: 'BRIDGE_DELEGATED',
+    counterFacts: {
+      fallback: { attempts: 0 }
+    }
+  });
+  current = appendGovernedReadAttemptStage(current, {
+    stage: 'NATIVE_DISPATCHED',
+    counterFacts: {
+      native_invocation: { started: 1 },
+      primary_memory: {
+        write_attempts: 0,
+        writes_committed: 0
+      }
+    }
+  });
+  current = appendGovernedReadAttemptStage(current, {
+    stage: 'SOURCE_PREFLIGHT'
+  });
+  current = appendGovernedReadAttemptStage(current, {
+    stage: 'PROVIDER_EMBEDDING',
+    counterFacts: {
+      provider: {
+        started: 1,
+        succeeded: 1,
+        failed: 0
+      }
+    }
+  });
+  current = appendGovernedReadAttemptStage(current, {
+    stage: 'HYDRATION',
+    counterFacts: {
+      derived_transaction: {
+        started: 1,
+        committed: 1,
+        rolled_back: 0
+      }
+    }
+  });
+  current = appendGovernedReadAttemptStage(current, {
+    stage: 'INDEX_RECOVERY'
+  });
+  current = appendGovernedReadAttemptStage(current, {
+    stage: 'VECTOR_SEARCH',
+    counterFacts: {
+      native_invocation: {
+        succeeded: 1,
+        failed: 0
+      }
+    }
+  });
+  current = appendGovernedReadAttemptStage(current, {
+    stage: 'SCOPE_POSTCHECK'
+  });
+  return {
+    accepted: true,
+    working_set: current,
+    evidence_complete: true,
+    result,
+    terminal_failure: null,
+    cleanup_complete: true
+  };
+}
+
 function unavailableInvocation(attemptRef) {
   return {
     status: 'denied',
@@ -843,7 +916,6 @@ test('full real transport replay commits one canonical terminal and cleans its l
     async projectInvocation({ request, bridgeResult }) {
       const failed = bridgeResult.accepted !== true ||
         bridgeResult.terminal_failure !== null;
-      const projected = bridgeResult.result?.results?.[0];
       return {
         status: failed ? 'unavailable' : 'ok',
         structured_content: failed
@@ -852,18 +924,11 @@ test('full real transport replay commits one canonical terminal and cleans its l
               result_count: 0,
               results: []
             }
-          : {
-              status: 'found',
-              result_count: 1,
-              results: [{
-                result_ref:
-                  `mref_${digestObject(request.request_id).slice(7, 31)}`,
-                summary:
-                  projected?.memoryContextProjection?.statement ||
-                  'bounded synthetic result',
-                relevance: projected?.score || 0.75
-              }]
-            },
+          : structuredProjection(
+              request.tool_request.name,
+              bridgeResult.result,
+              request.tool_request.arguments.project_context_ref
+            ),
         counters: liveCounters(bridgeResult.working_set),
         receipt_digests: {
           governance: digestObject({
@@ -1994,6 +2059,160 @@ test('Governance derives tool-aware execution parameters from every signed read 
   }), {
     code: 'governed_read_authorization_invalid'
   });
+});
+
+test('Governance binds public projection content to the successful lease result', async () => {
+  const contextRef = `pctx_${'n'.repeat(32)}`;
+  const request = {
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: contextRef,
+        query: 'projection binding query',
+        limit: 1
+      }
+    }
+  };
+  const header = createAttemptHeader({
+    attemptRef: `grat_${'n'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject(request),
+    contextBindingDigest: digestObject(contextRef),
+    now: NOW
+  });
+  const receipts = [];
+  for (const stage of [
+    'CREATED',
+    'EDGE_VALIDATED',
+    'RELAY_CLAIMED'
+  ]) {
+    receipts.push(createStageReceipt({
+      header,
+      receipts,
+      stage
+    }));
+  }
+  const projectedItem = {
+    sourceFilePresent: true,
+    scorePresent: true,
+    score: 0.75,
+    tagCountBucket: 'zero',
+    sourceKinds: ['vcp_native'],
+    memoryContextProjection: {
+      projectionVersion: 1,
+      lowDisclosure: true,
+      statement: 'canonical lease-derived statement',
+      classification: 'current_state',
+      freshness: 'recent',
+      reasonCodes: ['semantic_match'],
+      conflict: false
+    }
+  };
+  const resultWithHit = {
+    results: [projectedItem],
+    result_count: 1,
+    raw_memory_content_disclosed: false,
+    raw_vector_disclosed: false,
+    source_path_disclosed: false,
+    provider_response_disclosed: false
+  };
+  const resultWithoutHit = {
+    ...resultWithHit,
+    results: [],
+    result_count: 0
+  };
+
+  function createRuntime(nativeResult, project) {
+    return createGovernedReadAttemptGovernanceRuntime({
+      async authorizeRead() {
+        return {
+          accepted: true,
+          authorization: { accepted: true },
+          query: request.tool_request.arguments.query,
+          limit: request.tool_request.arguments.limit
+        };
+      },
+      async invokeBridge({ workingSet }) {
+        return successfulGovernanceBridgeResult(
+          workingSet,
+          nativeResult
+        );
+      },
+      async projectInvocation({ bridgeResult }) {
+        return {
+          status: 'ok',
+          structured_content: project(bridgeResult),
+          counters: liveCounters(bridgeResult.working_set),
+          receipt_digests: {
+            governance:
+              digestObject('projection-binding-governance'),
+            context: digestObject(contextRef)
+          }
+        };
+      }
+    });
+  }
+
+  const zeroHitForgery = createRuntime(
+    resultWithoutHit,
+    () => ({
+      status: 'found',
+      result_count: 1,
+      results: [{
+        result_ref: `mref_${'z'.repeat(24)}`,
+        summary: 'forged zero-hit statement',
+        relevance: 0.75
+      }]
+    })
+  );
+  await assert.rejects(
+    zeroHitForgery.handle({
+      request,
+      relayReceipt: {},
+      governedReadAttempt: { header, receipts }
+    }),
+    { code: 'governed_read_projection_binding_invalid' }
+  );
+
+  const substitution = createRuntime(
+    resultWithHit,
+    bridgeResult => {
+      const value = structuredProjection(
+        request.tool_request.name,
+        bridgeResult.result,
+        contextRef
+      );
+      value.results[0].summary =
+        'substituted public statement';
+      return value;
+    }
+  );
+  await assert.rejects(
+    substitution.handle({
+      request,
+      relayReceipt: {},
+      governedReadAttempt: { header, receipts }
+    }),
+    { code: 'governed_read_projection_binding_invalid' }
+  );
+
+  const canonical = createRuntime(
+    resultWithHit,
+    bridgeResult => structuredProjection(
+      request.tool_request.name,
+      bridgeResult.result,
+      contextRef
+    )
+  );
+  const accepted = await canonical.handle({
+    request,
+    relayReceipt: {},
+    governedReadAttempt: { header, receipts }
+  });
+  assert.equal(
+    accepted.structured_content.results[0].summary,
+    projectedItem.memoryContextProjection.statement
+  );
 });
 
 test('Bridge transport failure preserves unknown downstream counters', async () => {
