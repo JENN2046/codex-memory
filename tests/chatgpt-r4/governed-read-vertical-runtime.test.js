@@ -52,6 +52,7 @@ const {
 } = require('../../apps/local-recall-relay/relay-processor');
 const {
   createGovernedReadAttemptGovernanceRuntime,
+  deriveGovernedReadExecutionParameters,
   validateAuthorizationDecision
 } = require('../../src/adapters/chatgpt-r4/governed-read-attempt-runtime');
 const {
@@ -413,6 +414,33 @@ function bridgeWorkingSet(suffix) {
     }));
   }
   return { header, receipts };
+}
+
+function leaseTaskWorkingSet(suffix) {
+  let workingSet = bridgeWorkingSet(suffix);
+  workingSet = appendGovernedReadAttemptStage(workingSet, {
+    stage: 'NATIVE_DISPATCHED',
+    counterFacts: {
+      native_invocation: { started: 1 },
+      primary_memory: {
+        write_attempts: 0,
+        writes_committed: 0
+      }
+    }
+  });
+  workingSet = appendGovernedReadAttemptStage(workingSet, {
+    stage: 'SOURCE_PREFLIGHT'
+  });
+  return appendGovernedReadAttemptStage(workingSet, {
+    stage: 'PROVIDER_EMBEDDING',
+    counterFacts: {
+      provider: {
+        started: 1,
+        succeeded: 1,
+        failed: 0
+      }
+    }
+  });
 }
 
 test('attempt deadline outranks legacy Bridge and UDS transport timeouts', async t => {
@@ -1699,6 +1727,122 @@ test('Governance binds authorized query and limit to the signed request', async 
   }, requestAboveNativeLimit));
 });
 
+test('Governance derives tool-aware execution parameters from every signed read request', () => {
+  const projectContextRef = `pctx_${'e'.repeat(32)}`;
+  const cases = [
+    {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: projectContextRef,
+        query: 'signed search query',
+        limit: 8
+      },
+      expected: {
+        query: 'signed search query',
+        limit: 5
+      }
+    },
+    {
+      name: 'prepare_memory_context',
+      arguments: {
+        project_context_ref: projectContextRef
+      },
+      expected: {
+        query: 'current project task context',
+        limit: 5
+      }
+    },
+    {
+      name: 'prepare_memory_context',
+      arguments: {
+        project_context_ref: projectContextRef,
+        task_summary: 'signed task summary'
+      },
+      expected: {
+        query: 'signed task summary',
+        limit: 5
+      }
+    },
+    {
+      name: 'memory_overview',
+      arguments: {
+        project_context_ref: projectContextRef
+      },
+      expected: {
+        query: 'current project memory overview',
+        limit: 1
+      }
+    },
+    {
+      name: 'audit_memory',
+      arguments: {
+        project_context_ref: projectContextRef
+      },
+      expected: {
+        query: 'current project memory audit',
+        limit: 5
+      }
+    },
+    {
+      name: 'audit_memory',
+      arguments: {
+        project_context_ref: projectContextRef,
+        event_limit: 8
+      },
+      expected: {
+        query: 'current project memory audit',
+        limit: 5
+      }
+    }
+  ];
+
+  for (const fixture of cases) {
+    const request = {
+      tool_request: {
+        name: fixture.name,
+        arguments: fixture.arguments
+      }
+    };
+    assert.deepEqual(
+      deriveGovernedReadExecutionParameters(request),
+      fixture.expected
+    );
+    assert.doesNotThrow(() => validateAuthorizationDecision({
+      accepted: true,
+      authorization: { accepted: true },
+      ...fixture.expected
+    }, request));
+    assert.throws(() => validateAuthorizationDecision({
+      accepted: true,
+      authorization: { accepted: true },
+      ...fixture.expected,
+      query: `${fixture.expected.query} drift`
+    }, request), {
+      code: 'governed_read_authorization_invalid'
+    });
+    assert.throws(() => validateAuthorizationDecision({
+      accepted: true,
+      authorization: { accepted: true },
+      ...fixture.expected,
+      limit: fixture.expected.limit === 1 ? 2 : 1
+    }, request), {
+      code: 'governed_read_authorization_invalid'
+    });
+  }
+
+  assert.throws(() => deriveGovernedReadExecutionParameters({
+    tool_request: {
+      name: 'memory_overview',
+      arguments: {
+        project_context_ref: projectContextRef,
+        query: 'unsigned overview override'
+      }
+    }
+  }), {
+    code: 'governed_read_authorization_invalid'
+  });
+});
+
 test('Bridge transport failure preserves unknown downstream counters', async () => {
   const authorized = bridgeWorkingSet('e');
   authorized.receipts.pop();
@@ -2130,6 +2274,150 @@ test('lease task rejects skipped index search and ghost candidates', async t => 
     assert.equal(worker.snapshot().stores_created, 1);
     assert.equal(worker.snapshot().stores_removed, 1);
     assert.equal(worker.snapshot().cleanup_blocked, false);
+  }
+});
+
+test('lease task requires search evidence from every non-empty allowed diary index', async () => {
+  const allowedDiaryNames = ['PROJECT_ALPHA', 'PROJECT_BETA'];
+  function createInput(suffix, searchedDiaryNames) {
+    const searchCalls = new Map(
+      allowedDiaryNames.map(diaryName => [diaryName, 0])
+    );
+    const originalSearches = new Map();
+    const indexes = new Map(allowedDiaryNames.map(
+      (diaryName, index) => {
+        const diaryIndex = {
+          async stats() {
+            return { totalVectors: 1 };
+          },
+          search() {
+            searchCalls.set(
+              diaryName,
+              searchCalls.get(diaryName) + 1
+            );
+            return [{ id: index + 1 }];
+          },
+          remove() {}
+        };
+        originalSearches.set(diaryName, diaryIndex.search);
+        return [diaryName, diaryIndex];
+      }
+    ));
+    return {
+      input: {
+        workingSet: leaseTaskWorkingSet(suffix),
+        projection: {
+          async materialize() {
+            return {
+              hydratedChunkCount: 2,
+              counterFacts: {
+                derived_transaction: {
+                  started: 1,
+                  committed: 1,
+                  rolled_back: 0
+                }
+              }
+            };
+          }
+        },
+        projectionPlan: { dimension: 2 },
+        authorization: {
+          accepted: true,
+          allowedDiaryNames,
+          allowedDiaryCount: allowedDiaryNames.length
+        },
+        queryVector: [0.75, 0.25],
+        queryLimit: 1,
+        knowledgeBaseManager: {
+          async _getOrLoadDiaryIndex(diaryName) {
+            return indexes.get(diaryName);
+          },
+          async search(requestedDiaryNames) {
+            assert.deepEqual(
+              requestedDiaryNames,
+              allowedDiaryNames
+            );
+            for (const diaryName of searchedDiaryNames) {
+              await indexes.get(diaryName).search();
+            }
+            return searchedDiaryNames.length === 1
+              ? [{
+                  chunkId: 1,
+                  diaryName: 'PROJECT_ALPHA',
+                  fullPath: 'PROJECT_ALPHA/memory.md',
+                  sourceFile: 'PROJECT_ALPHA/memory.md',
+                  content: 'bounded synthetic governed memory',
+                  score: 0.75,
+                  matchedTags: []
+                }]
+              : [];
+          }
+        },
+        knowledgeBaseRootPath: 'synthetic-knowledge-base-root',
+        knowledgeBaseStorePath: 'synthetic-derived-store'
+      },
+      indexes,
+      originalSearches,
+      searchCalls
+    };
+  }
+
+  const incomplete = createInput('1', ['PROJECT_ALPHA']);
+  const rejected = await executeGovernedReadLeaseTask(
+    incomplete.input
+  );
+  assert.equal(rejected.accepted, false);
+  assert.equal(
+    rejected.working_set.receipts.at(-1).stage,
+    'VECTOR_SEARCH'
+  );
+  assert.equal(
+    rejected.working_set.receipts.at(-1).reason_code,
+    'vector_search_failed'
+  );
+  assert.deepEqual(
+    Object.fromEntries(incomplete.searchCalls),
+    { PROJECT_ALPHA: 1, PROJECT_BETA: 0 }
+  );
+  for (const diaryName of allowedDiaryNames) {
+    assert.equal(
+      incomplete.indexes.get(diaryName).search,
+      incomplete.originalSearches.get(diaryName)
+    );
+  }
+
+  const reused = createInput('2', allowedDiaryNames);
+  const sharedIndex = reused.indexes.get('PROJECT_ALPHA');
+  reused.input.knowledgeBaseManager._getOrLoadDiaryIndex =
+    async () => sharedIndex;
+  const ambiguous = await executeGovernedReadLeaseTask(reused.input);
+  assert.equal(ambiguous.accepted, false);
+  assert.equal(
+    ambiguous.working_set.receipts.at(-1).stage,
+    'INDEX_RECOVERY'
+  );
+  assert.equal(
+    ambiguous.working_set.receipts.at(-1).reason_code,
+    'index_recovery_failed'
+  );
+  assert.equal(
+    sharedIndex.search,
+    reused.originalSearches.get('PROJECT_ALPHA')
+  );
+
+  const complete = createInput('3', allowedDiaryNames);
+  const accepted = await executeGovernedReadLeaseTask(complete.input);
+  assert.equal(accepted.accepted, true);
+  assert.equal(accepted.result.result_count, 0);
+  assert.deepEqual(
+    Object.fromEntries(complete.searchCalls),
+    { PROJECT_ALPHA: 1, PROJECT_BETA: 1 }
+  );
+  for (const diaryName of allowedDiaryNames) {
+    assert.equal(
+      complete.indexes.get(diaryName).search,
+      complete.originalSearches.get(diaryName)
+    );
   }
 });
 

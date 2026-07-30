@@ -130,19 +130,22 @@ async function runStageHook(stageHooks, stage, input) {
   await hook(input);
 }
 
-function recordIndexCandidates(accounting, value) {
+function recordIndexCandidates(accounting, coverage, value) {
   const candidates = Array.isArray(value) ? value : [];
   accounting.rawCandidateCount += candidates.length;
+  coverage.rawCandidateCount += candidates.length;
   for (const candidate of candidates) {
     const chunkId = Number(candidate?.id);
     if (Number.isSafeInteger(chunkId) && chunkId >= 0) {
       accounting.candidateChunkIds.add(chunkId);
+      coverage.candidateChunkIds.add(chunkId);
     }
   }
 }
 
 function instrumentDiaryIndex(
   index,
+  diaryName,
   accounting,
   instrumentedIndexes,
   restoreHooks
@@ -152,27 +155,50 @@ function instrumentDiaryIndex(
       typeof index.search !== 'function') {
     throw new Error('lease_index_search_unavailable');
   }
-  if (instrumentedIndexes.has(index)) return;
+  const existingCoverage = instrumentedIndexes.get(index);
+  if (existingCoverage) {
+    if (existingCoverage.diaryName !== diaryName) {
+      throw new Error('lease_index_identity_reused');
+    }
+    return existingCoverage;
+  }
+  if (accounting.indexCoverage.has(diaryName)) {
+    throw new Error('lease_index_diary_duplicated');
+  }
+  const coverage = {
+    diaryName,
+    totalVectors: null,
+    searchCallCount: 0,
+    searchSuccessCount: 0,
+    searchFailureCount: 0,
+    rawCandidateCount: 0,
+    candidateChunkIds: new Set()
+  };
   const originalSearch = index.search;
   index.search = function governedReadLeaseIndexSearch(...args) {
     accounting.indexSearchCallCount += 1;
+    coverage.searchCallCount += 1;
     try {
       const value = originalSearch.apply(this, args);
       if (value && typeof value.then === 'function') {
         return Promise.resolve(value).then(result => {
           accounting.indexSearchSuccessCount += 1;
-          recordIndexCandidates(accounting, result);
+          coverage.searchSuccessCount += 1;
+          recordIndexCandidates(accounting, coverage, result);
           return result;
         }, error => {
           accounting.indexSearchFailureCount += 1;
+          coverage.searchFailureCount += 1;
           throw error;
         });
       }
       accounting.indexSearchSuccessCount += 1;
-      recordIndexCandidates(accounting, value);
+      coverage.searchSuccessCount += 1;
+      recordIndexCandidates(accounting, coverage, value);
       return value;
     } catch (error) {
       accounting.indexSearchFailureCount += 1;
+      coverage.searchFailureCount += 1;
       throw error;
     }
   };
@@ -189,7 +215,9 @@ function instrumentDiaryIndex(
       index.remove = originalRemove;
     });
   }
-  instrumentedIndexes.add(index);
+  instrumentedIndexes.set(index, coverage);
+  accounting.indexCoverage.set(diaryName, coverage);
+  return coverage;
 }
 
 function restoreDiaryIndexHooks(restoreHooks) {
@@ -209,9 +237,53 @@ function validateVectorSearchEvidence({
   loadedVectorCount,
   rawResults
 }) {
+  const indexCoverage = [...accounting.indexCoverage.values()];
+  let coveredVectorCount = 0;
+  let coveredSearchCallCount = 0;
+  let coveredSearchSuccessCount = 0;
+  let coveredSearchFailureCount = 0;
+  let coveredRawCandidateCount = 0;
+  let indexCoverageInvalid = indexCoverage.length < 1;
+  for (const coverage of indexCoverage) {
+    if (!Number.isSafeInteger(coverage.totalVectors) ||
+        coverage.totalVectors < 0 ||
+        !Number.isSafeInteger(coverage.searchCallCount) ||
+        !Number.isSafeInteger(coverage.searchSuccessCount) ||
+        !Number.isSafeInteger(coverage.searchFailureCount) ||
+        !Number.isSafeInteger(coverage.rawCandidateCount) ||
+        coverage.searchCallCount < 0 ||
+        coverage.searchSuccessCount < 0 ||
+        coverage.searchFailureCount < 0 ||
+        coverage.rawCandidateCount < 0 ||
+        coverage.searchFailureCount > 0 ||
+        coverage.searchSuccessCount !== coverage.searchCallCount ||
+        (coverage.totalVectors > 0 &&
+          coverage.searchCallCount === 0)) {
+      indexCoverageInvalid = true;
+      continue;
+    }
+    coveredVectorCount += coverage.totalVectors;
+    coveredSearchCallCount += coverage.searchCallCount;
+    coveredSearchSuccessCount += coverage.searchSuccessCount;
+    coveredSearchFailureCount += coverage.searchFailureCount;
+    coveredRawCandidateCount += coverage.rawCandidateCount;
+    if (![coveredVectorCount, coveredSearchCallCount,
+      coveredSearchSuccessCount, coveredSearchFailureCount,
+      coveredRawCandidateCount].every(Number.isSafeInteger)) {
+      indexCoverageInvalid = true;
+    }
+  }
   if (accounting.indexSearchFailureCount > 0 ||
       accounting.indexSearchSuccessCount !==
         accounting.indexSearchCallCount ||
+      indexCoverageInvalid ||
+      coveredVectorCount !== loadedVectorCount ||
+      coveredSearchCallCount !== accounting.indexSearchCallCount ||
+      coveredSearchSuccessCount !==
+        accounting.indexSearchSuccessCount ||
+      coveredSearchFailureCount !==
+        accounting.indexSearchFailureCount ||
+      coveredRawCandidateCount !== accounting.rawCandidateCount ||
       accounting.ghostCandidateCount > 0 ||
       (loadedVectorCount > 0 &&
         accounting.indexSearchCallCount === 0) ||
@@ -227,9 +299,20 @@ function validateVectorSearchEvidence({
           return true;
         }
         const chunkId = Number(result.chunkId);
+        const namedCoverage =
+          typeof result.diaryName === 'string'
+            ? accounting.indexCoverage.get(result.diaryName)
+            : null;
+        const resultCoverage = namedCoverage ||
+          (result.diaryName === undefined &&
+            accounting.indexCoverage.size === 1
+            ? indexCoverage[0]
+            : null);
         return !Number.isSafeInteger(chunkId) ||
           chunkId < 0 ||
-          !accounting.candidateChunkIds.has(chunkId);
+          !accounting.candidateChunkIds.has(chunkId) ||
+          !resultCoverage ||
+          !resultCoverage.candidateChunkIds.has(chunkId);
       })) {
     throw new Error('lease_vector_search_evidence_invalid');
   }
@@ -277,7 +360,7 @@ async function executeGovernedReadLeaseTask(input = {}) {
   let workingSet = input.workingSet;
   let hydration;
   let loadedVectorCount = 0;
-  const instrumentedIndexes = new Set();
+  const instrumentedIndexes = new Map();
   const restoreIndexHooks = [];
   const vectorSearchAccounting = {
     indexSearchCallCount: 0,
@@ -285,7 +368,8 @@ async function executeGovernedReadLeaseTask(input = {}) {
     indexSearchFailureCount: 0,
     rawCandidateCount: 0,
     ghostCandidateCount: 0,
-    candidateChunkIds: new Set()
+    candidateChunkIds: new Set(),
+    indexCoverage: new Map()
   };
 
   try {
@@ -326,8 +410,9 @@ async function executeGovernedReadLeaseTask(input = {}) {
     });
     for (const diaryName of authorization.allowedDiaryNames) {
       const index = await knowledgeBaseManager._getOrLoadDiaryIndex(diaryName);
-      instrumentDiaryIndex(
+      const coverage = instrumentDiaryIndex(
         index,
+        diaryName,
         vectorSearchAccounting,
         instrumentedIndexes,
         restoreIndexHooks
@@ -340,6 +425,7 @@ async function executeGovernedReadLeaseTask(input = {}) {
           stats.totalVectors < 0) {
         throw new Error('lease_index_stats_invalid');
       }
+      coverage.totalVectors = stats.totalVectors;
       loadedVectorCount += stats.totalVectors;
       if (!Number.isSafeInteger(loadedVectorCount)) {
         throw new Error('lease_index_vector_count_invalid');

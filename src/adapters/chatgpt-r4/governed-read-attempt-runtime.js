@@ -1,12 +1,17 @@
 'use strict';
 
 const {
-  LIMITS,
   appendGovernedReadAttemptStage,
-  validateGovernedReadAttemptWorkingSet
+  validateGovernedReadAttemptWorkingSet,
+  validateToolRequest
 } = require('../../../packages/chatgpt-r4-contracts');
 
 const MAX_NATIVE_RESULT_LIMIT = 5;
+const GOVERNED_READ_DEFAULT_QUERIES = Object.freeze({
+  audit_memory: 'current project memory audit',
+  memory_overview: 'current project memory overview',
+  prepare_memory_context: 'current project task context'
+});
 
 function codedError(code) {
   return Object.assign(new Error(code), { code });
@@ -32,6 +37,48 @@ function validateInvocation(value) {
   return value;
 }
 
+function deriveGovernedReadExecutionParameters(request) {
+  try {
+    validateToolRequest(request?.tool_request);
+  } catch {
+    throw codedError('governed_read_authorization_invalid');
+  }
+  const toolName = request.tool_request.name;
+  const requestArguments = request.tool_request.arguments;
+  if (toolName === 'search_memory') {
+    return Object.freeze({
+      query: requestArguments.query,
+      limit: Math.min(
+        requestArguments.limit ?? MAX_NATIVE_RESULT_LIMIT,
+        MAX_NATIVE_RESULT_LIMIT
+      )
+    });
+  }
+  if (toolName === 'prepare_memory_context') {
+    return Object.freeze({
+      query: requestArguments.task_summary ??
+        GOVERNED_READ_DEFAULT_QUERIES.prepare_memory_context,
+      limit: MAX_NATIVE_RESULT_LIMIT
+    });
+  }
+  if (toolName === 'memory_overview') {
+    return Object.freeze({
+      query: GOVERNED_READ_DEFAULT_QUERIES.memory_overview,
+      limit: 1
+    });
+  }
+  if (toolName === 'audit_memory') {
+    return Object.freeze({
+      query: GOVERNED_READ_DEFAULT_QUERIES.audit_memory,
+      limit: Math.min(
+        requestArguments.event_limit ?? MAX_NATIVE_RESULT_LIMIT,
+        MAX_NATIVE_RESULT_LIMIT
+      )
+    });
+  }
+  throw codedError('governed_read_authorization_invalid');
+}
+
 function validateAuthorizationDecision(decision, request) {
   if (!decision ||
       typeof decision !== 'object' ||
@@ -40,24 +87,14 @@ function validateAuthorizationDecision(decision, request) {
     throw codedError('governed_read_authorization_invalid');
   }
   if (decision.accepted === true) {
-    const requestArguments = request?.tool_request?.arguments;
-    const requestedLimit = requestArguments?.limit;
-    if (requestedLimit !== undefined &&
-        (!Number.isInteger(requestedLimit) ||
-          requestedLimit < 1 ||
-          requestedLimit > LIMITS.maxResultLimit)) {
-      throw codedError('governed_read_authorization_invalid');
-    }
-    const effectiveLimit = Math.min(
-      requestedLimit ?? MAX_NATIVE_RESULT_LIMIT,
-      MAX_NATIVE_RESULT_LIMIT
-    );
+    const execution =
+      deriveGovernedReadExecutionParameters(request);
     if (!decision.authorization ||
         decision.authorization.accepted !== true ||
         typeof decision.query !== 'string' ||
         !Number.isInteger(decision.limit) ||
-        decision.query !== requestArguments?.query ||
-        decision.limit !== effectiveLimit) {
+        decision.query !== execution.query ||
+        decision.limit !== execution.limit) {
       throw codedError('governed_read_authorization_invalid');
     }
   } else {
@@ -209,8 +246,10 @@ function createGovernedReadAttemptGovernanceRuntime({
 }
 
 module.exports = {
+  GOVERNED_READ_DEFAULT_QUERIES,
   MAX_NATIVE_RESULT_LIMIT,
   createGovernedReadAttemptGovernanceRuntime,
+  deriveGovernedReadExecutionParameters,
   invokeWithSignal,
   validateAuthorizationDecision,
   validateAbortSignal,

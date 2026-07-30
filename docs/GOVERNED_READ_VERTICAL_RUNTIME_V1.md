@@ -56,6 +56,21 @@ public response field is introduced.
 | `RESPONSE_FINALIZATION` | Relay | Finalize a signed response only after the downstream continuation validates. |
 | terminal | Edge broker | Execute first-terminal-wins CAS. |
 
+Governance derives the provider query and native limit only from the validated,
+signed tool request, then requires the injected authorization decision to
+match that derivation exactly:
+
+| Tool | Canonical provider query | Native limit |
+|---|---|---|
+| `search_memory` | exact signed `query` | `min(signed limit or 5, 5)` |
+| `prepare_memory_context` | exact signed `task_summary`, or `current project task context` when omitted | `5` |
+| `memory_overview` | `current project memory overview` | `1` |
+| `audit_memory` | `current project memory audit` | `min(signed event_limit or 5, 5)` |
+
+The fixed overview/audit/default-context queries are runtime constants, not
+new public arguments. Extra tool arguments, an altered query, or an altered
+limit fail before Bridge/provider dispatch.
+
 Governance denial, bridge failure, preflight failure, provider failure, child
 stage failure, response-finalization failure, timeout, cancellation, and
 cleanup failure all use the canonical contract registry. Upper layers forward
@@ -205,10 +220,13 @@ the scope postcheck, creates a low-disclosure result projection, shuts down the
 manager, and then exits.
 
 Before recording `VECTOR_SEARCH` success, the child instruments every recovered
-allowed-diary index. It requires actual index search calls when vectors are
-loaded, reconciles call/success/failure and candidate counts, rejects ghost
-candidate removal, and rejects returned chunk identifiers not seen in index
-candidates. A manager-level result array cannot substitute for index evidence.
+allowed-diary index. It records vector and search evidence per diary/index,
+requires every non-empty allowed index to receive an actual search call,
+reconciles per-index and aggregate call/success/failure and candidate counts,
+rejects one index object reused for different diaries, rejects ghost candidate
+removal, and binds each returned chunk identifier to a candidate observed from
+that result's diary index. A manager-level result array or evidence from only
+one of several non-empty indexes cannot substitute for complete index evidence.
 
 The parent accepts only an exact child response shape whose working set extends
 the parent prefix, counters reconcile, success ends at a completed
