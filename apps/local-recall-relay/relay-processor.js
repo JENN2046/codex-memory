@@ -238,6 +238,12 @@ function createRelayProcessor({
 }
 
 function validateTerminalResponseAgreement(responseStatus, terminal) {
+  if (terminal?.outcome === 'success') {
+    if (responseStatus !== 'ok') {
+      reject('relay_attempt_response_terminal_mismatch');
+    }
+    return terminal;
+  }
   if (terminal?.outcome !== 'failure') return terminal;
   const expectedStatus =
     failureRegistryEntry(terminal.reason_code).category === 'authorization'

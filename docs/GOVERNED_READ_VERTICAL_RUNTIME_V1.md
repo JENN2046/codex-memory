@@ -62,10 +62,10 @@ cleanup failure all use the canonical contract registry. Upper layers forward
 the canonical continuation or terminal failure; they do not maintain a second
 reason/category/fallback mapping.
 
-A failure terminal must agree with the signed public response: authorization
-failures require `denied`; every other canonical failure requires
-`unavailable`. Relay rejects a projected success response paired with any
-failure continuation rather than signing contradictory evidence.
+The terminal must agree bidirectionally with the signed public response:
+success requires `ok`, authorization failure requires `denied`, and every
+other canonical failure requires `unavailable`. Relay rejects any contradictory
+projection rather than signing it.
 
 ## Parent-owned preflight and provider
 
@@ -131,10 +131,10 @@ the existing cleanup latch retains the store and blocks later reads.
 The controller also launches the lease child with an empty `execArgv` list, so
 parent `--env-file`, `--require`, and `--import` startup authority cannot cross
 the process boundary before the child's minimal-environment checks. A
-synchronous pre-fork failure is explicitly reported as child-not-started: the
-still-empty attempt store is removed and later admission remains available.
-Only a child that started without provable shutdown can latch cleanup and
-retain its store.
+A synchronous fork rejection or asynchronous spawn error without a positive
+PID is explicitly reported as child-not-started: the still-empty attempt store
+is removed and later admission remains available. Only a PID-bearing child
+without provable shutdown can latch cleanup and retain its store.
 
 Before acknowledgement, the short Edge claim lease still permits safe reclaim
 of an abandoned Relay claim. Acknowledgement of an attempt claim atomically

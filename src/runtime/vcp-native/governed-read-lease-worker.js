@@ -380,8 +380,29 @@ function runLeaseWorkerProcess(task, {
       resolve(value);
     }
 
+    function childHasStarted() {
+      return Number.isSafeInteger(child?.pid) && child.pid > 0;
+    }
+
+    function finishUnstartedChild({
+      cancelledByCaller = false
+    } = {}) {
+      cancelled = cancelled || cancelledByCaller;
+      finish({
+        response: null,
+        shutdown_complete: true,
+        sigterm_sent: false,
+        cancelled,
+        child_started: false
+      });
+    }
+
     function maybeFinish(code) {
       if (!exited) return;
+      if (!childHasStarted()) {
+        finishUnstartedChild();
+        return;
+      }
       if (message && code === 0) {
         finish({
           response: message,
@@ -404,22 +425,16 @@ function runLeaseWorkerProcess(task, {
     function beginTermination({ cancelledByCaller = false } = {}) {
       if (settled || exited || terminationStarted) return;
       cancelled = cancelled || cancelledByCaller;
+      if (!childHasStarted()) {
+        finishUnstartedChild();
+        return;
+      }
       terminationStarted = true;
       let signalSent = false;
       try {
         signalSent = child.kill('SIGTERM') === true;
       } catch {}
       sigtermSent = sigtermSent || signalSent;
-      if (!signalSent && !Number.isInteger(child.pid)) {
-        finish({
-          response: message,
-          shutdown_complete: false,
-          sigterm_sent: sigtermSent,
-          cancelled,
-          child_started: true
-        });
-        return;
-      }
       termination = setTimeout(() => {
         if (settled || exited) return;
         try {

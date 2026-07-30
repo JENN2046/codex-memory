@@ -2128,6 +2128,7 @@ test('lease process strips inherited env and execArgv before exact-child timeout
     constructor() {
       super();
       this.connected = true;
+      this.pid = 12345;
       this.signals = [];
       this.unrefCalls = 0;
     }
@@ -2176,10 +2177,11 @@ test('lease process strips inherited env and execArgv before exact-child timeout
   assert.deepEqual(forkOptions.execArgv, []);
 });
 
-test('pre-fork child failure cleans its empty store and reuses capacity', async t => {
+test('pre-start child failures clean empty stores and reuse capacity', async t => {
   const fixture = createSqliteFixture(t);
   const successfulRunner =
     createSyntheticWorkerRunner(fixture.sourceProjection);
+  let asynchronousFailureChild = null;
   let runnerCalls = 0;
   let providerCalls = 0;
   const worker = createGovernedReadLeaseWorker({
@@ -2202,6 +2204,39 @@ test('pre-fork child failure cleans its empty store and reuses capacity', async 
           ...options,
           forkProcess() {
             throw new Error('synthetic_pre_fork_failure');
+          }
+        });
+      }
+      if (runnerCalls === 2) {
+        class SyntheticAsyncSpawnFailure extends EventEmitter {
+          constructor() {
+            super();
+            this.connected = false;
+            this.killCalls = 0;
+          }
+
+          send() {
+            queueMicrotask(() => this.emit(
+              'error',
+              new Error('synthetic_async_spawn_failure')
+            ));
+          }
+
+          kill() {
+            this.killCalls += 1;
+            return false;
+          }
+
+          disconnect() {}
+
+          unref() {}
+        }
+        asynchronousFailureChild =
+          new SyntheticAsyncSpawnFailure();
+        return runLeaseWorkerProcess(task, {
+          ...options,
+          forkProcess() {
+            return asynchronousFailureChild;
           }
         });
       }
@@ -2236,18 +2271,42 @@ test('pre-fork child failure cleans its empty store and reuses capacity', async 
   assert.equal(worker.snapshot().stores_removed, 1);
   assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
 
-  const second = await worker.execute({
+  const secondFailure = await worker.execute({
     workingSet: bridgeWorkingSet('g'),
     authorization,
-    query: 'capacity reused after pre fork failure',
+    query: 'async spawn cleanup failure',
     limit: 1
   });
-  assert.equal(second.accepted, true);
-  assert.equal(providerCalls, 2);
-  assert.equal(worker.snapshot().attempts_completed, 2);
+  assert.equal(secondFailure.accepted, false);
+  assert.equal(secondFailure.cleanup_complete, true);
+  assert.equal(secondFailure.evidence_complete, true);
+  assert.equal(
+    secondFailure.working_set.receipts.at(-1).reason_code,
+    'hydration_failed'
+  );
+  assert.deepEqual(
+    secondFailure.working_set.receipts.at(-1)
+      .counter_facts.derived_transaction,
+    { started: 0, committed: 0, rolled_back: 0 }
+  );
+  assert.equal(asynchronousFailureChild.killCalls, 0);
   assert.equal(worker.snapshot().cleanup_blocked, false);
   assert.equal(worker.snapshot().stores_created, 2);
   assert.equal(worker.snapshot().stores_removed, 2);
+  assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
+
+  const third = await worker.execute({
+    workingSet: bridgeWorkingSet('h'),
+    authorization,
+    query: 'capacity reused after pre start failures',
+    limit: 1
+  });
+  assert.equal(third.accepted, true);
+  assert.equal(providerCalls, 3);
+  assert.equal(worker.snapshot().attempts_completed, 3);
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+  assert.equal(worker.snapshot().stores_created, 3);
+  assert.equal(worker.snapshot().stores_removed, 3);
   assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
 });
 
@@ -2492,7 +2551,11 @@ test('Relay finalization failure forms a signed unavailable response and canonic
   ));
 });
 
-test('Relay rejects success responses paired with failure terminals', () => {
+test('Relay enforces public response and terminal outcome agreement', () => {
+  const success = {
+    outcome: 'success',
+    reason_code: null
+  };
   const nativeFailure = {
     outcome: 'failure',
     reason_code: 'vector_search_failed'
@@ -2501,6 +2564,14 @@ test('Relay rejects success responses paired with failure terminals', () => {
     outcome: 'failure',
     reason_code: 'governance_denied'
   };
+  assert.throws(
+    () => validateTerminalResponseAgreement('denied', success),
+    { code: 'relay_attempt_response_terminal_mismatch' }
+  );
+  assert.throws(
+    () => validateTerminalResponseAgreement('unavailable', success),
+    { code: 'relay_attempt_response_terminal_mismatch' }
+  );
   assert.throws(
     () => validateTerminalResponseAgreement('ok', nativeFailure),
     { code: 'relay_attempt_response_terminal_mismatch' }
@@ -2521,6 +2592,9 @@ test('Relay rejects success responses paired with failure terminals', () => {
   );
   assert.doesNotThrow(() =>
     validateTerminalResponseAgreement('denied', authorizationFailure)
+  );
+  assert.doesNotThrow(() =>
+    validateTerminalResponseAgreement('ok', success)
   );
 });
 
