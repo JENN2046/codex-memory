@@ -369,7 +369,7 @@ function runLeaseWorkerProcess(task, {
 } = {}) {
   validatePositiveInteger(
     workerTimeoutMs,
-    10,
+    1,
     60_000,
     'lease_worker_timeout_invalid'
   );
@@ -516,6 +516,9 @@ function runLeaseWorkerProcess(task, {
       return;
     }
 
+    timeout = setTimeout(() => {
+      beginTermination({ reason: 'timeout' });
+    }, workerTimeoutMs);
     try {
       child = forkProcess(childWorkerPath, [], {
         env: {
@@ -548,9 +551,6 @@ function runLeaseWorkerProcess(task, {
       exited = true;
       maybeFinish(code);
     });
-    timeout = setTimeout(() => {
-      beginTermination({ reason: 'timeout' });
-    }, workerTimeoutMs);
     signal?.addEventListener('abort', onAbort, { once: true });
     if (signal?.aborted) onAbort();
 
@@ -643,6 +643,18 @@ function createGovernedReadLeaseWorker({
     60_000,
     'lease_worker_provider_timeout_invalid'
   );
+  validatePositiveInteger(
+    workerTimeoutMs,
+    10,
+    60_000,
+    'lease_worker_timeout_invalid'
+  );
+  validatePositiveInteger(
+    terminationGraceMs,
+    10,
+    10_000,
+    'lease_worker_termination_grace_invalid'
+  );
   const root = validateOwnerOnlyLeaseRoot(leaseRoot, fsModule);
   for (const value of [
     vcpCodeRoot,
@@ -696,6 +708,8 @@ function createGovernedReadLeaseWorker({
     }
     const selectedQuery = normalizeQuery(query);
     const selectedLimit = normalizeLimit(limit);
+    const attemptDeadlineMs =
+      Date.parse(workingSet.header.deadline_at);
     if (authorization?.accepted !== true ||
         !Array.isArray(authorization.allowedDiaryNames) ||
         authorization.allowedDiaryNames.length < 1 ||
@@ -802,9 +816,7 @@ function createGovernedReadLeaseWorker({
         await invokeHook(stageHooks, 'PROVIDER_EMBEDDING', {
           attempt_ref: current.header.attempt_ref
         });
-        const providerDeadlineMs =
-          Date.parse(current.header.deadline_at);
-        const remainingProviderMs = providerDeadlineMs - nowMs();
+        const remainingProviderMs = attemptDeadlineMs - nowMs();
         if (remainingProviderMs <= 0) {
           return failedContinuation(
             current,
@@ -889,7 +901,7 @@ function createGovernedReadLeaseWorker({
           providerResult?.vector ?? providerResult,
           dimension
         );
-        if (providerDeadlineMs <= nowMs()) {
+        if (attemptDeadlineMs <= nowMs()) {
           throw codedError('lease_worker_provider_deadline_exceeded');
         }
         current = appendGovernedReadAttemptStage(current, {
@@ -918,6 +930,9 @@ function createGovernedReadLeaseWorker({
       }
 
       throwIfAborted(signal);
+      if (attemptDeadlineMs <= nowMs()) {
+        return terminatedFailure(current);
+      }
       try {
         attemptStore = createAttemptStore(root, fsModule);
         storesCreated += 1;
@@ -930,6 +945,23 @@ function createGovernedReadLeaseWorker({
         throw error;
       }
 
+      const remainingWorkerMs = attemptDeadlineMs - nowMs();
+      if (remainingWorkerMs <= 0) {
+        try {
+          removeAttemptStore(root, attemptStore.attemptRoot, fsModule);
+          storesRemoved += 1;
+          attemptStore = null;
+        } catch {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        attemptsCompleted += 1;
+        return terminatedFailure(current);
+      }
+      const effectiveWorkerTimeoutMs = Math.min(
+        workerTimeoutMs,
+        remainingWorkerMs
+      );
       let workerExecution;
       try {
         workerExecution = await workerRunner({
@@ -952,7 +984,7 @@ function createGovernedReadLeaseWorker({
           vcp_code_root: vcpCodeRoot,
           working_set: structuredClone(current)
         }, {
-          workerTimeoutMs,
+          workerTimeoutMs: effectiveWorkerTimeoutMs,
           terminationGraceMs,
           signal
         });
@@ -1034,6 +1066,22 @@ function createGovernedReadLeaseWorker({
         attemptsCompleted += 1;
         return terminatedFailure(current);
       }
+      if (attemptDeadlineMs <= nowMs()) {
+        if (workerExecution?.shutdown_complete !== true) {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        try {
+          removeAttemptStore(root, attemptStore.attemptRoot, fsModule);
+          storesRemoved += 1;
+          attemptStore = null;
+        } catch {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        attemptsCompleted += 1;
+        return terminatedFailure(current);
+      }
       let response = null;
       try {
         if (workerExecution?.response) {
@@ -1063,6 +1111,9 @@ function createGovernedReadLeaseWorker({
         return shutdownFailure(current);
       }
       attemptsCompleted += 1;
+      if (attemptDeadlineMs <= nowMs()) {
+        return terminatedFailure(current);
+      }
       return Object.freeze({
         ...response.result,
         terminal_failure: null,

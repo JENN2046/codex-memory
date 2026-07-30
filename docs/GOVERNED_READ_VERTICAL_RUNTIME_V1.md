@@ -119,10 +119,15 @@ cutover that can transport those `null` counters.
    an `AbortSignal` and calling the wrapper at most once;
 5. validates a finite vector whose dimension exactly matches the projection
    plan;
-6. creates one owner-only attempt directory and fresh derived store;
-7. launches and retains the exact child handle;
-8. accepts only a response whose receipt chain has the parent prefix;
-9. deletes the exact attempt directory only after child shutdown is proven.
+6. rechecks the remaining attempt TTL before store creation and again before
+   child launch;
+7. creates one owner-only attempt directory and fresh derived store;
+8. launches and retains the exact child handle with the smaller of the
+   configured worker timeout and the remaining absolute attempt TTL, starting
+   that timer before the fork so spawn overhead cannot extend the lease;
+9. accepts only a response whose receipt chain has the parent prefix and that
+   returned before `deadline_at`;
+10. deletes the exact attempt directory only after child shutdown is proven.
 
 No local fallback exists. A pre-provider rejection carries explicit zero
 provider evidence only where the origin can prove downstream dispatch did not
@@ -134,10 +139,11 @@ unknown fields into zero.
 If a provider ignores abort, no store or child is created and later admission
 remains closed until the exact provider promise settles. A provider result
 that arrives at or after `deadline_at` is discarded before derived/native
-work. Store creation failures latch `cleanupBlocked` only when a partially
-created attempt directory cannot be removed; a failure that created no
-resource, or whose partial resource was removed, does not poison later
-admission.
+work. If the remaining TTL expires between provider completion and child
+launch, no child starts and any newly created empty store is removed. Store
+creation failures latch `cleanupBlocked` only when a partially created attempt
+directory cannot be removed; a failure that created no resource, or whose
+partial resource was removed, does not poison later admission.
 
 ## One absolute transport deadline
 
@@ -260,11 +266,14 @@ the same evidence-incomplete `worker_execution_terminated` failure. Invalid
 runner evidence without an observed process exit remains incomplete shutdown
 evidence; its store is retained and later reads remain blocked.
 
-If graceful completion misses its deadline, the parent may send `SIGTERM` only
-to the child handle it created. It never uses `SIGKILL` and never enumerates or
-signals an unknown process. If shutdown or exact-store deletion cannot be
-proven, the result is `worker_shutdown_incomplete`, the store is retained, and
-the controller blocks every later read before provider execution.
+If graceful completion misses the smaller of the configured worker timeout and
+the remaining absolute attempt TTL, the parent may send `SIGTERM` only to the
+child handle it created. A child or injected runner result returned at or after
+`deadline_at` is discarded even when its shape claims success. The parent never
+uses `SIGKILL` and never enumerates or signals an unknown process. If shutdown
+or exact-store deletion cannot be proven, the result is
+`worker_shutdown_incomplete`, the store is retained, and the controller blocks
+every later read before provider execution.
 
 ## Real synthetic transport
 

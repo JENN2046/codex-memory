@@ -3536,19 +3536,23 @@ test('natural child exit cleans its exact store and reuses capacity', async t =>
   assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
 });
 
-test('lease timeout rejects late success and reuses capacity after exit', async t => {
+test('remaining attempt TTL terminates the lease child, rejects late success, and reuses capacity', async t => {
   const fixture = createSqliteFixture(t);
   const successfulRunner =
     createSyntheticWorkerRunner(fixture.sourceProjection);
   let lateExecution = null;
   let lateChild = null;
+  let current = NOW;
+  let attemptDeadlineMs = null;
+  let observedWorkerTimeoutMs = null;
   let runnerCalls = 0;
   let providerCalls = 0;
   const worker = createGovernedReadLeaseWorker({
-    clock: () => NOW,
+    clock: () => current,
     sourceProjection: fixture.sourceProjection,
     async providerWrapper() {
       providerCalls += 1;
+      current = new Date(attemptDeadlineMs - 10);
       return [0.75, 0.25];
     },
     dimension: 2,
@@ -3557,13 +3561,14 @@ test('lease timeout rejects late success and reuses capacity after exit', async 
     sourceRuntimeRoot: fixture.sourceRuntimeRoot,
     sourceKnowledgeBaseStorePath: fixture.sourceStore,
     knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
-    workerTimeoutMs: 10,
+    workerTimeoutMs: 60_000,
     terminationGraceMs: 100,
     async workerRunner(task, options) {
       runnerCalls += 1;
       if (runnerCalls !== 1) {
         return successfulRunner(task, options);
       }
+      observedWorkerTimeoutMs = options.workerTimeoutMs;
       class SyntheticLateSuccessChild extends EventEmitter {
         constructor() {
           super();
@@ -3610,8 +3615,11 @@ test('lease timeout rejects late success and reuses capacity after exit', async 
     allowedDiaryNames: ['PROJECT_ALPHA'],
     allowedDiaryCount: 1
   };
+  const lateWorkingSet = bridgeWorkingSet('i');
+  attemptDeadlineMs =
+    Date.parse(lateWorkingSet.header.deadline_at);
   const late = await worker.execute({
-    workingSet: bridgeWorkingSet('i'),
+    workingSet: lateWorkingSet,
     authorization,
     query: 'late success after timeout',
     limit: 1
@@ -3655,6 +3663,7 @@ test('lease timeout rejects late success and reuses capacity after exit', async 
   assert.equal(lateExecution.response, null);
   assert.equal(lateExecution.shutdown_complete, true);
   assert.equal(lateExecution.termination_reason, 'timeout');
+  assert.equal(observedWorkerTimeoutMs, 10);
   assert.equal(worker.snapshot().cleanup_blocked, false);
   assert.equal(worker.snapshot().stores_created, 1);
   assert.equal(worker.snapshot().stores_removed, 1);
@@ -3672,6 +3681,66 @@ test('lease timeout rejects late success and reuses capacity after exit', async 
   assert.equal(worker.snapshot().cleanup_blocked, false);
   assert.equal(worker.snapshot().stores_created, 2);
   assert.equal(worker.snapshot().stores_removed, 2);
+  assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
+});
+
+test('lease parent discards a runner success returned at the absolute attempt deadline', async t => {
+  const fixture = createSqliteFixture(t);
+  let current = NOW;
+  let attemptDeadlineMs = null;
+  let observedWorkerTimeoutMs = null;
+  let providerCalls = 0;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => current,
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      providerCalls += 1;
+      current = new Date(attemptDeadlineMs - 25);
+      return [0.75, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    workerTimeoutMs: 60_000,
+    async workerRunner(task, options) {
+      observedWorkerTimeoutMs = options.workerTimeoutMs;
+      current = new Date(attemptDeadlineMs);
+      return successfulWorkerExecution(task);
+    }
+  });
+  const workingSet = bridgeWorkingSet('v');
+  attemptDeadlineMs = Date.parse(workingSet.header.deadline_at);
+  const result = await worker.execute({
+    workingSet,
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'runner result returned at deadline',
+    limit: 1
+  });
+  assert.equal(result.accepted, false);
+  assert.equal(result.result, null);
+  assert.equal(result.cleanup_complete, true);
+  assert.equal(result.evidence_complete, false);
+  assert.deepEqual(result.terminal_failure, {
+    reason_code: 'worker_execution_terminated',
+    failure_origin: 'lease_worker'
+  });
+  assert.equal(
+    result.working_set.receipts.at(-1).stage,
+    'PROVIDER_EMBEDDING'
+  );
+  assert.equal(observedWorkerTimeoutMs, 25);
+  assert.equal(providerCalls, 1);
+  assert.equal(worker.snapshot().attempts_completed, 1);
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+  assert.equal(worker.snapshot().stores_created, 1);
+  assert.equal(worker.snapshot().stores_removed, 1);
   assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
 });
 
