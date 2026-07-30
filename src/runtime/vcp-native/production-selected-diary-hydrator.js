@@ -1663,10 +1663,21 @@ function createProductionSelectedDiarySourceProjection({
     });
   }
 
-  return Object.freeze({
+  const projection = {
     preflight,
     materialize
-  });
+  };
+  Object.defineProperty(
+    projection,
+    'preflightRequiresProcessIsolation',
+    {
+      configurable: false,
+      enumerable: false,
+      value: true,
+      writable: false
+    }
+  );
+  return Object.freeze(projection);
 }
 
 function createProductionSelectedDiaryRuntimeHydrator(options = {}) {

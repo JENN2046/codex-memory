@@ -60,6 +60,18 @@ function isLeaseTerminalFailure(value) {
   }
 }
 
+function cleanupMatchesLeaseTerminal(response) {
+  const shutdownFailure =
+    response.terminal_failure?.reason_code ===
+      'worker_shutdown_incomplete' &&
+    response.terminal_failure?.failure_origin === 'lease_worker';
+  if (shutdownFailure) {
+    return response.accepted === false &&
+      response.cleanup_complete === false;
+  }
+  return response.cleanup_complete === true;
+}
+
 function isExactLeaseResponse(value) {
   if (!value ||
       typeof value !== 'object' ||
@@ -127,8 +139,7 @@ function createGovernedReadAttemptBridge({
               response.working_set
             ) ||
             !isLeaseTerminalFailure(response.terminal_failure) ||
-            (response.accepted === true &&
-              response.cleanup_complete !== true)) {
+            !cleanupMatchesLeaseTerminal(response)) {
           throw codedError('governed_read_bridge_response_invalid');
         }
         return response;

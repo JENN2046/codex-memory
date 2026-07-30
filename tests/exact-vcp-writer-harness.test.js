@@ -98,6 +98,28 @@ test('exact authority harness routes production-writer output through the lease 
     ),
     'utf8'
   );
+  const preflightChild = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'src',
+      'runtime',
+      'vcp-native',
+      'governed-read-source-preflight-child.js'
+    ),
+    'utf8'
+  );
+  const preflightProcess = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'src',
+      'runtime',
+      'vcp-native',
+      'governed-read-source-preflight-process.js'
+    ),
+    'utf8'
+  );
   const leaseTask = fs.readFileSync(
     path.join(
       __dirname,
@@ -110,8 +132,12 @@ test('exact authority harness routes production-writer output through the lease 
     'utf8'
   );
   assert.match(harness, /createGovernedReadLeaseWorker/u);
+  assert.match(harness, /preflight_process_exercised/u);
   assert.match(harness, /lease_scoped_child_exercised:\s*true/u);
   assert.match(harness, /child_provider_authority_present:\s*false/u);
+  assert.match(preflightChild, /FORBIDDEN_ENVIRONMENT_KEYS/u);
+  assert.match(preflightProcess, /child\.kill\('SIGTERM'\)/u);
+  assert.doesNotMatch(preflightProcess, /SIGKILL/u);
   assert.match(worker, /FORBIDDEN_ENVIRONMENT_KEYS/u);
   assert.match(worker, /executeGovernedReadLeaseTask/u);
   assert.match(leaseTask, /source_snapshot_changed_after_preflight/u);

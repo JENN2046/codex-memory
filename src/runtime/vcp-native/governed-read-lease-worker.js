@@ -13,6 +13,11 @@ const {
   validateAttemptCounterRelationships,
   validateGovernedReadAttemptWorkingSet
 } = require('../../../packages/chatgpt-r4-contracts');
+const {
+  DEFAULT_SOURCE_PREFLIGHT_TIMEOUT_MS,
+  runSourcePreflightProcess,
+  validateSourcePreflightResponse
+} = require('./governed-read-source-preflight-process');
 
 const DEFAULT_WORKER_TIMEOUT_MS = 20_000;
 const DEFAULT_TERMINATION_GRACE_MS = 2_000;
@@ -614,6 +619,7 @@ function removeAttemptStore(leaseRoot, attemptRoot, fsModule) {
 
 function createGovernedReadLeaseWorker({
   sourceProjection,
+  sourcePreflightRunner,
   providerWrapper,
   dimension,
   leaseRoot,
@@ -622,6 +628,7 @@ function createGovernedReadLeaseWorker({
   sourceKnowledgeBaseStorePath,
   knowledgeBaseRootPath,
   workerRunner = runLeaseWorkerProcess,
+  sourcePreflightTimeoutMs = DEFAULT_SOURCE_PREFLIGHT_TIMEOUT_MS,
   workerTimeoutMs = DEFAULT_WORKER_TIMEOUT_MS,
   terminationGraceMs = DEFAULT_TERMINATION_GRACE_MS,
   providerTimeoutMs = DEFAULT_PROVIDER_TIMEOUT_MS,
@@ -629,8 +636,14 @@ function createGovernedReadLeaseWorker({
   stageHooks,
   clock = () => new Date()
 } = {}) {
+  const selectedSourcePreflightRunner =
+    sourcePreflightRunner === undefined &&
+      sourceProjection?.preflightRequiresProcessIsolation === true
+      ? runSourcePreflightProcess
+      : sourcePreflightRunner;
   if (!sourceProjection ||
       typeof sourceProjection.preflight !== 'function' ||
+      typeof selectedSourcePreflightRunner !== 'function' ||
       typeof providerWrapper !== 'function' ||
       typeof workerRunner !== 'function' ||
       typeof clock !== 'function') {
@@ -641,6 +654,12 @@ function createGovernedReadLeaseWorker({
     1,
     MAX_VECTOR_DIMENSION,
     'lease_worker_dimension_invalid'
+  );
+  validatePositiveInteger(
+    sourcePreflightTimeoutMs,
+    10,
+    60_000,
+    'lease_worker_source_preflight_timeout_invalid'
   );
   validatePositiveInteger(
     providerTimeoutMs,
@@ -681,6 +700,8 @@ function createGovernedReadLeaseWorker({
   let providerInvocations = 0;
   let providerInFlight = null;
   let nativeInvocations = 0;
+  let preflightProcessesStarted = 0;
+  let preflightProcessesCompleted = 0;
   let storesCreated = 0;
   let storesRemoved = 0;
   let sigtermCount = 0;
@@ -794,11 +815,67 @@ function createGovernedReadLeaseWorker({
           }
         };
         assertReadDeadline();
-        projectionPlan = sourceProjection.preflight({
-          assertReadDeadline,
-          allowedDiaryNames: authorization.allowedDiaryNames,
-          dimension
-        });
+        const remainingPreflightMs = attemptDeadlineMs - nowMs();
+        if (remainingPreflightMs <= 0) assertReadDeadline();
+        const preflightExecution =
+          await selectedSourcePreflightRunner({
+            allowed_diary_names: [
+              ...authorization.allowedDiaryNames
+            ],
+            dimension,
+            source_knowledge_base_store_path:
+              sourceKnowledgeBaseStorePath,
+            source_runtime_root: sourceRuntimeRoot
+          }, {
+            workerTimeoutMs: Math.min(
+              sourcePreflightTimeoutMs,
+              remainingPreflightMs
+            ),
+            terminationGraceMs,
+            signal
+          });
+        if (preflightExecution?.sigterm_sent === true) {
+          sigtermCount += 1;
+        }
+        if (preflightExecution?.child_started === true) {
+          preflightProcessesStarted += 1;
+          if (preflightExecution.shutdown_complete === true) {
+            preflightProcessesCompleted += 1;
+          }
+        }
+        const knownChildState =
+          preflightExecution?.child_started === true ||
+          preflightExecution?.child_started === false;
+        if (!knownChildState ||
+            typeof preflightExecution?.shutdown_complete !== 'boolean' ||
+            typeof preflightExecution?.sigterm_sent !== 'boolean' ||
+            typeof preflightExecution?.cancelled !== 'boolean') {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        if (preflightExecution.shutdown_complete !== true) {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        if (preflightExecution.cancelled === true || signal?.aborted) {
+          throw codedError('lease_worker_cancelled');
+        }
+        if (preflightExecution.termination_reason !== undefined ||
+            preflightExecution.child_started !== true ||
+            preflightExecution.sigterm_sent !== false ||
+            preflightExecution.response === null) {
+          throw codedError('lease_worker_source_preflight_failed');
+        }
+        const preflightResponse = validateSourcePreflightResponse(
+          preflightExecution.response
+        );
+        if (preflightResponse.accepted !== true) {
+          const sourceError =
+            codedError('lease_worker_source_preflight_failed');
+          sourceError.reasonCode = preflightResponse.reason_code;
+          throw sourceError;
+        }
+        projectionPlan = preflightResponse.projection_plan;
         assertReadDeadline();
         current = appendGovernedReadAttemptStage(current, {
           stage: 'SOURCE_PREFLIGHT',
@@ -1146,6 +1223,8 @@ function createGovernedReadLeaseWorker({
       provider_invocations: providerInvocations,
       provider_calls_in_flight: providerInFlight === null ? 0 : 1,
       native_invocations: nativeInvocations,
+      preflight_processes_started: preflightProcessesStarted,
+      preflight_processes_completed: preflightProcessesCompleted,
       stores_created: storesCreated,
       stores_removed: storesRemoved,
       sigterm_count: sigtermCount,

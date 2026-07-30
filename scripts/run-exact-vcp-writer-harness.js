@@ -269,6 +269,10 @@ async function run(options) {
       vcpRoot: options.vcpRoot
     });
     assert.equal(childResult.exact_vcp_sha_verified, true);
+    assert.equal(
+      childResult.projection.preflight_process_exercised,
+      true
+    );
     assert.equal(childResult.native_search.provider_invocations, 1);
     assert.equal(childResult.native_search.invocations, 1);
     assert.equal(

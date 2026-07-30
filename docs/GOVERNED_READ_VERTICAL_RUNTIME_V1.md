@@ -145,9 +145,10 @@ cutover that can transport those `null` counters.
 
 1. rejects a second attempt before provider execution;
 2. appends `NATIVE_DISPATCHED` with one native start and zero primary writes;
-3. runs production `preflight()` against the canonical read-only source while
-   injecting the immutable attempt deadline as a synchronous assertion around
-   every source boundary and streamed budget/selected row;
+3. runs production `preflight()` against the canonical read-only source in a
+   separate minimal-environment process, bounded by the smaller of the
+   preflight timeout and immutable attempt TTL, so one synchronous SQLite step
+   cannot pin the persistent controller;
 4. rechecks the attempt deadline and races the injected provider wrapper
    against the smaller of its timeout cap and remaining attempt TTL, passing
    an `AbortSignal` and calling the wrapper at most once;
@@ -168,6 +169,12 @@ path increments `attempts_completed` exactly once for every resolved or rejected
 execution, including dispatch, preflight, provider, pre-store deadline, cleanup,
 and child failures. The snapshot therefore cannot retain false unfinished
 attempts after a terminal return.
+
+The preflight process receives no provider authority. On timeout the parent
+sends `SIGTERM` only to its exact handle and discards a late result. A proven
+exit yields a normal `SOURCE_PREFLIGHT` failure; an unproven exit yields the
+terminal-level `worker_shutdown_incomplete`, latches the controller cleanup
+block, and prevents every later provider admission.
 
 No local fallback exists. A pre-provider rejection carries explicit zero
 provider evidence only where the origin can prove downstream dispatch did not
@@ -290,6 +297,7 @@ manager, and then exits.
 
 Before recording `VECTOR_SEARCH` success, the child instruments every recovered
 allowed-diary index. It records vector and search evidence per diary/index,
+requires the sum of recovered vectors to equal the exact hydrated chunk count,
 requires every non-empty allowed index to receive an actual search call,
 reconciles per-index and aggregate call/success/failure and candidate counts,
 rejects one index object reused for different diaries, rejects ghost candidate
@@ -318,6 +326,12 @@ uses `SIGKILL` and never enumerates or signals an unknown process. If shutdown
 or exact-store deletion cannot be proven, the result is
 `worker_shutdown_incomplete`, the store is retained, and the controller blocks
 every later read before provider execution.
+
+The Bridge accepts `cleanup_complete: false` only when it is paired with the
+canonical lease-worker `worker_shutdown_incomplete` terminal candidate.
+Ordinary receipt failures, successful results, and other terminal candidates
+must attest complete cleanup; a contradictory Shim response is replaced with
+the low-disclosure `bridge_delegation_failed` result.
 
 ## Real synthetic transport
 

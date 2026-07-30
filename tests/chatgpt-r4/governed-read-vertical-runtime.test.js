@@ -76,6 +76,11 @@ const {
   runLeaseWorkerProcess
 } = require('../../src/runtime/vcp-native/governed-read-lease-worker');
 const {
+  runSourcePreflightProcess
+} = require(
+  '../../src/runtime/vcp-native/governed-read-source-preflight-process'
+);
+const {
   executeGovernedReadLeaseTask
 } = require('../../src/runtime/vcp-native/governed-read-lease-task');
 const {
@@ -1103,6 +1108,8 @@ test('full real transport replay commits one canonical terminal and cleans its l
     provider_invocations: 1,
     provider_calls_in_flight: 0,
     native_invocations: 1,
+    preflight_processes_started: 1,
+    preflight_processes_completed: 1,
     stores_created: 1,
     stores_removed: 1,
     sigterm_count: 0,
@@ -2848,6 +2855,86 @@ test('Bridge transport failure preserves unknown downstream counters', async () 
     failureOrigin: terminalResult.terminal_failure.failure_origin
   }));
 
+  const ordinaryFailureBridge =
+    createGovernedReadAttemptBridge({
+      async invokeShim({ workingSet }) {
+        return {
+          accepted: false,
+          working_set: appendGovernedReadAttemptStage(workingSet, {
+            stage: 'NATIVE_DISPATCHED',
+            outcome: 'failed',
+            reasonCode: 'native_dispatch_failed',
+            counterFacts: {
+              provider: { started: 0, succeeded: 0, failed: 0 },
+              native_invocation: {
+                started: 0,
+                succeeded: 0,
+                failed: 0
+              },
+              primary_memory: {
+                write_attempts: 0,
+                writes_committed: 0
+              }
+            }
+          }),
+          evidence_complete: false,
+          result: null,
+          terminal_failure: null,
+          cleanup_complete: false
+        };
+      }
+    });
+  const rejectedOrdinaryFailure =
+    await ordinaryFailureBridge.invoke({
+      workingSet: authorized,
+      authorization: {
+        accepted: true,
+        allowedDiaryNames: ['PROJECT_ALPHA'],
+        allowedDiaryCount: 1
+      },
+      query: 'synthetic ordinary failure with incomplete cleanup',
+      limit: 1
+    });
+  assert.equal(
+    rejectedOrdinaryFailure.working_set.receipts.at(-1).reason_code,
+    'bridge_delegation_failed'
+  );
+  assert.equal(rejectedOrdinaryFailure.terminal_failure, null);
+  assert.equal(rejectedOrdinaryFailure.cleanup_complete, false);
+
+  const shutdownFailureBridge =
+    createGovernedReadAttemptBridge({
+      async invokeShim({ workingSet }) {
+        return {
+          accepted: false,
+          working_set: workingSet,
+          evidence_complete: false,
+          result: null,
+          terminal_failure: {
+            reason_code: 'worker_shutdown_incomplete',
+            failure_origin: 'lease_worker'
+          },
+          cleanup_complete: false
+        };
+      }
+    });
+  const acceptedShutdownFailure =
+    await shutdownFailureBridge.invoke({
+      workingSet: authorized,
+      authorization: {
+        accepted: true,
+        allowedDiaryNames: ['PROJECT_ALPHA'],
+        allowedDiaryCount: 1
+      },
+      query: 'synthetic canonical shutdown failure',
+      limit: 1
+    });
+  assert.deepEqual(acceptedShutdownFailure.terminal_failure, {
+    reason_code: 'worker_shutdown_incomplete',
+    failure_origin: 'lease_worker'
+  });
+  assert.equal(acceptedShutdownFailure.cleanup_complete, false);
+
   const incompleteCleanupBridge =
     createGovernedReadAttemptBridge({
       async invokeShim({ workingSet }) {
@@ -3223,22 +3310,59 @@ test('dispatch, preflight, and provider failures close before creating a derived
   assert.equal(preStoreWorker.snapshot().attempts_completed, 1);
 });
 
-test('source preflight enforces the attempt deadline before provider admission', async t => {
+test('source preflight terminates a stalled scan before provider and reuses capacity', async t => {
   const fixture = createSqliteFixture(t);
-  const workingSet = bridgeWorkingSet('j');
-  let current = NOW;
-  let deadlineChecks = 0;
+  let runnerCalls = 0;
   let providerCalls = 0;
+  let stalledChild = null;
+  let stalledForkOptions = null;
   const worker = createGovernedReadLeaseWorker({
-    clock: () => current,
-    sourceProjection: {
-      preflight({ assertReadDeadline }) {
-        assert.equal(typeof assertReadDeadline, 'function');
-        deadlineChecks += 1;
-        current = new Date(workingSet.header.deadline_at);
-        assertReadDeadline();
-        throw new Error('deadline guard must terminate preflight');
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    sourcePreflightTimeoutMs: 5_000,
+    async sourcePreflightRunner(task, options) {
+      runnerCalls += 1;
+      if (runnerCalls !== 1) {
+        return runSourcePreflightProcess(task, options);
       }
+      class StalledSourceScanChild extends EventEmitter {
+        constructor() {
+          super();
+          this.connected = true;
+          this.pid = 12_345;
+          this.signals = [];
+          this.sentMessage = null;
+        }
+
+        send(message) {
+          this.sentMessage = message;
+        }
+
+        kill(signal) {
+          this.signals.push(signal);
+          queueMicrotask(() => {
+            this.connected = false;
+            this.emit('exit', 0);
+          });
+          return true;
+        }
+
+        disconnect() {
+          this.connected = false;
+        }
+
+        unref() {}
+      }
+      stalledChild = new StalledSourceScanChild();
+      return runSourcePreflightProcess(task, {
+        ...options,
+        workerTimeoutMs: 10,
+        terminationGraceMs: 20,
+        forkProcess(_file, _args, forkOptions) {
+          stalledForkOptions = forkOptions;
+          return stalledChild;
+        }
+      });
     },
     async providerWrapper() {
       providerCalls += 1;
@@ -3254,8 +3378,8 @@ test('source preflight enforces the attempt deadline before provider admission',
       createSyntheticWorkerRunner(fixture.sourceProjection)
   });
 
-  const result = await worker.execute({
-    workingSet,
+  const stalled = await worker.execute({
+    workingSet: bridgeWorkingSet('j'),
     authorization: {
       accepted: true,
       allowedDiaryNames: ['PROJECT_ALPHA'],
@@ -3265,13 +3389,143 @@ test('source preflight enforces the attempt deadline before provider admission',
     limit: 1
   });
 
-  const receipt = result.working_set.receipts.at(-1);
-  assert.equal(result.accepted, false);
+  const receipt = stalled.working_set.receipts.at(-1);
+  assert.equal(stalled.accepted, false);
   assert.equal(receipt.stage, 'SOURCE_PREFLIGHT');
   assert.equal(receipt.reason_code, 'source_preflight_failed');
-  assert.equal(deadlineChecks, 1);
+  assert.equal(stalled.cleanup_complete, true);
+  assert.equal(stalled.terminal_failure, null);
   assert.equal(providerCalls, 0);
   assert.equal(worker.snapshot().stores_created, 0);
+  assert.deepEqual(stalledChild.signals, ['SIGTERM']);
+  assert.equal(stalledChild.signals.includes('SIGKILL'), false);
+  assert.deepEqual(Object.keys(stalledForkOptions.env).sort(), [
+    'LANG',
+    'LC_ALL',
+    'TZ'
+  ]);
+  assert.deepEqual(
+    stalledChild.sentMessage.task.allowed_diary_names,
+    ['PROJECT_ALPHA']
+  );
+
+  const recovered = await worker.execute({
+    workingSet: bridgeWorkingSet('k'),
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'source preflight capacity recovered',
+    limit: 1
+  });
+  assert.equal(recovered.accepted, true);
+  assert.equal(providerCalls, 1);
+  assert.equal(worker.snapshot().preflight_processes_started, 2);
+  assert.equal(worker.snapshot().preflight_processes_completed, 2);
+  assert.equal(worker.snapshot().sigterm_count, 1);
+  assert.equal(worker.snapshot().stores_created, 1);
+  assert.equal(worker.snapshot().stores_removed, 1);
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+});
+
+test('source preflight non-exit blocks every later provider admission', async t => {
+  const fixture = createSqliteFixture(t);
+  let providerCalls = 0;
+  let runnerCalls = 0;
+  let stalledChild = null;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    sourcePreflightTimeoutMs: 10,
+    terminationGraceMs: 10,
+    async sourcePreflightRunner(task, options) {
+      runnerCalls += 1;
+      class NonExitingSourceScanChild extends EventEmitter {
+        constructor() {
+          super();
+          this.connected = true;
+          this.pid = 23_456;
+          this.signals = [];
+          this.unrefCalls = 0;
+        }
+
+        send() {}
+
+        kill(signal) {
+          this.signals.push(signal);
+          return true;
+        }
+
+        disconnect() {
+          this.connected = false;
+        }
+
+        unref() {
+          this.unrefCalls += 1;
+        }
+      }
+      stalledChild = new NonExitingSourceScanChild();
+      return runSourcePreflightProcess(task, {
+        ...options,
+        forkProcess() {
+          return stalledChild;
+        }
+      });
+    },
+    async providerWrapper() {
+      providerCalls += 1;
+      return [0.75, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    workerRunner:
+      createSyntheticWorkerRunner(fixture.sourceProjection)
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    allowedDiaryCount: 1
+  };
+
+  const incomplete = await worker.execute({
+    workingSet: bridgeWorkingSet('l'),
+    authorization,
+    query: 'source preflight cannot prove process exit',
+    limit: 1
+  });
+  assert.equal(incomplete.accepted, false);
+  assert.equal(incomplete.cleanup_complete, false);
+  assert.deepEqual(incomplete.terminal_failure, {
+    reason_code: 'worker_shutdown_incomplete',
+    failure_origin: 'lease_worker'
+  });
+  assert.deepEqual(stalledChild.signals, ['SIGTERM']);
+  assert.equal(stalledChild.unrefCalls, 1);
+  assert.equal(providerCalls, 0);
+  assert.equal(worker.snapshot().cleanup_blocked, true);
+  assert.equal(worker.snapshot().preflight_processes_started, 1);
+  assert.equal(worker.snapshot().preflight_processes_completed, 0);
+
+  const blocked = await worker.execute({
+    workingSet: bridgeWorkingSet('m'),
+    authorization,
+    query: 'blocked after incomplete preflight shutdown',
+    limit: 1
+  });
+  assert.equal(blocked.accepted, false);
+  assert.equal(
+    blocked.working_set.receipts.at(-1).reason_code,
+    'native_attempt_busy'
+  );
+  assert.equal(providerCalls, 0);
+  assert.equal(runnerCalls, 1);
+  assert.equal(worker.snapshot().sigkill_count, 0);
+  assert.equal(worker.snapshot().unknown_processes_signalled, 0);
 });
 
 test('lease worker shares the signed public query character limit', async t => {
@@ -3619,7 +3873,33 @@ test('lease task requires search evidence from every non-empty allowed diary ind
     reused.originalSearches.get('PROJECT_ALPHA')
   );
 
-  const complete = createInput('3', allowedDiaryNames);
+  const partial = createInput('3', allowedDiaryNames);
+  partial.indexes.get('PROJECT_BETA').stats =
+    async () => ({ totalVectors: 0 });
+  const partialRecovery = await executeGovernedReadLeaseTask(
+    partial.input
+  );
+  assert.equal(partialRecovery.accepted, false);
+  assert.equal(
+    partialRecovery.working_set.receipts.at(-1).stage,
+    'INDEX_RECOVERY'
+  );
+  assert.equal(
+    partialRecovery.working_set.receipts.at(-1).reason_code,
+    'index_recovery_failed'
+  );
+  assert.deepEqual(
+    Object.fromEntries(partial.searchCalls),
+    { PROJECT_ALPHA: 0, PROJECT_BETA: 0 }
+  );
+  for (const diaryName of allowedDiaryNames) {
+    assert.equal(
+      partial.indexes.get(diaryName).search,
+      partial.originalSearches.get(diaryName)
+    );
+  }
+
+  const complete = createInput('4', allowedDiaryNames);
   const accepted = await executeGovernedReadLeaseTask(complete.input);
   assert.equal(accepted.accepted, true);
   assert.equal(accepted.result.result_count, 0);
@@ -4455,6 +4735,7 @@ test('remaining attempt TTL terminates the lease child, rejects late success, an
   assert.equal(worker.snapshot().stores_removed, 1);
   assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
 
+  current = NOW;
   const recovered = await worker.execute({
     workingSet: bridgeWorkingSet('j'),
     authorization,

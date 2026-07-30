@@ -450,6 +450,8 @@ async function run() {
   assert.equal(workerSnapshot.provider_invocations, 1);
   assert.equal(workerSnapshot.provider_calls_in_flight, 0);
   assert.equal(workerSnapshot.native_invocations, 1);
+  assert.equal(workerSnapshot.preflight_processes_started, 1);
+  assert.equal(workerSnapshot.preflight_processes_completed, 1);
   assert.equal(workerSnapshot.stores_created, 1);
   assert.equal(workerSnapshot.stores_removed, 1);
   assert.equal(workerSnapshot.cleanup_blocked, false);
@@ -690,6 +692,9 @@ async function run() {
     },
     projection: {
       preflight_passed: true,
+      preflight_process_exercised:
+        workerSnapshot.preflight_processes_started === 1 &&
+        workerSnapshot.preflight_processes_completed === 1,
       source_snapshot_stable: true,
       primary_source_unchanged_after_negatives: true,
       unauthorized_diary_excluded: true,

@@ -437,8 +437,10 @@ async function executeGovernedReadLeaseTask(input = {}) {
         throw new Error('lease_index_vector_count_invalid');
       }
     }
-    if (hydration.hydratedChunkCount > 0 && loadedVectorCount === 0) {
-      throw new Error('lease_index_empty_after_hydration');
+    if (!Number.isSafeInteger(hydration?.hydratedChunkCount) ||
+        hydration.hydratedChunkCount < 0 ||
+        loadedVectorCount !== hydration.hydratedChunkCount) {
+      throw new Error('lease_index_vector_count_mismatch');
     }
     workingSet = completeStage(workingSet, 'INDEX_RECOVERY');
   } catch {

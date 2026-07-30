@@ -41,13 +41,22 @@ const receipt = projection.materialize({
 });
 ```
 
-The controller injects the exact VCP SQLite constructor at factory creation.
-`preflight()` therefore opens the canonical source independently and does not
-require the later controller-owned derived `knowledgeBaseManager`. The
-controller also injects a synchronous absolute-deadline assertion. Preflight
-calls it around source identity/open/transaction boundaries, each schema
-query, every streamed budget row, every selected row, and bounded vector
-validation work.
+The direct projection API accepts the exact VCP SQLite constructor at factory
+creation. `preflight()` therefore opens the canonical source independently and
+does not require the later controller-owned derived `knowledgeBaseManager`.
+Direct source tests may inject a synchronous absolute-deadline assertion around
+source identity/open/transaction boundaries, schema queries, streamed rows,
+and bounded vector validation.
+
+The production lease controller does not rely on those cooperative assertions
+to interrupt a synchronous SQLite step. It forks
+`governed-read-source-preflight-child.js` before provider admission with only
+`LANG`, `LC_ALL`, and `TZ`, sends the exact allowlist/dimension/source reference
+over its owned IPC handle, and applies the smaller of its preflight cap and the
+remaining immutable attempt TTL. The child uses Node's read-only SQLite driver
+and returns only a bounded `ProjectionPlan` or canonical safe reason. A stalled
+`StatementSync.next()` is therefore contained in a process the controller can
+terminate without waiting for that call to return.
 
 `createProductionSelectedDiaryRuntimeHydrator()` remains as a compatibility
 adapter. It executes the same preflight and materialization methods back to
@@ -96,10 +105,12 @@ Preflight:
 The maximum approximately 272 MiB selected projection is never represented as
 resident `files[]` / `chunks[]` arrays. Only bounded counters, file ids, the
 last chunk index per selected file, and the current streamed row are retained.
-No whole-table `COUNT`/`SUM` aggregate can hide the attempt deadline during
-budget calculation. An expired assertion closes the read transaction and
-returns canonical `source_preflight_failed` evidence before provider
-admission.
+No whole-table `COUNT`/`SUM` aggregate is used during budget calculation. If a
+streamed SQLite step stalls, the parent sends `SIGTERM` only to the exact
+preflight child it created and discards every late result. A proven exit returns
+canonical `source_preflight_failed` evidence before provider admission. If
+exit cannot be proven within the shutdown grace, the controller returns
+`worker_shutdown_incomplete`, admits no provider call, and blocks later reads.
 
 ## Second pass and materialization
 
@@ -168,7 +179,8 @@ The isolated CI job `Exact VCP writer authority`:
 - verifies writer-null-vector omission and writer-produced sparse
   `chunk_index`;
 - runs production preflight through the parent-owned lease controller and
-  streaming materialization through the real child process;
+  its separate terminable preflight process, then streaming materialization
+  through the real lease child process;
 - writes a fourth valid but unauthorized diary through the exact writer and
   proves that neither the derived database nor the raw native search result
   contains its path or sentinel content;
