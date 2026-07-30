@@ -115,6 +115,14 @@ wins; if Edge is unavailable, the bounded nested timers eventually fail
 closed. A request first presented at or after `deadline_at` is rejected before
 opening a new downstream connection.
 
+Before acknowledgement, the short Edge claim lease still permits safe reclaim
+of an abandoned Relay claim. Acknowledgement of an attempt claim atomically
+extends that exact claim to `deadline_at`; Edge also evaluates the attempt
+deadline independently of request and claim lease expiry. The attempt deadline
+must not exceed the signed request expiry. Thus a normal read cannot be
+converted into `attempt_timeout` merely because it runs longer than the legacy
+five-second claim lease, while no claim can outlive its attempt authority.
+
 The existing 20-second Bridge, 30-second Governance UDS, and 15-second Relay
 UDS defaults remain unchanged for non-attempt traffic. No environment
 variable, public tool, input schema, signing authority, or live configuration

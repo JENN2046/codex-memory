@@ -19,6 +19,15 @@ const {
 const LOOPBACK_HOST = '127.0.0.1';
 const MAX_CONTROL_BODY_BYTES = LIMITS.maxResponseBytes + LIMITS.maxRequestBytes + 4096;
 const TERMINAL_STATES = new Set(['completed', 'cancelled', 'expired']);
+const REQUIRED_ATTEMPT_COORDINATOR_METHODS = Object.freeze([
+  'acceptAttempt',
+  'appendReceipt',
+  'cancelAttempt',
+  'commitProtocolCandidate',
+  'reportCoordinatorLoss',
+  'timeoutAttempt',
+  'workingSet'
+]);
 
 function createLoopbackEdgeRuntime({
   verifyRequest,
@@ -63,10 +72,9 @@ function createLoopbackEdgeRuntime({
     : null;
   if (attemptCoordinator !== null && (
     !governedReadAttempts ||
-    typeof attemptCoordinator.acceptAttempt !== 'function' ||
-    typeof attemptCoordinator.appendReceipt !== 'function' ||
-    typeof attemptCoordinator.commitProtocolCandidate !== 'function' ||
-    typeof attemptCoordinator.workingSet !== 'function'
+    REQUIRED_ATTEMPT_COORDINATOR_METHODS.some(method =>
+      typeof attemptCoordinator[method] !== 'function'
+    )
   )) {
     reject('edge_attempt_coordinator_invalid');
   }
@@ -105,6 +113,18 @@ function createLoopbackEdgeRuntime({
   function refresh(record) {
     if (TERMINAL_STATES.has(record.status)) return;
     const currentMs = nowMs();
+    if (record.attempt_deadline_ms !== null &&
+        record.attempt_deadline_ms <= currentMs) {
+      record.status = 'expired';
+      record.claim = null;
+      record.purge_after_ms =
+        record.attempt_deadline_ms + terminalRetentionMs;
+      try {
+        governedCoordinator.timeoutAttempt(record.attempt_ref);
+      } catch {}
+      emit('request_expired', record);
+      return;
+    }
     const requestExpiresMs = Date.parse(record.request.expires_at);
     if (requestExpiresMs <= currentMs) {
       record.status = 'expired';
@@ -179,7 +199,9 @@ function createLoopbackEdgeRuntime({
           attemptHeader.request_digest !== digestObject(request) ||
           typeof contextReference !== 'string' ||
           attemptHeader.context_binding_digest !==
-            digestObject(contextReference)) {
+            digestObject(contextReference) ||
+          Date.parse(attemptHeader.deadline_at) >
+            Date.parse(request.expires_at)) {
         reject('edge_attempt_header_binding_invalid');
       }
     }
@@ -202,7 +224,10 @@ function createLoopbackEdgeRuntime({
       attempt: 0,
       claim: null,
       purge_after_ms: null,
-      attempt_ref: attemptHeader?.attempt_ref || null
+      attempt_ref: attemptHeader?.attempt_ref || null,
+      attempt_deadline_ms: attemptHeader
+        ? Date.parse(attemptHeader.deadline_at)
+        : null
     };
     if (attemptHeader) {
       governedCoordinator.acceptAttempt(attemptHeader);
@@ -230,7 +255,13 @@ function createLoopbackEdgeRuntime({
     refreshAndPrune();
     for (const record of records.values()) {
       if (record.status !== 'queued') continue;
-      const expiresMs = nowMs() + claimLeaseMs;
+      const configuredExpiresMs = nowMs() + claimLeaseMs;
+      const expiresMs = record.attempt_deadline_ms === null
+        ? configuredExpiresMs
+        : Math.min(
+            configuredExpiresMs,
+            record.attempt_deadline_ms
+          );
       record.status = 'claimed';
       record.attempt += 1;
       record.claim = {
@@ -262,6 +293,13 @@ function createLoopbackEdgeRuntime({
     const activeClaim = requireLiveClaim(record, claimToken);
     if (activeClaim.acked) reject('edge_claim_ack_replay');
     activeClaim.acked = true;
+    if (record.attempt_deadline_ms !== null) {
+      activeClaim.expires_ms = record.attempt_deadline_ms;
+      if (activeClaim.expires_ms <= nowMs()) {
+        refresh(record);
+        reject('edge_claim_expired');
+      }
+    }
     emit('claim_acknowledged', record);
     return { request_id: requestId, status: 'acked', attempt: record.attempt };
   }

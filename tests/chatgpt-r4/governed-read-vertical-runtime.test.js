@@ -866,6 +866,139 @@ test('full real transport replay commits one canonical terminal and cleans its l
   assert.equal(uds.snapshot().request_bodies_logged, 0);
 });
 
+test('Edge acknowledged attempt claim lasts until the attempt deadline', async t => {
+  let current = new Date(NOW);
+  const principal = signingIdentity('claim-deadline-principal');
+  const edgeIdentity = signingIdentity('claim-deadline-edge');
+  const contextRef = `pctx_${'k'.repeat(32)}`;
+  const principalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('claim-deadline-principal'),
+    now: NOW,
+    nonce: 'principal_nonce_claim_deadline_01',
+    signing: signing(principal)
+  });
+  const request = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: contextRef,
+      query: 'claim deadline query',
+      limit: 1
+    },
+    now: NOW,
+    ttlSeconds: 2,
+    requestId: 'req_claim_deadline_000000000001',
+    nonce: 'request_nonce_claim_deadline_01',
+    signing: signing(edgeIdentity)
+  });
+  const header = createAttemptHeader({
+    attemptRef: `grat_${'k'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject(request),
+    contextBindingDigest: digestObject(contextRef),
+    now: NOW,
+    ttlSeconds: 1
+  });
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => current
+  });
+  const runtime = createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current,
+    claimLeaseMs: 50,
+    governedReadAttempts: true,
+    attemptCoordinator: coordinator
+  });
+  const address = await runtime.start();
+  t.after(() => runtime.stop());
+  const client = createLoopbackEdgeClient(address.url, {
+    timeoutMs: 1_000
+  });
+
+  const shortRequest = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: contextRef,
+      query: 'short request authority',
+      limit: 1
+    },
+    now: NOW,
+    ttlSeconds: 1,
+    requestId: 'req_short_claim_authority_000001',
+    nonce: 'request_nonce_short_authority_01',
+    signing: signing(edgeIdentity)
+  });
+  const longHeader = createAttemptHeader({
+    attemptRef: `grat_${'j'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject(shortRequest),
+    contextBindingDigest: digestObject(contextRef),
+    now: NOW,
+    ttlSeconds: 2
+  });
+  await assert.rejects(
+    client.submit(shortRequest, { attemptHeader: longHeader }),
+    { code: 'edge_attempt_header_binding_invalid' }
+  );
+
+  await client.submit(request, { attemptHeader: header });
+  const claim = await client.claim('deadline-relay');
+  assert.equal(
+    claim.lease_expires_at,
+    new Date(NOW.getTime() + 50).toISOString()
+  );
+  await client.acknowledge(claim);
+  current = new Date(NOW.getTime() + 100);
+  assert.equal((await client.state(claim)).status, 'claimed');
+  current = new Date(NOW.getTime() + 999);
+  assert.equal((await client.state(claim)).status, 'claimed');
+  current = new Date(NOW.getTime() + 1_000);
+  assert.equal((await client.state(claim)).status, 'expired');
+  assert.equal(
+    coordinator.protocol(header.attempt_ref).terminal.reason_code,
+    'attempt_timeout'
+  );
+});
+
+test('Edge validates every injected attempt coordinator lifecycle method', () => {
+  const required = [
+    'acceptAttempt',
+    'appendReceipt',
+    'cancelAttempt',
+    'commitProtocolCandidate',
+    'reportCoordinatorLoss',
+    'timeoutAttempt',
+    'workingSet'
+  ];
+  const completeCoordinator = Object.fromEntries(
+    required.map(method => [method, () => {}])
+  );
+  assert.doesNotThrow(() => createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    governedReadAttempts: true,
+    attemptCoordinator: completeCoordinator
+  }));
+  for (const missing of required) {
+    const incomplete = { ...completeCoordinator };
+    delete incomplete[missing];
+    assert.throws(
+      () => createLoopbackEdgeRuntime({
+        async verifyRequest() {},
+        async verifyResponse() {},
+        governedReadAttempts: true,
+        attemptCoordinator: incomplete
+      }),
+      { code: 'edge_attempt_coordinator_invalid' },
+      missing
+    );
+  }
+});
+
 test('Edge protocol-candidate commit is atomic and rejects a divergent prefix', () => {
   const header = createAttemptHeader({
     attemptRef: `grat_${'c'.repeat(32)}`,
