@@ -105,6 +105,9 @@ const ACTIVE_RUNTIME_DYNAMIC_REQUIRE_ALLOWLIST = Object.freeze({
   'src/core/GovernedMcpVcpNativeVcpToolBoxMcpShim.js': Object.freeze({
     knowledgeBaseManagerPath: 'KnowledgeBaseManager.js',
     embeddingUtilsPath: 'EmbeddingUtils.js'
+  }),
+  'src/runtime/vcp-native/production-governed-read-shim.js': Object.freeze({
+    embeddingUtilsPath: 'EmbeddingUtils.js'
   })
 });
 const ACTIVE_RUNTIME_PASSIVE_CONTRACT_IMPORT_ALLOWLIST = Object.freeze({
@@ -113,6 +116,18 @@ const ACTIVE_RUNTIME_PASSIVE_CONTRACT_IMPORT_ALLOWLIST = Object.freeze({
       'packages/chatgpt-r4-contracts/canonical.js',
     '../../../packages/chatgpt-r4-contracts/governed-read-attempt':
       'packages/chatgpt-r4-contracts/governed-read-attempt.js'
+  }),
+  'src/runtime/vcp-native/governed-read-lease-worker.js': Object.freeze({
+    '../../../packages/chatgpt-r4-contracts':
+      'packages/chatgpt-r4-contracts/index.js'
+  }),
+  'src/runtime/vcp-native/governed-read-shim-http-runtime.js': Object.freeze({
+    '../../../packages/chatgpt-r4-contracts':
+      'packages/chatgpt-r4-contracts/index.js'
+  }),
+  'src/runtime/vcp-native/governed-read-source-preflight-process.js': Object.freeze({
+    '../../../packages/chatgpt-r4-contracts':
+      'packages/chatgpt-r4-contracts/index.js'
   })
 });
 
@@ -637,7 +652,16 @@ function validateBoundaryManifests() {
   }
   if (edge.externalRuntimeImplemented !== true || edge.externalRuntimeActivated !== false ||
       edge.oauthRequired !== true || edge.relayAuthenticationRequired !== true ||
-      edge.zeroMemoryCountersRequired !== true || edge.externalMcpPath !== '/mcp' ||
+      edge.governedReadAttemptRequired !== true ||
+      edge.governedReadAttemptProtocol !== 'governed_read_attempt.v1' ||
+      edge.edgeDataResponseSchemaVersion !== 2 ||
+      edge.edgeRequestEnvelopeSchemaVersion !== 2 ||
+      edge.edgeResponseEnvelopeSchemaVersion !== 2 ||
+      edge.legacyV1EnvelopeAccepted !== false ||
+      edge.resolveCreatesReadAttempt !== false ||
+      edge.firstTerminalWins !== true ||
+      edge.attemptFailuresReturnToolErrorResult !== true ||
+      edge.externalMcpPath !== '/mcp' ||
       edge.protectedResourceMetadataPath !== '/.well-known/oauth-protected-resource') {
     throw new Error('edge_external_boundary_invalid');
   }

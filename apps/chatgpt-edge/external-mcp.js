@@ -11,14 +11,26 @@ const {
 
 const {
   DATA_TOOL_NAMES,
+  GOVERNED_READ_ATTEMPT_READ_TOOLS,
   RENDER_TOOL_NAMES,
+  createChatGptEdgeDataResponseV2,
+  createGovernedReadFailureLegacyContent,
   createPrincipalAssertion,
   createRequestEnvelope,
   digestObject,
+  governedReadTerminalResponseStatus,
+  projectLegacyCountersFromGovernedReadAttempt,
+  projectLegacyCountersFromGovernedReadAttemptPublic,
+  validateCounters,
+  validateLegacyResponseCountersAgainstAttemptPublic,
+  validateToolStructuredContent,
   validateToolArguments,
   validateWidgetDto,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
+const {
+  GOVERNED_ATTEMPT_FAILURE_RESULT_KIND
+} = require('./transient-request-broker');
 const {
   MEMORY_SCOPE_WIDGET_HTML,
   widgetResource
@@ -161,6 +173,7 @@ function createMcpProtocolServer({
     } catch (error) {
       throw safeMcpError(error, 'edge_governed_read_unavailable');
     }
+    response = normalizeBrokerResult(name, envelope, response);
     const result = {
       content: [{
         type: 'text',
@@ -168,9 +181,15 @@ function createMcpProtocolServer({
       }],
       structuredContent: response.structured_content,
       _meta: {
-        'codex-memory/receiptChainDigest': digestObject(response.receipt_chain),
+        'codex-memory/receiptChainDigest':
+          response.receipt_chain_digest ||
+          digestObject(response.receipt_chain),
         'codex-memory/receiptPresentation': receiptPresentation(name, response),
-        'codex-memory/counters': { ...response.counters }
+        'codex-memory/counters': response.structured_content?.attempt
+          ? projectLegacyCountersFromGovernedReadAttemptPublic(
+              response.structured_content.attempt
+            )
+          : { ...response.counters }
       }
     };
     if (response.status !== 'ok') result.isError = true;
@@ -178,6 +197,63 @@ function createMcpProtocolServer({
   });
 
   return server;
+}
+
+function normalizeBrokerResult(toolName, request, value) {
+  if (value?.kind !== GOVERNED_ATTEMPT_FAILURE_RESULT_KIND) {
+    if (value?.request_id !== request.request_id ||
+        value?.tool_name !== toolName) {
+      reject('edge_broker_result_binding_invalid');
+    }
+    validateNormalizedBrokerData(toolName, value);
+    return value;
+  }
+  if (value.request_id !== request.request_id ||
+      value.tool_name !== toolName) {
+    reject('edge_attempt_terminal_result_binding_invalid');
+  }
+  const protocol = value.governed_read_attempt;
+  const status = governedReadTerminalResponseStatus(
+    protocol?.terminal
+  );
+  if (status === 'ok') {
+    reject('edge_attempt_terminal_result_invalid');
+  }
+  const normalized = Object.freeze({
+    status,
+    structured_content: createChatGptEdgeDataResponseV2({
+      toolName,
+      structuredContent: createGovernedReadFailureLegacyContent(
+        toolName,
+        protocol.terminal
+      ),
+      governedReadAttempt: protocol
+    }),
+    counters: projectLegacyCountersFromGovernedReadAttempt(protocol),
+    receipt_chain_digest: digestObject({
+      protocol: protocol.terminal.protocol,
+      terminal_digest: protocol.terminal.terminal_digest
+    })
+  });
+  validateNormalizedBrokerData(toolName, normalized);
+  return normalized;
+}
+
+function validateNormalizedBrokerData(toolName, value) {
+  validateToolStructuredContent(
+    toolName,
+    value?.structured_content,
+    { status: value?.status }
+  );
+  if (GOVERNED_READ_ATTEMPT_READ_TOOLS.includes(toolName)) {
+    validateLegacyResponseCountersAgainstAttemptPublic(
+      value.counters,
+      value.structured_content.attempt
+    );
+  } else {
+    validateCounters(value?.counters, { requireZero: true });
+  }
+  return value;
 }
 
 function renderScopeTool(name, args) {
@@ -269,6 +345,8 @@ function safeMcpError(error, fallback) {
 module.exports = {
   createExternalMcpHandler,
   createMcpProtocolServer,
+  normalizeBrokerResult,
+  validateNormalizedBrokerData,
   modelVisibleErrorText,
   modelVisibleResultText,
   receiptPresentation,

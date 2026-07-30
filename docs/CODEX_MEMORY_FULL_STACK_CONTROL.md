@@ -113,11 +113,12 @@ manifests fails closed.
 Profile schema v6 persists a versioned controller runtime-source manifest
 digest plus the repository HEAD at adoption time. The manifest binds the
 tracked mode and byte-level SHA-256 of every file in the fixed broad runtime
-roots: all of `src/`, the Local Recall Relay, the ChatGPT R4 contracts package,
-all of `scripts/`, the manifest itself, and the package manifests. Because this
-does not infer dependencies from JavaScript syntax, aliases or dynamic module
-loading cannot omit a repository runtime file from the identity. The adopted
-repository HEAD remains an audit and
+roots: all of `src/`, the ChatGPT Edge runtime, the Local Recall Relay, the
+ChatGPT memory-scope widget loaded by Edge, the ChatGPT R4 contracts package,
+all of `scripts/`, the manifest itself, and the package manifests. Because
+this does not infer dependencies from JavaScript syntax, aliases or dynamic
+module loading cannot omit a repository runtime file from the identity. The
+adopted repository HEAD remains an audit and
 ancestor-continuity anchor; later committed governance/docs/test changes do not
 invalidate the runtime when the manifest digest is unchanged. A changed,
 missing, newly added, untracked, symlinked, or mode-drifted file inside a bound
@@ -247,8 +248,9 @@ provider, or prove a live exact-head runtime.
 8. start shim, authenticated hardened HTTP MCP, default-closed Governance UDS,
    retained Edge, and outbound Relay plus observer in order;
 9. run the native shim in the controller-managed process itself and prove that
-   its recorded PID owns the 7615 loopback listener before any capability
-   preflight can send a bearer token;
+   its recorded PID owns both the existing 7615 native-MCP listener and the
+   separate 7616 governed-attempt listener before Governance or any capability
+   preflight can dispatch work;
 10. prove through Linux `/proc` socket metadata that the recorded HTTP PID owns
    the exact loopback listener before reading or sending its bearer token;
    validate authenticated full HTTP health and its hardened,
@@ -285,8 +287,13 @@ Owner-only runtime environment files are parsed and allowlisted before child
 launch; they are not passed through Node's pre-bootstrap `--env-file` handling.
 The shim is launched directly with the controller's verified
 `process.execPath`, without a shell or wrapper child; the managed PID owns the
-listener. It is bound back to the pinned canonical VCPToolBox runtime, isolated
-store, governed mapping, loopback provider dependency,
+two loopback listeners. The native-MCP listener retains its existing bearer
+binding. The attempt-only listener accepts the bounded
+`governed_read_attempt.v1` working set only when the loopback request carries
+the existing Governance runtime-binding digest in its private HTTP binding
+header; it introduces no second signing secret or public endpoint. It is bound
+back to the pinned canonical VCPToolBox runtime, controller-owned per-attempt
+lease root, governed mapping, loopback provider dependency,
 provider/Governance/Relay private-file freshness, and native-write-off posture.
 The Relay child receives the controller-verified Governance PID, captures its
 Linux start identity before loading its runtime, and refuses to start unless
@@ -323,14 +330,19 @@ actually installed. R5-N capability preparation requires the flag on both
 responses; an older or substitute shim fails before native execution.
 
 After the governed mapping has resolved an exact diary allowlist, the
-production hydrator opens only the primary `knowledge_base.sqlite` database in
-read-only, `query_only` mode. Inside one read transaction it selects only the
-matching `files` and `chunks` rows and atomically projects that already-derived
-vector data into the isolated database. It does not scan diary files,
-re-embed stored content, read tags, call the provider, or modify the primary
-database. Query embedding remains the single provider stage owned by the
-governed native read; hydration occurs after that vector is validated and
-before selected-index recovery and search.
+production source projection opens only the primary `knowledge_base.sqlite`
+database in read-only, `query_only` mode. A first short read transaction
+validates source identity, schema, scoped files/chunks, sparse indexes, vector
+dimension and finite values, and budgets, then emits only a bounded projection
+plan plus digest. It closes before the single query-embedding provider call.
+
+The lease child reopens the same source identity, starts a second read
+transaction, and recomputes the selected-projection digest. A changed digest
+fails as `source_snapshot_changed_after_preflight` before any derived
+transaction. A matching snapshot stays open while rows stream into a fresh
+derived SQLite store in one atomic transaction; the complete projection is
+never retained in memory. The path does not scan diary files, re-embed stored
+content, read tags, call a second provider, or modify the primary database.
 
 The boundary is exact rather than best-effort:
 
@@ -349,10 +361,9 @@ The boundary is exact rather than best-effort:
   changed database handle, or stale isolated projection fails closed instead
   of being overwritten.
 
-A hydration-stage failure is preserved only as
-`native_selected_diary_hydration_failed` /
-`selected_diary_hydration_failed`; raw database or runtime detail is discarded,
-and local memory fallback remains forbidden.
+A source or hydration failure is preserved only through the canonical
+attempt-v1 failure registry; raw database or runtime detail is discarded, and
+local memory fallback remains forbidden.
 
 The returned receipt contains only acceptance booleans and aggregate
 diary/file/chunk counts. It contains no diary name, path, content, vector,
@@ -371,6 +382,19 @@ provider/Governance/Relay credential freshness alongside counters, schema
 versions, baseline identity, and bounded policy failure codes. It does not
 return private paths, file identities, environment values, tokens, keys, key
 digests, raw memory, request bodies, or provider responses.
+
+The low-disclosure Edge projection also binds the source contract dimensions:
+data response schema `2`, request and response envelope schema `2`,
+`governed_read_attempt.v1`, and `legacyV1Accepted: false`. These are source and
+acceptance facts, not proof that a stopped instance has already been rebound or
+started.
+
+The Shim projection independently requires the recorded Shim PID to own both
+loopback listeners and reports only the attempt protocol plus listener-identity
+booleans. Governance loads the v2 attempt runtime, keeps
+`resolve_memory_context` outside attempt admission, and routes every other data
+read through the bound Bridge/Shim listener. The former Governance application
+read path is not retained as an active v1 compatibility route.
 
 A v4/v5 profile makes `status` inspect the historical `7605` role so that
 controlled transition and shutdown remain possible. A v6 profile makes it
@@ -401,9 +425,10 @@ processing, and Edge completion so a controlled stop cannot strand an
 acknowledged request. Its 120-second controller wait covers the configured
 30-second acknowledgement, 55-second UDS, and 30-second completion maxima plus
 bounded overhead. The shim receives a 45-second wait because its governed
-shutdown may sequentially wait up to 10 seconds for active derived work, close
-the knowledge-base manager, and drain for up to another 10 seconds. HTTP also
-receives 45 seconds so `server.close()` can settle the controller-pinned
+shutdown may first wait up to 25 seconds for the attempt listener's retained
+handlers and exact lease workers, then close the existing knowledge-base
+manager and drain its derived work. HTTP also receives 45 seconds so
+`server.close()` can settle the controller-pinned
 30-second maximum active request before application close. Governance retains
 the 10-second wait. The controller stops but does not remove
 the retained Edge container, and it never escalates to `SIGKILL`.

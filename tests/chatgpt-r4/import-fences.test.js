@@ -28,7 +28,7 @@ test('R4-D D2B import fences accept external Edge and outbound Relay without act
   assert.equal(result.durableRemoteStateAllowed, false);
   const packageEntrypoints = discoverPackageRuntimeEntrypoints();
   assert.equal(result.activationEntrypointCount, packageEntrypoints.length);
-  assert.equal(result.passiveContractBindingCount, 2);
+  assert.equal(result.passiveContractBindingCount, 5);
   assert.equal(packageEntrypoints.some(file => file.endsWith('/src/cli/provider-smoke.js')), true);
   assert.equal(packageEntrypoints.some(file => file.endsWith('/scripts/verify-frozen-evidence-manifest.js')), true);
   assert.deepEqual(result.components.map(component => component.component), [

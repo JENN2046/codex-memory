@@ -78,7 +78,9 @@ function sendJson(outgoing, status, value) {
 function createGovernedReadShimHttpRuntime({
   leaseWorker,
   runtimeBindingDigest,
-  shutdownTimeoutMs = DEFAULT_SHUTDOWN_TIMEOUT_MS
+  shutdownTimeoutMs = DEFAULT_SHUTDOWN_TIMEOUT_MS,
+  host = '127.0.0.1',
+  port = 0
 } = {}) {
   if (!leaseWorker ||
       typeof leaseWorker.execute !== 'function' ||
@@ -87,7 +89,11 @@ function createGovernedReadShimHttpRuntime({
       !DIGEST_PATTERN.test(runtimeBindingDigest) ||
       !Number.isInteger(shutdownTimeoutMs) ||
       shutdownTimeoutMs < 10 ||
-      shutdownTimeoutMs > 60_000) {
+      shutdownTimeoutMs > 60_000 ||
+      host !== '127.0.0.1' ||
+      !Number.isInteger(port) ||
+      port < 0 ||
+      port > 65_535) {
     throw codedError('governed_read_shim_runtime_invalid');
   }
   let started = false;
@@ -187,7 +193,7 @@ function createGovernedReadShimHttpRuntime({
         };
         server.once('error', onError);
         server.once('listening', onListening);
-        server.listen(0, '127.0.0.1');
+        server.listen(port, host);
       });
       started = true;
       const address = server.address();

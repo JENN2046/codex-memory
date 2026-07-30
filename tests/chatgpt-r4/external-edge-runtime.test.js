@@ -12,9 +12,16 @@ const {
 } = require('jose');
 
 const {
+  CHATGPT_EDGE_DATA_SCHEMA_VERSION,
   ZERO_MEMORY_COUNTERS,
+  appendGovernedReadAttemptStage,
+  createChatGptEdgeDataResponseV2,
+  createGovernedReadAttemptProtocol,
   createResponseEnvelope,
+  createTerminalEnvelope,
   digestObject,
+  governedReadAttemptResponseBindingDigest,
+  projectLegacyCountersFromGovernedReadAttempt,
   sha256
 } = require('../../packages/chatgpt-r4-contracts');
 const {
@@ -22,6 +29,8 @@ const {
   createAuth0TokenVerifier,
   createExternalEdgeRuntime,
   createExternalMcpHandler,
+  createTransientRequestBroker,
+  normalizeBrokerResult,
   validateExternalEdgeRuntimeConfig
 } = require('../../apps/chatgpt-edge');
 
@@ -82,7 +91,7 @@ test('Auth0 verifier binds RS256 issuer, audience, client, scope, and single ope
   }
 });
 
-test('external Edge serves PRMD and official stateless MCP while relay completes a zero-memory read', async t => {
+test('external Edge serves PRMD and returns governed data response v2', async t => {
   const edgeIdentity = signingIdentity('r4d-edge');
   const relayIdentity = signingIdentity('r4d-relay');
   const events = [];
@@ -231,26 +240,97 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   });
   assert.equal(unauthorizedRelay.statusCode, 401);
 
-  const toolCall = mcpRequest(address, rpcRequest(8, 'tools/call', {
+  const resolveCall = mcpRequest(address, rpcRequest(8, 'tools/call', {
+    name: 'resolve_memory_context',
+    arguments: {
+      project_alias: 'project-alpha',
+      requested_visibility: 'project'
+    }
+  }), ACCESS_TOKEN);
+  const resolveClaim = await waitForClaim(address);
+  assert.equal(
+    Object.hasOwn(resolveClaim.body, 'governed_read_attempt'),
+    false
+  );
+  await relayRequest(address, '/v1/relay/ack', {
+    request_id: resolveClaim.body.request_id,
+    claim_token: resolveClaim.body.claim_token
+  });
+  const resolveResponse = createResponseEnvelope({
+    requestId: resolveClaim.body.request.request_id,
+    requestDigest: digestObject(resolveClaim.body.request),
+    toolName: 'resolve_memory_context',
+    status: 'ok',
+    structuredContent: {
+      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      project_context_ref: `pctx_${'A'.repeat(32)}`,
+      safe_project_alias: 'project-alpha',
+      expires_at: new Date(Date.now() + 60_000).toISOString(),
+      visibility_labels: ['project'],
+      context_status: 'resolved'
+    },
+    counters: { ...ZERO_MEMORY_COUNTERS },
+    receiptChain: {
+      edge_request: digestObject(resolveClaim.body.request),
+      relay: sha256('r4d-resolve-relay-receipt'),
+      governance: sha256('r4d-resolve-governance-receipt'),
+      context: sha256('r4d-resolve-context-receipt')
+    },
+    signing: signing(relayIdentity)
+  });
+  await relayRequest(address, '/v1/relay/complete', {
+    request_id: resolveClaim.body.request_id,
+    claim_token: resolveClaim.body.claim_token,
+    response: resolveResponse
+  });
+  const resolved = await resolveCall;
+  assert.equal(
+    resolved.body.result.structuredContent.schema_version,
+    CHATGPT_EDGE_DATA_SCHEMA_VERSION
+  );
+  assert.equal(
+    Object.hasOwn(resolved.body.result.structuredContent, 'attempt'),
+    false
+  );
+
+  const toolCall = mcpRequest(address, rpcRequest(9, 'tools/call', {
     name: 'memory_overview',
     arguments: { project_context_ref: `pctx_${'A'.repeat(32)}` }
   }), ACCESS_TOKEN);
   const claim = await waitForClaim(address);
   assert.equal(claim.statusCode, 200);
+  assert.equal(
+    claim.body.governed_read_attempt.header.tool_name,
+    'memory_overview'
+  );
   await relayRequest(address, '/v1/relay/ack', {
     request_id: claim.body.request_id,
     claim_token: claim.body.claim_token
   });
+  const candidate = successfulAttemptCandidate(
+    claim.body.governed_read_attempt
+  );
   const response = createResponseEnvelope({
     requestId: claim.body.request.request_id,
     requestDigest: digestObject(claim.body.request),
     toolName: 'memory_overview',
     status: 'ok',
-    structuredContent: { status: 'empty', kind: 'overview', item_count: 0 },
-    counters: { ...ZERO_MEMORY_COUNTERS },
+    structuredContent: createChatGptEdgeDataResponseV2({
+      toolName: 'memory_overview',
+      structuredContent: {
+        status: 'empty',
+        kind: 'overview',
+        item_count: 0
+      },
+      governedReadAttempt: candidate
+    }),
+    counters: projectLegacyCountersFromGovernedReadAttempt(candidate),
     receiptChain: {
       edge_request: digestObject(claim.body.request),
-      relay: sha256('r4d-relay-receipt'),
+      relay: governedReadAttemptResponseBindingDigest({
+        requestDigest: digestObject(claim.body.request),
+        terminalDigest: candidate.terminal.terminal_digest
+      }),
       governance: sha256('r4d-governance-receipt'),
       context: sha256('r4d-context-receipt')
     },
@@ -259,19 +339,29 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   const completed = await relayRequest(address, '/v1/relay/complete', {
     request_id: claim.body.request_id,
     claim_token: claim.body.claim_token,
-    response
+    response,
+    governed_read_attempt_candidate: candidate
   });
   assert.equal(completed.statusCode, 200);
   const toolResult = await toolCall;
   assert.equal(toolResult.statusCode, 200);
   assert.deepEqual(toolResult.body.result.structuredContent, {
+    schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
     status: 'empty',
     kind: 'overview',
-    item_count: 0
+    item_count: 0,
+    attempt: toolResult.body.result.structuredContent.attempt
   });
+  assert.equal(
+    toolResult.body.result.structuredContent.attempt.outcome,
+    'success'
+  );
   assert.match(toolResult.body.result.content[0].text, /workflow is consumed/u);
   assert.match(toolResult.body.result.content[0].text, /Omit every category not returned here/u);
-  assert.deepEqual(toolResult.body.result._meta['codex-memory/counters'], ZERO_MEMORY_COUNTERS);
+  assert.deepEqual(
+    toolResult.body.result._meta['codex-memory/counters'],
+    projectLegacyCountersFromGovernedReadAttempt(candidate)
+  );
   assert.match(toolResult.body.result._meta['codex-memory/receiptChainDigest'], /^sha256:[a-f0-9]{64}$/u);
 
   assert.equal(runtime.snapshot().durable_remote_state, false);
@@ -279,7 +369,7 @@ test('external Edge serves PRMD and official stateless MCP while relay completes
   assert.doesNotMatch(serializedEvents, /project_context_ref|tool_request|structured_content|claim_token|authorization/iu);
 });
 
-test('external Edge fails closed on proxy, OAuth, relay signature, and nonzero counters', { timeout: 5_000 }, async t => {
+test('external Edge returns a terminal v2 attempt after rejected completion timeout', { timeout: 5_000 }, async t => {
   const edgeIdentity = signingIdentity('r4d-edge-negative');
   const relayIdentity = signingIdentity('r4d-relay-negative');
   const runtime = createExternalEdgeRuntime({
@@ -329,16 +419,33 @@ test('external Edge fails closed on proxy, OAuth, relay signature, and nonzero c
     request_id: claim.body.request_id,
     claim_token: claim.body.claim_token
   });
+  const candidate = successfulAttemptCandidate(
+    claim.body.governed_read_attempt
+  );
   const nonzeroResponse = createResponseEnvelope({
     requestId: claim.body.request.request_id,
     requestDigest: digestObject(claim.body.request),
     toolName: 'memory_overview',
     status: 'ok',
-    structuredContent: { status: 'empty', kind: 'overview', item_count: 0 },
-    counters: { ...ZERO_MEMORY_COUNTERS, provider_calls: 1 },
+    structuredContent: createChatGptEdgeDataResponseV2({
+      toolName: 'memory_overview',
+      structuredContent: {
+        status: 'empty',
+        kind: 'overview',
+        item_count: 0
+      },
+      governedReadAttempt: candidate
+    }),
+    counters: {
+      ...projectLegacyCountersFromGovernedReadAttempt(candidate),
+      provider_calls: 0
+    },
     receiptChain: {
       edge_request: digestObject(claim.body.request),
-      relay: sha256('negative-relay'),
+      relay: governedReadAttemptResponseBindingDigest({
+        requestDigest: digestObject(claim.body.request),
+        terminalDigest: candidate.terminal.terminal_digest
+      }),
       governance: sha256('negative-governance'),
       context: sha256('negative-context')
     },
@@ -347,17 +454,170 @@ test('external Edge fails closed on proxy, OAuth, relay signature, and nonzero c
   const rejected = await relayRequest(address, '/v1/relay/complete', {
     request_id: claim.body.request_id,
     claim_token: claim.body.claim_token,
-    response: nonzeroResponse
+    response: nonzeroResponse,
+    governed_read_attempt_candidate: candidate
   });
   assert.equal(rejected.statusCode, 400);
-  assert.equal(rejected.body.error, 'zero_memory_counter_nonzero');
+  assert.equal(rejected.body.error, 'relay_attempt_counter_mismatch');
   const timedOut = await toolCall;
   assert.equal(timedOut.statusCode, 200);
-  assert.equal(timedOut.body.error.code, -32603);
-  assert.match(timedOut.body.error.message, /edge_response_timeout/u);
-  assert.match(timedOut.body.error.message, /transport_timeout/u);
-  assert.match(timedOut.body.error.message, /No receipt-bound memory result was returned/u);
-  assert.match(timedOut.body.error.message, /Do not call any tool to retry, verify, supplement, expand, or fill a table/u);
+  assert.equal(timedOut.body.result.isError, true);
+  assert.equal(
+    timedOut.body.result.structuredContent.schema_version,
+    CHATGPT_EDGE_DATA_SCHEMA_VERSION
+  );
+  assert.equal(
+    timedOut.body.result.structuredContent.attempt.reason_code,
+    'attempt_timeout'
+  );
+  assert.equal(
+    timedOut.body.result.structuredContent.attempt.evidence_complete,
+    false
+  );
+  assert.match(
+    timedOut.body.result.content[0].text,
+    /not a transport timeout/u
+  );
+  const late = await relayRequest(address, '/v1/relay/complete', {
+    request_id: claim.body.request_id,
+    claim_token: claim.body.claim_token,
+    response: nonzeroResponse,
+    governed_read_attempt_candidate: candidate
+  });
+  assert.equal(late.statusCode, 410);
+});
+
+test('external Edge retains a delayed timeout from its actual terminal commit', async () => {
+  let current = new Date('2026-07-31T00:00:00.000Z');
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current,
+    maxInFlight: 1,
+    maxRecords: 1,
+    terminalRetentionMs: 10
+  });
+  const contextRef = `pctx_${'R'.repeat(32)}`;
+  const request = marker => ({
+    request_id: `req_external_retention_${marker}_00000001`,
+    nonce: `request_nonce_external_retention_${marker}_01`,
+    expires_at: new Date(
+      current.getTime() + 60_000
+    ).toISOString(),
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: contextRef
+      }
+    }
+  });
+  const first = request('first');
+  await broker.submit(first);
+  current = new Date(Date.parse(first.expires_at) + 11);
+  const retry = request('retry');
+  await assert.rejects(
+    broker.submit(retry),
+    { code: 'edge_record_capacity_exceeded' }
+  );
+  current = new Date(current.getTime() + 10);
+  assert.equal(
+    (await broker.submit(retry)).status,
+    'queued'
+  );
+  broker.close();
+});
+
+test('external Edge does not commit a terminal before response cloning succeeds', async () => {
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    async verifyResponse() {}
+  });
+  const contextRef = `pctx_${'C'.repeat(32)}`;
+  const request = {
+    request_id: 'req_external_clone_failure_000000001',
+    nonce: 'request_nonce_external_clone_failure_01',
+    expires_at: new Date(Date.now() + 60_000).toISOString(),
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: contextRef
+      }
+    }
+  };
+  await broker.submit(request);
+  const claim = broker.claim('external-clone-failure-relay');
+  broker.acknowledge(claim.request_id, claim.claim_token);
+  const candidate = successfulAttemptCandidate(
+    claim.governed_read_attempt
+  );
+  const response = {
+    receipt_chain: {
+      relay: governedReadAttemptResponseBindingDigest({
+        requestDigest: digestObject(request),
+        terminalDigest: candidate.terminal.terminal_digest
+      })
+    },
+    structured_content: createChatGptEdgeDataResponseV2({
+      toolName: 'search_memory',
+      structuredContent: {
+        status: 'empty',
+        result_count: 0,
+        results: []
+      },
+      governedReadAttempt: candidate
+    }),
+    uncloneable: () => {}
+  };
+
+  await assert.rejects(
+    broker.complete(
+      claim.request_id,
+      claim.claim_token,
+      response,
+      candidate
+    ),
+    error => error?.name === 'DataCloneError'
+  );
+  assert.deepEqual(
+    broker.cancel(claim.request_id),
+    {
+      request_id: claim.request_id,
+      status: 'cancelled'
+    }
+  );
+  assert.equal(
+    broker.result(claim.request_id)
+      .governed_read_attempt_result
+      .governed_read_attempt
+      .terminal
+      .reason_code,
+    'attempt_cancelled'
+  );
+  broker.close();
+});
+
+test('external MCP normalization rejects legacy broker data before public output', () => {
+  const request = {
+    request_id: 'req_external_legacy_broker_00000001'
+  };
+  assert.throws(
+    () => normalizeBrokerResult(
+      'search_memory',
+      request,
+      {
+        request_id: request.request_id,
+        tool_name: 'search_memory',
+        status: 'ok',
+        structured_content: {
+          status: 'empty',
+          result_count: 0,
+          results: []
+        },
+        counters: ZERO_MEMORY_COUNTERS
+      }
+    ),
+    { code: 'response_data_schema_version_invalid' }
+  );
 });
 
 test('external Edge configuration rejects non-public origins, unsafe bind, and non-Ed25519 signing', () => {
@@ -444,6 +704,71 @@ test('external Edge configuration rejects non-public origins, unsafe bind, and n
     relaySigningKeyId: edgeIdentity.keyId
   }), { code: 'edge_runtime_signing_key_id_reused' });
 });
+
+function successfulAttemptCandidate(initialWorkingSet) {
+  let workingSet = initialWorkingSet;
+  for (const stage of [
+    'RELAY_CLAIMED',
+    'AUTHORIZED',
+    'BRIDGE_DELEGATED',
+    'NATIVE_DISPATCHED',
+    'SOURCE_PREFLIGHT',
+    'PROVIDER_EMBEDDING',
+    'HYDRATION',
+    'INDEX_RECOVERY',
+    'VECTOR_SEARCH',
+    'SCOPE_POSTCHECK',
+    'RESPONSE_FINALIZATION'
+  ]) {
+    const counterFacts = {
+      BRIDGE_DELEGATED: {
+        fallback: { attempts: 0 }
+      },
+      NATIVE_DISPATCHED: {
+        native_invocation: { started: 1 },
+        primary_memory: {
+          write_attempts: 0,
+          writes_committed: 0
+        }
+      },
+      PROVIDER_EMBEDDING: {
+        provider: {
+          started: 1,
+          succeeded: 1,
+          failed: 0
+        }
+      },
+      HYDRATION: {
+        derived_transaction: {
+          started: 1,
+          committed: 1,
+          rolled_back: 0
+        }
+      },
+      VECTOR_SEARCH: {
+        native_invocation: {
+          succeeded: 1,
+          failed: 0
+        }
+      }
+    }[stage] || {};
+    workingSet = appendGovernedReadAttemptStage(workingSet, {
+      stage,
+      counterFacts
+    });
+  }
+  const terminal = createTerminalEnvelope({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    outcome: 'success',
+    evidenceComplete: true
+  });
+  return createGovernedReadAttemptProtocol({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    terminal
+  });
+}
 
 async function signAccessToken(privateKey, {
   subject,

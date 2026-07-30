@@ -63,6 +63,12 @@ function createSyntheticRepository(t) {
     'scripts/codex-memory-stack.js',
     "'use strict';\n"
   );
+  write(root, 'apps/chatgpt-edge/index.js', "'use strict';\n");
+  write(
+    root,
+    'apps/chatgpt-memory-scope-widget/index.js',
+    "'use strict';\n"
+  );
   write(root, 'apps/local-recall-relay/index.js', "'use strict';\n");
   write(root, 'packages/chatgpt-r4-contracts/index.js', "'use strict';\n");
   write(root, 'src/index.js', "'use strict';\n");
@@ -87,6 +93,12 @@ test('checked-in controller manifest covers the fixed broad runtime source roots
   assert.ok(discovered.includes('src/http-index.js'));
   assert.ok(discovered.includes(
     'apps/local-recall-relay/outbound-main.js'
+  ));
+  assert.ok(discovered.includes(
+    'apps/chatgpt-edge/external-main.js'
+  ));
+  assert.ok(discovered.includes(
+    'apps/chatgpt-memory-scope-widget/src/resource.js'
   ));
   assert.ok(discovered.includes('package-lock.json'));
   assert.equal(

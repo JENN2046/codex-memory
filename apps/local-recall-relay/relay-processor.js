@@ -4,18 +4,24 @@ const {
   COUNTER_MODES,
   LIMITS,
   appendGovernedReadAttemptStage,
+  createChatGptEdgeDataResponseV2,
+  createGovernedReadFailureLegacyContent,
   createGovernedReadAttemptProtocol,
   createResponseEnvelope,
   createTerminalEnvelope,
   digestObject,
-  failureRegistryEntry,
   governedReadAttemptResponseBindingDigest,
   isGovernedReadAttemptWorkingSetExtension,
   validateCounters,
+  validateCounterMode,
   validateRequestEnvelope,
   validateReceiptChain,
-  validateToolStructuredContent,
+  validateLegacyInvocationCountersAgainstAttemptTerminal,
+  validateLegacyToolStructuredContent,
+  validateGovernedReadResponseStatus,
   validateGovernedReadAttemptWorkingSet,
+  GOVERNED_READ_ATTEMPT_READ_TOOLS,
+  projectLegacyCountersFromGovernedReadAttempt,
   deepFreeze,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
@@ -50,6 +56,15 @@ function createRelayProcessor({
       });
       const requestId = request.request_id;
       const toolName = request.tool_request.name;
+      const governedRead =
+        GOVERNED_READ_ATTEMPT_READ_TOOLS.includes(toolName);
+      if (governedRead && governedReadAttempt === undefined) {
+        reject('relay_attempt_required');
+      }
+      if (toolName === 'resolve_memory_context' &&
+          governedReadAttempt !== undefined) {
+        reject('relay_attempt_forbidden');
+      }
       let relayWorkingSet = null;
       if (governedReadAttempt !== undefined) {
         validateGovernedReadAttemptWorkingSet(governedReadAttempt);
@@ -108,7 +123,10 @@ function createRelayProcessor({
           requestDigest: validation.requestDigest,
           toolName,
           status: invocation.status,
-          structuredContent: invocation.structured_content,
+          structuredContent: createChatGptEdgeDataResponseV2({
+            toolName,
+            structuredContent: invocation.structured_content
+          }),
           counters: invocation.counters,
           receiptChain,
           now: responseNow,
@@ -192,7 +210,10 @@ function createRelayProcessor({
             failureOrigin: 'relay'
           });
           responseStatus = 'unavailable';
-          structuredContent = unavailableStructuredContent(toolName);
+          structuredContent = createGovernedReadFailureLegacyContent(
+            toolName,
+            terminal
+          );
         }
       }
 
@@ -209,13 +230,24 @@ function createRelayProcessor({
         })
       };
       validateReceiptChain(attemptReceiptChain);
+      const candidate = createGovernedReadAttemptProtocol({
+        header: candidateWorkingSet.header,
+        receipts: candidateWorkingSet.receipts,
+        terminal
+      });
       const response = createResponseEnvelope({
         requestId,
         requestDigest: validation.requestDigest,
         toolName,
         status: responseStatus,
-        structuredContent,
-        counters: invocation.counters,
+        structuredContent: createChatGptEdgeDataResponseV2({
+          toolName,
+          structuredContent,
+          governedReadAttempt: candidate
+        }),
+        counters: projectLegacyCountersFromGovernedReadAttempt(
+          candidate
+        ),
         receiptChain: attemptReceiptChain,
         now: responseNow,
         ttlSeconds: Math.min(
@@ -226,54 +258,21 @@ function createRelayProcessor({
       });
       return Object.freeze({
         response,
-        governed_read_attempt_candidate:
-          createGovernedReadAttemptProtocol({
-            header: candidateWorkingSet.header,
-            receipts: candidateWorkingSet.receipts,
-            terminal
-          })
+        governed_read_attempt_candidate: candidate
       });
     }
   });
 }
 
 function validateTerminalResponseAgreement(responseStatus, terminal) {
-  if (terminal?.outcome === 'success') {
-    if (responseStatus !== 'ok') {
-      reject('relay_attempt_response_terminal_mismatch');
-    }
-    return terminal;
-  }
-  if (terminal?.outcome !== 'failure') return terminal;
-  const expectedStatus =
-    failureRegistryEntry(terminal.reason_code).category === 'authorization'
-      ? 'denied'
-      : 'unavailable';
-  if (responseStatus !== expectedStatus) {
-    reject('relay_attempt_response_terminal_mismatch');
-  }
-  return terminal;
+  return validateGovernedReadResponseStatus(responseStatus, terminal);
 }
 
 function validateInvocationCounterAgreement(invocation, terminal) {
-  const mappings = [
-    ['provider_calls', terminal.provider.started],
-    ['native_invocations', terminal.native_invocation.started],
-    ['local_fallbacks', terminal.fallback.attempts],
-    ['primary_memory_writes', terminal.primary_memory.write_attempts],
-    ['derived_index_writes', terminal.derived_transaction.started]
-  ];
-  for (const [field, terminalValue] of mappings) {
-    if (terminalValue === null ||
-        invocation[field] !== terminalValue) {
-      reject('relay_attempt_counter_mismatch');
-    }
-  }
-  if (invocation.other_durable_mutations !== 0 ||
-      invocation.unrestricted_native_searches !== 0) {
-    reject('relay_attempt_counter_mismatch');
-  }
-  return invocation;
+  return validateLegacyInvocationCountersAgainstAttemptTerminal(
+    invocation,
+    { counters: terminal }
+  );
 }
 
 function validateInvocation(invocation, toolName, {
@@ -283,6 +282,7 @@ function validateInvocation(invocation, toolName, {
   if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
     reject('relay_invocation_invalid');
   }
+  if (counterMode !== null) validateCounterMode(counterMode);
   const keys = Object.keys(invocation).sort();
   const expectedKeys = [
     'counters',
@@ -295,10 +295,16 @@ function validateInvocation(invocation, toolName, {
     reject('relay_invocation_shape_invalid');
   }
   if (!['ok', 'denied', 'unavailable'].includes(invocation.status)) reject('relay_invocation_status_invalid');
-  validateToolStructuredContent(toolName, invocation.structured_content, {
+  validateLegacyToolStructuredContent(toolName, invocation.structured_content, {
     status: invocation.status
   });
-  validateCounters(invocation.counters, { counterMode });
+  if (governedReadAttempt) {
+    validateGovernedReadInvocationCounters(invocation.counters);
+  } else if (toolName === 'resolve_memory_context') {
+    validateCounters(invocation.counters, { requireZero: true });
+  } else {
+    validateCounters(invocation.counters, { counterMode });
+  }
   if (!invocation.receipt_digests ||
       typeof invocation.receipt_digests !== 'object' ||
       Array.isArray(invocation.receipt_digests) ||
@@ -339,23 +345,41 @@ function validateAttemptContinuation(value, prefix) {
   return value;
 }
 
-function unavailableStructuredContent(toolName) {
-  if (toolName === 'search_memory') {
-    return { status: 'unavailable', result_count: 0, results: [] };
+function validateGovernedReadInvocationCounters(counters) {
+  const keys = [
+    'provider_calls',
+    'native_invocations',
+    'local_fallbacks',
+    'primary_memory_writes',
+    'derived_index_writes',
+    'other_durable_mutations',
+    'unrestricted_native_searches'
+  ];
+  if (!counters ||
+      typeof counters !== 'object' ||
+      Array.isArray(counters) ||
+      Object.keys(counters).sort().join(',') !==
+        [...keys].sort().join(',')) {
+    reject('counter_shape_invalid');
   }
-  const kind = {
-    memory_overview: 'overview',
-    audit_memory: 'audit',
-    prepare_memory_context: 'context'
-  }[toolName];
-  if (!kind) reject('relay_attempt_tool_invalid');
-  return { status: 'unavailable', kind, item_count: 0 };
+  for (const key of keys.slice(0, 5)) {
+    const value = counters[key];
+    if (value !== null &&
+        (!Number.isSafeInteger(value) || value < 0)) {
+      reject('counter_value_invalid');
+    }
+  }
+  if (counters.other_durable_mutations !== 0 ||
+      counters.unrestricted_native_searches !== 0) {
+    reject('counter_value_invalid');
+  }
+  return counters;
 }
 
 module.exports = {
   createRelayProcessor,
-  unavailableStructuredContent,
   validateAttemptContinuation,
+  validateGovernedReadInvocationCounters,
   validateInvocationCounterAgreement,
   validateTerminalResponseAgreement,
   validateInvocation

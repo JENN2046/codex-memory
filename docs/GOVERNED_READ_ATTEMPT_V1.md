@@ -1,16 +1,17 @@
 # Governed Read Attempt v1
 
-Status: dormant source contract
+Status: active source contract; stopped runtime rebind pending
 
 Task: `CM-2159 / governed_read_attempt_refactor`
 
 Protocol: `governed_read_attempt.v1`
 
 This document describes the transport-neutral attempt contract introduced by
-the first CM-2159 refactor delivery. It does not activate the contract in the
-live Edge, Relay, Governance, Bridge, Shim, provider, or VCP path. The active
-ChatGPT Edge response remains v1 until the separately reviewed v2 cutover
-delivery. No public tool, tool name, or input schema is added here.
+the first CM-2159 refactor delivery and activated in source by the fourth
+ordered data-response v2 hard cut. The held-stopped schema-v6 runtime still
+requires a separately authorized source rebind before this source contract can
+become its accepted runtime identity. No public tool, tool name, or input
+schema is added.
 
 ## One protocol identity
 
@@ -89,8 +90,9 @@ allowlist. Registry lookup accepts only own properties, so JavaScript prototype
 names such as `constructor` remain unregistered and fail closed.
 
 Every registered attempt-v1 failure has `fallback_policy: forbidden`.
-Attempt-v1 therefore never invokes local fallback. Legacy non-attempt calls are
-unchanged by this dormant delivery.
+Attempt-v1 therefore never invokes local fallback. The four governed reads
+fail closed without an attempt; `resolve_memory_context` remains the only
+non-attempt data-tool operation.
 
 `provider_may_have_occurred` and `native_may_have_occurred` only control whether
 missing evidence may remain `null`. They never create a zero, one, success, or
@@ -183,8 +185,10 @@ one category/stage/origin definition, but it is explicitly forbidden as a
 terminal candidate. It can only be recorded by the Observer as a protocol
 violation.
 
-The source coordinator is dormant in this delivery and is exercised only by
-synthetic tests. The existing live request broker flow is unchanged.
+The transient Edge broker uses this coordinator for every accepted governed
+read in the v2 source path. Source and synthetic tests exercise terminal
+competition and capacity reuse; the stopped schema-v6 instance is not changed
+until an authorized rebind.
 
 ## Independent low-disclosure observation
 
@@ -222,16 +226,18 @@ evidence_complete:
 counters:
 ```
 
-Public response schema v2 does not become active in this delivery. The
-projection is a contract building block for the later hard-cut PR.
+Public data response schema v2 carries this projection for each governed read.
+The public validator reproduces the registry binding and counter
+reconciliation instead of trusting the projection.
 
 ## Non-claims
 
-This source contract does not:
+This source contract and its v2 cutover do not:
 
 - call a provider or memory tool;
 - read private configuration, raw logs, raw memory, or a source database;
 - modify VCPToolBox core or dependencies;
 - start, restart, rebind, deploy, release, or publish a runtime;
-- modify the six ChatGPT Edge tool names or any input schema;
+- add or rename any of the six ChatGPT Edge tools or modify an input schema;
+- rebind or start the held-stopped schema-v6 runtime;
 - establish R5-O success, production readiness, or `RC_READY`.

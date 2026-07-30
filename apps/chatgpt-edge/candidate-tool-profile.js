@@ -2,6 +2,8 @@
 
 const {
   DATA_TOOL_NAMES,
+  CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+  GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA,
   RENDER_TOOL_NAMES,
   CONTEXT_VISIBILITIES,
   PROJECT_CONTEXT_REF_PATTERN_SOURCE,
@@ -107,8 +109,15 @@ const toolDescriptors = deepFreeze({
     outputSchema: {
       type: 'object',
       additionalProperties: false,
-      required: ['status', 'result_count', 'results'],
+      required: [
+        'schema_version',
+        'status',
+        'result_count',
+        'results',
+        'attempt'
+      ],
       properties: {
+        schema_version: { const: CHATGPT_EDGE_DATA_SCHEMA_VERSION },
         status: { type: 'string' },
         result_count: { type: 'integer', minimum: 0, maximum: 8 },
         results: {
@@ -124,7 +133,8 @@ const toolDescriptors = deepFreeze({
               relevance: { type: 'number', minimum: 0, maximum: 1 }
             }
           }
-        }
+        },
+        attempt: GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA
       }
     }
   }),
@@ -196,8 +206,18 @@ function contextResolutionOutputSchema() {
       {
         type: 'object',
         additionalProperties: false,
-        required: ['project_context_ref', 'safe_project_alias', 'expires_at', 'visibility_labels', 'context_status'],
+        required: [
+          'schema_version',
+          'project_context_ref',
+          'safe_project_alias',
+          'expires_at',
+          'visibility_labels',
+          'context_status'
+        ],
         properties: {
+          schema_version: {
+            const: CHATGPT_EDGE_DATA_SCHEMA_VERSION
+          },
           project_context_ref: contextReferenceSchema(),
           safe_project_alias: { type: 'string', pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' },
           expires_at: { type: 'string' },
@@ -215,8 +235,13 @@ function denialContextSchema(status) {
   return {
     type: 'object',
     additionalProperties: false,
-    required: ['context_status'],
-    properties: { context_status: { const: status } }
+    required: ['schema_version', 'context_status'],
+    properties: {
+      schema_version: {
+        const: CHATGPT_EDGE_DATA_SCHEMA_VERSION
+      },
+      context_status: { const: status }
+    }
   };
 }
 
@@ -224,11 +249,19 @@ function boundedStatusSchema(kind) {
   return {
     type: 'object',
     additionalProperties: false,
-    required: ['status', 'kind', 'item_count'],
+    required: [
+      'schema_version',
+      'status',
+      'kind',
+      'item_count',
+      'attempt'
+    ],
     properties: {
+      schema_version: { const: CHATGPT_EDGE_DATA_SCHEMA_VERSION },
       status: { type: 'string' },
       kind: { const: kind },
-      item_count: { type: 'integer', minimum: 0, maximum: 8 }
+      item_count: { type: 'integer', minimum: 0, maximum: 8 },
+      attempt: GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA
     }
   };
 }

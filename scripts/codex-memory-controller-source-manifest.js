@@ -29,6 +29,8 @@ const SAFE_MANIFEST_PATH =
 const MAXIMUM_MANIFEST_FILES = 2_048;
 const REQUIRED_PATHS = Object.freeze([
   GIT_ATTRIBUTES_RELATIVE_PATH,
+  'apps/chatgpt-edge',
+  'apps/chatgpt-memory-scope-widget',
   'apps/local-recall-relay',
   'package-lock.json',
   'package.json',

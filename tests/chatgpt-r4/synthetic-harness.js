@@ -17,6 +17,11 @@ const { buildCandidateEdgeRequest, candidateToolProfile } = require('../../apps/
 const { createRelayProcessor } = require('../../apps/local-recall-relay');
 const { createMemoryScopeDto, parseToolResultNotification, widgetResource } = require('../../apps/chatgpt-memory-scope-widget');
 const { createGovernanceAdapter } = require('../../src/adapters/chatgpt-r4');
+const {
+  addZeroMemoryAttemptContinuation,
+  createAttemptHeaderForRequest,
+  createEdgeValidatedAttemptWorkingSet
+} = require('./governed-read-test-helpers');
 
 const FIXED_NOW = new Date('2026-07-18T00:00:00.000Z');
 const SYNTHETIC_ISSUER = 'https://idp.synthetic.invalid';
@@ -144,7 +149,16 @@ async function runZeroMemorySyntheticE2E() {
     clock,
     async forwardToUds(payload) {
       observations.relay_requests += 1;
-      return governanceAdapter.handle(payload);
+      const invocation = await governanceAdapter.handle({
+        request: payload.request,
+        relayReceipt: payload.relayReceipt
+      });
+      return payload.governedReadAttempt
+        ? addZeroMemoryAttemptContinuation(
+            invocation,
+            payload.governedReadAttempt
+          )
+        : invocation;
     }
   });
 
@@ -192,7 +206,21 @@ async function runZeroMemorySyntheticE2E() {
     nonce: 'request_nonce_overview_0001',
     signing: signing(edgeIdentity)
   });
-  const overviewResponse = await relay.handle(overviewRequest);
+  const overviewHeader = createAttemptHeaderForRequest(
+    overviewRequest,
+    {
+      attemptRef: `grat_${'s'.repeat(32)}`,
+      now: clock()
+    }
+  );
+  const overviewResponseResult = await relay.handle(
+    overviewRequest,
+    {
+      governedReadAttempt:
+        createEdgeValidatedAttemptWorkingSet(overviewHeader)
+    }
+  );
+  const overviewResponse = overviewResponseResult.response;
   validateResponseEnvelope(overviewResponse, {
     now: clock(),
     resolveResponsePublicKey: resolveRelayKey,

@@ -246,6 +246,10 @@ function loadSourceContractFacts(root, failures) {
     const core = loadModuleFresh(path.join(root, "src/core/constants.js"));
     const server = loadModuleFresh(path.join(root, "src/adapters/codex-mcp/server.js"));
     const edge = loadModuleFresh(path.join(root, "packages/chatgpt-r4-contracts/constants.js"));
+    const attempt = loadModuleFresh(path.join(
+      root,
+      "packages/chatgpt-r4-contracts/governed-read-attempt.js"
+    ));
     const observer = loadModuleFresh(path.join(root, "src/runtime/chatgpt-r4/private-dogfood-observer.js"));
     return {
       vcpCodexMemoryCore: Array.isArray(core.TOOL_DEFINITIONS) ? core.TOOL_DEFINITIONS.length : null,
@@ -257,6 +261,14 @@ function loadSourceContractFacts(root, failures) {
           ? edge.DATA_TOOL_NAMES.length + edge.RENDER_TOOL_NAMES.length
           : null
       ),
+      chatgptEdgeDataResponseSchemaVersion:
+        edge.CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      chatgptEdgeRequestEnvelopeSchemaVersion:
+        edge.EDGE_REQUEST_SCHEMA_VERSION,
+      chatgptEdgeResponseEnvelopeSchemaVersion:
+        edge.EDGE_RESPONSE_SCHEMA_VERSION,
+      governedReadAttemptProtocol:
+        attempt.GOVERNED_READ_ATTEMPT_PROTOCOL,
       dogfoodObservationSchemaVersion: observer.DOGFOOD_OBSERVATION_SCHEMA_VERSION
     };
   } catch {
@@ -371,6 +383,46 @@ function validateCurrentFactsSchema(facts, root, failures) {
   }
   if (source && source.dogfoodObservationSchemaVersion !== observationVersion) {
     failures.push("source dogfood observation schema version must match CURRENT_FACTS");
+  }
+
+  const edgeResponse = facts.contracts &&
+    facts.contracts.chatgptEdgeDataResponse;
+  const expectedEdgeResponse = {
+    dataResponseSchemaVersion: 2,
+    requestEnvelopeSchemaVersion: 2,
+    responseEnvelopeSchemaVersion: 2,
+    governedReadAttemptProtocol: "governed_read_attempt.v1",
+    legacyV1Accepted: false
+  };
+  if (!sameObjectKeys(
+    edgeResponse,
+    Object.keys(expectedEdgeResponse)
+  )) {
+    failures.push(
+      "contracts.chatgptEdgeDataResponse must contain the exact v2 contract dimensions"
+    );
+  } else {
+    for (const [key, value] of Object.entries(expectedEdgeResponse)) {
+      if (edgeResponse[key] !== value) {
+        failures.push(
+          `contracts.chatgptEdgeDataResponse.${key} must equal ${value}`
+        );
+      }
+    }
+  }
+  if (source && (
+    source.chatgptEdgeDataResponseSchemaVersion !==
+      edgeResponse?.dataResponseSchemaVersion ||
+    source.chatgptEdgeRequestEnvelopeSchemaVersion !==
+      edgeResponse?.requestEnvelopeSchemaVersion ||
+    source.chatgptEdgeResponseEnvelopeSchemaVersion !==
+      edgeResponse?.responseEnvelopeSchemaVersion ||
+    source.governedReadAttemptProtocol !==
+      edgeResponse?.governedReadAttemptProtocol
+  )) {
+    failures.push(
+      "source ChatGPT Edge v2 dimensions must match CURRENT_FACTS"
+    );
   }
 
   if (!Array.isArray(facts.blockers) || facts.blockers.length > 30) {

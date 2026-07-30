@@ -37,6 +37,16 @@ const ORIGIN = 'https://memory.jenn.dev';
 const MCP_RESOURCE = `${ORIGIN}/mcp`;
 const TOKEN = 'r'.repeat(48);
 
+function resolvedContext(suffix, expiresAt) {
+  return {
+    project_context_ref: `pctx_${suffix.repeat(32)}`,
+    safe_project_alias: `project-${suffix}`,
+    expires_at: expiresAt,
+    visibility_labels: ['project'],
+    context_status: 'resolved'
+  };
+}
+
 test('R4-D Relay preserves the legacy non-attempt UDS timeout', () => {
   assert.equal(DEFAULT_UDS_TIMEOUT_MS, 15_000);
 });
@@ -57,8 +67,11 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
   });
   const request = createRequestEnvelope({
     principalAssertion: principal,
-    toolName: 'memory_overview',
-    toolArguments: { project_context_ref: `pctx_${'t'.repeat(32)}` },
+    toolName: 'resolve_memory_context',
+    toolArguments: {
+      project_alias: 'project-t',
+      requested_visibility: 'project'
+    },
     now: startedAt,
     requestId: 'req_r5o_remaining_ttl_000000001',
     nonce: 'r5o_remaining_ttl_request_nonce',
@@ -95,11 +108,8 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
     async forwardToUds() {
       return {
         status: 'ok',
-        structured_content: {
-          status: 'available',
-          kind: 'overview',
-          item_count: 1
-        },
+        structured_content:
+          resolvedContext('t', request.expires_at),
         counters: ZERO_MEMORY_COUNTERS,
         receipt_digests: {
           governance: sha256('r5o-remaining-ttl-governance'),
@@ -134,8 +144,11 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
 
   const expiredRequest = createRequestEnvelope({
     principalAssertion: principal,
-    toolName: 'memory_overview',
-    toolArguments: { project_context_ref: `pctx_${'e'.repeat(32)}` },
+    toolName: 'resolve_memory_context',
+    toolArguments: {
+      project_alias: 'project-e',
+      requested_visibility: 'project'
+    },
     now: startedAt,
     requestId: 'req_r5o_expired_before_response_0001',
     nonce: 'r5o_expired_before_response_nonce',
@@ -171,11 +184,8 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
     async forwardToUds() {
       return {
         status: 'ok',
-        structured_content: {
-          status: 'available',
-          kind: 'overview',
-          item_count: 1
-        },
+        structured_content:
+          resolvedContext('e', expiredRequest.expires_at),
         counters: ZERO_MEMORY_COUNTERS,
         receipt_digests: {
           governance: sha256('r5o-expired-response-governance'),
@@ -222,8 +232,11 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   });
   const requestEnvelope = createRequestEnvelope({
     principalAssertion: principal,
-    toolName: 'memory_overview',
-    toolArguments: { project_context_ref: `pctx_${'x'.repeat(32)}` },
+    toolName: 'resolve_memory_context',
+    toolArguments: {
+      project_alias: 'project-x',
+      requested_visibility: 'project'
+    },
     now,
     requestId: 'req_d2b_outbound_relay_0000000001',
     nonce: 'd2b_request_nonce_0000001',
@@ -257,7 +270,8 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
   const server = net.createServer(socket => {
     socket.once('data', () => socket.end(`${JSON.stringify({
       status: 'ok',
-      structured_content: { status: 'empty', kind: 'overview', item_count: 0 },
+      structured_content:
+        resolvedContext('x', requestEnvelope.expires_at),
       counters: ZERO_MEMORY_COUNTERS,
       receipt_digests: {
         governance: sha256('d2b-governance'),
@@ -356,8 +370,11 @@ test('R4-D Relay observer distinguishes Edge completion failure without retainin
   });
   const request = createRequestEnvelope({
     principalAssertion: principal,
-    toolName: 'prepare_memory_context',
-    toolArguments: { project_context_ref: `pctx_${'z'.repeat(32)}` },
+    toolName: 'resolve_memory_context',
+    toolArguments: {
+      project_alias: 'project-z',
+      requested_visibility: 'project'
+    },
     now,
     requestId: 'req_completion_observer_000000001',
     nonce: 'completion_observer_request_nonce',
@@ -394,7 +411,8 @@ test('R4-D Relay observer distinguishes Edge completion failure without retainin
     async forwardToUds() {
       return {
         status: 'ok',
-        structured_content: { status: 'completed', kind: 'context', item_count: 1 },
+        structured_content:
+          resolvedContext('z', request.expires_at),
         counters: ZERO_MEMORY_COUNTERS,
         receipt_digests: {
           governance: sha256('completion-observer-governance'),
@@ -429,7 +447,7 @@ test('R4-D Relay observer distinguishes Edge completion failure without retainin
     request.request_id,
     claim.claim_token,
     request.nonce,
-    request.tool_request.arguments.project_context_ref
+    request.tool_request.arguments.project_alias
   ]) {
     assert.equal(serialized.includes(forbidden), false, forbidden);
   }
@@ -647,8 +665,11 @@ test('R4-D Relay drains a returned claim after shutdown cancellation', async () 
   });
   const request = createRequestEnvelope({
     principalAssertion: principal,
-    toolName: 'memory_overview',
-    toolArguments: { project_context_ref: `pctx_${'d'.repeat(32)}` },
+    toolName: 'resolve_memory_context',
+    toolArguments: {
+      project_alias: 'project-d',
+      requested_visibility: 'project'
+    },
     now,
     requestId: 'req_r4d_shutdown_drain_000000001',
     nonce: 'r4d_shutdown_drain_request_nonce',
@@ -715,11 +736,8 @@ test('R4-D Relay drains a returned claim after shutdown cancellation', async () 
   assert.equal(udsSignal?.aborted, false);
   releaseForward({
     status: 'ok',
-    structured_content: {
-      status: 'available',
-      kind: 'overview',
-      item_count: 1
-    },
+    structured_content:
+      resolvedContext('d', request.expires_at),
     counters: ZERO_MEMORY_COUNTERS,
     receipt_digests: {
       governance: sha256('r4d-shutdown-drain-governance'),

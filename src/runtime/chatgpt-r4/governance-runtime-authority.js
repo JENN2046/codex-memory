@@ -12,14 +12,19 @@ const {
   sha256,
   reject
 } = require('../../../packages/chatgpt-r4-contracts');
-const { createCodexMemoryApplication } = require('../../app');
 const { loadDiaryScopeMapping } = require('../../core/DiaryScopeMappingLoader');
 const { resolveRead } = require('../../core/DiaryScopeMapping');
 const {
-  createR4GovernanceRuntime,
   R4_LIVE_READ_MODE,
   R4_SESSION_SCOPED_LIVE_READ_MODE
 } = require('../../adapters/chatgpt-r4/governed-live-read-runtime');
+const {
+  createGovernedReadV2Runtime
+} = require('../../adapters/chatgpt-r4/governed-read-v2-runtime');
+const {
+  createGovernedReadAttemptBridge,
+  createGovernedReadShimHttpClient
+} = require('../../core/GovernedMcpVcpNativeReadAttemptBridge');
 const {
   PRINCIPAL_FINGERPRINT_PATTERN,
   createSessionReadActivationController
@@ -31,6 +36,8 @@ const { createPrivateDogfoodObserver } = require('./private-dogfood-observer');
 
 const DEFAULT_PRIVATE_ROOT = '/run/secrets/codex-memory-r4-governance';
 const MAX_PRIVATE_FILE_BYTES = 262_144;
+const GOVERNED_READ_SHIM_ENDPOINT =
+  'http://127.0.0.1:7616/v1/governed-read-attempt';
 
 function getEnvironment(environment, name) {
   const value = environment?.[name];
@@ -239,7 +246,7 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
   readFileSync = fs.readFileSync,
   statSync = fs.statSync,
   realpathSync = fs.realpathSync,
-  appFactory = createCodexMemoryApplication
+  invokeBridge = null
 } = {}) {
   const counterMode = environment.CODEX_MEMORY_R4_COUNTER_MODE || 'zero_memory';
   if (![R4_LIVE_READ_MODE, R4_SESSION_SCOPED_LIVE_READ_MODE].includes(counterMode) ||
@@ -364,9 +371,6 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
   const nativeEndpoint = validateLoopbackEndpoint(
     getEnvironment(environment, 'CODEX_MEMORY_R4_NATIVE_HTTP_ENDPOINT')
   );
-  const nativeToken = normalizeSingleLineSecret(
-    readReference('CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE')
-  );
   const expectedGovernanceBindingDigest = assertDigest(
     getEnvironment(environment, 'CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST'),
     'r4_governance_binding_digest_invalid'
@@ -375,53 +379,22 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
     reject('r4_governance_binding_digest_mismatch');
   }
 
-  const app = appFactory({
-    projectBasePath: stateRoot,
-    dailyNoteRootPath: path.join(stateRoot, 'no-primary-memory'),
-    dataDir: path.join(stateRoot, 'data'),
-    logsDir: path.join(stateRoot, 'receipts'),
-    securityProfile: 'hardened',
-    allowExternalProvider: false,
-    autoRebuildShadowOnStart: false,
-    autoRebuildActiveMemoryOnStart: false,
-    enableCandidateCache: false,
-    defaultClientId: 'ChatGPT',
-    governedMcpVcpNativeBridgeGateMode: 'strict',
-    governedMcpVcpNativeReadDelegationMode: 'primary',
-    governedMcpVcpNativeWriteDelegationMode: 'off',
-    governedMcpVcpNativeRuntimeTarget: {
-      targetReferenceName: nativeTargetReference,
-      targetKind: 'mcp_server'
-    },
-    governedMcpVcpNativeHttpMcpTarget: {
-      targetReferenceName: nativeTargetReference,
-      endpoint: nativeEndpoint,
-      bearerToken: nativeToken,
-      requestTimeoutMs: 30_000,
-      mcpToolNameByAction: {
-        search_memory: 'knowledge_base.search',
-        memory_overview: 'memory_overview',
-        audit_memory: 'audit_memory'
-      }
-    },
-    governedMcpVcpNativeReadShapeProbeHttpMcpTarget: {},
-    expectedDiaryScopeMappingReference: mappingState.mappingReference,
-    expectedDiaryScopeMappingDigest: mappingState.mappingDigest
-  });
-  let appClosed = false;
-  const closeApp = async () => {
-    if (appClosed) return;
-    appClosed = true;
-    await app.close();
-  };
-  try {
-    await app.initialize();
-  } catch (error) {
-    await closeApp().catch(() => {});
-    throw error;
+  if (nativeTargetReference.length < 1 || !nativeEndpoint) {
+    reject('r4_governance_native_target_invalid');
   }
-
-  const governanceRuntime = createR4GovernanceRuntime({
+  const selectedInvokeBridge = invokeBridge === null
+    ? createGovernedReadAttemptBridge({
+      invokeShim: createGovernedReadShimHttpClient({
+        endpoint: GOVERNED_READ_SHIM_ENDPOINT,
+        runtimeBindingDigest:
+          expectedGovernanceBindingDigest
+      })
+    }).invoke
+    : invokeBridge;
+  if (typeof selectedInvokeBridge !== 'function') {
+    reject('governed_read_v2_bridge_invalid');
+  }
+  const governanceRuntime = createGovernedReadV2Runtime({
     expectedIssuer: issuer,
     expectedAudience,
     resolveRequestPublicKey: keyId => keyId === edgeKeyId ? edgePublicKey : null,
@@ -432,8 +405,7 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
     selectedProjectAlias,
     resolveDiaryRead: resolveRead,
     contextSigning: { privateKey: contextPrivateKey, keyId: contextKeyId },
-    callGovernedTool: (toolName, args, requestContext) =>
-      app.callTool(toolName, args, requestContext),
+    invokeBridge: selectedInvokeBridge,
     activationController,
     dogfoodObserver,
     counterMode
@@ -460,7 +432,6 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
         });
       } catch (error) {
         await controlServer?.stop().catch(() => {});
-        await closeApp().catch(() => {});
         throw error;
       }
     },
@@ -468,8 +439,7 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
       let failure = null;
       for (const operation of [
         () => controlServer?.stop(),
-        () => udsServer.stop(),
-        () => closeApp()
+        () => udsServer.stop()
       ]) {
         try {
           await operation();
@@ -505,6 +475,7 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
 
 module.exports = {
   DEFAULT_PRIVATE_ROOT,
+  GOVERNED_READ_SHIM_ENDPOINT,
   MAX_PRIVATE_FILE_BYTES,
   assertDigest,
   computeGovernanceRuntimeBindingDigest,

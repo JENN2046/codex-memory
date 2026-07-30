@@ -9,6 +9,7 @@ const path = require('node:path');
 const {
   InMemoryReplayGuard,
   ZERO_MEMORY_COUNTERS,
+  COUNTER_MODES,
   createOpaqueId,
   createPrincipalAssertion,
   createProjectContextClaim,
@@ -33,6 +34,10 @@ const {
   principalKeyResolver,
   signing
 } = require('./synthetic-harness');
+const {
+  addZeroMemoryAttemptContinuation,
+  createAttemptHeaderForRequest
+} = require('./governed-read-test-helpers');
 
 const R4C_FIXED_NOW = new Date('2026-07-19T00:00:00.000Z');
 
@@ -156,7 +161,10 @@ async function createLocalIntegrationHarness({
         socket.destroy();
         return;
       }
-      if (!payload || Object.keys(payload).sort().join(',') !== 'relayReceipt,request') {
+      const payloadKeys = Object.keys(payload || {}).sort().join(',');
+      if (payloadKeys !== 'relayReceipt,request' &&
+          payloadKeys !==
+            'governedReadAttempt,relayReceipt,request') {
         socket.destroy();
         return;
       }
@@ -164,8 +172,19 @@ async function createLocalIntegrationHarness({
       if (governanceDelayMs > 0) await delay(governanceDelayMs);
       if (disconnected || socket.destroyed) return;
       try {
-        const invocation = await governanceAdapter.handle(payload);
-        if (!disconnected && !socket.destroyed) socket.end(`${JSON.stringify(invocation)}\n`);
+        const invocation = await governanceAdapter.handle({
+          request: payload.request,
+          relayReceipt: payload.relayReceipt
+        });
+        const response = payload.governedReadAttempt
+          ? addZeroMemoryAttemptContinuation(
+              invocation,
+              payload.governedReadAttempt
+            )
+          : invocation;
+        if (!disconnected && !socket.destroyed) {
+          socket.end(`${JSON.stringify(response)}\n`);
+        }
       } catch {
         socket.destroy();
       }
@@ -184,6 +203,7 @@ async function createLocalIntegrationHarness({
     maxRecords,
     clock,
     eventSink: edgeEventSink === undefined ? event => edgeEvents.push(event) : edgeEventSink,
+    governedReadAttempts: true,
     verifyRequest(request) {
       return validateRequestEnvelope(request, {
         now: clock(),
@@ -215,6 +235,7 @@ async function createLocalIntegrationHarness({
     resolvePrincipalPublicKey: resolvePrincipalKey,
     requestReplayGuard: new InMemoryReplayGuard({ clock }),
     responseSigning: signing(relayIdentity),
+    counterMode: COUNTER_MODES.zeroMemory,
     clock,
     edgeTimeoutMs,
     cancelPollMs,
@@ -243,6 +264,12 @@ async function createLocalIntegrationHarness({
       nowMs += milliseconds;
     },
     buildRequest,
+    buildAttemptHeader(request, options = {}) {
+      return createAttemptHeaderForRequest(request, {
+        now: clock(),
+        ...options
+      });
+    },
     edgeAddress,
     edgeClient,
     edgeRuntime,
@@ -282,7 +309,12 @@ async function runR4CLocalIntegrationProof() {
     const overviewRequest = harness.buildRequest('memory_overview', {
       project_context_ref: resolved.response.structured_content.project_context_ref
     });
-    await harness.edgeClient.submit(overviewRequest);
+    await harness.edgeClient.submit(overviewRequest, {
+      attemptHeader: harness.buildAttemptHeader(
+        overviewRequest,
+        { attemptRef: `grat_${'c'.repeat(32)}` }
+      )
+    });
     const overview = await harness.relayRuntime.processNext();
     const overviewResult = await harness.edgeClient.result(overviewRequest.request_id);
     validateResponseEnvelope(overviewResult.response, {

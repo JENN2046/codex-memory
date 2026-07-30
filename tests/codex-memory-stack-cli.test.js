@@ -13,7 +13,9 @@ const {
   CANONICAL_CODEX_MCP_ENDPOINT,
   CANONICAL_CODEX_MCP_TOOL_NAMES,
   CONTROLLER_CHANGE_PATHS,
+  EDGE_CONTRACT_STATUS,
   EXACT_HEAD_PROFILE_SCHEMA_VERSION,
+  GOVERNED_READ_SHIM_PORT,
   LEGACY_ROLLBACK_MCP_ENDPOINT,
   PROFILE_KEYS,
   PROFILE_SCHEMA_VERSION,
@@ -274,6 +276,7 @@ function acceptedStack(overrides = {}) {
       scopeDigest: VCP_SCOPE_DIGEST
     },
     shimListenerOwned: true,
+    governedReadShimListenerOwned: true,
     httpListenerOwned: true,
     governanceListenerOwned: true,
     governanceDataListenerOwned: true,
@@ -301,6 +304,13 @@ function acceptedStack(overrides = {}) {
 }
 
 test('profile contract is exact and stores references rather than secret values', () => {
+  assert.deepEqual(EDGE_CONTRACT_STATUS, {
+    dataResponseSchemaVersion: 2,
+    requestEnvelopeSchemaVersion: 2,
+    responseEnvelopeSchemaVersion: 2,
+    governedReadAttemptProtocol: 'governed_read_attempt.v1',
+    legacyV1Accepted: false
+  });
   assert.deepEqual(Object.keys(validateProfile(profile())).sort(), [...PROFILE_KEYS].sort());
   assert.deepEqual(
     Object.keys(validateProfile(v5Profile())).sort(),
@@ -1673,7 +1683,8 @@ test('managed child environments neutralize caller write, root, provider, and pu
       apiKey: 'synthetic-governed-provider-key',
       model: 'synthetic-embedding-model',
       dimension: '1024'
-    }
+    },
+    runtimeBindingDigest: `sha256:${'ab'.repeat(32)}`
   });
   assert.equal(shim.ENABLE_REAL_ROOT_WRITE, '0');
   assert.equal(shim.KB_ROOT, '');
@@ -1685,6 +1696,18 @@ test('managed child environments neutralize caller write, root, provider, and pu
   assert.equal(shim.API_URL, 'http://127.0.0.1:3000');
   assert.equal(shim.WhitelistEmbeddingModel, 'synthetic-embedding-model');
   assert.equal(shim.VECTORDB_DIMENSION, '1024');
+  assert.equal(
+    shim.CODEX_MEMORY_GOVERNED_READ_SHIM_PORT,
+    String(GOVERNED_READ_SHIM_PORT)
+  );
+  assert.equal(
+    shim.CODEX_MEMORY_GOVERNED_READ_LEASE_ROOT,
+    '/runtime/isolated/governed-read-leases'
+  );
+  assert.equal(
+    shim.CODEX_MEMORY_GOVERNED_READ_RUNTIME_BINDING_DIGEST,
+    `sha256:${'ab'.repeat(32)}`
+  );
 
   const http = buildHttpChildEnvironment(hostile, {
     token: 'synthetic-token',
@@ -1779,7 +1802,12 @@ test('managed shim arguments bind production selected-diary hydration', () => {
       '/runtime/codex-memory-full-stack-001/store',
       '--source-kb-store',
       '/runtime/VCPToolBox/VectorStore',
-      '--selected-diary-hydration'
+      '--selected-diary-hydration',
+      '--governed-read-attempts',
+      '--governed-read-port',
+      String(GOVERNED_READ_SHIM_PORT),
+      '--governed-read-lease-root',
+      '/runtime/codex-memory-full-stack-001/governed-read-leases'
     ]
   );
   assert.throws(
@@ -3368,6 +3396,13 @@ test('stack acceptance requires HTTP authentication and every pinned identity', 
     computeStackAccepted({
       ...accepted,
       shimListenerOwned: false
+    }),
+    false
+  );
+  assert.equal(
+    computeStackAccepted({
+      ...accepted,
+      governedReadShimListenerOwned: false
     }),
     false
   );

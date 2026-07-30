@@ -48,6 +48,7 @@ function createExternalEdgeRuntime(options = {}) {
     maxInFlight: config.maxInFlight,
     maxRecords: config.maxRecords,
     eventSink: config.eventSink,
+    attemptEventSink: config.attemptEventSink,
     eventComponent: 'external_edge_broker',
     verifyRequest(request) {
       return validateRequestEnvelope(request, {
@@ -245,6 +246,14 @@ function validateExternalEdgeRuntimeConfig(options) {
     reject('edge_oauth_verifier_invalid');
   }
   if (options.eventSink !== undefined && typeof options.eventSink !== 'function') reject('edge_event_sink_invalid');
+  if (options.attemptEventSink !== undefined &&
+      typeof options.attemptEventSink !== 'function') {
+    reject('edge_attempt_event_sink_invalid');
+  }
+  if (options.broker !== undefined &&
+      options.broker?.governedReadAttempts !== true) {
+    reject('edge_attempt_broker_required');
+  }
   const counterMode = options.counterMode || COUNTER_MODES.zeroMemory;
   if (!Object.values(COUNTER_MODES).includes(counterMode)) reject('edge_counter_mode_invalid');
   return Object.freeze({
@@ -269,6 +278,7 @@ function validateExternalEdgeRuntimeConfig(options) {
     clock: options.clock || (() => new Date()),
     verifyAccessToken: options.verifyAccessToken,
     eventSink: options.eventSink,
+    attemptEventSink: options.attemptEventSink,
     counterMode,
     broker: options.broker
   });
@@ -323,8 +333,29 @@ function handleRelay(pathname, body, broker, outgoing) {
     return sendJson(outgoing, 200, broker.acknowledge(body.request_id, body.claim_token));
   }
   if (pathname === '/v1/relay/complete') {
-    assertControlKeys(body, ['request_id', 'claim_token', 'response']);
-    return Promise.resolve(broker.complete(body.request_id, body.claim_token, body.response))
+    const hasCandidate = Object.hasOwn(
+      body,
+      'governed_read_attempt_candidate'
+    );
+    assertControlKeys(
+      body,
+      hasCandidate
+        ? [
+            'request_id',
+            'claim_token',
+            'response',
+            'governed_read_attempt_candidate'
+          ]
+        : ['request_id', 'claim_token', 'response']
+    );
+    return Promise.resolve(broker.complete(
+      body.request_id,
+      body.claim_token,
+      body.response,
+      hasCandidate
+        ? body.governed_read_attempt_candidate
+        : null
+    ))
       .then(result => sendJson(outgoing, 200, result));
   }
   assertControlKeys(body, ['request_id', 'claim_token']);

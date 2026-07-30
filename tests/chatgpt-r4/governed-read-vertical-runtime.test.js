@@ -49,6 +49,7 @@ const {
 } = require('../../apps/local-recall-relay/uds-transport');
 const {
   createRelayProcessor,
+  validateGovernedReadInvocationCounters,
   validateInvocationCounterAgreement,
   validateTerminalResponseAgreement
 } = require('../../apps/local-recall-relay/relay-processor');
@@ -1417,6 +1418,60 @@ test('Edge keeps context setup outside governed attempt admission', async t => {
   );
 });
 
+test('Relay rejects a read without an attempt before UDS forwarding', async () => {
+  const principal = signingIdentity('relay-preflight-principal');
+  const edge = signingIdentity('relay-preflight-edge');
+  const relay = signingIdentity('relay-preflight-response');
+  const contextRef = `pctx_${'p'.repeat(32)}`;
+  const principalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('relay-preflight-principal'),
+    now: NOW,
+    nonce: 'principal_nonce_relay_preflight_01',
+    signing: signing(principal)
+  });
+  const request = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: contextRef,
+      query: 'reject before forwarding',
+      limit: 1
+    },
+    now: NOW,
+    requestId: 'req_relay_preflight_no_attempt_0001',
+    nonce: 'request_nonce_relay_preflight_01',
+    signing: signing(edge)
+  });
+  let forwarded = 0;
+  const processor = createRelayProcessor({
+    expectedIssuer: ISSUER,
+    expectedAudience: AUDIENCE,
+    resolveRequestPublicKey: keyId =>
+      keyId === edge.keyId ? edge.publicKey : null,
+    resolvePrincipalPublicKey: value =>
+      value?.issuer === ISSUER &&
+      value?.key_id === principal.keyId
+        ? principal.publicKey
+        : null,
+    requestReplayGuard: new InMemoryReplayGuard({
+      clock: () => NOW
+    }),
+    responseSigning: signing(relay),
+    clock: () => NOW,
+    async forwardToUds() {
+      forwarded += 1;
+      throw new Error('must_not_forward');
+    }
+  });
+  await assert.rejects(
+    processor.handle(request),
+    { code: 'relay_attempt_required' }
+  );
+  assert.equal(forwarded, 0);
+});
+
 test('Edge acknowledged attempt claim lasts until the attempt deadline', async t => {
   let current = new Date(NOW);
   const principal = signingIdentity('claim-deadline-principal');
@@ -2372,11 +2427,22 @@ test('Governance binds denial receipts before emitting the canonical AUTHORIZED 
 });
 
 test('Governance binds authorized query and limit to the signed request', async () => {
+  const contextRef = `pctx_${'a'.repeat(32)}`;
+  const request = {
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: contextRef,
+        query: 'signed authorization query',
+        limit: 1
+      }
+    }
+  };
   const header = createAttemptHeader({
     attemptRef: `grat_${'a'.repeat(32)}`,
     toolName: 'search_memory',
-    requestDigest: digestObject('authorization-binding-request'),
-    contextBindingDigest: digestObject('authorization-binding-context'),
+    requestDigest: digestObject(request),
+    contextBindingDigest: digestObject(contextRef),
     now: NOW
   });
   const receipts = [];
@@ -2387,16 +2453,6 @@ test('Governance binds authorized query and limit to the signed request', async 
   ]) {
     receipts.push(createStageReceipt({ header, receipts, stage }));
   }
-  const request = {
-    tool_request: {
-      name: 'search_memory',
-      arguments: {
-        project_context_ref: `pctx_${'a'.repeat(32)}`,
-        query: 'signed authorization query',
-        limit: 1
-      }
-    }
-  };
   for (const decisionOverride of [
     { query: 'different execution query' },
     { limit: 2 }
@@ -5429,15 +5485,18 @@ test('Relay finalization failure forms a signed unavailable response and canonic
 test('Relay enforces public response and terminal outcome agreement', () => {
   const success = {
     outcome: 'success',
-    reason_code: null
+    reason_code: null,
+    failure_category: null
   };
   const nativeFailure = {
     outcome: 'failure',
-    reason_code: 'vector_search_failed'
+    reason_code: 'vector_search_failed',
+    failure_category: 'native_runtime'
   };
   const authorizationFailure = {
     outcome: 'failure',
-    reason_code: 'governance_denied'
+    reason_code: 'governance_denied',
+    failure_category: 'authorization'
   };
   assert.throws(
     () => validateTerminalResponseAgreement('denied', success),
@@ -5473,7 +5532,43 @@ test('Relay enforces public response and terminal outcome agreement', () => {
   );
 });
 
-test('Relay rejects legacy counters that contradict known or unknown terminal facts', () => {
+test('Relay preserves unknown attempt counters but rejects invalid values', () => {
+  assert.doesNotThrow(() =>
+    validateGovernedReadInvocationCounters({
+      provider_calls: 0,
+      native_invocations: 1,
+      local_fallbacks: null,
+      primary_memory_writes: 0,
+      derived_index_writes: null,
+      other_durable_mutations: 0,
+      unrestricted_native_searches: 0
+    })
+  );
+  assert.throws(() =>
+    validateGovernedReadInvocationCounters({
+      provider_calls: -1,
+      native_invocations: 1,
+      local_fallbacks: null,
+      primary_memory_writes: 0,
+      derived_index_writes: null,
+      other_durable_mutations: 0,
+      unrestricted_native_searches: 0
+    }),
+  { code: 'counter_value_invalid' });
+  assert.throws(() =>
+    validateGovernedReadInvocationCounters({
+      provider_calls: null,
+      native_invocations: null,
+      local_fallbacks: null,
+      primary_memory_writes: null,
+      derived_index_writes: null,
+      other_durable_mutations: null,
+      unrestricted_native_searches: 0
+    }),
+  { code: 'counter_value_invalid' });
+});
+
+test('Relay rejects legacy counters that contradict known terminal facts', () => {
   const counters = {
     provider_calls: 0,
     native_invocations: 1,
@@ -5518,5 +5613,18 @@ test('Relay rejects legacy counters that contradict known or unknown terminal fa
       }
     ),
     { code: 'relay_attempt_counter_mismatch' }
+  );
+  assert.doesNotThrow(
+    () => validateInvocationCounterAgreement(
+      { ...counters, provider_calls: null },
+      {
+        ...terminalCounters,
+        provider: {
+          started: null,
+          succeeded: null,
+          failed: null
+        }
+      }
+    )
   );
 });

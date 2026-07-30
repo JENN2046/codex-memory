@@ -12,6 +12,12 @@ const {
 const {
   createProductionSelectedDiaryRuntimeHydrator
 } = require('../runtime/vcp-native/production-selected-diary-hydrator');
+const {
+  createProductionGovernedReadShimRuntime
+} = require('../runtime/vcp-native/production-governed-read-shim');
+
+const GOVERNED_READ_ATTEMPT_DEFAULT_PORT = 7616;
+const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 
 function parseArgs(argv = [], env = process.env) {
   const options = {
@@ -24,6 +30,22 @@ function parseArgs(argv = [], env = process.env) {
       env.CODEX_MEMORY_VCP_SOURCE_KB_STORE_PATH || '',
     diaryScopeMappingPath: env.CODEX_MEMORY_DIARY_SCOPE_MAPPING_PATH || '',
     expectedBearerToken: env.CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN || '',
+    governedReadAttemptEnabled: false,
+    governedReadAttemptHost: '127.0.0.1',
+    governedReadAttemptPort: normalizePort(
+      env.CODEX_MEMORY_GOVERNED_READ_SHIM_PORT,
+      GOVERNED_READ_ATTEMPT_DEFAULT_PORT
+    ),
+    governedReadAttemptLeaseRoot:
+      env.CODEX_MEMORY_GOVERNED_READ_LEASE_ROOT || '',
+    governedReadRuntimeBindingDigest:
+      env.CODEX_MEMORY_GOVERNED_READ_RUNTIME_BINDING_DIGEST || '',
+    embeddingApiUrl: env.API_URL || '',
+    embeddingApiKey: env.API_Key || '',
+    embeddingModel: env.WhitelistEmbeddingModel || '',
+    vectorDimension: normalizePositiveInteger(
+      env.VECTORDB_DIMENSION
+    ),
     derivedRuntimeMutationPolicy: env.CODEX_MEMORY_DERIVED_RUNTIME_MUTATION_POLICY ||
       DERIVED_RUNTIME_MUTATION_POLICY,
     selectedDiaryHydrationEnabled: false,
@@ -72,11 +94,92 @@ function parseArgs(argv = [], env = process.env) {
       options.selectedDiaryHydrationEnabled = true;
       continue;
     }
+    if (token === '--governed-read-attempts') {
+      options.governedReadAttemptEnabled = true;
+      continue;
+    }
+    if (token === '--governed-read-port') {
+      options.governedReadAttemptPort = normalizePort(
+        argv[index + 1],
+        options.governedReadAttemptPort
+      );
+      index += 1;
+      continue;
+    }
+    if (token === '--governed-read-lease-root') {
+      options.governedReadAttemptLeaseRoot =
+        argv[index + 1] ||
+        options.governedReadAttemptLeaseRoot;
+      index += 1;
+      continue;
+    }
     if (token === '--enable-write') {
       options.enableWrite = true;
     }
   }
 
+  return options;
+}
+
+function configureGovernedReadAttemptRuntime(options, {
+  createRuntime = createProductionGovernedReadShimRuntime
+} = {}) {
+  if (!options ||
+      typeof options !== 'object' ||
+      typeof createRuntime !== 'function') {
+    throw new Error('governed_read_attempt_cli_invalid');
+  }
+  if (options.governedReadAttemptEnabled !== true) {
+    return options;
+  }
+  if (options.enableWrite === true ||
+      options.governedReadAttemptHost !== '127.0.0.1' ||
+      !Number.isInteger(options.governedReadAttemptPort) ||
+      options.governedReadAttemptPort < 1 ||
+      options.governedReadAttemptPort > 65_535 ||
+      options.governedReadAttemptPort === options.port ||
+      !pathIsAbsoluteDirectoryReference(
+        options.governedReadAttemptLeaseRoot
+      ) ||
+      !pathIsAbsoluteDirectoryReference(options.vcpToolBoxRoot) ||
+      !pathIsAbsoluteDirectoryReference(
+        options.knowledgeBaseRootPath
+      ) ||
+      !pathIsAbsoluteDirectoryReference(
+        options.sourceKnowledgeBaseStorePath
+      ) ||
+      !DIGEST_PATTERN.test(
+        options.governedReadRuntimeBindingDigest || ''
+      ) ||
+      !Number.isInteger(options.vectorDimension) ||
+      options.vectorDimension < 1 ||
+      options.vectorDimension > 65_536) {
+    throw new Error('governed_read_attempt_cli_boundary_invalid');
+  }
+  options.governedReadAttemptRuntime = createRuntime({
+    runtimeBindingDigest:
+      options.governedReadRuntimeBindingDigest,
+    host: options.governedReadAttemptHost,
+    port: options.governedReadAttemptPort,
+    leaseRoot: options.governedReadAttemptLeaseRoot,
+    vcpToolBoxRoot: options.vcpToolBoxRoot,
+    sourceKnowledgeBaseStorePath:
+      options.sourceKnowledgeBaseStorePath,
+    knowledgeBaseRootPath: options.knowledgeBaseRootPath,
+    dimension: options.vectorDimension,
+    provider: {
+      apiUrl: options.embeddingApiUrl,
+      apiKey: options.embeddingApiKey,
+      model: options.embeddingModel
+    }
+  });
+  if (!options.governedReadAttemptRuntime ||
+      typeof options.governedReadAttemptRuntime.start !== 'function' ||
+      typeof options.governedReadAttemptRuntime.stop !== 'function' ||
+      typeof options.governedReadAttemptRuntime.snapshot !==
+        'function') {
+    throw new Error('governed_read_attempt_cli_factory_invalid');
+  }
   return options;
 }
 
@@ -121,20 +224,41 @@ function normalizePort(value, fallback) {
   return Number.isInteger(parsed) && parsed >= 0 && parsed <= 65535 ? parsed : fallback;
 }
 
+function normalizePositiveInteger(value) {
+  const parsed = Number.parseInt(String(value ?? ''), 10);
+  return Number.isInteger(parsed) && parsed > 0
+    ? parsed
+    : null;
+}
+
 async function main(
   argv = process.argv.slice(2),
   environment = process.env
 ) {
-  const options = configureSelectedDiaryHydration(parseArgs(argv, environment));
+  const options = configureGovernedReadAttemptRuntime(
+    configureSelectedDiaryHydration(
+      parseArgs(argv, environment)
+    )
+  );
   options.expectedBearerToken = requireExpectedBearerToken(options.expectedBearerToken);
   const server = createGovernedMcpVcpNativeVcpToolBoxMcpShimServer(options);
-  await new Promise((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(options.port, options.host, () => {
-      server.off('error', reject);
-      resolve();
+  try {
+    await new Promise((resolve, reject) => {
+      server.once('error', reject);
+      server.listen(options.port, options.host, () => {
+        server.off('error', reject);
+        resolve();
+      });
     });
-  });
+    if (options.governedReadAttemptRuntime) {
+      await options.governedReadAttemptRuntime.start();
+    }
+  } catch (error) {
+    await options.governedReadAttemptRuntime?.stop()
+      .catch(() => {});
+    await server.shutdownGovernedRuntime().catch(() => {});
+    throw error;
+  }
   const address = server.address();
   const port = address && typeof address === 'object' ? address.port : options.port;
   process.stdout.write(JSON.stringify({
@@ -151,6 +275,13 @@ async function main(
     isolatedRuntimeStoreConfigured: Boolean(options.knowledgeBaseStorePath),
     selectedDiaryHydrationConfigured:
       typeof options.selectedDiaryRuntimeHydrator === 'function',
+    governedReadAttemptConfigured:
+      Boolean(options.governedReadAttemptRuntime),
+    governedReadAttemptProtocol:
+      options.governedReadAttemptRuntime
+        ? 'governed_read_attempt.v1'
+        : null,
+    governedReadAttemptEndpointDisclosed: false,
     diaryScopeMappingConfigured: Boolean(options.diaryScopeMappingPath),
     runtimeStorePathDisclosed: false,
     tokenMaterialDisclosed: false,
@@ -162,6 +293,7 @@ async function main(
     if (closing) return;
     closing = true;
     try {
+      await options.governedReadAttemptRuntime?.stop();
       const finalReceipt = await server.shutdownGovernedRuntime();
       process.stdout.write(JSON.stringify({
         status: 'stopped',
@@ -208,8 +340,11 @@ function requireExpectedBearerToken(value) {
 }
 
 module.exports = {
+  GOVERNED_READ_ATTEMPT_DEFAULT_PORT,
+  configureGovernedReadAttemptRuntime,
   configureSelectedDiaryHydration,
   main,
+  normalizePositiveInteger,
   normalizePort,
   parseArgs,
   requireExpectedBearerToken

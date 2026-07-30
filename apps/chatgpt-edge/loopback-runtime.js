@@ -6,10 +6,12 @@ const {
   GOVERNED_READ_ATTEMPT_READ_TOOLS,
   InMemoryReplayGuard,
   LIMITS,
+  canonicalJson,
   createOpaqueId,
   createStageReceipt,
   digestObject,
   governedReadAttemptResponseBindingDigest,
+  projectGovernedReadAttemptPublic,
   validateAttemptHeader,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
@@ -375,15 +377,27 @@ function createLoopbackEdgeRuntime({
       } catch {
         reject('edge_attempt_response_binding_invalid');
       }
-      if (response?.receipt_chain?.relay !== expectedBinding) {
+      if (response?.receipt_chain?.relay !== expectedBinding ||
+          canonicalJson(response?.structured_content?.attempt) !==
+            canonicalJson(projectGovernedReadAttemptPublic(
+              governedReadAttemptCandidate
+            ))) {
         reject('edge_attempt_response_binding_invalid');
       }
+    } else if (Object.hasOwn(
+      response?.structured_content || {},
+      'attempt'
+    )) {
+      reject('edge_attempt_response_binding_invalid');
+    }
+    const acceptedResponse = structuredClone(response);
+    if (currentRecord.attempt_ref) {
       governedCoordinator.commitProtocolCandidate(
         currentRecord.attempt_ref,
         governedReadAttemptCandidate
       );
     }
-    currentRecord.response = structuredClone(response);
+    currentRecord.response = acceptedResponse;
     currentRecord.status = 'completed';
     currentRecord.claim = null;
     currentRecord.purge_after_ms = nowMs() + terminalRetentionMs;
