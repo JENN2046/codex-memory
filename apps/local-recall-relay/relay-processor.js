@@ -264,7 +264,7 @@ function validateInvocationCounterAgreement(invocation, terminal) {
     ['derived_index_writes', terminal.derived_transaction.started]
   ];
   for (const [field, terminalValue] of mappings) {
-    if (terminalValue !== null &&
+    if (terminalValue === null ||
         invocation[field] !== terminalValue) {
       reject('relay_attempt_counter_mismatch');
     }

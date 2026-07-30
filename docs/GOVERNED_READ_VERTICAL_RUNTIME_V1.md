@@ -67,6 +67,12 @@ success requires `ok`, authorization failure requires `denied`, and every
 other canonical failure requires `unavailable`. Relay rejects any contradictory
 projection rather than signing it.
 
+The dormant v1 response counter shape can encode only integers. If a canonical
+terminal contains `null` for a counter group whose downstream evidence is
+unknown, Relay rejects the legacy response instead of allowing a projector to
+replace the unknown fact with zero. Public response v2 remains the separate
+cutover that can transport those `null` counters.
+
 ## Parent-owned preflight and provider
 
 `createGovernedReadLeaseWorker()` is the persistent Shim controller. It:
@@ -131,7 +137,7 @@ the existing cleanup latch retains the store and blocks later reads.
 The controller also launches the lease child with an empty `execArgv` list, so
 parent `--env-file`, `--require`, and `--import` startup authority cannot cross
 the process boundary before the child's minimal-environment checks. A
-A synchronous fork rejection or asynchronous spawn error without a positive
+synchronous fork rejection or asynchronous spawn error without a positive
 PID is explicitly reported as child-not-started: the still-empty attempt store
 is removed and later admission remains available. Only a PID-bearing child
 without provable shutdown can latch cleanup and retain its store.
@@ -154,6 +160,14 @@ deadline independently of request and claim lease expiry. The attempt deadline
 must not exceed the signed request expiry. Thus a normal read cannot be
 converted into `attempt_timeout` merely because it runs longer than the legacy
 five-second claim lease, while no claim can outlive its attempt authority.
+
+Committed coordinator terminals use the same bounded retention window as the
+corresponding Edge request record. This keeps terminal lookup and coordinator
+capacity aligned across sustained turnover. Request IDs, nonces, and
+attempt refs remain in the separate replay guard until their signed expiry;
+the guard is sized for the maximum number of terminal-retention windows within
+the envelope TTL. Expiring a full terminal record therefore restores admission
+capacity without making an accepted identity replayable.
 
 The existing 20-second Bridge, 30-second Governance UDS, and 15-second Relay
 UDS defaults remain unchanged for non-attempt traffic. No environment

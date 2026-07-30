@@ -1277,6 +1277,95 @@ test('Edge stop clears claimed governed records before the runtime restarts', as
   assert.equal(secondClaim.request_id, second.request.request_id);
 });
 
+test('Edge reuses governed coordinator capacity at the request retention cadence', async t => {
+  let current = new Date(NOW);
+  const principal = signingIdentity('retention-capacity-principal');
+  const edgeIdentity = signingIdentity('retention-capacity-edge');
+  const contextRef = `pctx_${'t'.repeat(32)}`;
+  const principalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('retention-capacity-principal'),
+    now: NOW,
+    nonce: 'principal_nonce_retention_capacity_01',
+    signing: signing(principal)
+  });
+  const runtime = createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current,
+    maxInFlight: 1,
+    maxRecords: 2,
+    terminalRetentionMs: 10,
+    governedReadAttempts: true
+  });
+  const address = await runtime.start();
+  t.after(() => runtime.stop());
+  const client = createLoopbackEdgeClient(address.url, {
+    timeoutMs: 1_000
+  });
+
+  for (const [index, marker] of ['a', 'b', 'c', 'd'].entries()) {
+    const request = createRequestEnvelope({
+      principalAssertion,
+      toolName: 'search_memory',
+      toolArguments: {
+        project_context_ref: contextRef,
+        query: 'retention capacity reuse',
+        limit: 1
+      },
+      now: current,
+      requestId: `req_retention_capacity_${index}_00000001`,
+      nonce: `request_nonce_retention_capacity_${index}_01`,
+      signing: signing(edgeIdentity)
+    });
+    const header = createAttemptHeader({
+      attemptRef: `grat_${marker.repeat(32)}`,
+      toolName: 'search_memory',
+      requestDigest: digestObject(request),
+      contextBindingDigest: digestObject(contextRef),
+      now: current
+    });
+    await client.submit(request, { attemptHeader: header });
+    await client.cancel(request.request_id);
+    current = new Date(current.getTime() + 10);
+  }
+
+  const replayRequest = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: contextRef,
+      query: 'retention identity replay',
+      limit: 1
+    },
+    now: current,
+    requestId: 'req_retention_capacity_replay_00001',
+    nonce: 'request_nonce_retention_replay_01',
+    signing: signing(edgeIdentity)
+  });
+  const replayHeader = createAttemptHeader({
+    attemptRef: `grat_${'a'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject(replayRequest),
+    contextBindingDigest: digestObject(contextRef),
+    now: current
+  });
+  await assert.rejects(
+    client.submit(replayRequest, { attemptHeader: replayHeader }),
+    { code: 'replay_detected' }
+  );
+
+  assert.deepEqual(runtime.snapshot().states, {
+    queued: 0,
+    claimed: 0,
+    completed: 0,
+    cancelled: 0,
+    expired: 0
+  });
+  assert.equal(runtime.snapshot().request_count, 0);
+});
+
 test('Edge protocol-candidate commit is atomic and rejects a divergent prefix', () => {
   const header = createAttemptHeader({
     attemptRef: `grat_${'c'.repeat(32)}`,
@@ -2947,7 +3036,7 @@ test('Relay enforces public response and terminal outcome agreement', () => {
   );
 });
 
-test('Relay rejects legacy counters that contradict known terminal facts', () => {
+test('Relay rejects legacy counters that contradict known or unknown terminal facts', () => {
   const counters = {
     provider_calls: 0,
     native_invocations: 1,
@@ -2979,15 +3068,18 @@ test('Relay rejects legacy counters that contradict known terminal facts', () =>
     { ...counters, provider_calls: 1 },
     terminalCounters
   ));
-  assert.doesNotThrow(() => validateInvocationCounterAgreement(
-    counters,
-    {
-      ...terminalCounters,
-      provider: {
-        started: null,
-        succeeded: null,
-        failed: null
+  assert.throws(
+    () => validateInvocationCounterAgreement(
+      counters,
+      {
+        ...terminalCounters,
+        provider: {
+          started: null,
+          succeeded: null,
+          failed: null
+        }
       }
-    }
-  ));
+    ),
+    { code: 'relay_attempt_counter_mismatch' }
+  );
 });

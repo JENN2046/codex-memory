@@ -878,6 +878,31 @@ test('Edge bounds terminal retention while preserving replay and short lookup', 
   );
 });
 
+test('Edge coordinator permits retained capacity reuse after its configured window', () => {
+  let clockNow = NOW;
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => clockNow,
+    maxAttempts: 1,
+    maxRetainedAttempts: 1,
+    terminalRetentionMs: 10
+  });
+  const first = header('e');
+  coordinator.acceptAttempt(first);
+  coordinator.cancelAttempt(first.attempt_ref);
+  assert.throws(
+    () => coordinator.acceptAttempt(header('f')),
+    { code: 'attempt_coordinator_retention_capacity_exceeded' }
+  );
+
+  clockNow = new Date(NOW.getTime() + 10);
+  const second = header('g', clockNow);
+  assert.doesNotThrow(() => coordinator.acceptAttempt(second));
+  assert.throws(
+    () => coordinator.protocol(first.attempt_ref),
+    { code: 'attempt_not_found' }
+  );
+});
+
 test('Edge cancellation and expiry close an existing failed receipt without replacing its evidence', () => {
   for (const [suffix, trigger] of [
     ['T', 'cancel'],

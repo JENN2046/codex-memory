@@ -67,6 +67,7 @@ function createLoopbackEdgeRuntime({
         clock,
         maxAttempts: maxInFlight,
         maxRetainedAttempts: maxRecords,
+        terminalRetentionMs,
         eventSink: attemptEventSink
       })
     : null;
@@ -80,8 +81,14 @@ function createLoopbackEdgeRuntime({
   }
 
   const records = new Map();
+  const replayRetentionWindows = Math.ceil(
+    LIMITS.maxEnvelopeTtlSeconds * 1000 / terminalRetentionMs
+  );
   const submissionReplayGuard = new InMemoryReplayGuard({
-    maxEntries: maxRecords * 2,
+    maxEntries:
+      maxRecords *
+      (governedReadAttempts ? 3 : 2) *
+      replayRetentionWindows,
     clock
   });
   let started = false;
@@ -215,7 +222,14 @@ function createLoopbackEdgeRuntime({
     if (activeCount >= maxInFlight) reject('edge_inflight_capacity_exceeded');
     submissionReplayGuard.consumeMany([
       { namespace: 'edge_submission_request_id', key: request.request_id, expiresAt: request.expires_at },
-      { namespace: 'edge_submission_nonce', key: request.nonce, expiresAt: request.expires_at }
+      { namespace: 'edge_submission_nonce', key: request.nonce, expiresAt: request.expires_at },
+      ...(attemptHeader
+        ? [{
+            namespace: 'edge_submission_attempt_ref',
+            key: attemptHeader.attempt_ref,
+            expiresAt: attemptHeader.deadline_at
+          }]
+        : [])
     ]);
     const record = {
       request: structuredClone(request),

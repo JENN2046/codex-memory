@@ -372,6 +372,8 @@ function createGovernedReadAttemptCoordinator({
   clock = () => new Date(),
   maxAttempts = 64,
   maxRetainedAttempts = Math.max(maxAttempts, 256),
+  terminalRetentionMs =
+    GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000,
   eventSink,
   eventComponent = 'transient_edge_broker'
 } = {}) {
@@ -383,6 +385,12 @@ function createGovernedReadAttemptCoordinator({
       maxRetainedAttempts < maxAttempts ||
       maxRetainedAttempts > 4096) {
     reject('attempt_coordinator_retention_capacity_invalid');
+  }
+  if (!Number.isInteger(terminalRetentionMs) ||
+      terminalRetentionMs < 10 ||
+      terminalRetentionMs >
+        GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000) {
+    reject('attempt_coordinator_terminal_retention_invalid');
   }
   if (eventSink !== undefined && typeof eventSink !== 'function') {
     reject('attempt_coordinator_event_sink_invalid');
@@ -549,12 +557,8 @@ function createGovernedReadAttemptCoordinator({
       header: record.header,
       receipts: record.receipts
     });
-    const purgeAfterMs = Math.max(
-      Date.parse(record.header.deadline_at),
-      nowMs() + GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000
-    );
     record.terminal = structuredClone(terminal);
-    record.purge_after_ms = purgeAfterMs;
+    record.purge_after_ms = nowMs() + terminalRetentionMs;
     activeAttempts -= 1;
     emit('attempt_terminal_committed', {
       attempt_ref: attemptRef,
