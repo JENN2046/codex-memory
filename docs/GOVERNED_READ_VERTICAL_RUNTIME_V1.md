@@ -138,7 +138,14 @@ without provable shutdown can latch cleanup and retain its store.
 Once timeout, cancellation, IPC failure, or child error starts termination, a
 later success message cannot reverse that decision. A subsequent exact-child
 exit proves shutdown and permits store cleanup, but the late result remains a
-failed, evidence-incomplete attempt rather than an accepted search.
+failed, evidence-incomplete `worker_execution_terminated` terminal candidate
+without inventing a child stage. Cancellation remains owned by the Edge
+coordinator.
+
+Every non-empty native result must bind to an observed index candidate
+`chunkId`. Low-disclosure projection is also completed before
+`SCOPE_POSTCHECK` is receipted; malformed projection input therefore becomes a
+canonical scope failure with a clean store, never a post-success exception.
 
 Before acknowledgement, the short Edge claim lease still permits safe reclaim
 of an abandoned Relay claim. Acknowledgement of an attempt claim atomically
@@ -186,10 +193,12 @@ candidates. A manager-level result array cannot substitute for index evidence.
 
 The parent accepts only an exact child response shape whose working set extends
 the parent prefix, counters reconcile, success ends at a completed
-`SCOPE_POSTCHECK`, failure ends at a canonical child-owned failed stage, and
-every result item matches the bounded low-disclosure projection. Invalid child
-evidence is treated as incomplete shutdown evidence; its store is retained and
-later reads remain blocked.
+`SCOPE_POSTCHECK`, and every result item matches the bounded low-disclosure
+projection. A normal child failure ends at its canonical failed stage; a
+proven post-termination exit instead uses the terminal-level
+`worker_execution_terminated` reason without asserting an unknown child stage.
+Invalid child evidence is treated as incomplete shutdown evidence; its store
+is retained and later reads remain blocked.
 
 If graceful completion misses its deadline, the parent may send `SIGTERM` only
 to the child handle it created. It never uses `SIGKILL` and never enumerates or

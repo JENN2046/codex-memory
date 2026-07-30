@@ -199,6 +199,20 @@ function shutdownFailure(workingSet) {
   });
 }
 
+function terminatedFailure(workingSet) {
+  return Object.freeze({
+    accepted: false,
+    working_set: workingSet,
+    evidence_complete: false,
+    result: null,
+    terminal_failure: Object.freeze({
+      reason_code: 'worker_execution_terminated',
+      failure_origin: 'lease_worker'
+    }),
+    cleanup_complete: true
+  });
+}
+
 async function invokeHook(stageHooks, stage, value) {
   const hook = stageHooks?.[stage];
   if (hook === undefined) return;
@@ -1008,17 +1022,7 @@ function createGovernedReadLeaseWorker({
           return shutdownFailure(current);
         }
         attemptsCompleted += 1;
-        return failedContinuation(
-          current,
-          'HYDRATION',
-          'hydration_failed',
-          {
-            native_invocation: {
-              succeeded: 0,
-              failed: 1
-            }
-          }
-        );
+        return terminatedFailure(current);
       }
       let response = null;
       try {

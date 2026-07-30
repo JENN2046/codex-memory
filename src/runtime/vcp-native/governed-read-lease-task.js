@@ -224,7 +224,7 @@ function validateVectorSearchEvidence({
         if (!result ||
             typeof result !== 'object' ||
             !Object.hasOwn(result, 'chunkId')) {
-          return false;
+          return true;
         }
         const chunkId = Number(result.chunkId);
         return !Number.isSafeInteger(chunkId) ||
@@ -400,6 +400,7 @@ async function executeGovernedReadLeaseTask(input = {}) {
     );
   }
 
+  let projectedResults;
   try {
     await runStageHook(stageHooks, 'SCOPE_POSTCHECK', {
       attempt_ref: workingSet.header.attempt_ref
@@ -411,6 +412,7 @@ async function executeGovernedReadLeaseTask(input = {}) {
     if (postcheck.accepted !== true) {
       throw new Error('lease_scope_postcheck_rejected');
     }
+    projectedResults = Object.freeze(projectReadResults(rawResults));
     workingSet = completeStage(workingSet, 'SCOPE_POSTCHECK');
   } catch {
     return failStage(
@@ -425,8 +427,8 @@ async function executeGovernedReadLeaseTask(input = {}) {
     working_set: workingSet,
     evidence_complete: countersComplete(workingSet),
     result: Object.freeze({
-      results: Object.freeze(projectReadResults(rawResults)),
-      result_count: rawResults.length,
+      results: projectedResults,
+      result_count: projectedResults.length,
       raw_memory_content_disclosed: false,
       raw_vector_disclosed: false,
       source_path_disclosed: false,

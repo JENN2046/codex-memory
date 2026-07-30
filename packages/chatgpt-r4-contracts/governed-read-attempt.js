@@ -292,6 +292,14 @@ const GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY = deepFreeze({
     nativeMayHaveOccurred: true,
     unknownCounterGroups: ALL_COUNTER_GROUPS
   }),
+  worker_execution_terminated: failure({
+    category: 'native_runtime',
+    stage: 'TERMINAL_FAILURE',
+    origin: 'lease_worker',
+    providerMayHaveOccurred: true,
+    nativeMayHaveOccurred: true,
+    unknownCounterGroups: ALL_COUNTER_GROUPS
+  }),
   worker_shutdown_incomplete: failure({
     category: 'cleanup',
     stage: 'TERMINAL_FAILURE',

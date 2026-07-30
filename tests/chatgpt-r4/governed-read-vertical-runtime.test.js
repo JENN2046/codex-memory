@@ -256,7 +256,9 @@ function createSqliteFixture(t) {
 function createSyntheticWorkerRunner(sourceProjection, {
   stageHooks,
   bypassIndexSearch = false,
-  ghostCandidate = false
+  ghostCandidate = false,
+  malformedProjection = false,
+  omitChunkId = false
 } = {}) {
   return async task => {
     assert.deepEqual(Object.keys(task.authorization).sort(), [
@@ -333,13 +335,13 @@ function createSyntheticWorkerRunner(sourceProjection, {
         );
         return row
           ? [{
-              chunkId: row.chunkId,
+              ...(omitChunkId ? {} : { chunkId: row.chunkId }),
               diaryName: row.diaryName,
               fullPath: row.fullPath,
               sourceFile: row.fullPath,
               content: row.content,
               score: 0.75,
-              matchedTags: []
+              matchedTags: malformedProjection ? {} : []
             }]
           : [];
       }
@@ -365,7 +367,7 @@ function createSyntheticWorkerRunner(sourceProjection, {
         result.accepted === true ||
           failedStage === 'SCOPE_POSTCHECK' ||
           (failedStage === 'VECTOR_SEARCH' &&
-            (bypassIndexSearch || ghostCandidate))
+            (bypassIndexSearch || ghostCandidate || omitChunkId))
           ? 1
           : 0
       );
@@ -1439,6 +1441,44 @@ test('Bridge transport failure preserves unknown downstream counters', async () 
     evidenceComplete: false,
     failureOrigin: 'bridge'
   }));
+
+  const terminalBridge = createGovernedReadAttemptBridge({
+    async invokeShim({ workingSet }) {
+      return {
+        accepted: false,
+        working_set: workingSet,
+        evidence_complete: false,
+        result: null,
+        terminal_failure: {
+          reason_code: 'worker_execution_terminated',
+          failure_origin: 'lease_worker'
+        },
+        cleanup_complete: true
+      };
+    }
+  });
+  const terminalResult = await terminalBridge.invoke({
+    workingSet: authorized,
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'synthetic terminated worker',
+    limit: 1
+  });
+  assert.deepEqual(terminalResult.terminal_failure, {
+    reason_code: 'worker_execution_terminated',
+    failure_origin: 'lease_worker'
+  });
+  assert.doesNotThrow(() => createTerminalEnvelope({
+    header: terminalResult.working_set.header,
+    receipts: terminalResult.working_set.receipts,
+    outcome: 'failure',
+    reasonCode: terminalResult.terminal_failure.reason_code,
+    evidenceComplete: terminalResult.evidence_complete,
+    failureOrigin: terminalResult.terminal_failure.failure_origin
+  }));
 });
 
 test('dispatch, preflight, and provider failures close before creating a derived store', async t => {
@@ -1739,7 +1779,8 @@ test('lease task rejects skipped index search and ghost candidates', async t => 
   const fixture = createSqliteFixture(t);
   const cases = [
     { bypassIndexSearch: true },
-    { ghostCandidate: true }
+    { ghostCandidate: true },
+    { omitChunkId: true }
   ];
   for (let index = 0; index < cases.length; index += 1) {
     let providerCalls = 0;
@@ -1785,6 +1826,61 @@ test('lease task rejects skipped index search and ghost candidates', async t => 
     assert.equal(worker.snapshot().stores_removed, 1);
     assert.equal(worker.snapshot().cleanup_blocked, false);
   }
+});
+
+test('lease task converts projection errors into a clean scope failure', async t => {
+  const fixture = createSqliteFixture(t);
+  let providerCalls = 0;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      providerCalls += 1;
+      return [0.75, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    workerRunner: createSyntheticWorkerRunner(
+      fixture.sourceProjection,
+      { malformedProjection: true }
+    )
+  });
+  const result = await worker.execute({
+    workingSet: bridgeWorkingSet('k'),
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'malformed low disclosure projection',
+    limit: 1
+  });
+  assert.equal(result.accepted, false);
+  assert.equal(result.cleanup_complete, true);
+  assert.equal(result.evidence_complete, true);
+  assert.equal(result.terminal_failure, null);
+  assert.equal(
+    result.working_set.receipts.at(-1).stage,
+    'SCOPE_POSTCHECK'
+  );
+  assert.equal(
+    result.working_set.receipts.at(-1).reason_code,
+    'scope_postcheck_failed'
+  );
+  assert.deepEqual(
+    aggregateAttemptCounters(result.working_set.receipts)
+      .native_invocation,
+    { started: 1, succeeded: 1, failed: 0 }
+  );
+  assert.equal(providerCalls, 1);
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+  assert.equal(worker.snapshot().stores_created, 1);
+  assert.equal(worker.snapshot().stores_removed, 1);
+  assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
 });
 
 test('shutdown failure retains the exact store and blocks the next provider call', async t => {
@@ -2394,16 +2490,38 @@ test('lease timeout rejects late success and reuses capacity after exit', async 
   assert.equal(late.accepted, false);
   assert.equal(late.cleanup_complete, true);
   assert.equal(late.evidence_complete, false);
-  assert.equal(late.working_set.receipts.at(-1).stage, 'HYDRATION');
-  assert.equal(
-    late.working_set.receipts.at(-1).reason_code,
-    'hydration_failed'
-  );
   assert.deepEqual(
-    late.working_set.receipts.at(-1)
-      .counter_facts.native_invocation,
-    { succeeded: 0, failed: 1 }
+    late.terminal_failure,
+    {
+      reason_code: 'worker_execution_terminated',
+      failure_origin: 'lease_worker'
+    }
   );
+  assert.equal(
+    late.working_set.receipts.at(-1).stage,
+    'PROVIDER_EMBEDDING'
+  );
+  const terminal = createTerminalEnvelope({
+    header: late.working_set.header,
+    receipts: late.working_set.receipts,
+    outcome: 'failure',
+    reasonCode: late.terminal_failure.reason_code,
+    evidenceComplete: late.evidence_complete,
+    failureOrigin: late.terminal_failure.failure_origin
+  });
+  assert.equal(terminal.last_completed_stage, 'PROVIDER_EMBEDDING');
+  assert.equal(terminal.failed_stage, 'TERMINAL_FAILURE');
+  assert.equal(terminal.reason_code, 'worker_execution_terminated');
+  assert.deepEqual(terminal.counters.native_invocation, {
+    started: 1,
+    succeeded: null,
+    failed: null
+  });
+  assert.deepEqual(terminal.counters.derived_transaction, {
+    started: null,
+    committed: null,
+    rolled_back: null
+  });
   assert.deepEqual(lateChild.signals, ['SIGTERM']);
   assert.equal(lateExecution.response, null);
   assert.equal(lateExecution.shutdown_complete, true);

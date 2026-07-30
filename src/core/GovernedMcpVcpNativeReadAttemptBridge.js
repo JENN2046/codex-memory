@@ -5,6 +5,7 @@ const http = require('node:http');
 const {
   LIMITS,
   appendGovernedReadAttemptStage,
+  failureRegistryEntry,
   governedReadAttemptDeadlineBudgetMs,
   isGovernedReadAttemptWorkingSetExtension,
   validateGovernedReadAttemptWorkingSet
@@ -47,6 +48,27 @@ function failedDelegation(workingSet) {
     terminal_failure: null,
     cleanup_complete: false
   });
+}
+
+function isLeaseTerminalFailure(value) {
+  if (value === null) return true;
+  if (!value ||
+      typeof value !== 'object' ||
+      Array.isArray(value) ||
+      Object.keys(value).sort().join(',') !==
+        'failure_origin,reason_code' ||
+      typeof value.reason_code !== 'string' ||
+      typeof value.failure_origin !== 'string') {
+    return false;
+  }
+  try {
+    const entry = failureRegistryEntry(value.reason_code);
+    return entry.stage === 'TERMINAL_FAILURE' &&
+      entry.origin === 'lease_worker' &&
+      value.failure_origin === entry.origin;
+  } catch {
+    return false;
+  }
 }
 
 function createGovernedReadAttemptBridge({
@@ -93,9 +115,7 @@ function createGovernedReadAttemptBridge({
               delegated,
               response.working_set
             ) ||
-            (response.terminal_failure !== null &&
-              response.terminal_failure?.reason_code !==
-                'worker_shutdown_incomplete')) {
+            !isLeaseTerminalFailure(response.terminal_failure)) {
           throw codedError('governed_read_bridge_response_invalid');
         }
         return response;
