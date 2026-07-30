@@ -12,8 +12,8 @@ const {
 } = require('../../../packages/chatgpt-r4-contracts');
 const { createGovernanceAdapter } = require('./governance-adapter');
 const {
-  searchProjection,
-  structuredProjection
+  legacyStructuredProjection,
+  searchProjection
 } = require('./governed-read-public-projection');
 const { resolveRegisteredProject, visibilityScope } = require('./project-registry');
 
@@ -623,7 +623,11 @@ function createGovernedLiveReadInvoker({
       reject('r4_live_read_native_delegation_rejected');
     }
     const evidence = nativeEvidence(result, resolution.allowedDiaryCount);
-    const structuredContent = structuredProjection(toolName, result, projectContextRef);
+    const structuredContent = legacyStructuredProjection(
+      toolName,
+      result,
+      projectContextRef
+    );
     assertNoMappingDisclosure(structuredContent, mappingState);
     validatePublicStructuredContent(structuredContent);
     const counters = countersFromEvidence(evidence);
@@ -930,6 +934,6 @@ module.exports = {
   effectiveVisibility,
   receiptBackedNativePreflightFailure,
   searchProjection,
-  structuredProjection,
+  structuredProjection: legacyStructuredProjection,
   visibilityLabels
 };

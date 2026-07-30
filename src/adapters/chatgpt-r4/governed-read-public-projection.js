@@ -48,6 +48,22 @@ function searchProjection(result, projectContextRef) {
   };
 }
 
+function boundedStatusProjection(
+  kind,
+  nativeResult,
+  projectContextRef
+) {
+  const search = searchProjection(
+    nativeResult,
+    projectContextRef
+  );
+  return {
+    status: search.result_count > 0 ? 'available' : 'empty',
+    kind,
+    item_count: search.result_count
+  };
+}
+
 function structuredProjection(
   toolName,
   nativeResult,
@@ -68,6 +84,28 @@ function structuredProjection(
     };
   }
   if (toolName === 'memory_overview') {
+    return boundedStatusProjection(
+      'overview',
+      nativeResult,
+      projectContextRef
+    );
+  }
+  if (toolName === 'audit_memory') {
+    return boundedStatusProjection(
+      'audit',
+      nativeResult,
+      projectContextRef
+    );
+  }
+  reject('r4_live_read_tool_invalid');
+}
+
+function legacyStructuredProjection(
+  toolName,
+  nativeResult,
+  projectContextRef
+) {
+  if (toolName === 'memory_overview') {
     return {
       status: 'available',
       kind: 'overview',
@@ -81,10 +119,15 @@ function structuredProjection(
       item_count: 1
     };
   }
-  reject('r4_live_read_tool_invalid');
+  return structuredProjection(
+    toolName,
+    nativeResult,
+    projectContextRef
+  );
 }
 
 module.exports = {
+  legacyStructuredProjection,
   searchProjection,
   structuredProjection
 };

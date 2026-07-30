@@ -96,6 +96,12 @@ different statement while retaining native-success receipts. The comparison
 adds no raw result or projection digest to receipts, logs, or the public
 response.
 
+The attempt projector also derives `memory_overview` and `audit_memory` status
+and item count from the validated lease results. Zero hits project as
+`empty / 0`; one or more bounded low-disclosure hits project as
+`available / item_count`. The pre-attempt governed-live projector retains its
+existing v1 behavior and is not switched by this dormant delivery.
+
 Governance also derives the context digest from the attempt header's validated
 context binding and derives the governance digest from the actual signed
 request, Relay receipt, accepted authorization or denial evidence, context

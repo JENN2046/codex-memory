@@ -2248,6 +2248,205 @@ test('Governance derives tool-aware execution parameters from every signed read 
   });
 });
 
+test('Governed attempt projections bind all four tools to hit and zero-hit lease results', async () => {
+  const projectedItem = {
+    score: 0.75,
+    memoryContextProjection: {
+      projectionVersion: 1,
+      lowDisclosure: true,
+      statement: 'bounded canonical projection statement',
+      classification: 'current_state',
+      freshness: 'recent',
+      reasonCodes: ['semantic_match'],
+      conflict: false
+    }
+  };
+  const nativeHit = {
+    results: [projectedItem],
+    result_count: 1
+  };
+  const nativeEmpty = {
+    results: [],
+    result_count: 0
+  };
+  const projectContextRef = `pctx_${'j'.repeat(32)}`;
+  const projectionCases = [
+    {
+      toolName: 'search_memory',
+      hit: {
+        status: 'found',
+        result_count: 1
+      },
+      empty: {
+        status: 'empty',
+        result_count: 0,
+        results: []
+      }
+    },
+    {
+      toolName: 'prepare_memory_context',
+      hit: {
+        status: 'found',
+        kind: 'context',
+        item_count: 1
+      },
+      empty: {
+        status: 'empty',
+        kind: 'context',
+        item_count: 0
+      }
+    },
+    {
+      toolName: 'memory_overview',
+      hit: {
+        status: 'available',
+        kind: 'overview',
+        item_count: 1
+      },
+      empty: {
+        status: 'empty',
+        kind: 'overview',
+        item_count: 0
+      }
+    },
+    {
+      toolName: 'audit_memory',
+      hit: {
+        status: 'available',
+        kind: 'audit',
+        item_count: 1
+      },
+      empty: {
+        status: 'empty',
+        kind: 'audit',
+        item_count: 0
+      }
+    }
+  ];
+  for (const fixture of projectionCases) {
+    const hit = structuredProjection(
+      fixture.toolName,
+      nativeHit,
+      projectContextRef
+    );
+    assert.equal(hit.status, fixture.hit.status);
+    if (fixture.toolName === 'search_memory') {
+      assert.equal(hit.result_count, fixture.hit.result_count);
+      assert.equal(hit.results.length, 1);
+    } else {
+      assert.deepEqual(hit, fixture.hit);
+    }
+    assert.deepEqual(
+      structuredProjection(
+        fixture.toolName,
+        nativeEmpty,
+        projectContextRef
+      ),
+      fixture.empty
+    );
+  }
+
+  for (const [toolName, kind, marker] of [
+    ['memory_overview', 'overview', 'o'],
+    ['audit_memory', 'audit', 'i']
+  ]) {
+    const contextRef = `pctx_${marker.repeat(32)}`;
+    const request = {
+      tool_request: {
+        name: toolName,
+        arguments: {
+          project_context_ref: contextRef,
+          ...(toolName === 'audit_memory'
+            ? { event_limit: 1 }
+            : {})
+        }
+      }
+    };
+    const header = createAttemptHeader({
+      attemptRef: `grat_${marker.repeat(32)}`,
+      toolName,
+      requestDigest: digestObject(request),
+      contextBindingDigest: digestObject(contextRef),
+      now: NOW
+    });
+    const receipts = [];
+    for (const stage of [
+      'CREATED',
+      'EDGE_VALIDATED',
+      'RELAY_CLAIMED'
+    ]) {
+      receipts.push(createStageReceipt({
+        header,
+        receipts,
+        stage
+      }));
+    }
+    const execution =
+      deriveGovernedReadExecutionParameters(request);
+    function projectionRuntime(structuredContent) {
+      return createGovernedReadAttemptGovernanceRuntime({
+        async authorizeRead() {
+          return {
+            accepted: true,
+            authorization: { accepted: true },
+            ...execution
+          };
+        },
+        async invokeBridge({ workingSet }) {
+          return successfulGovernanceBridgeResult(
+            workingSet,
+            nativeEmpty
+          );
+        },
+        async projectInvocation({
+          bridgeResult,
+          receiptDigests
+        }) {
+          return {
+            status: 'ok',
+            structured_content:
+              structuredContent(bridgeResult),
+            counters:
+              liveCounters(bridgeResult.working_set),
+            receipt_digests: receiptDigests
+          };
+        }
+      });
+    }
+    const forged = projectionRuntime(() => ({
+      status: 'available',
+      kind,
+      item_count: 1
+    }));
+    await assert.rejects(
+      forged.handle({
+        request,
+        relayReceipt: {},
+        governedReadAttempt: { header, receipts }
+      }),
+      { code: 'governed_read_projection_binding_invalid' }
+    );
+
+    const canonical = projectionRuntime(
+      bridgeResult => structuredProjection(
+        toolName,
+        bridgeResult.result,
+        contextRef
+      )
+    );
+    const accepted = await canonical.handle({
+      request,
+      relayReceipt: {},
+      governedReadAttempt: { header, receipts }
+    });
+    assert.deepEqual(accepted.structured_content, {
+      status: 'empty',
+      kind,
+      item_count: 0
+    });
+  }
+});
+
 test('Governance binds public projection content to the successful lease result', async () => {
   const contextRef = `pctx_${'n'.repeat(32)}`;
   const request = {
