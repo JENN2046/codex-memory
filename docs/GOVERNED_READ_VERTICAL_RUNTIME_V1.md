@@ -233,6 +233,14 @@ child handle. A late handler result cannot increment accepted-frame counters or
 write a response. If exact child shutdown cannot be proven after cancellation,
 the existing cleanup latch retains the store and blocks later reads.
 
+The persistent Shim tracks every asynchronous HTTP lease handler separately
+from its sockets. `stop()` aborts their signals, closes the listener and exact
+sockets, and then waits up to 25 seconds for those handlers to settle. If a
+provider or child ignores cancellation beyond that bound, stop fails with
+`governed_read_shim_shutdown_incomplete`, keeps the Shim logically started,
+and blocks restart. A later stop may complete only after the retained handler
+has actually settled.
+
 The controller also launches the lease child with an empty `execArgv` list, so
 parent `--env-file`, `--require`, and `--import` startup authority cannot cross
 the process boundary before the child's minimal-environment checks. A

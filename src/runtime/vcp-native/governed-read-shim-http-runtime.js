@@ -9,6 +9,7 @@ const {
 
 const MAX_HTTP_BODY_BYTES =
   LIMITS.maxRequestBytes + LIMITS.maxResponseBytes + 64 * 1024;
+const DEFAULT_SHUTDOWN_TIMEOUT_MS = 25_000;
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 
 function codedError(code) {
@@ -76,21 +77,28 @@ function sendJson(outgoing, status, value) {
 
 function createGovernedReadShimHttpRuntime({
   leaseWorker,
-  runtimeBindingDigest
+  runtimeBindingDigest,
+  shutdownTimeoutMs = DEFAULT_SHUTDOWN_TIMEOUT_MS
 } = {}) {
   if (!leaseWorker ||
       typeof leaseWorker.execute !== 'function' ||
       typeof leaseWorker.snapshot !== 'function' ||
       typeof runtimeBindingDigest !== 'string' ||
-      !DIGEST_PATTERN.test(runtimeBindingDigest)) {
+      !DIGEST_PATTERN.test(runtimeBindingDigest) ||
+      !Number.isInteger(shutdownTimeoutMs) ||
+      shutdownTimeoutMs < 10 ||
+      shutdownTimeoutMs > 60_000) {
     throw codedError('governed_read_shim_runtime_invalid');
   }
   let started = false;
+  let stopInProgress = null;
   let acceptedRequests = 0;
   let rejectedRequests = 0;
   const openSockets = new Set();
-  const server = http.createServer(async (incoming, outgoing) => {
-    const cancellation = new AbortController();
+  const activeHandlers = new Set();
+  const activeCancellations = new Set();
+
+  async function handleRequest(incoming, outgoing, cancellation) {
     const abortRequest = () => {
       if (!cancellation.signal.aborted) cancellation.abort();
     };
@@ -139,6 +147,21 @@ function createGovernedReadShimHttpRuntime({
       incoming.off('aborted', abortRequest);
       outgoing.off('close', abortClosedResponse);
     }
+  }
+
+  const server = http.createServer((incoming, outgoing) => {
+    const cancellation = new AbortController();
+    activeCancellations.add(cancellation);
+    const handler = handleRequest(
+      incoming,
+      outgoing,
+      cancellation
+    );
+    activeHandlers.add(handler);
+    handler.finally(() => {
+      activeHandlers.delete(handler);
+      activeCancellations.delete(cancellation);
+    });
   });
   server.on('connection', socket => {
     openSockets.add(socket);
@@ -179,11 +202,41 @@ function createGovernedReadShimHttpRuntime({
     },
     async stop() {
       if (!started) return;
-      for (const socket of openSockets) socket.destroy();
-      await new Promise((resolve, rejectStop) => {
-        server.close(error => error ? rejectStop(error) : resolve());
-      });
-      started = false;
+      if (stopInProgress) return stopInProgress;
+      const pendingStop = (async () => {
+        for (const cancellation of activeCancellations) {
+          if (!cancellation.signal.aborted) cancellation.abort();
+        }
+        for (const socket of openSockets) socket.destroy();
+        if (server.listening) {
+          await new Promise((resolve, rejectStop) => {
+            server.close(error => error ? rejectStop(error) : resolve());
+          });
+        }
+        if (activeHandlers.size > 0) {
+          let shutdownTimer;
+          const settled = await Promise.race([
+            Promise.allSettled([...activeHandlers]).then(() => true),
+            new Promise(resolve => {
+              shutdownTimer = setTimeout(
+                () => resolve(false),
+                shutdownTimeoutMs
+              );
+            })
+          ]);
+          clearTimeout(shutdownTimer);
+          if (!settled) {
+            throw codedError('governed_read_shim_shutdown_incomplete');
+          }
+        }
+        started = false;
+      })();
+      stopInProgress = pendingStop;
+      try {
+        await pendingStop;
+      } finally {
+        if (stopInProgress === pendingStop) stopInProgress = null;
+      }
     },
     snapshot() {
       return Object.freeze({
@@ -203,6 +256,7 @@ function createGovernedReadShimHttpRuntime({
 }
 
 module.exports = {
+  DEFAULT_SHUTDOWN_TIMEOUT_MS,
   MAX_HTTP_BODY_BYTES,
   createGovernedReadShimHttpRuntime
 };

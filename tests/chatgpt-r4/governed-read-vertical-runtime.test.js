@@ -833,6 +833,97 @@ test('Bridge cancellation reaches the Shim lease worker', async t => {
   assert.equal(shim.snapshot().rejected_requests, 1);
 });
 
+test('Shim stop fails closed until an active lease handler settles', async t => {
+  let workerSignal = null;
+  let workerExecuting = false;
+  let markWorkerStarted;
+  const workerStarted = new Promise(resolve => {
+    markWorkerStarted = resolve;
+  });
+  let releaseWorker;
+  const workerGate = new Promise(resolve => {
+    releaseWorker = resolve;
+  });
+  const runtimeBindingDigest = digestObject(
+    'synthetic-shim-shutdown-binding'
+  );
+  const shim = createGovernedReadShimHttpRuntime({
+    runtimeBindingDigest,
+    shutdownTimeoutMs: 30,
+    leaseWorker: {
+      async execute({ signal }) {
+        workerSignal = signal;
+        workerExecuting = true;
+        markWorkerStarted();
+        await workerGate;
+        workerExecuting = false;
+        return null;
+      },
+      snapshot() {
+        return {
+          provider_calls_in_flight: workerExecuting ? 1 : 0
+        };
+      }
+    }
+  });
+  t.after(async () => {
+    releaseWorker();
+    if (shim.snapshot().started) {
+      try {
+        await shim.stop();
+      } catch {}
+    }
+  });
+  const address = await shim.start();
+  const invokeShim = createGovernedReadShimHttpClient({
+    endpoint: address.endpoint,
+    runtimeBindingDigest,
+    clock: () => NOW
+  });
+  const pendingRequest = invokeShim({
+    workingSet: bridgeWorkingSet('k'),
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'shutdown waits for active lease work',
+    limit: 1
+  });
+  const requestRejected = assert.rejects(
+    pendingRequest,
+    error => [
+      'governed_read_bridge_http_unavailable',
+      'governed_read_bridge_response_invalid'
+    ].includes(error?.code)
+  );
+  await workerStarted;
+
+  await assert.rejects(
+    shim.stop(),
+    { code: 'governed_read_shim_shutdown_incomplete' }
+  );
+  assert.equal(workerSignal?.aborted, true);
+  assert.equal(shim.snapshot().started, true);
+  assert.equal(
+    shim.snapshot().lease_worker.provider_calls_in_flight,
+    1
+  );
+  await assert.rejects(
+    shim.start(),
+    { code: 'governed_read_shim_already_started' }
+  );
+
+  releaseWorker();
+  await requestRejected;
+  await shim.stop();
+  assert.equal(shim.snapshot().started, false);
+  assert.equal(
+    shim.snapshot().lease_worker.provider_calls_in_flight,
+    0
+  );
+});
+
 function successfulWorkerExecution(task, {
   shutdownComplete = true
 } = {}) {
