@@ -1355,6 +1355,103 @@ test('Edge acknowledged attempt claim lasts until the attempt deadline', async t
   );
 });
 
+test('Edge retains an active record until coordinator timeout succeeds', async t => {
+  let current = new Date(NOW);
+  let timeoutCalls = 0;
+  let timeoutAvailable = false;
+  const principal = signingIdentity('timeout-retry-principal');
+  const edgeIdentity = signingIdentity('timeout-retry-edge');
+  const contextRef = `pctx_${'z'.repeat(32)}`;
+  const principalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('timeout-retry-principal'),
+    now: NOW,
+    nonce: 'principal_nonce_timeout_retry_0001',
+    signing: signing(principal)
+  });
+  const request = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: contextRef,
+      query: 'coordinator timeout retry',
+      limit: 1
+    },
+    now: NOW,
+    ttlSeconds: 2,
+    requestId: 'req_timeout_retry_000000000000001',
+    nonce: 'request_nonce_timeout_retry_000001',
+    signing: signing(edgeIdentity)
+  });
+  const header = createAttemptHeader({
+    attemptRef: `grat_${'z'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject(request),
+    contextBindingDigest: digestObject(contextRef),
+    now: NOW,
+    ttlSeconds: 1
+  });
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => current
+  });
+  const injectedCoordinator = {
+    acceptAttempt: (...args) => coordinator.acceptAttempt(...args),
+    appendReceipt: (...args) => coordinator.appendReceipt(...args),
+    cancelAttempt: (...args) => coordinator.cancelAttempt(...args),
+    commitProtocolCandidate: (...args) =>
+      coordinator.commitProtocolCandidate(...args),
+    reportCoordinatorLoss: (...args) =>
+      coordinator.reportCoordinatorLoss(...args),
+    timeoutAttempt(attemptRef) {
+      timeoutCalls += 1;
+      if (!timeoutAvailable) {
+        throw Object.assign(
+          new Error('edge_attempt_timeout_commit_unavailable'),
+          { code: 'edge_attempt_timeout_commit_unavailable' }
+        );
+      }
+      return coordinator.timeoutAttempt(attemptRef);
+    },
+    workingSet: (...args) => coordinator.workingSet(...args)
+  };
+  const runtime = createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current,
+    governedReadAttempts: true,
+    attemptCoordinator: injectedCoordinator
+  });
+  const address = await runtime.start();
+  t.after(() => runtime.stop());
+  const client = createLoopbackEdgeClient(address.url, {
+    timeoutMs: 1_000
+  });
+
+  await client.submit(request, { attemptHeader: header });
+  const claim = await client.claim('timeout-retry-relay');
+  await client.acknowledge(claim);
+  current = new Date(NOW.getTime() + 1_000);
+  await assert.rejects(
+    client.state(claim),
+    { code: 'edge_attempt_timeout_commit_unavailable' }
+  );
+  assert.equal(timeoutCalls, 1);
+  assert.equal(
+    coordinator.snapshot(header.attempt_ref).terminal_committed,
+    false
+  );
+
+  timeoutAvailable = true;
+  assert.equal((await client.state(claim)).status, 'expired');
+  assert.equal(timeoutCalls, 2);
+  assert.equal(
+    coordinator.protocol(header.attempt_ref).terminal.reason_code,
+    'attempt_timeout'
+  );
+  assert.equal(runtime.snapshot().states.expired, 1);
+});
+
 test('Edge validates every injected attempt coordinator lifecycle method', () => {
   const required = [
     'acceptAttempt',
@@ -3369,6 +3466,60 @@ test('dispatch, preflight, and provider failures close before creating a derived
   assert.equal(preStoreWorker.snapshot().stores_created, 0);
   assert.equal(preStoreWorker.snapshot().attempts_started, 1);
   assert.equal(preStoreWorker.snapshot().attempts_completed, 1);
+});
+
+test('provider cancellation before dispatch never calls the wrapper', async t => {
+  const fixture = createSqliteFixture(t);
+  const cancellation = new AbortController();
+  let providerCalls = 0;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      providerCalls += 1;
+      throw new Error('cancelled attempt reached provider');
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    workerRunner:
+      createSyntheticWorkerRunner(fixture.sourceProjection),
+    stageHooks: {
+      async PROVIDER_EMBEDDING({ signal }) {
+        assert.equal(signal, cancellation.signal);
+        cancellation.abort();
+      }
+    }
+  });
+  const result = await worker.execute({
+    workingSet: bridgeWorkingSet('6'),
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'cancel before provider dispatch',
+    limit: 1,
+    signal: cancellation.signal
+  });
+  const receipt = result.working_set.receipts.at(-1);
+
+  assert.equal(result.accepted, false);
+  assert.equal(receipt.stage, 'PROVIDER_EMBEDDING');
+  assert.equal(receipt.reason_code, 'provider_embedding_failed');
+  assert.deepEqual(receipt.counter_facts.provider, {
+    started: 0,
+    succeeded: 0,
+    failed: 0
+  });
+  assert.equal(providerCalls, 0);
+  assert.equal(worker.snapshot().provider_invocations, 0);
+  assert.equal(worker.snapshot().provider_calls_in_flight, 0);
+  assert.equal(worker.snapshot().stores_created, 0);
+  assert.equal(worker.snapshot().attempts_completed, 1);
 });
 
 test('source preflight terminates a stalled scan before provider and reuses capacity', async t => {

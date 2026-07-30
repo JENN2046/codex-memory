@@ -906,8 +906,10 @@ function createGovernedReadLeaseWorker({
       let providerStarted = false;
       try {
         await invokeHook(stageHooks, 'PROVIDER_EMBEDDING', {
-          attempt_ref: current.header.attempt_ref
+          attempt_ref: current.header.attempt_ref,
+          signal
         });
+        throwIfAborted(signal);
         const remainingProviderMs = attemptDeadlineMs - nowMs();
         if (remainingProviderMs <= 0) {
           return failedContinuation(
@@ -923,8 +925,6 @@ function createGovernedReadLeaseWorker({
             }
           );
         }
-        providerInvocations += 1;
-        providerStarted = true;
         const providerAbortController = new AbortController();
         let rejectProviderCancellation = null;
         const providerCancellation = signal
@@ -944,14 +944,17 @@ function createGovernedReadLeaseWorker({
           { once: true }
         );
         if (signal?.aborted) onProviderCancellation();
-        const providerTask = Promise.resolve().then(() =>
-          providerWrapper({
+        const providerTask = Promise.resolve().then(() => {
+          throwIfAborted(signal);
+          providerInvocations += 1;
+          providerStarted = true;
+          return providerWrapper({
             query: selectedQuery,
             dimension,
             signal: providerAbortController.signal,
             deadlineAt: current.header.deadline_at
-          })
-        );
+          });
+        });
         providerInFlight = providerTask;
         providerTask.then(
           () => {

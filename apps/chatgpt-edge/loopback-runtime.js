@@ -118,45 +118,49 @@ function createLoopbackEdgeRuntime({
     return milliseconds;
   }
 
+  function confirmAttemptTimeout(record) {
+    if (!record.attempt_ref) return;
+    const confirmation =
+      governedCoordinator.timeoutAttempt(record.attempt_ref);
+    if (confirmation?.accepted !== true ||
+        confirmation.attempt_ref !== record.attempt_ref ||
+        confirmation.outcome !== 'failure' ||
+        !/^sha256:[a-f0-9]{64}$/u.test(
+          confirmation.terminal_digest || ''
+        )) {
+      reject('edge_attempt_timeout_terminal_invalid');
+    }
+  }
+
   function refresh(record) {
     if (TERMINAL_STATES.has(record.status)) return;
     const currentMs = nowMs();
     if (record.attempt_deadline_ms !== null &&
         record.attempt_deadline_ms <= currentMs) {
+      confirmAttemptTimeout(record);
       record.status = 'expired';
       record.claim = null;
       record.purge_after_ms =
         currentMs + terminalRetentionMs;
-      try {
-        governedCoordinator.timeoutAttempt(record.attempt_ref);
-      } catch {}
       emit('request_expired', record);
       return;
     }
     const requestExpiresMs = Date.parse(record.request.expires_at);
     if (requestExpiresMs <= currentMs) {
+      confirmAttemptTimeout(record);
       record.status = 'expired';
       record.claim = null;
       record.purge_after_ms = requestExpiresMs + terminalRetentionMs;
-      if (record.attempt_ref) {
-        try {
-          governedCoordinator.timeoutAttempt(record.attempt_ref);
-        } catch {}
-      }
       emit('request_expired', record);
       return;
     }
     if (record.status === 'claimed' && record.claim.expires_ms <= currentMs) {
       const acknowledged = record.claim.acked;
       const claimExpiresMs = record.claim.expires_ms;
+      if (acknowledged) confirmAttemptTimeout(record);
       record.status = acknowledged ? 'expired' : 'queued';
       record.claim = null;
       if (acknowledged) record.purge_after_ms = claimExpiresMs + terminalRetentionMs;
-      if (acknowledged && record.attempt_ref) {
-        try {
-          governedCoordinator.timeoutAttempt(record.attempt_ref);
-        } catch {}
-      }
       emit(acknowledged ? 'acknowledged_claim_expired' : 'claim_expired', record);
     }
   }
@@ -390,12 +394,12 @@ function createLoopbackEdgeRuntime({
   function cancel(requestId) {
     const record = requireRecord(requestId);
     if (TERMINAL_STATES.has(record.status)) reject('edge_request_terminal');
-    record.status = 'cancelled';
-    record.claim = null;
-    record.purge_after_ms = nowMs() + terminalRetentionMs;
     if (record.attempt_ref) {
       governedCoordinator.cancelAttempt(record.attempt_ref);
     }
+    record.status = 'cancelled';
+    record.claim = null;
+    record.purge_after_ms = nowMs() + terminalRetentionMs;
     emit('request_cancelled', record);
     return { request_id: requestId, status: record.status };
   }
