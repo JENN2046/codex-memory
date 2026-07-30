@@ -275,6 +275,12 @@ async function run(options) {
       childResult.projection.primary_source_unchanged_after_negatives,
       true
     );
+    assert.equal(childResult.writer.unauthorized_diary_generated, true);
+    assert.equal(childResult.projection.unauthorized_diary_excluded, true);
+    assert.equal(
+      childResult.native_search.unauthorized_diary_excluded,
+      true
+    );
     assert.ok(counters.requests >= 1);
     assert.ok(counters.items >= 1);
     assert.ok(counters.omitted >= 1);

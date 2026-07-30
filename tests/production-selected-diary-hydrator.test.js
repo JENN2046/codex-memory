@@ -672,6 +672,62 @@ test('preflight identity replacement stays a SOURCE_PREFLIGHT failure', t => {
   assert.equal(opened, false);
 });
 
+test('materialization invalid allowlists become HYDRATION failures', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      openCount += 1;
+      return openReadOnlyDatabase(file);
+    }
+  });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  assert.equal(openCount, 1);
+
+  for (const allowedDiaryNames of [
+    [],
+    ['PROJECT_ALPHA', 'PROJECT_ALPHA'],
+    ['../PROJECT_ALPHA'],
+    Array.from(
+      { length: 8 },
+      (_, index) => `${'界'.repeat(254)}${index}`
+    )
+  ]) {
+    assert.throws(
+      () => hydrate.materialize({
+        ...hydrationInput(value),
+        allowedDiaryNames,
+        projectionPlan: plan
+      }),
+      error => {
+        assert.equal(
+          error.code,
+          'selected_diary_hydration_allowlist_invalid'
+        );
+        assert.equal(error.reasonCode, 'hydration_failed');
+        assert.deepEqual(
+          error.counterFacts,
+          zeroDerivedCounterFactsFixture()
+        );
+        const failure = failureRegistryEntry(error.reasonCode);
+        assert.equal(failure.stage, 'HYDRATION');
+        assert.equal(failure.provider_may_have_occurred, true);
+        return true;
+      }
+    );
+  }
+  assert.equal(openCount, 1);
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
 test('projection byte budgets reject before selected rows are materialized', () => {
   const schema = {
     files: [

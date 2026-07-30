@@ -149,12 +149,19 @@ The isolated CI job `Exact VCP writer authority`:
 - verifies writer-null-vector omission and writer-produced sparse
   `chunk_index`;
 - runs production preflight and streaming materialization;
+- writes a fourth valid but unauthorized diary through the exact writer and
+  proves that neither the derived database nor the raw native search result
+  contains its path or sentinel content;
 - uses the production native adapter for exactly one query embedding, index
   recovery, vector search, and scope postcheck;
 - verifies primary database bytes do not change during governed reads;
 - derives vectorless, duplicate-index, NaN, Infinity, dimension, cross-scope,
   and between-pass-mutation negatives only by minimally corrupting copies of
   writer output.
+
+The two dormant-runtime passive contract imports are accepted only when their
+allowlisted targets are canonical regular files whose `realpath` is the exact
+expected contract path. A symlinked contract target fails the import fence.
 
 Default local tests do not clone VCPToolBox, install its dependencies, access
 the network, start a real service, or call a provider. The exact authority job

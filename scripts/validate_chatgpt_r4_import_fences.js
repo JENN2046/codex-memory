@@ -390,6 +390,20 @@ function isFile(file) {
   }
 }
 
+function isCanonicalRegularFile(file, {
+  lstatSync = target => fs.lstatSync(target),
+  realpathSync = target => fs.realpathSync(target)
+} = {}) {
+  try {
+    const stat = lstatSync(file);
+    return stat.isFile() &&
+      !stat.isSymbolicLink() &&
+      realpathSync(file) === file;
+  } catch {
+    return false;
+  }
+}
+
 function resolveRuntimeModuleFile(file, specifier, { fileExists = isFile } = {}) {
   if (!specifier.startsWith('.') && !specifier.startsWith('/')) return null;
   const base = path.resolve(path.dirname(file), specifier);
@@ -405,15 +419,16 @@ function isAllowedPassiveContractImport({
   relativeFile,
   resolved,
   specifier,
-  moduleRoot
+  moduleRoot,
+  lstatSync,
+  realpathSync
 }) {
   const allowed =
     ACTIVE_RUNTIME_PASSIVE_CONTRACT_IMPORT_ALLOWLIST[relativeFile];
   if (!allowed || !Object.hasOwn(allowed, specifier) || !resolved) return false;
-  const resolvedRelative = path.relative(moduleRoot, resolved)
-    .split(path.sep)
-    .join('/');
-  return resolvedRelative === allowed[specifier];
+  const expected = path.resolve(moduleRoot, allowed[specifier]);
+  return resolved === expected &&
+    isCanonicalRegularFile(expected, { lstatSync, realpathSync });
 }
 
 function validateComponent(component, root = ROOTS[component]) {
@@ -693,7 +708,9 @@ function validateNotActivated({
   entrypoints,
   readFileSync = file => fs.readFileSync(file, 'utf8'),
   fileExists = isFile,
-  moduleRoot = path.dirname(runtimeRoot)
+  moduleRoot = path.dirname(runtimeRoot),
+  lstatSync = file => fs.lstatSync(file),
+  realpathSync = file => fs.realpathSync(file)
 } = {}) {
   const activeEntrypoints = (entrypoints || discoverPackageRuntimeEntrypoints({ fileExists }))
     .filter(fileExists);
@@ -713,7 +730,9 @@ function validateNotActivated({
         relativeFile,
         resolved,
         specifier,
-        moduleRoot
+        moduleRoot,
+        lstatSync,
+        realpathSync
       })) {
         passiveContractBindingCount += 1;
         continue;

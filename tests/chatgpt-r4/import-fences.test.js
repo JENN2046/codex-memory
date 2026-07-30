@@ -1,6 +1,8 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 
@@ -61,11 +63,22 @@ test('R4-D D2B import fences accept external Edge and outbound Relay without act
     [passiveCanonical, ''],
     [passiveAttempt, '']
   ]);
+  const passiveFileIdentity = {
+    lstatSync(file) {
+      assert.equal(passiveSources.has(file), true);
+      return {
+        isFile: () => true,
+        isSymbolicLink: () => false
+      };
+    },
+    realpathSync: file => file
+  };
   const passive = validateNotActivated({
     runtimeRoot: passiveRuntimeRoot,
     entrypoints: [passiveHydrator],
     readFileSync: file => passiveSources.get(file),
-    fileExists: file => passiveSources.has(file)
+    fileExists: file => passiveSources.has(file),
+    ...passiveFileIdentity
   });
   assert.equal(passive.passiveContractBindingCount, 2);
   passiveSources.set(
@@ -147,6 +160,70 @@ test('R4-D D2B import fences accept external Edge and outbound Relay without act
       readFileSync: file => sources.get(file),
       fileExists: file => sources.has(file)
     }), /dynamic_import_forbidden:src\/core\/runtime\.js/);
+  }
+});
+
+test('passive contract targets must be canonical regular files', t => {
+  const roots = [];
+  t.after(() => {
+    for (const root of roots) {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  for (const symlinkTarget of [
+    'canonical.js',
+    'governed-read-attempt.js'
+  ]) {
+    const root = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'codex-memory-passive-contract-')
+    );
+    roots.push(root);
+    const runtimeRoot = path.join(root, 'src');
+    const hydrator = path.join(
+      runtimeRoot,
+      'runtime',
+      'vcp-native',
+      'production-selected-diary-hydrator.js'
+    );
+    const contractRoot = path.join(
+      root,
+      'packages',
+      'chatgpt-r4-contracts'
+    );
+    const candidate = path.join(
+      root,
+      'apps',
+      'chatgpt-edge',
+      'candidate.js'
+    );
+    fs.mkdirSync(path.dirname(hydrator), { recursive: true });
+    fs.mkdirSync(contractRoot, { recursive: true });
+    fs.mkdirSync(path.dirname(candidate), { recursive: true });
+    fs.writeFileSync(hydrator, [
+      "require('../../../packages/chatgpt-r4-contracts/canonical');",
+      "require('../../../packages/chatgpt-r4-contracts/governed-read-attempt');"
+    ].join('\n'), 'utf8');
+    fs.writeFileSync(candidate, 'module.exports = {};\n', 'utf8');
+    for (const filename of [
+      'canonical.js',
+      'governed-read-attempt.js'
+    ]) {
+      const contractFile = path.join(contractRoot, filename);
+      if (filename === symlinkTarget) {
+        fs.symlinkSync(candidate, contractFile);
+      } else {
+        fs.writeFileSync(contractFile, 'module.exports = {};\n', 'utf8');
+      }
+    }
+
+    assert.throws(
+      () => validateNotActivated({
+        runtimeRoot,
+        entrypoints: [hydrator]
+      }),
+      /candidate_runtime_activated/u
+    );
   }
 });
 

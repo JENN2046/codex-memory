@@ -204,12 +204,15 @@ async function run() {
 
   const alphaRoot = path.join(memoryRoot, 'PROJECT_ALPHA');
   const betaRoot = path.join(memoryRoot, 'PROJECT_BETA');
+  const deniedRoot = path.join(memoryRoot, 'PROJECT_DENIED');
   fs.mkdirSync(alphaRoot, { recursive: true });
   fs.mkdirSync(betaRoot, { recursive: true });
+  fs.mkdirSync(deniedRoot, { recursive: true });
   const sparseFile = path.join(alphaRoot, 'sparse.md');
   const updateFile = path.join(alphaRoot, 'update.md');
   const betaKeepFile = path.join(betaRoot, 'keep.md');
   const betaDeleteFile = path.join(betaRoot, 'delete.md');
+  const deniedFile = path.join(deniedRoot, 'denied.md');
   const rootFile = path.join(memoryRoot, 'root.md');
 
   fs.writeFileSync(
@@ -223,12 +226,18 @@ async function run() {
   fs.writeFileSync(updateFile, 'writer update version one.', 'utf8');
   fs.writeFileSync(betaKeepFile, 'writer beta retained memory.', 'utf8');
   fs.writeFileSync(betaDeleteFile, 'writer beta delete path memory.', 'utf8');
+  fs.writeFileSync(
+    deniedFile,
+    'writer update version two unauthorized diary sentinel.',
+    'utf8'
+  );
   fs.writeFileSync(rootFile, 'writer root memory.', 'utf8');
   await flushFiles(primaryManager, [
     sparseFile,
     updateFile,
     betaKeepFile,
     betaDeleteFile,
+    deniedFile,
     rootFile
   ]);
 
@@ -252,6 +261,12 @@ async function run() {
     ).get('PROJECT_BETA/delete.md').count,
     0
   );
+  assert.equal(
+    primaryManager.db.prepare(
+      'SELECT COUNT(*) AS count FROM files WHERE path = ?'
+    ).get('PROJECT_DENIED/denied.md').count,
+    1
+  );
 
   const sparseIndexes = primaryManager.db.prepare(`
     SELECT c.chunk_index AS chunkIndex
@@ -268,8 +283,8 @@ async function run() {
   const writerChunkCount = primaryManager.db.prepare(
     'SELECT COUNT(*) AS count FROM chunks'
   ).get().count;
-  assert.ok(writerFileCount >= 4);
-  assert.ok(writerChunkCount >= 4);
+  assert.ok(writerFileCount >= 5);
+  assert.ok(writerChunkCount >= 5);
 
   await quiesceManager(primaryManager);
   await primaryManager.shutdown();
@@ -321,10 +336,19 @@ async function run() {
   let hydration = null;
   let providerInvocationCount = 0;
   let nativeSearchInvocationCount = 0;
+  let nativeSearchResults = null;
   const exactSearch = derivedManager.search.bind(derivedManager);
   derivedManager.search = (...args) => {
     nativeSearchInvocationCount += 1;
-    return exactSearch(...args);
+    const result = exactSearch(...args);
+    if (result && typeof result.then === 'function') {
+      return Promise.resolve(result).then(value => {
+        nativeSearchResults = value;
+        return value;
+      });
+    }
+    nativeSearchResults = result;
+    return result;
   };
   const adapter = createVcpToolBoxNativeMemoryAdapter({
     vcpToolBoxRoot: vcpRoot,
@@ -385,6 +409,33 @@ async function run() {
   }
   assert.equal(providerInvocationCount, 1);
   assert.equal(nativeSearchInvocationCount, 1);
+  assert.equal(
+    derivedManager.db.prepare(
+      'SELECT COUNT(*) AS count FROM files WHERE diary_name = ?'
+    ).get('PROJECT_DENIED').count,
+    0
+  );
+  assert.equal(
+    derivedManager.db.prepare(
+      `SELECT COUNT(*) AS count
+       FROM chunks
+       WHERE content LIKE '%unauthorized diary sentinel%'`
+    ).get().count,
+    0
+  );
+  assert.ok(Array.isArray(nativeSearchResults));
+  assert.equal(
+    nativeSearchResults.some(result =>
+      result?.diaryName === 'PROJECT_DENIED' ||
+      String(result?.fullPath || '').replace(/\\/gu, '/')
+        .startsWith('PROJECT_DENIED/')
+    ),
+    false
+  );
+  assert.doesNotMatch(
+    JSON.stringify(nativeSearchResults),
+    /PROJECT_DENIED|unauthorized diary sentinel/u
+  );
   assert.equal(searchResult.results.length, 1);
   assert.equal(
     searchResult._nativeRuntimeReceipt.resultScopePostcheckPassed,
@@ -596,6 +647,7 @@ async function run() {
       delete_exercised: true,
       null_vector_omission_exercised: true,
       sparse_chunk_index_observed: true,
+      unauthorized_diary_generated: true,
       file_count: writerFileCount,
       chunk_count: writerChunkCount
     },
@@ -603,6 +655,7 @@ async function run() {
       preflight_passed: true,
       source_snapshot_stable: hydration.sourceSnapshotStable,
       primary_source_unchanged_after_negatives: true,
+      unauthorized_diary_excluded: true,
       primary_write_attempts: hydration.counterFacts.primary_memory.write_attempts,
       derived_transaction: hydration.counterFacts.derived_transaction
     },
@@ -610,7 +663,8 @@ async function run() {
       provider_invocations: providerInvocationCount,
       invocations: nativeSearchInvocationCount,
       result_count: searchResult.results.length,
-      scope_postcheck_passed: true
+      scope_postcheck_passed: true,
+      unauthorized_diary_excluded: true
     },
     negative_reasons: negativeReasons
   };

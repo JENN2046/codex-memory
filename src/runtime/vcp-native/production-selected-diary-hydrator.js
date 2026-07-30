@@ -1360,9 +1360,18 @@ function createProductionSelectedDiarySourceProjection({
     projectionPlan
   } = {}) {
     validateProjectionPlan(projectionPlan);
-    const allowed = normalizeSelectedDiaryNames(
-      allowedDiaryNames ?? projectionPlan.allowed_diary_names
-    );
+    let allowed;
+    try {
+      allowed = normalizeSelectedDiaryNames(
+        allowedDiaryNames ?? projectionPlan.allowed_diary_names
+      );
+    } catch {
+      throw codedError(
+        'selected_diary_hydration_allowlist_invalid',
+        'hydration_failed',
+        { counterFacts: zeroDerivedCounterFacts() }
+      );
+    }
     if (!sameAllowedDiaryNames(
       allowed,
       projectionPlan.allowed_diary_names
