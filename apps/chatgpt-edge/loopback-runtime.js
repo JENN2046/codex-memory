@@ -494,7 +494,11 @@ function createLoopbackEdgeRuntime({
       if (!started) return;
       await stopServer(server);
       started = false;
-      governedCoordinator?.reportCoordinatorLoss();
+      try {
+        governedCoordinator?.reportCoordinatorLoss();
+      } finally {
+        records.clear();
+      }
     },
     snapshot() {
       refreshAndPrune();

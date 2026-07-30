@@ -1166,6 +1166,117 @@ test('Edge validates every injected attempt coordinator lifecycle method', () =>
   }
 });
 
+test('Edge stop clears claimed governed records before the runtime restarts', async t => {
+  const principal = signingIdentity('stop-restart-principal');
+  const edgeIdentity = signingIdentity('stop-restart-edge');
+  const contextRef = `pctx_${'s'.repeat(32)}`;
+  const principalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('stop-restart-principal'),
+    now: NOW,
+    nonce: 'principal_nonce_stop_restart_01',
+    signing: signing(principal)
+  });
+  function requestAndHeader({
+    attemptMarker,
+    nonce,
+    requestId
+  }) {
+    const request = createRequestEnvelope({
+      principalAssertion,
+      toolName: 'search_memory',
+      toolArguments: {
+        project_context_ref: contextRef,
+        query: 'stop restart isolation',
+        limit: 1
+      },
+      now: NOW,
+      requestId,
+      nonce,
+      signing: signing(edgeIdentity)
+    });
+    const header = createAttemptHeader({
+      attemptRef: `grat_${attemptMarker.repeat(32)}`,
+      toolName: 'search_memory',
+      requestDigest: digestObject(request),
+      contextBindingDigest: digestObject(contextRef),
+      now: NOW
+    });
+    return { header, request };
+  }
+  const first = requestAndHeader({
+    attemptMarker: 'x',
+    requestId: 'req_stop_restart_first_00000001',
+    nonce: 'request_nonce_stop_restart_first_01'
+  });
+  const second = requestAndHeader({
+    attemptMarker: 'y',
+    requestId: 'req_stop_restart_second_0000001',
+    nonce: 'request_nonce_stop_restart_second_01'
+  });
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => NOW
+  });
+  const runtime = createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => NOW,
+    maxInFlight: 1,
+    maxRecords: 2,
+    governedReadAttempts: true,
+    attemptCoordinator: coordinator
+  });
+  t.after(() => runtime.stop());
+
+  const firstAddress = await runtime.start();
+  const firstClient = createLoopbackEdgeClient(firstAddress.url, {
+    timeoutMs: 1_000
+  });
+  await firstClient.submit(first.request, {
+    attemptHeader: first.header
+  });
+  const firstClaim = await firstClient.claim('stop-restart-relay');
+  await firstClient.acknowledge(firstClaim);
+  assert.equal(runtime.snapshot().states.claimed, 1);
+
+  await runtime.stop();
+  assert.deepEqual(runtime.snapshot(), {
+    in_memory_only: true,
+    request_count: 0,
+    states: {
+      queued: 0,
+      claimed: 0,
+      completed: 0,
+      cancelled: 0,
+      expired: 0
+    },
+    governed_read_attempts_enabled: true
+  });
+  assert.throws(
+    () => coordinator.snapshot(first.header.attempt_ref),
+    { code: 'attempt_not_found' }
+  );
+
+  const secondAddress = await runtime.start();
+  const secondClient = createLoopbackEdgeClient(secondAddress.url, {
+    timeoutMs: 1_000
+  });
+  assert.equal(
+    await secondClient.claim('stop-restart-relay'),
+    null
+  );
+  await assert.rejects(
+    secondClient.result(first.request.request_id),
+    { code: 'edge_request_not_found' }
+  );
+  await secondClient.submit(second.request, {
+    attemptHeader: second.header
+  });
+  const secondClaim = await secondClient.claim('stop-restart-relay');
+  assert.equal(secondClaim.request_id, second.request.request_id);
+});
+
 test('Edge protocol-candidate commit is atomic and rejects a divergent prefix', () => {
   const header = createAttemptHeader({
     attemptRef: `grat_${'c'.repeat(32)}`,
