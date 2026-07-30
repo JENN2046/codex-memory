@@ -818,24 +818,23 @@ test('projection byte budgets reject before selected rows are materialized', () 
         }
         if (sql.includes('AS metadataBytes')) {
           return {
-            get() {
-              return {
-                count: 1,
-                metadataBytes: 64,
-                ...summaryPatch
-              };
+            iterate() {
+              return [{
+                metadataBytes:
+                  summaryPatch.metadataBytes ?? 64
+              }][Symbol.iterator]();
             }
           };
         }
         if (sql.includes('AS contentBytes')) {
           return {
-            get() {
-              return {
-                count: 1,
-                contentBytes: 32,
-                vectorBytes: 8,
-                ...summaryPatch
-              };
+            iterate() {
+              return [{
+                contentBytes:
+                  summaryPatch.contentBytes ?? 32,
+                vectorBytes:
+                  summaryPatch.vectorBytes ?? 8
+              }][Symbol.iterator]();
             }
           };
         }
@@ -852,6 +851,62 @@ test('projection byte budgets reject before selected rows are materialized', () 
     );
     assert.equal(selectedRowsMaterialized, false);
   }
+});
+
+test('source preflight deadline guard interrupts the streaming budget scan', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  insertMemory(value.source, {
+    chunkId: 12,
+    content: 'second selected memory',
+    fileId: 8,
+    filePath: 'PROJECT_ALPHA/second.md'
+  });
+  value.closeSource();
+  let budgetRowsRead = 0;
+  let deadlineChecks = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      const database = openReadOnlyDatabase(file);
+      return proxyReadOnlyDatabase(database, (sql, statement) => ({
+        all: statement.all.bind(statement),
+        get: statement.get.bind(statement),
+        iterate(...args) {
+          const iterator = statement.iterate(...args);
+          if (!sql.includes('AS metadataBytes')) return iterator;
+          return {
+            [Symbol.iterator]() {
+              return this;
+            },
+            next() {
+              const step = iterator.next();
+              if (!step.done) budgetRowsRead += 1;
+              return step;
+            }
+          };
+        }
+      }));
+    }
+  });
+
+  assert.throws(
+    () => hydrate.preflight({
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      assertReadDeadline() {
+        deadlineChecks += 1;
+        if (budgetRowsRead >= 1) {
+          throw new Error('synthetic_attempt_deadline');
+        }
+      },
+      dimension: 2
+    }),
+    {
+      code: 'selected_diary_hydration_source_deadline_exceeded',
+      reasonCode: 'source_preflight_failed'
+    }
+  );
+  assert.equal(budgetRowsRead, 1);
+  assert.ok(deadlineChecks > 1);
 });
 
 test('production hydrator rejects selected rows whose path escapes the exact diary', async t => {

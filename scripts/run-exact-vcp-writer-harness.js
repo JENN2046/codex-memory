@@ -269,6 +269,10 @@ async function run(options) {
       vcpRoot: options.vcpRoot
     });
     assert.equal(childResult.exact_vcp_sha_verified, true);
+    assert.equal(
+      childResult.projection.preflight_process_exercised,
+      true
+    );
     assert.equal(childResult.native_search.provider_invocations, 1);
     assert.equal(childResult.native_search.invocations, 1);
     assert.equal(
@@ -278,9 +282,30 @@ async function run(options) {
     assert.equal(childResult.writer.unauthorized_diary_generated, true);
     assert.equal(childResult.projection.unauthorized_diary_excluded, true);
     assert.equal(
+      childResult.projection.derived_scope_directly_verified,
+      true
+    );
+    assert.equal(
       childResult.native_search.unauthorized_diary_excluded,
       true
     );
+    assert.equal(
+      childResult.native_search.derived_scope_directly_verified,
+      true
+    );
+    assert.equal(
+      childResult.native_search.lease_scoped_child_exercised,
+      true
+    );
+    assert.equal(
+      childResult.native_search.child_provider_authority_present,
+      false
+    );
+    assert.equal(
+      childResult.native_search.derived_store_removed,
+      true
+    );
+    assert.equal(childResult.native_search.sigkill_used, false);
     assert.ok(counters.requests >= 1);
     assert.ok(counters.items >= 1);
     assert.ok(counters.omitted >= 1);

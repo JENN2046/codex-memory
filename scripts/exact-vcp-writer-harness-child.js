@@ -107,6 +107,35 @@ function vectorBuffer(values) {
   return Buffer.from(new Float32Array(values).buffer);
 }
 
+function bridgeWorkingSet(contracts, suffix) {
+  const header = contracts.createAttemptHeader({
+    attemptRef: `grat_${suffix.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: contracts.digestObject(`exact-request-${suffix}`),
+    contextBindingDigest:
+      contracts.digestObject(`exact-context-${suffix}`),
+    now: new Date('2026-07-30T00:00:00.000Z')
+  });
+  const receipts = [];
+  for (const stage of [
+    'CREATED',
+    'EDGE_VALIDATED',
+    'RELAY_CLAIMED',
+    'AUTHORIZED',
+    'BRIDGE_DELEGATED'
+  ]) {
+    receipts.push(contracts.createStageReceipt({
+      header,
+      receipts,
+      stage,
+      counterFacts: stage === 'BRIDGE_DELEGATED'
+        ? { fallback: { attempts: 0 } }
+        : {}
+    }));
+  }
+  return { header, receipts };
+}
+
 function copyWriterDatabase({
   Database,
   sourceFile,
@@ -182,11 +211,12 @@ async function run() {
   const runtimeRoot = path.join(workspaceRoot, 'vcp-runtime');
   const memoryRoot = path.join(runtimeRoot, 'dailynote');
   const primaryStore = path.join(runtimeRoot, 'VectorStore');
-  const derivedStore = path.join(workspaceRoot, 'derived-store');
+  const leaseRoot = path.join(workspaceRoot, 'governed-read-leases');
   fs.mkdirSync(runtimeRoot, { recursive: true });
   fs.mkdirSync(memoryRoot, { recursive: true });
   fs.mkdirSync(primaryStore, { recursive: true });
-  fs.mkdirSync(derivedStore, { recursive: true });
+  fs.mkdirSync(leaseRoot, { recursive: true, mode: 0o700 });
+  fs.chmodSync(leaseRoot, 0o700);
 
   setRuntimeEnvironment({ memoryRoot, storePath: primaryStore });
   const primaryManager = loadFreshKnowledgeBaseManager(vcpRoot);
@@ -294,19 +324,17 @@ async function run() {
     vcpToolBoxRoot: runtimeRoot,
     sourceDatabaseConstructor: Database
   });
-  const plan = projection.preflight({
-    allowedDiaryNames: ['PROJECT_ALPHA', 'PROJECT_BETA', 'Root'],
-    dimension: 4
-  });
-
-  setRuntimeEnvironment({ memoryRoot, storePath: derivedStore });
-  const derivedManager = loadFreshKnowledgeBaseManager(vcpRoot);
   const exactEmbeddingUtils = loadFreshEmbeddingUtils(vcpRoot);
   const {
-    createVcpToolBoxNativeMemoryAdapter
+    createGovernedReadLeaseWorker,
+    runLeaseWorkerProcess
   } = require(path.join(
     codexRoot,
-    'src/core/GovernedMcpVcpNativeVcpToolBoxMcpShim.js'
+    'src/runtime/vcp-native/governed-read-lease-worker.js'
+  ));
+  const contracts = require(path.join(
+    codexRoot,
+    'packages/chatgpt-r4-contracts'
   ));
   const allowedDiaryNames = Object.freeze([
     'PROJECT_ALPHA',
@@ -322,121 +350,133 @@ async function run() {
       .update('exact-vcp-writer-authority-v1')
       .digest('hex')}`
   });
-  let hydration = null;
   let providerInvocationCount = 0;
-  let nativeSearchInvocationCount = 0;
-  let nativeSearchResults = null;
-  const exactSearch = derivedManager.search.bind(derivedManager);
-  derivedManager.search = (...args) => {
-    nativeSearchInvocationCount += 1;
-    const result = exactSearch(...args);
-    if (result && typeof result.then === 'function') {
-      return Promise.resolve(result).then(value => {
-        nativeSearchResults = value;
-        return value;
-      });
+  let derivedScopeDirectlyVerified = false;
+  const runWorkerWithDerivedScopeGate = async (task, options) => {
+    const execution = await runLeaseWorkerProcess(task, options);
+    if (execution?.response?.result?.accepted !== true ||
+        execution.shutdown_complete !== true) {
+      return execution;
     }
-    nativeSearchResults = result;
-    return result;
+    const derivedDatabase = new Database(path.join(
+      task.derived_store_path,
+      'knowledge_base.sqlite'
+    ), {
+      readonly: true,
+      fileMustExist: true
+    });
+    try {
+      const placeholders = task.authorization.allowedDiaryNames
+        .map(() => '?')
+        .join(', ');
+      const unauthorizedDiaryRows = derivedDatabase.prepare(`
+        SELECT COUNT(*) AS count
+        FROM files
+        WHERE diary_name NOT IN (${placeholders})
+      `).get(...task.authorization.allowedDiaryNames).count;
+      const unauthorizedSentinelRows = derivedDatabase.prepare(`
+        SELECT COUNT(*) AS count
+        FROM chunks c
+        INNER JOIN files f ON f.id = c.file_id
+        WHERE f.diary_name = 'PROJECT_DENIED'
+           OR c.content LIKE ?
+      `).get('%unauthorized diary sentinel%').count;
+      assert.equal(unauthorizedDiaryRows, 0);
+      assert.equal(unauthorizedSentinelRows, 0);
+      derivedScopeDirectlyVerified = true;
+    } finally {
+      derivedDatabase.close();
+    }
+    return execution;
   };
-  const adapter = createVcpToolBoxNativeMemoryAdapter({
-    vcpToolBoxRoot: vcpRoot,
-    knowledgeBaseRootPath: memoryRoot,
-    knowledgeBaseStorePath: derivedStore,
-    knowledgeBaseManager: derivedManager,
-    embeddingUtils: {
-      async getEmbeddingsBatch(texts) {
-        providerInvocationCount += 1;
-        return exactEmbeddingUtils.getEmbeddingsBatch(texts, {
+  const leaseWorker = createGovernedReadLeaseWorker({
+    clock: () => new Date('2026-07-30T00:00:00.000Z'),
+    sourceProjection: projection,
+    async providerWrapper({ query }) {
+      providerInvocationCount += 1;
+      const embeddings = await exactEmbeddingUtils.getEmbeddingsBatch(
+        [query],
+        {
           apiUrl: process.env.API_URL,
           apiKey: process.env.API_Key,
           model: process.env.WhitelistEmbeddingModel
-        });
-      }
+        }
+      );
+      return embeddings?.[0];
     },
-    selectedDiaryRuntimeHydrator(input) {
-      hydration = projection.materialize({
-        ...input,
-        projectionPlan: plan
-      });
-      return hydration;
-    }
+    dimension: 4,
+    leaseRoot,
+    vcpCodeRoot: vcpRoot,
+    sourceRuntimeRoot: runtimeRoot,
+    sourceKnowledgeBaseStorePath: primaryStore,
+    knowledgeBaseRootPath: memoryRoot,
+    workerRunner: runWorkerWithDerivedScopeGate,
+    workerTimeoutMs: 60_000,
+    terminationGraceMs: 5_000
   });
-  const searchResult = await adapter.search({
+  const searchResult = await leaseWorker.execute({
+    workingSet: bridgeWorkingSet(contracts, 'w'),
+    authorization,
     query: 'writer update version two',
     limit: 1
-  }, {
-    authorization
   });
-  assert.ok(hydration);
-  assert.deepEqual(hydration.counterFacts, {
-    primary_memory: {
-      write_attempts: 0,
-      writes_committed: 0
-    },
-    derived_transaction: {
-      started: 1,
-      committed: 1,
-      rolled_back: 0
-    }
+  assert.equal(searchResult.accepted, true);
+  assert.equal(searchResult.cleanup_complete, true);
+  assert.equal(searchResult.evidence_complete, true);
+  const attemptCounters = contracts.aggregateAttemptCounters(
+    searchResult.working_set.receipts
+  );
+  assert.deepEqual(attemptCounters.primary_memory, {
+    write_attempts: 0,
+    writes_committed: 0
   });
-  for (const table of [
-    'file_tags',
-    'kv_store',
-    'migration_deleted_chunks',
-    'migration_deleted_files',
-    'tag_intrinsic_residuals',
-    'tag_pair_similarity',
-    'tags'
-  ]) {
-    assert.equal(
-      derivedManager.db.prepare(
-        `SELECT COUNT(*) AS count FROM ${table}`
-      ).get().count,
-      0
-    );
-  }
+  assert.deepEqual(attemptCounters.derived_transaction, {
+    started: 1,
+    committed: 1,
+    rolled_back: 0
+  });
+  assert.deepEqual(attemptCounters.provider, {
+    started: 1,
+    succeeded: 1,
+    failed: 0
+  });
+  assert.deepEqual(attemptCounters.native_invocation, {
+    started: 1,
+    succeeded: 1,
+    failed: 0
+  });
+  assert.equal(attemptCounters.fallback.attempts, 0);
+  const workerSnapshot = leaseWorker.snapshot();
+  assert.equal(workerSnapshot.provider_invocations, 1);
+  assert.equal(workerSnapshot.provider_calls_in_flight, 0);
+  assert.equal(workerSnapshot.native_invocations, 1);
+  assert.equal(workerSnapshot.preflight_processes_started, 1);
+  assert.equal(workerSnapshot.preflight_processes_completed, 1);
+  assert.equal(workerSnapshot.stores_created, 1);
+  assert.equal(workerSnapshot.stores_removed, 1);
+  assert.equal(workerSnapshot.cleanup_blocked, false);
+  assert.equal(workerSnapshot.sigkill_count, 0);
+  assert.equal(workerSnapshot.provider_authority_in_child, false);
   assert.equal(providerInvocationCount, 1);
-  assert.equal(nativeSearchInvocationCount, 1);
+  assert.equal(derivedScopeDirectlyVerified, true);
+  assert.equal(searchResult.result.result_count, 1);
   assert.equal(
-    derivedManager.db.prepare(
-      'SELECT COUNT(*) AS count FROM files WHERE diary_name = ?'
-    ).get('PROJECT_DENIED').count,
-    0
+    searchResult.result.raw_memory_content_disclosed,
+    false
   );
+  assert.equal(searchResult.result.raw_vector_disclosed, false);
+  assert.equal(searchResult.result.source_path_disclosed, false);
   assert.equal(
-    derivedManager.db.prepare(
-      `SELECT COUNT(*) AS count
-       FROM chunks
-       WHERE content LIKE '%unauthorized diary sentinel%'`
-    ).get().count,
-    0
-  );
-  assert.ok(Array.isArray(nativeSearchResults));
-  assert.equal(
-    nativeSearchResults.some(result =>
-      result?.diaryName === 'PROJECT_DENIED' ||
-      String(result?.fullPath || '').replace(/\\/gu, '/')
-        .startsWith('PROJECT_DENIED/')
-    ),
+    searchResult.result.provider_response_disclosed,
     false
   );
   assert.doesNotMatch(
-    JSON.stringify(nativeSearchResults),
+    JSON.stringify(searchResult.result),
     /PROJECT_DENIED|unauthorized diary sentinel/u
   );
-  assert.equal(searchResult.results.length, 1);
   assert.equal(
-    searchResult._nativeRuntimeReceipt.resultScopePostcheckPassed,
-    true
-  );
-  assert.equal(
-    searchResult._nativeRuntimeReceipt.rawMemoryContentDisclosed,
-    false
-  );
-  assert.equal(
-    searchResult._nativeRuntimeReceipt.providerApiCalled,
-    true
+    searchResult.working_set.receipts.at(-1).stage,
+    'SCOPE_POSTCHECK'
   );
   assert.equal(sha256File(sourceFile), sourceBeforeRead);
 
@@ -548,8 +588,6 @@ async function run() {
     }
   });
 
-  await adapter.shutdown();
-
   const mutationCaseRoot = path.join(
     runtimeRoot,
     'corruption-between-pass'
@@ -566,60 +604,74 @@ async function run() {
       vcpToolBoxRoot: mutationCaseRoot,
       sourceDatabaseConstructor: Database
     });
-  const mutationPlan = mutationProjection.preflight({
-    allowedDiaryNames: ['PROJECT_ALPHA', 'PROJECT_BETA', 'Root'],
-    dimension: 4
-  });
-  const sourceMutation = new Database(mutationCopy.targetFile);
-  sourceMutation.prepare(`
-    UPDATE chunks
-    SET content = content || ' test-only-between-pass-mutation'
-    WHERE id = (SELECT MIN(id) FROM chunks)
-  `).run();
-  sourceMutation.close();
-
-  const mutationDerivedStore = path.join(
+  const mutationLeaseRoot = path.join(
     workspaceRoot,
-    'between-pass-derived-store'
+    'between-pass-leases'
   );
-  fs.mkdirSync(mutationDerivedStore, { recursive: true });
-  setRuntimeEnvironment({
-    memoryRoot: mutationCopy.memoryRoot,
-    storePath: mutationDerivedStore
+  fs.mkdirSync(mutationLeaseRoot, {
+    recursive: true,
+    mode: 0o700
   });
-  const mutationManager = loadFreshKnowledgeBaseManager(vcpRoot);
-  let mutationManagerInitialized = false;
-  try {
-    await mutationManager.initialize();
-    mutationManagerInitialized = true;
-    await quiesceManager(mutationManager);
-    assert.throws(
-      () => mutationProjection.materialize({
-        allowedDiaryNames: ['PROJECT_ALPHA', 'PROJECT_BETA', 'Root'],
-        knowledgeBaseManager: mutationManager,
-        knowledgeBaseRootPath: mutationCopy.memoryRoot,
-        knowledgeBaseStorePath: mutationDerivedStore,
-        projectionPlan: mutationPlan
-      }),
-      error => {
-        assert.equal(
-          error.reasonCode,
-          'source_snapshot_changed_after_preflight'
-        );
-        assert.deepEqual(error.counterFacts.derived_transaction, {
-          started: 0,
-          committed: 0,
-          rolled_back: 0
-        });
-        return true;
+  fs.chmodSync(mutationLeaseRoot, 0o700);
+  let mutationProviderCalls = 0;
+  const mutationWorker = createGovernedReadLeaseWorker({
+    clock: () => new Date('2026-07-30T00:00:00.000Z'),
+    sourceProjection: mutationProjection,
+    async providerWrapper({ query }) {
+      mutationProviderCalls += 1;
+      const embeddings = await exactEmbeddingUtils.getEmbeddingsBatch(
+        [query],
+        {
+          apiUrl: process.env.API_URL,
+          apiKey: process.env.API_Key,
+          model: process.env.WhitelistEmbeddingModel
+        }
+      );
+      const sourceMutation = new Database(mutationCopy.targetFile);
+      try {
+        sourceMutation.prepare(`
+          UPDATE chunks
+          SET content =
+            content || ' test-only-between-pass-mutation'
+          WHERE id = (SELECT MIN(id) FROM chunks)
+        `).run();
+      } finally {
+        sourceMutation.close();
       }
-    );
-  } finally {
-    if (mutationManagerInitialized) {
-      await quiesceManager(mutationManager);
-      await mutationManager.shutdown();
-    }
-  }
+      return embeddings?.[0];
+    },
+    dimension: 4,
+    leaseRoot: mutationLeaseRoot,
+    vcpCodeRoot: vcpRoot,
+    sourceRuntimeRoot: mutationCaseRoot,
+    sourceKnowledgeBaseStorePath: mutationCopy.storePath,
+    knowledgeBaseRootPath: mutationCopy.memoryRoot,
+    workerTimeoutMs: 60_000,
+    terminationGraceMs: 5_000
+  });
+  const mutationResult = await mutationWorker.execute({
+    workingSet: bridgeWorkingSet(contracts, 'x'),
+    authorization,
+    query: 'writer update version two',
+    limit: 1
+  });
+  assert.equal(mutationResult.accepted, false);
+  assert.equal(
+    mutationResult.working_set.receipts.at(-1).reason_code,
+    'source_snapshot_changed_after_preflight'
+  );
+  const mutationCounters = contracts.aggregateAttemptCounters(
+    mutationResult.working_set.receipts
+  );
+  assert.deepEqual(mutationCounters.derived_transaction, {
+    started: 0,
+    committed: 0,
+    rolled_back: 0
+  });
+  assert.equal(mutationProviderCalls, 1);
+  assert.equal(mutationWorker.snapshot().stores_created, 1);
+  assert.equal(mutationWorker.snapshot().stores_removed, 1);
+  assert.equal(mutationWorker.snapshot().cleanup_blocked, false);
   negativeReasons.between_pass =
     'source_snapshot_changed_after_preflight';
   assert.equal(sha256File(sourceFile), sourceBeforeRead);
@@ -640,18 +692,30 @@ async function run() {
     },
     projection: {
       preflight_passed: true,
-      source_snapshot_stable: hydration.sourceSnapshotStable,
+      preflight_process_exercised:
+        workerSnapshot.preflight_processes_started === 1 &&
+        workerSnapshot.preflight_processes_completed === 1,
+      source_snapshot_stable: true,
       primary_source_unchanged_after_negatives: true,
       unauthorized_diary_excluded: true,
-      primary_write_attempts: hydration.counterFacts.primary_memory.write_attempts,
-      derived_transaction: hydration.counterFacts.derived_transaction
+      derived_scope_directly_verified:
+        derivedScopeDirectlyVerified,
+      primary_write_attempts:
+        attemptCounters.primary_memory.write_attempts,
+      derived_transaction: attemptCounters.derived_transaction
     },
     native_search: {
       provider_invocations: providerInvocationCount,
-      invocations: nativeSearchInvocationCount,
-      result_count: searchResult.results.length,
+      invocations: workerSnapshot.native_invocations,
+      result_count: searchResult.result.result_count,
       scope_postcheck_passed: true,
-      unauthorized_diary_excluded: true
+      unauthorized_diary_excluded: true,
+      derived_scope_directly_verified:
+        derivedScopeDirectlyVerified,
+      lease_scoped_child_exercised: true,
+      child_provider_authority_present: false,
+      derived_store_removed: true,
+      sigkill_used: false
     },
     negative_reasons: negativeReasons
   };

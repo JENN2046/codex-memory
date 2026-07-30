@@ -260,6 +260,31 @@ function queryIterator(database, sql, values, errorCode, reasonCode) {
   }
 }
 
+function assertSourceReadDeadline(assertReadDeadline, phase) {
+  if (assertReadDeadline === undefined) return;
+  const reasonCode = phase === 'preflight'
+    ? 'source_preflight_failed'
+    : 'hydration_failed';
+  if (typeof assertReadDeadline !== 'function') {
+    throw codedError(
+      'selected_diary_hydration_source_deadline_guard_invalid',
+      reasonCode
+    );
+  }
+  try {
+    const result = assertReadDeadline();
+    if (result && typeof result.then === 'function') {
+      throw new TypeError('source_deadline_guard_must_be_synchronous');
+    }
+  } catch (error) {
+    rethrowKnown(error);
+    throw codedError(
+      'selected_diary_hydration_source_deadline_exceeded',
+      reasonCode
+    );
+  }
+}
+
 function assertExactDatabaseFile(database, expectedFile, {
   errorCode,
   reasonCode,
@@ -449,9 +474,12 @@ function placeholders(count) {
 
 function validateSourceSchema(database, {
   errorCode = 'selected_diary_hydration_source_schema_invalid',
-  reasonCode = 'source_schema_invalid'
+  reasonCode = 'source_schema_invalid',
+  assertReadDeadline,
+  phase = 'preflight'
 } = {}) {
   for (const [table, expectedColumns] of Object.entries(REQUIRED_SOURCE_SCHEMA)) {
+    assertSourceReadDeadline(assertReadDeadline, phase);
     const rows = queryAll(
       database,
       `PRAGMA table_info(${table})`,
@@ -459,6 +487,7 @@ function validateSourceSchema(database, {
       errorCode,
       reasonCode
     );
+    assertSourceReadDeadline(assertReadDeadline, phase);
     if (rows.length !== expectedColumns.length) {
       throw codedError(errorCode, reasonCode);
     }
@@ -483,7 +512,8 @@ function projectionBudget(
   dimension,
   {
     errorCode = 'selected_diary_hydration_source_projection_invalid',
-    phase = 'preflight'
+    phase = 'preflight',
+    assertReadDeadline
   } = {}
 ) {
   const schemaReason = phase === 'preflight'
@@ -495,31 +525,85 @@ function projectionBudget(
   const vectorReason = phase === 'preflight'
     ? 'source_vector_invalid'
     : 'hydration_failed';
-  const fileSummary = queryOne(database, `
-    SELECT
-      COUNT(*) AS count,
-      COALESCE(SUM(
-        length(CAST(path AS BLOB)) +
-        length(CAST(diary_name AS BLOB)) +
-        length(CAST(checksum AS BLOB))
-      ), 0) AS metadataBytes
+  let fileCount = 0;
+  let metadataBytes = 0;
+  const fileBudgets = queryIterator(database, `
+    SELECT (
+      length(CAST(path AS BLOB)) +
+      length(CAST(diary_name AS BLOB)) +
+      length(CAST(checksum AS BLOB))
+    ) AS metadataBytes
     FROM files
     WHERE diary_name IN (${marker})
-  `, allowedDiaryNames, errorCode, schemaReason);
-  const chunkSummary = queryOne(database, `
+    ORDER BY id
+    LIMIT ?
+  `, [...allowedDiaryNames, MAX_SELECTED_FILES + 1], errorCode, schemaReason);
+  try {
+    while (true) {
+      assertSourceReadDeadline(assertReadDeadline, phase);
+      const step = fileBudgets.next();
+      assertSourceReadDeadline(assertReadDeadline, phase);
+      if (step.done) break;
+      const rowBytes = Number(step.value?.metadataBytes);
+      if (!Number.isSafeInteger(rowBytes) || rowBytes < 0) {
+        throw codedError(errorCode, schemaReason);
+      }
+      fileCount += 1;
+      metadataBytes += rowBytes;
+      if (fileCount > MAX_SELECTED_FILES ||
+          !Number.isSafeInteger(metadataBytes) ||
+          metadataBytes > MAX_SELECTED_METADATA_BYTES) {
+        throw codedError(errorCode, budgetReason);
+      }
+    }
+  } catch (error) {
+    rethrowKnown(error);
+    throw codedError(errorCode, schemaReason);
+  }
+
+  let chunkCount = 0;
+  let contentBytes = 0;
+  let vectorBytes = 0;
+  const chunkBudgets = queryIterator(database, `
     SELECT
-      COUNT(*) AS count,
-      COALESCE(SUM(length(CAST(c.content AS BLOB))), 0) AS contentBytes,
-      COALESCE(SUM(length(c.vector)), 0) AS vectorBytes
+      length(CAST(c.content AS BLOB)) AS contentBytes,
+      length(c.vector) AS vectorBytes
     FROM chunks c
     INNER JOIN files f ON f.id = c.file_id
     WHERE f.diary_name IN (${marker})
-  `, allowedDiaryNames, errorCode, schemaReason);
-  const fileCount = Number(fileSummary?.count);
-  const metadataBytes = Number(fileSummary?.metadataBytes);
-  const chunkCount = Number(chunkSummary?.count);
-  const contentBytes = Number(chunkSummary?.contentBytes);
-  const vectorBytes = Number(chunkSummary?.vectorBytes);
+    ORDER BY c.id
+    LIMIT ?
+  `, [...allowedDiaryNames, MAX_SELECTED_CHUNKS + 1], errorCode, schemaReason);
+  try {
+    while (true) {
+      assertSourceReadDeadline(assertReadDeadline, phase);
+      const step = chunkBudgets.next();
+      assertSourceReadDeadline(assertReadDeadline, phase);
+      if (step.done) break;
+      const rowContentBytes = Number(step.value?.contentBytes);
+      const rowVectorBytes = Number(step.value?.vectorBytes);
+      if (!Number.isSafeInteger(rowContentBytes) ||
+          rowContentBytes < 0 ||
+          !Number.isSafeInteger(rowVectorBytes) ||
+          rowVectorBytes < 0) {
+        throw codedError(errorCode, schemaReason);
+      }
+      chunkCount += 1;
+      contentBytes += rowContentBytes;
+      vectorBytes += rowVectorBytes;
+      if (chunkCount > MAX_SELECTED_CHUNKS ||
+          !Number.isSafeInteger(contentBytes) ||
+          !Number.isSafeInteger(vectorBytes) ||
+          contentBytes > MAX_SELECTED_CONTENT_BYTES ||
+          vectorBytes > MAX_SELECTED_VECTOR_BYTES) {
+        throw codedError(errorCode, budgetReason);
+      }
+    }
+  } catch (error) {
+    rethrowKnown(error);
+    throw codedError(errorCode, schemaReason);
+  }
+
   const expectedVectorBytes =
     chunkCount * dimension * Float32Array.BYTES_PER_ELEMENT;
   for (const value of [
@@ -533,13 +617,6 @@ function projectionBudget(
     if (!Number.isSafeInteger(value) || value < 0) {
       throw codedError(errorCode, schemaReason);
     }
-  }
-  if (fileCount > MAX_SELECTED_FILES ||
-      metadataBytes > MAX_SELECTED_METADATA_BYTES ||
-      chunkCount > MAX_SELECTED_CHUNKS ||
-      contentBytes > MAX_SELECTED_CONTENT_BYTES ||
-      vectorBytes > MAX_SELECTED_VECTOR_BYTES) {
-    throw codedError(errorCode, budgetReason);
   }
   if (vectorBytes !== expectedVectorBytes) {
     throw codedError(errorCode, vectorReason);
@@ -571,7 +648,8 @@ function validateProjectionBudget(value) {
 
 function normalizedVector(value, dimension, {
   errorCode = 'selected_diary_hydration_source_projection_invalid',
-  phase = 'preflight'
+  phase = 'preflight',
+  assertReadDeadline
 } = {}) {
   const reasonCode = phase === 'preflight'
     ? 'source_vector_invalid'
@@ -585,6 +663,9 @@ function normalizedVector(value, dimension, {
   }
   let nonzero = false;
   for (let offset = 0; offset < vector.length; offset += 4) {
+    if (offset % (64 * 1024) === 0) {
+      assertSourceReadDeadline(assertReadDeadline, phase);
+    }
     const item = vector.readFloatLE(offset);
     if (!Number.isFinite(item)) throw codedError(errorCode, reasonCode);
     if (item !== 0) nonzero = true;
@@ -682,7 +763,8 @@ function normalizedFileRow(row, allowed, {
 
 function normalizedChunkRow(row, fileIds, dimension, lastChunkIndex, {
   errorCode,
-  phase
+  phase,
+  assertReadDeadline
 }) {
   const reasonCode = phase === 'preflight'
     ? 'source_schema_invalid'
@@ -704,7 +786,11 @@ function normalizedChunkRow(row, fileIds, dimension, lastChunkIndex, {
     fileId: row.fileId,
     chunkIndex: row.chunkIndex,
     content: row.content,
-    vector: normalizedVector(row.vector, dimension, { errorCode, phase })
+    vector: normalizedVector(row.vector, dimension, {
+      errorCode,
+      phase,
+      assertReadDeadline
+    })
   };
 }
 
@@ -738,7 +824,8 @@ function scanSelectedProjection(
     errorCode = 'selected_diary_hydration_source_projection_invalid',
     phase = 'preflight',
     onFile,
-    onChunk
+    onChunk,
+    assertReadDeadline
   } = {}
 ) {
   const schemaReason = phase === 'preflight'
@@ -748,7 +835,9 @@ function scanSelectedProjection(
     errorCode: phase === 'preflight'
       ? 'selected_diary_hydration_source_schema_invalid'
       : errorCode,
-    reasonCode: schemaReason
+    reasonCode: schemaReason,
+    assertReadDeadline,
+    phase
   });
   const allowed = new Set(allowedDiaryNames);
   const marker = placeholders(allowedDiaryNames.length);
@@ -757,21 +846,11 @@ function scanSelectedProjection(
     marker,
     allowedDiaryNames,
     dimension,
-    { errorCode, phase }
+    { errorCode, phase, assertReadDeadline }
   );
-  const duplicatePath = queryOne(database, `
-    SELECT path
-    FROM files
-    WHERE diary_name IN (${marker})
-    GROUP BY path
-    HAVING COUNT(*) > 1
-    LIMIT 1
-  `, allowedDiaryNames, errorCode, schemaReason);
-  if (duplicatePath !== undefined) {
-    throw codedError(errorCode, schemaReason);
-  }
   const hash = projectionDigestBuilder(allowedDiaryNames, dimension, budget);
   const fileIds = new Set();
+  const selectedPaths = new Set();
   let fileCount = 0;
   let metadataBytes = 0;
   const files = queryIterator(database, `
@@ -789,10 +868,18 @@ function scanSelectedProjection(
     LIMIT ?
   `, [...allowedDiaryNames, MAX_SELECTED_FILES + 1], errorCode, schemaReason);
   try {
-    for (const row of files) {
+    while (true) {
+      assertSourceReadDeadline(assertReadDeadline, phase);
+      const step = files.next();
+      assertSourceReadDeadline(assertReadDeadline, phase);
+      if (step.done) break;
+      const row = step.value;
       const file = normalizedFileRow(row, allowed, { errorCode, phase });
-      if (fileIds.has(file.id)) throw codedError(errorCode, schemaReason);
+      if (fileIds.has(file.id) || selectedPaths.has(file.path)) {
+        throw codedError(errorCode, schemaReason);
+      }
       fileIds.add(file.id);
+      selectedPaths.add(file.path);
       fileCount += 1;
       metadataBytes +=
         Buffer.byteLength(file.path, 'utf8') +
@@ -807,6 +894,7 @@ function scanSelectedProjection(
       }
       updateFileDigest(hash, file);
       if (onFile) onFile(file);
+      assertSourceReadDeadline(assertReadDeadline, phase);
     }
   } catch (error) {
     rethrowKnown(error);
@@ -835,13 +923,18 @@ function scanSelectedProjection(
     LIMIT ?
   `, [...allowedDiaryNames, MAX_SELECTED_CHUNKS + 1], errorCode, schemaReason);
   try {
-    for (const row of chunks) {
+    while (true) {
+      assertSourceReadDeadline(assertReadDeadline, phase);
+      const step = chunks.next();
+      assertSourceReadDeadline(assertReadDeadline, phase);
+      if (step.done) break;
+      const row = step.value;
       const chunk = normalizedChunkRow(
         row,
         fileIds,
         dimension,
         lastChunkIndex,
-        { errorCode, phase }
+        { errorCode, phase, assertReadDeadline }
       );
       chunkCount += 1;
       contentBytes += Buffer.byteLength(chunk.content, 'utf8');
@@ -856,6 +949,7 @@ function scanSelectedProjection(
       }
       updateChunkDigest(hash, chunk);
       if (onChunk) onChunk(chunk);
+      assertSourceReadDeadline(assertReadDeadline, phase);
     }
   } catch (error) {
     rethrowKnown(error);
@@ -1164,6 +1258,7 @@ function defaultOpenSourceDatabase(
 }
 
 function executeSourceSnapshot({
+  assertReadDeadline,
   boundary,
   expectedSourceIdentity,
   fsModule,
@@ -1179,11 +1274,13 @@ function executeSourceSnapshot({
   const errorCode = preflight
     ? 'selected_diary_hydration_source_database_invalid'
     : 'source_snapshot_changed_after_preflight';
+  assertSourceReadDeadline(assertReadDeadline, phase);
   const currentIdentity = sourceIdentityDigest(boundary.sourceDatabase, {
     errorCode,
     reasonCode: identityReason,
     fsModule
   });
+  assertSourceReadDeadline(assertReadDeadline, phase);
   if (expectedSourceIdentity &&
       currentIdentity !== expectedSourceIdentity) {
     throw codedError(
@@ -1197,10 +1294,12 @@ function executeSourceSnapshot({
   let operationResult;
   try {
     try {
+      assertSourceReadDeadline(assertReadDeadline, phase);
       sourceDatabase = openSourceDatabase(
         boundary.sourceDatabase,
         knowledgeBaseManager
       );
+      assertSourceReadDeadline(assertReadDeadline, phase);
     } catch (error) {
       if (preflight) throw error;
       throw codedError(
@@ -1230,16 +1329,20 @@ function executeSourceSnapshot({
         fsModule
       }
     );
+    assertSourceReadDeadline(assertReadDeadline, phase);
     const identityAfterOpen = sourceIdentityDigest(boundary.sourceDatabase, {
       errorCode,
       reasonCode: identityReason,
       fsModule
     });
+    assertSourceReadDeadline(assertReadDeadline, phase);
     if (identityAfterOpen !== currentIdentity) {
       throw codedError(errorCode, identityReason);
     }
     sourceDatabase.exec('PRAGMA query_only = ON');
+    assertSourceReadDeadline(assertReadDeadline, phase);
     const queryOnly = sourceDatabase.prepare('PRAGMA query_only').get();
+    assertSourceReadDeadline(assertReadDeadline, phase);
     if (Number(Object.values(queryOnly || {})[0]) !== 1) {
       throw codedError(
         'selected_diary_hydration_source_database_not_readonly',
@@ -1247,11 +1350,14 @@ function executeSourceSnapshot({
       );
     }
     sourceDatabase.exec('BEGIN');
+    assertSourceReadDeadline(assertReadDeadline, phase);
     let committed = false;
     try {
       operationResult = operation(sourceDatabase);
+      assertSourceReadDeadline(assertReadDeadline, phase);
       sourceDatabase.exec('COMMIT');
       committed = true;
+      assertSourceReadDeadline(assertReadDeadline, phase);
       return operationResult;
     } finally {
       if (!committed) {
@@ -1325,10 +1431,12 @@ function createProductionSelectedDiarySourceProjection({
   }
 
   function preflight({
+    assertReadDeadline,
     allowedDiaryNames,
     dimension,
     knowledgeBaseManager
   } = {}) {
+    assertSourceReadDeadline(assertReadDeadline, 'preflight');
     const allowed = normalizeSelectedDiaryNames(allowedDiaryNames);
     const selectedDimension = dimension ??
       knowledgeBaseManager?.config?.dimension;
@@ -1342,6 +1450,7 @@ function createProductionSelectedDiarySourceProjection({
       fsModule
     });
     const selected = executeSourceSnapshot({
+      assertReadDeadline,
       boundary,
       expectedSourceIdentity: sourceIdentity,
       fsModule,
@@ -1353,7 +1462,7 @@ function createProductionSelectedDiarySourceProjection({
           sourceDatabase,
           allowed,
           boundary.dimension,
-          { phase: 'preflight' }
+          { phase: 'preflight', assertReadDeadline }
         );
       }
     });
@@ -1554,10 +1663,21 @@ function createProductionSelectedDiarySourceProjection({
     });
   }
 
-  return Object.freeze({
+  const projection = {
     preflight,
     materialize
-  });
+  };
+  Object.defineProperty(
+    projection,
+    'preflightRequiresProcessIsolation',
+    {
+      configurable: false,
+      enumerable: false,
+      value: true,
+      writable: false
+    }
+  );
+  return Object.freeze(projection);
 }
 
 function createProductionSelectedDiaryRuntimeHydrator(options = {}) {

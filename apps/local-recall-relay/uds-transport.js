@@ -2,18 +2,27 @@
 
 const net = require('node:net');
 
-const { LIMITS, reject } = require('../../packages/chatgpt-r4-contracts');
+const {
+  GOVERNED_READ_ATTEMPT_LIMITS,
+  LIMITS,
+  governedReadAttemptDeadlineBudgetMs,
+  reject
+} = require('../../packages/chatgpt-r4-contracts');
 
-const MAX_UDS_REQUEST_BYTES = LIMITS.maxRequestBytes + 8192;
-const MAX_UDS_RESPONSE_BYTES = LIMITS.maxResponseBytes;
+const MAX_UDS_REQUEST_BYTES = LIMITS.maxRequestBytes +
+  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes + 8192;
+const MAX_UDS_RESPONSE_BYTES = LIMITS.maxResponseBytes +
+  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes;
 const DEFAULT_UDS_TIMEOUT_MS = 15_000;
+const GOVERNED_READ_UDS_DEADLINE_MARGIN_MS = 3_000;
 
 function createUdsForwarder({
   socketPath,
   timeoutMs = DEFAULT_UDS_TIMEOUT_MS,
   maxResponseBytes = MAX_UDS_RESPONSE_BYTES,
   verifyUdsListenerOwner = null,
-  verifyConnectedUdsPeer = null
+  verifyConnectedUdsPeer = null,
+  clock = () => new Date()
 } = {}) {
   if (typeof socketPath !== 'string' || !socketPath.startsWith('/') || socketPath.includes('\0')) {
     reject('relay_uds_path_invalid');
@@ -36,10 +45,29 @@ function createUdsForwarder({
       (verifyConnectedUdsPeer === null)) {
     reject('relay_uds_identity_verifier_incomplete');
   }
+  if (typeof clock !== 'function') {
+    reject('relay_uds_clock_invalid');
+  }
 
   return function forwardToUds(payload, { signal } = {}) {
     const encoded = Buffer.from(`${JSON.stringify(payload)}\n`, 'utf8');
     if (encoded.length > MAX_UDS_REQUEST_BYTES) reject('relay_uds_request_too_large');
+    let requestTimeoutMs = timeoutMs;
+    if (payload?.governedReadAttempt?.header) {
+      requestTimeoutMs = governedReadAttemptDeadlineBudgetMs(
+        payload.governedReadAttempt.header,
+        {
+          now: clock(),
+          marginMs: GOVERNED_READ_UDS_DEADLINE_MARGIN_MS
+        }
+      );
+      if (requestTimeoutMs === 0) {
+        return Promise.reject(Object.assign(
+          new Error('relay_request_expired_before_response'),
+          { code: 'relay_request_expired_before_response' }
+        ));
+      }
+    }
 
     return new Promise((resolve, rejectForward) => {
       let settled = false;
@@ -103,7 +131,10 @@ function createUdsForwarder({
         fail('relay_uds_unavailable', error);
         return;
       }
-      timer = setTimeout(() => fail('relay_uds_timeout'), timeoutMs);
+      timer = setTimeout(
+        () => fail('relay_uds_timeout'),
+        requestTimeoutMs
+      );
       socket.on('connect', () => {
         if (!listenerOwnerVerified() ||
             !connectedPeerVerified()) {
@@ -150,6 +181,7 @@ function createUdsForwarder({
 
 module.exports = {
   DEFAULT_UDS_TIMEOUT_MS,
+  GOVERNED_READ_UDS_DEADLINE_MARGIN_MS,
   MAX_UDS_REQUEST_BYTES,
   MAX_UDS_RESPONSE_BYTES,
   createUdsForwarder

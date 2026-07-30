@@ -11,14 +11,19 @@ const {
   canonicalJson,
   createAttemptHeader,
   createGovernedReadAttemptProtocol,
+  createGovernedReadAttemptWorkingSet,
   createStageReceipt,
   createTerminalEnvelope,
   digestObject,
   failureRegistryEntry,
+  governedReadAttemptDeadlineBudgetMs,
+  governedReadAttemptResponseBindingDigest,
+  isGovernedReadAttemptWorkingSetExtension,
   projectGovernedReadAttemptOwner,
   projectGovernedReadAttemptPublic,
   validateAttemptHeader,
   validateGovernedReadAttemptProtocol,
+  validateGovernedReadTerminalFailureCandidate,
   validateStageReceipt,
   validateTerminalEnvelope,
   utf8ByteLength
@@ -167,6 +172,151 @@ test('AttemptHeader is immutable, bounded, and contains no mutable state identit
     ...value,
     current_stage: 'CREATED'
   }), { code: 'attempt_header_shape_invalid' });
+});
+
+test('attempt deadline budgets preserve one absolute deadline with bounded transport margin', () => {
+  const value = header('D');
+  assert.equal(
+    governedReadAttemptDeadlineBudgetMs(value, {
+      now: new Date(NOW.getTime() + 10_000),
+      marginMs: 3_000
+    }),
+    23_000
+  );
+  assert.equal(
+    governedReadAttemptDeadlineBudgetMs(value, {
+      now: new Date(NOW.getTime() - 30_000),
+      marginMs: 3_000
+    }),
+    GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000 +
+      3_000
+  );
+  assert.equal(
+    governedReadAttemptDeadlineBudgetMs(value, {
+      now: new Date(NOW.getTime() + 30_000),
+      marginMs: 3_000
+    }),
+    0
+  );
+  assert.throws(
+    () => governedReadAttemptDeadlineBudgetMs(value, {
+      now: 'not-a-clock'
+    }),
+    { code: 'attempt_deadline_clock_invalid' }
+  );
+  assert.throws(
+    () => governedReadAttemptDeadlineBudgetMs(value, {
+      marginMs: 10_001
+    }),
+    { code: 'attempt_deadline_margin_invalid' }
+  );
+});
+
+test('working-set extension requires an exact immutable header and receipt prefix', () => {
+  const value = header('W');
+  const created = createStageReceipt({
+    header: value,
+    stage: 'CREATED'
+  });
+  const prefix = createGovernedReadAttemptWorkingSet({
+    header: value,
+    receipts: [created]
+  });
+  const validated = createStageReceipt({
+    header: value,
+    receipts: prefix.receipts,
+    stage: 'EDGE_VALIDATED'
+  });
+  const extension = createGovernedReadAttemptWorkingSet({
+    header: value,
+    receipts: [...prefix.receipts, validated]
+  });
+  assert.equal(
+    isGovernedReadAttemptWorkingSetExtension(prefix, extension),
+    true
+  );
+  assert.equal(
+    isGovernedReadAttemptWorkingSetExtension(extension, prefix),
+    false
+  );
+  assert.equal(
+    isGovernedReadAttemptWorkingSetExtension(
+      prefix,
+      createGovernedReadAttemptWorkingSet({
+        header: header('X'),
+        receipts: []
+      })
+    ),
+    false
+  );
+});
+
+test('terminal failure candidates are registry-bound terminal reasons', () => {
+  const candidate = {
+    reason_code: 'worker_execution_terminated',
+    failure_origin: 'lease_worker'
+  };
+  assert.equal(
+    validateGovernedReadTerminalFailureCandidate(candidate),
+    candidate
+  );
+  for (const invalid of [
+    {
+      reason_code: 'worker_execution_terminated',
+      failure_origin: 'bridge'
+    },
+    {
+      reason_code: 'provider_embedding_failed',
+      failure_origin: 'provider_wrapper'
+    },
+    {
+      reason_code: 'terminal_missing',
+      failure_origin: 'observer'
+    },
+    {
+      reason_code: 'unknown_terminal_reason',
+      failure_origin: 'lease_worker'
+    },
+    {
+      reason_code: 'worker_execution_terminated',
+      failure_origin: 'lease_worker',
+      extra: true
+    }
+  ]) {
+    assert.throws(
+      () => validateGovernedReadTerminalFailureCandidate(invalid)
+    );
+  }
+});
+
+test('signed response binding changes with either request or terminal digest', () => {
+  const requestDigest = digestObject('response-binding-request');
+  const terminalDigest = digestObject('response-binding-terminal');
+  const value = governedReadAttemptResponseBindingDigest({
+    requestDigest,
+    terminalDigest
+  });
+  assert.equal(
+    value,
+    governedReadAttemptResponseBindingDigest({
+      requestDigest,
+      terminalDigest
+    })
+  );
+  assert.notEqual(
+    value,
+    governedReadAttemptResponseBindingDigest({
+      requestDigest: digestObject('other-request'),
+      terminalDigest
+    })
+  );
+  assert.notEqual(
+    value,
+    governedReadAttemptResponseBindingDigest({
+      requestDigest,
+      terminalDigest: digestObject('other-terminal')
+    })
+  );
 });
 
 test('complete success derives one bounded terminal and public/owner projections', () => {
@@ -767,6 +917,31 @@ test('Edge bounds terminal retention while preserving replay and short lookup', 
   );
 });
 
+test('Edge coordinator permits retained capacity reuse after its configured window', () => {
+  let clockNow = NOW;
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => clockNow,
+    maxAttempts: 1,
+    maxRetainedAttempts: 1,
+    terminalRetentionMs: 10
+  });
+  const first = header('e');
+  coordinator.acceptAttempt(first);
+  coordinator.cancelAttempt(first.attempt_ref);
+  assert.throws(
+    () => coordinator.acceptAttempt(header('f')),
+    { code: 'attempt_coordinator_retention_capacity_exceeded' }
+  );
+
+  clockNow = new Date(NOW.getTime() + 10);
+  const second = header('g', clockNow);
+  assert.doesNotThrow(() => coordinator.acceptAttempt(second));
+  assert.throws(
+    () => coordinator.protocol(first.attempt_ref),
+    { code: 'attempt_not_found' }
+  );
+});
+
 test('Edge cancellation and expiry close an existing failed receipt without replacing its evidence', () => {
   for (const [suffix, trigger] of [
     ['T', 'cancel'],
@@ -849,6 +1024,52 @@ test('Edge terminal CAS gives the deadline precedence at the exact boundary', ()
       assert.equal(terminal.evidence_complete, false);
     }
   }
+});
+
+test('Edge protocol candidate validation cannot cross the deadline into success', () => {
+  let commitPhase = false;
+  let commitClockCalls = 0;
+  const observer = createGovernedReadAttemptObserver();
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock() {
+      if (!commitPhase) return NOW;
+      commitClockCalls += 1;
+      return new Date(
+        NOW.getTime() + (commitClockCalls === 1 ? 29_999 : 30_000)
+      );
+    },
+    eventSink: observer.observe
+  });
+  const value = header('9');
+  coordinator.acceptAttempt(value);
+  const receipts = completedReceipts(value);
+  const candidate = createGovernedReadAttemptProtocol({
+    header: value,
+    receipts,
+    terminal: createTerminalEnvelope({
+      header: value,
+      receipts,
+      outcome: 'success',
+      evidenceComplete: true
+    })
+  });
+
+  commitPhase = true;
+  assert.throws(
+    () => coordinator.commitProtocolCandidate(
+      value.attempt_ref,
+      candidate
+    ),
+    { code: 'attempt_terminal_already_committed' }
+  );
+  assert.ok(commitClockCalls >= 2);
+  assert.equal(coordinator.snapshot(value.attempt_ref).receipt_count, 1);
+  const terminal = coordinator.protocol(value.attempt_ref).terminal;
+  assert.equal(terminal.outcome, 'failure');
+  assert.equal(terminal.reason_code, 'attempt_timeout');
+  assert.equal(terminal.receipt_count, 1);
+  assert.equal(observer.snapshot().receipts_accepted, 1);
+  assert.equal(observer.snapshot().terminal_failures, 1);
 });
 
 test('Edge cancellation at the deadline resolves as timeout', () => {

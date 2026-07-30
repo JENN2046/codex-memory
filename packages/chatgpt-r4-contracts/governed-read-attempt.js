@@ -152,8 +152,8 @@ const GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY = deepFreeze({
     category: 'bridge',
     stage: 'BRIDGE_DELEGATED',
     origin: 'bridge',
-    providerMayHaveOccurred: false,
-    nativeMayHaveOccurred: false,
+    providerMayHaveOccurred: true,
+    nativeMayHaveOccurred: true,
     unknownCounterGroups: ALL_COUNTER_GROUPS
   }),
   native_attempt_busy: failure({
@@ -292,6 +292,14 @@ const GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY = deepFreeze({
     nativeMayHaveOccurred: true,
     unknownCounterGroups: ALL_COUNTER_GROUPS
   }),
+  worker_execution_terminated: failure({
+    category: 'native_runtime',
+    stage: 'TERMINAL_FAILURE',
+    origin: 'lease_worker',
+    providerMayHaveOccurred: true,
+    nativeMayHaveOccurred: true,
+    unknownCounterGroups: ALL_COUNTER_GROUPS
+  }),
   worker_shutdown_incomplete: failure({
     category: 'cleanup',
     stage: 'TERMINAL_FAILURE',
@@ -352,6 +360,10 @@ const TERMINAL_KEYS = Object.freeze([
   'receipt_count',
   'last_receipt_digest',
   'terminal_digest'
+]);
+const WORKING_SET_KEYS = Object.freeze([
+  'header',
+  'receipts'
 ]);
 
 function assertExactKeys(value, expected, code) {
@@ -448,12 +460,55 @@ function validateAttemptHeader(header) {
   return header;
 }
 
+function governedReadAttemptDeadlineBudgetMs(
+  header,
+  {
+    now = new Date(),
+    marginMs = 0
+  } = {}
+) {
+  validateAttemptHeader(header);
+  const current = now instanceof Date
+    ? new Date(now.getTime())
+    : new Date(now);
+  if (!Number.isFinite(current.getTime())) {
+    reject('attempt_deadline_clock_invalid');
+  }
+  if (!Number.isInteger(marginMs) ||
+      marginMs < 0 ||
+      marginMs > 10_000) {
+    reject('attempt_deadline_margin_invalid');
+  }
+  const remainingMs =
+    Date.parse(header.deadline_at) - current.getTime();
+  if (remainingMs <= 0) return 0;
+  return Math.min(
+    remainingMs + marginMs,
+    GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000 + marginMs
+  );
+}
+
 function failureRegistryEntry(reasonCode) {
   assertSafeCode(reasonCode, 'attempt_reason_invalid');
   if (!Object.hasOwn(GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY, reasonCode)) {
     reject('attempt_reason_unknown');
   }
   return GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY[reasonCode];
+}
+
+function validateGovernedReadTerminalFailureCandidate(value) {
+  assertExactKeys(
+    value,
+    ['reason_code', 'failure_origin'],
+    'attempt_terminal_failure_candidate_invalid'
+  );
+  const entry = failureRegistryEntry(value.reason_code);
+  if (entry.stage !== 'TERMINAL_FAILURE' ||
+      entry.terminal_candidate_allowed !== true ||
+      value.failure_origin !== entry.origin) {
+    reject('attempt_terminal_failure_candidate_invalid');
+  }
+  return value;
 }
 
 function validateCounterFacts(
@@ -619,6 +674,82 @@ function validateAttemptReceiptChain(header, receipts) {
     accepted.push(receipt);
   }
   return receipts;
+}
+
+function createGovernedReadAttemptWorkingSet({
+  header,
+  receipts = []
+} = {}) {
+  validateAttemptHeader(header);
+  validateAttemptReceiptChain(header, receipts);
+  const workingSet = {
+    header: structuredClone(header),
+    receipts: structuredClone(receipts)
+  };
+  if (utf8ByteLength(workingSet) >
+      GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes) {
+    reject('attempt_working_set_too_large');
+  }
+  return deepFreeze(workingSet);
+}
+
+function validateGovernedReadAttemptWorkingSet(workingSet) {
+  assertExactKeys(
+    workingSet,
+    WORKING_SET_KEYS,
+    'attempt_working_set_shape_invalid'
+  );
+  if (utf8ByteLength(workingSet) >
+      GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes) {
+    reject('attempt_working_set_too_large');
+  }
+  validateAttemptHeader(workingSet.header);
+  validateAttemptReceiptChain(workingSet.header, workingSet.receipts);
+  return workingSet;
+}
+
+function isGovernedReadAttemptWorkingSetExtension(prefix, candidate) {
+  validateGovernedReadAttemptWorkingSet(prefix);
+  validateGovernedReadAttemptWorkingSet(candidate);
+  if (canonicalJson(prefix.header) !== canonicalJson(candidate.header) ||
+      candidate.receipts.length < prefix.receipts.length) {
+    return false;
+  }
+  return prefix.receipts.every((receipt, index) =>
+    canonicalJson(receipt) === canonicalJson(candidate.receipts[index])
+  );
+}
+
+function governedReadAttemptResponseBindingDigest({
+  requestDigest,
+  terminalDigest
+} = {}) {
+  assertDigest(
+    requestDigest,
+    'attempt_response_request_digest_invalid'
+  );
+  assertDigest(
+    terminalDigest,
+    'attempt_response_terminal_digest_invalid'
+  );
+  return digestObject({
+    protocol: GOVERNED_READ_ATTEMPT_PROTOCOL,
+    request_digest: requestDigest,
+    terminal_digest: terminalDigest
+  });
+}
+
+function appendGovernedReadAttemptStage(workingSet, input = {}) {
+  validateGovernedReadAttemptWorkingSet(workingSet);
+  const receipt = createStageReceipt({
+    ...input,
+    header: workingSet.header,
+    receipts: workingSet.receipts
+  });
+  return createGovernedReadAttemptWorkingSet({
+    header: workingSet.header,
+    receipts: [...workingSet.receipts, receipt]
+  });
 }
 
 function emptyCounters() {
@@ -940,12 +1071,17 @@ module.exports = {
   GOVERNED_READ_ATTEMPT_STAGES,
   GOVERNED_READ_ATTEMPT_TERMINAL_STAGES,
   aggregateAttemptCounters,
+  appendGovernedReadAttemptStage,
   attemptRef,
   createAttemptHeader,
   createGovernedReadAttemptProtocol,
+  createGovernedReadAttemptWorkingSet,
   createStageReceipt,
   createTerminalEnvelope,
   failureRegistryEntry,
+  governedReadAttemptDeadlineBudgetMs,
+  governedReadAttemptResponseBindingDigest,
+  isGovernedReadAttemptWorkingSetExtension,
   projectGovernedReadAttemptOwner,
   projectGovernedReadAttemptPublic,
   validateAttemptCounterRelationships,
@@ -953,6 +1089,8 @@ module.exports = {
   validateAttemptHeader,
   validateCounterFacts,
   validateGovernedReadAttemptProtocol,
+  validateGovernedReadTerminalFailureCandidate,
+  validateGovernedReadAttemptWorkingSet,
   validateAttemptReceiptChain,
   validateStageReceipt,
   validateTerminalEnvelope

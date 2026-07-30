@@ -11,6 +11,10 @@ const {
   reject
 } = require('../../../packages/chatgpt-r4-contracts');
 const { createGovernanceAdapter } = require('./governance-adapter');
+const {
+  legacyStructuredProjection,
+  searchProjection
+} = require('./governed-read-public-projection');
 const { resolveRegisteredProject, visibilityScope } = require('./project-registry');
 
 const R4_LIVE_READ_MODE = COUNTER_MODES.governedLiveReadV1;
@@ -20,7 +24,6 @@ const MAX_CONTEXTS = 1024;
 const MAX_AUTHORIZED_TOOL_CALLS = 20;
 const MAX_R5A_AUTHORIZED_TOOL_CALLS = 40;
 const MAX_INACTIVE_REQUEST_ATTEMPTS = 128;
-const MIN_PUBLIC_RELEVANCE = 0.5;
 const R5A_POST_CALL_SAFETY_ERROR_CODES = new Set([
   'r4_live_read_native_delegation_rejected',
   'r4_live_read_native_receipt_invalid',
@@ -545,41 +548,6 @@ function assertNoMappingDisclosure(value, mappingState) {
   }
 }
 
-function searchProjection(result, projectContextRef) {
-  const source = Array.isArray(result?.results) ? result.results : [];
-  const results = source.slice(0, 5).flatMap((item, index) => {
-    const projection = item?.memoryContextProjection;
-    if (!isPlainObject(projection) || projection.lowDisclosure !== true ||
-        typeof projection.statement !== 'string' || !projection.statement.trim()) return [];
-    const numeric = item.score;
-    if (typeof numeric !== 'number' || !Number.isFinite(numeric)) return [];
-    const relevance = Math.max(0, Math.min(1, numeric));
-    if (relevance < MIN_PUBLIC_RELEVANCE) return [];
-    return [{
-      result_ref: `mref_${digestObject({ projectContextRef, index, projection }).slice(7, 31)}`,
-      summary: projection.statement,
-      relevance
-    }];
-  });
-  return {
-    status: results.length > 0 ? 'found' : 'empty',
-    result_count: results.length,
-    results
-  };
-}
-
-function structuredProjection(toolName, nativeResult, projectContextRef) {
-  if (toolName === 'search_memory') return searchProjection(nativeResult, projectContextRef);
-  if (toolName === 'prepare_memory_context') {
-    const search = searchProjection(nativeResult, projectContextRef);
-    return { status: search.status, kind: 'context', item_count: search.result_count };
-  }
-  if (toolName === 'memory_overview') {
-    return { status: 'available', kind: 'overview', item_count: 1 };
-  }
-  return { status: 'available', kind: 'audit', item_count: 1 };
-}
-
 function createGovernedLiveReadInvoker({
   mappingState,
   resolveDiaryRead,
@@ -655,7 +623,11 @@ function createGovernedLiveReadInvoker({
       reject('r4_live_read_native_delegation_rejected');
     }
     const evidence = nativeEvidence(result, resolution.allowedDiaryCount);
-    const structuredContent = structuredProjection(toolName, result, projectContextRef);
+    const structuredContent = legacyStructuredProjection(
+      toolName,
+      result,
+      projectContextRef
+    );
     assertNoMappingDisclosure(structuredContent, mappingState);
     validatePublicStructuredContent(structuredContent);
     const counters = countersFromEvidence(evidence);
@@ -962,6 +934,6 @@ module.exports = {
   effectiveVisibility,
   receiptBackedNativePreflightFailure,
   searchProjection,
-  structuredProjection,
+  structuredProjection: legacyStructuredProjection,
   visibilityLabels
 };

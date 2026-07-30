@@ -20,13 +20,14 @@ deploy, cutover, complete-V8, or readiness claim.
 `activePhase: governed_read_attempt_refactor`
 
 PR `#72` delivered the `_003` `INVALID_ARGUMENT` repair; PR `#73` delivered the
-dormant governed-read-attempt contract and terminal CAS without live activation. The later
-single-use `_004` observation failed closed without producing one
-attempt-scoped, stage-ordered, counter-reconciled terminal envelope acceptable
-as R5-O evidence. `_004` is consumed and must not be retried or reconstructed
-from legacy error mappings. `CM-2159` therefore remains active under the
-`governed_read_attempt_refactor` route. The current schema-v6 stack was
-separately authorized to stop before source construction and is being held
+dormant governed-read-attempt contract and terminal CAS; PR `#74` delivered the
+two-pass source projection and exact-writer authority harness. None activated
+the public attempt path. The later single-use `_004` observation failed closed
+without producing one attempt-scoped, stage-ordered, counter-reconciled
+terminal envelope acceptable as R5-O evidence. `_004` is consumed and must not
+be retried or reconstructed from legacy error mappings. `CM-2159` therefore
+remains active under the `governed_read_attempt_refactor` route. The current
+schema-v6 stack was separately authorized to stop before source construction and is being held
 stopped. This declaration does not authorize restart, rebind, provider or
 memory-tool execution, private configuration access, `_005`, cutover, or
 readiness claims.
@@ -52,8 +53,8 @@ future task.
 
 ## Next Safe Action
 
-Deliver the remaining three ordered CM-2159 PRs for source projection, vertical
-runtime, and Edge response v2; source projection based on PR `#73`'s merged main
+Deliver the remaining two ordered CM-2159 PRs for the lease-scoped vertical
+runtime and Edge response v2; vertical runtime based on PR `#74`'s merged main
 is current. Keep schema v6 stopped. Only after all four deliveries merge and
 merged-main CI succeeds may stopped-state `rebind-source` authorization be
 requested, followed by distinct single-use R5-O `_005` authorization. Do not
@@ -74,8 +75,9 @@ from this declaration alone.
   They do not authorize another status probe, lifecycle action, provider call,
   private runtime verification, real memory read or write, release, deploy,
   cutover, or readiness claim.
-- PR `#73` remains dormant; it changes no public MCP surface, active Edge
-  response, dependency, CI, runtime/provider configuration, baseline, or status.
+- PRs `#73` and `#74` remain dormant; they change no public MCP surface, active
+  Edge response, dependency, runtime/provider configuration, baseline, or
+  status.
 
 ## Evidence And History
 
@@ -91,6 +93,8 @@ Last completed: `CM-2158 / CMV-2243`.
 - PR `#72` merged that source/test repair as `e07d3f15...`.
 - PR `#73` merged dormant attempt-v1 and the synthetic Edge-to-Observer slice as
   `6fe2b532...`; merged-main CI run `30501105867` passed.
+- PR `#74` merged the production two-pass source projection, streaming atomic
+  materialization, and exact-VCP writer authority harness as `dcd2c42a...`.
 - Single-use authorization `_004` was consumed and failed closed. It did not
   establish a receipt-bound R5-O result. Exact stage and counter facts that
   were not present in component evidence remain unknown and are not inferred
@@ -101,18 +105,16 @@ Last completed: `CM-2158 / CMV-2243`.
   container. A single low-disclosure status confirmed schema v6 and the stopped
   state. No restart, rebind, provider call, memory-tool call, raw log read, or
   raw memory read occurred. The stack must remain stopped during construction.
-- The current source-projection construction adds two-pass digest validation,
-  streaming derived materialization, strict transaction counters, and an exact
-  VCP writer authority harness. It neither activates attempt-v1 in the live
-  path nor performs the public response-v2 cutover.
+- The current vertical-runtime construction connects the dormant attempt
+  working set over real synthetic Edge HTTP, Relay, owner-only Governance UDS,
+  Bridge/Shim HTTP, parent-only provider/preflight, a lease-scoped exact VCP
+  child, scope postcheck, Edge terminal CAS, and Observer reconciliation. It
+  neither starts the stopped stack nor performs the public response-v2 cutover.
 - PR `#65` and the exact V5 transition are historical closeout evidence only.
   They store no live locator or private payload and do not claim current health
   or authorize runtime, mutation, release, or deploy work.
-- Controller contract detail: `docs/CODEX_MEMORY_FULL_STACK_CONTROL.md`.
-- Compact machine snapshot: `.agent_board/CURRENT_FACTS.json`.
-- Historical recovery index:
-  `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`.
-- Pre-compaction history is permanently recoverable from
-  `ef62d4819ece3d93cb90e2d55fa84973cf43b7d1`.
+- Controller contract: `docs/CODEX_MEMORY_FULL_STACK_CONTROL.md`; compact snapshot: `.agent_board/CURRENT_FACTS.json`.
+- Historical recovery index: `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`.
+- Pre-compaction history is permanently recoverable from `ef62d4819ece3d93cb90e2d55fa84973cf43b7d1`.
 
 <!-- CURRENT-FACTS-ACTIVE-END -->
