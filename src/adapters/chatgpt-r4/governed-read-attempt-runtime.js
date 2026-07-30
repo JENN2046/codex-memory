@@ -131,6 +131,17 @@ function deriveGovernedReadReceiptDigests({
       throw codedError('governed_read_receipt_binding_invalid');
     }
     const contextDigest = header.context_binding_digest;
+    const authorizationEvidence = decision.accepted === true
+      ? decision.authorization
+      : {
+          accepted: false,
+          invocation: {
+            status: decision.invocation.status,
+            structured_content:
+              decision.invocation.structured_content,
+            counters: decision.invocation.counters
+          }
+        };
     const governanceReceipt = {
       schema_version: 1,
       kind: 'governed_read_attempt_governance_receipt',
@@ -138,7 +149,7 @@ function deriveGovernedReadReceiptDigests({
       request_digest: header.request_digest,
       relay_receipt_digest: digestObject(relayReceipt),
       authorization_digest:
-        digestObject(decision.authorization),
+        digestObject(authorizationEvidence),
       context_receipt_digest: contextDigest,
       tool_name: header.tool_name
     };
@@ -316,6 +327,13 @@ function createGovernedReadAttemptGovernanceRuntime({
         }), signal),
         request
       );
+      const expectedReceiptDigests =
+        deriveGovernedReadReceiptDigests({
+          request,
+          relayReceipt,
+          decision,
+          governedReadAttempt
+        });
       if (decision.accepted !== true) {
         const denied = appendGovernedReadAttemptStage(
           governedReadAttempt,
@@ -333,8 +351,12 @@ function createGovernedReadAttemptGovernanceRuntime({
             }
           }
         );
+        const invocation = validateInvocationReceiptBinding(
+          decision.invocation,
+          expectedReceiptDigests
+        );
         return Object.freeze({
-          ...decision.invocation,
+          ...invocation,
           governed_read_attempt: Object.freeze({
             working_set: denied,
             evidence_complete: false,
@@ -343,13 +365,6 @@ function createGovernedReadAttemptGovernanceRuntime({
         });
       }
 
-      const expectedReceiptDigests =
-        deriveGovernedReadReceiptDigests({
-          request,
-          relayReceipt,
-          decision,
-          governedReadAttempt
-        });
       const authorized = appendGovernedReadAttemptStage(
         governedReadAttempt,
         { stage: 'AUTHORIZED' }
@@ -421,6 +436,7 @@ module.exports = {
   MAX_NATIVE_RESULT_LIMIT,
   createGovernedReadAttemptGovernanceRuntime,
   deriveGovernedReadExecutionParameters,
+  deriveGovernedReadReceiptDigests,
   invokeWithSignal,
   validateAuthorizationDecision,
   validateAbortSignal,

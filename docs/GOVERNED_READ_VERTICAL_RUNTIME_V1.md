@@ -98,9 +98,11 @@ response.
 
 Governance also derives the context digest from the attempt header's validated
 context binding and derives the governance digest from the actual signed
-request, Relay receipt, accepted authorization, context digest, tool, and
-attempt identity. An injectable projector receives those canonical digests but
-cannot replace either value with another format-valid digest.
+request, Relay receipt, accepted authorization or denial evidence, context
+digest, tool, and attempt identity. Denial evidence binds the returned status,
+structured content, and counters while excluding the receipt digests themselves
+to avoid self-reference. Neither a denied invocation nor an injectable
+projector can replace either canonical digest with another format-valid value.
 
 An unaccepted Bridge continuation must carry exactly one canonical failure
 form: either a final failed receipt or a registry-bound lease-worker terminal

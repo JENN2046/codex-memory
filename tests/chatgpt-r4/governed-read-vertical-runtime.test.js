@@ -54,6 +54,7 @@ const {
 const {
   createGovernedReadAttemptGovernanceRuntime,
   deriveGovernedReadExecutionParameters,
+  deriveGovernedReadReceiptDigests,
   validateAuthorizationDecision
 } = require('../../src/adapters/chatgpt-r4/governed-read-attempt-runtime');
 const {
@@ -1948,12 +1949,27 @@ test('Edge protocol-candidate commit is atomic and rejects a divergent prefix', 
   );
 });
 
-test('Governance denial emits the canonical AUTHORIZED failure without bridge dispatch', async () => {
+test('Governance binds denial receipts before emitting the canonical AUTHORIZED failure', async () => {
+  const contextRef = `pctx_${'d'.repeat(32)}`;
+  const request = {
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: contextRef,
+        query: 'denied governed read',
+        limit: 1
+      }
+    }
+  };
+  const relayReceipt = {
+    kind: 'synthetic_relay_receipt',
+    status: 'claimed'
+  };
   const header = createAttemptHeader({
     attemptRef: `grat_${'d'.repeat(32)}`,
     toolName: 'search_memory',
-    requestDigest: digestObject('denied-request'),
-    contextBindingDigest: digestObject('denied-context'),
+    requestDigest: digestObject(request),
+    contextBindingDigest: digestObject(contextRef),
     now: NOW
   });
   const receipts = [];
@@ -1965,27 +1981,39 @@ test('Governance denial emits the canonical AUTHORIZED failure without bridge di
     receipts.push(createStageReceipt({ header, receipts, stage }));
   }
   let bridgeCalls = 0;
-  const runtime = createGovernedReadAttemptGovernanceRuntime({
-    async authorizeRead() {
-      return {
-        accepted: false,
-        invocation: unavailableInvocation(header.attempt_ref)
-      };
-    },
-    async invokeBridge() {
-      bridgeCalls += 1;
-    },
-    async projectInvocation() {
-      throw new Error('projector_must_not_run');
-    }
-  });
-  const result = await runtime.handle({
-    request: {
-      tool_request: {
-        name: 'search_memory'
+  function denialDecision(projectReceiptDigests = value => value) {
+    const decision = {
+      accepted: false,
+      invocation: unavailableInvocation(header.attempt_ref)
+    };
+    decision.invocation.receipt_digests = projectReceiptDigests(
+      deriveGovernedReadReceiptDigests({
+        request,
+        relayReceipt,
+        decision,
+        governedReadAttempt: { header, receipts }
+      })
+    );
+    return decision;
+  }
+  function denialRuntime(projectReceiptDigests) {
+    return createGovernedReadAttemptGovernanceRuntime({
+      async authorizeRead() {
+        return denialDecision(projectReceiptDigests);
+      },
+      async invokeBridge() {
+        bridgeCalls += 1;
+      },
+      async projectInvocation() {
+        throw new Error('projector_must_not_run');
       }
-    },
-    relayReceipt: {},
+    });
+  }
+
+  const runtime = denialRuntime();
+  const result = await runtime.handle({
+    request,
+    relayReceipt,
     governedReadAttempt: {
       header,
       receipts
@@ -2000,6 +2028,22 @@ test('Governance denial emits the canonical AUTHORIZED failure without bridge di
     result.governed_read_attempt.working_set.receipts.at(-1).reason_code,
     'governance_denied'
   );
+
+  for (const field of ['governance', 'context']) {
+    const forgedRuntime = denialRuntime(receiptDigests => ({
+      ...receiptDigests,
+      [field]: digestObject(`forged-denial-${field}-receipt`)
+    }));
+    await assert.rejects(
+      forgedRuntime.handle({
+        request,
+        relayReceipt,
+        governedReadAttempt: { header, receipts }
+      }),
+      { code: 'governed_read_receipt_binding_invalid' }
+    );
+  }
+  assert.equal(bridgeCalls, 0);
 });
 
 test('Governance binds authorized query and limit to the signed request', async () => {
