@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const http = require('node:http');
+const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
@@ -619,6 +620,66 @@ test('Governance UDS deadline aborts an in-progress frame exactly once', async t
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(observedSignal?.aborted, true);
   assert.equal(handleSettled, true);
+  assert.equal(udsServer.snapshot().accepted_frames, 0);
+  assert.equal(udsServer.snapshot().rejected_frames, 1);
+});
+
+test('Governance UDS attempt deadline is absolute despite peer activity', async t => {
+  const workingSet = bridgeWorkingSet('w');
+  const nearDeadline = new Date(
+    Date.parse(workingSet.header.deadline_at) - 40
+  );
+  const udsRoot = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-governed-absolute-deadline-'
+  ));
+  fs.chmodSync(udsRoot, 0o700);
+  const socketPath = path.join(udsRoot, 'governance.sock');
+  let markAborted;
+  const aborted = new Promise(resolve => {
+    markAborted = resolve;
+  });
+  const udsServer = createGovernanceUdsServer({
+    socketPath,
+    socketIdleTimeoutMs: 1_000,
+    attemptDeadlineMarginMs: 0,
+    clock: () => nearDeadline,
+    governanceRuntime: {
+      async handle(_payload, { signal }) {
+        await new Promise(resolve => {
+          signal.addEventListener('abort', resolve, { once: true });
+        });
+        markAborted();
+        return { late_result: true };
+      }
+    }
+  });
+  await udsServer.start();
+  const socket = net.createConnection(socketPath);
+  let peerActivity = null;
+  t.after(async () => {
+    if (peerActivity !== null) clearInterval(peerActivity);
+    socket.destroy();
+    await udsServer.stop();
+    fs.rmSync(udsRoot, { recursive: true, force: true });
+  });
+  await new Promise((resolve, rejectConnect) => {
+    socket.once('connect', resolve);
+    socket.once('error', rejectConnect);
+  });
+  socket.write(`${JSON.stringify({
+    governedReadAttempt: workingSet,
+    relayReceipt: { safe: true },
+    request: { safe: true }
+  })}\n`);
+  peerActivity = setInterval(() => {
+    if (!socket.destroyed) socket.write('x');
+  }, 5);
+  const outcome = await Promise.race([
+    aborted.then(() => 'aborted'),
+    new Promise(resolve => setTimeout(() => resolve('safety_timeout'), 200))
+  ]);
+  assert.equal(outcome, 'aborted');
   assert.equal(udsServer.snapshot().accepted_frames, 0);
   assert.equal(udsServer.snapshot().rejected_frames, 1);
 });

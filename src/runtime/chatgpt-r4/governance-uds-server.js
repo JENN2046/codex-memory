@@ -91,11 +91,19 @@ function createGovernanceUdsServer({
     let handled = false;
     let settled = false;
     let processingAbortController = null;
+    let attemptDeadlineTimer = null;
+
+    function clearAttemptDeadlineTimer() {
+      if (attemptDeadlineTimer === null) return;
+      clearTimeout(attemptDeadlineTimer);
+      attemptDeadlineTimer = null;
+    }
 
     function rejectFrame({ destroy = true } = {}) {
       if (settled) return;
       settled = true;
       handled = true;
+      clearAttemptDeadlineTimer();
       if (processingAbortController !== null &&
           !processingAbortController.signal.aborted) {
         processingAbortController.abort();
@@ -151,7 +159,12 @@ function createGovernanceUdsServer({
         if (governedTimeoutMs === 0) {
           return rejectFrame();
         }
-        socket.setTimeout(governedTimeoutMs, () => rejectFrame());
+        socket.setTimeout(0);
+        attemptDeadlineTimer = setTimeout(
+          () => rejectFrame(),
+          governedTimeoutMs
+        );
+        attemptDeadlineTimer.unref?.();
       }
       processingAbortController = new AbortController();
       try {
@@ -165,6 +178,7 @@ function createGovernanceUdsServer({
         }
         settled = true;
         processingAbortController = null;
+        clearAttemptDeadlineTimer();
         socket.setTimeout(0);
         observations.accepted_frames += 1;
         socket.end(encoded);

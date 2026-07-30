@@ -214,7 +214,9 @@ closed. A request first presented at or after `deadline_at` is rejected before
 opening a new downstream connection.
 
 Governance UDS tracks frame admission separately from processing completion.
-Its deadline or a peer disconnect aborts the in-progress frame exactly once,
+After an attempt frame is admitted, an independent wall-clock timer enforces
+the derived deadline; later socket activity cannot refresh or extend it. That
+deadline or a peer disconnect aborts the in-progress frame exactly once,
 destroys the socket, and propagates one internal `AbortSignal` through
 Governance, Bridge HTTP, Shim, the provider wrapper, and the controller-owned
 child handle. A late handler result cannot increment accepted-frame counters or
