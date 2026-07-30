@@ -125,7 +125,7 @@ function createLoopbackEdgeRuntime({
       record.status = 'expired';
       record.claim = null;
       record.purge_after_ms =
-        record.attempt_deadline_ms + terminalRetentionMs;
+        currentMs + terminalRetentionMs;
       try {
         governedCoordinator.timeoutAttempt(record.attempt_ref);
       } catch {}

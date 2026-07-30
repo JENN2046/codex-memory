@@ -215,8 +215,12 @@ corresponding Edge request record. This keeps terminal lookup and coordinator
 capacity aligned across sustained turnover. Request IDs, nonces, and
 attempt refs remain in the separate replay guard until their signed expiry;
 the guard is sized for the maximum number of terminal-retention windows within
-the envelope TTL. Expiring a full terminal record therefore restores admission
-capacity without making an accepted identity replayable.
+the envelope TTL. A timeout first observed after its deadline anchors both
+Edge-record and coordinator-terminal retention at that actual terminal commit
+time, rather than immediately pruning the Edge record against the old
+deadline. Expiring a full terminal record therefore restores admission
+capacity without making an accepted identity replayable or leaving hidden
+coordinator-only retention pressure.
 Submission identities are held in a rollback-capable replay reservation while
 the coordinator admits the attempt. A coordinator rejection releases that
 reservation, so a still-valid signed envelope can retry after transient

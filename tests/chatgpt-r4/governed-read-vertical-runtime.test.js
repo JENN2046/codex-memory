@@ -1460,8 +1460,114 @@ test('Edge reuses governed coordinator capacity at the request retention cadence
   assert.equal(runtime.snapshot().request_count, 0);
 });
 
-test('Edge preserves replay identities when coordinator admission rejects', async t => {
+test('Edge anchors delayed timeout retention at the terminal commit time', async t => {
   let current = new Date(NOW);
+  const principal = signingIdentity('delayed-timeout-principal');
+  const edgeIdentity = signingIdentity('delayed-timeout-edge');
+  const contextRef = `pctx_${'w'.repeat(32)}`;
+  const principalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('delayed-timeout-principal'),
+    now: NOW,
+    nonce: 'principal_nonce_delayed_timeout_01',
+    signing: signing(principal)
+  });
+  const runtime = createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current,
+    maxInFlight: 2,
+    maxRecords: 2,
+    terminalRetentionMs: 10,
+    governedReadAttempts: true
+  });
+  const address = await runtime.start();
+  t.after(() => runtime.stop());
+  const client = createLoopbackEdgeClient(address.url, {
+    timeoutMs: 1_000
+  });
+  const deadlines = [];
+
+  for (const [index, marker] of ['x', 'y'].entries()) {
+    const request = createRequestEnvelope({
+      principalAssertion,
+      toolName: 'search_memory',
+      toolArguments: {
+        project_context_ref: contextRef,
+        query: 'delayed timeout retention seed',
+        limit: 1
+      },
+      now: NOW,
+      requestId: `req_delayed_timeout_seed_${index}_00001`,
+      nonce: `request_nonce_delayed_timeout_seed_${index}`,
+      signing: signing(edgeIdentity)
+    });
+    const header = createAttemptHeader({
+      attemptRef: `grat_${marker.repeat(32)}`,
+      toolName: 'search_memory',
+      requestDigest: digestObject(request),
+      contextBindingDigest: digestObject(contextRef),
+      now: NOW
+    });
+    deadlines.push(Date.parse(header.deadline_at));
+    await client.submit(request, { attemptHeader: header });
+  }
+
+  current = new Date(Math.max(...deadlines) + 11);
+  assert.deepEqual(runtime.snapshot().states, {
+    queued: 0,
+    claimed: 0,
+    completed: 0,
+    cancelled: 0,
+    expired: 2
+  });
+
+  const retryPrincipalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('delayed-timeout-principal'),
+    now: current,
+    nonce: 'principal_nonce_delayed_timeout_02',
+    signing: signing(principal)
+  });
+  const retryRequest = createRequestEnvelope({
+    principalAssertion: retryPrincipalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: contextRef,
+      query: 'retry after aligned delayed timeout retention',
+      limit: 1
+    },
+    now: current,
+    requestId: 'req_delayed_timeout_retry_0000001',
+    nonce: 'request_nonce_delayed_timeout_retry_01',
+    signing: signing(edgeIdentity)
+  });
+  const retryHeader = createAttemptHeader({
+    attemptRef: `grat_${'z'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject(retryRequest),
+    contextBindingDigest: digestObject(contextRef),
+    now: current
+  });
+
+  await assert.rejects(
+    client.submit(retryRequest, { attemptHeader: retryHeader }),
+    { code: 'edge_record_capacity_exceeded' }
+  );
+  current = new Date(current.getTime() + 10);
+  assert.deepEqual(
+    await client.submit(retryRequest, { attemptHeader: retryHeader }),
+    {
+      request_id: retryRequest.request_id,
+      status: 'queued'
+    }
+  );
+  await client.cancel(retryRequest.request_id);
+});
+
+test('Edge preserves replay identities when coordinator admission rejects', async t => {
   const principal = signingIdentity('admission-retry-principal');
   const edgeIdentity = signingIdentity('admission-retry-edge');
   const contextRef = `pctx_${'u'.repeat(32)}`;
@@ -1473,14 +1579,31 @@ test('Edge preserves replay identities when coordinator admission rejects', asyn
     nonce: 'principal_nonce_admission_retry_01',
     signing: signing(principal)
   });
+  const coordinator = createGovernedReadAttemptCoordinator({
+    clock: () => NOW,
+    maxAttempts: 1
+  });
+  let rejectAdmission = true;
   const runtime = createLoopbackEdgeRuntime({
     async verifyRequest() {},
     async verifyResponse() {},
-    clock: () => current,
+    clock: () => NOW,
     maxInFlight: 1,
     maxRecords: 1,
-    terminalRetentionMs: 10,
-    governedReadAttempts: true
+    governedReadAttempts: true,
+    attemptCoordinator: {
+      ...coordinator,
+      acceptAttempt(header) {
+        if (rejectAdmission) {
+          rejectAdmission = false;
+          throw Object.assign(
+            new Error('synthetic_coordinator_admission_rejected'),
+            { code: 'synthetic_coordinator_admission_rejected' }
+          );
+        }
+        return coordinator.acceptAttempt(header);
+      }
+    }
   });
   const address = await runtime.start();
   t.after(() => runtime.stop());
@@ -1488,81 +1611,40 @@ test('Edge preserves replay identities when coordinator admission rejects', asyn
     timeoutMs: 1_000
   });
 
-  const firstRequest = createRequestEnvelope({
+  const request = createRequestEnvelope({
     principalAssertion,
     toolName: 'search_memory',
     toolArguments: {
       project_context_ref: contextRef,
-      query: 'coordinator retention seed',
+      query: 'coordinator admission retry',
       limit: 1
     },
-    now: current,
-    requestId: 'req_admission_retry_seed_000001',
-    nonce: 'request_nonce_admission_retry_seed_01',
-    signing: signing(edgeIdentity)
-  });
-  const firstHeader = createAttemptHeader({
-    attemptRef: `grat_${'p'.repeat(32)}`,
-    toolName: 'search_memory',
-    requestDigest: digestObject(firstRequest),
-    contextBindingDigest: digestObject(contextRef),
-    now: current
-  });
-  await client.submit(firstRequest, {
-    attemptHeader: firstHeader
-  });
-
-  current = new Date(Date.parse(firstHeader.deadline_at) + 10);
-  const retryPrincipalAssertion = createPrincipalAssertion({
-    issuer: ISSUER,
-    audience: AUDIENCE,
-    subjectFingerprint: digestObject('admission-retry-principal'),
-    now: current,
-    nonce: 'principal_nonce_admission_retry_02',
-    signing: signing(principal)
-  });
-  const retryRequest = createRequestEnvelope({
-    principalAssertion: retryPrincipalAssertion,
-    toolName: 'search_memory',
-    toolArguments: {
-      project_context_ref: contextRef,
-      query: 'retry after coordinator retention',
-      limit: 1
-    },
-    now: current,
+    now: NOW,
     requestId: 'req_admission_retry_candidate_0001',
     nonce: 'request_nonce_admission_retry_candidate_01',
     signing: signing(edgeIdentity)
   });
-  const retryHeader = createAttemptHeader({
-    attemptRef: `grat_${'q'.repeat(32)}`,
+  const header = createAttemptHeader({
+    attemptRef: `grat_${'p'.repeat(32)}`,
     toolName: 'search_memory',
-    requestDigest: digestObject(retryRequest),
+    requestDigest: digestObject(request),
     contextBindingDigest: digestObject(contextRef),
-    now: current
+    now: NOW
   });
   await assert.rejects(
-    client.submit(retryRequest, {
-      attemptHeader: retryHeader
-    }),
-    {
-      code:
-        'attempt_coordinator_retention_capacity_exceeded'
-    }
+    client.submit(request, { attemptHeader: header }),
+    { code: 'synthetic_coordinator_admission_rejected' }
   );
   assert.equal(runtime.snapshot().request_count, 0);
 
-  current = new Date(current.getTime() + 10);
   assert.deepEqual(
-    await client.submit(retryRequest, {
-      attemptHeader: retryHeader
-    }),
+    await client.submit(request, { attemptHeader: header }),
     {
-      request_id: retryRequest.request_id,
+      request_id: request.request_id,
       status: 'queued'
     }
   );
-  await client.cancel(retryRequest.request_id);
+  await client.cancel(request.request_id);
 });
 
 test('Edge closes partial coordinator admission and releases replay identities', async () => {
