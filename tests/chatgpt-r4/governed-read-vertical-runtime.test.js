@@ -2161,6 +2161,7 @@ test('lease process strips inherited env and execArgv before exact-child timeout
   assert.equal(child.signals.includes('SIGKILL'), false);
   assert.equal(child.unrefCalls, 1);
   assert.equal(result.shutdown_complete, false);
+  assert.equal(result.child_started, true);
   assert.deepEqual(Object.keys(forkOptions.env).sort(), [
     'LANG',
     'LC_ALL',
@@ -2173,6 +2174,81 @@ test('lease process strips inherited env and execArgv before exact-child timeout
     false
   );
   assert.deepEqual(forkOptions.execArgv, []);
+});
+
+test('pre-fork child failure cleans its empty store and reuses capacity', async t => {
+  const fixture = createSqliteFixture(t);
+  const successfulRunner =
+    createSyntheticWorkerRunner(fixture.sourceProjection);
+  let runnerCalls = 0;
+  let providerCalls = 0;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      providerCalls += 1;
+      return [0.75, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    async workerRunner(task, options) {
+      runnerCalls += 1;
+      if (runnerCalls === 1) {
+        return runLeaseWorkerProcess(task, {
+          ...options,
+          forkProcess() {
+            throw new Error('synthetic_pre_fork_failure');
+          }
+        });
+      }
+      return successfulRunner(task, options);
+    }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    allowedDiaryCount: 1
+  };
+  const first = await worker.execute({
+    workingSet: bridgeWorkingSet('f'),
+    authorization,
+    query: 'pre fork cleanup failure',
+    limit: 1
+  });
+  assert.equal(first.accepted, false);
+  assert.equal(first.cleanup_complete, true);
+  assert.equal(first.evidence_complete, true);
+  assert.equal(
+    first.working_set.receipts.at(-1).reason_code,
+    'hydration_failed'
+  );
+  assert.deepEqual(
+    first.working_set.receipts.at(-1)
+      .counter_facts.derived_transaction,
+    { started: 0, committed: 0, rolled_back: 0 }
+  );
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+  assert.equal(worker.snapshot().stores_created, 1);
+  assert.equal(worker.snapshot().stores_removed, 1);
+  assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
+
+  const second = await worker.execute({
+    workingSet: bridgeWorkingSet('g'),
+    authorization,
+    query: 'capacity reused after pre fork failure',
+    limit: 1
+  });
+  assert.equal(second.accepted, true);
+  assert.equal(providerCalls, 2);
+  assert.equal(worker.snapshot().attempts_completed, 2);
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+  assert.equal(worker.snapshot().stores_created, 2);
+  assert.equal(worker.snapshot().stores_removed, 2);
+  assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
 });
 
 test('lease process IPC failure retains control of and terminates its exact child', async () => {

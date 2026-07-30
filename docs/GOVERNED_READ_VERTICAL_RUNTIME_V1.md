@@ -130,7 +130,11 @@ the existing cleanup latch retains the store and blocks later reads.
 
 The controller also launches the lease child with an empty `execArgv` list, so
 parent `--env-file`, `--require`, and `--import` startup authority cannot cross
-the process boundary before the child's minimal-environment checks.
+the process boundary before the child's minimal-environment checks. A
+synchronous pre-fork failure is explicitly reported as child-not-started: the
+still-empty attempt store is removed and later admission remains available.
+Only a child that started without provable shutdown can latch cleanup and
+retain its store.
 
 Before acknowledgement, the short Edge claim lease still permits safe reclaim
 of an abandoned Relay claim. Acknowledgement of an attempt claim atomically

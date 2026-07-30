@@ -387,7 +387,8 @@ function runLeaseWorkerProcess(task, {
           response: message,
           shutdown_complete: message.shutdown_complete === true,
           sigterm_sent: sigtermSent,
-          cancelled
+          cancelled,
+          child_started: true
         });
         return;
       }
@@ -395,7 +396,8 @@ function runLeaseWorkerProcess(task, {
         response: message,
         shutdown_complete: false,
         sigterm_sent: sigtermSent,
-        cancelled
+        cancelled,
+        child_started: true
       });
     }
 
@@ -413,7 +415,8 @@ function runLeaseWorkerProcess(task, {
           response: message,
           shutdown_complete: false,
           sigterm_sent: sigtermSent,
-          cancelled
+          cancelled,
+          child_started: true
         });
         return;
       }
@@ -427,7 +430,8 @@ function runLeaseWorkerProcess(task, {
           response: message,
           shutdown_complete: false,
           sigterm_sent: sigtermSent,
-          cancelled
+          cancelled,
+          child_started: true
         });
       }, terminationGraceMs);
     }
@@ -441,7 +445,8 @@ function runLeaseWorkerProcess(task, {
         response: null,
         shutdown_complete: true,
         sigterm_sent: false,
-        cancelled: true
+        cancelled: true,
+        child_started: false
       });
       return;
     }
@@ -460,9 +465,10 @@ function runLeaseWorkerProcess(task, {
     } catch {
       finish({
         response: null,
-        shutdown_complete: false,
+        shutdown_complete: true,
         sigterm_sent: false,
-        cancelled: false
+        cancelled: false,
+        child_started: false
       });
       return;
     }
@@ -907,6 +913,39 @@ function createGovernedReadLeaseWorker({
           return shutdownFailure(current);
         }
         throw codedError('lease_worker_cancelled');
+      }
+      if (workerExecution?.child_started === false) {
+        if (workerExecution?.shutdown_complete !== true ||
+            workerExecution?.response !== null ||
+            workerExecution?.sigterm_sent !== false) {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        try {
+          removeAttemptStore(root, attemptStore.attemptRoot, fsModule);
+          storesRemoved += 1;
+          attemptStore = null;
+        } catch {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        attemptsCompleted += 1;
+        return failedContinuation(
+          current,
+          'HYDRATION',
+          'hydration_failed',
+          {
+            native_invocation: {
+              succeeded: 0,
+              failed: 1
+            },
+            derived_transaction: {
+              started: 0,
+              committed: 0,
+              rolled_back: 0
+            }
+          }
+        );
       }
       let response = null;
       try {
