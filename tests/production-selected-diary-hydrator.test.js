@@ -217,6 +217,20 @@ function hydrationInput(value, allowedDiaryNames = ['PROJECT_ALPHA']) {
   };
 }
 
+function zeroDerivedCounterFactsFixture() {
+  return {
+    primary_memory: {
+      write_attempts: 0,
+      writes_committed: 0
+    },
+    derived_transaction: {
+      started: 0,
+      committed: 0,
+      rolled_back: 0
+    }
+  };
+}
+
 function hydrationAttemptReceipt(counterFacts, {
   outcome = 'completed',
   reasonCode = null
@@ -487,17 +501,7 @@ test('materialization classifies a second source-open failure after provider as 
         'selected_diary_hydration_source_database_open_failed'
       );
       assert.equal(error.reasonCode, 'hydration_failed');
-      assert.deepEqual(error.counterFacts, {
-        primary_memory: {
-          write_attempts: 0,
-          writes_committed: 0
-        },
-        derived_transaction: {
-          started: 0,
-          committed: 0,
-          rolled_back: 0
-        }
-      });
+      assert.deepEqual(error.counterFacts, zeroDerivedCounterFactsFixture());
       const failure = failureRegistryEntry(error.reasonCode);
       assert.equal(failure.stage, 'HYDRATION');
       assert.equal(failure.provider_may_have_occurred, true);
@@ -515,6 +519,157 @@ test('materialization classifies a second source-open failure after provider as 
     value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
     0
   );
+});
+
+test('materialization classifies a missing source boundary after provider as hydration', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let openCount = 0;
+  const hydrate = value.hydrator({
+    openSourceDatabase(file) {
+      openCount += 1;
+      return openReadOnlyDatabase(file);
+    }
+  });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  assert.equal(openCount, 1);
+  fs.unlinkSync(value.sourceFile);
+
+  assert.throws(
+    () => hydrate.materialize({
+      ...hydrationInput(value),
+      projectionPlan: plan
+    }),
+    error => {
+      assert.equal(
+        error.code,
+        'selected_diary_hydration_source_database_invalid'
+      );
+      assert.equal(error.reasonCode, 'hydration_failed');
+      assert.deepEqual(error.counterFacts, zeroDerivedCounterFactsFixture());
+      const failure = failureRegistryEntry(error.reasonCode);
+      assert.equal(failure.stage, 'HYDRATION');
+      assert.equal(failure.provider_may_have_occurred, true);
+      return true;
+    }
+  );
+  assert.equal(openCount, 1);
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
+test('materialization classifies an unreadable source boundary after provider as hydration', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+  let denySourceAccess = false;
+  const fsModule = {
+    ...fs,
+    lstatSync(file) {
+      if (denySourceAccess && file === value.sourceFile) {
+        const error = new Error('synthetic source permission change');
+        error.code = 'EACCES';
+        throw error;
+      }
+      return fs.lstatSync(file);
+    }
+  };
+  const hydrate = value.hydrator({ fsModule });
+  const plan = hydrate.preflight({
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    dimension: 2
+  });
+  denySourceAccess = true;
+
+  assert.throws(
+    () => hydrate.materialize({
+      ...hydrationInput(value),
+      projectionPlan: plan
+    }),
+    error => {
+      assert.equal(
+        error.code,
+        'selected_diary_hydration_source_database_invalid'
+      );
+      assert.equal(error.reasonCode, 'hydration_failed');
+      assert.deepEqual(error.counterFacts, zeroDerivedCounterFactsFixture());
+      return true;
+    }
+  );
+  assert.equal(
+    value.isolated.prepare('SELECT COUNT(*) AS count FROM files').get().count,
+    0
+  );
+});
+
+test('preflight identity replacement stays a SOURCE_PREFLIGHT failure', t => {
+  const value = fixture(t);
+  insertMemory(value.source);
+  value.closeSource();
+
+  const replacementFile = path.join(
+    value.sourceStore,
+    'knowledge_base.replacement.sqlite'
+  );
+  const replacement = new DatabaseSync(replacementFile);
+  createSchema(replacement);
+  insertMemory(replacement, {
+    checksum: 'replacement-checksum',
+    content: 'synthetic replacement memory'
+  });
+  replacement.close();
+
+  let sourceLstatCount = 0;
+  let replaced = false;
+  const fsModule = {
+    ...fs,
+    lstatSync(file) {
+      const stat = fs.lstatSync(file);
+      if (file === value.sourceFile) {
+        sourceLstatCount += 1;
+        if (sourceLstatCount === 3) {
+          fs.renameSync(replacementFile, value.sourceFile);
+          replaced = true;
+        }
+      }
+      return stat;
+    }
+  };
+  let opened = false;
+  const hydrate = value.hydrator({
+    fsModule,
+    openSourceDatabase() {
+      opened = true;
+      throw new Error('must not open a replaced preflight source');
+    }
+  });
+
+  assert.throws(
+    () => hydrate.preflight({
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      dimension: 2
+    }),
+    error => {
+      assert.equal(
+        error.code,
+        'selected_diary_hydration_source_database_invalid'
+      );
+      assert.equal(error.reasonCode, 'source_identity_invalid');
+      assert.equal(error.counterFacts, undefined);
+      const failure = failureRegistryEntry(error.reasonCode);
+      assert.equal(failure.stage, 'SOURCE_PREFLIGHT');
+      assert.equal(failure.provider_may_have_occurred, false);
+      return true;
+    }
+  );
+  assert.equal(replaced, true);
+  assert.equal(opened, false);
 });
 
 test('projection byte budgets reject before selected rows are materialized', () => {

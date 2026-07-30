@@ -1180,9 +1180,11 @@ function executeSourceSnapshot({
   });
   if (expectedSourceIdentity &&
       currentIdentity !== expectedSourceIdentity) {
-    throw codedError(errorCode, 'source_snapshot_changed_after_preflight', {
-      counterFacts: zeroDerivedCounterFacts()
-    });
+    throw codedError(
+      errorCode,
+      identityReason,
+      preflight ? {} : { counterFacts: zeroDerivedCounterFacts() }
+    );
   }
   let sourceDatabase;
   let activeError = null;
@@ -1371,14 +1373,26 @@ function createProductionSelectedDiarySourceProjection({
         { counterFacts: zeroDerivedCounterFacts() }
       );
     }
-    const boundary = validateRuntimeBoundary({
-      knowledgeBaseManager,
-      knowledgeBaseRootPath,
-      knowledgeBaseStorePath,
-      sourceKnowledgeBaseStorePath,
-      vcpToolBoxRoot,
-      fsModule
-    });
+    let boundary;
+    try {
+      boundary = validateRuntimeBoundary({
+        knowledgeBaseManager,
+        knowledgeBaseRootPath,
+        knowledgeBaseStorePath,
+        sourceKnowledgeBaseStorePath,
+        vcpToolBoxRoot,
+        fsModule
+      });
+    } catch (error) {
+      throw codedError(
+        typeof error?.code === 'string' &&
+          error.code.startsWith('selected_diary_hydration_')
+          ? error.code
+          : 'selected_diary_hydration_boundary_mismatch',
+        'hydration_failed',
+        { counterFacts: zeroDerivedCounterFacts() }
+      );
+    }
     if (boundary.dimension !== projectionPlan.dimension) {
       throw codedError(
         'selected_diary_hydration_projection_plan_dimension_mismatch',
