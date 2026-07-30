@@ -220,7 +220,7 @@ function createLoopbackEdgeRuntime({
       return !TERMINAL_STATES.has(record.status);
     }).length;
     if (activeCount >= maxInFlight) reject('edge_inflight_capacity_exceeded');
-    submissionReplayGuard.consumeMany([
+    const replayReservation = submissionReplayGuard.reserveMany([
       { namespace: 'edge_submission_request_id', key: request.request_id, expiresAt: request.expires_at },
       { namespace: 'edge_submission_nonce', key: request.nonce, expiresAt: request.expires_at },
       ...(attemptHeader
@@ -244,7 +244,12 @@ function createLoopbackEdgeRuntime({
         : null
     };
     if (attemptHeader) {
-      governedCoordinator.acceptAttempt(attemptHeader);
+      try {
+        governedCoordinator.acceptAttempt(attemptHeader);
+      } catch (error) {
+        replayReservation.rollback();
+        throw error;
+      }
       const workingSet = governedCoordinator.workingSet(
         attemptHeader.attempt_ref
       );
@@ -257,6 +262,7 @@ function createLoopbackEdgeRuntime({
         })
       );
     }
+    replayReservation.commit();
     records.set(request.request_id, record);
     emit('request_queued', record);
     return { request_id: request.request_id, status: record.status };

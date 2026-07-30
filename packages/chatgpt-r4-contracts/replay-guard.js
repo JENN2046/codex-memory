@@ -20,7 +20,7 @@ class InMemoryReplayGuard {
     return this.consumeMany([{ namespace, key, expiresAt }]);
   }
 
-  consumeMany(entries) {
+  reserveMany(entries) {
     if (!Array.isArray(entries) || entries.length < 1) reject('replay_batch_invalid');
     const pending = entries.map(entry => {
       if (!entry || typeof entry !== 'object' || Array.isArray(entry)) reject('replay_batch_invalid');
@@ -42,6 +42,29 @@ class InMemoryReplayGuard {
     }
     if (this.entries.size + pending.length > this.maxEntries) reject('replay_guard_capacity_exceeded');
     for (const entry of pending) this.entries.set(entry.composite, entry.expiresMs);
+    let active = true;
+    return Object.freeze({
+      commit() {
+        if (!active) return false;
+        active = false;
+        return true;
+      },
+      rollback: () => {
+        if (!active) return false;
+        active = false;
+        for (const entry of pending) {
+          if (this.entries.get(entry.composite) === entry.expiresMs) {
+            this.entries.delete(entry.composite);
+          }
+        }
+        return true;
+      }
+    });
+  }
+
+  consumeMany(entries) {
+    const reservation = this.reserveMany(entries);
+    reservation.commit();
     return true;
   }
 

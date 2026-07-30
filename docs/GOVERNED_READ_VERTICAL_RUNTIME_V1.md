@@ -168,6 +168,11 @@ attempt refs remain in the separate replay guard until their signed expiry;
 the guard is sized for the maximum number of terminal-retention windows within
 the envelope TTL. Expiring a full terminal record therefore restores admission
 capacity without making an accepted identity replayable.
+Submission identities are held in a rollback-capable replay reservation while
+the coordinator admits the attempt. A coordinator rejection releases that
+reservation, so a still-valid signed envelope can retry after transient
+capacity clears; successful coordinator admission commits the identities
+before the Edge request record becomes visible.
 
 The existing 20-second Bridge, 30-second Governance UDS, and 15-second Relay
 UDS defaults remain unchanged for non-attempt traffic. No environment

@@ -1366,6 +1366,111 @@ test('Edge reuses governed coordinator capacity at the request retention cadence
   assert.equal(runtime.snapshot().request_count, 0);
 });
 
+test('Edge preserves replay identities when coordinator admission rejects', async t => {
+  let current = new Date(NOW);
+  const principal = signingIdentity('admission-retry-principal');
+  const edgeIdentity = signingIdentity('admission-retry-edge');
+  const contextRef = `pctx_${'u'.repeat(32)}`;
+  const principalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('admission-retry-principal'),
+    now: NOW,
+    nonce: 'principal_nonce_admission_retry_01',
+    signing: signing(principal)
+  });
+  const runtime = createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current,
+    maxInFlight: 1,
+    maxRecords: 1,
+    terminalRetentionMs: 10,
+    governedReadAttempts: true
+  });
+  const address = await runtime.start();
+  t.after(() => runtime.stop());
+  const client = createLoopbackEdgeClient(address.url, {
+    timeoutMs: 1_000
+  });
+
+  const firstRequest = createRequestEnvelope({
+    principalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: contextRef,
+      query: 'coordinator retention seed',
+      limit: 1
+    },
+    now: current,
+    requestId: 'req_admission_retry_seed_000001',
+    nonce: 'request_nonce_admission_retry_seed_01',
+    signing: signing(edgeIdentity)
+  });
+  const firstHeader = createAttemptHeader({
+    attemptRef: `grat_${'p'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject(firstRequest),
+    contextBindingDigest: digestObject(contextRef),
+    now: current
+  });
+  await client.submit(firstRequest, {
+    attemptHeader: firstHeader
+  });
+
+  current = new Date(Date.parse(firstHeader.deadline_at) + 10);
+  const retryPrincipalAssertion = createPrincipalAssertion({
+    issuer: ISSUER,
+    audience: AUDIENCE,
+    subjectFingerprint: digestObject('admission-retry-principal'),
+    now: current,
+    nonce: 'principal_nonce_admission_retry_02',
+    signing: signing(principal)
+  });
+  const retryRequest = createRequestEnvelope({
+    principalAssertion: retryPrincipalAssertion,
+    toolName: 'search_memory',
+    toolArguments: {
+      project_context_ref: contextRef,
+      query: 'retry after coordinator retention',
+      limit: 1
+    },
+    now: current,
+    requestId: 'req_admission_retry_candidate_0001',
+    nonce: 'request_nonce_admission_retry_candidate_01',
+    signing: signing(edgeIdentity)
+  });
+  const retryHeader = createAttemptHeader({
+    attemptRef: `grat_${'q'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject(retryRequest),
+    contextBindingDigest: digestObject(contextRef),
+    now: current
+  });
+  await assert.rejects(
+    client.submit(retryRequest, {
+      attemptHeader: retryHeader
+    }),
+    {
+      code:
+        'attempt_coordinator_retention_capacity_exceeded'
+    }
+  );
+  assert.equal(runtime.snapshot().request_count, 0);
+
+  current = new Date(current.getTime() + 10);
+  assert.deepEqual(
+    await client.submit(retryRequest, {
+      attemptHeader: retryHeader
+    }),
+    {
+      request_id: retryRequest.request_id,
+      status: 'queued'
+    }
+  );
+  await client.cancel(retryRequest.request_id);
+});
+
 test('Edge protocol-candidate commit is atomic and rejects a divergent prefix', () => {
   const header = createAttemptHeader({
     attemptRef: `grat_${'c'.repeat(32)}`,
