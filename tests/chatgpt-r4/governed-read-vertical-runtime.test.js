@@ -2163,6 +2163,7 @@ test('lease process strips inherited env and execArgv before exact-child timeout
   assert.equal(child.unrefCalls, 1);
   assert.equal(result.shutdown_complete, false);
   assert.equal(result.child_started, true);
+  assert.equal(result.termination_reason, 'timeout');
   assert.deepEqual(Object.keys(forkOptions.env).sort(), [
     'LANG',
     'LC_ALL',
@@ -2310,6 +2311,123 @@ test('pre-start child failures clean empty stores and reuse capacity', async t =
   assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
 });
 
+test('lease timeout rejects late success and reuses capacity after exit', async t => {
+  const fixture = createSqliteFixture(t);
+  const successfulRunner =
+    createSyntheticWorkerRunner(fixture.sourceProjection);
+  let lateExecution = null;
+  let lateChild = null;
+  let runnerCalls = 0;
+  let providerCalls = 0;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      providerCalls += 1;
+      return [0.75, 0.25];
+    },
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    workerTimeoutMs: 10,
+    terminationGraceMs: 100,
+    async workerRunner(task, options) {
+      runnerCalls += 1;
+      if (runnerCalls !== 1) {
+        return successfulRunner(task, options);
+      }
+      class SyntheticLateSuccessChild extends EventEmitter {
+        constructor() {
+          super();
+          this.connected = true;
+          this.pid = 24680;
+          this.signals = [];
+          this.task = null;
+        }
+
+        send(envelope) {
+          this.task = envelope.task;
+        }
+
+        kill(signal) {
+          this.signals.push(signal);
+          queueMicrotask(() => {
+            const execution =
+              successfulWorkerExecution(this.task);
+            this.emit('message', execution.response);
+            this.connected = false;
+            this.emit('exit', 0);
+          });
+          return true;
+        }
+
+        disconnect() {
+          this.connected = false;
+        }
+
+        unref() {}
+      }
+      lateChild = new SyntheticLateSuccessChild();
+      lateExecution = await runLeaseWorkerProcess(task, {
+        ...options,
+        forkProcess() {
+          return lateChild;
+        }
+      });
+      return lateExecution;
+    }
+  });
+  const authorization = {
+    accepted: true,
+    allowedDiaryNames: ['PROJECT_ALPHA'],
+    allowedDiaryCount: 1
+  };
+  const late = await worker.execute({
+    workingSet: bridgeWorkingSet('i'),
+    authorization,
+    query: 'late success after timeout',
+    limit: 1
+  });
+  assert.equal(late.accepted, false);
+  assert.equal(late.cleanup_complete, true);
+  assert.equal(late.evidence_complete, false);
+  assert.equal(late.working_set.receipts.at(-1).stage, 'HYDRATION');
+  assert.equal(
+    late.working_set.receipts.at(-1).reason_code,
+    'hydration_failed'
+  );
+  assert.deepEqual(
+    late.working_set.receipts.at(-1)
+      .counter_facts.native_invocation,
+    { succeeded: 0, failed: 1 }
+  );
+  assert.deepEqual(lateChild.signals, ['SIGTERM']);
+  assert.equal(lateExecution.response, null);
+  assert.equal(lateExecution.shutdown_complete, true);
+  assert.equal(lateExecution.termination_reason, 'timeout');
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+  assert.equal(worker.snapshot().stores_created, 1);
+  assert.equal(worker.snapshot().stores_removed, 1);
+  assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
+
+  const recovered = await worker.execute({
+    workingSet: bridgeWorkingSet('j'),
+    authorization,
+    query: 'capacity reused after late timeout result',
+    limit: 1
+  });
+  assert.equal(recovered.accepted, true);
+  assert.equal(providerCalls, 2);
+  assert.equal(worker.snapshot().attempts_completed, 2);
+  assert.equal(worker.snapshot().cleanup_blocked, false);
+  assert.equal(worker.snapshot().stores_created, 2);
+  assert.equal(worker.snapshot().stores_removed, 2);
+  assert.deepEqual(fs.readdirSync(fixture.leaseRoot), []);
+});
+
 test('lease process IPC failure retains control of and terminates its exact child', async () => {
   class SyntheticChild extends EventEmitter {
     constructor() {
@@ -2392,8 +2510,10 @@ test('lease process cancellation terminates only its exact child', async () => {
   const result = await pending;
   assert.deepEqual(child.signals, ['SIGTERM']);
   assert.equal(result.cancelled, true);
-  assert.equal(result.shutdown_complete, false);
+  assert.equal(result.response, null);
+  assert.equal(result.shutdown_complete, true);
   assert.equal(result.sigterm_sent, true);
+  assert.equal(result.termination_reason, 'cancelled');
 });
 
 test('Relay finalization failure forms a signed unavailable response and canonical terminal', async () => {

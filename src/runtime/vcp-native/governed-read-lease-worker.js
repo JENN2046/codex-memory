@@ -24,6 +24,12 @@ const CHILD_FAILURE_STAGES = Object.freeze([
   'VECTOR_SEARCH',
   'SCOPE_POSTCHECK'
 ]);
+const CHILD_TERMINATION_REASONS = Object.freeze([
+  'cancelled',
+  'child_error',
+  'ipc_send_failure',
+  'timeout'
+]);
 const CONTEXT_CLASSIFICATIONS = Object.freeze([
   'must_know',
   'recent_decisions',
@@ -369,6 +375,7 @@ function runLeaseWorkerProcess(task, {
     let termination = null;
     let sigtermSent = false;
     let terminationStarted = false;
+    let terminationReason = null;
     let cancelled = false;
 
     function finish(value) {
@@ -403,6 +410,17 @@ function runLeaseWorkerProcess(task, {
         finishUnstartedChild();
         return;
       }
+      if (terminationStarted) {
+        finish({
+          response: null,
+          shutdown_complete: true,
+          sigterm_sent: sigtermSent,
+          cancelled,
+          child_started: true,
+          termination_reason: terminationReason
+        });
+        return;
+      }
       if (message && code === 0) {
         finish({
           response: message,
@@ -422,7 +440,10 @@ function runLeaseWorkerProcess(task, {
       });
     }
 
-    function beginTermination({ cancelledByCaller = false } = {}) {
+    function beginTermination({
+      cancelledByCaller = false,
+      reason = 'child_error'
+    } = {}) {
       if (settled || exited || terminationStarted) return;
       cancelled = cancelled || cancelledByCaller;
       if (!childHasStarted()) {
@@ -430,6 +451,7 @@ function runLeaseWorkerProcess(task, {
         return;
       }
       terminationStarted = true;
+      terminationReason = cancelledByCaller ? 'cancelled' : reason;
       let signalSent = false;
       try {
         signalSent = child.kill('SIGTERM') === true;
@@ -446,13 +468,17 @@ function runLeaseWorkerProcess(task, {
           shutdown_complete: false,
           sigterm_sent: sigtermSent,
           cancelled,
-          child_started: true
+          child_started: true,
+          termination_reason: terminationReason
         });
       }, terminationGraceMs);
     }
 
     function onAbort() {
-      beginTermination({ cancelledByCaller: true });
+      beginTermination({
+        cancelledByCaller: true,
+        reason: 'cancelled'
+      });
     }
 
     if (signal?.aborted) {
@@ -492,14 +518,14 @@ function runLeaseWorkerProcess(task, {
       message = value;
     });
     child.once('error', () => {
-      beginTermination();
+      beginTermination({ reason: 'child_error' });
     });
     child.once('exit', code => {
       exited = true;
       maybeFinish(code);
     });
     timeout = setTimeout(() => {
-      beginTermination();
+      beginTermination({ reason: 'timeout' });
     }, workerTimeoutMs);
     signal?.addEventListener('abort', onAbort, { once: true });
     if (signal?.aborted) onAbort();
@@ -511,7 +537,7 @@ function runLeaseWorkerProcess(task, {
         task
       });
     } catch {
-      beginTermination();
+      beginTermination({ reason: 'ipc_send_failure' });
     }
   });
 }
@@ -958,6 +984,38 @@ function createGovernedReadLeaseWorker({
               started: 0,
               committed: 0,
               rolled_back: 0
+            }
+          }
+        );
+      }
+      const terminationReason =
+        workerExecution?.termination_reason;
+      if (terminationReason !== undefined) {
+        if (!CHILD_TERMINATION_REASONS.includes(
+          terminationReason
+        ) ||
+            workerExecution?.shutdown_complete !== true ||
+            workerExecution?.response !== null) {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        try {
+          removeAttemptStore(root, attemptStore.attemptRoot, fsModule);
+          storesRemoved += 1;
+          attemptStore = null;
+        } catch {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        attemptsCompleted += 1;
+        return failedContinuation(
+          current,
+          'HYDRATION',
+          'hydration_failed',
+          {
+            native_invocation: {
+              succeeded: 0,
+              failed: 1
             }
           }
         );

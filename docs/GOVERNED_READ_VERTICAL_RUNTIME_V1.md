@@ -135,6 +135,10 @@ A synchronous fork rejection or asynchronous spawn error without a positive
 PID is explicitly reported as child-not-started: the still-empty attempt store
 is removed and later admission remains available. Only a PID-bearing child
 without provable shutdown can latch cleanup and retain its store.
+Once timeout, cancellation, IPC failure, or child error starts termination, a
+later success message cannot reverse that decision. A subsequent exact-child
+exit proves shutdown and permits store cleanup, but the late result remains a
+failed, evidence-incomplete attempt rather than an accepted search.
 
 Before acknowledgement, the short Edge claim lease still permits safe reclaim
 of an abandoned Relay claim. Acknowledgement of an attempt claim atomically
