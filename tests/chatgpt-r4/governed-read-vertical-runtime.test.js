@@ -1500,6 +1500,158 @@ test('Edge preserves replay identities when coordinator admission rejects', asyn
   await client.cancel(retryRequest.request_id);
 });
 
+test('Edge closes partial coordinator admission and releases replay identities', async () => {
+  const cases = [
+    {
+      name: 'working_set',
+      originalMarker: 'h',
+      retryMarker: 'i',
+      expectedCode: 'synthetic_working_set_failed',
+      terminalReason: 'attempt_cancelled'
+    },
+    {
+      name: 'append_receipt',
+      originalMarker: 'j',
+      retryMarker: 'k',
+      expectedCode: 'synthetic_append_receipt_failed',
+      terminalReason: 'attempt_cancelled'
+    },
+    {
+      name: 'deadline',
+      originalMarker: 'l',
+      retryMarker: 'm',
+      expectedCode: 'attempt_receipt_after_deadline',
+      terminalReason: 'attempt_timeout'
+    }
+  ];
+
+  for (const [index, fault] of cases.entries()) {
+    let current = new Date(NOW);
+    const principal = signingIdentity(
+      `partial-admission-principal-${fault.name}`
+    );
+    const edgeIdentity = signingIdentity(
+      `partial-admission-edge-${fault.name}`
+    );
+    const contextRef = `pctx_${fault.originalMarker.repeat(32)}`;
+    const principalAssertion = createPrincipalAssertion({
+      issuer: ISSUER,
+      audience: AUDIENCE,
+      subjectFingerprint: digestObject(
+        `partial-admission-principal-${fault.name}`
+      ),
+      now: NOW,
+      nonce: `principal_nonce_partial_admission_${index}_01`,
+      signing: signing(principal)
+    });
+    const request = createRequestEnvelope({
+      principalAssertion,
+      toolName: 'search_memory',
+      toolArguments: {
+        project_context_ref: contextRef,
+        query: `partial admission ${fault.name}`,
+        limit: 1
+      },
+      now: NOW,
+      ttlSeconds: 60,
+      requestId: `req_partial_admission_${index}_00000001`,
+      nonce: `request_nonce_partial_admission_${index}_01`,
+      signing: signing(edgeIdentity)
+    });
+    const originalHeader = createAttemptHeader({
+      attemptRef: `grat_${fault.originalMarker.repeat(32)}`,
+      toolName: 'search_memory',
+      requestDigest: digestObject(request),
+      contextBindingDigest: digestObject(contextRef),
+      now: NOW,
+      ttlSeconds: 30
+    });
+    const coordinator = createGovernedReadAttemptCoordinator({
+      clock: () => current,
+      maxAttempts: 1
+    });
+    let faultInjected = false;
+    const injectedCoordinator = {
+      ...coordinator,
+      workingSet(attemptRef) {
+        if (fault.name === 'working_set' && !faultInjected) {
+          faultInjected = true;
+          throw Object.assign(
+            new Error(fault.expectedCode),
+            { code: fault.expectedCode }
+          );
+        }
+        return coordinator.workingSet(attemptRef);
+      },
+      appendReceipt(attemptRef, receipt) {
+        if (!faultInjected && fault.name === 'append_receipt') {
+          faultInjected = true;
+          coordinator.appendReceipt(attemptRef, receipt);
+          throw Object.assign(
+            new Error(fault.expectedCode),
+            { code: fault.expectedCode }
+          );
+        }
+        if (!faultInjected && fault.name === 'deadline') {
+          faultInjected = true;
+          current = new Date(Date.parse(originalHeader.deadline_at));
+        }
+        return coordinator.appendReceipt(attemptRef, receipt);
+      }
+    };
+    const runtime = createLoopbackEdgeRuntime({
+      async verifyRequest() {},
+      async verifyResponse() {},
+      clock: () => current,
+      maxInFlight: 1,
+      maxRecords: 1,
+      governedReadAttempts: true,
+      attemptCoordinator: injectedCoordinator
+    });
+    const address = await runtime.start();
+    const client = createLoopbackEdgeClient(address.url, {
+      timeoutMs: 1_000
+    });
+
+    try {
+      await assert.rejects(
+        client.submit(request, { attemptHeader: originalHeader }),
+        { code: fault.expectedCode }
+      );
+      assert.equal(runtime.snapshot().request_count, 0);
+      assert.equal(
+        coordinator.protocol(originalHeader.attempt_ref)
+          .terminal.reason_code,
+        fault.terminalReason
+      );
+
+      const retryHeader = createAttemptHeader({
+        attemptRef: `grat_${fault.retryMarker.repeat(32)}`,
+        toolName: 'search_memory',
+        requestDigest: digestObject(request),
+        contextBindingDigest: digestObject(contextRef),
+        now: current,
+        ttlSeconds: 20
+      });
+      assert.deepEqual(
+        await client.submit(request, { attemptHeader: retryHeader }),
+        {
+          request_id: request.request_id,
+          status: 'queued'
+        }
+      );
+      await client.cancel(request.request_id);
+      assert.equal(
+        coordinator.protocol(retryHeader.attempt_ref)
+          .terminal.reason_code,
+        'attempt_cancelled'
+      );
+    } finally {
+      await runtime.stop();
+    }
+  }
+});
+
 test('Edge protocol-candidate commit is atomic and rejects a divergent prefix', () => {
   const header = createAttemptHeader({
     attemptRef: `grat_${'c'.repeat(32)}`,

@@ -56,6 +56,13 @@ public response field is introduced.
 | `RESPONSE_FINALIZATION` | Relay | Finalize a signed response only after the downstream continuation validates. |
 | terminal | Edge broker | Execute first-terminal-wins CAS. |
 
+Edge treats replay reservation, coordinator acceptance, and the initial
+`EDGE_VALIDATED` receipt as one admission transaction. If a post-acceptance
+step fails, Edge closes that exact accepted attempt (or observes the terminal
+that already won at its deadline), rolls back the replay reservation, and
+creates no request record. A still-valid signed request can then be admitted
+with a fresh attempt identity without leaking active coordinator capacity.
+
 Governance derives the provider query and native limit only from the validated,
 signed tool request, then requires the injected authorization decision to
 match that derivation exactly:

@@ -244,23 +244,34 @@ function createLoopbackEdgeRuntime({
         : null
     };
     if (attemptHeader) {
+      let attemptAccepted = false;
       try {
         governedCoordinator.acceptAttempt(attemptHeader);
+        attemptAccepted = true;
+        const workingSet = governedCoordinator.workingSet(
+          attemptHeader.attempt_ref
+        );
+        governedCoordinator.appendReceipt(
+          attemptHeader.attempt_ref,
+          createStageReceipt({
+            header: workingSet.header,
+            receipts: workingSet.receipts,
+            stage: 'EDGE_VALIDATED'
+          })
+        );
       } catch (error) {
+        if (attemptAccepted) {
+          try {
+            governedCoordinator.cancelAttempt(
+              attemptHeader.attempt_ref
+            );
+          } catch {
+            // A deadline may already have won the coordinator terminal CAS.
+          }
+        }
         replayReservation.rollback();
         throw error;
       }
-      const workingSet = governedCoordinator.workingSet(
-        attemptHeader.attempt_ref
-      );
-      governedCoordinator.appendReceipt(
-        attemptHeader.attempt_ref,
-        createStageReceipt({
-          header: workingSet.header,
-          receipts: workingSet.receipts,
-          stage: 'EDGE_VALIDATED'
-        })
-      );
     }
     replayReservation.commit();
     records.set(request.request_id, record);
