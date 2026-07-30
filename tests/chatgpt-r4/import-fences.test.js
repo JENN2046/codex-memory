@@ -26,11 +26,68 @@ test('R4-D D2B import fences accept external Edge and outbound Relay without act
   assert.equal(result.durableRemoteStateAllowed, false);
   const packageEntrypoints = discoverPackageRuntimeEntrypoints();
   assert.equal(result.activationEntrypointCount, packageEntrypoints.length);
+  assert.equal(result.passiveContractBindingCount, 2);
   assert.equal(packageEntrypoints.some(file => file.endsWith('/src/cli/provider-smoke.js')), true);
   assert.equal(packageEntrypoints.some(file => file.endsWith('/scripts/verify-frozen-evidence-manifest.js')), true);
   assert.deepEqual(result.components.map(component => component.component), [
     'contracts', 'edge', 'relay', 'widget', 'governance'
   ]);
+
+  const passiveRoot = path.join('/synthetic-passive-runtime');
+  const passiveRuntimeRoot = path.join(passiveRoot, 'src');
+  const passiveHydrator = path.join(
+    passiveRuntimeRoot,
+    'runtime',
+    'vcp-native',
+    'production-selected-diary-hydrator.js'
+  );
+  const passiveCanonical = path.join(
+    passiveRoot,
+    'packages',
+    'chatgpt-r4-contracts',
+    'canonical.js'
+  );
+  const passiveAttempt = path.join(
+    passiveRoot,
+    'packages',
+    'chatgpt-r4-contracts',
+    'governed-read-attempt.js'
+  );
+  const passiveSources = new Map([
+    [passiveHydrator, [
+      "require('../../../packages/chatgpt-r4-contracts/canonical');",
+      "require('../../../packages/chatgpt-r4-contracts/governed-read-attempt');"
+    ].join('\n')],
+    [passiveCanonical, ''],
+    [passiveAttempt, '']
+  ]);
+  const passive = validateNotActivated({
+    runtimeRoot: passiveRuntimeRoot,
+    entrypoints: [passiveHydrator],
+    readFileSync: file => passiveSources.get(file),
+    fileExists: file => passiveSources.has(file)
+  });
+  assert.equal(passive.passiveContractBindingCount, 2);
+  passiveSources.set(
+    passiveHydrator,
+    "require('../../../packages/chatgpt-r4-contracts')"
+  );
+  assert.throws(() => validateNotActivated({
+    runtimeRoot: passiveRuntimeRoot,
+    entrypoints: [passiveHydrator],
+    readFileSync: file => passiveSources.get(file),
+    fileExists: file => passiveSources.has(file)
+  }), /candidate_runtime_activated/);
+  passiveSources.set(
+    path.join(passiveRuntimeRoot, 'core', 'unexpected.js'),
+    "require('../../packages/chatgpt-r4-contracts/canonical')"
+  );
+  assert.throws(() => validateNotActivated({
+    runtimeRoot: passiveRuntimeRoot,
+    entrypoints: [path.join(passiveRuntimeRoot, 'core', 'unexpected.js')],
+    readFileSync: file => passiveSources.get(file),
+    fileExists: file => passiveSources.has(file)
+  }), /candidate_runtime_activated/);
 
   const runtimeRoot = path.join('/synthetic-runtime', 'src');
   const sources = new Map([

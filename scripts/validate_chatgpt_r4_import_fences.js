@@ -107,6 +107,14 @@ const ACTIVE_RUNTIME_DYNAMIC_REQUIRE_ALLOWLIST = Object.freeze({
     embeddingUtilsPath: 'EmbeddingUtils.js'
   })
 });
+const ACTIVE_RUNTIME_PASSIVE_CONTRACT_IMPORT_ALLOWLIST = Object.freeze({
+  'src/runtime/vcp-native/production-selected-diary-hydrator.js': Object.freeze({
+    '../../../packages/chatgpt-r4-contracts/canonical':
+      'packages/chatgpt-r4-contracts/canonical.js',
+    '../../../packages/chatgpt-r4-contracts/governed-read-attempt':
+      'packages/chatgpt-r4-contracts/governed-read-attempt.js'
+  })
+});
 
 const FORBIDDEN_RUNTIME_PATTERNS = Object.freeze([
   { pattern: /\bprocess\b/u, code: 'runtime_process_access' },
@@ -393,6 +401,21 @@ function resolveRuntimeModuleFile(file, specifier, { fileExists = isFile } = {})
   return candidates.find(candidate => fileExists(candidate)) || null;
 }
 
+function isAllowedPassiveContractImport({
+  relativeFile,
+  resolved,
+  specifier,
+  moduleRoot
+}) {
+  const allowed =
+    ACTIVE_RUNTIME_PASSIVE_CONTRACT_IMPORT_ALLOWLIST[relativeFile];
+  if (!allowed || !Object.hasOwn(allowed, specifier) || !resolved) return false;
+  const resolvedRelative = path.relative(moduleRoot, resolved)
+    .split(path.sep)
+    .join('/');
+  return resolvedRelative === allowed[specifier];
+}
+
 function validateComponent(component, root = ROOTS[component]) {
   const files = walkFiles(root);
   const imports = [];
@@ -676,6 +699,7 @@ function validateNotActivated({
     .filter(fileExists);
   const queue = [...activeEntrypoints];
   const visited = new Set();
+  let passiveContractBindingCount = 0;
   while (queue.length > 0) {
     const file = queue.shift();
     if (visited.has(file)) continue;
@@ -685,6 +709,15 @@ function validateNotActivated({
     assertNoDynamicRuntimeImports(source, relativeFile);
     for (const specifier of extractStaticRuntimeImports(source)) {
       const resolved = resolveRuntimeModuleFile(file, specifier, { fileExists });
+      if (isAllowedPassiveContractImport({
+        relativeFile,
+        resolved,
+        specifier,
+        moduleRoot
+      })) {
+        passiveContractBindingCount += 1;
+        continue;
+      }
       if (CANDIDATE_RUNTIME_PATTERN.test(specifier) ||
           (resolved && CANDIDATE_RUNTIME_PATTERN.test(resolved.split(path.sep).join('/')))) {
         throw new Error(`candidate_runtime_activated:${relativeFile}:${specifier}`);
@@ -692,7 +725,11 @@ function validateNotActivated({
       if (resolved && isWithin(resolved, moduleRoot) && !visited.has(resolved)) queue.push(resolved);
     }
   }
-  return { entrypointCount: activeEntrypoints.length, moduleCount: visited.size };
+  return {
+    entrypointCount: activeEntrypoints.length,
+    moduleCount: visited.size,
+    passiveContractBindingCount
+  };
 }
 
 function validateImportFences() {
@@ -710,6 +747,7 @@ function validateImportFences() {
     externalRuntimeActivated: false,
     activationEntrypointCount: activation.entrypointCount,
     activationModuleCount: activation.moduleCount,
+    passiveContractBindingCount: activation.passiveContractBindingCount,
     externalRuntimeUsed: false,
     durableRemoteStateAllowed: false,
     publicToolSurfaceExpanded: false
@@ -731,6 +769,7 @@ module.exports = {
   ROOT,
   ROOTS,
   COMPONENT_POLICIES,
+  ACTIVE_RUNTIME_PASSIVE_CONTRACT_IMPORT_ALLOWLIST,
   R4C_RUNTIME_FILE_POLICIES,
   extractImports,
   extractStaticRuntimeImports,
