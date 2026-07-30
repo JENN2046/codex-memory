@@ -69,8 +69,9 @@ reason/category/fallback mapping.
 1. rejects a second attempt before provider execution;
 2. appends `NATIVE_DISPATCHED` with one native start and zero primary writes;
 3. runs production `preflight()` against the canonical read-only source;
-4. rechecks the attempt deadline and calls the injected provider wrapper at
-   most once only while the lease remains live;
+4. rechecks the attempt deadline and races the injected provider wrapper
+   against the smaller of its timeout cap and remaining attempt TTL, passing
+   an `AbortSignal` and calling the wrapper at most once;
 5. validates a finite vector whose dimension exactly matches the projection
    plan;
 6. creates one owner-only attempt directory and fresh derived store;
@@ -84,6 +85,14 @@ occur. A Bridge transport failure cannot prove that its request was not
 accepted before the response was lost, so provider/native counters remain
 unknown. Neither registry metadata nor upper-layer error handling turns those
 unknown fields into zero.
+
+If a provider ignores abort, no store or child is created and later admission
+remains closed until the exact provider promise settles. A provider result
+that arrives at or after `deadline_at` is discarded before derived/native
+work. Store creation failures latch `cleanupBlocked` only when a partially
+created attempt directory cannot be removed; a failure that created no
+resource, or whose partial resource was removed, does not poison later
+admission.
 
 ## Lease child
 

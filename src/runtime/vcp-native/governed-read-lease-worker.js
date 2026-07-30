@@ -15,6 +15,7 @@ const {
 
 const DEFAULT_WORKER_TIMEOUT_MS = 20_000;
 const DEFAULT_TERMINATION_GRACE_MS = 2_000;
+const DEFAULT_PROVIDER_TIMEOUT_MS = 15_000;
 const MAX_QUERY_CHARACTERS = 1_000;
 const MAX_VECTOR_DIMENSION = 65_536;
 const CHILD_FAILURE_STAGES = Object.freeze([
@@ -453,12 +454,24 @@ function runLeaseWorkerProcess(task, {
 }
 
 function createAttemptStore(leaseRoot, fsModule) {
-  const attemptRoot = fsModule.mkdtempSync(
-    path.join(leaseRoot, 'governed-read-')
-  );
-  const derivedStore = path.join(attemptRoot, 'derived-store');
-  fsModule.mkdirSync(derivedStore, { mode: 0o700 });
-  return Object.freeze({ attemptRoot, derivedStore });
+  let attemptRoot = null;
+  try {
+    attemptRoot = fsModule.mkdtempSync(
+      path.join(leaseRoot, 'governed-read-')
+    );
+    const derivedStore = path.join(attemptRoot, 'derived-store');
+    fsModule.mkdirSync(derivedStore, { mode: 0o700 });
+    return Object.freeze({ attemptRoot, derivedStore });
+  } catch {
+    if (attemptRoot !== null) {
+      try {
+        removeAttemptStore(leaseRoot, attemptRoot, fsModule);
+      } catch {
+        throw codedError('lease_worker_store_cleanup_incomplete');
+      }
+    }
+    throw codedError('lease_worker_store_creation_failed');
+  }
 }
 
 function removeAttemptStore(leaseRoot, attemptRoot, fsModule) {
@@ -493,6 +506,7 @@ function createGovernedReadLeaseWorker({
   workerRunner = runLeaseWorkerProcess,
   workerTimeoutMs = DEFAULT_WORKER_TIMEOUT_MS,
   terminationGraceMs = DEFAULT_TERMINATION_GRACE_MS,
+  providerTimeoutMs = DEFAULT_PROVIDER_TIMEOUT_MS,
   fsModule = fs,
   stageHooks,
   clock = () => new Date()
@@ -509,6 +523,12 @@ function createGovernedReadLeaseWorker({
     1,
     MAX_VECTOR_DIMENSION,
     'lease_worker_dimension_invalid'
+  );
+  validatePositiveInteger(
+    providerTimeoutMs,
+    10,
+    60_000,
+    'lease_worker_provider_timeout_invalid'
   );
   const root = validateOwnerOnlyLeaseRoot(leaseRoot, fsModule);
   for (const value of [
@@ -529,6 +549,7 @@ function createGovernedReadLeaseWorker({
   let attemptsStarted = 0;
   let attemptsCompleted = 0;
   let providerInvocations = 0;
+  let providerInFlight = null;
   let nativeInvocations = 0;
   let storesCreated = 0;
   let storesRemoved = 0;
@@ -566,7 +587,7 @@ function createGovernedReadLeaseWorker({
           authorization.allowedDiaryNames.length) {
       throw codedError('lease_worker_authorization_invalid');
     }
-    if (active || cleanupBlocked) {
+    if (active || cleanupBlocked || providerInFlight !== null) {
       return failedContinuation(
         workingSet,
         'NATIVE_DISPATCHED',
@@ -661,7 +682,10 @@ function createGovernedReadLeaseWorker({
         await invokeHook(stageHooks, 'PROVIDER_EMBEDDING', {
           attempt_ref: current.header.attempt_ref
         });
-        if (Date.parse(current.header.deadline_at) <= nowMs()) {
+        const providerDeadlineMs =
+          Date.parse(current.header.deadline_at);
+        const remainingProviderMs = providerDeadlineMs - nowMs();
+        if (remainingProviderMs <= 0) {
           return failedContinuation(
             current,
             'PROVIDER_EMBEDDING',
@@ -677,14 +701,53 @@ function createGovernedReadLeaseWorker({
         }
         providerInvocations += 1;
         providerStarted = true;
-        const providerResult = await providerWrapper({
-          query: selectedQuery,
-          dimension
+        const providerAbortController = new AbortController();
+        const providerTask = Promise.resolve().then(() =>
+          providerWrapper({
+            query: selectedQuery,
+            dimension,
+            signal: providerAbortController.signal,
+            deadlineAt: current.header.deadline_at
+          })
+        );
+        providerInFlight = providerTask;
+        providerTask.then(
+          () => {
+            if (providerInFlight === providerTask) {
+              providerInFlight = null;
+            }
+          },
+          () => {
+            if (providerInFlight === providerTask) {
+              providerInFlight = null;
+            }
+          }
+        );
+        let providerTimer;
+        const providerTimeout = new Promise((_, rejectProvider) => {
+          providerTimer = setTimeout(() => {
+            const timeoutError =
+              codedError('lease_worker_provider_timeout');
+            providerAbortController.abort(timeoutError);
+            rejectProvider(timeoutError);
+          }, Math.min(providerTimeoutMs, remainingProviderMs));
         });
+        let providerResult;
+        try {
+          providerResult = await Promise.race([
+            providerTask,
+            providerTimeout
+          ]);
+        } finally {
+          clearTimeout(providerTimer);
+        }
         vector = normalizeVector(
           providerResult?.vector ?? providerResult,
           dimension
         );
+        if (providerDeadlineMs <= nowMs()) {
+          throw codedError('lease_worker_provider_deadline_exceeded');
+        }
         current = appendGovernedReadAttemptStage(current, {
           stage: 'PROVIDER_EMBEDDING',
           counterFacts: {
@@ -713,9 +776,13 @@ function createGovernedReadLeaseWorker({
       try {
         attemptStore = createAttemptStore(root, fsModule);
         storesCreated += 1;
-      } catch {
-        cleanupBlocked = true;
-        return shutdownFailure(current);
+      } catch (error) {
+        if (error?.code ===
+            'lease_worker_store_cleanup_incomplete') {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
+        throw error;
       }
 
       let workerExecution;
@@ -799,6 +866,7 @@ function createGovernedReadLeaseWorker({
       attempts_started: attemptsStarted,
       attempts_completed: attemptsCompleted,
       provider_invocations: providerInvocations,
+      provider_calls_in_flight: providerInFlight === null ? 0 : 1,
       native_invocations: nativeInvocations,
       stores_created: storesCreated,
       stores_removed: storesRemoved,
@@ -820,6 +888,7 @@ function createGovernedReadLeaseWorker({
 
 module.exports = {
   CHILD_WORKER_PATH,
+  DEFAULT_PROVIDER_TIMEOUT_MS,
   DEFAULT_TERMINATION_GRACE_MS,
   DEFAULT_WORKER_TIMEOUT_MS,
   createGovernedReadLeaseWorker,

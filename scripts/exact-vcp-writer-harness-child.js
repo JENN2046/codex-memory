@@ -408,6 +408,7 @@ async function run() {
   assert.equal(attemptCounters.fallback.attempts, 0);
   const workerSnapshot = leaseWorker.snapshot();
   assert.equal(workerSnapshot.provider_invocations, 1);
+  assert.equal(workerSnapshot.provider_calls_in_flight, 0);
   assert.equal(workerSnapshot.native_invocations, 1);
   assert.equal(workerSnapshot.stores_created, 1);
   assert.equal(workerSnapshot.stores_removed, 1);
