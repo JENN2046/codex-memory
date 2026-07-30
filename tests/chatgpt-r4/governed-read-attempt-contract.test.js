@@ -11,10 +11,13 @@ const {
   canonicalJson,
   createAttemptHeader,
   createGovernedReadAttemptProtocol,
+  createGovernedReadAttemptWorkingSet,
   createStageReceipt,
   createTerminalEnvelope,
   digestObject,
   failureRegistryEntry,
+  governedReadAttemptResponseBindingDigest,
+  isGovernedReadAttemptWorkingSetExtension,
   projectGovernedReadAttemptOwner,
   projectGovernedReadAttemptPublic,
   validateAttemptHeader,
@@ -167,6 +170,75 @@ test('AttemptHeader is immutable, bounded, and contains no mutable state identit
     ...value,
     current_stage: 'CREATED'
   }), { code: 'attempt_header_shape_invalid' });
+});
+
+test('working-set extension requires an exact immutable header and receipt prefix', () => {
+  const value = header('W');
+  const created = createStageReceipt({
+    header: value,
+    stage: 'CREATED'
+  });
+  const prefix = createGovernedReadAttemptWorkingSet({
+    header: value,
+    receipts: [created]
+  });
+  const validated = createStageReceipt({
+    header: value,
+    receipts: prefix.receipts,
+    stage: 'EDGE_VALIDATED'
+  });
+  const extension = createGovernedReadAttemptWorkingSet({
+    header: value,
+    receipts: [...prefix.receipts, validated]
+  });
+  assert.equal(
+    isGovernedReadAttemptWorkingSetExtension(prefix, extension),
+    true
+  );
+  assert.equal(
+    isGovernedReadAttemptWorkingSetExtension(extension, prefix),
+    false
+  );
+  assert.equal(
+    isGovernedReadAttemptWorkingSetExtension(
+      prefix,
+      createGovernedReadAttemptWorkingSet({
+        header: header('X'),
+        receipts: []
+      })
+    ),
+    false
+  );
+});
+
+test('signed response binding changes with either request or terminal digest', () => {
+  const requestDigest = digestObject('response-binding-request');
+  const terminalDigest = digestObject('response-binding-terminal');
+  const value = governedReadAttemptResponseBindingDigest({
+    requestDigest,
+    terminalDigest
+  });
+  assert.equal(
+    value,
+    governedReadAttemptResponseBindingDigest({
+      requestDigest,
+      terminalDigest
+    })
+  );
+  assert.notEqual(
+    value,
+    governedReadAttemptResponseBindingDigest({
+      requestDigest: digestObject('other-request'),
+      terminalDigest
+    })
+  );
+  assert.notEqual(
+    value,
+    governedReadAttemptResponseBindingDigest({
+      requestDigest,
+      terminalDigest: digestObject('other-terminal')
+    })
+  );
 });
 
 test('complete success derives one bounded terminal and public/owner projections', () => {

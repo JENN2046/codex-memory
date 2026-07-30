@@ -77,6 +77,50 @@ test('CI authority job pins the exact VCP baseline without secret inputs', () =>
   assert.doesNotMatch(job, /\$\{\{\s*secrets\./u);
 });
 
+test('exact authority harness routes production-writer output through the lease child', () => {
+  const harness = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'scripts',
+      'exact-vcp-writer-harness-child.js'
+    ),
+    'utf8'
+  );
+  const worker = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'src',
+      'runtime',
+      'vcp-native',
+      'governed-read-lease-worker-child.js'
+    ),
+    'utf8'
+  );
+  const leaseTask = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'src',
+      'runtime',
+      'vcp-native',
+      'governed-read-lease-task.js'
+    ),
+    'utf8'
+  );
+  assert.match(harness, /createGovernedReadLeaseWorker/u);
+  assert.match(harness, /lease_scoped_child_exercised:\s*true/u);
+  assert.match(harness, /child_provider_authority_present:\s*false/u);
+  assert.match(worker, /FORBIDDEN_ENVIRONMENT_KEYS/u);
+  assert.match(worker, /executeGovernedReadLeaseTask/u);
+  assert.match(leaseTask, /source_snapshot_changed_after_preflight/u);
+  assert.doesNotMatch(
+    worker,
+    /process\.env\.(?:API_URL|API_Key|OPENAI_API_KEY)\s*=/u
+  );
+});
+
 test('checkout validator accepts an exact clean commit and rejects tracked drift', t => {
   const root = fs.mkdtempSync(
     path.join(os.tmpdir(), 'codex-memory-vcp-checkout-validator-')

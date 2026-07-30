@@ -13,8 +13,11 @@ function createLoopbackEdgeClient(edgeUrl, { timeoutMs = 1_000 } = {}) {
   }
 
   return Object.freeze({
-    submit(request) {
-      return requestJson(baseUrl, '/v1/requests/submit', { request }, timeoutMs);
+    submit(request, { attemptHeader } = {}) {
+      return requestJson(baseUrl, '/v1/requests/submit', {
+        request,
+        ...(attemptHeader ? { attempt_header: attemptHeader } : {})
+      }, timeoutMs);
     },
     claim(relayId) {
       return requestJson(baseUrl, '/v1/relay/claim', { relay_id: relayId }, timeoutMs);
@@ -22,8 +25,19 @@ function createLoopbackEdgeClient(edgeUrl, { timeoutMs = 1_000 } = {}) {
     acknowledge(claim) {
       return requestJson(baseUrl, '/v1/relay/ack', claimControl(claim), timeoutMs);
     },
-    complete(claim, response) {
-      return requestJson(baseUrl, '/v1/relay/complete', { ...claimControl(claim), response }, timeoutMs);
+    complete(claim, response, {
+      governedReadAttemptCandidate
+    } = {}) {
+      return requestJson(baseUrl, '/v1/relay/complete', {
+        ...claimControl(claim),
+        response,
+        ...(governedReadAttemptCandidate
+          ? {
+              governed_read_attempt_candidate:
+                governedReadAttemptCandidate
+            }
+          : {})
+      }, timeoutMs);
     },
     state(claim) {
       return requestJson(baseUrl, '/v1/relay/state', claimControl(claim), timeoutMs);

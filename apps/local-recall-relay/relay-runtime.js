@@ -20,7 +20,8 @@ function createRelayRuntime({
   clock = () => new Date(),
   cancelPollMs = 10,
   eventComponent = 'outbound_relay',
-  eventSink
+  eventSink,
+  governedReadAttemptStageHooks
 } = {}) {
   validateEdgeClient(edgeClient);
   if (typeof forwardToUds !== 'function') reject('relay_forwarder_missing');
@@ -119,6 +120,7 @@ function createRelayRuntime({
         responseSigning,
         counterMode,
         clock,
+        governedReadAttemptStageHooks,
         async forwardToUds(payload) {
           emit('uds_forward_started', claim.request_id, { attempt: claim.attempt });
           const invocation = await forwardToUds(payload, { signal: cancellation.signal });
@@ -130,15 +132,32 @@ function createRelayRuntime({
       try {
         let response;
         try {
-          response = await processor.handle(claim.request);
+          response = await processor.handle(claim.request, {
+            ...(claim.governed_read_attempt
+              ? {
+                  governedReadAttempt:
+                    claim.governed_read_attempt
+                }
+              : {})
+          });
           emit('response_prepared', claim.request_id, { attempt: claim.attempt });
         } catch (error) {
           return processingFailure(error, 'process');
         }
         try {
           emit('edge_complete_started', claim.request_id, { attempt: claim.attempt });
-          await edgeClient.complete(claim, response, {
-            signal: cancellation.signal
+          const governedReadAttemptCandidate =
+            response?.governed_read_attempt_candidate || null;
+          const responseEnvelope = governedReadAttemptCandidate
+            ? response.response
+            : response;
+          await edgeClient.complete(claim, responseEnvelope, {
+            signal: cancellation.signal,
+            ...(governedReadAttemptCandidate
+              ? {
+                  governedReadAttemptCandidate
+                }
+              : {})
           });
         } catch (error) {
           return processingFailure(error, 'complete');
@@ -148,7 +167,13 @@ function createRelayRuntime({
           status: 'completed',
           request_id: claim.request_id,
           attempt: claim.attempt,
-          response
+          response: response?.response || response,
+          ...(response?.governed_read_attempt_candidate
+            ? {
+                governed_read_attempt_candidate:
+                  response.governed_read_attempt_candidate
+              }
+            : {})
         });
       } finally {
         monitorStopped = true;

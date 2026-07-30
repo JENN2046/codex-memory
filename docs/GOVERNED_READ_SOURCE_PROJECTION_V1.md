@@ -9,7 +9,8 @@ provider, read real memory, change the public MCP surface, cut over Edge
 responses, or claim readiness.
 
 The schema-v6 stack remains stopped. Lease-worker process isolation and the
-provider-between-passes runtime wiring belong to the next ordered delivery.
+provider-between-passes runtime wiring are consumed by the companion dormant
+vertical runtime; neither delivery activates the public path.
 
 ## Production API
 
@@ -156,12 +157,14 @@ The isolated CI job `Exact VCP writer authority`:
 - exercises real `pendingFiles/_flushBatch`, update, and delete paths;
 - verifies writer-null-vector omission and writer-produced sparse
   `chunk_index`;
-- runs production preflight and streaming materialization;
+- runs production preflight through the parent-owned lease controller and
+  streaming materialization through the real child process;
 - writes a fourth valid but unauthorized diary through the exact writer and
   proves that neither the derived database nor the raw native search result
   contains its path or sentinel content;
-- uses the production native adapter for exactly one query embedding, index
-  recovery, vector search, and scope postcheck;
+- uses the parent-only synthetic provider wrapper exactly once, then the exact
+  VCP singleton in the child for index recovery, one vector search, and scope
+  postcheck;
 - verifies primary database bytes do not change during governed reads;
 - derives vectorless, duplicate-index, NaN, Infinity, dimension, cross-scope,
   and between-pass-mutation negatives only by minimally corrupting copies of
@@ -177,7 +180,9 @@ is the cross-repository gate.
 
 ## Non-claims
 
-This source delivery does not establish a lease-scoped child worker, live
-attempt receipts, public data-response v2, rebind, `_005`, R5-O acceptance,
-production readiness, release readiness, deploy readiness, cutover readiness,
-or `RC_READY`.
+This source module alone does not establish live attempt receipts or activate a
+lease-scoped child worker. Its companion dormant runtime is documented in
+`docs/GOVERNED_READ_VERTICAL_RUNTIME_V1.md`. Together they still do not
+establish public data-response v2, rebind, `_005`, R5-O acceptance, production
+readiness, release readiness, deploy readiness, cutover readiness, or
+`RC_READY`.

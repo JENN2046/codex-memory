@@ -2,10 +2,16 @@
 
 const net = require('node:net');
 
-const { LIMITS, reject } = require('../../packages/chatgpt-r4-contracts');
+const {
+  GOVERNED_READ_ATTEMPT_LIMITS,
+  LIMITS,
+  reject
+} = require('../../packages/chatgpt-r4-contracts');
 
-const MAX_UDS_REQUEST_BYTES = LIMITS.maxRequestBytes + 8192;
-const MAX_UDS_RESPONSE_BYTES = LIMITS.maxResponseBytes;
+const MAX_UDS_REQUEST_BYTES = LIMITS.maxRequestBytes +
+  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes + 8192;
+const MAX_UDS_RESPONSE_BYTES = LIMITS.maxResponseBytes +
+  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes;
 const DEFAULT_UDS_TIMEOUT_MS = 15_000;
 
 function createUdsForwarder({

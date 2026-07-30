@@ -6,8 +6,15 @@ const {
   InMemoryReplayGuard,
   LIMITS,
   createOpaqueId,
+  createStageReceipt,
+  digestObject,
+  governedReadAttemptResponseBindingDigest,
+  validateAttemptHeader,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
+const {
+  createGovernedReadAttemptCoordinator
+} = require('./transient-request-broker');
 
 const LOOPBACK_HOST = '127.0.0.1';
 const MAX_CONTROL_BODY_BYTES = LIMITS.maxResponseBytes + LIMITS.maxRequestBytes + 4096;
@@ -21,7 +28,10 @@ function createLoopbackEdgeRuntime({
   terminalRetentionMs = 5_000,
   maxInFlight = 64,
   maxRecords = 256,
-  eventSink
+  eventSink,
+  governedReadAttempts = false,
+  attemptCoordinator = null,
+  attemptEventSink
 } = {}) {
   if (typeof verifyRequest !== 'function') reject('edge_request_verifier_missing');
   if (typeof verifyResponse !== 'function') reject('edge_response_verifier_missing');
@@ -38,6 +48,28 @@ function createLoopbackEdgeRuntime({
     reject('edge_record_limit_invalid');
   }
   if (eventSink !== undefined && typeof eventSink !== 'function') reject('edge_event_sink_invalid');
+  if (typeof governedReadAttempts !== 'boolean' ||
+      (attemptEventSink !== undefined &&
+       typeof attemptEventSink !== 'function')) {
+    reject('edge_attempt_runtime_invalid');
+  }
+  const governedCoordinator = governedReadAttempts
+    ? attemptCoordinator || createGovernedReadAttemptCoordinator({
+        clock,
+        maxAttempts: maxInFlight,
+        maxRetainedAttempts: maxRecords,
+        eventSink: attemptEventSink
+      })
+    : null;
+  if (attemptCoordinator !== null && (
+    !governedReadAttempts ||
+    typeof attemptCoordinator.acceptAttempt !== 'function' ||
+    typeof attemptCoordinator.appendReceipt !== 'function' ||
+    typeof attemptCoordinator.commitProtocolCandidate !== 'function' ||
+    typeof attemptCoordinator.workingSet !== 'function'
+  )) {
+    reject('edge_attempt_coordinator_invalid');
+  }
 
   const records = new Map();
   const submissionReplayGuard = new InMemoryReplayGuard({
@@ -78,6 +110,11 @@ function createLoopbackEdgeRuntime({
       record.status = 'expired';
       record.claim = null;
       record.purge_after_ms = requestExpiresMs + terminalRetentionMs;
+      if (record.attempt_ref) {
+        try {
+          governedCoordinator.timeoutAttempt(record.attempt_ref);
+        } catch {}
+      }
       emit('request_expired', record);
       return;
     }
@@ -87,6 +124,11 @@ function createLoopbackEdgeRuntime({
       record.status = acknowledged ? 'expired' : 'queued';
       record.claim = null;
       if (acknowledged) record.purge_after_ms = claimExpiresMs + terminalRetentionMs;
+      if (acknowledged && record.attempt_ref) {
+        try {
+          governedCoordinator.timeoutAttempt(record.attempt_ref);
+        } catch {}
+      }
       emit(acknowledged ? 'acknowledged_claim_expired' : 'claim_expired', record);
     }
   }
@@ -124,8 +166,23 @@ function createLoopbackEdgeRuntime({
     return record.claim;
   }
 
-  async function submit(request) {
+  async function submit(request, attemptHeader = null) {
     await verifyRequest(request);
+    if ((attemptHeader === null) !== (governedCoordinator === null)) {
+      reject('edge_attempt_header_required');
+    }
+    if (attemptHeader !== null) {
+      validateAttemptHeader(attemptHeader);
+      const contextReference =
+        request?.tool_request?.arguments?.project_context_ref;
+      if (attemptHeader.tool_name !== request?.tool_request?.name ||
+          attemptHeader.request_digest !== digestObject(request) ||
+          typeof contextReference !== 'string' ||
+          attemptHeader.context_binding_digest !==
+            digestObject(contextReference)) {
+        reject('edge_attempt_header_binding_invalid');
+      }
+    }
     refreshAndPrune();
     if (records.has(request.request_id)) reject('replay_detected');
     if (records.size >= maxRecords) reject('edge_record_capacity_exceeded');
@@ -144,8 +201,23 @@ function createLoopbackEdgeRuntime({
       status: 'queued',
       attempt: 0,
       claim: null,
-      purge_after_ms: null
+      purge_after_ms: null,
+      attempt_ref: attemptHeader?.attempt_ref || null
     };
+    if (attemptHeader) {
+      governedCoordinator.acceptAttempt(attemptHeader);
+      const workingSet = governedCoordinator.workingSet(
+        attemptHeader.attempt_ref
+      );
+      governedCoordinator.appendReceipt(
+        attemptHeader.attempt_ref,
+        createStageReceipt({
+          header: workingSet.header,
+          receipts: workingSet.receipts,
+          stage: 'EDGE_VALIDATED'
+        })
+      );
+    }
     records.set(request.request_id, record);
     emit('request_queued', record);
     return { request_id: request.request_id, status: record.status };
@@ -173,7 +245,13 @@ function createLoopbackEdgeRuntime({
         request: structuredClone(record.request),
         claim_token: record.claim.token,
         lease_expires_at: new Date(expiresMs).toISOString(),
-        attempt: record.attempt
+        attempt: record.attempt,
+        ...(record.attempt_ref
+          ? {
+              governed_read_attempt:
+                governedCoordinator.workingSet(record.attempt_ref)
+            }
+          : {})
       };
     }
     return null;
@@ -188,7 +266,12 @@ function createLoopbackEdgeRuntime({
     return { request_id: requestId, status: 'acked', attempt: record.attempt };
   }
 
-  async function complete(requestId, claimToken, response) {
+  async function complete(
+    requestId,
+    claimToken,
+    response,
+    governedReadAttemptCandidate = null
+  ) {
     const record = requireRecord(requestId);
     const activeClaim = requireLiveClaim(record, claimToken);
     if (!activeClaim.acked) reject('edge_claim_not_acknowledged');
@@ -196,6 +279,30 @@ function createLoopbackEdgeRuntime({
     const currentRecord = requireRecord(requestId);
     const currentClaim = requireLiveClaim(currentRecord, claimToken);
     if (!currentClaim.acked) reject('edge_claim_not_acknowledged');
+    if ((currentRecord.attempt_ref === null) !==
+        (governedReadAttemptCandidate === null)) {
+      reject('edge_attempt_candidate_required');
+    }
+    if (currentRecord.attempt_ref) {
+      let expectedBinding;
+      try {
+        expectedBinding =
+          governedReadAttemptResponseBindingDigest({
+            requestDigest: digestObject(currentRecord.request),
+            terminalDigest:
+              governedReadAttemptCandidate?.terminal?.terminal_digest
+          });
+      } catch {
+        reject('edge_attempt_response_binding_invalid');
+      }
+      if (response?.receipt_chain?.relay !== expectedBinding) {
+        reject('edge_attempt_response_binding_invalid');
+      }
+      governedCoordinator.commitProtocolCandidate(
+        currentRecord.attempt_ref,
+        governedReadAttemptCandidate
+      );
+    }
     currentRecord.response = structuredClone(response);
     currentRecord.status = 'completed';
     currentRecord.claim = null;
@@ -210,6 +317,9 @@ function createLoopbackEdgeRuntime({
     record.status = 'cancelled';
     record.claim = null;
     record.purge_after_ms = nowMs() + terminalRetentionMs;
+    if (record.attempt_ref) {
+      governedCoordinator.cancelAttempt(record.attempt_ref);
+    }
     emit('request_cancelled', record);
     return { request_id: requestId, status: record.status };
   }
@@ -246,8 +356,17 @@ function createLoopbackEdgeRuntime({
       const route = `${incoming.method || ''} ${parsedUrl.pathname}`;
       if (route === 'POST /v1/requests/submit') {
         const body = await readJsonBody(incoming);
-        assertControlKeys(body, ['request']);
-        return sendJson(outgoing, 202, await submit(body.request));
+        assertControlKeys(
+          body,
+          body.attempt_header
+            ? ['attempt_header', 'request']
+            : ['request']
+        );
+        return sendJson(
+          outgoing,
+          202,
+          await submit(body.request, body.attempt_header || null)
+        );
       }
       if (route === 'POST /v1/relay/claim') {
         const body = await readJsonBody(incoming);
@@ -262,8 +381,23 @@ function createLoopbackEdgeRuntime({
       }
       if (route === 'POST /v1/relay/complete') {
         const body = await readJsonBody(incoming);
-        assertControlKeys(body, ['request_id', 'claim_token', 'response']);
-        return sendJson(outgoing, 200, await complete(body.request_id, body.claim_token, body.response));
+        assertControlKeys(
+          body,
+          body.governed_read_attempt_candidate
+            ? [
+                'claim_token',
+                'governed_read_attempt_candidate',
+                'request_id',
+                'response'
+              ]
+            : ['request_id', 'claim_token', 'response']
+        );
+        return sendJson(outgoing, 200, await complete(
+          body.request_id,
+          body.claim_token,
+          body.response,
+          body.governed_read_attempt_candidate || null
+        ));
       }
       if (route === 'POST /v1/relay/state') {
         const body = await readJsonBody(incoming);
@@ -322,6 +456,7 @@ function createLoopbackEdgeRuntime({
       if (!started) return;
       await stopServer(server);
       started = false;
+      governedCoordinator?.reportCoordinatorLoss();
     },
     snapshot() {
       refreshAndPrune();
@@ -329,7 +464,14 @@ function createLoopbackEdgeRuntime({
       for (const record of records.values()) {
         counts[record.status] += 1;
       }
-      return Object.freeze({ in_memory_only: true, request_count: records.size, states: counts });
+      return Object.freeze({
+        in_memory_only: true,
+        request_count: records.size,
+        states: counts,
+        ...(governedCoordinator
+          ? { governed_read_attempts_enabled: true }
+          : {})
+      });
     }
   });
 }

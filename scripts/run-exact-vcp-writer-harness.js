@@ -281,6 +281,19 @@ async function run(options) {
       childResult.native_search.unauthorized_diary_excluded,
       true
     );
+    assert.equal(
+      childResult.native_search.lease_scoped_child_exercised,
+      true
+    );
+    assert.equal(
+      childResult.native_search.child_provider_authority_present,
+      false
+    );
+    assert.equal(
+      childResult.native_search.derived_store_removed,
+      true
+    );
+    assert.equal(childResult.native_search.sigkill_used, false);
     assert.ok(counters.requests >= 1);
     assert.ok(counters.items >= 1);
     assert.ok(counters.omitted >= 1);

@@ -4,10 +4,16 @@ const fs = require('node:fs');
 const net = require('node:net');
 const path = require('node:path');
 
-const { LIMITS, reject } = require('../../../packages/chatgpt-r4-contracts');
+const {
+  GOVERNED_READ_ATTEMPT_LIMITS,
+  LIMITS,
+  reject
+} = require('../../../packages/chatgpt-r4-contracts');
 
-const MAX_REQUEST_BYTES = LIMITS.maxRequestBytes + 8192;
-const MAX_RESPONSE_BYTES = LIMITS.maxResponseBytes;
+const MAX_REQUEST_BYTES = LIMITS.maxRequestBytes +
+  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes + 8192;
+const MAX_RESPONSE_BYTES = LIMITS.maxResponseBytes +
+  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes;
 const MAX_CONCURRENT_CONNECTIONS = 32;
 const SOCKET_IDLE_TIMEOUT_MS = 30_000;
 
@@ -96,8 +102,13 @@ function createGovernanceUdsServer({
         socket.destroy();
         return;
       }
-      if (!payload || typeof payload !== 'object' || Array.isArray(payload) ||
-          Object.keys(payload).sort().join(',') !== 'relayReceipt,request') {
+      const payloadKeys = payload && typeof payload === 'object' &&
+        !Array.isArray(payload)
+        ? Object.keys(payload).sort().join(',')
+        : '';
+      if (payloadKeys !== 'relayReceipt,request' &&
+          payloadKeys !==
+            'governedReadAttempt,relayReceipt,request') {
         observations.rejected_frames += 1;
         socket.destroy();
         return;

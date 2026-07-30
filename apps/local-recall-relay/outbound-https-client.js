@@ -43,9 +43,20 @@ function createOutboundEdgeClient(edgeOrigin, {
       return invoke('/v1/relay/ack', claimControl(claim), options);
     },
     complete(claim, response, options) {
+      const governedReadAttemptCandidate =
+        options?.governedReadAttemptCandidate;
       return invoke(
         '/v1/relay/complete',
-        { ...claimControl(claim), response },
+        {
+          ...claimControl(claim),
+          response,
+          ...(governedReadAttemptCandidate
+            ? {
+                governed_read_attempt_candidate:
+                  governedReadAttemptCandidate
+              }
+            : {})
+        },
         options
       );
     },

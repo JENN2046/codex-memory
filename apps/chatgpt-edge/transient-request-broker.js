@@ -4,10 +4,13 @@ const {
   GOVERNED_READ_ATTEMPT_LIMITS,
   aggregateAttemptCounters,
   createGovernedReadAttemptProtocol,
+  createGovernedReadAttemptWorkingSet,
   createStageReceipt,
   createTerminalEnvelope,
+  isGovernedReadAttemptWorkingSetExtension,
   validateAttemptCounterRelationships,
   validateAttemptHeader,
+  validateGovernedReadAttemptProtocol,
   validateStageReceipt,
   validateTerminalEnvelope,
   InMemoryReplayGuard,
@@ -593,6 +596,57 @@ function createGovernedReadAttemptCoordinator({
     return acceptTerminalCandidate(attemptRef, record, terminal);
   }
 
+  function commitProtocolCandidate(attemptRef, candidate) {
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) rejectTerminalCandidate(attemptRef);
+    if (deadlineReached(record)) {
+      commitCoordinatorFailure(attemptRef, 'attempt_timeout');
+      rejectTerminalCandidate(attemptRef);
+    }
+    validateGovernedReadAttemptProtocol(candidate);
+    const existingWorkingSet = createGovernedReadAttemptWorkingSet({
+      header: record.header,
+      receipts: record.receipts
+    });
+    const candidateWorkingSet = createGovernedReadAttemptWorkingSet({
+      header: candidate.header,
+      receipts: candidate.receipts
+    });
+    if (!isGovernedReadAttemptWorkingSetExtension(
+      existingWorkingSet,
+      candidateWorkingSet
+    )) {
+      reject('attempt_candidate_prefix_invalid');
+    }
+    const acceptedReceipts = [...record.receipts];
+    for (const receipt of candidate.receipts.slice(record.receipts.length)) {
+      validateStageReceipt(receipt, {
+        header: record.header,
+        receipts: acceptedReceipts
+      });
+      acceptedReceipts.push(receipt);
+      validateAttemptCounterRelationships(
+        aggregateAttemptCounters(acceptedReceipts)
+      );
+    }
+    validateTerminalEnvelope(candidate.terminal, {
+      header: record.header,
+      receipts: acceptedReceipts
+    });
+    for (const receipt of candidate.receipts.slice(record.receipts.length)) {
+      record.receipts.push(structuredClone(receipt));
+      emit('attempt_receipt_appended', {
+        attempt_ref: attemptRef,
+        receipt: structuredClone(receipt)
+      });
+    }
+    return acceptTerminalCandidate(
+      attemptRef,
+      record,
+      candidate.terminal
+    );
+  }
+
   function timeoutAttempt(attemptRef) {
     return commitCoordinatorFailure(attemptRef, 'attempt_timeout');
   }
@@ -640,6 +694,15 @@ function createGovernedReadAttemptCoordinator({
     });
   }
 
+  function workingSet(attemptRef) {
+    const record = requireAttempt(attemptRef);
+    if (record.terminal) reject('attempt_terminal_already_committed');
+    return createGovernedReadAttemptWorkingSet({
+      header: record.header,
+      receipts: record.receipts
+    });
+  }
+
   function reportCoordinatorLoss() {
     let missing = 0;
     for (const [attemptRef, record] of attempts) {
@@ -659,12 +722,14 @@ function createGovernedReadAttemptCoordinator({
     acceptAttempt: guardMutation(acceptAttempt),
     appendReceipt: guardMutation(appendReceipt),
     cancelAttempt: guardMutation(cancelAttempt),
+    commitProtocolCandidate: guardMutation(commitProtocolCandidate),
     commitTerminal: guardMutation(commitTerminal),
     expireDueAttempts: guardMutation(expireDueAttempts),
     protocol,
     reportCoordinatorLoss: guardMutation(reportCoordinatorLoss),
     snapshot,
-    timeoutAttempt: guardMutation(timeoutAttempt)
+    timeoutAttempt: guardMutation(timeoutAttempt),
+    workingSet
   });
 }
 
