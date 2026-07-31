@@ -4523,21 +4523,25 @@ test('one-active-attempt lock rejects a concurrent read before provider executio
   assert.equal(worker.snapshot().stores_removed, 1);
 });
 
-test('provider timeout aborts the lease and retains admission until the call settles', async t => {
+test('provider timeout waits for cancellation-aware provider shutdown and reuses admission', async t => {
   const fixture = createSqliteFixture(t);
   let providerCalls = 0;
   let providerSignal;
-  let releaseProvider;
-  const pendingProvider = new Promise(resolve => {
-    releaseProvider = resolve;
-  });
   const worker = createGovernedReadLeaseWorker({
     clock: () => NOW,
     sourceProjection: fixture.sourceProjection,
     async providerWrapper({ signal }) {
       providerCalls += 1;
       providerSignal = signal;
-      if (providerCalls === 1) return pendingProvider;
+      if (providerCalls === 1) {
+        return new Promise((_, reject) => {
+          signal.addEventListener(
+            'abort',
+            () => reject(new Error('synthetic_provider_cancelled')),
+            { once: true }
+          );
+        });
+      }
       return [0.75, 0.25];
     },
     providerTimeoutMs: 10,
@@ -4570,16 +4574,71 @@ test('provider timeout aborts the lease and retains admission until the call set
     { started: 1, succeeded: 0, failed: 1 }
   );
   assert.equal(worker.snapshot().stores_created, 0);
-  assert.equal(worker.snapshot().provider_calls_in_flight, 1);
+  assert.equal(worker.snapshot().provider_calls_in_flight, 0);
 
-  const blocked = await worker.execute({
+  const recovered = await worker.execute({
     workingSet: bridgeWorkingSet('u'),
     authorization: {
       accepted: true,
       allowedDiaryNames: ['PROJECT_ALPHA'],
       allowedDiaryCount: 1
     },
-    query: 'blocked while provider settles',
+    query: 'provider admission recovered',
+    limit: 1
+  });
+  assert.equal(recovered.accepted, true);
+  assert.equal(providerCalls, 2);
+  assert.equal(worker.snapshot().stores_created, 1);
+  assert.equal(worker.snapshot().stores_removed, 1);
+});
+
+test('provider that ignores cancellation latches incomplete shutdown instead of releasing unknown work', async t => {
+  const fixture = createSqliteFixture(t);
+  let providerCalls = 0;
+  const worker = createGovernedReadLeaseWorker({
+    clock: () => NOW,
+    sourceProjection: fixture.sourceProjection,
+    async providerWrapper() {
+      providerCalls += 1;
+      return new Promise(() => {});
+    },
+    providerTimeoutMs: 10,
+    terminationGraceMs: 10,
+    dimension: 2,
+    leaseRoot: fixture.leaseRoot,
+    vcpCodeRoot: fixture.root,
+    sourceRuntimeRoot: fixture.sourceRuntimeRoot,
+    sourceKnowledgeBaseStorePath: fixture.sourceStore,
+    knowledgeBaseRootPath: fixture.knowledgeBaseRootPath,
+    workerRunner:
+      createSyntheticWorkerRunner(fixture.sourceProjection)
+  });
+  const timedOut = await worker.execute({
+    workingSet: bridgeWorkingSet('v'),
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'ignored provider cancellation',
+    limit: 1
+  });
+  assert.equal(timedOut.accepted, false);
+  assert.equal(timedOut.cleanup_complete, false);
+  assert.deepEqual(timedOut.terminal_failure, {
+    reason_code: 'worker_shutdown_incomplete',
+    failure_origin: 'lease_worker'
+  });
+  assert.equal(worker.snapshot().cleanup_blocked, true);
+  assert.equal(worker.snapshot().provider_calls_in_flight, 1);
+  const blocked = await worker.execute({
+    workingSet: bridgeWorkingSet('w'),
+    authorization: {
+      accepted: true,
+      allowedDiaryNames: ['PROJECT_ALPHA'],
+      allowedDiaryCount: 1
+    },
+    query: 'blocked after unknown provider shutdown',
     limit: 1
   });
   assert.equal(
@@ -4587,24 +4646,6 @@ test('provider timeout aborts the lease and retains admission until the call set
     'native_attempt_busy'
   );
   assert.equal(providerCalls, 1);
-
-  releaseProvider([0.75, 0.25]);
-  await new Promise(resolve => setImmediate(resolve));
-  assert.equal(worker.snapshot().provider_calls_in_flight, 0);
-  const recovered = await worker.execute({
-    workingSet: bridgeWorkingSet('w'),
-    authorization: {
-      accepted: true,
-      allowedDiaryNames: ['PROJECT_ALPHA'],
-      allowedDiaryCount: 1
-    },
-    query: 'provider lock recovered',
-    limit: 1
-  });
-  assert.equal(recovered.accepted, true);
-  assert.equal(providerCalls, 2);
-  assert.equal(worker.snapshot().stores_created, 1);
-  assert.equal(worker.snapshot().stores_removed, 1);
 });
 
 test('store creation latches cleanup only when a partial resource cannot be removed', async t => {

@@ -153,7 +153,8 @@ with zero.
    cannot pin the persistent controller;
 4. rechecks the attempt deadline and races the injected provider wrapper
    against the smaller of its timeout cap and remaining attempt TTL, passing
-   an `AbortSignal` and calling the wrapper at most once;
+   an `AbortSignal`, calling the wrapper at most once, and waiting for
+   cancellation cleanup before releasing admission;
 5. validates a finite vector whose dimension exactly matches the projection
    plan and remains finite after conversion to the child's `Float32Array`;
 6. rechecks the remaining attempt TTL before store creation and again before
@@ -166,11 +167,23 @@ with zero.
    returned before `deadline_at`;
 10. deletes the exact attempt directory only after child shutdown is proven.
 
-The production provider wrapper calls the exact pinned VCP singleton
-`EmbeddingUtils.getEmbeddingsBatch([query], config)` once. It suppresses that
-singleton's console diagnostics for the bounded call so an error body or
-provider response preview cannot enter Shim logs. Only canonical attempt
-failure evidence leaves the provider stage.
+The production provider wrapper starts one fresh Shim-owned provider child and
+calls the exact pinned VCP singleton
+`EmbeddingUtils.getEmbeddingsBatch([query], config)` once inside that child.
+Provider URL, key, model, query, and dimension cross only the exact IPC handle;
+they are not placed in argv or environment. The child inherits only
+`LANG`, `LC_ALL`, and `TZ`, and its stdout/stderr are ignored. Console
+suppression is child-local, so even a stalled VCP call cannot mute the
+persistent Shim's global console.
+
+Timeout or cancellation sends `SIGTERM` only to that exact provider-child
+handle. The lease does not release its single-attempt admission until the
+provider child has exited. A late provider message cannot reverse a termination
+decision. If exact shutdown cannot be proven within the grace bound, the lease
+returns `worker_shutdown_incomplete`, latches cleanup closed, and does not
+pretend that the provider authority disappeared. The derived-store lease child
+still receives no provider URL, key, model, or other provider authority.
+Only canonical attempt failure evidence leaves the provider stage.
 
 Once controller admission increments `attempts_started`, one shared `finally`
 path increments `attempts_completed` exactly once for every resolved or rejected
@@ -191,14 +204,17 @@ accepted before the response was lost, so provider/native counters remain
 unknown. Neither registry metadata nor upper-layer error handling turns those
 unknown fields into zero.
 
-If a provider ignores abort, no store or child is created and later admission
-remains closed until the exact provider promise settles. A provider result
-that arrives at or after `deadline_at` is discarded before derived/native
-work. If the remaining TTL expires between provider completion and child
-launch, no child starts and any newly created empty store is removed. Store
-creation failures latch `cleanupBlocked` only when a partially created attempt
-directory cannot be removed; a failure that created no resource, or whose
-partial resource was removed, does not poison later admission.
+If an injected non-production provider wrapper ignores abort, no store or
+derived child is created; the bounded shutdown wait ends in
+`worker_shutdown_incomplete` and latches cleanup closed. The production wrapper
+does not retain such an unbounded promise in the persistent Shim because the
+exact VCP call lives in the terminable provider child. A provider result that
+arrives at or after `deadline_at` is discarded before derived/native work. If
+the remaining TTL expires between provider completion and child launch, no
+child starts and any newly created empty store is removed. Store creation
+failures latch `cleanupBlocked` only when a partially created attempt directory
+cannot be removed; a failure that created no resource, or whose partial
+resource was removed, does not poison later admission.
 
 Cancellation is rechecked after the provider stage hook and again inside the
 scheduled provider task before the wrapper is called. Provider start counters

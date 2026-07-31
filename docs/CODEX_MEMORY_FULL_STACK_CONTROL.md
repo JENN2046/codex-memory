@@ -336,6 +336,14 @@ validates source identity, schema, scoped files/chunks, sparse indexes, vector
 dimension and finite values, and budgets, then emits only a bounded projection
 plan plus digest. It closes before the single query-embedding provider call.
 
+That provider call runs in one fresh Shim-owned helper process, not in the
+derived-store lease child. Provider authority crosses only its exact IPC
+handle; argv and the minimal child environment contain no provider key or Edge
+token, and stdout/stderr are ignored. Cancellation or timeout sends `SIGTERM`
+only to the exact helper and waits for exit before the single native-attempt
+slot can be reused. Failure to prove exit latches cleanup closed instead of
+leaving an unresolved provider promise under reusable admission.
+
 The lease child reopens the same source identity, starts a second read
 transaction, and recomputes the selected-projection digest. A changed digest
 fails as `source_snapshot_changed_after_preflight` before any derived

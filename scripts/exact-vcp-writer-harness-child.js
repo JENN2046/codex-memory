@@ -89,12 +89,6 @@ function loadFreshKnowledgeBaseManager(vcpRoot) {
   return require(modulePath);
 }
 
-function loadFreshEmbeddingUtils(vcpRoot) {
-  const modulePath = path.join(vcpRoot, 'EmbeddingUtils.js');
-  delete require.cache[require.resolve(modulePath)];
-  return require(modulePath);
-}
-
 function setRuntimeEnvironment({
   memoryRoot,
   storePath
@@ -324,7 +318,6 @@ async function run() {
     vcpToolBoxRoot: runtimeRoot,
     sourceDatabaseConstructor: Database
   });
-  const exactEmbeddingUtils = loadFreshEmbeddingUtils(vcpRoot);
   const {
     createGovernedReadLeaseWorker,
     runLeaseWorkerProcess
@@ -332,6 +325,19 @@ async function run() {
     codexRoot,
     'src/runtime/vcp-native/governed-read-lease-worker.js'
   ));
+  const {
+    createVcpQueryEmbeddingProvider
+  } = require(path.join(
+    codexRoot,
+    'src/runtime/vcp-native/production-governed-read-shim.js'
+  ));
+  const exactQueryEmbeddingProvider =
+    createVcpQueryEmbeddingProvider({
+      vcpToolBoxRoot: vcpRoot,
+      apiUrl: process.env.API_URL,
+      apiKey: process.env.API_Key,
+      model: process.env.WhitelistEmbeddingModel
+    });
   const contracts = require(path.join(
     codexRoot,
     'packages/chatgpt-r4-contracts'
@@ -392,17 +398,9 @@ async function run() {
   const leaseWorker = createGovernedReadLeaseWorker({
     clock: () => new Date('2026-07-30T00:00:00.000Z'),
     sourceProjection: projection,
-    async providerWrapper({ query }) {
+    async providerWrapper(input) {
       providerInvocationCount += 1;
-      const embeddings = await exactEmbeddingUtils.getEmbeddingsBatch(
-        [query],
-        {
-          apiUrl: process.env.API_URL,
-          apiKey: process.env.API_Key,
-          model: process.env.WhitelistEmbeddingModel
-        }
-      );
-      return embeddings?.[0];
+      return exactQueryEmbeddingProvider(input);
     },
     dimension: 4,
     leaseRoot,
@@ -617,16 +615,10 @@ async function run() {
   const mutationWorker = createGovernedReadLeaseWorker({
     clock: () => new Date('2026-07-30T00:00:00.000Z'),
     sourceProjection: mutationProjection,
-    async providerWrapper({ query }) {
+    async providerWrapper(input) {
       mutationProviderCalls += 1;
-      const embeddings = await exactEmbeddingUtils.getEmbeddingsBatch(
-        [query],
-        {
-          apiUrl: process.env.API_URL,
-          apiKey: process.env.API_Key,
-          model: process.env.WhitelistEmbeddingModel
-        }
-      );
+      const providerResult =
+        await exactQueryEmbeddingProvider(input);
       const sourceMutation = new Database(mutationCopy.targetFile);
       try {
         sourceMutation.prepare(`
@@ -638,7 +630,7 @@ async function run() {
       } finally {
         sourceMutation.close();
       }
-      return embeddings?.[0];
+      return providerResult;
     },
     dimension: 4,
     leaseRoot: mutationLeaseRoot,

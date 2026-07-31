@@ -232,6 +232,23 @@ async function invokeHook(stageHooks, stage, value) {
   await hook(value);
 }
 
+async function waitForPromiseSettlement(promise, timeoutMs) {
+  let timeout = null;
+  try {
+    return await Promise.race([
+      Promise.resolve(promise).then(
+        () => true,
+        () => true
+      ),
+      new Promise(resolve => {
+        timeout = setTimeout(() => resolve(false), timeoutMs);
+      })
+    ]);
+  } finally {
+    if (timeout !== null) clearTimeout(timeout);
+  }
+}
+
 function sourceFailureReason(error) {
   const reasonCode = error?.reasonCode;
   if (typeof reasonCode !== 'string') return 'source_preflight_failed';
@@ -904,6 +921,8 @@ function createGovernedReadLeaseWorker({
 
       let vector;
       let providerStarted = false;
+      let providerTask = null;
+      let providerAbortController = null;
       try {
         await invokeHook(stageHooks, 'PROVIDER_EMBEDDING', {
           attempt_ref: current.header.attempt_ref,
@@ -925,7 +944,7 @@ function createGovernedReadLeaseWorker({
             }
           );
         }
-        const providerAbortController = new AbortController();
+        providerAbortController = new AbortController();
         let rejectProviderCancellation = null;
         const providerCancellation = signal
           ? new Promise((_, rejectCancellation) => {
@@ -944,7 +963,7 @@ function createGovernedReadLeaseWorker({
           { once: true }
         );
         if (signal?.aborted) onProviderCancellation();
-        const providerTask = Promise.resolve().then(() => {
+        providerTask = Promise.resolve().then(() => {
           throwIfAborted(signal);
           providerInvocations += 1;
           providerStarted = true;
@@ -1009,7 +1028,24 @@ function createGovernedReadLeaseWorker({
             }
           }
         });
-      } catch {
+      } catch (error) {
+        if (providerTask !== null &&
+            providerAbortController?.signal.aborted) {
+          const providerShutdownComplete =
+            await waitForPromiseSettlement(
+              providerTask,
+              terminationGraceMs
+            );
+          if (!providerShutdownComplete) {
+            cleanupBlocked = true;
+            return shutdownFailure(current);
+          }
+        }
+        if (error?.code ===
+            'governed_read_provider_shutdown_incomplete') {
+          cleanupBlocked = true;
+          return shutdownFailure(current);
+        }
         return failedContinuation(
           current,
           'PROVIDER_EMBEDDING',

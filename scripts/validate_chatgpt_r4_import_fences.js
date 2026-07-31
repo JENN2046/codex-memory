@@ -106,7 +106,7 @@ const ACTIVE_RUNTIME_DYNAMIC_REQUIRE_ALLOWLIST = Object.freeze({
     knowledgeBaseManagerPath: 'KnowledgeBaseManager.js',
     embeddingUtilsPath: 'EmbeddingUtils.js'
   }),
-  'src/runtime/vcp-native/production-governed-read-shim.js': Object.freeze({
+  'src/runtime/vcp-native/production-governed-read-provider-child.js': Object.freeze({
     embeddingUtilsPath: 'EmbeddingUtils.js'
   })
 });

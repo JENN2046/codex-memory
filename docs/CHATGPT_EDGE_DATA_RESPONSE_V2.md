@@ -119,6 +119,14 @@ source projection and lease worker, and adds no signing secret. Governance
 loads the v2 attempt runtime and no longer retains the prior application read
 path as an active v1 compatibility route.
 
+The persistent Shim also owns a fresh, per-attempt provider helper process.
+That helper receives provider authority only over its exact IPC handle, calls
+the pinned VCP embedding singleton once, inherits no provider/Edge secret
+environment, and exposes no stdout/stderr. Timeout or cancellation sends
+`SIGTERM` only to the exact helper and waits for proven exit before native
+admission is reusable. The separate derived-store lease child remains
+provider-authority-free.
+
 These source changes do not rebind or start the held-stopped schema-v6 stack.
 After all four CM-2159 PRs are merged and merged-main CI succeeds, a separate
 current authorization is still required for stopped-state `rebind-source`.
