@@ -122,6 +122,9 @@ reference, response body, provider/native inference, raw memory, or secret.
 Before rejecting a new accepted resolution at its retention bound, it evicts the
 oldest terminal or missing record. Active chains are never evicted, so a shorter
 coordinator terminal-retention window cannot poison Observer admission.
+Eviction preserves a bounded lightweight replay tombstone through the immutable
+deadline; replayed accepted/receipt/terminal event chains cannot increment the
+Observer's accepted business counters twice.
 
 ## Bounds
 

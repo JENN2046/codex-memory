@@ -790,26 +790,72 @@ test('Observer reuses capacity after shorter coordinator terminal retention', ()
     maxRetainedResolutions: 1
   });
   const observed = [];
+  const delivered = [];
   const coordinator = createGovernedContextResolutionCoordinator({
     clock: () => new Date(currentMs),
     maxResolutions: 1,
     maxRetainedResolutions: 1,
     terminalRetentionMs: 10,
-    eventSink: event => observed.push(observer.observe(event))
+    eventSink: event => {
+      delivered.push(event);
+      observed.push(observer.observe(event));
+    }
   });
   const completed = header('observer-short-coordinator-retention');
   commitCoordinatorSuccess(coordinator, completed);
+  const replay = delivered.slice();
 
   currentMs += 10;
   const reusable = header('observer-capacity-reused');
-  assert.doesNotThrow(() => coordinator.acceptResolution(reusable));
+  commitCoordinatorSuccess(coordinator, reusable);
 
   assert.equal(observed.every(Boolean), true);
+  const beforeReplay = observer.snapshot();
+  assert.equal(beforeReplay.resolutions_accepted, 2);
+  assert.equal(beforeReplay.receipts_accepted, 14);
+  assert.equal(beforeReplay.terminal_successes, 2);
+  assert.equal(beforeReplay.protocol_violations, 0);
+
+  assert.equal(replay.every(event => observer.observe(event) === false), true);
+  const afterReplay = observer.snapshot();
+  assert.equal(afterReplay.resolutions_accepted, 2);
+  assert.equal(afterReplay.receipts_accepted, 14);
+  assert.equal(afterReplay.terminal_successes, 2);
+  assert.equal(afterReplay.protocol_violations, replay.length);
+});
+
+test('Observer replay tombstone capacity is reusable at the old deadline', () => {
+  let currentMs = NOW_MS;
+  const observer = createGovernedContextResolutionObserver({
+    clock: () => new Date(currentMs),
+    maxRetainedResolutions: 1,
+    maxReplayTombstones: 1
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(currentMs),
+    eventSink: event => observer.observe(event)
+  });
+  const completed = header('observer-bounded-tombstone', { ttlSeconds: 1 });
+  commitCoordinatorSuccess(coordinator, completed);
+  const waiting = header('observer-tombstone-capacity-reused');
+  const acceptedEvent = {
+    component: 'governed_context_resolution_coordinator',
+    event: 'resolution_accepted',
+    header: waiting
+  };
+
+  currentMs += 10;
+  assert.equal(observer.observe(acceptedEvent), false);
+  assert.equal(
+    observer.snapshot().last_violation_code,
+    'context_resolution_observer_tombstone_capacity_exceeded'
+  );
+
+  currentMs = Date.parse(completed.deadline_at);
+  assert.equal(observer.observe(acceptedEvent), true);
   const snapshot = observer.snapshot();
   assert.equal(snapshot.resolutions_accepted, 2);
-  assert.equal(snapshot.receipts_accepted, 8);
-  assert.equal(snapshot.terminal_successes, 1);
-  assert.equal(snapshot.protocol_violations, 0);
+  assert.equal(snapshot.protocol_violations, 1);
 });
 
 test('Observer rejects a tampered receipt independently', () => {
