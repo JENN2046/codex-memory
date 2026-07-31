@@ -19,16 +19,15 @@ deploy, cutover, complete-V8, or readiness claim.
 
 `activePhase: governed_read_attempt_refactor`
 
-PRs `#73`-`#75` delivered the attempt contract/terminal CAS, two-pass source
-projection/exact-writer harness, and lease-scoped vertical runtime. Main CI for
-the `#75` merge `75838ae5...` passed as run `30570842512`. The separately
-authorized fourth construction item is the ChatGPT Edge data response v2 hard
-cut from that exact main base. The schema-v6 stack remains held stopped; source
-cutover is not runtime activation. Single-use `_004` failed closed without an
-acceptable attempt terminal, is consumed, and cannot be retried or
-reconstructed. This declaration authorizes no merge, restart, rebind, provider
-or memory-tool execution, private configuration access, `_005`, or readiness
-claim.
+PRs `#73`-`#76` delivered all four items: attempt contract/terminal CAS,
+two-pass source projection/exact-writer authority, lease-scoped runtime, and
+the Edge v2 hard cut. PR `#76` head `912a5c05...` was squash-merged as
+`4b3d1173...`; merged-main CI `30617653640` passed. An authorized stopped-state
+`rebind-source` and one status accepted schema v6, current source, managed
+runtime identity, and v2/attempt-v1/v1-rejection. Single-use R5-O `_005`
+received no usable project_context_ref; search_memory was not invoked and no
+attempt terminal exists. Its canonical reason remains unknown and is not
+inferred. `_005` is consumed; no retry or readiness claim is authorized.
 
 ## Last Accepted Product Baseline
 
@@ -46,17 +45,14 @@ future task.
 ## Open Blockers
 
 - `r5_h_matrix_incomplete` [open]: The R5-H private ChatGPT dogfood matrix is incomplete.
-- `r5_o_private_exact_head_runtime_unverified` [open]: R5-O _004 failed closed without an acceptable governed-read terminal envelope; no private exact-head result is established.
+- `r5_o_private_exact_head_runtime_unverified` [open]: R5-O _005 ended before attempt creation because its single resolver result exposed no usable project_context_ref; search_memory was not invoked, no governed-read terminal exists, and no private exact-head result is established.
 - `fresh_non_empty_task_context_relevance_unproven` [open]: Fresh non-empty task-context recall relevance has not been proven.
 
 ## Next Safe Action
 
-Deliver the fourth ordered CM-2159 PR for the Edge response v2 hard cut, with
-unchanged tool names/input schemas and active v1 rejection. Merge remains a
-separate Jenn-only action. Keep schema v6 stopped. Only after the fourth PR is
-merged and merged-main CI succeeds may stopped-state `rebind-source`
-authorization be requested, followed by distinct single-use R5-O `_005`
-authorization.
+Do not retry or reconstruct `_005`. Keep CM-2159 open and preserve the accepted
+runtime identity without another probe or lifecycle action. Any such action or
+provider/memory-tool call requires a separately scoped proposal and authority.
 
 ## Authority Boundaries
 
@@ -72,9 +68,9 @@ authorization.
   They do not authorize another status probe, lifecycle action, provider call,
   private runtime verification, real memory read or write, release, deploy,
   cutover, or readiness claim.
-- PRs `#73`-`#75` are merged source construction, but remain dormant in the
-  held-stopped runtime. The v2 source cutover changes no tool name or input
-  schema and is not a deployment/readiness claim.
+- PRs `#73`-`#76` are merged source construction. The authorized rebind accepted
+  that source as the schema-v6 runtime identity; it did not establish R5-O,
+  change a tool name/input schema, or authorize further execution.
 
 ## Evidence And History
 
@@ -92,8 +88,10 @@ Last completed: `CM-2158 / CMV-2243`.
   `6fe2b532...`; merged-main CI run `30501105867` passed.
 - PR `#74` merged the production two-pass source projection, streaming atomic
   materialization, and exact-VCP writer authority harness as `dcd2c42a...`.
-- PR `#75` merged the lease-scoped vertical runtime as `75838ae5...`;
-  merged-main CI run `30570842512` passed.
+- PR `#75` merged the lease-scoped runtime as `75838ae5...`; CI `30570842512` passed.
+- PR `#76` hard-cut Edge data/request/response to v2, preserving tool/input
+  schemas and rejecting v1. Head `912a5c05...` was squash-merged as
+  `4b3d1173...`; merged-main CI run `30617653640` passed.
 - Single-use authorization `_004` was consumed and failed closed. It did not
   establish a receipt-bound R5-O result. Exact stage and counter facts that
   were not present in component evidence remain unknown and are not inferred
@@ -104,10 +102,14 @@ Last completed: `CM-2158 / CMV-2243`.
   container. A single low-disclosure status confirmed schema v6 and the stopped
   state. No restart, rebind, provider call, memory-tool call, raw log read, or
   raw memory read occurred. The stack must remain stopped during construction.
-- The current fourth construction hard-cuts ChatGPT Edge data, request, and
-  response schemas to v2, requires one attempt for every read, and keeps
-  `resolve_memory_context` attempt-free. It neither starts nor rebinds the
-  stopped stack.
+- Under exact authorization bound to `4b3d1173...`, one stopped-state
+  `rebind-source` and one low-disclosure status accepted schema v6, the current
+  source manifest, managed runtime identity, and the Edge v2/attempt-v1/v1
+  rejection dimensions without establishing readiness.
+- Single-use R5-O `_005` invoked the resolver once. Its bounded result provided
+  no usable project_context_ref, so search_memory was not invoked and no attempt
+  terminal exists. No retry occurred; the canonical reason is not inferred,
+  CM-2159 remains open, and `lastCompleted` remains unchanged.
 - PR `#65` and the exact V5 transition are historical closeout evidence only.
   They store no live locator or private payload and do not claim current health
   or authorize runtime, mutation, release, or deploy work.
