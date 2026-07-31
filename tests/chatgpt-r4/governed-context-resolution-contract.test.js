@@ -680,6 +680,52 @@ test('Observer validates the chain and records missing terminal without fabricat
   assert.equal(snapshot.native_counts_inferred, false);
 });
 
+test('Edge preserves Observer event order for a promise-returning sink', async () => {
+  const observer = createGovernedContextResolutionObserver({
+    clock: () => new Date(NOW_MS)
+  });
+  const delivered = [];
+  let releaseAccepted;
+  const acceptedBarrier = new Promise(resolve => {
+    releaseAccepted = resolve;
+  });
+  let resolveTerminal;
+  const terminalDelivered = new Promise(resolve => {
+    resolveTerminal = resolve;
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS),
+    eventSink: async event => {
+      if (event.event === 'resolution_accepted') {
+        await acceptedBarrier;
+      }
+      delivered.push(event.event);
+      assert.equal(observer.observe(event), true);
+      if (event.event === 'resolution_terminal_committed') {
+        resolveTerminal();
+      }
+    }
+  });
+  const value = header('observer-async-order');
+
+  commitCoordinatorSuccess(coordinator, value);
+  await Promise.resolve();
+  assert.deepEqual(delivered, []);
+  releaseAccepted();
+  await terminalDelivered;
+
+  assert.deepEqual(delivered, [
+    'resolution_accepted',
+    ...Array(7).fill('resolution_receipt_appended'),
+    'resolution_terminal_committed'
+  ]);
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.resolutions_accepted, 1);
+  assert.equal(snapshot.receipts_accepted, 7);
+  assert.equal(snapshot.terminal_successes, 1);
+  assert.equal(snapshot.protocol_violations, 0);
+});
+
 test('Observer rejects a tampered receipt independently', () => {
   const observer = createGovernedContextResolutionObserver({
     clock: () => new Date(NOW_MS)

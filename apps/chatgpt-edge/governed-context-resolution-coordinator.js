@@ -48,6 +48,7 @@ function createGovernedContextResolutionCoordinator({
   const resolutions = new Map();
   let activeResolutions = 0;
   let eventDispatchDepth = 0;
+  let eventDeliveryTail = null;
 
   function nowMs() {
     const value = clock();
@@ -74,22 +75,42 @@ function createGovernedContextResolutionCoordinator({
     }
   }
 
-  function emit(event, payload = {}) {
-    if (!eventSink) return;
+  function dispatchEvent(message) {
     eventDispatchDepth += 1;
     try {
-      const pending = eventSink(Object.freeze({
-        component: GOVERNED_CONTEXT_RESOLUTION_EVENT_COMPONENT,
-        event,
-        ...payload
-      }));
-      if (pending && typeof pending.catch === 'function') {
-        pending.catch(() => {});
-      }
+      return eventSink(message);
     } catch {
       // Observation cannot change coordinator CAS state.
+      return undefined;
     } finally {
       eventDispatchDepth -= 1;
+    }
+  }
+
+  function trackEventDelivery(pending) {
+    const tracked = Promise.resolve(pending).catch(() => {});
+    eventDeliveryTail = tracked;
+    tracked.then(() => {
+      if (eventDeliveryTail === tracked) eventDeliveryTail = null;
+    });
+  }
+
+  function emit(event, payload = {}) {
+    if (!eventSink) return;
+    const message = Object.freeze({
+      component: GOVERNED_CONTEXT_RESOLUTION_EVENT_COMPONENT,
+      event,
+      ...payload
+    });
+    if (eventDeliveryTail) {
+      trackEventDelivery(
+        eventDeliveryTail.then(() => dispatchEvent(message))
+      );
+      return;
+    }
+    const pending = dispatchEvent(message);
+    if (pending && typeof pending.then === 'function') {
+      trackEventDelivery(pending);
     }
   }
 

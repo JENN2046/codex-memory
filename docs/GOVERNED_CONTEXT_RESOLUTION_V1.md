@@ -103,7 +103,9 @@ application.
 - late completion and duplicate terminal candidates are rejected;
 - a committed terminal immediately releases active admission capacity;
 - active capacity is independent from bounded terminal retention;
-- synchronous Observer callbacks cannot reenter coordinator mutations; and
+- synchronous Observer callbacks cannot reenter coordinator mutations;
+- promise-returning Observer sinks are serialized in emission order without
+  delaying or changing the coordinator's terminal CAS; and
 - coordinator loss emits `terminal_missing` and fabricates no terminal.
 
 ## Independent observation
