@@ -569,6 +569,22 @@ function validateResponseEnvelope(envelope, {
     status: envelope.status
   });
   if (envelope.tool_name === 'resolve_memory_context') {
+    if (envelope.status === 'ok') {
+      const contextExpiresMs = parseTime(
+        envelope.structured_content.expires_at,
+        'response_context_expiry_invalid'
+      );
+      const nowMs = now instanceof Date
+        ? now.getTime()
+        : new Date(now).getTime();
+      const responseIssuedMs = parseTime(
+        envelope.issued_at,
+        'response_issued_at_invalid'
+      );
+      if (contextExpiresMs <= Math.max(nowMs, responseIssuedMs)) {
+        reject('response_context_expired');
+      }
+    }
     validateCounters(envelope.counters, { requireZero: true });
   } else {
     validateLegacyResponseCountersAgainstAttemptPublic(
