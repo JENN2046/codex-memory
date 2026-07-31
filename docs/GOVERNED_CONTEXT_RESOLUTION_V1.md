@@ -115,6 +115,9 @@ validates headers, receipt identity, origin, sequence, hash chain, failed-stage
 reason binding, and terminal derivation. Its snapshot exposes aggregate counts
 and one safe violation code only. It projects no resolution identifier, context
 reference, response body, provider/native inference, raw memory, or secret.
+Before rejecting a new accepted resolution at its retention bound, it evicts the
+oldest terminal or missing record. Active chains are never evicted, so a shorter
+coordinator terminal-retention window cannot poison Observer admission.
 
 ## Bounds
 
@@ -132,8 +135,9 @@ ttl_max_seconds: 60
 The source-only tests cover the complete success chain, every registered
 stage-failure path, first-terminal competition, deadline ordering, cancellation,
 timeout, active-capacity reuse beyond 64 lifetime operations, coordinator loss,
-Observer tamper rejection, malformed and expired refs, missing issuance
-evidence, cross-request receipt splicing, and fake read-counter injection.
+Observer retention-window divergence and tamper rejection, malformed and
+expired refs, missing issuance evidence, cross-request receipt splicing, and
+fake read-counter injection.
 
 The dormancy test also pins all six existing ChatGPT Edge tool input/output
 schema digests and asserts that no live resolver or governed-read module imports

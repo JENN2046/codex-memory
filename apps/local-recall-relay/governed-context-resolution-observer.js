@@ -65,6 +65,23 @@ function createGovernedContextResolutionObserver({
     }
   }
 
+  function evictOldestClosedResolution() {
+    let selectedRef = null;
+    let selectedPurgeAfterMs = Number.POSITIVE_INFINITY;
+    for (const [resolutionRef, record] of resolutions) {
+      if ((!record.terminal && !record.missing) ||
+          !Number.isFinite(record.purge_after_ms)) continue;
+      if (selectedRef === null ||
+          record.purge_after_ms < selectedPurgeAfterMs) {
+        selectedRef = resolutionRef;
+        selectedPurgeAfterMs = record.purge_after_ms;
+      }
+    }
+    if (selectedRef === null) return false;
+    resolutions.delete(selectedRef);
+    return true;
+  }
+
   function violation(code) {
     counters.protocol_violations += 1;
     lastViolationCode = typeof code === 'string' &&
@@ -87,7 +104,8 @@ function createGovernedContextResolutionObserver({
         if (resolutions.has(event.header.resolution_ref)) {
           return violation('context_resolution_observer_duplicate_accept');
         }
-        if (resolutions.size >= maxRetainedResolutions) {
+        if (resolutions.size >= maxRetainedResolutions &&
+            !evictOldestClosedResolution()) {
           return violation(
             'context_resolution_observer_retention_capacity_exceeded'
           );

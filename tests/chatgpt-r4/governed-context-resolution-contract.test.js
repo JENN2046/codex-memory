@@ -726,6 +726,35 @@ test('Edge preserves Observer event order for a promise-returning sink', async (
   assert.equal(snapshot.protocol_violations, 0);
 });
 
+test('Observer reuses capacity after shorter coordinator terminal retention', () => {
+  let currentMs = NOW_MS;
+  const observer = createGovernedContextResolutionObserver({
+    clock: () => new Date(currentMs),
+    maxRetainedResolutions: 1
+  });
+  const observed = [];
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(currentMs),
+    maxResolutions: 1,
+    maxRetainedResolutions: 1,
+    terminalRetentionMs: 10,
+    eventSink: event => observed.push(observer.observe(event))
+  });
+  const completed = header('observer-short-coordinator-retention');
+  commitCoordinatorSuccess(coordinator, completed);
+
+  currentMs += 10;
+  const reusable = header('observer-capacity-reused');
+  assert.doesNotThrow(() => coordinator.acceptResolution(reusable));
+
+  assert.equal(observed.every(Boolean), true);
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.resolutions_accepted, 2);
+  assert.equal(snapshot.receipts_accepted, 8);
+  assert.equal(snapshot.terminal_successes, 1);
+  assert.equal(snapshot.protocol_violations, 0);
+});
+
 test('Observer rejects a tampered receipt independently', () => {
   const observer = createGovernedContextResolutionObserver({
     clock: () => new Date(NOW_MS)
