@@ -110,8 +110,9 @@ application.
 - promise-returning Observer sinks are serialized in emission order without
   delaying or changing the coordinator's terminal CAS;
 - asynchronous delivery retains at most 256 events by default (4096 maximum),
-  records low-disclosure queue drops or sink rejections, and blocks new
-  admission after any delivery loss; and
+  records low-disclosure queue drops, thrown/rejected sinks, or explicit
+  synchronous/asynchronous `false` refusal, and blocks new admission after any
+  delivery loss; and
 - coordinator loss emits `terminal_missing`, fabricates no terminal, and
   permanently closes that coordinator to subsequent mutation.
 

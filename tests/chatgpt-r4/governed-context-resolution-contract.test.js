@@ -872,6 +872,95 @@ test('Edge fails closed after a promise-returning Observer sink rejects', async 
   ), { code: 'context_resolution_observer_delivery_incomplete' });
 });
 
+test('Edge treats synchronous Observer false as delivery loss', () => {
+  const observer = createGovernedContextResolutionObserver({
+    clock: () => new Date(NOW_MS),
+    maxRetainedResolutions: 1
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS),
+    maxResolutions: 2,
+    eventSink: event => observer.observe(event)
+  });
+
+  coordinator.acceptResolution(header('observer-active-capacity-one'));
+  coordinator.acceptResolution(header('observer-active-capacity-two'));
+
+  assert.deepEqual(coordinator.observerDeliverySnapshot(), {
+    event_sink_configured: true,
+    max_pending_events: 256,
+    pending_events: 0,
+    dropped_events: 2,
+    delivery_compromised: true
+  });
+  assert.throws(() => coordinator.acceptResolution(
+    header('observer-admission-after-sync-false')
+  ), { code: 'context_resolution_observer_delivery_incomplete' });
+});
+
+test('Edge treats promise-resolved Observer false as delivery loss', async () => {
+  let resolveTerminal;
+  const terminalDelivered = new Promise(resolve => {
+    resolveTerminal = resolve;
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS),
+    eventSink: async event => {
+      if (event.event === 'resolution_terminal_committed') {
+        resolveTerminal();
+      }
+      return event.event !== 'resolution_accepted';
+    }
+  });
+
+  commitCoordinatorSuccess(coordinator, header('observer-async-false'));
+  await terminalDelivered;
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.deepEqual(coordinator.observerDeliverySnapshot(), {
+    event_sink_configured: true,
+    max_pending_events: 256,
+    pending_events: 0,
+    dropped_events: 1,
+    delivery_compromised: true
+  });
+  assert.throws(() => coordinator.acceptResolution(
+    header('observer-admission-after-async-false')
+  ), { code: 'context_resolution_observer_delivery_incomplete' });
+});
+
+test('Edge counts a queued synchronous Observer refusal exactly once', async () => {
+  let releaseAccepted;
+  const acceptedBarrier = new Promise(resolve => {
+    releaseAccepted = resolve;
+  });
+  let resolveReceipt;
+  const receiptDelivered = new Promise(resolve => {
+    resolveReceipt = resolve;
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS),
+    eventSink: event => {
+      if (event.event === 'resolution_accepted') return acceptedBarrier;
+      resolveReceipt();
+      return false;
+    }
+  });
+
+  coordinator.acceptResolution(header('observer-queued-sync-false'));
+  releaseAccepted(true);
+  await receiptDelivered;
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.deepEqual(coordinator.observerDeliverySnapshot(), {
+    event_sink_configured: true,
+    max_pending_events: 256,
+    pending_events: 0,
+    dropped_events: 1,
+    delivery_compromised: true
+  });
+});
+
 test('Observer reuses capacity after shorter coordinator terminal retention', () => {
   let currentMs = NOW_MS;
   const observer = createGovernedContextResolutionObserver({

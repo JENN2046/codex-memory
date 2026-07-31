@@ -81,6 +81,10 @@ function createGovernedContextResolutionCoordinator({
     return Date.parse(record.header.deadline_at) <= nowMs();
   }
 
+  function markObserverDeliveryLoss() {
+    droppedObserverEvents += 1;
+  }
+
   function pruneExpiredTerminals(currentMs) {
     for (const [resolutionRef, record] of resolutions) {
       if (record.terminal &&
@@ -105,7 +109,7 @@ function createGovernedContextResolutionCoordinator({
       return eventSink(message);
     } catch {
       // Observation cannot change coordinator CAS state.
-      droppedObserverEvents += 1;
+      markObserverDeliveryLoss();
       return undefined;
     } finally {
       eventDispatchDepth -= 1;
@@ -115,9 +119,11 @@ function createGovernedContextResolutionCoordinator({
   function trackEventDelivery(pending) {
     pendingObserverEvents += 1;
     const tracked = Promise.resolve(pending)
-      .catch(() => {
-        // A rejected delivery is evidence loss, just like a bounded-queue drop.
-        droppedObserverEvents += 1;
+      .then(delivery => {
+        if (delivery === false) markObserverDeliveryLoss();
+      }, () => {
+        // A rejected delivery is evidence loss, just like an explicit refusal.
+        markObserverDeliveryLoss();
       })
       .finally(() => {
         pendingObserverEvents -= 1;
@@ -132,7 +138,7 @@ function createGovernedContextResolutionCoordinator({
     if (!eventSink) return;
     if (eventDeliveryTail &&
         pendingObserverEvents >= maxPendingObserverEvents) {
-      droppedObserverEvents += 1;
+      markObserverDeliveryLoss();
       return;
     }
     const message = Object.freeze({
@@ -147,6 +153,10 @@ function createGovernedContextResolutionCoordinator({
       return;
     }
     const pending = dispatchEvent(message);
+    if (pending === false) {
+      markObserverDeliveryLoss();
+      return;
+    }
     if (pending && typeof pending.then === 'function') {
       trackEventDelivery(pending);
     }
