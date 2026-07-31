@@ -73,11 +73,20 @@ function createGovernedContextResolutionObserver({
   }
 
   function pruneExpiredReplayTombstones(currentMs) {
-    for (const [resolutionRef, expiresAtMs] of replayTombstones) {
-      if (expiresAtMs <= currentMs) {
+    for (const [resolutionRef, tombstone] of replayTombstones) {
+      if (tombstone.expires_at_ms <= currentMs) {
         replayTombstones.delete(resolutionRef);
       }
     }
+  }
+
+  function markReplayTombstoneClosure(resolutionRef, closure) {
+    const tombstone = replayTombstones.get(resolutionRef);
+    if (!tombstone) return;
+    replayTombstones.set(resolutionRef, Object.freeze({
+      ...tombstone,
+      closure
+    }));
   }
 
   function replayProtectionExpiresAt(header) {
@@ -155,7 +164,10 @@ function createGovernedContextResolutionObserver({
         });
         replayTombstones.set(
           event.header.resolution_ref,
-          replayProtectionExpiresAt(event.header)
+          Object.freeze({
+            expires_at_ms: replayProtectionExpiresAt(event.header),
+            closure: 'active'
+          })
         );
         counters.resolutions_accepted += 1;
         return true;
@@ -199,6 +211,7 @@ function createGovernedContextResolutionObserver({
         });
         record.terminal = structuredClone(event.terminal);
         record.purge_after_ms = retainedUntil(record, currentMs);
+        markReplayTombstoneClosure(event.resolution_ref, 'terminal');
         if (event.terminal.outcome === 'success') {
           counters.terminal_successes += 1;
         } else {
@@ -208,7 +221,8 @@ function createGovernedContextResolutionObserver({
       }
       if (event.event === 'resolution_terminal_rejected') {
         const record = resolutions.get(event.resolution_ref);
-        if (!record?.terminal ||
+        const tombstone = replayTombstones.get(event.resolution_ref);
+        if ((!record?.terminal && tombstone?.closure !== 'terminal') ||
             event.rejection_code !==
               'context_resolution_terminal_already_committed') {
           return violation(
@@ -227,6 +241,7 @@ function createGovernedContextResolutionObserver({
         }
         record.missing = true;
         record.purge_after_ms = retainedUntil(record, currentMs);
+        markReplayTombstoneClosure(event.resolution_ref, 'missing');
         counters.terminals_missing += 1;
         return violation('terminal_missing');
       }

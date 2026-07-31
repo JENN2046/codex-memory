@@ -1002,6 +1002,40 @@ test('Observer reuses capacity after shorter coordinator terminal retention', ()
   assert.equal(afterReplay.protocol_violations, replay.length);
 });
 
+test('Observer tombstone validates terminal rejection after record eviction', () => {
+  const observer = createGovernedContextResolutionObserver({
+    clock: () => new Date(NOW_MS),
+    maxRetainedResolutions: 1
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS),
+    eventSink: event => observer.observe(event)
+  });
+  const evicted = header('observer-evicted-terminal');
+  const replacement = header('observer-terminal-replacement');
+
+  commitCoordinatorSuccess(coordinator, evicted);
+  commitCoordinatorSuccess(coordinator, replacement);
+  assert.throws(() => coordinator.commitTerminal(
+    evicted.resolution_ref,
+    successfulProtocol(evicted).terminal
+  ), { code: 'context_resolution_terminal_already_committed' });
+
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.terminals_rejected, 1);
+  assert.equal(snapshot.protocol_violations, 0);
+  assert.deepEqual(coordinator.observerDeliverySnapshot(), {
+    event_sink_configured: true,
+    max_pending_events: 256,
+    pending_events: 0,
+    dropped_events: 0,
+    delivery_compromised: false
+  });
+  assert.doesNotThrow(() => coordinator.acceptResolution(
+    header('observer-admission-after-evicted-terminal-rejection')
+  ));
+});
+
 test('Observer replay tombstone capacity is reusable at the old deadline', () => {
   let currentMs = NOW_MS;
   const observer = createGovernedContextResolutionObserver({

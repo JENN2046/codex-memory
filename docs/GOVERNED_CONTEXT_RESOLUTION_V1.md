@@ -127,10 +127,11 @@ Before rejecting a new accepted resolution at its retention bound, it evicts the
 oldest terminal or missing record. Active chains are never evicted, so a shorter
 coordinator terminal-retention window cannot poison Observer admission.
 Eviction preserves a bounded lightweight replay tombstone through the immutable
-deadline plus one bounded transport TTL. `accepted_at_ms` proves coordinator-side
-admission before the deadline, so a serialized event delivered at the deadline
-remains valid while replayed accepted/receipt/terminal chains cannot increment
-the Observer's accepted business counters twice.
+deadline plus one bounded transport TTL, including only enough closure state to
+validate a later coordinator terminal rejection. `accepted_at_ms` proves
+coordinator-side admission before the deadline, so a serialized event delivered
+at the deadline remains valid while replayed accepted/receipt/terminal chains
+cannot increment the Observer's accepted business counters twice.
 
 ## Bounds
 
