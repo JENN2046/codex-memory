@@ -1,6 +1,6 @@
 # Governed Read Attempt v1
 
-Status: active source contract; stopped runtime rebind pending
+Status: active source/runtime contract; R5-O verification blocked
 
 Task: `CM-2159 / governed_read_attempt_refactor`
 
@@ -8,10 +8,10 @@ Protocol: `governed_read_attempt.v1`
 
 This document describes the transport-neutral attempt contract introduced by
 the first CM-2159 refactor delivery and activated in source by the fourth
-ordered data-response v2 hard cut. The held-stopped schema-v6 runtime still
-requires a separately authorized source rebind before this source contract can
-become its accepted runtime identity. No public tool, tool name, or input
-schema is added.
+ordered data-response v2 hard cut. After merged-main CI passed, a separately
+authorized stopped-state rebind accepted this source contract as the schema-v6
+runtime identity. That binding is not R5-O or readiness evidence. No public
+tool, tool name, or input schema is added.
 
 ## One protocol identity
 
@@ -190,8 +190,8 @@ violation.
 
 The transient Edge broker uses this coordinator for every accepted governed
 read in the v2 source path. Source and synthetic tests exercise terminal
-competition and capacity reuse; the stopped schema-v6 instance is not changed
-until an authorized rebind.
+competition and capacity reuse. The later authorized rebind accepted this v2
+source path as the schema-v6 runtime identity.
 
 ## Independent low-disclosure observation
 
@@ -233,14 +233,26 @@ Public data response schema v2 carries this projection for each governed read.
 The public validator reproduces the registry binding and counter
 reconciliation instead of trusting the projection.
 
+## Post-rebind verification boundary
+
+Single-use R5-O `_005` ended before attempt creation. Its one
+`resolve_memory_context` result did not provide a usable
+`project_context_ref`, so `search_memory` was not invoked. Consequently `_005`
+has no attempt header, receipts, terminal envelope, or terminal counters to
+reconcile. The resolver's canonical status/reason was not available in the
+bounded projection and is not inferred. No retry occurred, and the R5-O
+blocker remains open.
+
 ## Non-claims
 
-This source contract and its v2 cutover do not:
+This source/runtime contract and the bounded `_005` outcome do not:
 
-- call a provider or memory tool;
+- establish a governed-read search, provider invocation, or attempt terminal
+  for `_005`;
 - read private configuration, raw logs, raw memory, or a source database;
 - modify VCPToolBox core or dependencies;
-- start, restart, rebind, deploy, release, or publish a runtime;
+- authorize another start, restart, rebind, status, resolver, search, provider,
+  or memory-tool action;
+- deploy, release, or publish a runtime;
 - add or rename any of the six ChatGPT Edge tools or modify an input schema;
-- rebind or start the held-stopped schema-v6 runtime;
 - establish R5-O success, production readiness, or `RC_READY`.

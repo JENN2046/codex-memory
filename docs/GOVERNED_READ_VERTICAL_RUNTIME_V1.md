@@ -10,8 +10,14 @@ ChatGPT Edge data contract.
 
 The ChatGPT Edge tool count, tool names, and input schemas remain unchanged.
 Data response v2 and request/response envelope v2 now reject v1 in source.
-Stopped-state rebind, R5-O `_005`, and readiness decisions remain separate
-work. The schema-v6 stack stays stopped.
+At this third-delivery checkpoint, stopped-state rebind, R5-O `_005`, and
+readiness decisions remained separate work, and the schema-v6 stack stayed
+stopped. After the fourth delivery merged and merged-main CI passed, a
+separately authorized `rebind-source` started and accepted the managed
+schema-v6 runtime identity. Single-use `_005` later ended at resolve with no
+usable `project_context_ref`; `search_memory` was not invoked, no governed-read
+attempt terminal exists, and no retry occurred. This post-delivery evidence
+does not establish R5-O or readiness.
 
 ## One transported working set
 
@@ -449,13 +455,17 @@ configuration, or live memory.
 
 ## Non-claims
 
-This delivery does not:
+At its third-delivery checkpoint, this delivery did not:
 
 - start, restart, rebind, or inspect the stopped schema-v6 stack;
 - call a real provider or memory tool;
 - read private configuration, raw logs, raw memory, or provider output;
 - modify VCPToolBox core or dependencies;
 - add, rename, or change any public tool or input schema;
-- rebind or activate the held-stopped schema-v6 instance;
 - authorize `_005`, deploy, release, publish, or merge;
 - establish R5-O acceptance, production readiness, or `RC_READY`.
+
+The stopped-state statement above is historical, not a claim that the stack
+remains stopped now. The later authorized rebind and pre-attempt `_005` outcome
+are the bounded current facts described in the status section; they authorize
+no further runtime or memory-tool action.

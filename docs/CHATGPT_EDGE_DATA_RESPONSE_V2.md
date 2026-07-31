@@ -1,6 +1,6 @@
 # ChatGPT Edge Data Response v2
 
-Status: source hard cut complete; stopped runtime rebind pending
+Status: source hard cut and stopped-state runtime rebind accepted; R5-O blocked
 
 Task: `CM-2159 / governed_read_attempt_refactor`
 
@@ -127,18 +127,33 @@ environment, and exposes no stdout/stderr. Timeout or cancellation sends
 admission is reusable. The separate derived-store lease child remains
 provider-authority-free.
 
-These source changes do not rebind or start the held-stopped schema-v6 stack.
-After all four CM-2159 PRs are merged and merged-main CI succeeds, a separate
-current authorization is still required for stopped-state `rebind-source`.
+The source delivery itself did not rebind or start the held-stopped schema-v6
+stack. After all four CM-2159 PRs merged and merged-main CI passed, a separate
+authorization bound to merged main accepted one stopped-state `rebind-source`
+and one low-disclosure status. That bounded evidence confirmed schema v6, the
+current source manifest, managed runtime identity, and the Edge v2,
+attempt-v1, and active-v1-rejection dimensions. It did not establish R5-O or
+readiness and authorizes no further status or lifecycle action.
+
+## Post-rebind R5-O outcome
+
+Single-use R5-O `_005` called `resolve_memory_context` once. The bounded
+workflow received no usable `project_context_ref`, so it did not invoke
+`search_memory` and no governed-read attempt or terminal envelope exists for
+that run. The resolver's canonical status/reason was not present in the
+bounded projection and is not inferred. The authorization is consumed, no
+retry occurred, and the private exact-head runtime blocker remains open.
 
 ## Non-claims
 
-This delivery does not:
+This delivery and its bounded post-merge evidence do not:
 
-- call a provider or memory tool;
+- establish a governed-read search, provider invocation, or attempt terminal
+  for `_005`;
 - read private configuration, raw logs, raw memory, or provider output;
 - change VCPToolBox core or dependencies;
 - add a public tool, rename a tool, or change an input schema;
-- rebind, start, deploy, release, or publish a runtime;
-- authorize R5-O `_005` or merge;
+- deploy, release, or publish a runtime;
+- authorize another status, lifecycle, provider, resolver, search, or
+  memory-tool action;
 - establish R5-O acceptance, production readiness, or `RC_READY`.

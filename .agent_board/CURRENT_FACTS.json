@@ -60,7 +60,7 @@
     {
       "id": "r5_o_private_exact_head_runtime_unverified",
       "status": "open",
-      "summary": "R5-O _004 failed closed without an acceptable governed-read terminal envelope; no private exact-head result is established."
+      "summary": "R5-O _005 ended before attempt creation because its single resolver result exposed no usable project_context_ref; search_memory was not invoked, no governed-read terminal exists, and no private exact-head result is established."
     },
     {
       "id": "fresh_non_empty_task_context_relevance_unproven",
