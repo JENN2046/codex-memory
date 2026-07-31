@@ -252,14 +252,17 @@ function createTransientRequestBroker({
     let attemptHeader = null;
     if (attemptTool) {
       const currentMs = nowMs();
-      const remainingMs = Date.parse(request.expires_at) - currentMs;
-      const ttlSeconds = Math.min(
-        GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds,
-        Math.floor(remainingMs / 1000)
+      const requestDeadlineMs = Date.parse(request.expires_at);
+      const attemptDeadlineMs = Math.min(
+        requestDeadlineMs,
+        currentMs +
+          GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000
       );
       const contextReference =
         request.tool_request.arguments.project_context_ref;
-      if (ttlSeconds < 1 || typeof contextReference !== 'string') {
+      if (!Number.isFinite(attemptDeadlineMs) ||
+          attemptDeadlineMs <= currentMs ||
+          typeof contextReference !== 'string') {
         reject('edge_attempt_header_binding_invalid');
       }
       attemptHeader = createAttemptHeader({
@@ -267,7 +270,7 @@ function createTransientRequestBroker({
         requestDigest: digestObject(request),
         contextBindingDigest: digestObject(contextReference),
         now: new Date(currentMs),
-        ttlSeconds
+        deadlineAt: new Date(attemptDeadlineMs).toISOString()
       });
     }
     const replayReservation = submissionReplayGuard.reserveMany([

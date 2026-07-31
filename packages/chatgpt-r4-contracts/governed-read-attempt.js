@@ -415,14 +415,32 @@ function createAttemptHeader({
   requestDigest,
   contextBindingDigest,
   now = new Date(),
-  ttlSeconds = GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds,
+  ttlSeconds,
+  deadlineAt,
   randomBytes
 } = {}) {
   const createdAt = now instanceof Date ? new Date(now.getTime()) : new Date(now);
   if (!Number.isFinite(createdAt.getTime())) reject('attempt_header_clock_invalid');
-  if (!Number.isInteger(ttlSeconds) || ttlSeconds < 1 ||
-      ttlSeconds > GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds) {
+  if (ttlSeconds !== undefined && deadlineAt !== undefined) {
     reject('attempt_header_ttl_invalid');
+  }
+  let deadlineMs;
+  if (deadlineAt !== undefined) {
+    deadlineMs = parseTimestamp(
+      deadlineAt,
+      'attempt_deadline_at_invalid'
+    );
+  } else {
+    const selectedTtlSeconds = ttlSeconds ??
+      GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds;
+    if (!Number.isInteger(selectedTtlSeconds) ||
+        selectedTtlSeconds < 1 ||
+        selectedTtlSeconds >
+          GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds) {
+      reject('attempt_header_ttl_invalid');
+    }
+    deadlineMs =
+      createdAt.getTime() + selectedTtlSeconds * 1000;
   }
   const header = {
     schema_version: GOVERNED_READ_ATTEMPT_SCHEMA_VERSION,
@@ -432,7 +450,7 @@ function createAttemptHeader({
     request_digest: requestDigest,
     context_binding_digest: contextBindingDigest,
     created_at: createdAt.toISOString(),
-    deadline_at: new Date(createdAt.getTime() + ttlSeconds * 1000).toISOString(),
+    deadline_at: new Date(deadlineMs).toISOString(),
     coordinator: GOVERNED_READ_ATTEMPT_COORDINATOR
   };
   validateAttemptHeader(header);

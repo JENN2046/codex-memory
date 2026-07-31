@@ -527,6 +527,51 @@ test('external Edge retains a delayed timeout from its actual terminal commit', 
   broker.close();
 });
 
+test('external Edge preserves a positive subsecond attempt budget for one-second requests', async () => {
+  const createdAt = new Date('2026-07-31T00:00:00.000Z');
+  let current = new Date(createdAt);
+  const requestDeadline = new Date(
+    createdAt.getTime() + 1_000
+  ).toISOString();
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {
+      current = new Date(createdAt.getTime() + 1);
+    },
+    async verifyResponse() {},
+    clock: () => current
+  });
+  const contextRef = `pctx_${'S'.repeat(32)}`;
+  const request = {
+    request_id: 'req_external_one_second_ttl_000001',
+    nonce: 'request_nonce_external_one_second_ttl_01',
+    expires_at: requestDeadline,
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: contextRef
+      }
+    }
+  };
+
+  const submitted = await broker.submit(request);
+  const claim = broker.claim('one-second-relay');
+  assert.equal(submitted.status, 'queued');
+  assert.equal(
+    claim.governed_read_attempt.header.created_at,
+    current.toISOString()
+  );
+  assert.equal(
+    claim.governed_read_attempt.header.deadline_at,
+    requestDeadline
+  );
+  assert.equal(
+    Date.parse(claim.governed_read_attempt.header.deadline_at) -
+      Date.parse(claim.governed_read_attempt.header.created_at),
+    999
+  );
+  broker.close();
+});
+
 test('external Edge does not commit a terminal before response cloning succeeds', async () => {
   const broker = createTransientRequestBroker({
     async verifyRequest() {},

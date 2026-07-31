@@ -210,6 +210,36 @@ test('attempt deadline budgets preserve one absolute deadline with bounded trans
     }),
     { code: 'attempt_deadline_margin_invalid' }
   );
+
+  const subsecondDeadline = new Date(
+    NOW.getTime() + 999
+  ).toISOString();
+  const subsecond = createAttemptHeader({
+    attemptRef: `grat_${'S'.repeat(32)}`,
+    toolName: 'search_memory',
+    requestDigest: digestObject('subsecond-request'),
+    contextBindingDigest: digestObject('subsecond-context'),
+    now: NOW,
+    deadlineAt: subsecondDeadline
+  });
+  assert.equal(subsecond.deadline_at, subsecondDeadline);
+  assert.equal(
+    governedReadAttemptDeadlineBudgetMs(subsecond, { now: NOW }),
+    999
+  );
+  assert.throws(
+    () => createAttemptHeader({
+      attemptRef: `grat_${'T'.repeat(32)}`,
+      toolName: 'search_memory',
+      requestDigest: digestObject('conflicting-deadline-request'),
+      contextBindingDigest:
+        digestObject('conflicting-deadline-context'),
+      now: NOW,
+      ttlSeconds: 1,
+      deadlineAt: subsecondDeadline
+    }),
+    { code: 'attempt_header_ttl_invalid' }
+  );
 });
 
 test('working-set extension requires an exact immutable header and receipt prefix', () => {
