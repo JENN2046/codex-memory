@@ -105,6 +105,7 @@ function createGovernedContextResolutionCoordinator({
       return eventSink(message);
     } catch {
       // Observation cannot change coordinator CAS state.
+      droppedObserverEvents += 1;
       return undefined;
     } finally {
       eventDispatchDepth -= 1;
@@ -114,7 +115,10 @@ function createGovernedContextResolutionCoordinator({
   function trackEventDelivery(pending) {
     pendingObserverEvents += 1;
     const tracked = Promise.resolve(pending)
-      .catch(() => {})
+      .catch(() => {
+        // A rejected delivery is evidence loss, just like a bounded-queue drop.
+        droppedObserverEvents += 1;
+      })
       .finally(() => {
         pendingObserverEvents -= 1;
       });

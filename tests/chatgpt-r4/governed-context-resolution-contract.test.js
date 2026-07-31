@@ -832,6 +832,46 @@ test('Edge bounds events queued behind a stalled promise-returning sink', async 
   );
 });
 
+test('Edge fails closed after a promise-returning Observer sink rejects', async () => {
+  const delivered = [];
+  let resolveTerminal;
+  const terminalDelivered = new Promise(resolve => {
+    resolveTerminal = resolve;
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS),
+    eventSink: async event => {
+      delivered.push(event.event);
+      if (event.event === 'resolution_accepted') {
+        throw new Error('synthetic observer transport rejection');
+      }
+      if (event.event === 'resolution_terminal_committed') {
+        resolveTerminal();
+      }
+    }
+  });
+
+  commitCoordinatorSuccess(coordinator, header('observer-rejected-delivery'));
+  await terminalDelivered;
+  await new Promise(resolve => setImmediate(resolve));
+
+  assert.deepEqual(delivered, [
+    'resolution_accepted',
+    ...Array(7).fill('resolution_receipt_appended'),
+    'resolution_terminal_committed'
+  ]);
+  assert.deepEqual(coordinator.observerDeliverySnapshot(), {
+    event_sink_configured: true,
+    max_pending_events: 256,
+    pending_events: 0,
+    dropped_events: 1,
+    delivery_compromised: true
+  });
+  assert.throws(() => coordinator.acceptResolution(
+    header('observer-admission-after-rejection')
+  ), { code: 'context_resolution_observer_delivery_incomplete' });
+});
+
 test('Observer reuses capacity after shorter coordinator terminal retention', () => {
   let currentMs = NOW_MS;
   const observer = createGovernedContextResolutionObserver({
