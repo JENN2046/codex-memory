@@ -716,6 +716,12 @@ test('Observer validates the chain and records missing terminal without fabricat
     active_resolutions_lost: 1,
     terminals_fabricated: 0
   });
+  assert.throws(() => coordinator.acceptResolution(missing), {
+    code: 'context_resolution_coordinator_lost'
+  });
+  assert.throws(() => coordinator.acceptResolution(
+    header('observer-fresh-after-loss')
+  ), { code: 'context_resolution_coordinator_lost' });
   const snapshot = observer.snapshot();
   assert.equal(snapshot.resolutions_accepted, 2);
   assert.equal(snapshot.terminal_successes, 1);

@@ -109,7 +109,8 @@ application.
 - synchronous Observer callbacks cannot reenter coordinator mutations;
 - promise-returning Observer sinks are serialized in emission order without
   delaying or changing the coordinator's terminal CAS; and
-- coordinator loss emits `terminal_missing` and fabricates no terminal.
+- coordinator loss emits `terminal_missing`, fabricates no terminal, and
+  permanently closes that coordinator to subsequent mutation.
 
 ## Independent observation
 

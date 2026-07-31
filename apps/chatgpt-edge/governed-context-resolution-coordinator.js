@@ -56,6 +56,7 @@ function createGovernedContextResolutionCoordinator({
   let activeResolutions = 0;
   let eventDispatchDepth = 0;
   let eventDeliveryTail = null;
+  let coordinatorLost = false;
 
   function nowMs() {
     const value = clock();
@@ -133,6 +134,9 @@ function createGovernedContextResolutionCoordinator({
     return (...args) => {
       if (eventDispatchDepth > 0) {
         reject('context_resolution_coordinator_reentrant_mutation');
+      }
+      if (coordinatorLost) {
+        reject('context_resolution_coordinator_lost');
       }
       return operation(...args);
     };
@@ -448,6 +452,7 @@ function createGovernedContextResolutionCoordinator({
   }
 
   function reportCoordinatorLoss() {
+    coordinatorLost = true;
     let missing = 0;
     for (const [resolutionRef, record] of resolutions) {
       if (record.terminal) continue;
@@ -457,7 +462,6 @@ function createGovernedContextResolutionCoordinator({
       missing += 1;
     }
     resolutions.clear();
-    replayTombstones.clear();
     activeResolutions = 0;
     return Object.freeze({
       active_resolutions_lost: missing,
