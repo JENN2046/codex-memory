@@ -104,8 +104,10 @@ application.
 - a committed terminal immediately releases active admission capacity;
 - active capacity is independent from bounded terminal retention;
 - terminal payloads may expire early, but a bounded lightweight replay
-  tombstone rejects the same `resolution_ref` through its immutable deadline;
-- replay-tombstone capacity fails closed and is reclaimed at those deadlines;
+  tombstone rejects the same `resolution_ref` through its immutable deadline
+  plus one shared bounded asynchronous-delivery grace;
+- coordinator and Observer replay-tombstone capacity use that same expiry,
+  fail closed while retained, and reclaim together after the grace;
 - synchronous Observer callbacks cannot reenter coordinator mutations;
 - promise-returning Observer sinks are serialized in emission order without
   delaying or changing the coordinator's terminal CAS;

@@ -81,6 +81,11 @@ function createGovernedContextResolutionCoordinator({
     return Date.parse(record.header.deadline_at) <= nowMs();
   }
 
+  function replayProtectionExpiresAt(header) {
+    return Date.parse(header.deadline_at) +
+      GOVERNED_CONTEXT_RESOLUTION_LIMITS.ttlSeconds * 1000;
+  }
+
   function markObserverDeliveryLoss() {
     droppedObserverEvents += 1;
   }
@@ -222,7 +227,7 @@ function createGovernedContextResolutionCoordinator({
     resolutions.set(header.resolution_ref, record);
     replayTombstones.set(
       header.resolution_ref,
-      Date.parse(header.deadline_at)
+      replayProtectionExpiresAt(header)
     );
     activeResolutions += 1;
     emit('resolution_accepted', {

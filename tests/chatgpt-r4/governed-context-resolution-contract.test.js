@@ -652,7 +652,7 @@ test('Edge retains a replay tombstone after terminal payload eviction', () => {
   });
 });
 
-test('Edge replay tombstone capacity is reusable after immutable deadlines', () => {
+test('Edge replay tombstone capacity is reusable after delivery grace', () => {
   let currentMs = NOW_MS;
   const coordinator = createGovernedContextResolutionCoordinator({
     clock: () => new Date(currentMs),
@@ -664,14 +664,20 @@ test('Edge replay tombstone capacity is reusable after immutable deadlines', () 
   const completed = header('bounded-replay-tombstone', { ttlSeconds: 1 });
   commitCoordinatorSuccess(coordinator, completed);
 
-  currentMs += 10;
-  const waiting = header('replay-tombstone-capacity-reused');
-  assert.throws(() => coordinator.acceptResolution(waiting), {
+  currentMs = Date.parse(completed.deadline_at);
+  const blocked = header('replay-tombstone-capacity-blocked', {
+    nowMs: currentMs
+  });
+  assert.throws(() => coordinator.acceptResolution(blocked), {
     code: 'context_resolution_coordinator_tombstone_capacity_exceeded'
   });
 
-  currentMs = Date.parse(completed.deadline_at);
-  assert.doesNotThrow(() => coordinator.acceptResolution(waiting));
+  currentMs = Date.parse(completed.deadline_at) +
+    GOVERNED_CONTEXT_RESOLUTION_LIMITS.ttlSeconds * 1000;
+  const reusable = header('replay-tombstone-capacity-reused', {
+    nowMs: currentMs
+  });
+  assert.doesNotThrow(() => coordinator.acceptResolution(reusable));
 });
 
 test('deadline wins over a success candidate validated at the boundary', () => {
@@ -1036,7 +1042,7 @@ test('Observer tombstone validates terminal rejection after record eviction', ()
   ));
 });
 
-test('Observer replay tombstone capacity is reusable at the old deadline', () => {
+test('paired replay tombstone capacity is reused after the same grace', () => {
   let currentMs = NOW_MS;
   const observer = createGovernedContextResolutionObserver({
     clock: () => new Date(currentMs),
@@ -1045,31 +1051,37 @@ test('Observer replay tombstone capacity is reusable at the old deadline', () =>
   });
   const coordinator = createGovernedContextResolutionCoordinator({
     clock: () => new Date(currentMs),
+    maxResolutions: 1,
+    maxRetainedResolutions: 1,
+    maxReplayTombstones: 1,
+    terminalRetentionMs: 10,
     eventSink: event => observer.observe(event)
   });
   const completed = header('observer-bounded-tombstone', { ttlSeconds: 1 });
   commitCoordinatorSuccess(coordinator, completed);
-  const waiting = header('observer-tombstone-capacity-reused');
-  const acceptedEvent = {
-    component: 'governed_context_resolution_coordinator',
-    event: 'resolution_accepted',
-    header: waiting,
-    accepted_at_ms: NOW_MS
-  };
 
-  currentMs += 10;
-  assert.equal(observer.observe(acceptedEvent), false);
-  assert.equal(
-    observer.snapshot().last_violation_code,
-    'context_resolution_observer_tombstone_capacity_exceeded'
-  );
+  currentMs = Date.parse(completed.deadline_at);
+  const blocked = header('observer-tombstone-capacity-blocked', {
+    nowMs: currentMs
+  });
+  assert.throws(() => coordinator.acceptResolution(blocked), {
+    code: 'context_resolution_coordinator_tombstone_capacity_exceeded'
+  });
+  assert.equal(observer.snapshot().protocol_violations, 0);
 
-  currentMs = Date.parse(completed.deadline_at) +
+  currentMs +=
     GOVERNED_CONTEXT_RESOLUTION_LIMITS.ttlSeconds * 1000;
-  assert.equal(observer.observe(acceptedEvent), true);
+  const reusable = header('observer-tombstone-capacity-reused', {
+    nowMs: currentMs
+  });
+  assert.doesNotThrow(() => coordinator.acceptResolution(reusable));
   const snapshot = observer.snapshot();
   assert.equal(snapshot.resolutions_accepted, 2);
-  assert.equal(snapshot.protocol_violations, 1);
+  assert.equal(snapshot.protocol_violations, 0);
+  assert.equal(
+    coordinator.observerDeliverySnapshot().delivery_compromised,
+    false
+  );
 });
 
 test('Observer rejects a tampered receipt independently', () => {
