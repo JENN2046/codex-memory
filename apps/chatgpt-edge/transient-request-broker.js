@@ -24,6 +24,9 @@ const {
   createOpaqueId,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
+const {
+  deriveGovernedReadAttemptRetention
+} = require('./governed-read-attempt-retention');
 
 const TERMINAL_STATES = new Set(['completed', 'cancelled', 'expired']);
 const GOVERNED_ATTEMPT_FAILURE_RESULT_KIND =
@@ -79,12 +82,16 @@ function createTransientRequestBroker({
 
   const records = new Map();
   const waiters = new Map();
+  const attemptRetention = deriveGovernedReadAttemptRetention({
+    maxRecords,
+    requestRecordRetentionMs: terminalRetentionMs
+  });
   const governedCoordinator =
     attemptCoordinator || createGovernedReadAttemptCoordinator({
       clock,
       maxAttempts: maxInFlight,
-      maxRetainedAttempts: maxRecords,
-      terminalRetentionMs,
+      maxRetainedAttempts: attemptRetention.maxRetainedAttempts,
+      terminalRetentionMs: attemptRetention.terminalRetentionMs,
       eventSink: attemptEventSink || eventSink,
       eventComponent: `${eventComponent.slice(0, 71)}_attempt`
     });

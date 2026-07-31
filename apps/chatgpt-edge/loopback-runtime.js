@@ -18,6 +18,9 @@ const {
 const {
   createGovernedReadAttemptCoordinator
 } = require('./transient-request-broker');
+const {
+  deriveGovernedReadAttemptRetention
+} = require('./governed-read-attempt-retention');
 
 const LOOPBACK_HOST = '127.0.0.1';
 const MAX_CONTROL_BODY_BYTES = LIMITS.maxResponseBytes + LIMITS.maxRequestBytes + 4096;
@@ -65,12 +68,18 @@ function createLoopbackEdgeRuntime({
        typeof attemptEventSink !== 'function')) {
     reject('edge_attempt_runtime_invalid');
   }
+  const attemptRetention = governedReadAttempts
+    ? deriveGovernedReadAttemptRetention({
+        maxRecords,
+        requestRecordRetentionMs: terminalRetentionMs
+      })
+    : null;
   const governedCoordinator = governedReadAttempts
     ? attemptCoordinator || createGovernedReadAttemptCoordinator({
         clock,
         maxAttempts: maxInFlight,
-        maxRetainedAttempts: maxRecords,
-        terminalRetentionMs,
+        maxRetainedAttempts: attemptRetention.maxRetainedAttempts,
+        terminalRetentionMs: attemptRetention.terminalRetentionMs,
         eventSink: attemptEventSink
       })
     : null;

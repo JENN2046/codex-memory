@@ -173,10 +173,13 @@ CAS:
 - `maxAttempts` bounds active non-terminal attempts; a committed terminal
   immediately releases its admission slot;
 - `maxRetainedAttempts` separately bounds active plus retained terminal records.
-  A terminal remains addressable for protocol projection, replay rejection, and
-  late-candidate rejection through a short retention window of at least one
-  protocol TTL; expired terminals are pruned on admission, and retention
-  saturation fails closed instead of growing memory without bound;
+  Request records may use a shorter cleanup window, but that window never
+  shortens attempt retention. A terminal remains addressable for protocol
+  projection, replay rejection, and late-candidate rejection for one complete
+  protocol TTL after terminal commit. Edge sizes the attempt retention pool for
+  request-record turnover within that TTL, capped at 4,096 records; expired
+  terminals are pruned on admission, and retention saturation fails closed
+  instead of growing memory without bound;
 - coordinator loss emits `terminal_missing` for independent observation and
   clears the transient record without fabricating a terminal.
 

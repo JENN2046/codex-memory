@@ -938,6 +938,16 @@ test('Edge bounds terminal retention while preserving replay and short lookup', 
     { code: 'attempt_coordinator_retention_capacity_exceeded' }
   );
 
+  clockNow = new Date(NOW.getTime() + 59_999);
+  assert.equal(
+    coordinator.protocol(first.attempt_ref).terminal.reason_code,
+    'attempt_cancelled'
+  );
+  assert.throws(
+    () => coordinator.cancelAttempt(first.attempt_ref),
+    { code: 'attempt_terminal_already_committed' }
+  );
+
   clockNow = new Date(NOW.getTime() + 60_000);
   const fresh = header('d', clockNow);
   assert.doesNotThrow(() => coordinator.acceptAttempt(fresh));

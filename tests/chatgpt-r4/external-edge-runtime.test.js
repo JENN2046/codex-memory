@@ -34,6 +34,11 @@ const {
   normalizeBrokerResult,
   validateExternalEdgeRuntimeConfig
 } = require('../../apps/chatgpt-edge');
+const {
+  deriveGovernedReadAttemptRetention
+} = require(
+  '../../apps/chatgpt-edge/governed-read-attempt-retention'
+);
 
 const PUBLIC_ORIGIN = 'https://memory.codex-memory.dev';
 const MCP_RESOURCE = `${PUBLIC_ORIGIN}/mcp`;
@@ -45,6 +50,29 @@ const OPERATOR_FINGERPRINT = sha256(`${ISSUER}\n${OPERATOR_SUBJECT}`);
 const ACCESS_TOKEN = 'synthetic_access_token_value_00000000000000000001';
 const INSUFFICIENT_SCOPE_TOKEN = 'synthetic_scope_token_value_000000000000000000001';
 const RELAY_TOKEN = 'synthetic_relay_token_value_00000000000000000001';
+
+test('Edge keeps attempt terminals for one protocol TTL independently from request cleanup', () => {
+  assert.deepEqual(
+    deriveGovernedReadAttemptRetention({
+      maxRecords: 256,
+      requestRecordRetentionMs: 5_000
+    }),
+    {
+      maxRetainedAttempts: 3_072,
+      terminalRetentionMs: 60_000
+    }
+  );
+  assert.deepEqual(
+    deriveGovernedReadAttemptRetention({
+      maxRecords: 1,
+      requestRecordRetentionMs: 10
+    }),
+    {
+      maxRetainedAttempts: 4_096,
+      terminalRetentionMs: 60_000
+    }
+  );
+});
 
 test('Auth0 verifier binds RS256 issuer, audience, client, scope, and single operator', async () => {
   const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', { modulusLength: 2048 });
