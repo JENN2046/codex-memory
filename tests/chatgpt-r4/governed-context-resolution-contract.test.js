@@ -700,6 +700,45 @@ test('deadline wins over a success candidate validated at the boundary', () => {
   assert.equal(accepted.terminal.context_ref_issued, null);
 });
 
+test('deadline wins when failed receipt validation crosses the boundary', () => {
+  const value = header('receipt-validation-deadline', { ttlSeconds: 1 });
+  const deadlineMs = Date.parse(value.deadline_at);
+  let boundaryReads = null;
+  const observer = createGovernedContextResolutionObserver({
+    clock: () => new Date(deadlineMs)
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => {
+      if (boundaryReads === null) return new Date(NOW_MS);
+      boundaryReads += 1;
+      return new Date(boundaryReads === 1 ? deadlineMs - 1 : deadlineMs);
+    },
+    eventSink: event => observer.observe(event)
+  });
+  coordinator.acceptResolution(value);
+  const workingSet = coordinator.workingSet(value.resolution_ref);
+  const failedReceipt = createContextResolutionStageReceipt({
+    header: value,
+    receipts: workingSet.receipts,
+    stage: 'EDGE_VALIDATED',
+    outcome: 'failed',
+    reasonCode: 'resolution_edge_request_invalid'
+  });
+
+  boundaryReads = 0;
+  assert.throws(() => coordinator.appendReceipt(
+    value.resolution_ref,
+    failedReceipt
+  ), { code: 'context_resolution_receipt_after_deadline' });
+
+  const terminal = coordinator.protocol(value.resolution_ref).terminal;
+  assert.equal(terminal.reason_code, 'resolution_timeout');
+  assert.equal(terminal.receipt_count, 1);
+  assert.equal(observer.snapshot().receipts_accepted, 1);
+  assert.equal(observer.snapshot().terminal_failures, 1);
+  assert.equal(observer.snapshot().protocol_violations, 0);
+});
+
 test('Observer validates the chain and records missing terminal without fabrication', () => {
   const observer = createGovernedContextResolutionObserver({
     clock: () => new Date(NOW_MS)

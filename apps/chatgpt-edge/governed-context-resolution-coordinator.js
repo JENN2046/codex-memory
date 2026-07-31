@@ -269,6 +269,10 @@ function createGovernedContextResolutionCoordinator({
         failureOrigin: receipt.origin
       });
     }
+    if (deadlineReached(record)) {
+      commitCoordinatorFailure(resolutionRef, 'resolution_timeout');
+      reject('context_resolution_receipt_after_deadline');
+    }
     record.receipts.push(structuredClone(receipt));
     emit('resolution_receipt_appended', {
       resolution_ref: resolutionRef,
