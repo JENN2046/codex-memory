@@ -9,12 +9,16 @@ const {
   utf8ByteLength
 } = require('./canonical');
 const { reject } = require('./errors');
+const {
+  assertGovernedSafeCode,
+  defineGovernedFailureRegistry,
+  governedFailureRegistryEntry
+} = require('./governed-failure-registry');
 
 const GOVERNED_READ_ATTEMPT_PROTOCOL = 'governed_read_attempt.v1';
 const GOVERNED_READ_ATTEMPT_SCHEMA_VERSION = 1;
 const GOVERNED_READ_ATTEMPT_COORDINATOR = 'chatgpt_edge_transient_broker';
 const GOVERNED_READ_ATTEMPT_REF_PATTERN = /^grat_[A-Za-z0-9_-]{24,96}$/u;
-const SAFE_CODE_PATTERN = /^[a-z][a-z0-9_]{0,79}$/u;
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 
 const GOVERNED_READ_ATTEMPT_STAGES = Object.freeze([
@@ -123,7 +127,7 @@ function failure({
   });
 }
 
-const GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY = deepFreeze({
+const GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY = defineGovernedFailureRegistry({
   edge_request_invalid: failure({
     category: 'validation',
     stage: 'EDGE_VALIDATED',
@@ -392,7 +396,7 @@ function assertDigest(value, code) {
 }
 
 function assertSafeCode(value, code) {
-  if (typeof value !== 'string' || !SAFE_CODE_PATTERN.test(value)) reject(code);
+  return assertGovernedSafeCode(value, code);
 }
 
 function parseTimestamp(value, code) {
@@ -518,11 +522,14 @@ function governedReadAttemptDeadlineBudgetMs(
 }
 
 function failureRegistryEntry(reasonCode) {
-  assertSafeCode(reasonCode, 'attempt_reason_invalid');
-  if (!Object.hasOwn(GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY, reasonCode)) {
-    reject('attempt_reason_unknown');
-  }
-  return GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY[reasonCode];
+  return governedFailureRegistryEntry(
+    GOVERNED_READ_ATTEMPT_FAILURE_REGISTRY,
+    reasonCode,
+    {
+      invalidReasonCode: 'attempt_reason_invalid',
+      unknownReasonCode: 'attempt_reason_unknown'
+    }
+  );
 }
 
 function validateGovernedReadTerminalFailureCandidate(value) {
