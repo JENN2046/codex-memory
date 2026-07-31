@@ -108,6 +108,24 @@ function createGovernedContextResolutionCoordinator({
     }
   }
 
+  function evictOldestClosedResolution() {
+    let selectedRef = null;
+    let selectedPurgeAfterMs = Number.POSITIVE_INFINITY;
+    for (const [resolutionRef, record] of resolutions) {
+      if (!record.terminal || !Number.isFinite(record.purge_after_ms)) {
+        continue;
+      }
+      if (selectedRef === null ||
+          record.purge_after_ms < selectedPurgeAfterMs) {
+        selectedRef = resolutionRef;
+        selectedPurgeAfterMs = record.purge_after_ms;
+      }
+    }
+    if (selectedRef === null) return false;
+    resolutions.delete(selectedRef);
+    return true;
+  }
+
   function dispatchEvent(message) {
     eventDispatchDepth += 1;
     try {
@@ -206,11 +224,12 @@ function createGovernedContextResolutionCoordinator({
     if (activeResolutions >= maxResolutions) {
       reject('context_resolution_coordinator_capacity_exceeded');
     }
-    if (resolutions.size >= maxRetainedResolutions) {
-      reject('context_resolution_coordinator_retention_capacity_exceeded');
-    }
     if (replayTombstones.size >= maxReplayTombstones) {
       reject('context_resolution_coordinator_tombstone_capacity_exceeded');
+    }
+    if (resolutions.size >= maxRetainedResolutions &&
+        !evictOldestClosedResolution()) {
+      reject('context_resolution_coordinator_retention_capacity_exceeded');
     }
     const acceptedHeader = structuredClone(header);
     const created = createContextResolutionStageReceipt({

@@ -652,6 +652,25 @@ test('Edge retains a replay tombstone after terminal payload eviction', () => {
   });
 });
 
+test('Edge reuses retained capacity immediately after terminal closure', () => {
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS),
+    maxResolutions: 1,
+    maxRetainedResolutions: 1
+  });
+  const completed = header('retained-capacity-completed');
+  commitCoordinatorSuccess(coordinator, completed);
+
+  const reusable = header('retained-capacity-reused');
+  assert.doesNotThrow(() => coordinator.acceptResolution(reusable));
+  assert.throws(() => coordinator.snapshot(completed.resolution_ref), {
+    code: 'context_resolution_not_found'
+  });
+  assert.throws(() => coordinator.acceptResolution(completed), {
+    code: 'context_resolution_ref_replay'
+  });
+});
+
 test('Edge replay tombstone capacity is reusable after delivery grace', () => {
   let currentMs = NOW_MS;
   const coordinator = createGovernedContextResolutionCoordinator({
@@ -1120,6 +1139,37 @@ test('paired replay tombstone capacity is reused after the same grace', () => {
   assert.equal(
     coordinator.observerDeliverySnapshot().delivery_compromised,
     false
+  );
+});
+
+test('Observer prunes expired tombstones before terminal rejection replay', () => {
+  let currentMs = NOW_MS;
+  const observer = createGovernedContextResolutionObserver({
+    clock: () => new Date(currentMs),
+    maxRetainedResolutions: 1,
+    maxReplayTombstones: 1
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(currentMs),
+    eventSink: event => observer.observe(event)
+  });
+  const completed = header('observer-expired-rejection', { ttlSeconds: 1 });
+  commitCoordinatorSuccess(coordinator, completed);
+
+  currentMs = Date.parse(completed.deadline_at) +
+    GOVERNED_CONTEXT_RESOLUTION_LIMITS.ttlSeconds * 1000;
+  assert.equal(observer.observe({
+    component: 'governed_context_resolution_coordinator',
+    event: 'resolution_terminal_rejected',
+    resolution_ref: completed.resolution_ref,
+    rejection_code: 'context_resolution_terminal_already_committed'
+  }), false);
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.terminals_rejected, 0);
+  assert.equal(snapshot.protocol_violations, 1);
+  assert.equal(
+    snapshot.last_violation_code,
+    'context_resolution_observer_terminal_rejection_invalid'
   );
 });
 

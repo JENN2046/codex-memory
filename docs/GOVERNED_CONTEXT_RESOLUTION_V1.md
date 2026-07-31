@@ -103,6 +103,8 @@ application.
 - late completion and duplicate terminal candidates are rejected;
 - a committed terminal immediately releases active admission capacity;
 - active capacity is independent from bounded terminal retention;
+- when retained terminal payload capacity is full, the oldest closed payload is
+  evicted while its replay tombstone remains authoritative;
 - terminal payloads may expire early, but a bounded lightweight replay
   tombstone rejects the same `resolution_ref` through its immutable deadline
   plus one shared bounded asynchronous-delivery grace;
@@ -132,8 +134,9 @@ Eviction preserves a bounded lightweight replay tombstone through the immutable
 deadline plus one bounded transport TTL, including only enough closure state to
 validate a later coordinator terminal rejection. `accepted_at_ms` proves
 coordinator-side admission before the deadline, so a serialized event delivered
-at the deadline remains valid while replayed accepted/receipt/terminal chains
-cannot increment the Observer's accepted business counters twice.
+at the deadline remains valid. Expired records and tombstones are pruned before
+every recognized coordinator event, so post-grace terminal-rejection replay
+cannot increment accepted business counters or retain identifiers indefinitely.
 
 ## Bounds
 

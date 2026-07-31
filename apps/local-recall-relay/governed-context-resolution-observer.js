@@ -128,9 +128,9 @@ function createGovernedContextResolutionObserver({
     try {
       const currentMs = nowMs();
       pruneExpired(currentMs);
+      pruneExpiredReplayTombstones(currentMs);
       if (event.event === 'resolution_accepted') {
         validateContextResolutionHeader(event.header);
-        pruneExpiredReplayTombstones(currentMs);
         const acceptedAtMs = event.accepted_at_ms;
         if (!Number.isSafeInteger(acceptedAtMs) ||
             acceptedAtMs < Date.parse(event.header.created_at) ||
