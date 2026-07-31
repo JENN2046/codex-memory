@@ -232,7 +232,30 @@ function safeFailureResponse(error) {
   });
 }
 
+function installProviderTerminationBoundary(
+  runtimeProcess = process
+) {
+  if (!runtimeProcess ||
+      typeof runtimeProcess.prependOnceListener !== 'function' ||
+      typeof runtimeProcess.exit !== 'function') {
+    throw codedError('governed_read_provider_runtime_invalid');
+  }
+  let terminating = false;
+  runtimeProcess.prependOnceListener('SIGTERM', () => {
+    if (terminating) return;
+    terminating = true;
+    try {
+      if (runtimeProcess.connected &&
+          typeof runtimeProcess.disconnect === 'function') {
+        runtimeProcess.disconnect();
+      }
+    } catch {}
+    runtimeProcess.exit(1);
+  });
+}
+
 if (require.main === module) {
+  installProviderTerminationBoundary();
   let consumed = false;
   process.on('message', async message => {
     if (consumed) return;
@@ -262,6 +285,7 @@ module.exports = {
   PROVIDER_RESULT_KIND,
   PROVIDER_TASK_KIND,
   assertMinimalEnvironment,
+  installProviderTerminationBoundary,
   runVcpQueryEmbeddingTask,
   safeFailureResponse,
   validateProviderMessage,

@@ -1445,6 +1445,11 @@ test('VCPToolBox native MCP shim CLI binds the governed attempt listener to an o
     ],
     [
       '--governed-read-attempts',
+      '--governed-read-port',
+      '7617'
+    ],
+    [
+      '--governed-read-attempts',
       '--enable-write'
     ]
   ]) {

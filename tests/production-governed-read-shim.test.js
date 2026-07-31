@@ -18,6 +18,7 @@ const {
 );
 const {
   PROVIDER_TASK_KIND,
+  installProviderTerminationBoundary,
   runVcpQueryEmbeddingTask
 } = require(
   '../src/runtime/vcp-native/production-governed-read-provider-child'
@@ -77,6 +78,37 @@ class FakeProviderChild extends EventEmitter {
     this.unrefCalled = true;
   }
 }
+
+test('provider child owns a first-priority SIGTERM exit boundary', () => {
+  class SyntheticProviderProcess extends EventEmitter {
+    constructor() {
+      super();
+      this.connected = true;
+      this.disconnectCalls = 0;
+      this.exitCodes = [];
+    }
+
+    disconnect() {
+      this.connected = false;
+      this.disconnectCalls += 1;
+    }
+
+    exit(code) {
+      this.exitCodes.push(code);
+    }
+  }
+  const runtimeProcess = new SyntheticProviderProcess();
+  let laterHandlerCalls = 0;
+  installProviderTerminationBoundary(runtimeProcess);
+  runtimeProcess.on('SIGTERM', () => {
+    laterHandlerCalls += 1;
+  });
+  runtimeProcess.emit('SIGTERM');
+  runtimeProcess.emit('SIGTERM');
+  assert.equal(runtimeProcess.disconnectCalls, 1);
+  assert.deepEqual(runtimeProcess.exitCodes, [1]);
+  assert.equal(laterHandlerCalls, 2);
+});
 
 test('provider child performs one exact VCP batch call with child-local console suppression', async () => {
   const calls = [];
@@ -303,6 +335,30 @@ test('provider process timeout terminates its exact child without accepting a la
     termination_reason: 'timeout'
   });
   assert.deepEqual(child.signals, ['SIGTERM']);
+});
+
+test('unproven provider child exit remains parent-owned and fails closed without SIGKILL', async () => {
+  const child = new FakeProviderChild();
+  const execution = await runVcpQueryEmbeddingProviderProcess(
+    providerTask(),
+    {
+      forkProcess: () => child,
+      terminationGraceMs: 10,
+      workerTimeoutMs: 10
+    }
+  );
+  assert.deepEqual(execution, {
+    response: null,
+    shutdown_complete: false,
+    sigterm_sent: true,
+    cancelled: false,
+    child_started: true,
+    termination_reason: 'timeout'
+  });
+  assert.deepEqual(child.signals, ['SIGTERM']);
+  assert.equal(child.signals.includes('SIGKILL'), false);
+  assert.equal(child.connected, true);
+  assert.equal(child.unrefCalled, false);
 });
 
 test('provider process completes a real minimal fork and returns only the bounded vector', async t => {

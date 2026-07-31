@@ -135,8 +135,8 @@ function configureGovernedReadAttemptRuntime(options, {
   if (options.enableWrite === true ||
       options.governedReadAttemptHost !== '127.0.0.1' ||
       !Number.isInteger(options.governedReadAttemptPort) ||
-      options.governedReadAttemptPort < 1 ||
-      options.governedReadAttemptPort > 65_535 ||
+      options.governedReadAttemptPort !==
+        GOVERNED_READ_ATTEMPT_DEFAULT_PORT ||
       options.governedReadAttemptPort === options.port ||
       !pathIsAbsoluteDirectoryReference(
         options.governedReadAttemptLeaseRoot

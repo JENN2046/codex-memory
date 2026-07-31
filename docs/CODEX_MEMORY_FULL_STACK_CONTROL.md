@@ -250,7 +250,9 @@ provider, or prove a live exact-head runtime.
 9. run the native shim in the controller-managed process itself and prove that
    its recorded PID owns both the existing 7615 native-MCP listener and the
    separate 7616 governed-attempt listener before Governance or any capability
-   preflight can dispatch work;
+   preflight can dispatch work; 7616 is the canonical fixed governed-attempt
+   port, and a non-canonical environment or CLI override is rejected before
+   runtime construction;
 10. prove through Linux `/proc` socket metadata that the recorded HTTP PID owns
    the exact loopback listener before reading or sending its bearer token;
    validate authenticated full HTTP health and its hardened,

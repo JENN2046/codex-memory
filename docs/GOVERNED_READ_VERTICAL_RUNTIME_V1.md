@@ -177,12 +177,17 @@ suppression is child-local, so even a stalled VCP call cannot mute the
 persistent Shim's global console.
 
 Timeout or cancellation sends `SIGTERM` only to that exact provider-child
-handle. The lease does not release its single-attempt admission until the
-provider child has exited. A late provider message cannot reverse a termination
-decision. If exact shutdown cannot be proven within the grace bound, the lease
-returns `worker_shutdown_incomplete`, latches cleanup closed, and does not
-pretend that the provider authority disappeared. The derived-store lease child
-still receives no provider URL, key, model, or other provider authority.
+handle. The provider entrypoint installs a first-priority one-shot termination
+boundary before loading VCP code, disconnects its IPC channel, and exits itself
+on that signal even when the in-flight provider promise does not settle. The
+lease does not release its single-attempt admission until the provider child
+has exited. A late provider message cannot reverse a termination decision. If
+exact shutdown still cannot be proven within the grace bound, the lease returns
+`worker_shutdown_incomplete`, latches cleanup closed, and does not pretend that
+the provider authority disappeared. The parent keeps that exact child
+referenced and its IPC channel bound; it never detaches an unproven child or
+uses `SIGKILL`. The derived-store lease child still receives no provider URL,
+key, model, or other provider authority.
 Only canonical attempt failure evidence leaves the provider stage.
 
 Once controller admission increments `attempts_started`, one shared `finally`

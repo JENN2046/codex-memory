@@ -175,12 +175,9 @@ function runVcpQueryEmbeddingProviderProcess(task, {
       sigtermSent = sigtermSent || signalSent;
       termination = setTimeout(() => {
         if (settled || exited) return;
-        try {
-          if (child.connected) child.disconnect();
-        } catch {}
-        try {
-          child.unref();
-        } catch {}
+        // The governed-read child policy permits no escalation beyond the
+        // exact SIGTERM above. Keep an unproven child referenced and IPC-bound
+        // so it cannot become an invisible orphan after cleanup latches closed.
         finish({
           response: null,
           shutdown_complete: false,
