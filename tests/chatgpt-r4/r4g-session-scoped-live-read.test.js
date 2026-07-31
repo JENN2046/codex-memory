@@ -17,7 +17,7 @@ const {
   digestObject,
   sha256,
   validateCounters,
-  validateToolStructuredContent
+  validateLegacyToolStructuredContent
 } = require('../../packages/chatgpt-r4-contracts');
 const {
   createR4GovernanceRuntime,
@@ -664,7 +664,7 @@ test('R4-G suppresses an in-flight kill and finalizes a failed native invocation
   });
   assert.equal(suppressed.counters.provider_calls, 1);
   assert.equal(suppressed.counters.native_invocations, 1);
-  assert.doesNotThrow(() => validateToolStructuredContent(
+  assert.doesNotThrow(() => validateLegacyToolStructuredContent(
     'search_memory',
     suppressed.structured_content,
     { status: 'unavailable' }
@@ -924,16 +924,8 @@ test('R4-G runtime authority binds operator/control references and starts defaul
   };
   environment.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST =
     computeGovernanceRuntimeBindingDigest(environment);
-  let initialized = 0;
-  let closed = 0;
-  const appFactory = () => ({
-    async initialize() { initialized += 1; },
-    async callTool() { return delegatedResult(); },
-    async close() { closed += 1; }
-  });
   const runtime = await loadGovernanceRuntimeFromEnvironment(environment, {
-    privateRoot: root,
-    appFactory
+    privateRoot: root
   });
   await runtime.start();
   t.after(async () => {
@@ -946,7 +938,10 @@ test('R4-G runtime authority binds operator/control references and starts defaul
   assert.equal(runtime.snapshot().session_control.private_dogfood_observation.sessions_started, 0);
   assert.equal(runtime.snapshot().session_control.activation.activation_status, 'inactive');
   assert.equal(runtime.snapshot().session_activation_durable_state_written, false);
-  assert.equal(initialized, 1);
+  assert.equal(
+    runtime.snapshot().context.legacy_v1_read_path_active,
+    false
+  );
   const status = await callControlSocket(environment.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH, {
     schema_version: 1,
     operation: 'status',
@@ -971,12 +966,10 @@ test('R4-G runtime authority binds operator/control references and starts defaul
   invalidEnvironment.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST =
     computeGovernanceRuntimeBindingDigest(invalidEnvironment);
   await assert.rejects(loadGovernanceRuntimeFromEnvironment(invalidEnvironment, {
-    privateRoot: root,
-    appFactory
+    privateRoot: root
   }), { code: 'r4_governance_control_socket_path_invalid' });
   assert.equal(DATA_TOOL_NAMES.includes('activate_live_read'), false);
   assert.equal(DATA_TOOL_NAMES.includes('kill_live_read'), false);
-  assert.equal(closed, 0);
 });
 
 test('R5-A observer records only bounded low-disclosure session outcomes', async () => {

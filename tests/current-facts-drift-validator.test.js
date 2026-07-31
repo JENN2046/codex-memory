@@ -98,6 +98,13 @@ function facts() {
       },
       dogfoodObservation: {
         schemaVersion: 3
+      },
+      chatgptEdgeDataResponse: {
+        dataResponseSchemaVersion: 2,
+        requestEnvelopeSchemaVersion: 2,
+        responseEnvelopeSchemaVersion: 2,
+        governedReadAttemptProtocol: "governed_read_attempt.v1",
+        legacyV1Accepted: false
       }
     },
     blockers: FIXTURE_BLOCKERS.map((blocker) => ({ ...blocker })),
@@ -239,7 +246,12 @@ function writeSourceContracts(root) {
   writeFile(
     root,
     "packages/chatgpt-r4-contracts/constants.js",
-    "module.exports={DATA_TOOL_NAMES:Array.from({length:5}),RENDER_TOOL_NAMES:Array.from({length:1})};\n"
+    "module.exports={DATA_TOOL_NAMES:Array.from({length:5}),RENDER_TOOL_NAMES:Array.from({length:1}),CHATGPT_EDGE_DATA_SCHEMA_VERSION:2,EDGE_REQUEST_SCHEMA_VERSION:2,EDGE_RESPONSE_SCHEMA_VERSION:2};\n"
+  );
+  writeFile(
+    root,
+    "packages/chatgpt-r4-contracts/governed-read-attempt.js",
+    "module.exports={GOVERNED_READ_ATTEMPT_PROTOCOL:'governed_read_attempt.v1'};\n"
   );
   writeFile(
     root,
@@ -292,6 +304,26 @@ test("current facts validator accepts the compact schema v5 authority surfaces",
   const root = workspace();
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects legacy ChatGPT Edge response dimensions", () => {
+  const root = workspace();
+  const changed = facts();
+  changed.contracts.chatgptEdgeDataResponse.dataResponseSchemaVersion = 1;
+  changed.contracts.chatgptEdgeDataResponse.legacyV1Accepted = true;
+  writeFacts(root, changed);
+
+  const result = validateCurrentFactsDrift(root);
+
+  assert.equal(result.ok, false);
+  assert.match(
+    result.failures.join("\n"),
+    /chatgptEdgeDataResponse\.dataResponseSchemaVersion must equal 2/
+  );
+  assert.match(
+    result.failures.join("\n"),
+    /chatgptEdgeDataResponse\.legacyV1Accepted must equal false/
+  );
 });
 
 test("current facts validator accepts a rotated product baseline with valid Git relationships", () => {

@@ -3,6 +3,8 @@
 const crypto = require('node:crypto');
 const {
   ARCHITECTURE_REFERENCE,
+  EDGE_REQUEST_SCHEMA_VERSION,
+  EDGE_RESPONSE_SCHEMA_VERSION,
   KINDS,
   SCHEMA_VERSION,
   LIMITS
@@ -95,7 +97,7 @@ function createRequestEnvelope({
   signing
 }) {
   return signObject({
-    schema_version: SCHEMA_VERSION,
+    schema_version: EDGE_REQUEST_SCHEMA_VERSION,
     kind: KINDS.requestEnvelope,
     architecture_reference: ARCHITECTURE_REFERENCE,
     request_id: requestId || createOpaqueId('req_', signing?.randomBytes),
@@ -124,7 +126,7 @@ function createResponseEnvelope({
   signing
 }) {
   return signObject({
-    schema_version: SCHEMA_VERSION,
+    schema_version: EDGE_RESPONSE_SCHEMA_VERSION,
     kind: KINDS.responseEnvelope,
     architecture_reference: ARCHITECTURE_REFERENCE,
     response_id: responseId || createOpaqueId('res_', signing?.randomBytes),

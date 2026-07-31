@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
   "factsMode": "committed_status_snapshot",
-  "updatedAt": "2026-07-30",
+  "updatedAt": "2026-07-31",
   "baseBranch": "main",
   "status": {
     "project": "NOT_READY_BLOCKED",
@@ -42,6 +42,13 @@
     },
     "dogfoodObservation": {
       "schemaVersion": 3
+    },
+    "chatgptEdgeDataResponse": {
+      "dataResponseSchemaVersion": 2,
+      "requestEnvelopeSchemaVersion": 2,
+      "responseEnvelopeSchemaVersion": 2,
+      "governedReadAttemptProtocol": "governed_read_attempt.v1",
+      "legacyV1Accepted": false
     }
   },
   "blockers": [

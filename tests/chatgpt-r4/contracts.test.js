@@ -5,7 +5,11 @@ const crypto = require('node:crypto');
 const test = require('node:test');
 
 const {
+  CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+  COUNTER_MODES,
   DATA_TOOL_NAMES,
+  EDGE_REQUEST_SCHEMA_VERSION,
+  EDGE_RESPONSE_SCHEMA_VERSION,
   HTTPS_URI_PATTERN_SOURCE,
   InMemoryReplayGuard,
   PRINCIPAL_ASSERTION_SCHEMA,
@@ -26,6 +30,7 @@ const {
   sha256,
   validateProjectContextClaim,
   validatePublicStructuredContent,
+  validateLegacyToolStructuredContent,
   validateRequestEnvelope,
   validateResponseEnvelope,
   validateToolStructuredContent,
@@ -74,6 +79,14 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.equal(PRINCIPAL_ASSERTION_SCHEMA.properties.audience.pattern, HTTPS_URI_PATTERN_SOURCE);
   assert.deepEqual(PRINCIPAL_ASSERTION_SCHEMA.properties.scopes.contains, { const: 'memory.read' });
   assert.equal(PROJECT_CONTEXT_CLAIM_SCHEMA.properties.client_id.const, 'ChatGPT');
+  assert.equal(
+    REQUEST_ENVELOPE_SCHEMA.properties.schema_version.const,
+    EDGE_REQUEST_SCHEMA_VERSION
+  );
+  assert.equal(
+    RESPONSE_ENVELOPE_SCHEMA.properties.schema_version.const,
+    EDGE_RESPONSE_SCHEMA_VERSION
+  );
   const requestVariants = REQUEST_ENVELOPE_SCHEMA.properties.tool_request.oneOf;
   assert.deepEqual(requestVariants.map(variant => variant.properties.name.const), DATA_TOOL_NAMES);
   assert.equal(requestVariants.every(variant => variant.additionalProperties === false), true);
@@ -104,7 +117,10 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
     variant.properties.tool_name.const === 'memory_overview');
   const searchResponse = responseVariants.find(variant =>
     variant.properties.tool_name.const === 'search_memory');
-  assert.deepEqual(overviewResponse.properties.structured_content.required, ['status', 'kind', 'item_count']);
+  assert.deepEqual(
+    overviewResponse.properties.structured_content.required,
+    ['schema_version', 'status', 'kind', 'item_count', 'attempt']
+  );
   assert.equal(overviewResponse.properties.structured_content.properties.kind.const, 'overview');
   assert.equal(overviewResponse.properties.structured_content.additionalProperties, false);
   const contextResponses = responseVariants.filter(variant =>
@@ -112,6 +128,10 @@ test('R4-B exports frozen principal, context, request, response, and widget sche
   assert.deepEqual(contextResponses.map(variant => variant.properties.status.const), [
     'ok', 'denied', 'unavailable'
   ]);
+  assert.equal(contextResponses.every(variant =>
+    Object.values(variant.properties.counters.properties)
+      .every(counter => counter.const === 0)
+  ), true);
   for (const toolName of ['memory_overview', 'search_memory', 'audit_memory', 'prepare_memory_context']) {
     assert.deepEqual(
       responseVariants
@@ -176,6 +196,19 @@ test('signed principal and request validate with exact audience and one-time rep
   });
   assert.equal(result.requestDigest, digestObject(request));
   assert.equal(replayGuard.size, 2);
+  const legacyV1Request = structuredClone(request);
+  legacyV1Request.schema_version = 1;
+  assert.throws(() => validateRequestEnvelope(legacyV1Request, {
+    now: clock(),
+    expectedIssuer: SYNTHETIC_ISSUER,
+    expectedAudience: SYNTHETIC_AUDIENCE,
+    resolvePrincipalPublicKey: principalKeyResolver(
+      SYNTHETIC_ISSUER,
+      principal
+    ),
+    resolveRequestPublicKey: keyResolver(edge),
+    consumeReplay: false
+  }), { code: 'request_schema_version_invalid' });
 
   const boundedSlowRequest = createRequestEnvelope({
     principalAssertion,
@@ -486,8 +519,11 @@ test('response binds request, counters, receipts, and relay signature', () => {
   const { principal, edge, relay, clock, principalAssertion } = fixture();
   const request = createRequestEnvelope({
     principalAssertion,
-    toolName: 'memory_overview',
-    toolArguments: { project_context_ref: `pctx_${'h'.repeat(32)}` },
+    toolName: 'resolve_memory_context',
+    toolArguments: {
+      project_alias: 'project-alpha',
+      requested_visibility: 'project'
+    },
     now: clock(),
     requestId: 'req_response_binding_0000001',
     nonce: 'request_nonce_response_0001',
@@ -496,9 +532,16 @@ test('response binds request, counters, receipts, and relay signature', () => {
   const response = createResponseEnvelope({
     requestId: request.request_id,
     requestDigest: digestObject(request),
-    toolName: 'memory_overview',
+    toolName: 'resolve_memory_context',
     status: 'ok',
-    structuredContent: { status: 'empty', kind: 'overview', item_count: 0 },
+    structuredContent: {
+      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      project_context_ref: `pctx_${'h'.repeat(32)}`,
+      safe_project_alias: 'project-alpha',
+      expires_at: '2026-07-18T00:05:00.000Z',
+      visibility_labels: ['project'],
+      context_status: 'resolved'
+    },
     counters: ZERO_MEMORY_COUNTERS,
     receiptChain: {
       edge_request: digestObject(request),
@@ -516,13 +559,28 @@ test('response binds request, counters, receipts, and relay signature', () => {
     expectedRequest: request,
     requireZeroCounters: true
   }), response);
+  const legacyV1Response = structuredClone(response);
+  legacyV1Response.schema_version = 1;
+  assert.throws(() => validateResponseEnvelope(legacyV1Response, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relay),
+    expectedRequest: request,
+    requireZeroCounters: true
+  }), { code: 'response_schema_version_invalid' });
 
   const mismatchedReceipt = createResponseEnvelope({
     requestId: request.request_id,
     requestDigest: digestObject(request),
-    toolName: 'memory_overview',
+    toolName: 'resolve_memory_context',
     status: 'ok',
-    structuredContent: { status: 'empty', kind: 'overview', item_count: 0 },
+    structuredContent: {
+      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      project_context_ref: `pctx_${'h'.repeat(32)}`,
+      safe_project_alias: 'project-alpha',
+      expires_at: '2026-07-18T00:05:00.000Z',
+      visibility_labels: ['project'],
+      context_status: 'resolved'
+    },
     counters: ZERO_MEMORY_COUNTERS,
     receiptChain: {
       edge_request: sha256('different-request'),
@@ -543,9 +601,12 @@ test('response binds request, counters, receipts, and relay signature', () => {
   const invalidStructuredContent = createResponseEnvelope({
     requestId: request.request_id,
     requestDigest: digestObject(request),
-    toolName: 'memory_overview',
+    toolName: 'resolve_memory_context',
     status: 'ok',
-    structuredContent: { foo: 'bar' },
+    structuredContent: {
+      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      foo: 'bar'
+    },
     counters: ZERO_MEMORY_COUNTERS,
     receiptChain: {
       edge_request: digestObject(request),
@@ -565,6 +626,7 @@ test('response binds request, counters, receipts, and relay signature', () => {
   }), { code: 'response_structured_content_shape_invalid' });
 
   assert.doesNotThrow(() => validateToolStructuredContent('resolve_memory_context', {
+    schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
     project_context_ref: `pctx_${'j'.repeat(32)}`,
     safe_project_alias: 'project-alpha',
     expires_at: '2026-07-18T00:05:00.000Z',
@@ -573,17 +635,26 @@ test('response binds request, counters, receipts, and relay signature', () => {
   }));
   assert.doesNotThrow(() => validateToolStructuredContent(
     'resolve_memory_context',
-    { context_status: 'denied' },
+    {
+      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      context_status: 'denied'
+    },
     { status: 'denied' }
   ));
   assert.doesNotThrow(() => validateToolStructuredContent(
     'resolve_memory_context',
-    { context_status: 'unavailable' },
+    {
+      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      context_status: 'unavailable'
+    },
     { status: 'unavailable' }
   ));
   assert.throws(() => validateToolStructuredContent(
     'resolve_memory_context',
-    { context_status: 'resolved' },
+    {
+      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      context_status: 'resolved'
+    },
     { status: 'denied' }
   ), { code: 'response_context_status_invalid' });
   const deniedContextRequest = createRequestEnvelope({
@@ -603,7 +674,10 @@ test('response binds request, counters, receipts, and relay signature', () => {
     requestDigest: digestObject(deniedContextRequest),
     toolName: 'resolve_memory_context',
     status: 'denied',
-    structuredContent: { context_status: 'denied' },
+    structuredContent: {
+      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      context_status: 'denied'
+    },
     counters: ZERO_MEMORY_COUNTERS,
     receiptChain: {
       edge_request: digestObject(deniedContextRequest),
@@ -621,43 +695,43 @@ test('response binds request, counters, receipts, and relay signature', () => {
     expectedRequest: deniedContextRequest,
     requireZeroCounters: true
   }));
-  assert.doesNotThrow(() => validateToolStructuredContent('search_memory', {
+  assert.doesNotThrow(() => validateLegacyToolStructuredContent('search_memory', {
     status: 'ok',
     result_count: 1,
     results: [{ result_ref: `mref_${'r'.repeat(24)}`, summary: 'Synthetic summary', relevance: 0.9 }]
   }));
   for (const status of ['denied', 'unavailable']) {
-    assert.doesNotThrow(() => validateToolStructuredContent('search_memory', {
+    assert.doesNotThrow(() => validateLegacyToolStructuredContent('search_memory', {
       status,
       result_count: 0,
       results: []
     }, { status }));
-    assert.throws(() => validateToolStructuredContent('search_memory', {
+    assert.throws(() => validateLegacyToolStructuredContent('search_memory', {
       status,
       result_count: 1,
       results: [{ result_ref: `mref_${'r'.repeat(24)}`, summary: 'Stale summary', relevance: 0.9 }]
     }, { status }), { code: 'response_search_results_invalid' });
   }
-  assert.throws(() => validateToolStructuredContent('search_memory', {
+  assert.throws(() => validateLegacyToolStructuredContent('search_memory', {
     status: 'denied', result_count: 0, results: []
   }, { status: 'unavailable' }), { code: 'response_result_status_mismatch' });
   for (const resultRef of ['/home/jenn/private.sqlite', '..\\private.sqlite', '../private.sqlite']) {
-    assert.throws(() => validateToolStructuredContent('search_memory', {
+    assert.throws(() => validateLegacyToolStructuredContent('search_memory', {
       status: 'ok',
       result_count: 1,
       results: [{ result_ref: resultRef, summary: 'Synthetic summary', relevance: 0.9 }]
     }), { code: 'public_disclosure_forbidden' });
   }
-  assert.doesNotThrow(() => validateToolStructuredContent('audit_memory', {
+  assert.doesNotThrow(() => validateLegacyToolStructuredContent('audit_memory', {
     status: 'empty', kind: 'audit', item_count: 0
   }));
-  assert.doesNotThrow(() => validateToolStructuredContent('prepare_memory_context', {
+  assert.doesNotThrow(() => validateLegacyToolStructuredContent('prepare_memory_context', {
     status: 'empty', kind: 'context', item_count: 0
   }));
-  assert.doesNotThrow(() => validateToolStructuredContent('memory_overview', {
+  assert.doesNotThrow(() => validateLegacyToolStructuredContent('memory_overview', {
     status: 'denied', kind: 'overview', item_count: 0
   }, { status: 'denied' }));
-  assert.throws(() => validateToolStructuredContent('memory_overview', {
+  assert.throws(() => validateLegacyToolStructuredContent('memory_overview', {
     status: 'denied', kind: 'overview', item_count: 1
   }, { status: 'denied' }), { code: 'response_item_count_invalid' });
 
@@ -668,6 +742,12 @@ test('response binds request, counters, receipts, and relay signature', () => {
     resolveResponsePublicKey: keyResolver(relay),
     expectedRequest: request,
     requireZeroCounters: true
+  }), { code: 'zero_memory_counter_nonzero' });
+  assert.throws(() => validateResponseEnvelope(nonzero, {
+    now: clock(),
+    resolveResponsePublicKey: keyResolver(relay),
+    expectedRequest: request,
+    counterMode: COUNTER_MODES.governedLiveReadV1
   }), { code: 'zero_memory_counter_nonzero' });
 
   const wrongRequest = structuredClone(request);

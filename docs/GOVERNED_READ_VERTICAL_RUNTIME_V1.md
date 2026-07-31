@@ -2,15 +2,16 @@
 
 ## Status
 
-This is the dormant third ordered `CM-2159` delivery. It connects
+This is the third ordered `CM-2159` delivery. It connects
 `governed_read_attempt.v1` across real loopback HTTP and owner-only UDS
 transports for synthetic replay, and it adds the production lease-scoped VCP
-worker path. It does not activate the path in the public Edge data tools.
+worker path. The fourth ordered delivery activates that path in the source
+ChatGPT Edge data contract.
 
-The ChatGPT Edge tool count, tool names, input schemas, and active v1 response
-remain unchanged. Public response v2, live v1 rejection, stopped-state rebind,
-R5-O `_005`, and readiness decisions remain separate work. The schema-v6 stack
-stays stopped.
+The ChatGPT Edge tool count, tool names, and input schemas remain unchanged.
+Data response v2 and request/response envelope v2 now reject v1 in source.
+Stopped-state rebind, R5-O `_005`, and readiness decisions remain separate
+work. The schema-v6 stack stays stopped.
 
 ## One transported working set
 
@@ -37,15 +38,16 @@ late candidate.
 
 Attempt admission applies only to the four canonical governed data-read tools.
 `resolve_memory_context` remains the preceding context-setup operation and is
-queued without an attempt header even while dormant attempt mode is enabled.
+queued without an attempt header while attempt mode is enabled.
 The four governed reads still fail closed when their header is absent; importing
 the contract package's canonical read-tool list avoids a second Edge allowlist.
 
 The Relay response signature also binds the candidate. In attempt mode, the
 existing signed `receipt_chain.relay` carries a canonical digest of the request
 digest and terminal digest. Edge recomputes that binding after response
-signature validation and before terminal CAS. No new signing key, secret, or
-public response field is introduced.
+signature validation and before terminal CAS. No new signing key or secret is
+introduced. The fourth delivery adds only the bounded public `attempt`
+projection defined by data response v2.
 
 ## Vertical stage ownership
 
@@ -99,8 +101,8 @@ response.
 The attempt projector also derives `memory_overview` and `audit_memory` status
 and item count from the validated lease results. Zero hits project as
 `empty / 0`; one or more bounded low-disclosure hits project as
-`available / item_count`. The pre-attempt governed-live projector retains its
-existing v1 behavior and is not switched by this dormant delivery.
+`available / item_count`. The public v2 response preserves those tool-specific
+fields and adds the canonical terminal projection.
 
 Governance also derives the context digest from the attempt header's validated
 context binding and derives the governance digest from the actual signed
@@ -133,11 +135,11 @@ success requires `ok`, authorization failure requires `denied`, and every
 other canonical failure requires `unavailable`. Relay rejects any contradictory
 projection rather than signing it.
 
-The dormant v1 response counter shape can encode only integers. If a canonical
-terminal contains `null` for a counter group whose downstream evidence is
-unknown, Relay rejects the legacy response instead of allowing a projector to
-replace the unknown fact with zero. Public response v2 remains the separate
-cutover that can transport those `null` counters.
+Response v2 preserves `null` for a counter field whose downstream evidence is
+unknown. The signed envelope's flat counters are derived from the same
+terminal and may also contain `null`; Relay and Edge require them to match the
+public attempt projection exactly. No projector may replace unknown evidence
+with zero.
 
 ## Parent-owned preflight and provider
 
@@ -151,7 +153,8 @@ cutover that can transport those `null` counters.
    cannot pin the persistent controller;
 4. rechecks the attempt deadline and races the injected provider wrapper
    against the smaller of its timeout cap and remaining attempt TTL, passing
-   an `AbortSignal` and calling the wrapper at most once;
+   an `AbortSignal`, calling the wrapper at most once, and waiting for
+   cancellation cleanup before releasing admission;
 5. validates a finite vector whose dimension exactly matches the projection
    plan and remains finite after conversion to the child's `Float32Array`;
 6. rechecks the remaining attempt TTL before store creation and again before
@@ -163,6 +166,29 @@ cutover that can transport those `null` counters.
 9. accepts only a response whose receipt chain has the parent prefix and that
    returned before `deadline_at`;
 10. deletes the exact attempt directory only after child shutdown is proven.
+
+The production provider wrapper starts one fresh Shim-owned provider child and
+calls the exact pinned VCP singleton
+`EmbeddingUtils.getEmbeddingsBatch([query], config)` once inside that child.
+Provider URL, key, model, query, and dimension cross only the exact IPC handle;
+they are not placed in argv or environment. The child inherits only
+`LANG`, `LC_ALL`, and `TZ`, and its stdout/stderr are ignored. Console
+suppression is child-local, so even a stalled VCP call cannot mute the
+persistent Shim's global console.
+
+Timeout or cancellation sends `SIGTERM` only to that exact provider-child
+handle. The provider entrypoint installs a first-priority one-shot termination
+boundary before loading VCP code, disconnects its IPC channel, and exits itself
+on that signal even when the in-flight provider promise does not settle. The
+lease does not release its single-attempt admission until the provider child
+has exited. A late provider message cannot reverse a termination decision. If
+exact shutdown still cannot be proven within the grace bound, the lease returns
+`worker_shutdown_incomplete`, latches cleanup closed, and does not pretend that
+the provider authority disappeared. The parent keeps that exact child
+referenced and its IPC channel bound; it never detaches an unproven child or
+uses `SIGKILL`. The derived-store lease child still receives no provider URL,
+key, model, or other provider authority.
+Only canonical attempt failure evidence leaves the provider stage.
 
 Once controller admission increments `attempts_started`, one shared `finally`
 path increments `attempts_completed` exactly once for every resolved or rejected
@@ -183,14 +209,17 @@ accepted before the response was lost, so provider/native counters remain
 unknown. Neither registry metadata nor upper-layer error handling turns those
 unknown fields into zero.
 
-If a provider ignores abort, no store or child is created and later admission
-remains closed until the exact provider promise settles. A provider result
-that arrives at or after `deadline_at` is discarded before derived/native
-work. If the remaining TTL expires between provider completion and child
-launch, no child starts and any newly created empty store is removed. Store
-creation failures latch `cleanupBlocked` only when a partially created attempt
-directory cannot be removed; a failure that created no resource, or whose
-partial resource was removed, does not poison later admission.
+If an injected non-production provider wrapper ignores abort, no store or
+derived child is created; the bounded shutdown wait ends in
+`worker_shutdown_incomplete` and latches cleanup closed. The production wrapper
+does not retain such an unbounded promise in the persistent Shim because the
+exact VCP call lives in the terminable provider child. A provider result that
+arrives at or after `deadline_at` is discarded before derived/native work. If
+the remaining TTL expires between provider completion and child launch, no
+child starts and any newly created empty store is removed. Store creation
+failures latch `cleanupBlocked` only when a partially created attempt directory
+cannot be removed; a failure that created no resource, or whose partial
+resource was removed, does not poison later admission.
 
 Cancellation is rechecked after the provider stage hook and again inside the
 scheduled provider task before the wrapper is called. Provider start counters
@@ -240,6 +269,15 @@ provider or child ignores cancellation beyond that bound, stop fails with
 `governed_read_shim_shutdown_incomplete`, keeps the Shim logically started,
 and blocks restart. A later stop may complete only after the retained handler
 has actually settled.
+
+The fourth delivery installs that attempt HTTP runtime beside the existing
+native-MCP listener inside the same controller-owned Shim process. Controller
+acceptance requires the recorded PID to own both loopback sockets before
+Governance starts. The attempt listener is bound with the existing Governance
+runtime identity and does not inherit an Edge token or introduce another
+signing secret. Production Governance now instantiates the v2 attempt runtime
+and Bridge client directly; the previous application-backed read path is not
+kept as a live v1 fallback.
 
 The controller also launches the lease child with an empty `execArgv` list, so
 parent `--env-file`, `--require`, and `--import` startup authority cannot cross
@@ -417,7 +455,7 @@ This delivery does not:
 - call a real provider or memory tool;
 - read private configuration, raw logs, raw memory, or provider output;
 - modify VCPToolBox core or dependencies;
-- activate public attempt-v1 output or public response schema v2;
-- change any public tool or input schema;
-- authorize `_005`, deploy, release, publish, cutover, or merge;
+- add, rename, or change any public tool or input schema;
+- rebind or activate the held-stopped schema-v6 instance;
+- authorize `_005`, deploy, release, publish, or merge;
 - establish R5-O acceptance, production readiness, or `RC_READY`.

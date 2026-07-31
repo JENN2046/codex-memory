@@ -11,14 +11,32 @@ const {
 
 const {
   DATA_TOOL_NAMES,
+  GOVERNED_READ_ATTEMPT_READ_TOOLS,
   RENDER_TOOL_NAMES,
+  createChatGptEdgeDataResponseV2,
+  createGovernedReadFailureLegacyContent,
   createPrincipalAssertion,
   createRequestEnvelope,
+  canonicalJson,
   digestObject,
+  governedReadAttemptResponseBindingDigest,
+  governedReadTerminalResponseStatus,
+  projectGovernedReadAttemptPublic,
+  projectLegacyCountersFromGovernedReadAttempt,
+  projectLegacyCountersFromGovernedReadAttemptPublic,
+  validateCounters,
+  validateGovernedReadAttemptProtocol,
+  validateGovernedReadResponseStatus,
+  validateLegacyResponseCountersAgainstAttemptPublic,
+  validateToolStructuredContent,
   validateToolArguments,
   validateWidgetDto,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
+const {
+  GOVERNED_ATTEMPT_FAILURE_RESULT_KIND,
+  GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND
+} = require('./transient-request-broker');
 const {
   MEMORY_SCOPE_WIDGET_HTML,
   widgetResource
@@ -36,7 +54,8 @@ function createExternalMcpHandler({
   edgeSigning,
   clock = () => new Date(),
   requestTtlSeconds = 30,
-  responseTimeoutMs = 30_000
+  responseTimeoutMs = 30_000,
+  verifyBrokerResponse
 } = {}) {
   if (!broker || typeof broker.submit !== 'function' || typeof broker.waitForResult !== 'function') {
     reject('edge_broker_invalid');
@@ -53,6 +72,9 @@ function createExternalMcpHandler({
   if (responseTimeoutMs > requestTtlSeconds * 1000) {
     reject('edge_response_timeout_exceeds_request_ttl');
   }
+  if (typeof verifyBrokerResponse !== 'function') {
+    reject('edge_broker_response_verifier_missing');
+  }
 
   async function handle(incoming, outgoing, parsedBody, authInfo) {
     const server = createMcpProtocolServer({
@@ -62,7 +84,8 @@ function createExternalMcpHandler({
       edgeSigning,
       clock,
       requestTtlSeconds,
-      responseTimeoutMs
+      responseTimeoutMs,
+      verifyBrokerResponse
     });
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined
@@ -87,7 +110,8 @@ function createMcpProtocolServer({
   edgeSigning,
   clock,
   requestTtlSeconds,
-  responseTimeoutMs
+  responseTimeoutMs,
+  verifyBrokerResponse
 }) {
   const server = new Server({
     name: 'codex-memory-chatgpt-r4-edge',
@@ -161,6 +185,12 @@ function createMcpProtocolServer({
     } catch (error) {
       throw safeMcpError(error, 'edge_governed_read_unavailable');
     }
+    response = normalizeBrokerResult(
+      name,
+      envelope,
+      response,
+      { verifyBrokerResponse }
+    );
     const result = {
       content: [{
         type: 'text',
@@ -168,9 +198,15 @@ function createMcpProtocolServer({
       }],
       structuredContent: response.structured_content,
       _meta: {
-        'codex-memory/receiptChainDigest': digestObject(response.receipt_chain),
+        'codex-memory/receiptChainDigest':
+          response.receipt_chain_digest ||
+          digestObject(response.receipt_chain),
         'codex-memory/receiptPresentation': receiptPresentation(name, response),
-        'codex-memory/counters': { ...response.counters }
+        'codex-memory/counters': response.structured_content?.attempt
+          ? projectLegacyCountersFromGovernedReadAttemptPublic(
+              response.structured_content.attempt
+            )
+          : { ...response.counters }
       }
     };
     if (response.status !== 'ok') result.isError = true;
@@ -178,6 +214,162 @@ function createMcpProtocolServer({
   });
 
   return server;
+}
+
+function normalizeBrokerResult(
+  toolName,
+  request,
+  value,
+  { verifyBrokerResponse } = {}
+) {
+  if (typeof verifyBrokerResponse !== 'function') {
+    reject('edge_broker_response_verifier_missing');
+  }
+  const attemptTool =
+    GOVERNED_READ_ATTEMPT_READ_TOOLS.includes(toolName);
+  if (!attemptTool) {
+    if (value?.kind === GOVERNED_ATTEMPT_FAILURE_RESULT_KIND ||
+        value?.kind === GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND ||
+        value?.request_id !== request.request_id ||
+        value?.tool_name !== toolName) {
+      reject('edge_broker_result_binding_invalid');
+    }
+    verifyBrokerResponse(value, request);
+    validateNormalizedBrokerData(toolName, value);
+    return value;
+  }
+  if (value?.kind === GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND) {
+    assertExactBrokerResultKeys(value, [
+      'governed_read_attempt',
+      'kind',
+      'request_id',
+      'response',
+      'tool_name'
+    ]);
+    if (value?.request_id !== request.request_id ||
+        value?.tool_name !== toolName) {
+      reject('edge_broker_result_binding_invalid');
+    }
+    const protocol = validateAttemptProtocolRequestBinding(
+      toolName,
+      request,
+      value.governed_read_attempt
+    );
+    verifyBrokerResponse(value.response, request);
+    validateGovernedReadResponseStatus(
+      value.response?.status,
+      protocol.terminal
+    );
+    const expectedRelayBinding =
+      governedReadAttemptResponseBindingDigest({
+        requestDigest: digestObject(request),
+        terminalDigest: protocol.terminal.terminal_digest
+      });
+    if (value.response?.receipt_chain?.relay !==
+          expectedRelayBinding ||
+        canonicalJson(value.response?.structured_content?.attempt) !==
+          canonicalJson(projectGovernedReadAttemptPublic(protocol))) {
+      reject('edge_attempt_response_binding_invalid');
+    }
+    validateNormalizedBrokerData(toolName, value.response);
+    return value.response;
+  }
+  if (value?.kind !== GOVERNED_ATTEMPT_FAILURE_RESULT_KIND) {
+    reject('edge_attempt_response_result_required');
+  }
+  assertExactBrokerResultKeys(value, [
+    'governed_read_attempt',
+    'kind',
+    'request_id',
+    'tool_name'
+  ]);
+  if (value.request_id !== request.request_id ||
+      value.tool_name !== toolName) {
+    reject('edge_attempt_terminal_result_binding_invalid');
+  }
+  const protocol = validateAttemptProtocolRequestBinding(
+    toolName,
+    request,
+    value.governed_read_attempt
+  );
+  const status = governedReadTerminalResponseStatus(
+    protocol?.terminal
+  );
+  if (status === 'ok') {
+    reject('edge_attempt_terminal_result_invalid');
+  }
+  const normalized = Object.freeze({
+    status,
+    structured_content: createChatGptEdgeDataResponseV2({
+      toolName,
+      structuredContent: createGovernedReadFailureLegacyContent(
+        toolName,
+        protocol.terminal
+      ),
+      governedReadAttempt: protocol
+    }),
+    counters: projectLegacyCountersFromGovernedReadAttempt(protocol),
+    receipt_chain_digest: digestObject({
+      protocol: protocol.terminal.protocol,
+      terminal_digest: protocol.terminal.terminal_digest
+    })
+  });
+  validateNormalizedBrokerData(toolName, normalized);
+  return normalized;
+}
+
+function assertExactBrokerResultKeys(value, expected) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    reject('edge_broker_result_shape_invalid');
+  }
+  const actual = Object.keys(value).sort();
+  const wanted = [...expected].sort();
+  if (actual.length !== wanted.length ||
+      actual.some((key, index) => key !== wanted[index])) {
+    reject('edge_broker_result_shape_invalid');
+  }
+  return value;
+}
+
+function validateAttemptProtocolRequestBinding(
+  toolName,
+  request,
+  protocol
+) {
+  try {
+    validateGovernedReadAttemptProtocol(protocol);
+    const contextReference =
+      request?.tool_request?.arguments?.project_context_ref;
+    if (protocol.header.tool_name !== toolName ||
+        protocol.header.request_digest !== digestObject(request) ||
+        typeof contextReference !== 'string' ||
+        protocol.header.context_binding_digest !==
+          digestObject(contextReference) ||
+        Date.parse(protocol.header.deadline_at) >
+          Date.parse(request.expires_at)) {
+      reject('edge_attempt_response_binding_invalid');
+    }
+  } catch {
+    reject('edge_attempt_response_binding_invalid');
+  }
+  return protocol;
+}
+
+function validateNormalizedBrokerData(toolName, value) {
+  validateToolStructuredContent(
+    toolName,
+    value?.structured_content,
+    { status: value?.status }
+  );
+  if (GOVERNED_READ_ATTEMPT_READ_TOOLS.includes(toolName)) {
+    validateLegacyResponseCountersAgainstAttemptPublic(
+      value.counters,
+      value.structured_content.attempt
+    );
+  } else {
+    validateCounters(value?.counters, { requireZero: true });
+  }
+  return value;
 }
 
 function renderScopeTool(name, args) {
@@ -269,6 +461,8 @@ function safeMcpError(error, fallback) {
 module.exports = {
   createExternalMcpHandler,
   createMcpProtocolServer,
+  normalizeBrokerResult,
+  validateNormalizedBrokerData,
   modelVisibleErrorText,
   modelVisibleResultText,
   receiptPresentation,

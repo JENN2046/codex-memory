@@ -4,6 +4,7 @@ const assert = require('node:assert/strict');
 const test = require('node:test');
 
 const {
+  COUNTER_MODES,
   InMemoryReplayGuard,
   ZERO_MEMORY_COUNTERS,
   createPrincipalAssertion,
@@ -23,6 +24,10 @@ const {
   runZeroMemorySyntheticE2E,
   signing
 } = require('./synthetic-harness');
+const {
+  createAttemptHeaderForRequest,
+  createEdgeValidatedAttemptWorkingSet
+} = require('./governed-read-test-helpers');
 const { validateRelayReceipt } = require('../../src/adapters/chatgpt-r4/governance-adapter');
 
 test('R4-B zero-memory synthetic Edge -> Relay -> UDS -> governance flow passes', async () => {
@@ -62,7 +67,21 @@ test('R4-B zero-memory synthetic Edge -> Relay -> UDS -> governance flow passes'
 
 test('duplicate request and reused project context fail before a second governed invocation', async () => {
   const result = await runZeroMemorySyntheticE2E();
-  await assert.rejects(() => result.internal.relay.handle(result.requests.overviewRequest), { code: 'replay_detected' });
+  const attempt = (request, marker) => ({
+    governedReadAttempt: createEdgeValidatedAttemptWorkingSet(
+      createAttemptHeaderForRequest(request, {
+        attemptRef: `grat_${marker.repeat(32)}`,
+        now: result.internal.clock()
+      })
+    )
+  });
+  await assert.rejects(
+    () => result.internal.relay.handle(
+      result.requests.overviewRequest,
+      attempt(result.requests.overviewRequest, 'd')
+    ),
+    { code: 'replay_detected' }
+  );
 
   const retry = buildCandidateEdgeRequest({
     principalAssertion: result.internal.principalAssertion,
@@ -75,7 +94,13 @@ test('duplicate request and reused project context fail before a second governed
     nonce: 'request_nonce_context_reuse_01',
     signing: signing(result.internal.identities.edgeIdentity)
   });
-  await assert.rejects(() => result.internal.relay.handle(retry), { code: 'replay_detected' });
+  await assert.rejects(
+    () => result.internal.relay.handle(
+      retry,
+      attempt(retry, 'r')
+    ),
+    { code: 'replay_detected' }
+  );
   assert.equal(result.artifact.governed_invocation_count, 1);
 });
 
@@ -109,7 +134,10 @@ test('context resolution returns signed low-disclosure denials without a context
     });
     const response = await result.internal.relay.handle(request);
     assert.equal(response.status, expectedStatus);
-    assert.deepEqual(response.structured_content, { context_status: expectedStatus });
+    assert.deepEqual(response.structured_content, {
+      schema_version: 2,
+      context_status: expectedStatus
+    });
     assert.equal(Object.hasOwn(response.structured_content, 'project_context_ref'), false);
     assert.deepEqual(response.counters, ZERO_MEMORY_COUNTERS);
     assert.doesNotThrow(() => validateResponseEnvelope(response, {
@@ -179,6 +207,17 @@ test('Relay receipt is exact, request-bound, and proves replay checking without 
       context: sha256('context')
     }
   }, 'memory_overview'), { code: 'zero_memory_counter_nonzero' });
+  assert.throws(() => validateInvocation({
+    status: 'denied',
+    structured_content: { context_status: 'denied' },
+    counters: { ...ZERO_MEMORY_COUNTERS, provider_calls: 1 },
+    receipt_digests: {
+      governance: sha256('governance'),
+      context: sha256('context')
+    }
+  }, 'resolve_memory_context', {
+    counterMode: COUNTER_MODES.governedLiveReadV1
+  }), { code: 'zero_memory_counter_nonzero' });
 });
 
 test('Relay stamps the response after a slow injected UDS invocation completes', async () => {
@@ -197,8 +236,11 @@ test('Relay stamps the response after a slow injected UDS invocation completes',
   });
   const request = createRequestEnvelope({
     principalAssertion,
-    toolName: 'memory_overview',
-    toolArguments: { project_context_ref: `pctx_${'z'.repeat(32)}` },
+    toolName: 'resolve_memory_context',
+    toolArguments: {
+      project_alias: 'project-alpha',
+      requested_visibility: 'project'
+    },
     now: clock(),
     requestId: 'req_slow_relay_response_0001',
     nonce: 'request_nonce_slow_relay_01',
@@ -221,7 +263,14 @@ test('Relay stamps the response after a slow injected UDS invocation completes',
       nowMs += 40_000;
       return {
         status: 'ok',
-        structured_content: { status: 'empty', kind: 'overview', item_count: 0 },
+        structured_content: {
+          project_context_ref: `pctx_${'z'.repeat(32)}`,
+          safe_project_alias: 'project-alpha',
+          expires_at:
+            new Date(nowMs + 10_000).toISOString(),
+          visibility_labels: ['project'],
+          context_status: 'resolved'
+        },
         counters: ZERO_MEMORY_COUNTERS,
         receipt_digests: {
           governance: sha256(relayReceipt.request_digest),

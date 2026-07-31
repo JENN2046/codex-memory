@@ -8,6 +8,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
+  CHATGPT_EDGE_DATA_SCHEMA_VERSION,
   ZERO_MEMORY_COUNTERS,
   createResponseEnvelope,
   digestObject,
@@ -98,7 +99,8 @@ test('R4-C first stale lookup and snapshot purge untouched records past retentio
   assert.deepEqual(harness.edgeRuntime.snapshot(), {
     in_memory_only: true,
     request_count: 0,
-    states: { queued: 0, claimed: 0, completed: 0, cancelled: 0, expired: 0 }
+    states: { queued: 0, claimed: 0, completed: 0, cancelled: 0, expired: 0 },
+    governed_read_attempts_enabled: true
   });
 });
 
@@ -319,17 +321,26 @@ test('R4-C Relay waits for asynchronous Edge completion beyond the former one-se
 test('R4-C rejects completion before ack and a signed response with the wrong request correlation', async t => {
   const harness = await createLocalIntegrationHarness();
   t.after(() => harness.close());
-  const request = harness.buildRequest('memory_overview', {
-    project_context_ref: `pctx_${'x'.repeat(32)}`
+  const request = harness.buildRequest('resolve_memory_context', {
+    project_alias: 'project-alpha',
+    requested_visibility: 'project'
   });
   await harness.edgeClient.submit(request);
   const claim = await harness.edgeClient.claim('correlation-relay');
   const forged = createResponseEnvelope({
     requestId: 'req_wrong_response_correlation_0001',
     requestDigest: digestObject(request),
-    toolName: 'memory_overview',
+    toolName: 'resolve_memory_context',
     status: 'ok',
-    structuredContent: { status: 'empty', kind: 'overview', item_count: 0 },
+    structuredContent: {
+      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+      project_context_ref: `pctx_${'x'.repeat(32)}`,
+      safe_project_alias: 'project-alpha',
+      expires_at:
+        new Date(harness.clock().getTime() + 30_000).toISOString(),
+      visibility_labels: ['project'],
+      context_status: 'resolved'
+    },
     counters: { ...ZERO_MEMORY_COUNTERS },
     receiptChain: {
       edge_request: digestObject(request),

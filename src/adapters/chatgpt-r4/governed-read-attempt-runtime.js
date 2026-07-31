@@ -166,6 +166,30 @@ function deriveGovernedReadReceiptDigests({
   }
 }
 
+function validateGovernedReadAttemptRequestBinding(
+  request,
+  governedReadAttempt
+) {
+  const contextReference =
+    request?.tool_request?.arguments?.project_context_ref;
+  try {
+    if (governedReadAttempt.header.request_digest !==
+          digestObject(request) ||
+        typeof contextReference !== 'string' ||
+        governedReadAttempt.header.context_binding_digest !==
+          digestObject(contextReference)) {
+      throw codedError('governed_read_receipt_binding_invalid');
+    }
+  } catch (error) {
+    if (error?.code ===
+        'governed_read_receipt_binding_invalid') {
+      throw error;
+    }
+    throw codedError('governed_read_receipt_binding_invalid');
+  }
+  return governedReadAttempt;
+}
+
 function validateInvocationReceiptBinding(
   invocation,
   expectedReceiptDigests
@@ -317,12 +341,17 @@ function createGovernedReadAttemptGovernanceRuntime({
             request?.tool_request?.name) {
         throw codedError('governed_read_governance_stage_invalid');
       }
+      validateGovernedReadAttemptRequestBinding(
+        request,
+        governedReadAttempt
+      );
 
       const decision = validateAuthorizationDecision(
         await invokeWithSignal(() => authorizeRead({
           request,
           relayReceipt,
           attemptRef: governedReadAttempt.header.attempt_ref,
+          governedReadAttempt,
           signal
         }), signal),
         request
@@ -440,5 +469,6 @@ module.exports = {
   invokeWithSignal,
   validateAuthorizationDecision,
   validateAbortSignal,
+  validateGovernedReadAttemptRequestBinding,
   validateInvocation
 };

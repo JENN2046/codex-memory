@@ -1,13 +1,20 @@
 'use strict';
 
 const {
+  GOVERNED_READ_ATTEMPT_READ_TOOLS,
   GOVERNED_READ_ATTEMPT_LIMITS,
+  LIMITS,
   aggregateAttemptCounters,
+  canonicalJson,
+  createAttemptHeader,
   createGovernedReadAttemptProtocol,
   createGovernedReadAttemptWorkingSet,
   createStageReceipt,
   createTerminalEnvelope,
   isGovernedReadAttemptWorkingSetExtension,
+  governedReadAttemptResponseBindingDigest,
+  digestObject,
+  projectGovernedReadAttemptPublic,
   validateAttemptCounterRelationships,
   validateAttemptHeader,
   validateGovernedReadAttemptProtocol,
@@ -17,8 +24,25 @@ const {
   createOpaqueId,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
+const {
+  deriveGovernedReadAttemptRetention
+} = require('./governed-read-attempt-retention');
 
 const TERMINAL_STATES = new Set(['completed', 'cancelled', 'expired']);
+const GOVERNED_ATTEMPT_FAILURE_RESULT_KIND =
+  'governed_read_attempt_terminal_result';
+const GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND =
+  'governed_read_attempt_response_result';
+const REQUIRED_ATTEMPT_COORDINATOR_METHODS = Object.freeze([
+  'acceptAttempt',
+  'appendReceipt',
+  'cancelAttempt',
+  'commitProtocolCandidate',
+  'protocol',
+  'reportCoordinatorLoss',
+  'timeoutAttempt',
+  'workingSet'
+]);
 
 function createTransientRequestBroker({
   verifyRequest,
@@ -29,7 +53,9 @@ function createTransientRequestBroker({
   maxInFlight = 64,
   maxRecords = 256,
   eventSink,
-  eventComponent = 'transient_edge_broker'
+  eventComponent = 'transient_edge_broker',
+  attemptCoordinator = null,
+  attemptEventSink
 } = {}) {
   if (typeof verifyRequest !== 'function') reject('edge_request_verifier_missing');
   if (typeof verifyResponse !== 'function') reject('edge_response_verifier_missing');
@@ -46,14 +72,42 @@ function createTransientRequestBroker({
     reject('edge_record_limit_invalid');
   }
   if (eventSink !== undefined && typeof eventSink !== 'function') reject('edge_event_sink_invalid');
+  if (attemptEventSink !== undefined &&
+      typeof attemptEventSink !== 'function') {
+    reject('edge_attempt_event_sink_invalid');
+  }
   if (typeof eventComponent !== 'string' || !/^[a-z][a-z0-9_]{0,79}$/u.test(eventComponent)) {
     reject('edge_event_component_invalid');
   }
 
   const records = new Map();
   const waiters = new Map();
+  const attemptRetention = deriveGovernedReadAttemptRetention({
+    maxRecords,
+    requestRecordRetentionMs: terminalRetentionMs
+  });
+  const governedCoordinator =
+    attemptCoordinator || createGovernedReadAttemptCoordinator({
+      clock,
+      maxAttempts: maxInFlight,
+      maxRetainedAttempts: attemptRetention.maxRetainedAttempts,
+      terminalRetentionMs: attemptRetention.terminalRetentionMs,
+      eventSink: attemptEventSink || eventSink,
+      eventComponent: `${eventComponent.slice(0, 71)}_attempt`
+    });
+  if (REQUIRED_ATTEMPT_COORDINATOR_METHODS.some(method =>
+    typeof governedCoordinator?.[method] !== 'function'
+  )) {
+    reject('edge_attempt_coordinator_invalid');
+  }
   const submissionReplayGuard = new InMemoryReplayGuard({
-    maxEntries: maxRecords * 2,
+    maxEntries:
+      maxRecords *
+      3 *
+      Math.ceil(
+        LIMITS.maxEnvelopeTtlSeconds * 1000 /
+          terminalRetentionMs
+      ),
     clock
   });
 
@@ -66,6 +120,7 @@ function createTransientRequestBroker({
         request_id: record?.request.request_id || null,
         status: record?.status || null,
         attempt: record?.attempt || 0,
+        attempt_ref: record?.attempt_ref || null,
         ...extra
       }));
       if (pending && typeof pending.catch === 'function') pending.catch(() => {});
@@ -87,6 +142,38 @@ function createTransientRequestBroker({
     return null;
   }
 
+  function attemptFailureResult(record) {
+    if (!record.attempt_protocol) {
+      reject('edge_attempt_terminal_missing');
+    }
+    return Object.freeze({
+      kind: GOVERNED_ATTEMPT_FAILURE_RESULT_KIND,
+      request_id: record.request.request_id,
+      tool_name: record.request.tool_request.name,
+      governed_read_attempt: structuredClone(record.attempt_protocol)
+    });
+  }
+
+  function attemptResponseResult(record) {
+    if (!record.attempt_protocol || !record.response) {
+      reject('edge_attempt_response_missing');
+    }
+    return Object.freeze({
+      kind: GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND,
+      request_id: record.request.request_id,
+      tool_name: record.request.tool_request.name,
+      response: structuredClone(record.response),
+      governed_read_attempt:
+        structuredClone(record.attempt_protocol)
+    });
+  }
+
+  function completedBrokerResult(record) {
+    return record.attempt_ref
+      ? attemptResponseResult(record)
+      : structuredClone(record.response);
+  }
+
   function settleWaiters(record) {
     const pending = waiters.get(record.request.request_id);
     if (!pending) return;
@@ -94,7 +181,9 @@ function createTransientRequestBroker({
     for (const waiter of pending) {
       waiter.cleanup();
       if (record.status === 'completed') {
-        waiter.resolve(structuredClone(record.response));
+        waiter.resolve(completedBrokerResult(record));
+      } else if (record.attempt_protocol) {
+        waiter.resolve(attemptFailureResult(record));
       } else {
         const code = terminalError(record) || 'edge_request_not_completed';
         waiter.reject(Object.assign(new Error(code), { code }));
@@ -102,14 +191,34 @@ function createTransientRequestBroker({
     }
   }
 
+  function commitAttemptFailure(record, reasonCode) {
+    if (!record.attempt_ref) return null;
+    const acceptance = reasonCode === 'attempt_timeout'
+      ? governedCoordinator.timeoutAttempt(record.attempt_ref)
+      : governedCoordinator.cancelAttempt(record.attempt_ref);
+    if (acceptance?.accepted !== true ||
+        acceptance.attempt_ref !== record.attempt_ref ||
+        acceptance.outcome !== 'failure') {
+      reject('edge_attempt_terminal_invalid');
+    }
+    record.attempt_protocol =
+      governedCoordinator.protocol(record.attempt_ref);
+    return acceptance;
+  }
+
   function refresh(record) {
     if (TERMINAL_STATES.has(record.status)) return;
     const currentMs = nowMs();
     const requestExpiresMs = Date.parse(record.request.expires_at);
-    if (requestExpiresMs <= currentMs) {
+    if ((record.attempt_deadline_ms !== null &&
+         record.attempt_deadline_ms <= currentMs) ||
+        requestExpiresMs <= currentMs) {
+      commitAttemptFailure(record, 'attempt_timeout');
       record.status = 'expired';
       record.claim = null;
-      record.purge_after_ms = requestExpiresMs + terminalRetentionMs;
+      record.purge_after_ms = record.attempt_ref
+        ? currentMs + terminalRetentionMs
+        : requestExpiresMs + terminalRetentionMs;
       emit('request_expired', record);
       settleWaiters(record);
       return;
@@ -120,7 +229,10 @@ function createTransientRequestBroker({
       record.status = acknowledged ? 'expired' : 'queued';
       record.claim = null;
       if (acknowledged) {
-        record.purge_after_ms = claimExpiresMs + terminalRetentionMs;
+        commitAttemptFailure(record, 'attempt_timeout');
+        record.purge_after_ms = record.attempt_ref
+          ? currentMs + terminalRetentionMs
+          : claimExpiresMs + terminalRetentionMs;
         settleWaiters(record);
       }
       emit(acknowledged ? 'acknowledged_claim_expired' : 'claim_expired', record);
@@ -170,9 +282,43 @@ function createTransientRequestBroker({
       return !TERMINAL_STATES.has(record.status);
     }).length;
     if (activeCount >= maxInFlight) reject('edge_inflight_capacity_exceeded');
-    submissionReplayGuard.consumeMany([
+    const attemptTool = GOVERNED_READ_ATTEMPT_READ_TOOLS.includes(
+      request?.tool_request?.name
+    );
+    let attemptHeader = null;
+    if (attemptTool) {
+      const currentMs = nowMs();
+      const requestDeadlineMs = Date.parse(request.expires_at);
+      const attemptDeadlineMs = Math.min(
+        requestDeadlineMs,
+        currentMs +
+          GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds * 1000
+      );
+      const contextReference =
+        request.tool_request.arguments.project_context_ref;
+      if (!Number.isFinite(attemptDeadlineMs) ||
+          attemptDeadlineMs <= currentMs ||
+          typeof contextReference !== 'string') {
+        reject('edge_attempt_header_binding_invalid');
+      }
+      attemptHeader = createAttemptHeader({
+        toolName: request.tool_request.name,
+        requestDigest: digestObject(request),
+        contextBindingDigest: digestObject(contextReference),
+        now: new Date(currentMs),
+        deadlineAt: new Date(attemptDeadlineMs).toISOString()
+      });
+    }
+    const replayReservation = submissionReplayGuard.reserveMany([
       { namespace: 'edge_submission_request_id', key: request.request_id, expiresAt: request.expires_at },
-      { namespace: 'edge_submission_nonce', key: request.nonce, expiresAt: request.expires_at }
+      { namespace: 'edge_submission_nonce', key: request.nonce, expiresAt: request.expires_at },
+      ...(attemptHeader
+        ? [{
+            namespace: 'edge_submission_attempt_ref',
+            key: attemptHeader.attempt_ref,
+            expiresAt: attemptHeader.deadline_at
+          }]
+        : [])
     ]);
     const record = {
       request: structuredClone(request),
@@ -180,11 +326,51 @@ function createTransientRequestBroker({
       status: 'queued',
       attempt: 0,
       claim: null,
-      purge_after_ms: null
+      purge_after_ms: null,
+      attempt_ref: attemptHeader?.attempt_ref || null,
+      attempt_deadline_ms: attemptHeader
+        ? Date.parse(attemptHeader.deadline_at)
+        : null,
+      attempt_protocol: null
     };
+    if (attemptHeader) {
+      let accepted = false;
+      try {
+        governedCoordinator.acceptAttempt(attemptHeader);
+        accepted = true;
+        const workingSet = governedCoordinator.workingSet(
+          attemptHeader.attempt_ref
+        );
+        governedCoordinator.appendReceipt(
+          attemptHeader.attempt_ref,
+          createStageReceipt({
+            header: workingSet.header,
+            receipts: workingSet.receipts,
+            stage: 'EDGE_VALIDATED'
+          })
+        );
+      } catch (error) {
+        if (accepted) {
+          try {
+            governedCoordinator.cancelAttempt(attemptHeader.attempt_ref);
+          } catch {
+            // A deadline can win while the submission is rolling back.
+          }
+        }
+        replayReservation.rollback();
+        throw error;
+      }
+    }
+    replayReservation.commit();
     records.set(request.request_id, record);
     emit('request_queued', record);
-    return { request_id: request.request_id, status: record.status };
+    return {
+      request_id: request.request_id,
+      status: record.status,
+      ...(attemptHeader
+        ? { attempt_ref: attemptHeader.attempt_ref }
+        : {})
+    };
   }
 
   function claim(relayId) {
@@ -194,7 +380,10 @@ function createTransientRequestBroker({
     refreshAndPrune();
     for (const record of records.values()) {
       if (record.status !== 'queued') continue;
-      const expiresMs = nowMs() + claimLeaseMs;
+      const configuredExpiresMs = nowMs() + claimLeaseMs;
+      const expiresMs = record.attempt_deadline_ms === null
+        ? configuredExpiresMs
+        : Math.min(configuredExpiresMs, record.attempt_deadline_ms);
       record.status = 'claimed';
       record.attempt += 1;
       record.claim = {
@@ -209,7 +398,13 @@ function createTransientRequestBroker({
         request: structuredClone(record.request),
         claim_token: record.claim.token,
         lease_expires_at: new Date(expiresMs).toISOString(),
-        attempt: record.attempt
+        attempt: record.attempt,
+        ...(record.attempt_ref
+          ? {
+              governed_read_attempt:
+                governedCoordinator.workingSet(record.attempt_ref)
+            }
+          : {})
       };
     }
     return null;
@@ -220,11 +415,23 @@ function createTransientRequestBroker({
     const activeClaim = requireLiveClaim(record, claimToken);
     if (activeClaim.acked) reject('edge_claim_ack_replay');
     activeClaim.acked = true;
+    if (record.attempt_deadline_ms !== null) {
+      activeClaim.expires_ms = record.attempt_deadline_ms;
+      if (activeClaim.expires_ms <= nowMs()) {
+        refresh(record);
+        reject('edge_claim_expired');
+      }
+    }
     emit('claim_acknowledged', record);
     return { request_id: requestId, status: 'acked', attempt: record.attempt };
   }
 
-  async function complete(requestId, claimToken, response) {
+  async function complete(
+    requestId,
+    claimToken,
+    response,
+    governedReadAttemptCandidate = null
+  ) {
     const record = requireRecord(requestId);
     const activeClaim = requireLiveClaim(record, claimToken);
     if (!activeClaim.acked) reject('edge_claim_not_acknowledged');
@@ -232,7 +439,47 @@ function createTransientRequestBroker({
     const currentRecord = requireRecord(requestId);
     const currentClaim = requireLiveClaim(currentRecord, claimToken);
     if (!currentClaim.acked) reject('edge_claim_not_acknowledged');
-    currentRecord.response = structuredClone(response);
+    if ((currentRecord.attempt_ref === null) !==
+        (governedReadAttemptCandidate === null)) {
+      reject('edge_attempt_candidate_required');
+    }
+    if (currentRecord.attempt_ref) {
+      let expectedBinding;
+      try {
+        validateGovernedReadAttemptProtocol(
+          governedReadAttemptCandidate
+        );
+        expectedBinding = governedReadAttemptResponseBindingDigest({
+          requestDigest: digestObject(currentRecord.request),
+          terminalDigest:
+            governedReadAttemptCandidate.terminal.terminal_digest
+        });
+      } catch {
+        reject('edge_attempt_response_binding_invalid');
+      }
+      if (response?.receipt_chain?.relay !== expectedBinding ||
+          canonicalJson(response?.structured_content?.attempt) !==
+            canonicalJson(projectGovernedReadAttemptPublic(
+              governedReadAttemptCandidate
+            ))) {
+        reject('edge_attempt_response_binding_invalid');
+      }
+    } else if (Object.hasOwn(
+      response?.structured_content || {},
+      'attempt'
+    )) {
+      reject('edge_attempt_response_binding_invalid');
+    }
+    const acceptedResponse = structuredClone(response);
+    if (currentRecord.attempt_ref) {
+      governedCoordinator.commitProtocolCandidate(
+        currentRecord.attempt_ref,
+        governedReadAttemptCandidate
+      );
+      currentRecord.attempt_protocol =
+        governedCoordinator.protocol(currentRecord.attempt_ref);
+    }
+    currentRecord.response = acceptedResponse;
     currentRecord.status = 'completed';
     currentRecord.claim = null;
     currentRecord.purge_after_ms = nowMs() + terminalRetentionMs;
@@ -244,6 +491,7 @@ function createTransientRequestBroker({
   function cancel(requestId) {
     const record = requireRecord(requestId);
     if (TERMINAL_STATES.has(record.status)) reject('edge_request_terminal');
+    commitAttemptFailure(record, 'attempt_cancelled');
     record.status = 'cancelled';
     record.claim = null;
     record.purge_after_ms = nowMs() + terminalRetentionMs;
@@ -268,12 +516,20 @@ function createTransientRequestBroker({
   function result(requestId) {
     const record = requireRecord(requestId);
     if (record.status !== 'completed') {
+      if (record.attempt_protocol) {
+        return {
+          request_id: requestId,
+          status: record.status,
+          governed_read_attempt_result:
+            attemptFailureResult(record)
+        };
+      }
       return { request_id: requestId, status: record.status };
     }
     return {
       request_id: requestId,
       status: record.status,
-      response: structuredClone(record.response)
+      response: completedBrokerResult(record)
     };
   }
 
@@ -282,7 +538,12 @@ function createTransientRequestBroker({
       reject('edge_wait_timeout_invalid');
     }
     const record = requireRecord(requestId);
-    if (record.status === 'completed') return Promise.resolve(structuredClone(record.response));
+    if (record.status === 'completed') {
+      return Promise.resolve(completedBrokerResult(record));
+    }
+    if (record.attempt_protocol) {
+      return Promise.resolve(attemptFailureResult(record));
+    }
     const code = terminalError(record);
     if (code) return Promise.reject(Object.assign(new Error(code), { code }));
 
@@ -307,10 +568,17 @@ function createTransientRequestBroker({
       pending.add(waiter);
       waiters.set(requestId, pending);
       timeout = setTimeout(() => {
-        pending.delete(waiter);
-        if (pending.size === 0) waiters.delete(requestId);
         try {
-          cancel(requestId);
+          const currentRecord = requireRecord(requestId);
+          if (!TERMINAL_STATES.has(currentRecord.status)) {
+            commitAttemptFailure(currentRecord, 'attempt_timeout');
+            currentRecord.status = 'expired';
+            currentRecord.claim = null;
+            currentRecord.purge_after_ms =
+              nowMs() + terminalRetentionMs;
+            emit('request_expired', currentRecord);
+            settleWaiters(currentRecord);
+          }
         } catch {
           // A completion racing the timeout is returned by the result check below.
         }
@@ -323,6 +591,10 @@ function createTransientRequestBroker({
         waiter.cleanup();
         if (current?.status === 'completed') {
           resolve(current.response);
+          return;
+        }
+        if (current?.governed_read_attempt_result) {
+          resolve(current.governed_read_attempt_result);
           return;
         }
         rejectWait(Object.assign(new Error('edge_response_timeout'), { code: 'edge_response_timeout' }));
@@ -339,22 +611,34 @@ function createTransientRequestBroker({
     refreshAndPrune();
     const counts = { queued: 0, claimed: 0, completed: 0, cancelled: 0, expired: 0 };
     for (const record of records.values()) counts[record.status] += 1;
-    return Object.freeze({ in_memory_only: true, request_count: records.size, states: counts });
+    return Object.freeze({
+      in_memory_only: true,
+      governed_read_attempts_enabled: true,
+      request_count: records.size,
+      states: counts
+    });
   }
 
   function close() {
     for (const record of records.values()) {
       if (!TERMINAL_STATES.has(record.status)) {
+        try {
+          commitAttemptFailure(record, 'attempt_cancelled');
+        } catch {
+          // Coordinator-loss reporting below preserves fail-closed evidence.
+        }
         record.status = 'expired';
         record.claim = null;
         record.purge_after_ms = nowMs();
         settleWaiters(record);
       }
     }
+    governedCoordinator.reportCoordinatorLoss();
     records.clear();
   }
 
   return Object.freeze({
+    governedReadAttempts: true,
     submit,
     claim,
     acknowledge,
@@ -785,6 +1069,8 @@ function createGovernedReadAttemptCoordinator({
 }
 
 module.exports = {
+  GOVERNED_ATTEMPT_FAILURE_RESULT_KIND,
+  GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND,
   TERMINAL_STATES,
   createGovernedReadAttemptCoordinator,
   createTransientRequestBroker

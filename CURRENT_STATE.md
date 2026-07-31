@@ -19,18 +19,16 @@ deploy, cutover, complete-V8, or readiness claim.
 
 `activePhase: governed_read_attempt_refactor`
 
-PR `#72` delivered the `_003` `INVALID_ARGUMENT` repair; PR `#73` delivered the
-dormant governed-read-attempt contract and terminal CAS; PR `#74` delivered the
-two-pass source projection and exact-writer authority harness. None activated
-the public attempt path. The later single-use `_004` observation failed closed
-without producing one attempt-scoped, stage-ordered, counter-reconciled
-terminal envelope acceptable as R5-O evidence. `_004` is consumed and must not
-be retried or reconstructed from legacy error mappings. `CM-2159` therefore
-remains active under the `governed_read_attempt_refactor` route. The current
-schema-v6 stack was separately authorized to stop before source construction and is being held
-stopped. This declaration does not authorize restart, rebind, provider or
-memory-tool execution, private configuration access, `_005`, cutover, or
-readiness claims.
+PRs `#73`-`#75` delivered the attempt contract/terminal CAS, two-pass source
+projection/exact-writer harness, and lease-scoped vertical runtime. Main CI for
+the `#75` merge `75838ae5...` passed as run `30570842512`. The separately
+authorized fourth construction item is the ChatGPT Edge data response v2 hard
+cut from that exact main base. The schema-v6 stack remains held stopped; source
+cutover is not runtime activation. Single-use `_004` failed closed without an
+acceptable attempt terminal, is consumed, and cannot be retried or
+reconstructed. This declaration authorizes no merge, restart, rebind, provider
+or memory-tool execution, private configuration access, `_005`, or readiness
+claim.
 
 ## Last Accepted Product Baseline
 
@@ -53,13 +51,12 @@ future task.
 
 ## Next Safe Action
 
-Deliver the remaining two ordered CM-2159 PRs for the lease-scoped vertical
-runtime and Edge response v2; vertical runtime based on PR `#74`'s merged main
-is current. Keep schema v6 stopped. Only after all four deliveries merge and
-merged-main CI succeeds may stopped-state `rebind-source` authorization be
-requested, followed by distinct single-use R5-O `_005` authorization. Do not
-start or rebind the stack, read private memory, invoke a provider, or run `_005`
-from this declaration alone.
+Deliver the fourth ordered CM-2159 PR for the Edge response v2 hard cut, with
+unchanged tool names/input schemas and active v1 rejection. Merge remains a
+separate Jenn-only action. Keep schema v6 stopped. Only after the fourth PR is
+merged and merged-main CI succeeds may stopped-state `rebind-source`
+authorization be requested, followed by distinct single-use R5-O `_005`
+authorization.
 
 ## Authority Boundaries
 
@@ -75,9 +72,9 @@ from this declaration alone.
   They do not authorize another status probe, lifecycle action, provider call,
   private runtime verification, real memory read or write, release, deploy,
   cutover, or readiness claim.
-- PRs `#73` and `#74` remain dormant; they change no public MCP surface, active
-  Edge response, dependency, runtime/provider configuration, baseline, or
-  status.
+- PRs `#73`-`#75` are merged source construction, but remain dormant in the
+  held-stopped runtime. The v2 source cutover changes no tool name or input
+  schema and is not a deployment/readiness claim.
 
 ## Evidence And History
 
@@ -95,6 +92,8 @@ Last completed: `CM-2158 / CMV-2243`.
   `6fe2b532...`; merged-main CI run `30501105867` passed.
 - PR `#74` merged the production two-pass source projection, streaming atomic
   materialization, and exact-VCP writer authority harness as `dcd2c42a...`.
+- PR `#75` merged the lease-scoped vertical runtime as `75838ae5...`;
+  merged-main CI run `30570842512` passed.
 - Single-use authorization `_004` was consumed and failed closed. It did not
   establish a receipt-bound R5-O result. Exact stage and counter facts that
   were not present in component evidence remain unknown and are not inferred
@@ -105,11 +104,10 @@ Last completed: `CM-2158 / CMV-2243`.
   container. A single low-disclosure status confirmed schema v6 and the stopped
   state. No restart, rebind, provider call, memory-tool call, raw log read, or
   raw memory read occurred. The stack must remain stopped during construction.
-- The current vertical-runtime construction connects the dormant attempt
-  working set over real synthetic Edge HTTP, Relay, owner-only Governance UDS,
-  Bridge/Shim HTTP, parent-only provider/preflight, a lease-scoped exact VCP
-  child, scope postcheck, Edge terminal CAS, and Observer reconciliation. It
-  neither starts the stopped stack nor performs the public response-v2 cutover.
+- The current fourth construction hard-cuts ChatGPT Edge data, request, and
+  response schemas to v2, requires one attempt for every read, and keeps
+  `resolve_memory_context` attempt-free. It neither starts nor rebinds the
+  stopped stack.
 - PR `#65` and the exact V5 transition are historical closeout evidence only.
   They store no live locator or private payload and do not claim current health
   or authorize runtime, mutation, release, or deploy work.

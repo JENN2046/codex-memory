@@ -3,8 +3,11 @@
 const { deepFreeze } = require('./canonical');
 const {
   ARCHITECTURE_REFERENCE,
+  CHATGPT_EDGE_DATA_SCHEMA_VERSION,
   CONTEXT_VISIBILITIES,
   DATA_TOOL_NAMES,
+  EDGE_REQUEST_SCHEMA_VERSION,
+  EDGE_RESPONSE_SCHEMA_VERSION,
   HTTPS_URI_PATTERN_SOURCE,
   KINDS,
   LIMITS,
@@ -14,6 +17,12 @@ const {
   SCHEMA_VERSION,
   ZERO_MEMORY_COUNTER_KEYS
 } = require('./constants');
+const {
+  GOVERNED_READ_ATTEMPT_COUNTER_FIELDS,
+  GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES,
+  GOVERNED_READ_ATTEMPT_PROTOCOL,
+  GOVERNED_READ_ATTEMPT_REF_PATTERN
+} = require('./governed-read-attempt');
 
 const projectContextReference = {
   type: 'string',
@@ -82,21 +91,118 @@ const toolRequestVariants = [
   }))
 ];
 
-function toolResponse(name, structuredContentSchema, status = null) {
+function toolResponse(
+  name,
+  structuredContentSchema,
+  status = null,
+  { requireZeroCounters = false } = {}
+) {
   return {
     type: 'object',
     required: ['tool_name', 'structured_content', ...(status ? ['status'] : [])],
     properties: {
       tool_name: { const: name },
       ...(status ? { status: { const: status } } : {}),
-      structured_content: structuredContentSchema
+      structured_content: structuredContentSchema,
+      ...(requireZeroCounters
+        ? {
+            counters: exactArguments({
+              required: ZERO_MEMORY_COUNTER_KEYS,
+              properties: Object.fromEntries(
+                ZERO_MEMORY_COUNTER_KEYS.map(key => [
+                  key,
+                  { const: 0 }
+                ])
+              )
+            })
+          }
+        : {})
     }
   };
 }
 
-function boundedStatusContent(kind, nonOkStatus = null) {
+const nullableCounter = {
+  type: ['integer', 'null'],
+  minimum: 0
+};
+
+const GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA = deepFreeze(exactArguments({
+  required: [
+    'protocol',
+    'attempt_ref',
+    'outcome',
+    'last_completed_stage',
+    'failed_stage',
+    'reason_code',
+    'failure_category',
+    'evidence_complete',
+    'counters'
+  ],
+  properties: {
+    protocol: { const: GOVERNED_READ_ATTEMPT_PROTOCOL },
+    attempt_ref: {
+      type: 'string',
+      pattern: GOVERNED_READ_ATTEMPT_REF_PATTERN.source
+    },
+    outcome: { enum: ['success', 'failure'] },
+    last_completed_stage: {
+      enum: [null, ...GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES]
+    },
+    failed_stage: {
+      enum: [
+        null,
+        ...GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES,
+        'TERMINAL_FAILURE'
+      ]
+    },
+    reason_code: {
+      type: ['string', 'null'],
+      pattern: '^[a-z][a-z0-9_]{0,79}$'
+    },
+    failure_category: {
+      type: ['string', 'null'],
+      pattern: '^[a-z][a-z0-9_]{0,79}$'
+    },
+    evidence_complete: { type: 'boolean' },
+    counters: exactArguments({
+      required: Object.keys(GOVERNED_READ_ATTEMPT_COUNTER_FIELDS),
+      properties: Object.fromEntries(
+        Object.entries(GOVERNED_READ_ATTEMPT_COUNTER_FIELDS)
+          .map(([group, fields]) => [
+            group,
+            exactArguments({
+              required: fields,
+              properties: Object.fromEntries(
+                fields.map(field => [field, nullableCounter])
+              )
+            })
+          ])
+      )
+    })
+  }
+}));
+
+function edgeDataContent({ required, properties, attempt = false }) {
   return exactArguments({
+    required: [
+      'schema_version',
+      ...required,
+      ...(attempt ? ['attempt'] : [])
+    ],
+    properties: {
+      schema_version: { const: CHATGPT_EDGE_DATA_SCHEMA_VERSION },
+      ...properties,
+      ...(attempt
+        ? { attempt: GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA }
+        : {})
+    }
+  });
+}
+
+function boundedStatusContent(kind, nonOkStatus = null) {
+  return edgeDataContent({
     required: ['status', 'kind', 'item_count'],
+    attempt: true,
     properties: {
       status: nonOkStatus
         ? { const: nonOkStatus }
@@ -110,8 +216,9 @@ function boundedStatusContent(kind, nonOkStatus = null) {
 }
 
 function searchStatusContent(nonOkStatus = null) {
-  const schema = exactArguments({
+  const schema = edgeDataContent({
     required: ['status', 'result_count', 'results'],
+    attempt: true,
     properties: {
       status: nonOkStatus
         ? { const: nonOkStatus }
@@ -150,7 +257,7 @@ function searchStatusContent(nonOkStatus = null) {
 }
 
 const toolResponseVariants = [
-  toolResponse('resolve_memory_context', exactArguments({
+  toolResponse('resolve_memory_context', edgeDataContent({
     required: [
       'project_context_ref', 'safe_project_alias', 'expires_at',
       'visibility_labels', 'context_status'
@@ -172,15 +279,15 @@ const toolResponseVariants = [
       },
       context_status: { const: 'resolved' }
     }
-  }), 'ok'),
-  toolResponse('resolve_memory_context', exactArguments({
+  }), 'ok', { requireZeroCounters: true }),
+  toolResponse('resolve_memory_context', edgeDataContent({
     required: ['context_status'],
     properties: { context_status: { const: 'denied' } }
-  }), 'denied'),
-  toolResponse('resolve_memory_context', exactArguments({
+  }), 'denied', { requireZeroCounters: true }),
+  toolResponse('resolve_memory_context', edgeDataContent({
     required: ['context_status'],
     properties: { context_status: { const: 'unavailable' } }
-  }), 'unavailable'),
+  }), 'unavailable', { requireZeroCounters: true }),
   toolResponse('memory_overview', boundedStatusContent('overview'), 'ok'),
   toolResponse('memory_overview', boundedStatusContent('overview', 'denied'), 'denied'),
   toolResponse('memory_overview', boundedStatusContent('overview', 'unavailable'), 'unavailable'),
@@ -274,7 +381,7 @@ const PROJECT_CONTEXT_CLAIM_SCHEMA = deepFreeze({
 });
 
 const REQUEST_ENVELOPE_SCHEMA = deepFreeze({
-  $id: 'codex-memory://chatgpt-r4/edge-request-envelope-v1',
+  $id: 'codex-memory://chatgpt-r4/edge-request-envelope-v2',
   type: 'object',
   additionalProperties: false,
   required: [
@@ -283,7 +390,7 @@ const REQUEST_ENVELOPE_SCHEMA = deepFreeze({
     'signature'
   ],
   properties: {
-    schema_version: { const: SCHEMA_VERSION },
+    schema_version: { const: EDGE_REQUEST_SCHEMA_VERSION },
     kind: { const: KINDS.requestEnvelope },
     architecture_reference: { const: ARCHITECTURE_REFERENCE },
     request_id: { type: 'string', pattern: REQUEST_ID_PATTERN_SOURCE },
@@ -297,7 +404,7 @@ const REQUEST_ENVELOPE_SCHEMA = deepFreeze({
 });
 
 const RESPONSE_ENVELOPE_SCHEMA = deepFreeze({
-  $id: 'codex-memory://chatgpt-r4/edge-response-envelope-v1',
+  $id: 'codex-memory://chatgpt-r4/edge-response-envelope-v2',
   type: 'object',
   additionalProperties: false,
   required: [
@@ -307,7 +414,7 @@ const RESPONSE_ENVELOPE_SCHEMA = deepFreeze({
   ],
   allOf: [{ oneOf: toolResponseVariants }],
   properties: {
-    schema_version: { const: SCHEMA_VERSION },
+    schema_version: { const: EDGE_RESPONSE_SCHEMA_VERSION },
     kind: { const: KINDS.responseEnvelope },
     architecture_reference: { const: ARCHITECTURE_REFERENCE },
     response_id: { type: 'string', pattern: '^res_[A-Za-z0-9_-]{24,96}$' },
@@ -322,7 +429,12 @@ const RESPONSE_ENVELOPE_SCHEMA = deepFreeze({
       type: 'object',
       additionalProperties: false,
       required: ZERO_MEMORY_COUNTER_KEYS,
-      properties: Object.fromEntries(ZERO_MEMORY_COUNTER_KEYS.map(key => [key, { type: 'integer', minimum: 0 }]))
+      properties: Object.fromEntries(
+        ZERO_MEMORY_COUNTER_KEYS.map(key => [
+          key,
+          { type: ['integer', 'null'], minimum: 0 }
+        ])
+      )
     },
     receipt_chain: {
       type: 'object',
@@ -389,6 +501,7 @@ const WIDGET_DTO_SCHEMA = deepFreeze({
 });
 
 module.exports = {
+  GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA,
   PRINCIPAL_ASSERTION_SCHEMA,
   PROJECT_CONTEXT_CLAIM_SCHEMA,
   REQUEST_ENVELOPE_SCHEMA,

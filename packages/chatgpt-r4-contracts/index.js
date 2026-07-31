@@ -11,5 +11,6 @@ module.exports = {
   ...require('./replay-guard'),
   ...require('./external-runtime-preflight'),
   ...require('./self-hosted-binding-amendment'),
-  ...require('./governed-read-attempt')
+  ...require('./governed-read-attempt'),
+  ...require('./edge-data-response-v2')
 };

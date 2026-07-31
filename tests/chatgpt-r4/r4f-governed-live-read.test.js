@@ -11,17 +11,23 @@ const {
   COUNTER_MODES,
   InMemoryReplayGuard,
   ZERO_MEMORY_COUNTERS,
+  appendGovernedReadAttemptStage,
+  createAttemptHeader,
   createPrincipalAssertion,
   createRequestEnvelope,
+  createStageReceipt,
+  digestObject,
   sha256,
   validateCounters,
+  validateLegacyToolStructuredContent,
+  validateLegacyResponseCountersAgainstAttemptPublic,
   validateResponseEnvelope,
   validateToolArguments,
-  validateToolStructuredContent
 } = require('../../packages/chatgpt-r4-contracts');
 const { createRelayProcessor } = require('../../apps/local-recall-relay');
 const {
   createGovernedLiveReadInvoker,
+  createGovernedReadV2Runtime,
   createR4GovernanceRuntime,
   validateProjectRegistry
 } = require('../../src/adapters/chatgpt-r4');
@@ -212,7 +218,6 @@ function delegatedResult({
 }
 
 function relayReceipt(request) {
-  const { digestObject } = require('../../packages/chatgpt-r4-contracts');
   return {
     schema_version: 1,
     kind: 'chatgpt_r4_relay_receipt',
@@ -222,6 +227,99 @@ function relayReceipt(request) {
     forwarded_over: 'injected_uds_boundary',
     scope_authorized_by_relay: false,
     durable_state_written: false
+  };
+}
+
+function edgeValidatedAttempt(request, contextRef, suffix) {
+  const header = createAttemptHeader({
+    attemptRef: `grat_${suffix.repeat(32)}`,
+    toolName: request.tool_request.name,
+    requestDigest: digestObject(request),
+    contextBindingDigest: digestObject(contextRef),
+    now: NOW
+  });
+  const created = createStageReceipt({
+    header,
+    stage: 'CREATED'
+  });
+  return appendGovernedReadAttemptStage({
+    header,
+    receipts: [created]
+  }, {
+    stage: 'EDGE_VALIDATED'
+  });
+}
+
+function completeAttemptBridge(input) {
+  let current = input.workingSet;
+  for (const stage of [
+    'BRIDGE_DELEGATED',
+    'NATIVE_DISPATCHED',
+    'SOURCE_PREFLIGHT',
+    'PROVIDER_EMBEDDING',
+    'HYDRATION',
+    'INDEX_RECOVERY',
+    'VECTOR_SEARCH',
+    'SCOPE_POSTCHECK'
+  ]) {
+    const counterFacts = {
+      BRIDGE_DELEGATED: {
+        fallback: { attempts: 0 }
+      },
+      NATIVE_DISPATCHED: {
+        native_invocation: { started: 1 },
+        primary_memory: {
+          write_attempts: 0,
+          writes_committed: 0
+        }
+      },
+      PROVIDER_EMBEDDING: {
+        provider: {
+          started: 1,
+          succeeded: 1,
+          failed: 0
+        }
+      },
+      HYDRATION: {
+        derived_transaction: {
+          started: 1,
+          committed: 1,
+          rolled_back: 0
+        }
+      },
+      VECTOR_SEARCH: {
+        native_invocation: {
+          succeeded: 1,
+          failed: 0
+        }
+      }
+    }[stage] || {};
+    current = appendGovernedReadAttemptStage(
+      current,
+      { stage, counterFacts }
+    );
+  }
+  return {
+    accepted: true,
+    working_set: current,
+    evidence_complete: true,
+    result: {
+      results: [{
+        memoryContextProjection: {
+          projectionVersion: 1,
+          lowDisclosure: true,
+          statement:
+            'Current governed product goal and blockers.',
+          classification: 'current_state',
+          freshness: 'recent',
+          reasonCodes: ['semantic_match'],
+          conflict: false
+        },
+        score: 0.91
+      }]
+    },
+    terminal_failure: null,
+    cleanup_complete: true
   };
 }
 
@@ -391,7 +489,7 @@ test('R4-F validates bounded projections for every governed read tool', async ()
     });
     assert.equal(result.status, 'ok');
     assert.equal(result.structured_content.status, status);
-    assert.doesNotThrow(() => validateToolStructuredContent(
+    assert.doesNotThrow(() => validateLegacyToolStructuredContent(
       toolName,
       result.structured_content,
       { status: result.status }
@@ -574,7 +672,7 @@ test('R4-F rejects mapping reference and digest disclosure in native summaries',
   }
 });
 
-test('R5-O _003 exact search arguments cross Edge, Relay, and Governance unchanged', async () => {
+test('R5-O _003 exact search arguments cross Edge, Relay, Governance, and Bridge unchanged', async () => {
   const edge = identity('r4f-edge');
   const context = identity('r4f-context');
   const relay = identity('r4f-relay');
@@ -583,7 +681,7 @@ test('R5-O _003 exact search arguments cross Edge, Relay, and Governance unchang
     resolveDiaryRead: resolveRead
   });
   let governedCalls = 0;
-  const runtime = createR4GovernanceRuntime({
+  const runtime = createGovernedReadV2Runtime({
     expectedIssuer: ISSUER,
     expectedAudience: AUDIENCE,
     resolveRequestPublicKey: keyId => keyId === edge.keyId ? edge.publicKey : null,
@@ -595,20 +693,17 @@ test('R5-O _003 exact search arguments cross Edge, Relay, and Governance unchang
     resolveDiaryRead: resolveRead,
     contextSigning: { privateKey: context.privateKey, keyId: context.keyId },
     clock: () => new Date(NOW),
-    async callGovernedTool(toolName, args, requestContext) {
+    counterMode: COUNTER_MODES.governedLiveReadV1,
+    async invokeBridge(input) {
       governedCalls += 1;
-      assert.equal(toolName, 'search_memory');
-      assert.deepEqual(args, {
-        query: R5O_003_QUERY,
-        target: 'both',
-        limit: 1,
-        include_content: false
-      });
-      assert.equal(Object.hasOwn(args, 'scope'), false);
-      assert.equal(requestContext.executionContext.clientId, 'Codex');
-      assert.equal(requestContext.executionContext.projectId, 'project-alpha');
-      assert.equal(requestContext.executionContext.visibility, 'project');
-      return delegatedResult();
+      assert.equal(input.query, R5O_003_QUERY);
+      assert.equal(input.limit, 1);
+      assert.equal(input.authorization.accepted, true);
+      assert.equal(
+        input.authorization.allowedDiaryCount,
+        input.authorization.allowedDiaryNames.length
+      );
+      return completeAttemptBridge(input);
     }
   });
   const processor = createRelayProcessor({
@@ -637,18 +732,30 @@ test('R5-O _003 exact search arguments cross Edge, Relay, and Governance unchang
   }, 1);
   const resolveResponse = await processor.handle(resolveRequest);
   assert.equal(resolveResponse.status, 'ok');
+  assert.equal(resolveResponse.structured_content.schema_version, 2);
   assert.equal(resolveResponse.structured_content.safe_project_alias, 'project-alpha');
   assert.deepEqual(resolveResponse.counters, ZERO_MEMORY_COUNTERS);
 
+  const contextRef =
+    resolveResponse.structured_content.project_context_ref;
   const searchRequest = requestFixture(edge, principal, 'search_memory', {
-    project_context_ref: resolveResponse.structured_content.project_context_ref,
+    project_context_ref: contextRef,
     query: R5O_003_QUERY,
     limit: 1
   }, 2);
-  const searchResponse = await processor.handle(searchRequest);
+  const processed = await processor.handle(searchRequest, {
+    governedReadAttempt:
+      edgeValidatedAttempt(searchRequest, contextRef, 'q')
+  });
+  const searchResponse = processed.response;
   assert.equal(searchResponse.status, 'ok');
+  assert.equal(searchResponse.structured_content.schema_version, 2);
   assert.equal(searchResponse.structured_content.status, 'found');
   assert.equal(searchResponse.structured_content.result_count, 1);
+  assert.equal(
+    searchResponse.structured_content.attempt.protocol,
+    'governed_read_attempt.v1'
+  );
   assert.equal(searchResponse.counters.provider_calls, 1);
   assert.equal(searchResponse.counters.native_invocations, 1);
   assert.equal(searchResponse.counters.primary_memory_writes, 0);
@@ -662,9 +769,7 @@ test('R5-O _003 exact search arguments cross Edge, Relay, and Governance unchang
   assert.equal(runtimeSnapshot.counters.provider_calls, 1);
   assert.equal(runtimeSnapshot.counters.primary_memory_writes, 0);
   assert.equal(runtimeSnapshot.counters.unrestricted_native_searches, 0);
-  assert.equal(runtimeSnapshot.receipt_chains.length, 1);
-  assert.match(runtimeSnapshot.receipt_chains[0].native_runtime, /^sha256:[a-f0-9]{64}$/u);
-  assert.match(runtimeSnapshot.receipt_chains[0].governance, /^sha256:[a-f0-9]{64}$/u);
+  assert.equal(runtimeSnapshot.legacy_v1_read_path_active, false);
   assert.equal(runtimeSnapshot.raw_memory_persisted, false);
   assert.doesNotThrow(() => validateResponseEnvelope(searchResponse, {
     now: NOW,
@@ -672,12 +777,12 @@ test('R5-O _003 exact search arguments cross Edge, Relay, and Governance unchang
     expectedRequest: searchRequest,
     counterMode: COUNTER_MODES.governedLiveReadV1
   }));
-  assert.throws(() => validateResponseEnvelope(searchResponse, {
-    now: NOW,
-    resolveResponsePublicKey: keyId => keyId === relay.keyId ? relay.publicKey : null,
-    expectedRequest: searchRequest,
-    requireZeroCounters: true
-  }), { code: 'zero_memory_counter_nonzero' });
+  assert.throws(() =>
+    validateLegacyResponseCountersAgainstAttemptPublic(
+      ZERO_MEMORY_COUNTERS,
+      searchResponse.structured_content.attempt
+    ),
+  { code: 'relay_attempt_counter_mismatch' });
 });
 
 test('R5-O _003 rejects a string limit before Relay or Governance dispatch', () => {
@@ -966,48 +1071,34 @@ test('R4-F runtime authority is default-off and loads only owner-only exact bind
   };
   environment.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST =
     computeGovernanceRuntimeBindingDigest(environment);
-  let initialized = 0;
-  let closed = 0;
-  const appFactory = config => {
-    assert.equal(config.governedMcpVcpNativeWriteDelegationMode, 'off');
-    assert.equal(config.expectedDiaryScopeMappingDigest, mappingState.mappingDigest);
-    assert.deepEqual(config.governedMcpVcpNativeReadShapeProbeHttpMcpTarget, {});
-    return {
-      async initialize() { initialized += 1; },
-      async callTool() { return delegatedResult(); },
-      async close() { closed += 1; }
-    };
-  };
   await assert.rejects(loadGovernanceRuntimeFromEnvironment({
     ...environment,
     CODEX_MEMORY_R4_GOVERNANCE_LIVE_READ_ENABLED: 'false'
-  }, { privateRoot: root, appFactory }), { code: 'r4_governance_live_read_disabled' });
-  assert.equal(initialized, 0);
+  }, { privateRoot: root }), { code: 'r4_governance_live_read_disabled' });
 
   await assert.rejects(loadGovernanceRuntimeFromEnvironment({
     ...environment,
     CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST: sha256('mismatched-r4f-binding')
-  }, { privateRoot: root, appFactory }), { code: 'r4_governance_binding_digest_mismatch' });
-  assert.equal(initialized, 0);
+  }, { privateRoot: root }), { code: 'r4_governance_binding_digest_mismatch' });
 
   await assert.rejects(loadGovernanceRuntimeFromEnvironment({
     ...environment,
     CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST: sha256('mismatched-r4f-mapping')
-  }, { privateRoot: root, appFactory }), { code: 'r4_governance_expected_binding_mismatch' });
-  assert.equal(initialized, 0);
+  }, { privateRoot: root }), { code: 'r4_governance_expected_binding_mismatch' });
 
   const runtime = await loadGovernanceRuntimeFromEnvironment(environment, {
-    privateRoot: root,
-    appFactory
+    privateRoot: root
   });
   await runtime.start();
   assert.equal(runtime.snapshot().mode, COUNTER_MODES.governedLiveReadV1);
   assert.equal(runtime.snapshot().mapping_bound, true);
   assert.equal(runtime.snapshot().governance_binding_bound, true);
   assert.equal(runtime.snapshot().public_write_surface_enabled, false);
-  assert.equal(initialized, 1);
+  assert.equal(
+    runtime.snapshot().context.legacy_v1_read_path_active,
+    false
+  );
   await runtime.stop();
-  assert.equal(closed, 1);
 
   const ipv6Environment = {
     ...environment,
@@ -1016,12 +1107,9 @@ test('R4-F runtime authority is default-off and loads only owner-only exact bind
   ipv6Environment.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST =
     computeGovernanceRuntimeBindingDigest(ipv6Environment);
   const ipv6Runtime = await loadGovernanceRuntimeFromEnvironment(ipv6Environment, {
-    privateRoot: root,
-    appFactory
+    privateRoot: root
   });
   await ipv6Runtime.start();
   await ipv6Runtime.stop();
-  assert.equal(initialized, 2);
-  assert.equal(closed, 2);
   fs.rmSync(root, { recursive: true, force: true });
 });

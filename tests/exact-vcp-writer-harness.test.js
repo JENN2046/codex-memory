@@ -77,7 +77,7 @@ test('CI authority job pins the exact VCP baseline without secret inputs', () =>
   assert.doesNotMatch(job, /\$\{\{\s*secrets\./u);
 });
 
-test('exact authority harness routes production-writer output through the lease child', () => {
+test('exact authority harness routes writer output through isolated provider and lease children', () => {
   const harness = fs.readFileSync(
     path.join(
       __dirname,
@@ -120,6 +120,28 @@ test('exact authority harness routes production-writer output through the lease 
     ),
     'utf8'
   );
+  const providerChild = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'src',
+      'runtime',
+      'vcp-native',
+      'production-governed-read-provider-child.js'
+    ),
+    'utf8'
+  );
+  const providerProcess = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'src',
+      'runtime',
+      'vcp-native',
+      'production-governed-read-shim.js'
+    ),
+    'utf8'
+  );
   const leaseTask = fs.readFileSync(
     path.join(
       __dirname,
@@ -132,12 +154,17 @@ test('exact authority harness routes production-writer output through the lease 
     'utf8'
   );
   assert.match(harness, /createGovernedReadLeaseWorker/u);
+  assert.match(harness, /createVcpQueryEmbeddingProvider/u);
   assert.match(harness, /preflight_process_exercised/u);
   assert.match(harness, /lease_scoped_child_exercised:\s*true/u);
   assert.match(harness, /child_provider_authority_present:\s*false/u);
   assert.match(preflightChild, /FORBIDDEN_ENVIRONMENT_KEYS/u);
   assert.match(preflightProcess, /child\.kill\('SIGTERM'\)/u);
   assert.doesNotMatch(preflightProcess, /SIGKILL/u);
+  assert.match(providerChild, /FORBIDDEN_ENVIRONMENT_KEYS/u);
+  assert.match(providerChild, /getEmbeddingsBatch/u);
+  assert.match(providerProcess, /child\.kill\('SIGTERM'\)/u);
+  assert.doesNotMatch(providerProcess, /SIGKILL/u);
   assert.match(worker, /FORBIDDEN_ENVIRONMENT_KEYS/u);
   assert.match(worker, /executeGovernedReadLeaseTask/u);
   assert.match(leaseTask, /source_snapshot_changed_after_preflight/u);

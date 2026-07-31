@@ -2,6 +2,8 @@
   "schemaVersion": 1,
   "paths": [
     ".gitattributes",
+    "apps/chatgpt-edge",
+    "apps/chatgpt-memory-scope-widget",
     "apps/local-recall-relay",
     "package-lock.json",
     "package.json",

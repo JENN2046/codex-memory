@@ -365,6 +365,17 @@ const WORKING_SET_KEYS = Object.freeze([
   'header',
   'receipts'
 ]);
+const PUBLIC_PROJECTION_KEYS = Object.freeze([
+  'protocol',
+  'attempt_ref',
+  'outcome',
+  'last_completed_stage',
+  'failed_stage',
+  'reason_code',
+  'failure_category',
+  'evidence_complete',
+  'counters'
+]);
 
 function assertExactKeys(value, expected, code) {
   if (!isPlainObject(value)) reject(code);
@@ -404,14 +415,32 @@ function createAttemptHeader({
   requestDigest,
   contextBindingDigest,
   now = new Date(),
-  ttlSeconds = GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds,
+  ttlSeconds,
+  deadlineAt,
   randomBytes
 } = {}) {
   const createdAt = now instanceof Date ? new Date(now.getTime()) : new Date(now);
   if (!Number.isFinite(createdAt.getTime())) reject('attempt_header_clock_invalid');
-  if (!Number.isInteger(ttlSeconds) || ttlSeconds < 1 ||
-      ttlSeconds > GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds) {
+  if (ttlSeconds !== undefined && deadlineAt !== undefined) {
     reject('attempt_header_ttl_invalid');
+  }
+  let deadlineMs;
+  if (deadlineAt !== undefined) {
+    deadlineMs = parseTimestamp(
+      deadlineAt,
+      'attempt_deadline_at_invalid'
+    );
+  } else {
+    const selectedTtlSeconds = ttlSeconds ??
+      GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds;
+    if (!Number.isInteger(selectedTtlSeconds) ||
+        selectedTtlSeconds < 1 ||
+        selectedTtlSeconds >
+          GOVERNED_READ_ATTEMPT_LIMITS.ttlSeconds) {
+      reject('attempt_header_ttl_invalid');
+    }
+    deadlineMs =
+      createdAt.getTime() + selectedTtlSeconds * 1000;
   }
   const header = {
     schema_version: GOVERNED_READ_ATTEMPT_SCHEMA_VERSION,
@@ -421,7 +450,7 @@ function createAttemptHeader({
     request_digest: requestDigest,
     context_binding_digest: contextBindingDigest,
     created_at: createdAt.toISOString(),
-    deadline_at: new Date(createdAt.getTime() + ttlSeconds * 1000).toISOString(),
+    deadline_at: new Date(deadlineMs).toISOString(),
     coordinator: GOVERNED_READ_ATTEMPT_COORDINATOR
   };
   validateAttemptHeader(header);
@@ -1042,7 +1071,7 @@ function projectGovernedReadAttemptOwner(protocol) {
 function projectGovernedReadAttemptPublic(protocol) {
   validateGovernedReadAttemptProtocol(protocol);
   const terminal = protocol.terminal;
-  return deepFreeze(structuredClone({
+  const projection = {
     protocol: GOVERNED_READ_ATTEMPT_PROTOCOL,
     attempt_ref: terminal.attempt_ref,
     outcome: terminal.outcome,
@@ -1052,7 +1081,64 @@ function projectGovernedReadAttemptPublic(protocol) {
     failure_category: terminal.failure_category,
     evidence_complete: terminal.evidence_complete,
     counters: terminal.counters
-  }));
+  };
+  validateGovernedReadAttemptPublicProjection(projection);
+  return deepFreeze(structuredClone(projection));
+}
+
+function validateGovernedReadAttemptPublicProjection(projection) {
+  assertExactKeys(
+    projection,
+    PUBLIC_PROJECTION_KEYS,
+    'attempt_public_projection_shape_invalid'
+  );
+  if (projection.protocol !== GOVERNED_READ_ATTEMPT_PROTOCOL ||
+      typeof projection.attempt_ref !== 'string' ||
+      !GOVERNED_READ_ATTEMPT_REF_PATTERN.test(projection.attempt_ref) ||
+      !['success', 'failure'].includes(projection.outcome) ||
+      typeof projection.evidence_complete !== 'boolean') {
+    reject('attempt_public_projection_invalid');
+  }
+  if (projection.last_completed_stage !== null &&
+      !GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES.includes(
+        projection.last_completed_stage
+      )) {
+    reject('attempt_public_projection_invalid');
+  }
+  let failureEntry = null;
+  if (projection.outcome === 'success') {
+    if (projection.last_completed_stage !== 'RESPONSE_FINALIZATION' ||
+        projection.failed_stage !== null ||
+        projection.reason_code !== null ||
+        projection.failure_category !== null ||
+        projection.evidence_complete !== true) {
+      reject('attempt_public_projection_invalid');
+    }
+  } else {
+    failureEntry = failureRegistryEntry(projection.reason_code);
+    const expectedFailedStage = failureEntry.stage === 'TERMINAL_FAILURE'
+      ? 'TERMINAL_FAILURE'
+      : failureEntry.stage;
+    if (projection.failed_stage !== expectedFailedStage ||
+        projection.failure_category !== failureEntry.category) {
+      reject('attempt_public_projection_invalid');
+    }
+    if (projection.last_completed_stage !== null &&
+        expectedFailedStage !== 'TERMINAL_FAILURE' &&
+        GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES.indexOf(
+          projection.last_completed_stage
+        ) >= GOVERNED_READ_ATTEMPT_NON_TERMINAL_STAGES.indexOf(
+          expectedFailedStage
+        )) {
+      reject('attempt_public_projection_invalid');
+    }
+  }
+  validateAttemptCounters(projection.counters, {
+    outcome: projection.outcome,
+    evidenceComplete: projection.evidence_complete,
+    failureEntry
+  });
+  return projection;
 }
 
 module.exports = {
@@ -1089,6 +1175,7 @@ module.exports = {
   validateAttemptHeader,
   validateCounterFacts,
   validateGovernedReadAttemptProtocol,
+  validateGovernedReadAttemptPublicProjection,
   validateGovernedReadTerminalFailureCandidate,
   validateGovernedReadAttemptWorkingSet,
   validateAttemptReceiptChain,

@@ -2,6 +2,9 @@
 
 const {
   ARCHITECTURE_REFERENCE,
+  CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+  EDGE_REQUEST_SCHEMA_VERSION,
+  EDGE_RESPONSE_SCHEMA_VERSION,
   SCHEMA_VERSION,
   KINDS,
   DATA_TOOL_NAMES,
@@ -16,6 +19,14 @@ const {
   FORBIDDEN_AUTHORITY_KEYS,
   FORBIDDEN_PUBLIC_DISCLOSURE_KEYS
 } = require('./constants');
+const {
+  GOVERNED_READ_ATTEMPT_READ_TOOLS,
+  validateGovernedReadAttemptPublicProjection
+} = require('./governed-read-attempt');
+const {
+  governedReadTerminalResponseStatus,
+  validateLegacyResponseCountersAgainstAttemptPublic
+} = require('./edge-data-response-v2');
 const { isPlainObject, canonicalJson, digestObject, utf8ByteLength, normalizeKey } = require('./canonical');
 const { verifySignedObject } = require('./signatures');
 const { reject } = require('./errors');
@@ -312,7 +323,9 @@ function validateRequestEnvelope(envelope, {
     'issued_at', 'expires_at', 'nonce', 'principal_assertion', 'tool_request',
     'signature'
   ], 'request_envelope_shape_invalid');
-  if (envelope.schema_version !== SCHEMA_VERSION) reject('request_schema_version_invalid');
+  if (envelope.schema_version !== EDGE_REQUEST_SCHEMA_VERSION) {
+    reject('request_schema_version_invalid');
+  }
   if (envelope.kind !== KINDS.requestEnvelope) reject('request_kind_invalid');
   if (envelope.architecture_reference !== ARCHITECTURE_REFERENCE) reject('request_architecture_invalid');
   assertString(envelope.request_id, { code: 'request_id_invalid', max: 100, pattern: REQUEST_ID_PATTERN });
@@ -390,7 +403,11 @@ function validatePublicStructuredContent(content) {
   return content;
 }
 
-function validateToolStructuredContent(toolName, content, { status = 'ok' } = {}) {
+function validateLegacyToolStructuredContent(
+  toolName,
+  content,
+  { status = 'ok' } = {}
+) {
   validatePublicStructuredContent(content);
   if (toolName === 'resolve_memory_context') {
     if (status === 'denied' || status === 'unavailable') {
@@ -469,6 +486,46 @@ function validateToolStructuredContent(toolName, content, { status = 'ok' } = {}
   return content;
 }
 
+function validateToolStructuredContent(
+  toolName,
+  content,
+  { status = 'ok' } = {}
+) {
+  validatePublicStructuredContent(content);
+  if (content.schema_version !== CHATGPT_EDGE_DATA_SCHEMA_VERSION) {
+    reject('response_data_schema_version_invalid');
+  }
+  if (toolName === 'resolve_memory_context') {
+    if (Object.hasOwn(content, 'attempt')) {
+      reject('response_structured_content_shape_invalid');
+    }
+    const { schema_version: ignored, ...legacy } = content;
+    return validateLegacyToolStructuredContent(
+      toolName,
+      legacy,
+      { status }
+    );
+  }
+  if (!GOVERNED_READ_ATTEMPT_READ_TOOLS.includes(toolName) ||
+      !Object.hasOwn(content, 'attempt')) {
+    reject('response_governed_attempt_required');
+  }
+  validateGovernedReadAttemptPublicProjection(content.attempt);
+  if (status !== governedReadTerminalResponseStatus(content.attempt)) {
+    reject('response_attempt_status_mismatch');
+  }
+  const {
+    schema_version: ignoredSchemaVersion,
+    attempt: ignoredAttempt,
+    ...legacy
+  } = content;
+  return validateLegacyToolStructuredContent(
+    toolName,
+    legacy,
+    { status }
+  );
+}
+
 function validateVisibilityLabels(labels, code) {
   if (!Array.isArray(labels) || labels.length < 1 ||
       new Set(labels).size !== labels.length ||
@@ -490,7 +547,9 @@ function validateResponseEnvelope(envelope, {
     'request_id', 'request_digest', 'tool_name', 'status', 'issued_at',
     'expires_at', 'structured_content', 'counters', 'receipt_chain', 'signature'
   ], 'response_envelope_shape_invalid');
-  if (envelope.schema_version !== SCHEMA_VERSION) reject('response_schema_version_invalid');
+  if (envelope.schema_version !== EDGE_RESPONSE_SCHEMA_VERSION) {
+    reject('response_schema_version_invalid');
+  }
   if (envelope.kind !== KINDS.responseEnvelope) reject('response_kind_invalid');
   if (envelope.architecture_reference !== ARCHITECTURE_REFERENCE) reject('response_architecture_invalid');
   assertString(envelope.response_id, { code: 'response_id_invalid', max: 100, pattern: RESPONSE_ID_PATTERN });
@@ -505,10 +564,18 @@ function validateResponseEnvelope(envelope, {
     maxTtlSeconds: LIMITS.maxEnvelopeTtlSeconds,
     prefix: 'response'
   });
+  if (counterMode !== null) validateCounterMode(counterMode);
   validateToolStructuredContent(envelope.tool_name, envelope.structured_content, {
     status: envelope.status
   });
-  validateCounters(envelope.counters, { counterMode });
+  if (envelope.tool_name === 'resolve_memory_context') {
+    validateCounters(envelope.counters, { requireZero: true });
+  } else {
+    validateLegacyResponseCountersAgainstAttemptPublic(
+      envelope.counters,
+      envelope.structured_content.attempt
+    );
+  }
   validateReceiptChain(envelope.receipt_chain);
   if (envelope.receipt_chain.edge_request !== envelope.request_digest) {
     reject('response_receipt_request_mismatch');
@@ -572,6 +639,7 @@ module.exports = {
   validateToolArguments,
   validateToolRequest,
   validateRequestEnvelope,
+  validateLegacyToolStructuredContent,
   validateCounterMode,
   validateCounters,
   validateReceiptChain,

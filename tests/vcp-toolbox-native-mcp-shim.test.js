@@ -19,6 +19,7 @@ const {
   runGovernedVcpNativeAcceptance
 } = require('../src/cli/governed-vcp-native-acceptance');
 const {
+  configureGovernedReadAttemptRuntime,
   configureSelectedDiaryHydration,
   parseArgs,
   requireExpectedBearerToken
@@ -1376,6 +1377,89 @@ test('VCPToolBox native MCP shim CLI wires selected-diary hydration only for exp
     })),
     /selected_diary_hydration_cli_boundary_invalid/u
   );
+});
+
+test('VCPToolBox native MCP shim CLI binds the governed attempt listener to an owner-scoped lease runtime', () => {
+  const bindingDigest = `sha256:${'ab'.repeat(32)}`;
+  const options = parseArgs([
+    '--vcp-root',
+    '/PRIVATE/VCPToolBox',
+    '--kb-root',
+    '/PRIVATE/VCPToolBox/dailynote',
+    '--source-kb-store',
+    '/PRIVATE/VCPToolBox/VectorStore',
+    '--governed-read-attempts',
+    '--governed-read-port',
+    '7616',
+    '--governed-read-lease-root',
+    '/PRIVATE/governed-read-leases'
+  ], {
+    CODEX_MEMORY_GOVERNED_READ_RUNTIME_BINDING_DIGEST:
+      bindingDigest,
+    API_URL: 'http://127.0.0.1:3000',
+    API_Key: 'synthetic-governed-provider-key',
+    WhitelistEmbeddingModel: 'synthetic-embedding-model',
+    VECTORDB_DIMENSION: '1024'
+  });
+  let factoryOptions = null;
+  const expectedRuntime = {
+    async start() {},
+    async stop() {},
+    snapshot() {
+      return { started: false };
+    }
+  };
+  configureGovernedReadAttemptRuntime(options, {
+    createRuntime(value) {
+      factoryOptions = value;
+      return expectedRuntime;
+    }
+  });
+  assert.equal(
+    options.governedReadAttemptRuntime,
+    expectedRuntime
+  );
+  assert.deepEqual(factoryOptions, {
+    runtimeBindingDigest: bindingDigest,
+    host: '127.0.0.1',
+    port: 7616,
+    leaseRoot: '/PRIVATE/governed-read-leases',
+    vcpToolBoxRoot: '/PRIVATE/VCPToolBox',
+    sourceKnowledgeBaseStorePath:
+      '/PRIVATE/VCPToolBox/VectorStore',
+    knowledgeBaseRootPath:
+      '/PRIVATE/VCPToolBox/dailynote',
+    dimension: 1024,
+    provider: {
+      apiUrl: 'http://127.0.0.1:3000',
+      apiKey: 'synthetic-governed-provider-key',
+      model: 'synthetic-embedding-model'
+    }
+  });
+
+  for (const argv of [
+    [
+      '--governed-read-attempts',
+      '--governed-read-port',
+      '7615'
+    ],
+    [
+      '--governed-read-attempts',
+      '--governed-read-port',
+      '7617'
+    ],
+    [
+      '--governed-read-attempts',
+      '--enable-write'
+    ]
+  ]) {
+    assert.throws(
+      () => configureGovernedReadAttemptRuntime(
+        parseArgs(argv)
+      ),
+      /governed_read_attempt_cli_boundary_invalid/u
+    );
+  }
 });
 
 function governanceMeta(toolName = 'search_memory') {

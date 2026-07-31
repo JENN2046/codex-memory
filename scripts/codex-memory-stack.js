@@ -17,16 +17,36 @@ const {
   MANIFEST_SCHEMA_VERSION,
   inspectControllerSourceManifest
 } = require('./codex-memory-controller-source-manifest');
+const {
+  CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+  EDGE_REQUEST_SCHEMA_VERSION,
+  EDGE_RESPONSE_SCHEMA_VERSION
+} = require('../packages/chatgpt-r4-contracts/constants');
+const {
+  GOVERNED_READ_ATTEMPT_PROTOCOL
+} = require('../packages/chatgpt-r4-contracts/governed-read-attempt');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
 const PROFILE_SCHEMA_VERSION = 6;
 const EXACT_HEAD_PROFILE_SCHEMA_VERSION = 5;
 const LEGACY_PROFILE_SCHEMA_VERSION = 4;
+const EDGE_CONTRACT_STATUS = Object.freeze({
+  dataResponseSchemaVersion:
+    CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+  requestEnvelopeSchemaVersion:
+    EDGE_REQUEST_SCHEMA_VERSION,
+  responseEnvelopeSchemaVersion:
+    EDGE_RESPONSE_SCHEMA_VERSION,
+  governedReadAttemptProtocol:
+    GOVERNED_READ_ATTEMPT_PROTOCOL,
+  legacyV1Accepted: false
+});
 const PROFILE_FILENAME = 'full-stack-control.json';
 const RUNTIME_DIRECTORY_NAME = 'codex-memory-full-stack-001';
 const EDGE_CONTAINER_DEFAULT = 'codex-memory-full-stack-001-edge';
 const PROVIDER_CONTAINER_DEFAULT = 'new-api-wsl';
+const GOVERNED_READ_SHIM_PORT = 7616;
 const CANONICAL_CODEX_MCP_ENDPOINT = Object.freeze({
   host: '127.0.0.1',
   path: '/mcp/codex-memory',
@@ -3281,6 +3301,7 @@ function computeRuntimeAccepted({
   vcpProviderCredentialFresh,
   vcpRuntime,
   shimListenerOwned,
+  governedReadShimListenerOwned,
   httpListenerOwned,
   governanceListenerOwned,
   governanceDataListenerOwned,
@@ -3305,6 +3326,7 @@ function computeRuntimeAccepted({
       processes?.[name]?.controllerManaged === true
     ) &&
     shimListenerOwned === true &&
+    governedReadShimListenerOwned === true &&
     httpListenerOwned === true &&
     governanceListenerOwned === true &&
     governanceDataListenerOwned === true &&
@@ -3414,6 +3436,12 @@ async function inspectStack({
   });
   const shimListenerOwned = processes.shim.controllerManaged &&
     processOwnsLoopbackTcpListener(processes.shim.pid, 7615);
+  const governedReadShimListenerOwned =
+    processes.shim.controllerManaged &&
+    processOwnsLoopbackTcpListener(
+      processes.shim.pid,
+      GOVERNED_READ_SHIM_PORT
+    );
   const httpListenerOwned = processes.http.controllerManaged &&
     processOwnsLoopbackTcpListener(
       processes.http.pid,
@@ -3540,6 +3568,7 @@ async function inspectStack({
     vcpProviderCredentialFresh,
     vcpRuntime,
     shimListenerOwned,
+    governedReadShimListenerOwned,
     httpListenerOwned,
     governanceListenerOwned,
     governanceDataListenerOwned,
@@ -3562,6 +3591,7 @@ async function inspectStack({
     vcpProviderCredentialFresh,
     vcpRuntime,
     shimListenerOwned,
+    governedReadShimListenerOwned,
     httpListenerOwned,
     governanceListenerOwned,
     governanceDataListenerOwned,
@@ -3620,8 +3650,14 @@ async function inspectStack({
       scopeComplete: vcpRuntime.scopeComplete
     }),
     shim: Object.freeze({
-      reachable: shimListenerOwned,
-      listenerIdentityMatch: shimListenerOwned
+      reachable:
+        shimListenerOwned &&
+        governedReadShimListenerOwned,
+      listenerIdentityMatch: shimListenerOwned,
+      governedReadAttemptListenerIdentityMatch:
+        governedReadShimListenerOwned,
+      governedReadAttemptProtocol:
+        GOVERNED_READ_ATTEMPT_PROTOCOL
     }),
     httpMcp: Object.freeze({
       reachable: httpHealth.reachable,
@@ -3641,7 +3677,8 @@ async function inspectStack({
       healthy: edge.healthy,
       secure: edge.secure,
       revisionMatch: edge.revision === profile.runtimeBaseline,
-      identityMatch: profileEdgeIdentityMatches(profile, edge)
+      identityMatch: profileEdgeIdentityMatches(profile, edge),
+      ...EDGE_CONTRACT_STATUS
     }),
     secretValuesReturned: false,
     rawMemoryReturned: false
@@ -4029,6 +4066,12 @@ async function startStackWithProfile(storedProfile, {
       if (!shimState.running && await portListening(7615)) {
         throw codedError('stack_unmanaged_shim_listener');
       }
+      if (!shimState.running &&
+          await portListening(GOVERNED_READ_SHIM_PORT)) {
+        throw codedError(
+          'stack_unmanaged_governed_read_shim_listener'
+        );
+      }
       const shim = await spawnManaged('shim', '_run-shim', governanceEnvironment, {
         profile,
         environment
@@ -4038,7 +4081,11 @@ async function startStackWithProfile(storedProfile, {
         const state = inspectManagedProcess('shim', { environment, profile });
         return state.controllerManaged &&
           state.pid === shim.pid &&
-          processOwnsLoopbackTcpListener(state.pid, 7615);
+          processOwnsLoopbackTcpListener(state.pid, 7615) &&
+          processOwnsLoopbackTcpListener(
+            state.pid,
+            GOVERNED_READ_SHIM_PORT
+          );
       }, {
         failureCode: 'stack_shim_start_timeout'
       });
@@ -4098,7 +4145,14 @@ async function startStackWithProfile(storedProfile, {
       );
       if (!shimBeforeGovernance.controllerManaged ||
           shimBeforeGovernance.pid !== shim.pid ||
-          !processOwnsLoopbackTcpListener(shimBeforeGovernance.pid, 7615)) {
+          !processOwnsLoopbackTcpListener(
+            shimBeforeGovernance.pid,
+            7615
+          ) ||
+          !processOwnsLoopbackTcpListener(
+            shimBeforeGovernance.pid,
+            GOVERNED_READ_SHIM_PORT
+          )) {
         throw codedError('stack_shim_listener_identity_mismatch');
       }
       if (!governanceState.running) {
@@ -4658,11 +4712,13 @@ function buildShimChildEnvironment(environment, {
   runtimeRoot,
   vcpRoot,
   mappingPath,
-  providerEnvironment
+  providerEnvironment,
+  runtimeBindingDigest
 }) {
   if (!providerEnvironment || typeof providerEnvironment.apiKey !== 'string' ||
       typeof providerEnvironment.model !== 'string' ||
-      typeof providerEnvironment.dimension !== 'string') {
+      typeof providerEnvironment.dimension !== 'string' ||
+      !SAFE_SHA256_DIGEST.test(runtimeBindingDigest || '')) {
     throw codedError('stack_vcp_provider_environment_invalid');
   }
   return {
@@ -4683,6 +4739,12 @@ function buildShimChildEnvironment(environment, {
     KNOWLEDGEBASE_STORE_PATH: path.join(runtimeRoot, 'store'),
     CODEX_MEMORY_DIARY_SCOPE_MAPPING_PATH: mappingPath,
     CODEX_MEMORY_VCP_NATIVE_HTTP_TOKEN: token,
+    CODEX_MEMORY_GOVERNED_READ_SHIM_PORT:
+      String(GOVERNED_READ_SHIM_PORT),
+    CODEX_MEMORY_GOVERNED_READ_LEASE_ROOT:
+      path.join(runtimeRoot, 'governed-read-leases'),
+    CODEX_MEMORY_GOVERNED_READ_RUNTIME_BINDING_DIGEST:
+      runtimeBindingDigest,
     CODEX_MEMORY_DERIVED_RUNTIME_MUTATION_POLICY:
       'isolated_derived_runtime_mutation_v1',
     ENABLE_REAL_ROOT_WRITE: '0'
@@ -4812,7 +4874,12 @@ function managedShimArguments({ vcpRoot, runtimeRoot } = {}) {
     path.join(runtimeRoot, 'store'),
     '--source-kb-store',
     path.join(vcpRoot, 'VectorStore'),
-    '--selected-diary-hydration'
+    '--selected-diary-hydration',
+    '--governed-read-attempts',
+    '--governed-read-port',
+    String(GOVERNED_READ_SHIM_PORT),
+    '--governed-read-lease-root',
+    path.join(runtimeRoot, 'governed-read-leases')
   ]);
 }
 
@@ -4859,12 +4926,18 @@ async function runShimChild() {
     process.env.CODEX_MEMORY_R4_NATIVE_HTTP_TOKEN_REFERENCE,
     privateRoot
   ));
+  assertOwnerOnlyDirectory(
+    path.join(runtimeRoot, 'governed-read-leases'),
+    { create: true }
+  );
   const shimEnvironment = buildShimChildEnvironment(process.env, {
     token,
     runtimeRoot,
     vcpRoot,
     mappingPath,
-    providerEnvironment
+    providerEnvironment,
+    runtimeBindingDigest:
+      process.env.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST
   });
   writeProviderConfigIdentityReceipt({
     ...profileControllerIdentityReceipt(profile),
@@ -4972,7 +5045,11 @@ function requireShimListenerForGovernanceChild(privateRoot) {
     profile
   });
   if (!state.controllerManaged ||
-      !processOwnsLoopbackTcpListener(state.pid, 7615)) {
+      !processOwnsLoopbackTcpListener(state.pid, 7615) ||
+      !processOwnsLoopbackTcpListener(
+        state.pid,
+        GOVERNED_READ_SHIM_PORT
+      )) {
     throw codedError('stack_shim_listener_identity_mismatch');
   }
   return state.pid;
@@ -5335,7 +5412,9 @@ module.exports = {
   CANONICAL_CODEX_MCP_TOOL_NAMES,
   CANONICAL_CODEX_MCP_ENDPOINT,
   CONTROLLER_CHANGE_PATHS,
+  EDGE_CONTRACT_STATUS,
   EXACT_HEAD_PROFILE_SCHEMA_VERSION,
+  GOVERNED_READ_SHIM_PORT,
   PROFILE_KEYS,
   PROFILE_SCHEMA_VERSION,
   LEGACY_ROLLBACK_MCP_ENDPOINT,
