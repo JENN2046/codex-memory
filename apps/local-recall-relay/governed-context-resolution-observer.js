@@ -80,6 +80,11 @@ function createGovernedContextResolutionObserver({
     }
   }
 
+  function replayProtectionExpiresAt(header) {
+    return Date.parse(header.deadline_at) +
+      GOVERNED_CONTEXT_RESOLUTION_LIMITS.ttlSeconds * 1000;
+  }
+
   function evictOldestClosedResolution() {
     let selectedRef = null;
     let selectedPurgeAfterMs = Number.POSITIVE_INFINITY;
@@ -117,11 +122,14 @@ function createGovernedContextResolutionObserver({
       if (event.event === 'resolution_accepted') {
         validateContextResolutionHeader(event.header);
         pruneExpiredReplayTombstones(currentMs);
-        if (Date.parse(event.header.created_at) > currentMs) {
-          return violation('context_resolution_observer_created_at_in_future');
+        const acceptedAtMs = event.accepted_at_ms;
+        if (!Number.isSafeInteger(acceptedAtMs) ||
+            acceptedAtMs < Date.parse(event.header.created_at) ||
+            acceptedAtMs >= Date.parse(event.header.deadline_at)) {
+          return violation('context_resolution_observer_accepted_at_invalid');
         }
-        if (Date.parse(event.header.deadline_at) <= currentMs) {
-          return violation('context_resolution_observer_deadline_expired');
+        if (replayProtectionExpiresAt(event.header) <= currentMs) {
+          return violation('context_resolution_observer_delivery_expired');
         }
         if (resolutions.has(event.header.resolution_ref) ||
             replayTombstones.has(event.header.resolution_ref)) {
@@ -147,7 +155,7 @@ function createGovernedContextResolutionObserver({
         });
         replayTombstones.set(
           event.header.resolution_ref,
-          Date.parse(event.header.deadline_at)
+          replayProtectionExpiresAt(event.header)
         );
         counters.resolutions_accepted += 1;
         return true;

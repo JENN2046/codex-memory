@@ -20,6 +20,7 @@ function createGovernedContextResolutionCoordinator({
   maxResolutions = 64,
   maxRetainedResolutions = Math.max(maxResolutions, 256),
   maxReplayTombstones = 4096,
+  maxPendingObserverEvents = 256,
   terminalRetentionMs =
     GOVERNED_CONTEXT_RESOLUTION_LIMITS.ttlSeconds * 1000,
   eventSink
@@ -41,6 +42,11 @@ function createGovernedContextResolutionCoordinator({
       maxReplayTombstones > 65536) {
     reject('context_resolution_coordinator_tombstone_capacity_invalid');
   }
+  if (!Number.isInteger(maxPendingObserverEvents) ||
+      maxPendingObserverEvents < 1 ||
+      maxPendingObserverEvents > 4096) {
+    reject('context_resolution_coordinator_observer_queue_invalid');
+  }
   if (!Number.isInteger(terminalRetentionMs) ||
       terminalRetentionMs < 10 ||
       terminalRetentionMs >
@@ -56,6 +62,8 @@ function createGovernedContextResolutionCoordinator({
   let activeResolutions = 0;
   let eventDispatchDepth = 0;
   let eventDeliveryTail = null;
+  let pendingObserverEvents = 0;
+  let droppedObserverEvents = 0;
   let coordinatorLost = false;
 
   function nowMs() {
@@ -104,7 +112,12 @@ function createGovernedContextResolutionCoordinator({
   }
 
   function trackEventDelivery(pending) {
-    const tracked = Promise.resolve(pending).catch(() => {});
+    pendingObserverEvents += 1;
+    const tracked = Promise.resolve(pending)
+      .catch(() => {})
+      .finally(() => {
+        pendingObserverEvents -= 1;
+      });
     eventDeliveryTail = tracked;
     tracked.then(() => {
       if (eventDeliveryTail === tracked) eventDeliveryTail = null;
@@ -113,6 +126,11 @@ function createGovernedContextResolutionCoordinator({
 
   function emit(event, payload = {}) {
     if (!eventSink) return;
+    if (eventDeliveryTail &&
+        pendingObserverEvents >= maxPendingObserverEvents) {
+      droppedObserverEvents += 1;
+      return;
+    }
     const message = Object.freeze({
       component: GOVERNED_CONTEXT_RESOLUTION_EVENT_COMPONENT,
       event,
@@ -149,6 +167,9 @@ function createGovernedContextResolutionCoordinator({
   }
 
   function acceptResolution(header) {
+    if (droppedObserverEvents > 0) {
+      reject('context_resolution_observer_delivery_incomplete');
+    }
     validateContextResolutionHeader(header);
     const acceptedAtMs = nowMs();
     pruneExpiredTerminals(acceptedAtMs);
@@ -191,7 +212,8 @@ function createGovernedContextResolutionCoordinator({
     );
     activeResolutions += 1;
     emit('resolution_accepted', {
-      header: structuredClone(acceptedHeader)
+      header: structuredClone(acceptedHeader),
+      accepted_at_ms: acceptedAtMs
     });
     emit('resolution_receipt_appended', {
       resolution_ref: header.resolution_ref,
@@ -469,6 +491,16 @@ function createGovernedContextResolutionCoordinator({
     });
   }
 
+  function observerDeliverySnapshot() {
+    return Object.freeze({
+      event_sink_configured: Boolean(eventSink),
+      max_pending_events: maxPendingObserverEvents,
+      pending_events: pendingObserverEvents,
+      dropped_events: droppedObserverEvents,
+      delivery_compromised: droppedObserverEvents > 0
+    });
+  }
+
   return Object.freeze({
     acceptResolution: guardMutation(acceptResolution),
     appendReceipt: guardMutation(appendReceipt),
@@ -476,6 +508,7 @@ function createGovernedContextResolutionCoordinator({
     commitProtocolCandidate: guardMutation(commitProtocolCandidate),
     commitTerminal: guardMutation(commitTerminal),
     expireDueResolutions: guardMutation(expireDueResolutions),
+    observerDeliverySnapshot,
     protocol,
     reportCoordinatorLoss: guardMutation(reportCoordinatorLoss),
     snapshot,

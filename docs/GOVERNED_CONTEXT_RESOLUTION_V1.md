@@ -108,7 +108,9 @@ application.
 - replay-tombstone capacity fails closed and is reclaimed at those deadlines;
 - synchronous Observer callbacks cannot reenter coordinator mutations;
 - promise-returning Observer sinks are serialized in emission order without
-  delaying or changing the coordinator's terminal CAS; and
+  delaying or changing the coordinator's terminal CAS;
+- asynchronous delivery retains at most 256 events by default (4096 maximum),
+  records low-disclosure drops, and blocks new admission after any drop; and
 - coordinator loss emits `terminal_missing`, fabricates no terminal, and
   permanently closes that coordinator to subsequent mutation.
 
@@ -123,8 +125,10 @@ Before rejecting a new accepted resolution at its retention bound, it evicts the
 oldest terminal or missing record. Active chains are never evicted, so a shorter
 coordinator terminal-retention window cannot poison Observer admission.
 Eviction preserves a bounded lightweight replay tombstone through the immutable
-deadline; replayed accepted/receipt/terminal event chains cannot increment the
-Observer's accepted business counters twice.
+deadline plus one bounded transport TTL. `accepted_at_ms` proves coordinator-side
+admission before the deadline, so a serialized event delivered at the deadline
+remains valid while replayed accepted/receipt/terminal chains cannot increment
+the Observer's accepted business counters twice.
 
 ## Bounds
 
@@ -137,6 +141,8 @@ complete_protocol_max_bytes: 16384
 ttl_max_seconds: 60
 replay_tombstones_default: 4096
 replay_tombstones_max: 65536
+pending_observer_events_default: 256
+pending_observer_events_max: 4096
 ```
 
 ## Synthetic evidence

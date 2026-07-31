@@ -738,8 +738,9 @@ test('Observer validates the chain and records missing terminal without fabricat
 });
 
 test('Edge preserves Observer event order for a promise-returning sink', async () => {
+  let currentMs = NOW_MS;
   const observer = createGovernedContextResolutionObserver({
-    clock: () => new Date(NOW_MS)
+    clock: () => new Date(currentMs)
   });
   const delivered = [];
   let releaseAccepted;
@@ -751,7 +752,7 @@ test('Edge preserves Observer event order for a promise-returning sink', async (
     resolveTerminal = resolve;
   });
   const coordinator = createGovernedContextResolutionCoordinator({
-    clock: () => new Date(NOW_MS),
+    clock: () => new Date(currentMs),
     eventSink: async event => {
       if (event.event === 'resolution_accepted') {
         await acceptedBarrier;
@@ -763,11 +764,12 @@ test('Edge preserves Observer event order for a promise-returning sink', async (
       }
     }
   });
-  const value = header('observer-async-order');
+  const value = header('observer-async-order', { ttlSeconds: 1 });
 
   commitCoordinatorSuccess(coordinator, value);
   await Promise.resolve();
   assert.deepEqual(delivered, []);
+  currentMs = Date.parse(value.deadline_at);
   releaseAccepted();
   await terminalDelivered;
 
@@ -781,6 +783,53 @@ test('Edge preserves Observer event order for a promise-returning sink', async (
   assert.equal(snapshot.receipts_accepted, 7);
   assert.equal(snapshot.terminal_successes, 1);
   assert.equal(snapshot.protocol_violations, 0);
+});
+
+test('Edge bounds events queued behind a stalled promise-returning sink', async () => {
+  const delivered = [];
+  let releaseFirst;
+  const firstBarrier = new Promise(resolve => {
+    releaseFirst = resolve;
+  });
+  let resolveSecond;
+  const secondDelivered = new Promise(resolve => {
+    resolveSecond = resolve;
+  });
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS),
+    maxPendingObserverEvents: 2,
+    eventSink: async event => {
+      delivered.push(event.event);
+      if (delivered.length === 1) await firstBarrier;
+      if (delivered.length === 2) resolveSecond();
+    }
+  });
+
+  commitCoordinatorSuccess(coordinator, header('observer-stalled-queue'));
+  await Promise.resolve();
+  assert.deepEqual(delivered, ['resolution_accepted']);
+  assert.deepEqual(coordinator.observerDeliverySnapshot(), {
+    event_sink_configured: true,
+    max_pending_events: 2,
+    pending_events: 2,
+    dropped_events: 7,
+    delivery_compromised: true
+  });
+  assert.throws(() => coordinator.acceptResolution(
+    header('observer-admission-after-drop')
+  ), { code: 'context_resolution_observer_delivery_incomplete' });
+
+  releaseFirst();
+  await secondDelivered;
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(delivered, [
+    'resolution_accepted',
+    'resolution_receipt_appended'
+  ]);
+  assert.equal(
+    coordinator.observerDeliverySnapshot().pending_events,
+    0
+  );
 });
 
 test('Observer reuses capacity after shorter coordinator terminal retention', () => {
@@ -841,7 +890,8 @@ test('Observer replay tombstone capacity is reusable at the old deadline', () =>
   const acceptedEvent = {
     component: 'governed_context_resolution_coordinator',
     event: 'resolution_accepted',
-    header: waiting
+    header: waiting,
+    accepted_at_ms: NOW_MS
   };
 
   currentMs += 10;
@@ -851,7 +901,8 @@ test('Observer replay tombstone capacity is reusable at the old deadline', () =>
     'context_resolution_observer_tombstone_capacity_exceeded'
   );
 
-  currentMs = Date.parse(completed.deadline_at);
+  currentMs = Date.parse(completed.deadline_at) +
+    GOVERNED_CONTEXT_RESOLUTION_LIMITS.ttlSeconds * 1000;
   assert.equal(observer.observe(acceptedEvent), true);
   const snapshot = observer.snapshot();
   assert.equal(snapshot.resolutions_accepted, 2);
@@ -866,7 +917,8 @@ test('Observer rejects a tampered receipt independently', () => {
   assert.equal(observer.observe({
     component: 'governed_context_resolution_coordinator',
     event: 'resolution_accepted',
-    header: value
+    header: value,
+    accepted_at_ms: NOW_MS
   }), true);
   const created = createContextResolutionStageReceipt({
     header: value,
