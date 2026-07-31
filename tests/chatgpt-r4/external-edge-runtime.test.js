@@ -528,6 +528,61 @@ test('external Edge retains a delayed timeout from its actual terminal commit', 
   broker.close();
 });
 
+test('external Edge replay capacity spans the request TTL across terminal turnover', async () => {
+  let current = new Date('2026-07-31T00:00:00.000Z');
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current,
+    maxInFlight: 1,
+    maxRecords: 1,
+    terminalRetentionMs: 10
+  });
+  const contextRef = `pctx_${'T'.repeat(32)}`;
+  const request = marker => ({
+    request_id:
+      `req_external_replay_turnover_${marker}_000001`,
+    nonce:
+      `request_nonce_external_replay_turnover_${marker}_01`,
+    expires_at: new Date(
+      current.getTime() + 60_000
+    ).toISOString(),
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: contextRef
+      }
+    }
+  });
+  const first = request('first');
+  const requests = [
+    first,
+    request('second'),
+    request('third'),
+    request('fourth')
+  ];
+  for (const currentRequest of requests) {
+    assert.equal(
+      (await broker.submit(currentRequest)).status,
+      'queued'
+    );
+    assert.equal(
+      broker.cancel(currentRequest.request_id).status,
+      'cancelled'
+    );
+    current = new Date(current.getTime() + 10);
+  }
+  await assert.rejects(
+    broker.submit(first),
+    { code: 'replay_detected' }
+  );
+  assert.equal(
+    (await broker.submit(request('fresh'))).status,
+    'queued'
+  );
+  broker.close();
+});
+
 test('external Edge preserves a positive subsecond attempt budget for one-second requests', async () => {
   const createdAt = new Date('2026-07-31T00:00:00.000Z');
   let current = new Date(createdAt);

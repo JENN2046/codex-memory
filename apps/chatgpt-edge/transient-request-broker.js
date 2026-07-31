@@ -3,6 +3,7 @@
 const {
   GOVERNED_READ_ATTEMPT_READ_TOOLS,
   GOVERNED_READ_ATTEMPT_LIMITS,
+  LIMITS,
   aggregateAttemptCounters,
   canonicalJson,
   createAttemptHeader,
@@ -93,7 +94,13 @@ function createTransientRequestBroker({
     reject('edge_attempt_coordinator_invalid');
   }
   const submissionReplayGuard = new InMemoryReplayGuard({
-    maxEntries: maxRecords * 3,
+    maxEntries:
+      maxRecords *
+      3 *
+      Math.ceil(
+        LIMITS.maxEnvelopeTtlSeconds * 1000 /
+          terminalRetentionMs
+      ),
     clock
   });
 
