@@ -623,6 +623,57 @@ test('Edge active capacity remains reusable after more than 64 lifetime resoluti
   );
 });
 
+test('Edge retains a replay tombstone after terminal payload eviction', () => {
+  let currentMs = NOW_MS;
+  const events = [];
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(currentMs),
+    maxResolutions: 1,
+    maxRetainedResolutions: 1,
+    terminalRetentionMs: 10,
+    eventSink: event => events.push(event)
+  });
+  const value = header('replay-after-terminal-eviction', { ttlSeconds: 1 });
+  commitCoordinatorSuccess(coordinator, value);
+
+  currentMs += 10;
+  assert.throws(() => coordinator.acceptResolution(value), {
+    code: 'context_resolution_ref_replay'
+  });
+  assert.throws(() => coordinator.snapshot(value.resolution_ref), {
+    code: 'context_resolution_not_found'
+  });
+  assert.equal(events.filter(event =>
+    event.event === 'resolution_accepted').length, 1);
+
+  currentMs = Date.parse(value.deadline_at);
+  assert.throws(() => coordinator.acceptResolution(value), {
+    code: 'context_resolution_deadline_expired'
+  });
+});
+
+test('Edge replay tombstone capacity is reusable after immutable deadlines', () => {
+  let currentMs = NOW_MS;
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(currentMs),
+    maxResolutions: 1,
+    maxRetainedResolutions: 1,
+    maxReplayTombstones: 1,
+    terminalRetentionMs: 10
+  });
+  const completed = header('bounded-replay-tombstone', { ttlSeconds: 1 });
+  commitCoordinatorSuccess(coordinator, completed);
+
+  currentMs += 10;
+  const waiting = header('replay-tombstone-capacity-reused');
+  assert.throws(() => coordinator.acceptResolution(waiting), {
+    code: 'context_resolution_coordinator_tombstone_capacity_exceeded'
+  });
+
+  currentMs = Date.parse(completed.deadline_at);
+  assert.doesNotThrow(() => coordinator.acceptResolution(waiting));
+});
+
 test('deadline wins over a success candidate validated at the boundary', () => {
   let currentMs = NOW_MS;
   const coordinator = createGovernedContextResolutionCoordinator({

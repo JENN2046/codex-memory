@@ -103,6 +103,9 @@ application.
 - late completion and duplicate terminal candidates are rejected;
 - a committed terminal immediately releases active admission capacity;
 - active capacity is independent from bounded terminal retention;
+- terminal payloads may expire early, but a bounded lightweight replay
+  tombstone rejects the same `resolution_ref` through its immutable deadline;
+- replay-tombstone capacity fails closed and is reclaimed at those deadlines;
 - synchronous Observer callbacks cannot reenter coordinator mutations;
 - promise-returning Observer sinks are serialized in emission order without
   delaying or changing the coordinator's terminal CAS; and
@@ -128,6 +131,8 @@ receipt_max_count: 7
 terminal_max_bytes: 4096
 complete_protocol_max_bytes: 16384
 ttl_max_seconds: 60
+replay_tombstones_default: 4096
+replay_tombstones_max: 65536
 ```
 
 ## Synthetic evidence
@@ -136,8 +141,8 @@ The source-only tests cover the complete success chain, every registered
 stage-failure path, first-terminal competition, deadline ordering, cancellation,
 timeout, active-capacity reuse beyond 64 lifetime operations, coordinator loss,
 Observer retention-window divergence and tamper rejection, malformed and
-expired refs, missing issuance evidence, cross-request receipt splicing, and
-fake read-counter injection.
+expired refs, post-eviction ref replay, missing issuance evidence,
+cross-request receipt splicing, and fake read-counter injection.
 
 The dormancy test also pins all six existing ChatGPT Edge tool input/output
 schema digests and asserts that no live resolver or governed-read module imports
