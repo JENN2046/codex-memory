@@ -2,15 +2,19 @@
 
 ## Status
 
-`governed_read_source_projection.v1` is the dormant source-projection contract
-for the second ordered `CM-2159` delivery. It does not activate
-`governed_read_attempt.v1` in the live path, start a service, call a real
-provider, read real memory, change the public MCP surface, cut over Edge
-responses, or claim readiness.
+`governed_read_source_projection.v1` is the source-projection contract
+introduced by the second ordered `CM-2159` delivery. At that delivery
+checkpoint it was dormant: it did not activate `governed_read_attempt.v1`,
+start a service, call a real provider, read real memory, change the public MCP
+surface, cut over Edge responses, or claim readiness.
 
-The schema-v6 stack remains stopped. Lease-worker process isolation and the
-provider-between-passes runtime wiring are consumed by the companion dormant
-vertical runtime; neither delivery activates the public path.
+The schema-v6 stack remained stopped at that checkpoint. The third delivery
+added the companion vertical runtime, and the fourth hard-cut the Edge v2 path.
+After both merged and merged-main CI passed, a separately authorized
+`rebind-source` started and accepted the managed schema-v6 runtime identity.
+Single-use `_005` later ended at resolve with no usable `project_context_ref`;
+`search_memory` was not invoked, no attempt terminal exists, and no retry
+occurred. These later facts do not establish R5-O or readiness.
 
 ## Production API
 
@@ -192,9 +196,10 @@ The isolated CI job `Exact VCP writer authority`:
   and between-pass-mutation negatives only by minimally corrupting copies of
   writer output.
 
-The two dormant-runtime passive contract imports are accepted only when their
-allowlisted targets are canonical regular files whose `realpath` is the exact
-expected contract path. A symlinked contract target fails the import fence.
+The two passive contract imports introduced for the then-dormant runtime are
+accepted only when their allowlisted targets are canonical regular files whose
+`realpath` is the exact expected contract path. A symlinked contract target
+fails the import fence.
 
 Default local tests do not clone VCPToolBox, install its dependencies, access
 the network, start a real service, or call a provider. The exact authority job
@@ -202,9 +207,12 @@ is the cross-repository gate.
 
 ## Non-claims
 
-This source module alone does not establish live attempt receipts or activate a
-lease-scoped child worker. Its companion dormant runtime is documented in
-`docs/GOVERNED_READ_VERTICAL_RUNTIME_V1.md`. Together they still do not
-establish public data-response v2, rebind, `_005`, R5-O acceptance, production
-readiness, release readiness, deploy readiness, cutover readiness, or
-`RC_READY`.
+At its second-delivery checkpoint, this source module alone did not establish
+live attempt receipts or activate a lease-scoped child worker. Its companion
+runtime was still dormant, and together they did not yet establish public
+data-response v2, rebind, or `_005`.
+
+The later v2 cutover, authorized rebind, and pre-attempt `_005` outcome are the
+bounded current facts described above. They do not establish R5-O acceptance,
+production readiness, release readiness, deploy readiness, cutover readiness,
+or `RC_READY`, and they authorize no further runtime or memory-tool action.
