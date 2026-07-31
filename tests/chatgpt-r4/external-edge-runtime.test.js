@@ -739,11 +739,11 @@ test('external MCP independently requires signed canonical broker evidence befor
   );
 
   const unsigned = structuredClone(brokerResult);
-  const signatureTail =
-    unsigned.response.signature.value.at(-1);
+  const signatureHead =
+    unsigned.response.signature.value.at(0);
   unsigned.response.signature.value =
-    `${unsigned.response.signature.value.slice(0, -1)}` +
-    `${signatureTail === 'A' ? 'B' : 'A'}`;
+    `${signatureHead === 'A' ? 'B' : 'A'}` +
+    `${unsigned.response.signature.value.slice(1)}`;
   assert.throws(
     () => normalizeBrokerResult(
       'search_memory',
