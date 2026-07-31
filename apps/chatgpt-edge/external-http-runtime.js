@@ -41,7 +41,17 @@ function createExternalEdgeRuntime(options = {}) {
     expectedClientId: config.oauthClientId,
     operatorSubjectFingerprint: config.operatorSubjectFingerprint
   });
-  const broker = config.broker || createTransientRequestBroker({
+  const verifyBrokerResponse = (response, request) =>
+    validateResponseEnvelope(response, {
+      now: config.clock(),
+      resolveResponsePublicKey: keyId =>
+        keyId === config.relaySigningKeyId
+          ? config.relaySigningPublicKey
+          : null,
+      expectedRequest: request,
+      counterMode: config.counterMode
+    });
+  const broker = createTransientRequestBroker({
     clock: config.clock,
     claimLeaseMs: config.claimLeaseMs,
     terminalRetentionMs: config.terminalRetentionMs,
@@ -60,16 +70,7 @@ function createExternalEdgeRuntime(options = {}) {
         consumeReplay: false
       });
     },
-    verifyResponse(response, request) {
-      return validateResponseEnvelope(response, {
-        now: config.clock(),
-        resolveResponsePublicKey: keyId => keyId === config.relaySigningKeyId
-          ? config.relaySigningPublicKey
-          : null,
-        expectedRequest: request,
-        counterMode: config.counterMode
-      });
-    }
+    verifyResponse: verifyBrokerResponse
   });
   const mcp = createExternalMcpHandler({
     broker,
@@ -78,7 +79,8 @@ function createExternalEdgeRuntime(options = {}) {
     edgeSigning: config.edgeSigning,
     clock: config.clock,
     requestTtlSeconds: config.requestTtlSeconds,
-    responseTimeoutMs: config.responseTimeoutMs
+    responseTimeoutMs: config.responseTimeoutMs,
+    verifyBrokerResponse
   });
   let started = false;
 
@@ -250,9 +252,8 @@ function validateExternalEdgeRuntimeConfig(options) {
       typeof options.attemptEventSink !== 'function') {
     reject('edge_attempt_event_sink_invalid');
   }
-  if (options.broker !== undefined &&
-      options.broker?.governedReadAttempts !== true) {
-    reject('edge_attempt_broker_required');
+  if (options.broker !== undefined) {
+    reject('edge_custom_broker_forbidden');
   }
   const counterMode = options.counterMode || COUNTER_MODES.zeroMemory;
   if (!Object.values(COUNTER_MODES).includes(counterMode)) reject('edge_counter_mode_invalid');
@@ -279,8 +280,7 @@ function validateExternalEdgeRuntimeConfig(options) {
     verifyAccessToken: options.verifyAccessToken,
     eventSink: options.eventSink,
     attemptEventSink: options.attemptEventSink,
-    counterMode,
-    broker: options.broker
+    counterMode
   });
 }
 

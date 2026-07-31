@@ -27,6 +27,8 @@ const {
 const TERMINAL_STATES = new Set(['completed', 'cancelled', 'expired']);
 const GOVERNED_ATTEMPT_FAILURE_RESULT_KIND =
   'governed_read_attempt_terminal_result';
+const GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND =
+  'governed_read_attempt_response_result';
 const REQUIRED_ATTEMPT_COORDINATOR_METHODS = Object.freeze([
   'acceptAttempt',
   'appendReceipt',
@@ -138,6 +140,26 @@ function createTransientRequestBroker({
     });
   }
 
+  function attemptResponseResult(record) {
+    if (!record.attempt_protocol || !record.response) {
+      reject('edge_attempt_response_missing');
+    }
+    return Object.freeze({
+      kind: GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND,
+      request_id: record.request.request_id,
+      tool_name: record.request.tool_request.name,
+      response: structuredClone(record.response),
+      governed_read_attempt:
+        structuredClone(record.attempt_protocol)
+    });
+  }
+
+  function completedBrokerResult(record) {
+    return record.attempt_ref
+      ? attemptResponseResult(record)
+      : structuredClone(record.response);
+  }
+
   function settleWaiters(record) {
     const pending = waiters.get(record.request.request_id);
     if (!pending) return;
@@ -145,7 +167,7 @@ function createTransientRequestBroker({
     for (const waiter of pending) {
       waiter.cleanup();
       if (record.status === 'completed') {
-        waiter.resolve(structuredClone(record.response));
+        waiter.resolve(completedBrokerResult(record));
       } else if (record.attempt_protocol) {
         waiter.resolve(attemptFailureResult(record));
       } else {
@@ -440,6 +462,8 @@ function createTransientRequestBroker({
         currentRecord.attempt_ref,
         governedReadAttemptCandidate
       );
+      currentRecord.attempt_protocol =
+        governedCoordinator.protocol(currentRecord.attempt_ref);
     }
     currentRecord.response = acceptedResponse;
     currentRecord.status = 'completed';
@@ -491,7 +515,7 @@ function createTransientRequestBroker({
     return {
       request_id: requestId,
       status: record.status,
-      response: structuredClone(record.response)
+      response: completedBrokerResult(record)
     };
   }
 
@@ -500,7 +524,9 @@ function createTransientRequestBroker({
       reject('edge_wait_timeout_invalid');
     }
     const record = requireRecord(requestId);
-    if (record.status === 'completed') return Promise.resolve(structuredClone(record.response));
+    if (record.status === 'completed') {
+      return Promise.resolve(completedBrokerResult(record));
+    }
     if (record.attempt_protocol) {
       return Promise.resolve(attemptFailureResult(record));
     }
@@ -1030,6 +1056,7 @@ function createGovernedReadAttemptCoordinator({
 
 module.exports = {
   GOVERNED_ATTEMPT_FAILURE_RESULT_KIND,
+  GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND,
   TERMINAL_STATES,
   createGovernedReadAttemptCoordinator,
   createTransientRequestBroker

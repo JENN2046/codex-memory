@@ -22,7 +22,8 @@ const {
   digestObject,
   governedReadAttemptResponseBindingDigest,
   projectLegacyCountersFromGovernedReadAttempt,
-  sha256
+  sha256,
+  validateResponseEnvelope
 } = require('../../packages/chatgpt-r4-contracts');
 const {
   MODEL_WORKFLOW_INSTRUCTIONS,
@@ -641,27 +642,155 @@ test('external Edge does not commit a terminal before response cloning succeeds'
   broker.close();
 });
 
-test('external MCP normalization rejects legacy broker data before public output', () => {
+test('external MCP independently requires signed canonical broker evidence before public output', async t => {
+  const now = new Date('2026-07-31T00:00:00.000Z');
+  const relayIdentity = signingIdentity(
+    'external-normalization-relay'
+  );
   const request = {
-    request_id: 'req_external_legacy_broker_00000001'
+    request_id: 'req_external_legacy_broker_00000001',
+    nonce: 'request_nonce_external_legacy_broker_01',
+    expires_at: new Date(
+      now.getTime() + 60_000
+    ).toISOString(),
+    tool_request: {
+      name: 'search_memory',
+      arguments: {
+        project_context_ref: `pctx_${'N'.repeat(32)}`
+      }
+    }
   };
+  const verifyBrokerResponse = (response, expectedRequest) =>
+    validateResponseEnvelope(response, {
+      now,
+      resolveResponsePublicKey: keyId =>
+        keyId === relayIdentity.keyId
+          ? relayIdentity.publicKey
+          : null,
+      expectedRequest
+    });
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    verifyResponse: verifyBrokerResponse,
+    clock: () => now
+  });
+  t.after(() => broker.close());
+  await broker.submit(request);
+  const claim = broker.claim('normalization-relay');
+  broker.acknowledge(claim.request_id, claim.claim_token);
+  const candidate = successfulAttemptCandidate(
+    claim.governed_read_attempt
+  );
+  const response = createResponseEnvelope({
+    requestId: request.request_id,
+    requestDigest: digestObject(request),
+    toolName: 'search_memory',
+    status: 'ok',
+    structuredContent: createChatGptEdgeDataResponseV2({
+      toolName: 'search_memory',
+      structuredContent: {
+        status: 'empty',
+        result_count: 0,
+        results: []
+      },
+      governedReadAttempt: candidate
+    }),
+    counters:
+      projectLegacyCountersFromGovernedReadAttempt(candidate),
+    receiptChain: {
+      edge_request: digestObject(request),
+      relay: governedReadAttemptResponseBindingDigest({
+        requestDigest: digestObject(request),
+        terminalDigest: candidate.terminal.terminal_digest
+      }),
+      governance: sha256('normalization-governance'),
+      context: sha256('normalization-context')
+    },
+    now,
+    signing: signing(relayIdentity)
+  });
+  await broker.complete(
+    claim.request_id,
+    claim.claim_token,
+    response,
+    candidate
+  );
+  const brokerResult = await broker.waitForResult(
+    request.request_id
+  );
+  assert.deepEqual(
+    normalizeBrokerResult(
+      'search_memory',
+      request,
+      brokerResult,
+      { verifyBrokerResponse }
+    ),
+    response
+  );
+
+  assert.throws(
+    () => normalizeBrokerResult(
+      'search_memory',
+      request,
+      response,
+      { verifyBrokerResponse }
+    ),
+    { code: 'edge_attempt_response_result_required' }
+  );
+
+  const unsigned = structuredClone(brokerResult);
+  const signatureTail =
+    unsigned.response.signature.value.at(-1);
+  unsigned.response.signature.value =
+    `${unsigned.response.signature.value.slice(0, -1)}` +
+    `${signatureTail === 'A' ? 'B' : 'A'}`;
+  assert.throws(
+    () => normalizeBrokerResult(
+      'search_memory',
+      request,
+      unsigned,
+      { verifyBrokerResponse }
+    ),
+    error => /signature/u.test(error?.code || '')
+  );
+
+  const incomplete = structuredClone(brokerResult);
+  incomplete.governed_read_attempt.receipts.pop();
+  assert.throws(
+    () => normalizeBrokerResult(
+      'search_memory',
+      request,
+      incomplete,
+      { verifyBrokerResponse }
+    ),
+    { code: 'edge_attempt_response_binding_invalid' }
+  );
+
+  const wrongRelayBinding = createResponseEnvelope({
+    requestId: request.request_id,
+    requestDigest: digestObject(request),
+    toolName: 'search_memory',
+    status: 'ok',
+    structuredContent: response.structured_content,
+    counters: response.counters,
+    receiptChain: {
+      ...response.receipt_chain,
+      relay: sha256('wrong-normalization-relay-binding')
+    },
+    now,
+    signing: signing(relayIdentity)
+  });
   assert.throws(
     () => normalizeBrokerResult(
       'search_memory',
       request,
       {
-        request_id: request.request_id,
-        tool_name: 'search_memory',
-        status: 'ok',
-        structured_content: {
-          status: 'empty',
-          result_count: 0,
-          results: []
-        },
-        counters: ZERO_MEMORY_COUNTERS
-      }
+        ...brokerResult,
+        response: wrongRelayBinding
+      },
+      { verifyBrokerResponse }
     ),
-    { code: 'response_data_schema_version_invalid' }
+    { code: 'edge_attempt_response_binding_invalid' }
   );
 });
 
@@ -714,6 +843,12 @@ test('external Edge configuration rejects non-public origins, unsafe bind, and n
     requestTtlSeconds: 30,
     responseTimeoutMs: 60_000
   }), { code: 'edge_response_timeout_exceeds_request_ttl' });
+  assert.throws(() => validateExternalEdgeRuntimeConfig({
+    ...base,
+    broker: {
+      governedReadAttempts: true
+    }
+  }), { code: 'edge_custom_broker_forbidden' });
   assert.throws(() => validateExternalEdgeRuntimeConfig({
     ...base,
     responseTimeoutMs: 10_000,
