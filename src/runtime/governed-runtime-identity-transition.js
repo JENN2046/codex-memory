@@ -1753,6 +1753,14 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       transition_ref: previewValue.request.transition_ref,
       previous_state_digest: record.previous_state_digest
     });
+    if (Date.parse(previewValue.request.request.expires_at) <= nowMs()) {
+      return terminalFailure(
+        previewValue.request,
+        previewValue.receipts,
+        'transition_expired',
+        { runtimeStopped: true }
+      );
+    }
 
     let swapped;
     try {

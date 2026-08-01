@@ -123,6 +123,8 @@ Immediately before CAS, the coordinator revalidates store version, exact
 It checks request expiry again after candidate revalidation and state
 construction, directly before establishing commit context and invoking CAS, so
 a slow verifier cannot carry expired authority into the atomic write.
+Because commit-context persistence may itself block, expiry is checked once
+more after that write returns and immediately before `compareAndSwap()`.
 When the current controller binding already uses the stable authority model,
 the request authority ID and lineage must match it both during preview and
 immediately before CAS. Authority rotation requires a separate protocol.
@@ -266,6 +268,10 @@ Event creation is independent of transport availability. When no `eventSink`
 is attached, acceptance, receipts, atomic commit, and terminal envelopes remain
 queued in full; a later synchronous Observer can consume the stream from its
 canonical beginning.
+When an Observer starts from a committed authoritative state, it derives the
+exact canonical event set for that state's `last_transition` and acknowledges
+matching pending envelopes idempotently. Events that do not match the state
+remain subject to ordinary validation and rejection.
 
 The unique failure registry includes:
 

@@ -1657,6 +1657,32 @@ test('13d3d. a coordinator without a sink persists the complete event stream', (
   assert.equal(observer.snapshot().protocol_violations, 0);
 });
 
+test('13d3e. current authoritative state acknowledges its pending commit events', () => {
+  const state = initialState();
+  const store = createGovernedRuntimeIdentityStateStore(state);
+  const recordStore = createTransitionRecordStore();
+  const coordinator = createGovernedRuntimeIdentityTransitionCoordinator({
+    store,
+    authorityProofReplayStore: createAuthorityProofReplayStore(),
+    transitionRecordStore: recordStore,
+    authorityVerifier,
+    candidateManifestVerifier: manifestVerifier,
+    clock: () => NOW
+  });
+  const request = requestFor(state);
+  const prepared = coordinator.preview(request);
+  assert.equal(coordinator.commit(prepared.preview).status, 'terminal_success');
+  assert.equal(recordStore.pendingObserverEvents().length > 0, true);
+  const current = store.snapshot();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: current
+  });
+  harness({ state: current, store, recordStore, observer });
+  assert.equal(recordStore.pendingObserverEvents().length, 0);
+  assert.equal(observer.snapshot().last_authoritative_store_version, 1);
+  assert.equal(observer.snapshot().protocol_violations, 0);
+});
+
 test('13d4. initial state read fault terminalizes the durable reservation', () => {
   const state = initialState();
   const innerStore = createGovernedRuntimeIdentityStateStore(state);
@@ -2754,6 +2780,33 @@ test('candidate revalidation cannot carry an expired request into CAS', () => {
   assert.equal(outcome.protocol.terminal.reason_code, 'transition_expired');
   assert.equal(run.store.snapshot().store_version, 0);
   assert.equal(manifestCalls, 2);
+});
+
+test('commit-context persistence cannot carry an expired request into CAS', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore();
+  let currentTime = NOW;
+  let contextWrites = 0;
+  const slowRecords = {
+    ...recordStore,
+    setCommitContext(input) {
+      contextWrites += 1;
+      const written = recordStore.setCommitContext(input);
+      currentTime = new Date(NOW.getTime() + 121_000);
+      return written;
+    }
+  };
+  const run = harness({
+    state,
+    recordStore: slowRecords,
+    clock: () => currentTime
+  });
+  const prepared = run.coordinator.preview(requestFor(state));
+  const outcome = run.coordinator.commit(prepared.preview);
+  assert.equal(outcome.status, 'terminal_failure');
+  assert.equal(outcome.protocol.terminal.reason_code, 'transition_expired');
+  assert.equal(run.store.snapshot().store_version, 0);
+  assert.equal(contextWrites, 1);
 });
 
 test('expired previews cannot exhaust transition record admission capacity', () => {

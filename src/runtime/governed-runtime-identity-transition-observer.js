@@ -36,6 +36,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
   const transitions = new Map();
   const terminalHistory = new Map();
   const terminalReplayMarkers = new Set();
+  const acknowledgedEventDigests = new Set();
   for (const transitionRef of initialTerminalReplayMarkers) {
     if (!GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN.test(
       transitionRef || ''
@@ -64,7 +65,50 @@ function createGovernedRuntimeIdentityTransitionObserver({
     const lastTransitionRef =
       initialAuthoritativeState.last_transition?.protocol?.request
         ?.transition_ref;
-    if (lastTransitionRef) terminalReplayMarkers.add(lastTransitionRef);
+    if (lastTransitionRef) {
+      terminalReplayMarkers.add(lastTransitionRef);
+      const protocol = initialAuthoritativeState.last_transition.protocol;
+      const canonicalEvents = [
+        {
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_accepted',
+          transition_ref: lastTransitionRef,
+          request: structuredClone(protocol.request)
+        },
+        ...protocol.receipts.map(receipt => ({
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_receipt_appended',
+          transition_ref: lastTransitionRef,
+          receipt: structuredClone(receipt)
+        })),
+        {
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_atomic_commit',
+          transition_ref: lastTransitionRef,
+          protocol: structuredClone(protocol),
+          accepted_runtime: structuredClone(
+            initialAuthoritativeState.accepted_runtime
+          ),
+          controller_binding: structuredClone(
+            initialAuthoritativeState.controller_binding
+          ),
+          store_version: initialAuthoritativeState.store_version,
+          previous_state_digest:
+            initialAuthoritativeState.last_transition.previous_state_digest,
+          state_digest: digestObject(initialAuthoritativeState),
+          state_projection: structuredClone(initialAuthoritativeState)
+        },
+        {
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_terminal_committed',
+          transition_ref: lastTransitionRef,
+          terminal: structuredClone(protocol.terminal)
+        }
+      ];
+      for (const event of canonicalEvents) {
+        acknowledgedEventDigests.add(digestObject(event));
+      }
+    }
   }
   const counters = {
     transitions_accepted: 0,
@@ -78,7 +122,6 @@ function createGovernedRuntimeIdentityTransitionObserver({
     unknown_evidence_receipts: 0
   };
   let lastViolationCode = null;
-  const acknowledgedEventDigests = new Set();
 
   function violation(code) {
     counters.protocol_violations += 1;
