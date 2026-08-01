@@ -115,7 +115,8 @@ function createCharacterizationFixture({
     relay_calls: 0,
     governance_calls: 0,
     bridge_calls: 0,
-    last_terminal_reason: null
+    last_terminal_reason: null,
+    last_terminal: null
   };
   const resolutionObserver = createGovernedContextResolutionObserver({
     clock: () => NOW
@@ -160,7 +161,14 @@ function createCharacterizationFixture({
     });
     governance = runtime;
   } else {
-    const issueProjectContext = async () => {
+    const issueProjectContext = async ({ onResolutionStage }) => {
+      if (issueOutcome === 'failure_before_resolution') {
+        throw Object.assign(new Error('synthetic_context_issuer_preflight_failed'), {
+          code: 'synthetic_context_issuer_preflight_failed'
+        });
+      }
+      onResolutionStage?.('REGISTRY_RESOLVED');
+      onResolutionStage?.('SCOPE_RESOLVED');
       if (issueOutcome === 'unavailable') {
         return { status: 'unavailable' };
       }
@@ -260,6 +268,8 @@ function createCharacterizationFixture({
       observations.last_terminal_reason =
         relayResult.governed_context_resolution_failure_candidate
           .terminal.reason_code;
+      observations.last_terminal =
+        relayResult.governed_context_resolution_failure_candidate.terminal;
       broker.fail(
         claim.request_id,
         claim.claim_token,
@@ -479,6 +489,23 @@ test('resolver boundary preserves exact failure codes for issuance and public pr
     { code: 'project_context_ref_invalid' }
   );
   assertResolverOnly(malformedReference.snapshot());
+});
+
+test('issuer failure before resolution progress fails closed without invented stage receipts', async () => {
+  const fixture = createCharacterizationFixture({
+    issueOutcome: 'failure_before_resolution'
+  });
+  await assert.rejects(
+    fixture.resolve(),
+    { code: 'synthetic_context_issuer_preflight_failed' }
+  );
+  const snapshot = fixture.snapshot();
+  assert.equal(snapshot.last_terminal_reason, 'context_registry_unavailable');
+  assert.equal(snapshot.last_terminal.last_completed_stage, 'RELAY_CLAIMED');
+  assert.equal(snapshot.last_terminal.failed_stage, 'REGISTRY_RESOLVED');
+  assert.equal(snapshot.last_terminal.mapping_resolved, null);
+  assert.equal(snapshot.last_terminal.scope_resolved, null);
+  assertResolverOnly(snapshot);
 });
 
 test('resolver response-finalization failure commits a canonical terminal while preserving a safe error', async () => {

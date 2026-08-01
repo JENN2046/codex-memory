@@ -170,6 +170,12 @@ const GOVERNED_CONTEXT_RESOLUTION_FAILURE_REGISTRY =
       origin: 'governance',
       publicResponseStatus: 'denied'
     }),
+    context_scope_unavailable: failure({
+      category: 'context_scope_failed',
+      stage: 'SCOPE_RESOLVED',
+      origin: 'governance',
+      publicResponseStatus: 'unavailable'
+    }),
     context_issuance_unavailable: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
@@ -240,6 +246,7 @@ const FAILED_FACTS_BY_REASON = deepFreeze({
   context_scope_denied: {
     scope_resolved: false
   },
+  context_scope_unavailable: {},
   context_issuance_unavailable: {
     context_ref_issued: false
   },
@@ -431,6 +438,11 @@ function contextResolutionFailureRegistryEntry(reasonCode) {
       unknownReasonCode: 'context_resolution_reason_unknown'
     }
   );
+}
+
+function contextResolutionFailureFacts(reasonCode) {
+  contextResolutionFailureRegistryEntry(reasonCode);
+  return structuredClone(FAILED_FACTS_BY_REASON[reasonCode]);
 }
 
 function nextReceiptStage(receipts) {
@@ -947,6 +959,7 @@ module.exports = {
   GOVERNED_CONTEXT_RESOLUTION_TERMINAL_STAGES,
   appendGovernedContextResolutionStage,
   contextResolutionDeadlineBudgetMs,
+  contextResolutionFailureFacts,
   contextResolutionFailureRegistryEntry,
   contextResolutionRef,
   createContextResolutionHeader,

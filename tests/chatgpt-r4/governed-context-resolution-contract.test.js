@@ -50,6 +50,7 @@ const FAILURE_FACTS = Object.freeze({
   context_scope_denied: {
     scope_resolved: false
   },
+  context_scope_unavailable: {},
   context_issuance_unavailable: {
     context_ref_issued: false
   },

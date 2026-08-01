@@ -678,6 +678,43 @@ test('external Edge binds resolver failure reasons to the signed response status
   broker.close();
 });
 
+test('external Edge extends an acknowledged resolver claim through its resolution deadline', async () => {
+  const createdAt = new Date('2026-07-31T00:00:00.000Z');
+  let current = new Date(createdAt);
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current,
+    claimLeaseMs: 10
+  });
+  const request = {
+    request_id: 'req_external_resolution_ack_deadline_000001',
+    nonce: 'request_nonce_external_resolution_ack_deadline_01',
+    expires_at: new Date(createdAt.getTime() + 60_000).toISOString(),
+    tool_request: {
+      name: 'resolve_memory_context',
+      arguments: {
+        project_alias: 'codex-memory',
+        requested_visibility: 'project'
+      }
+    }
+  };
+  await broker.submit(request);
+  const claim = broker.claim('external-resolution-ack-deadline-relay');
+  broker.acknowledge(claim.request_id, claim.claim_token);
+  current = new Date(createdAt.getTime() + 11);
+  assert.deepEqual(
+    broker.state(claim.request_id, claim.claim_token),
+    {
+      request_id: claim.request_id,
+      status: 'claimed',
+      attempt: 1,
+      claim_state: 'acked'
+    }
+  );
+  broker.close();
+});
+
 test('external Edge preserves a positive subsecond attempt budget for one-second requests', async () => {
   const createdAt = new Date('2026-07-31T00:00:00.000Z');
   let current = new Date(createdAt);

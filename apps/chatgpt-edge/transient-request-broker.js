@@ -551,8 +551,10 @@ function createTransientRequestBroker({
     const activeClaim = requireLiveClaim(record, claimToken);
     if (activeClaim.acked) reject('edge_claim_ack_replay');
     activeClaim.acked = true;
-    if (record.attempt_deadline_ms !== null) {
-      activeClaim.expires_ms = record.attempt_deadline_ms;
+    const operationDeadlineMs = record.attempt_deadline_ms ??
+      record.resolution_deadline_ms;
+    if (operationDeadlineMs !== null) {
+      activeClaim.expires_ms = operationDeadlineMs;
       if (activeClaim.expires_ms <= nowMs()) {
         refresh(record);
         reject('edge_claim_expired');

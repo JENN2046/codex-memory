@@ -4,6 +4,8 @@ const {
   COUNTER_MODES,
   ZERO_MEMORY_COUNTERS,
   appendGovernedContextResolutionStage,
+  contextResolutionFailureFacts,
+  contextResolutionFailureRegistryEntry,
   digestObject,
   validateGovernedContextResolutionWorkingSet,
   validateCounters,
@@ -235,6 +237,11 @@ async function handleResolve({
       failContextResolution(resolution, 'context_mapping_not_found')
     );
   }
+  let resolutionProgress = resolution;
+  const recordResolutionStage = stage => {
+    if (!resolutionProgress) return;
+    resolutionProgress = appendResolutionStages(resolutionProgress, [{ stage }]);
+  };
   let issued;
   try {
     issued = await issueProjectContext({
@@ -242,12 +249,13 @@ async function handleResolve({
       safeProjectAlias: args.project_alias,
       requestedVisibility: args.requested_visibility,
       now,
-      governedContextResolution: resolution !== null
+      governedContextResolution: resolution !== null,
+      onResolutionStage: recordResolutionStage
     });
   } catch (error) {
     throwWithContextResolutionFailure(
       error,
-      failContextResolution(resolution, 'context_issuance_failed')
+      failContextResolution(resolutionProgress, 'context_issuance_failed')
     );
   }
   if (issued && typeof issued === 'object' && !Array.isArray(issued) &&
@@ -288,7 +296,7 @@ async function handleResolve({
     });
     return withResolutionContinuation(
       result,
-      failContextResolution(resolution, reasonCode)
+      failContextResolution(resolutionProgress, reasonCode)
     );
   }
   if (!issued || typeof issued !== 'object' || Array.isArray(issued) ||
@@ -298,7 +306,7 @@ async function handleResolve({
     });
     throwWithContextResolutionFailure(
       error,
-      failContextResolution(resolution, 'context_issue_result_invalid')
+      failContextResolution(resolutionProgress, 'context_issue_result_invalid')
     );
   }
   try {
@@ -314,7 +322,7 @@ async function handleResolve({
       : 'context_ref_invalid';
     throwWithContextResolutionFailure(
       error,
-      failContextResolution(resolution, reasonCode)
+      failContextResolution(resolutionProgress, reasonCode)
     );
   }
   const requestedVisibility = args.requested_visibility;
@@ -325,7 +333,7 @@ async function handleResolve({
     });
     throwWithContextResolutionFailure(
       error,
-      failContextResolution(resolution, 'context_ref_invalid')
+      failContextResolution(resolutionProgress, 'context_ref_invalid')
     );
   }
 
@@ -363,7 +371,17 @@ async function handleResolve({
     structuredContent,
     contextReceipt
   });
-  return withResolutionContinuation(result, completeContextResolution(resolution));
+  try {
+    return withResolutionContinuation(
+      result,
+      completeContextResolution(resolutionProgress)
+    );
+  } catch (error) {
+    throwWithContextResolutionFailure(
+      error,
+      failContextResolution(resolutionProgress, 'context_issuance_failed')
+    );
+  }
 }
 
 function throwWithContextResolutionFailure(error, continuation) {
@@ -405,11 +423,7 @@ function appendResolutionStages(workingSet, stages) {
 function completeContextResolution(workingSet) {
   if (!workingSet) return null;
   return Object.freeze({
-    working_set: appendResolutionStages(workingSet, [
-      { stage: 'REGISTRY_RESOLVED' },
-      { stage: 'SCOPE_RESOLVED' },
-      { stage: 'CONTEXT_ISSUED' }
-    ]),
+    working_set: appendResolutionStages(workingSet, [{ stage: 'CONTEXT_ISSUED' }]),
     terminal_failure: null,
     evidence_complete: true
   });
@@ -417,47 +431,41 @@ function completeContextResolution(workingSet) {
 
 function failContextResolution(workingSet, reasonCode) {
   if (!workingSet) return null;
-  const failureFacts = {
-    context_mapping_not_found: {
-      registry_resolved: true,
-      mapping_resolved: false
-    },
-    context_scope_denied: { scope_resolved: false },
-    context_issuance_unavailable: { context_ref_issued: false },
-    context_issuance_failed: {},
-    context_issue_result_invalid: {},
-    context_ref_invalid: {
-      context_ref_issued: true,
-      context_ref_shape_valid: false
-    },
-    context_ref_expired: {
-      context_ref_issued: true,
-      context_ref_shape_valid: true,
-      context_ref_unexpired: false
-    }
-  };
-  const failed = stage => ({
-    stage,
+  const lastStage = workingSet.receipts.at(-1)?.stage;
+  const requestedEntry = contextResolutionFailureRegistryEntry(reasonCode);
+  const stagePlan = lastStage === 'RELAY_CLAIMED'
+    ? {
+        effectiveReasonCode: requestedEntry.stage === 'REGISTRY_RESOLVED'
+          ? reasonCode
+          : 'context_registry_unavailable',
+        failedStage: 'REGISTRY_RESOLVED'
+      }
+    : lastStage === 'REGISTRY_RESOLVED'
+      ? {
+          effectiveReasonCode: requestedEntry.stage === 'SCOPE_RESOLVED'
+            ? reasonCode
+            : 'context_scope_unavailable',
+          failedStage: 'SCOPE_RESOLVED'
+        }
+      : {
+          effectiveReasonCode: requestedEntry.stage === 'CONTEXT_ISSUED'
+            ? reasonCode
+            : 'context_issuance_failed',
+          failedStage: 'CONTEXT_ISSUED'
+        };
+  const effectiveFacts = contextResolutionFailureFacts(
+    stagePlan.effectiveReasonCode
+  );
+  const stages = [{
+    stage: stagePlan.failedStage,
     outcome: 'failed',
-    reasonCode,
-    facts: failureFacts[reasonCode]
-  });
-  const stages = reasonCode === 'context_mapping_not_found'
-    ? [failed('REGISTRY_RESOLVED')]
-    : reasonCode === 'context_scope_denied'
-      ? [
-          { stage: 'REGISTRY_RESOLVED' },
-          failed('SCOPE_RESOLVED')
-        ]
-      : [
-          { stage: 'REGISTRY_RESOLVED' },
-          { stage: 'SCOPE_RESOLVED' },
-          failed('CONTEXT_ISSUED')
-        ];
+    reasonCode: stagePlan.effectiveReasonCode,
+    facts: effectiveFacts
+  }];
   return Object.freeze({
     working_set: appendResolutionStages(workingSet, stages),
     terminal_failure: Object.freeze({
-      reason_code: reasonCode,
+      reason_code: stagePlan.effectiveReasonCode,
       failure_origin: 'governance'
     }),
     evidence_complete: true

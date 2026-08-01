@@ -84,14 +84,28 @@ function createContextAuthority({
       safeProjectAlias,
       requestedVisibility,
       now,
-      governedContextResolution = false
+      governedContextResolution = false,
+      onResolutionStage = null
     }) {
+      if (onResolutionStage !== null && typeof onResolutionStage !== 'function') {
+        reject('r4_context_resolution_stage_callback_invalid');
+      }
       const withResolutionReason = (value, resolutionReason) => ({
         ...value,
         ...(governedContextResolution
           ? { resolution_reason: resolutionReason }
           : {})
       });
+      const registeredAlias = registryState.registry.projects.find(project =>
+        project.safeProjectAlias === safeProjectAlias
+      );
+      if (!registeredAlias ||
+          registeredAlias.projectId !== selectedProject.projectId) {
+        return withResolutionReason({
+          status: 'denied'
+        }, 'context_mapping_not_found');
+      }
+      onResolutionStage?.('REGISTRY_RESOLVED');
       const preauthorization = activationController?.checkContextIssueAuthorization({
         principalFingerprint,
         safeProjectAlias,
@@ -106,9 +120,6 @@ function createContextAuthority({
           ? 'context_scope_denied'
           : 'context_issuance_unavailable');
       }
-      const registeredAlias = registryState.registry.projects.find(project =>
-        project.safeProjectAlias === safeProjectAlias
-      );
       const project = resolveRegisteredProject(
         registryState,
         safeProjectAlias,
@@ -118,14 +129,11 @@ function createContextAuthority({
         return activationController ? withResolutionReason({
           status: 'denied',
           activation_receipt_digest: preauthorization.receipt_digest
-        }, registeredAlias && registeredAlias.projectId === selectedProject.projectId
-          ? 'context_scope_denied'
-          : 'context_mapping_not_found') : withResolutionReason({
+        }, 'context_scope_denied') : withResolutionReason({
           status: 'denied'
-        }, registeredAlias && registeredAlias.projectId === selectedProject.projectId
-          ? 'context_scope_denied'
-          : 'context_mapping_not_found');
+        }, 'context_scope_denied');
       }
+      onResolutionStage?.('SCOPE_RESOLVED');
       prune(now.getTime());
       if (contexts.size >= MAX_CONTEXTS) {
         return withResolutionReason({
