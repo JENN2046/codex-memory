@@ -416,7 +416,7 @@ function createGovernedContextResolutionCoordinator({
     resolutionRef,
     record,
     terminal,
-    { deadlineWins = false } = {}
+    { deadlineWins = false, committedAtMs } = {}
   ) {
     if (record.terminal) rejectTerminalCandidate(resolutionRef);
     validateContextResolutionTerminalEnvelope(terminal, {
@@ -428,9 +428,9 @@ function createGovernedContextResolutionCoordinator({
       receipts: record.receipts,
       terminal
     });
-    const committedAtMs = nowMs();
+    const finalizationMs = committedAtMs ?? nowMs();
     if (deadlineWins &&
-        Date.parse(record.header.deadline_at) <= committedAtMs) {
+        Date.parse(record.header.deadline_at) <= finalizationMs) {
       commitCoordinatorFailure(resolutionRef, 'resolution_timeout');
       rejectTerminalCandidate(resolutionRef);
     }
@@ -439,7 +439,7 @@ function createGovernedContextResolutionCoordinator({
       resolutionRef,
       record,
       terminal,
-      committedAtMs
+      finalizationMs
     );
     emitTerminalCommitted(resolutionRef, terminal, responseVerified);
     return acceptance;
@@ -532,7 +532,7 @@ function createGovernedContextResolutionCoordinator({
       resolutionRef,
       record,
       candidate.terminal,
-      { deadlineWins: true }
+      { deadlineWins: true, committedAtMs }
     );
   }
 

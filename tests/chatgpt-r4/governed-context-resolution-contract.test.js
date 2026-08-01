@@ -978,6 +978,32 @@ test('deadline wins over a success candidate validated at the boundary', () => {
   assert.equal(accepted.terminal.context_ref_issued, null);
 });
 
+test('Edge preserves a candidate finalized before the deadline while appending its receipt prefix', () => {
+  const value = header('candidate-finalization-deadline', { ttlSeconds: 1 });
+  const deadlineMs = Date.parse(value.deadline_at);
+  let boundaryReads = null;
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => {
+      if (boundaryReads === null) return new Date(NOW_MS);
+      boundaryReads += 1;
+      return new Date(boundaryReads <= 2 ? deadlineMs - 1 : deadlineMs);
+    }
+  });
+  coordinator.acceptResolution(value);
+  const candidate = failedProtocol('context_mapping_not_found', value);
+
+  boundaryReads = 0;
+  const accepted = coordinator.commitProtocolCandidate(
+    value.resolution_ref,
+    candidate
+  );
+  assert.equal(accepted.accepted, true);
+  const protocol = coordinator.protocol(value.resolution_ref);
+  assert.equal(protocol.terminal.reason_code, 'context_mapping_not_found');
+  assert.equal(protocol.receipts.length, candidate.receipts.length);
+  assert.equal(coordinator.snapshot(value.resolution_ref).terminal_committed, true);
+});
+
 test('deadline wins when failed receipt validation crosses the boundary', () => {
   const value = header('receipt-validation-deadline', { ttlSeconds: 1 });
   const deadlineMs = Date.parse(value.deadline_at);
