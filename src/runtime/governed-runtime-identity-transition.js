@@ -290,6 +290,108 @@ function createAuthorityProofReplayStore(initialEntries = []) {
   return Object.freeze({ consume, snapshot });
 }
 
+function createTransitionRecordStore(initialRecords = []) {
+  if (!Array.isArray(initialRecords) ||
+      initialRecords.length > AUTHORITY_PROOF_REPLAY_LIMIT) {
+    reject('transition_record_store_invalid');
+  }
+  const records = new Map();
+
+  function validateRecord(record) {
+    if (!exactKeys(record, [
+      'transition_ref',
+      'request_digest',
+      'status',
+      'protocol'
+    ]) ||
+        !TRANSITION_REF_PATTERN.test(record.transition_ref || '') ||
+        !['reserved', 'terminal'].includes(record.status)) {
+      reject('transition_record_store_invalid');
+    }
+    assertDigest(record.request_digest, 'transition_record_store_invalid');
+    if (record.status === 'reserved') {
+      if (record.protocol !== null) reject('transition_record_store_invalid');
+    } else {
+      validateGovernedRuntimeIdentityTransitionProtocol(record.protocol);
+      if (record.protocol.request.transition_ref !== record.transition_ref ||
+          runtimeIdentityTransitionRequestDigest(record.protocol.request) !==
+            record.request_digest) {
+        reject('transition_record_store_invalid');
+      }
+    }
+    return record;
+  }
+
+  for (const record of initialRecords) {
+    validateRecord(record);
+    if (records.has(record.transition_ref)) {
+      reject('transition_record_store_invalid');
+    }
+    records.set(record.transition_ref, structuredClone(record));
+  }
+
+  function reserve({ transition_ref: ref, request_digest: requestDigest } = {}) {
+    if (!TRANSITION_REF_PATTERN.test(ref || '')) {
+      reject('transition_record_store_invalid');
+    }
+    assertDigest(requestDigest, 'transition_record_store_invalid');
+    if (records.has(ref)) return false;
+    if (records.size >= AUTHORITY_PROOF_REPLAY_LIMIT) {
+      reject('transition_record_store_capacity_exceeded');
+    }
+    records.set(ref, {
+      transition_ref: ref,
+      request_digest: requestDigest,
+      status: 'reserved',
+      protocol: null
+    });
+    return true;
+  }
+
+  function finalize({
+    transition_ref: ref,
+    request_digest: requestDigest,
+    protocol
+  } = {}) {
+    validateGovernedRuntimeIdentityTransitionProtocol(protocol);
+    const current = records.get(ref);
+    if (!current || current.request_digest !== requestDigest ||
+        protocol.request.transition_ref !== ref ||
+        runtimeIdentityTransitionRequestDigest(protocol.request) !==
+          requestDigest) {
+      reject('transition_record_store_context_mismatch');
+    }
+    if (current.status === 'terminal') {
+      return canonicalJson(current.protocol) === canonicalJson(protocol);
+    }
+    const terminal = {
+      transition_ref: ref,
+      request_digest: requestDigest,
+      status: 'terminal',
+      protocol: structuredClone(protocol)
+    };
+    validateRecord(terminal);
+    records.set(ref, terminal);
+    return true;
+  }
+
+  function get(ref) {
+    if (!TRANSITION_REF_PATTERN.test(ref || '')) {
+      reject('transition_record_store_invalid');
+    }
+    const record = records.get(ref);
+    return record ? deepFreeze(structuredClone(record)) : null;
+  }
+
+  function snapshot() {
+    return deepFreeze(
+      [...records.values()].map(record => structuredClone(record))
+    );
+  }
+
+  return Object.freeze({ finalize, get, reserve, snapshot });
+}
+
 function stableControllerBinding(request, acceptedRuntime) {
   const base = {
     model: STABLE_CONTROLLER_BINDING_MODEL,
@@ -305,6 +407,13 @@ function stableControllerBinding(request, acceptedRuntime) {
   };
   validateControllerBinding(binding);
   return deepFreeze(binding);
+}
+
+function stableAuthorityMatches(state, request) {
+  return state.controller_binding.model !== STABLE_CONTROLLER_BINDING_MODEL ||
+    (state.controller_binding.authority_id === request.authority.authority_id &&
+      state.controller_binding.authority_lineage_digest ===
+        request.authority.authority_lineage_digest);
 }
 
 function lifecycleMatchesRequest(lifecycle, request) {
@@ -376,6 +485,7 @@ function candidateVerificationFailure(verification, request) {
 function createGovernedRuntimeIdentityTransitionCoordinator({
   store,
   authorityProofReplayStore,
+  transitionRecordStore,
   authorityVerifier,
   candidateManifestVerifier,
   clock = () => new Date(),
@@ -388,6 +498,12 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   if (!authorityProofReplayStore ||
       typeof authorityProofReplayStore.consume !== 'function') {
     reject('transition_coordinator_authority_proof_store_invalid');
+  }
+  if (!transitionRecordStore ||
+      typeof transitionRecordStore.reserve !== 'function' ||
+      typeof transitionRecordStore.finalize !== 'function' ||
+      typeof transitionRecordStore.get !== 'function') {
+    reject('transition_coordinator_record_store_invalid');
   }
   if (typeof authorityVerifier !== 'function') {
     reject('transition_coordinator_authority_verifier_invalid');
@@ -481,6 +597,14 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       terminal
     });
     if (storeRecord) {
+      const finalized = transitionRecordStore.finalize({
+        transition_ref: request.transition_ref,
+        request_digest: runtimeIdentityTransitionRequestDigest(request),
+        protocol
+      });
+      if (finalized !== true) {
+        reject('transition_record_store_context_mismatch');
+      }
       records.set(request.transition_ref, {
         status: 'terminal',
         preview: null,
@@ -516,7 +640,37 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   function preview(request) {
     validateRuntimeIdentityTransitionRequest(request);
     const currentMs = nowMs();
-    if (records.has(request.transition_ref)) {
+    const requestDigest = runtimeIdentityTransitionRequestDigest(request);
+    let persistedRecord;
+    try {
+      persistedRecord = transitionRecordStore.get(request.transition_ref);
+    } catch {
+      return terminalFailure(
+        request,
+        [],
+        'transition_record_store_unavailable',
+        { storeRecord: false, emitTerminal: false }
+      );
+    }
+    if (records.has(request.transition_ref) || persistedRecord !== null) {
+      return terminalFailure(request, [], 'transition_replayed', {
+        storeRecord: false,
+        emitTerminal: false
+      });
+    }
+    let refReserved;
+    try {
+      refReserved = transitionRecordStore.reserve({
+        transition_ref: request.transition_ref,
+        request_digest: requestDigest
+      });
+    } catch {
+      return terminalFailure(request, [], 'transition_record_store_unavailable', {
+        storeRecord: false,
+        emitTerminal: false
+      });
+    }
+    if (refReserved !== true) {
       return terminalFailure(request, [], 'transition_replayed', {
         storeRecord: false,
         emitTerminal: false
@@ -575,6 +729,17 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         'AUTHORITY_VERIFIED',
         'authority_lineage_mismatch',
         authority
+      );
+    }
+    if (!stableAuthorityMatches(initial, request)) {
+      return failedStage(
+        workingSet,
+        'AUTHORITY_VERIFIED',
+        'authority_lineage_mismatch',
+        {
+          authority_id_match: false,
+          authority_lineage_match: false
+        }
       );
     }
     let proofConsumed;
@@ -771,6 +936,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     validateGovernedRuntimeIdentityState(before);
     if (before.store_version !== previewValue.expected_store_version ||
         fromRuntimeFailure(before, previewValue.request) ||
+        !stableAuthorityMatches(before, previewValue.request) ||
         !lifecycleMatchesRequest(before.lifecycle, previewValue.request)) {
       return casFailure(
         previewValue,
@@ -924,6 +1090,19 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       );
     }
     record.status = 'terminal';
+    const finalized = transitionRecordStore.finalize({
+      transition_ref: previewValue.request.transition_ref,
+      request_digest: previewValue.request_digest,
+      protocol
+    });
+    if (finalized !== true) {
+      return casFailure(
+        previewValue,
+        'partial_transition_detected',
+        { transition_record_finalized: false },
+        { runtimeStopped: true }
+      );
+    }
     record.protocol = protocol;
     record.preview = null;
     for (const receipt of workingSet.receipts.slice(
@@ -968,9 +1147,11 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
 
   function protocol(transitionRef) {
     const record = records.get(transitionRef);
-    if (!record?.protocol) reject('transition_terminal_missing');
-    validateGovernedRuntimeIdentityTransitionProtocol(record.protocol);
-    return record.protocol;
+    const persisted = transitionRecordStore.get(transitionRef);
+    const selected = record?.protocol || persisted?.protocol;
+    if (!selected) reject('transition_terminal_missing');
+    validateGovernedRuntimeIdentityTransitionProtocol(selected);
+    return selected;
   }
 
   return Object.freeze({
@@ -988,6 +1169,7 @@ module.exports = {
   createAuthorityProofReplayStore,
   createGovernedRuntimeIdentityStateStore,
   createGovernedRuntimeIdentityTransitionCoordinator,
+  createTransitionRecordStore,
   stableControllerBinding,
   validateControllerBinding,
   validateGovernedRuntimeIdentityState

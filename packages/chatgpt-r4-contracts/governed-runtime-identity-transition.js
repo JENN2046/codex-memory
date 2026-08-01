@@ -125,6 +125,9 @@ const GOVERNED_RUNTIME_IDENTITY_TRANSITION_FAILURE_REGISTRY =
     transition_cas_lost: failure(
       'concurrency', 'TRANSITION_COMMITTED', 'identity_store'
     ),
+    transition_record_store_unavailable: failure(
+      'persistence', 'TERMINAL_FAILURE', 'transition_coordinator'
+    ),
     post_identity_mismatch: failure(
       'identity', 'POST_IDENTITY_VERIFIED', 'transition_coordinator',
       { fatal: true }

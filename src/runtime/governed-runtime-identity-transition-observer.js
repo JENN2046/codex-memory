@@ -4,6 +4,7 @@ const {
   canonicalJson,
   createGovernedRuntimeIdentityTransitionProtocol,
   createRuntimeIdentityTransitionTerminal,
+  createTransitionRuntimeIdentity,
   reject,
   validateGovernedRuntimeIdentityTransitionProtocol,
   validateRuntimeIdentity,
@@ -12,6 +13,7 @@ const {
   validateRuntimeIdentityTransitionTerminal
 } = require('../../packages/chatgpt-r4-contracts');
 const {
+  stableControllerBinding,
   validateControllerBinding
 } = require('./governed-runtime-identity-transition');
 
@@ -96,11 +98,24 @@ function createGovernedRuntimeIdentityTransitionObserver({
         validateGovernedRuntimeIdentityTransitionProtocol(event.protocol);
         validateRuntimeIdentity(event.accepted_runtime);
         validateControllerBinding(event.controller_binding);
+        const derivedRuntime = createTransitionRuntimeIdentity({
+          fromRuntime: record.request.from_runtime,
+          toRuntime: record.request.to_runtime,
+          transitionRef: record.request.transition_ref
+        });
+        const derivedBinding = stableControllerBinding(
+          record.request,
+          derivedRuntime
+        );
         if (event.protocol.terminal.outcome !== 'success' ||
             canonicalJson(event.protocol.request) !==
               canonicalJson(record.request) ||
             canonicalJson(event.protocol.receipts) !==
               canonicalJson(record.receipts) ||
+            canonicalJson(event.accepted_runtime) !==
+              canonicalJson(derivedRuntime) ||
+            canonicalJson(event.controller_binding) !==
+              canonicalJson(derivedBinding) ||
             event.protocol.terminal.new_runtime_identity_digest !==
               event.accepted_runtime.identity_digest ||
             event.protocol.terminal.controller_binding_digest !==

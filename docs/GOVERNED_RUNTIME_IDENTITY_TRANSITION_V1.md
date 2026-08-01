@@ -22,6 +22,9 @@ is bound to one transition request. The coordinator requires an atomic
 authority-proof replay store; a live adapter must persist it across coordinator
 or process restarts. The included in-memory adapter is synthetic but retains
 consumption across coordinator recreation when the same store is reused.
+The coordinator separately requires an atomic transition-record store that
+reserves each `transition_ref` with its request digest and retains the terminal
+protocol. A live adapter must persist this store as well.
 
 ## Canonical request and digests
 
@@ -67,7 +70,8 @@ default failure terminal.
 
 A replay of an existing `transition_ref` returns a separate canonical replay
 failure without replacing or emitting over the authoritative prepared or
-terminal record for that reference.
+terminal record for that reference. Coordinator recreation cannot make a
+reserved or terminal reference reusable.
 
 ## Atomic commit
 
@@ -84,6 +88,9 @@ one versioned compare-and-swap. The CAS candidate simultaneously contains:
 
 Immediately before CAS, the coordinator revalidates store version, exact
 `from_runtime`, stopped/held state, safe-stop receipt, and candidate manifest.
+When the current controller binding already uses the stable authority model,
+the request authority ID and lineage must match it both during preview and
+immediately before CAS. Authority rotation requires a separate protocol.
 CAS loss leaves the old state unchanged. A store that reports a write without
 the exact committed state is classified as fatal
 `partial_transition_detected`. A successful transition never starts the
@@ -112,7 +119,9 @@ authority.
 ## Observer and failure registry
 
 The Observer consumes only the canonical request, ordered receipt stream,
-atomic commit event, and terminal. It independently reconstructs the terminal
+atomic commit event, and terminal. It independently derives the accepted
+runtime identity and stable controller binding from the recorded request, then
+reconstructs the terminal
 and rejects spliced transitions, incorrect receipt order or origin, duplicate
 atomic commits, terminal mismatch, missing terminals, and post-terminal
 events.
@@ -135,6 +144,7 @@ protocol_binding_invalid
 transition_expired
 transition_replayed
 transition_cas_lost
+transition_record_store_unavailable
 post_identity_mismatch
 partial_transition_detected
 terminal_missing

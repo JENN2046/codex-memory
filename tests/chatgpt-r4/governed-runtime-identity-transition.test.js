@@ -9,7 +9,9 @@ const {
   GOVERNED_RUNTIME_IDENTITY_TRANSITION_PROTOCOL,
   appendRuntimeIdentityTransitionStage,
   canonicalJson,
+  createGovernedRuntimeIdentityTransitionProtocol,
   createRuntimeIdentityTransitionRequest,
+  createRuntimeIdentityTransitionTerminal,
   digestObject,
   runtimeIdentityTransitionAuthorityContextDigest,
   runtimeIdentityTransitionRequestDigest,
@@ -25,6 +27,8 @@ const {
   createAuthorityProofReplayStore,
   createGovernedRuntimeIdentityStateStore,
   createGovernedRuntimeIdentityTransitionCoordinator,
+  createTransitionRecordStore,
+  stableControllerBinding,
   validateGovernedRuntimeIdentityState
 } = require('../../src/runtime/governed-runtime-identity-transition');
 const {
@@ -115,6 +119,7 @@ function legacyEvidence(state, target = toRuntime('b')) {
 
 function requestFor(state, {
   suffix = 'A',
+  transitionRef = `grit_${suffix.repeat(32)}`,
   target = toRuntime('b'),
   fromRuntime = state.accepted_runtime,
   safeStopDigest = state.lifecycle.safe_stop_receipt_digest,
@@ -126,7 +131,7 @@ function requestFor(state, {
   ttlSeconds = 120
 } = {}) {
   return createRuntimeIdentityTransitionRequest({
-    transitionRef: `grit_${suffix.repeat(32)}`,
+    transitionRef,
     authority: {
       authority_id: authorityId,
       authority_lineage_digest: authorityLineage,
@@ -177,15 +182,18 @@ function harness({
   clock = () => NOW,
   store = null,
   proofStore = null,
+  recordStore = null,
   observer = null
 } = {}) {
   const selectedStore = store || createGovernedRuntimeIdentityStateStore(state);
   const selectedProofStore = proofStore || createAuthorityProofReplayStore();
+  const selectedRecordStore = recordStore || createTransitionRecordStore();
   const selectedObserver = observer ||
     createGovernedRuntimeIdentityTransitionObserver();
   const coordinator = createGovernedRuntimeIdentityTransitionCoordinator({
     store: selectedStore,
     authorityProofReplayStore: selectedProofStore,
+    transitionRecordStore: selectedRecordStore,
     authorityVerifier: authority,
     candidateManifestVerifier: manifest,
     clock,
@@ -195,6 +203,7 @@ function harness({
     coordinator,
     observer: selectedObserver,
     proofStore: selectedProofStore,
+    recordStore: selectedRecordStore,
     store: selectedStore,
     state
   };
@@ -536,6 +545,31 @@ test('10b. same-ref replay cannot overwrite prepared or successful authority rec
   );
 });
 
+test('10c. transition ref replay remains rejected after coordinator recreation', () => {
+  const first = prepareAndCommit();
+  const state = first.store.snapshot();
+  const rebuilt = harness({
+    state,
+    store: first.store,
+    proofStore: first.proofStore,
+    recordStore: first.recordStore
+  });
+  const replay = rebuilt.coordinator.preview(requestFor(state, {
+    suffix: 'R',
+    transitionRef: first.request.transition_ref,
+    target: toRuntime('c'),
+    fromRuntime: state.accepted_runtime,
+    proofDigest: digestObject('fresh-proof-for-old-ref'),
+    legacy: null
+  }));
+  assert.equal(replay.status, 'terminal_failure');
+  assert.equal(replay.protocol.terminal.reason_code, 'transition_replayed');
+  assert.deepEqual(
+    rebuilt.coordinator.protocol(first.request.transition_ref),
+    first.committed.protocol
+  );
+});
+
 test('11. a late candidate after terminal cannot overwrite accepted state', () => {
   const result = prepareAndCommit();
   const after = result.store.snapshot();
@@ -635,6 +669,54 @@ test('17. Observer independently reconstructs the exact terminal', () => {
   );
 });
 
+test('17a. Observer rejects a self-consistent commit not derived from its request', () => {
+  const result = prepareAndCommit();
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    request: result.request
+  });
+  for (const receipt of result.committed.protocol.receipts) {
+    observer.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_receipt_appended',
+      transition_ref: result.request.transition_ref,
+      receipt
+    });
+  }
+  const forgedRuntime = {
+    ...structuredClone(result.committed.accepted_runtime),
+    identity_digest: digestObject('forged-but-shaped-runtime')
+  };
+  const forgedBinding = stableControllerBinding(result.request, forgedRuntime);
+  const forgedTerminal = createRuntimeIdentityTransitionTerminal({
+    request: result.request,
+    receipts: result.committed.protocol.receipts,
+    outcome: 'success',
+    newRuntimeIdentityDigest: forgedRuntime.identity_digest,
+    controllerBindingDigest: forgedBinding.binding_digest,
+    runtimeStopped: true
+  });
+  const forgedProtocol = createGovernedRuntimeIdentityTransitionProtocol({
+    request: result.request,
+    receipts: result.committed.protocol.receipts,
+    terminal: forgedTerminal
+  });
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: result.request.transition_ref,
+    protocol: forgedProtocol,
+    accepted_runtime: forgedRuntime,
+    controller_binding: forgedBinding,
+    store_version: 1,
+    state_digest: digestObject('forged-state')
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 0);
+  assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
 test('18. terminal missing records a violation and fabricates no failure terminal', () => {
   const state = initialState();
   const run = harness({ state });
@@ -691,6 +773,46 @@ test('20. legacy migration is one-shot and a later request cannot reuse it', () 
   assert.equal(outcome.status, 'terminal_failure');
   assert.equal(outcome.protocol.terminal.reason_code, 'from_identity_changed');
   assert.equal(first.store.snapshot().store_version, 1);
+});
+
+test('stable controller authority cannot be replaced by an ordinary transition', () => {
+  const first = prepareAndCommit();
+  const state = first.store.snapshot();
+  const otherAuthorityId = `grauth_${'Z'.repeat(24)}`;
+  const otherLineage = digestObject('other-stable-authority-lineage');
+  const run = harness({
+    state,
+    store: first.store,
+    proofStore: first.proofStore,
+    recordStore: first.recordStore,
+    authority({ authority, authority_context_digest: context }) {
+      return {
+        verified: true,
+        authority_id: authority.authority_id,
+        authority_lineage_digest: authority.authority_lineage_digest,
+        authority_context_digest: context,
+        authority_proof_digest: authority.authority_proof_digest
+      };
+    }
+  });
+  const outcome = run.coordinator.preview(requestFor(state, {
+    suffix: 'Z',
+    target: toRuntime('c'),
+    fromRuntime: state.accepted_runtime,
+    authorityId: otherAuthorityId,
+    authorityLineage: otherLineage,
+    proofDigest: digestObject('other-authority-proof'),
+    legacy: null
+  }));
+  assert.equal(outcome.status, 'terminal_failure');
+  assert.equal(
+    outcome.protocol.terminal.reason_code,
+    'authority_lineage_mismatch'
+  );
+  assert.equal(
+    run.store.snapshot().controller_binding.authority_id,
+    AUTHORITY_ID
+  );
 });
 
 test('profile and endpoint drift have distinct canonical failures', () => {
