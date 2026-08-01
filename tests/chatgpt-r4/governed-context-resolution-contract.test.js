@@ -435,6 +435,16 @@ test('public resolver projections preserve canonical facts and never invent unkn
     ...unknown,
     context_ref_delivered: true
   }), { code: 'context_resolution_public_projection_unknown_invalid' });
+  for (const [field, value] of [
+    ['context_ref_issued', true],
+    ['last_completed_stage', 'CONTEXT_ISSUED'],
+    ['failed_stage', 'TERMINAL_FAILURE']
+  ]) {
+    assert.throws(() => validateGovernedContextResolutionPublicProjection({
+      ...unknown,
+      [field]: value
+    }), { code: 'context_resolution_public_projection_unknown_invalid' });
+  }
   assert.throws(() => validateGovernedContextResolutionPublicProjection({
     ...finalizedProjection,
     context_ref_delivered: true

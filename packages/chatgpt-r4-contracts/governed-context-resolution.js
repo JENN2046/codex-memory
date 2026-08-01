@@ -1043,11 +1043,14 @@ function validateGovernedContextResolutionPublicProjection(projection) {
     return projection;
   }
   if (projection.evidence_complete === false) {
-    if (projection.reason_code !== null ||
+    if (projection.last_completed_stage !== null ||
+        projection.failed_stage !== null ||
+        projection.reason_code !== null ||
         projection.failure_category !== null ||
         projection.failure_origin !== null ||
-        projection.context_ref_entered_response === true ||
-        projection.context_ref_delivered === true) {
+        projection.context_ref_issued !== null ||
+        projection.context_ref_entered_response !== null ||
+        projection.context_ref_delivered !== null) {
       reject('context_resolution_public_projection_unknown_invalid');
     }
     return projection;
