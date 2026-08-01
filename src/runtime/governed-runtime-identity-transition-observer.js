@@ -43,6 +43,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
     unknown_evidence_receipts: 0
   };
   let lastViolationCode = null;
+  let lastAuthoritativeCommit = null;
 
   function violation(code) {
     counters.protocol_violations += 1;
@@ -138,6 +139,14 @@ function createGovernedRuntimeIdentityTransitionObserver({
               event.accepted_runtime.identity_digest ||
             !Number.isSafeInteger(event.store_version) ||
             event.store_version < 1 ||
+            (lastAuthoritativeCommit !== null &&
+              (event.store_version !==
+                lastAuthoritativeCommit.store_version + 1 ||
+                event.previous_state_digest !==
+                  lastAuthoritativeCommit.state_digest ||
+                canonicalJson(record.request.from_runtime) !== canonicalJson(
+                  lastAuthoritativeCommit.accepted_runtime
+                ))) ||
             event.state_projection.store_version !== event.store_version ||
             canonicalJson(event.state_projection.accepted_runtime) !==
               canonicalJson(event.accepted_runtime) ||
@@ -164,6 +173,11 @@ function createGovernedRuntimeIdentityTransitionObserver({
           accepted_runtime: structuredClone(event.accepted_runtime),
           controller_binding: structuredClone(event.controller_binding),
           protocol: structuredClone(event.protocol),
+          store_version: event.store_version,
+          state_digest: event.state_digest
+        };
+        lastAuthoritativeCommit = {
+          accepted_runtime: structuredClone(event.accepted_runtime),
           store_version: event.store_version,
           state_digest: event.state_digest
         };
@@ -251,6 +265,12 @@ function createGovernedRuntimeIdentityTransitionObserver({
       ...counters,
       active_transitions: transitions.size,
       retained_terminals: terminalHistory.size,
+      last_authoritative_store_version:
+        lastAuthoritativeCommit?.store_version ?? null,
+      last_authoritative_state_digest:
+        lastAuthoritativeCommit?.state_digest ?? null,
+      last_accepted_runtime_identity_digest:
+        lastAuthoritativeCommit?.accepted_runtime.identity_digest ?? null,
       last_violation_code: lastViolationCode,
       terminals_fabricated: 0,
       runtime_started: false,

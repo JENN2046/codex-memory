@@ -24,7 +24,13 @@ or process restarts. The included in-memory adapter is synthetic but retains
 consumption across coordinator recreation when the same store is reused.
 The coordinator separately requires an atomic transition-record store that
 reserves each `transition_ref` with its request digest and retains the terminal
-protocol. A live adapter must persist this store as well.
+protocol. Active reservations use a bounded admission set; finalization moves
+the complete protocol into a separate durable archive whose replay marker is
+still consulted on every reservation. Archived terminals do not count against
+the active-reservation limit. A live adapter must persist both tiers and back
+the terminal archive with scalable storage or an equivalent compacted replay
+index. Expired requests are rejected before reservation and cannot consume
+either tier.
 
 ## Canonical request and digests
 
@@ -138,7 +144,11 @@ independently derives the accepted runtime identity and stable controller
 binding from the recorded request, validates the governed state projection,
 binds its lifecycle receipt to the request, verifies one-shot legacy migration
 consumption when applicable, and recomputes its digest instead of trusting a
-shaped digest string. It then
+shaped digest string. Across verified atomic commits it also retains the last
+authoritative store version, state digest, and accepted runtime. The next
+commit must advance the version by exactly one and its `from_runtime` must
+equal that accepted runtime, so mutually exclusive CAS forks cannot both be
+reported as verified. It then
 reconstructs the terminal and requires it to equal the terminal already bound
 to the verified atomic commit. It rejects spliced transitions, incorrect
 receipt order or origin, duplicate atomic commits, terminal mismatch, missing

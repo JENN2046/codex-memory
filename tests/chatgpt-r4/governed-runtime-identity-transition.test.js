@@ -645,6 +645,50 @@ test('10c. transition ref replay remains rejected after coordinator recreation',
   );
 });
 
+test('10c1. archived terminals preserve replay markers without consuming admission capacity', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore([], {
+    maxActiveReservations: 1
+  });
+  const firstRequest = requestFor(state);
+  const firstDigest = runtimeIdentityTransitionRequestDigest(firstRequest);
+  const firstTerminal = createRuntimeIdentityTransitionTerminal({
+    request: firstRequest,
+    receipts: [],
+    outcome: 'failure',
+    reasonCode: 'transition_replayed',
+    runtimeStopped: true
+  });
+  const firstProtocol = createGovernedRuntimeIdentityTransitionProtocol({
+    request: firstRequest,
+    receipts: [],
+    terminal: firstTerminal
+  });
+  assert.equal(recordStore.reserve({
+    transition_ref: firstRequest.transition_ref,
+    request_digest: firstDigest
+  }), true);
+  assert.equal(recordStore.finalize({
+    transition_ref: firstRequest.transition_ref,
+    request_digest: firstDigest,
+    protocol: firstProtocol
+  }), true);
+
+  const secondRequest = requestFor(state, {
+    suffix: 'B',
+    proofDigest: digestObject('archive-capacity-proof-B')
+  });
+  assert.equal(recordStore.reserve({
+    transition_ref: secondRequest.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(secondRequest)
+  }), true);
+  assert.equal(recordStore.reserve({
+    transition_ref: firstRequest.transition_ref,
+    request_digest: firstDigest
+  }), false);
+  assert.equal(recordStore.get(firstRequest.transition_ref).status, 'terminal');
+});
+
 test('10d. coordinator recovers a reserved ref index from atomic state protocol', () => {
   const first = prepareAndCommit();
   const state = first.store.snapshot();
@@ -1089,6 +1133,131 @@ test('17g. Observer verifies one-shot legacy migration consumption', () => {
   assert.equal(observer.snapshot().protocol_violations, 1);
 });
 
+test('17h. Observer rejects a fork that reuses an authoritative store version', () => {
+  const first = prepareAndCommit();
+  const second = prepareAndCommit({
+    request: {
+      suffix: 'B',
+      target: toRuntime('c'),
+      proofDigest: digestObject('fork-proof-B')
+    }
+  });
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  replayObserverPrelude(observer, first);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: first.request.transition_ref,
+    protocol: first.committed.protocol,
+    accepted_runtime: first.committed.accepted_runtime,
+    controller_binding: first.committed.controller_binding,
+    store_version: 1,
+    state_digest: first.committed.state_digest,
+    state_projection: first.store.snapshot()
+  }), true);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_terminal_committed',
+    transition_ref: first.request.transition_ref,
+    terminal: first.committed.protocol.terminal
+  }), true);
+
+  replayObserverPrelude(observer, second);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: second.request.transition_ref,
+    protocol: second.committed.protocol,
+    accepted_runtime: second.committed.accepted_runtime,
+    controller_binding: second.committed.controller_binding,
+    store_version: 1,
+    previous_state_digest: first.committed.state_digest,
+    state_digest: second.committed.state_digest,
+    state_projection: second.store.snapshot()
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 1);
+  assert.equal(observer.snapshot().last_authoritative_store_version, 1);
+});
+
+test('17i. Observer rejects a monotonic version whose from identity is stale', () => {
+  const first = prepareAndCommit();
+  const staleBranch = prepareAndCommit({
+    request: {
+      suffix: 'C',
+      target: toRuntime('d'),
+      proofDigest: digestObject('stale-from-proof-C')
+    }
+  });
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  replayObserverPrelude(observer, first);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: first.request.transition_ref,
+    protocol: first.committed.protocol,
+    accepted_runtime: first.committed.accepted_runtime,
+    controller_binding: first.committed.controller_binding,
+    store_version: 1,
+    state_digest: first.committed.state_digest,
+    state_projection: first.store.snapshot()
+  }), true);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_terminal_committed',
+    transition_ref: first.request.transition_ref,
+    terminal: first.committed.protocol.terminal
+  }), true);
+
+  replayObserverPrelude(observer, staleBranch);
+  const forgedVersionProjection = {
+    ...structuredClone(staleBranch.store.snapshot()),
+    store_version: 2
+  };
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: staleBranch.request.transition_ref,
+    protocol: staleBranch.committed.protocol,
+    accepted_runtime: staleBranch.committed.accepted_runtime,
+    controller_binding: staleBranch.committed.controller_binding,
+    store_version: 2,
+    previous_state_digest: first.committed.state_digest,
+    state_digest: digestObject(forgedVersionProjection),
+    state_projection: forgedVersionProjection
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 1);
+  assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
+test('17j. Observer accepts one exact monotonic atomic state sequence', () => {
+  const run = harness();
+  const firstRequest = requestFor(run.state);
+  const firstPrepared = run.coordinator.preview(firstRequest);
+  const first = run.coordinator.commit(firstPrepared.preview);
+  assert.equal(first.status, 'terminal_success');
+
+  const afterFirst = run.store.snapshot();
+  const secondRequest = requestFor(afterFirst, {
+    suffix: 'D',
+    target: toRuntime('d'),
+    fromRuntime: afterFirst.accepted_runtime,
+    proofDigest: digestObject('monotonic-proof-D'),
+    legacy: null
+  });
+  const secondPrepared = run.coordinator.preview(secondRequest);
+  assert.equal(secondPrepared.status, 'prepared');
+  assert.equal(
+    run.coordinator.commit(secondPrepared.preview).status,
+    'terminal_success'
+  );
+  assert.equal(run.observer.snapshot().atomic_commits_verified, 2);
+  assert.equal(run.observer.snapshot().last_authoritative_store_version, 2);
+  assert.equal(
+    run.observer.snapshot().last_accepted_runtime_identity_digest,
+    run.store.snapshot().accepted_runtime.identity_digest
+  );
+});
+
 test('18. terminal missing records a violation and fabricates no failure terminal', () => {
   const state = initialState();
   const run = harness({ state });
@@ -1247,6 +1416,25 @@ test('expired transition is canonical terminal failure without store mutation', 
   const outcome = run.coordinator.preview(requestFor(state));
   assert.equal(outcome.protocol.terminal.reason_code, 'transition_expired');
   assert.deepEqual(run.store.snapshot(), state);
+  assert.deepEqual(run.recordStore.snapshot(), []);
+});
+
+test('expired previews cannot exhaust transition record admission capacity', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore();
+  const run = harness({
+    state,
+    recordStore,
+    clock: () => new Date(NOW.getTime() + 121_000)
+  });
+  for (let index = 0; index < 4097; index += 1) {
+    const outcome = run.coordinator.preview(requestFor(state, {
+      transitionRef: `grit_expired_${index.toString(36).padStart(24, '0')}`,
+      proofDigest: digestObject(`expired-capacity-proof-${index}`)
+    }));
+    assert.equal(outcome.protocol.terminal.reason_code, 'transition_expired');
+  }
+  assert.deepEqual(recordStore.snapshot(), []);
 });
 
 test('receipt stage order is exact and bounded through post verification', () => {

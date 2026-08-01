@@ -304,12 +304,20 @@ function createAuthorityProofReplayStore(initialEntries = []) {
   return Object.freeze({ consume, snapshot });
 }
 
-function createTransitionRecordStore(initialRecords = []) {
+function createTransitionRecordStore(initialRecords = [], {
+  maxActiveReservations = AUTHORITY_PROOF_REPLAY_LIMIT
+} = {}) {
   if (!Array.isArray(initialRecords) ||
-      initialRecords.length > AUTHORITY_PROOF_REPLAY_LIMIT) {
+      !Number.isInteger(maxActiveReservations) ||
+      maxActiveReservations < 1 ||
+      maxActiveReservations > AUTHORITY_PROOF_REPLAY_LIMIT) {
     reject('transition_record_store_invalid');
   }
-  const records = new Map();
+  // Active reservations are bounded admission state. Completed protocols move
+  // to a separate durable archive so replay protection survives compaction
+  // without terminal history permanently consuming admission capacity.
+  const activeRecords = new Map();
+  const terminalArchive = new Map();
 
   function validateRecord(record) {
     if (!exactKeys(record, [
@@ -338,10 +346,17 @@ function createTransitionRecordStore(initialRecords = []) {
 
   for (const record of initialRecords) {
     validateRecord(record);
-    if (records.has(record.transition_ref)) {
+    if (activeRecords.has(record.transition_ref) ||
+        terminalArchive.has(record.transition_ref)) {
       reject('transition_record_store_invalid');
     }
-    records.set(record.transition_ref, structuredClone(record));
+    const target = record.status === 'reserved'
+      ? activeRecords
+      : terminalArchive;
+    target.set(record.transition_ref, structuredClone(record));
+  }
+  if (activeRecords.size > maxActiveReservations) {
+    reject('transition_record_store_invalid');
   }
 
   function reserve({ transition_ref: ref, request_digest: requestDigest } = {}) {
@@ -349,11 +364,11 @@ function createTransitionRecordStore(initialRecords = []) {
       reject('transition_record_store_invalid');
     }
     assertDigest(requestDigest, 'transition_record_store_invalid');
-    if (records.has(ref)) return false;
-    if (records.size >= AUTHORITY_PROOF_REPLAY_LIMIT) {
+    if (activeRecords.has(ref) || terminalArchive.has(ref)) return false;
+    if (activeRecords.size >= maxActiveReservations) {
       reject('transition_record_store_capacity_exceeded');
     }
-    records.set(ref, {
+    activeRecords.set(ref, {
       transition_ref: ref,
       request_digest: requestDigest,
       status: 'reserved',
@@ -368,7 +383,7 @@ function createTransitionRecordStore(initialRecords = []) {
     protocol
   } = {}) {
     validateGovernedRuntimeIdentityTransitionProtocol(protocol);
-    const current = records.get(ref);
+    const current = activeRecords.get(ref) || terminalArchive.get(ref);
     if (!current || current.request_digest !== requestDigest ||
         protocol.request.transition_ref !== ref ||
         runtimeIdentityTransitionRequestDigest(protocol.request) !==
@@ -385,7 +400,8 @@ function createTransitionRecordStore(initialRecords = []) {
       protocol: structuredClone(protocol)
     };
     validateRecord(terminal);
-    records.set(ref, terminal);
+    activeRecords.delete(ref);
+    terminalArchive.set(ref, terminal);
     return true;
   }
 
@@ -393,13 +409,14 @@ function createTransitionRecordStore(initialRecords = []) {
     if (!TRANSITION_REF_PATTERN.test(ref || '')) {
       reject('transition_record_store_invalid');
     }
-    const record = records.get(ref);
+    const record = activeRecords.get(ref) || terminalArchive.get(ref);
     return record ? deepFreeze(structuredClone(record)) : null;
   }
 
   function snapshot() {
     return deepFreeze(
-      [...records.values()].map(record => structuredClone(record))
+      [...activeRecords.values(), ...terminalArchive.values()]
+        .map(record => structuredClone(record))
     );
   }
 
@@ -702,6 +719,13 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     recoverLastTransitionRecord();
     const currentMs = nowMs();
     const requestDigest = runtimeIdentityTransitionRequestDigest(request);
+    if (Date.parse(request.request.created_at) > currentMs ||
+        Date.parse(request.request.expires_at) <= currentMs) {
+      return terminalFailure(request, [], 'transition_expired', {
+        storeRecord: false,
+        emitTerminal: false
+      });
+    }
     let persistedRecord;
     try {
       persistedRecord = transitionRecordStore.get(request.transition_ref);
@@ -738,10 +762,6 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       });
     }
     emit('transition_accepted', { request });
-    if (Date.parse(request.request.created_at) > currentMs ||
-        Date.parse(request.request.expires_at) <= currentMs) {
-      return terminalFailure(request, [], 'transition_expired');
-    }
     const initial = store.snapshot();
     validateGovernedRuntimeIdentityState(initial);
     let workingSet = { request, receipts: [] };
@@ -1225,6 +1245,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       accepted_runtime: newRuntime,
       controller_binding: controllerBinding,
       store_version: after.store_version,
+      previous_state_digest: digestObject(before),
       state_digest: digestObject(after),
       state_projection: after
     });
