@@ -5,6 +5,8 @@ const {
   reject
 } = require('../../packages/chatgpt-r4-contracts');
 
+const MAX_REPLAY_TOMBSTONES = 8_388_608;
+
 function deriveGovernedContextResolutionRetention({
   maxRecords,
   requestRecordRetentionMs
@@ -18,9 +20,13 @@ function deriveGovernedContextResolutionRetention({
     GOVERNED_CONTEXT_RESOLUTION_LIMITS.ttlSeconds * 2 * 1000 /
       requestRecordRetentionMs
   );
+  const maxReplayTombstones = maxRecords * replayWindows;
+  if (maxReplayTombstones > MAX_REPLAY_TOMBSTONES) {
+    reject('context_resolution_tombstone_capacity_exceeded');
+  }
   return Object.freeze({
     maxRetainedResolutions: maxRecords,
-    maxReplayTombstones: Math.min(65_536, maxRecords * replayWindows)
+    maxReplayTombstones
   });
 }
 

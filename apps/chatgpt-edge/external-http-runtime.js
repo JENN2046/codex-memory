@@ -52,7 +52,8 @@ function createExternalEdgeRuntime(options = {}) {
       expectedRequest: request,
       counterMode: config.counterMode
     });
-  const broker = createTransientRequestBroker({
+  function createBroker() {
+    return createTransientRequestBroker({
     clock: config.clock,
     claimLeaseMs: config.claimLeaseMs,
     terminalRetentionMs: config.terminalRetentionMs,
@@ -73,8 +74,10 @@ function createExternalEdgeRuntime(options = {}) {
       });
     },
     verifyResponse: verifyBrokerResponse
-  });
-  const mcp = createExternalMcpHandler({
+    });
+  }
+  function createMcp(broker) {
+    return createExternalMcpHandler({
     broker,
     issuer: config.issuer,
     audience: mcpResource,
@@ -83,7 +86,10 @@ function createExternalEdgeRuntime(options = {}) {
     requestTtlSeconds: config.requestTtlSeconds,
     responseTimeoutMs: config.responseTimeoutMs,
     verifyBrokerResponse
-  });
+    });
+  }
+  let broker = createBroker();
+  let mcp = createMcp(broker);
   let started = false;
 
   const server = http.createServer(async (incoming, outgoing) => {
@@ -162,10 +168,12 @@ function createExternalEdgeRuntime(options = {}) {
       return Object.freeze({ host: address.address, port: address.port });
     },
     async stop() {
-      broker.close();
       if (!started) return;
+      broker.close();
       await stopServer(server);
       started = false;
+      broker = createBroker();
+      mcp = createMcp(broker);
     },
     snapshot() {
       return Object.freeze({
@@ -175,7 +183,9 @@ function createExternalEdgeRuntime(options = {}) {
         broker: broker.snapshot()
       });
     },
-    broker,
+    get broker() {
+      return broker;
+    },
     handleRequest: server.listeners('request')[0]
   });
 }
