@@ -218,6 +218,22 @@ function prepareAndCommit(options = {}) {
   return { ...value, committed, prepared, request };
 }
 
+function replayObserverPrelude(observer, result) {
+  observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    request: result.request
+  });
+  for (const receipt of result.committed.protocol.receipts) {
+    observer.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_receipt_appended',
+      transition_ref: result.request.transition_ref,
+      receipt
+    });
+  }
+}
+
 test('v1 request canonical digest binds every nested field and separates authority from runtime source', () => {
   const state = initialState();
   const request = requestFor(state);
@@ -428,6 +444,41 @@ test('6. candidate content evidence that does not reproduce its digest is reject
   });
   const outcome = run.coordinator.preview(requestFor(state));
   assert.equal(outcome.protocol.terminal.reason_code, 'candidate_manifest_invalid');
+});
+
+test('6a. malformed candidate verifier output becomes a canonical failure', () => {
+  const state = initialState();
+  const run = harness({
+    state,
+    manifest(input) {
+      const verification = manifestVerifier(input);
+      delete verification.protocol_versions;
+      return verification;
+    }
+  });
+  const outcome = run.coordinator.preview(requestFor(state));
+  assert.equal(outcome.status, 'terminal_failure');
+  assert.equal(outcome.protocol.terminal.reason_code, 'candidate_manifest_invalid');
+});
+
+test('6b. malformed candidate revalidation is a canonical failure without CAS', () => {
+  const state = initialState();
+  let calls = 0;
+  const run = harness({
+    state,
+    manifest(input) {
+      calls += 1;
+      const verification = manifestVerifier(input);
+      if (calls === 2) delete verification.protocol_versions;
+      return verification;
+    }
+  });
+  const prepared = run.coordinator.preview(requestFor(state));
+  assert.equal(prepared.status, 'prepared');
+  const outcome = run.coordinator.commit(prepared.preview);
+  assert.equal(outcome.status, 'terminal_failure');
+  assert.equal(outcome.protocol.terminal.reason_code, 'transition_cas_lost');
+  assert.equal(run.store.snapshot().store_version, 0);
 });
 
 test('7. dirty candidate manifest scope is rejected', () => {
@@ -945,6 +996,52 @@ test('17e. Observer rotates terminal history without exhausting active capacity'
     observer.reconcile(latestRequest.transition_ref).terminal.reason_code,
     'transition_replayed'
   );
+});
+
+test('17f. Observer binds atomic state to the request safe-stop receipt', () => {
+  const result = prepareAndCommit();
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  replayObserverPrelude(observer, result);
+  const projection = structuredClone(result.store.snapshot());
+  projection.lifecycle.safe_stop_receipt_digest =
+    digestObject('different-safe-stop-receipt');
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: result.request.transition_ref,
+    protocol: result.committed.protocol,
+    accepted_runtime: result.committed.accepted_runtime,
+    controller_binding: result.committed.controller_binding,
+    store_version: projection.store_version,
+    state_digest: digestObject(projection),
+    state_projection: projection
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 0);
+  assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
+test('17g. Observer verifies one-shot legacy migration consumption', () => {
+  const result = prepareAndCommit();
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  replayObserverPrelude(observer, result);
+  const projection = structuredClone(result.store.snapshot());
+  projection.legacy_migration = {
+    consumed: false,
+    evidence_digest: null
+  };
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: result.request.transition_ref,
+    protocol: result.committed.protocol,
+    accepted_runtime: result.committed.accepted_runtime,
+    controller_binding: result.committed.controller_binding,
+    store_version: projection.store_version,
+    state_digest: digestObject(projection),
+    state_projection: projection
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 0);
+  assert.equal(observer.snapshot().protocol_violations, 1);
 });
 
 test('18. terminal missing records a violation and fabricates no failure terminal', () => {

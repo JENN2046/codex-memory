@@ -148,6 +148,14 @@ function createGovernedRuntimeIdentityTransitionObserver({
             event.state_projection.lifecycle.lifecycle_state !== 'stopped' ||
             event.state_projection.lifecycle.held_stopped !== true ||
             event.state_projection.lifecycle.running_component_count !== 0 ||
+            event.state_projection.lifecycle.safe_stop_receipt_digest !==
+              record.request.preconditions.safe_stop_receipt_digest ||
+            (record.request.legacy_transition_evidence !== null &&
+              (event.state_projection.legacy_migration.consumed !== true ||
+                event.state_projection.legacy_migration.evidence_digest !==
+                  digestObject(
+                    record.request.legacy_transition_evidence
+                  ))) ||
             !DIGEST_PATTERN.test(event.state_digest || '') ||
             digestObject(event.state_projection) !== event.state_digest) {
           return violation('transition_observer_atomic_commit_invalid');

@@ -131,7 +131,9 @@ The Observer consumes only the canonical request, ordered receipt stream,
 governed atomic-state projection, atomic commit event, and terminal. It
 independently derives the accepted runtime identity and stable controller
 binding from the recorded request, validates the governed state projection,
-and recomputes its digest instead of trusting a shaped digest string. It then
+binds its lifecycle receipt to the request, verifies one-shot legacy migration
+consumption when applicable, and recomputes its digest instead of trusting a
+shaped digest string. It then
 reconstructs the terminal and requires it to equal the terminal already bound
 to the verified atomic commit. It rejects spliced transitions, incorrect
 receipt order or origin, duplicate atomic commits, terminal mismatch, missing

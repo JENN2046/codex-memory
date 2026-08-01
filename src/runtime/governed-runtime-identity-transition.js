@@ -483,7 +483,8 @@ function candidateVerificationFailure(verification, request) {
       verification.manifest_schema !== request.to_runtime.manifest_schema ||
       verification.manifest_digest !== request.to_runtime.manifest_digest ||
       verification.candidate_tree_digest !==
-        request.to_runtime.candidate_tree_digest) {
+        request.to_runtime.candidate_tree_digest ||
+      !isPlainObject(verification.protocol_versions)) {
     return 'candidate_manifest_invalid';
   }
   if (verification.scope_clean !== true) {
@@ -1019,11 +1020,18 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     } catch {
       candidate = null;
     }
-    if (candidateVerificationFailure(candidate, previewValue.request)) {
+    const candidateFailure = candidateVerificationFailure(
+      candidate,
+      previewValue.request
+    );
+    if (candidateFailure) {
       return casFailure(
         previewValue,
         'transition_cas_lost',
-        { candidate_revalidation: false },
+        {
+          candidate_revalidation: false,
+          candidate_failure_reason: candidateFailure
+        },
         { runtimeStopped: true }
       );
     }
