@@ -208,6 +208,12 @@ versions cannot replace the safe-stop receipt. A consumed
 `transition_terminal_missing` remains a recorded protocol violation but returns
 delivery acknowledgement, preventing its durable outbox entry from wedging the
 stream.
+Before CAS, the reserved record persists the exact previous-state digest and
+retains delivered event digests. Reconstruction can therefore regenerate only
+missing post-CAS receipts, atomic commit, and terminal envelopes from the
+authoritative state even without a local preview record. Protocol lookup during
+event dispatch skips outbox flushing, so a synchronous Observer callback cannot
+recursively redeliver the queue head.
 
 The unique failure registry includes:
 

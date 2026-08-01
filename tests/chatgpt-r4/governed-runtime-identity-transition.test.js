@@ -887,6 +887,7 @@ test('10e. a failed terminal-index write is recovered before the next transition
     discardObserverEvent: durableRecords.discardObserverEvent,
     enqueueObserverEvent: durableRecords.enqueueObserverEvent,
     pendingObserverEvents: durableRecords.pendingObserverEvents,
+    setCommitContext: durableRecords.setCommitContext,
     reserve: durableRecords.reserve,
     get: durableRecords.get,
     snapshot: durableRecords.snapshot,
@@ -1083,6 +1084,48 @@ test('13b1. retry recovers committed success after repeated readback faults', ()
   assert.equal(run.observer.snapshot().terminal_successes, 1);
 });
 
+test('13b2. reconstruction replays post-CAS events from a reserved record', () => {
+  const state = initialState();
+  const durableRecords = createTransitionRecordStore();
+  let failSuccessFinalization = true;
+  const failingRecords = {
+    ...durableRecords,
+    finalize(input) {
+      if (failSuccessFinalization &&
+          input.protocol.terminal.outcome === 'success') {
+        failSuccessFinalization = false;
+        throw new Error('synthetic-post-cas-process-exit');
+      }
+      return durableRecords.finalize(input);
+    }
+  };
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  const first = harness({ state, recordStore: failingRecords, observer });
+  const request = requestFor(state);
+  const prepared = first.coordinator.preview(request);
+  assert.throws(
+    () => first.coordinator.commit(prepared.preview),
+    { code: 'transition_record_store_recovery_failed' }
+  );
+  assert.equal(observer.snapshot().active_transitions, 1);
+  const committedState = first.store.snapshot();
+  assert.equal(committedState.store_version, 1);
+
+  const rebuiltRecords = createTransitionRecordStore(durableRecords.snapshot());
+  harness({
+    state: committedState,
+    store: createGovernedRuntimeIdentityStateStore(committedState),
+    recordStore: rebuiltRecords,
+    observer
+  });
+  assert.equal(rebuiltRecords.pendingObserverEvents().length, 0);
+  assert.equal(observer.snapshot().active_transitions, 0);
+  assert.equal(observer.snapshot().atomic_commits_verified, 1);
+  assert.equal(observer.snapshot().terminal_successes, 1);
+});
+
 test('13c. finalized protocols remain queryable after local record release', () => {
   const result = prepareAndCommit();
   assert.deepEqual(
@@ -1237,6 +1280,35 @@ test('13d4. initial state read fault terminalizes the durable reservation', () =
   );
   assert.equal(run.observer.snapshot().active_transitions, 0);
   assert.equal(run.observer.snapshot().terminal_failures, 1);
+});
+
+test('13d5. protocol lookup during Observer dispatch does not reenter outbox flush', () => {
+  const state = initialState();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  let coordinator;
+  let callbackProtocol = null;
+  const run = harness({
+    state,
+    observer: {
+      observe(event) {
+        const accepted = observer.observe(event);
+        if (event.event === 'transition_terminal_committed') {
+          callbackProtocol = coordinator.protocol(event.transition_ref);
+        }
+        return accepted;
+      }
+    }
+  });
+  coordinator = run.coordinator;
+  const request = requestFor(state);
+  const prepared = coordinator.preview(request);
+  const committed = coordinator.commit(prepared.preview);
+  assert.equal(committed.status, 'terminal_success');
+  assert.deepEqual(callbackProtocol, committed.protocol);
+  assert.equal(run.recordStore.pendingObserverEvents().length, 0);
+  assert.equal(observer.snapshot().terminal_successes, 1);
 });
 
 test('13e. archived protocol lookup does not require identity-state readback', () => {

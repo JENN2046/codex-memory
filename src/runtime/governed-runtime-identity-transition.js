@@ -374,7 +374,9 @@ function createTransitionRecordStore(initialRecords = [], {
       'request_digest',
       'status',
       'protocol',
-      'observer_outbox'
+      'observer_outbox',
+      'observer_delivered_digests',
+      'previous_state_digest'
     ]) ||
         !TRANSITION_REF_PATTERN.test(record.transition_ref || '') ||
         !['reserved', 'terminal'].includes(record.status)) {
@@ -387,6 +389,16 @@ function createTransitionRecordStore(initialRecords = [], {
       reject('transition_record_store_invalid');
     }
     assertDigest(record.request_digest, 'transition_record_store_invalid');
+    if (!Array.isArray(record.observer_delivered_digests) ||
+        record.observer_delivered_digests.some(
+          digest => !DIGEST_PATTERN.test(digest)
+        ) ||
+        new Set(record.observer_delivered_digests).size !==
+          record.observer_delivered_digests.length ||
+        (record.previous_state_digest !== null &&
+          !DIGEST_PATTERN.test(record.previous_state_digest))) {
+      reject('transition_record_store_invalid');
+    }
     if (record.status === 'reserved') {
       if (record.protocol !== null) reject('transition_record_store_invalid');
     } else {
@@ -401,10 +413,25 @@ function createTransitionRecordStore(initialRecords = [], {
   }
 
   for (const record of initialRecords) {
-    const normalized = exactKeys(record, [
+    const legacyRecord = exactKeys(record, [
       'transition_ref', 'request_digest', 'status', 'protocol'
-    ])
-      ? { ...structuredClone(record), observer_outbox: [] }
+    ]);
+    const preAnchorOutboxRecord = exactKeys(record, [
+      'transition_ref',
+      'request_digest',
+      'status',
+      'protocol',
+      'observer_outbox'
+    ]);
+    const normalized = legacyRecord || preAnchorOutboxRecord
+      ? {
+        ...structuredClone(record),
+        observer_outbox: preAnchorOutboxRecord
+          ? structuredClone(record.observer_outbox)
+          : [],
+        observer_delivered_digests: [],
+        previous_state_digest: null
+      }
       : structuredClone(record);
     validateRecord(normalized);
     if (activeRecords.has(normalized.transition_ref) ||
@@ -434,7 +461,9 @@ function createTransitionRecordStore(initialRecords = [], {
       request_digest: requestDigest,
       status: 'reserved',
       protocol: null,
-      observer_outbox: []
+      observer_outbox: [],
+      observer_delivered_digests: [],
+      previous_state_digest: null
     });
     return true;
   }
@@ -467,7 +496,11 @@ function createTransitionRecordStore(initialRecords = [], {
       request_digest: requestDigest,
       status: 'terminal',
       protocol: structuredClone(protocol),
-      observer_outbox: structuredClone(current.observer_outbox)
+      observer_outbox: structuredClone(current.observer_outbox),
+      observer_delivered_digests: structuredClone(
+        current.observer_delivered_digests
+      ),
+      previous_state_digest: current.previous_state_digest
     };
     validateRecord(terminal);
     activeRecords.delete(ref);
@@ -527,11 +560,30 @@ function createTransitionRecordStore(initialRecords = [], {
       reject('transition_record_store_context_mismatch');
     }
     current.observer_outbox.shift();
+    current.observer_delivered_digests.push(digest);
     return true;
   }
 
   function discardObserverEvent(input = {}) {
     return ackObserverEvent(input);
+  }
+
+  function setCommitContext({
+    transition_ref: ref,
+    previous_state_digest: previousStateDigest
+  } = {}) {
+    const current = activeRecords.get(ref);
+    assertDigest(
+      previousStateDigest,
+      'transition_record_store_context_mismatch'
+    );
+    if (!current || current.status !== 'reserved' ||
+        (current.previous_state_digest !== null &&
+          current.previous_state_digest !== previousStateDigest)) {
+      reject('transition_record_store_context_mismatch');
+    }
+    current.previous_state_digest = previousStateDigest;
+    return true;
   }
 
   return Object.freeze({
@@ -542,6 +594,7 @@ function createTransitionRecordStore(initialRecords = [], {
     get,
     pendingObserverEvents,
     reserve,
+    setCommitContext,
     snapshot
   });
 }
@@ -690,6 +743,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       typeof transitionRecordStore.pendingObserverEvents !== 'function' ||
       typeof transitionRecordStore.ackObserverEvent !== 'function' ||
       typeof transitionRecordStore.discardObserverEvent !== 'function' ||
+      typeof transitionRecordStore.setCommitContext !== 'function' ||
       typeof transitionRecordStore.snapshot !== 'function') {
     reject('transition_coordinator_record_store_invalid');
   }
@@ -728,26 +782,30 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     }
     const localRecord = records.get(recoveryRef);
     let recoveryEvents = [];
-    if (localRecord?.status === 'prepared') {
-      if (!DIGEST_PATTERN.test(localRecord.previous_state_digest || '') ||
-          canonicalJson(localRecord.preview?.request) !==
-            canonicalJson(recoveryRequest)) {
-        reject('transition_record_store_recovery_failed');
-      }
-      recoveryEvents = [
-        ...recoveryProtocol.receipts.slice(
-          localRecord.preview.receipts.length
-        ).map(receipt => observerEnvelope('transition_receipt_appended', {
-          transition_ref: recoveryRef,
-          receipt
-        })),
+    if (localRecord?.status === 'prepared' &&
+        (canonicalJson(localRecord.preview?.request) !==
+          canonicalJson(recoveryRequest) ||
+          localRecord.previous_state_digest !==
+            recoveryRecord.previous_state_digest)) {
+      reject('transition_record_store_recovery_failed');
+    }
+    if (recoveryRecord.previous_state_digest !== null) {
+      const expectedEvents = [
+        observerEnvelope('transition_accepted', {
+          request: recoveryRequest
+        }),
+        ...recoveryProtocol.receipts.map(receipt =>
+          observerEnvelope('transition_receipt_appended', {
+            transition_ref: recoveryRef,
+            receipt
+          })),
         observerEnvelope('transition_atomic_commit', {
           transition_ref: recoveryRef,
           protocol: recoveryProtocol,
           accepted_runtime: recoveryState.accepted_runtime,
           controller_binding: recoveryState.controller_binding,
           store_version: recoveryState.store_version,
-          previous_state_digest: localRecord.previous_state_digest,
+          previous_state_digest: recoveryRecord.previous_state_digest,
           state_digest: digestObject(recoveryState),
           state_projection: recoveryState
         }),
@@ -756,6 +814,18 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
           terminal: recoveryProtocol.terminal
         })
       ];
+      const knownDigests = new Set([
+        ...recoveryRecord.observer_delivered_digests,
+        ...recoveryRecord.observer_outbox.map(entry => entry.event_digest)
+      ]);
+      recoveryEvents = expectedEvents.filter(
+        envelope => !knownDigests.has(digestObject(envelope))
+      );
+      if (recoveryEvents.some(
+        envelope => envelope.event === 'transition_atomic_commit'
+      ) && !DIGEST_PATTERN.test(recoveryRecord.previous_state_digest)) {
+        reject('transition_record_store_recovery_failed');
+      }
     }
     if (recoveryRecord.status === 'reserved') {
       let recovered;
@@ -1476,6 +1546,10 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     };
     validateGovernedRuntimeIdentityState(nextState);
     record.previous_state_digest = digestObject(before);
+    transitionRecordStore.setCommitContext({
+      transition_ref: previewValue.request.transition_ref,
+      previous_state_digest: record.previous_state_digest
+    });
 
     let swapped;
     try {
@@ -1620,7 +1694,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   function protocol(transitionRef) {
-    flushPendingObserverEvents();
+    if (eventDispatchDepth === 0) flushPendingObserverEvents();
     const record = records.get(transitionRef);
     const persisted = transitionRecordStore.get(transitionRef);
     let selected = record?.protocol || persisted?.protocol || null;
