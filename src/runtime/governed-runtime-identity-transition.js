@@ -603,6 +603,9 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     reject('transition_coordinator_event_sink_invalid');
   }
 
+  const records = new Map();
+  let eventDispatchDepth = 0;
+
   function recoverLastTransitionRecord() {
     const recoveryState = store.snapshot();
     validateGovernedRuntimeIdentityState(recoveryState);
@@ -641,11 +644,36 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         canonicalJson(recoveryProtocol)) {
       reject('transition_record_store_recovery_failed');
     }
+    const localRecord = records.get(recoveryRef);
+    if (localRecord?.status === 'prepared') {
+      if (!DIGEST_PATTERN.test(localRecord.previous_state_digest || '') ||
+          canonicalJson(localRecord.preview?.request) !==
+            canonicalJson(recoveryRequest)) {
+        reject('transition_record_store_recovery_failed');
+      }
+      for (const receipt of recoveryProtocol.receipts.slice(
+        localRecord.preview.receipts.length
+      )) {
+        emitReceipt(receipt);
+      }
+      emit('transition_atomic_commit', {
+        transition_ref: recoveryRef,
+        protocol: recoveryProtocol,
+        accepted_runtime: recoveryState.accepted_runtime,
+        controller_binding: recoveryState.controller_binding,
+        store_version: recoveryState.store_version,
+        previous_state_digest: localRecord.previous_state_digest,
+        state_digest: digestObject(recoveryState),
+        state_projection: recoveryState
+      });
+      emit('transition_terminal_committed', {
+        transition_ref: recoveryRef,
+        terminal: recoveryProtocol.terminal
+      });
+      records.delete(recoveryRef);
+    }
   }
   recoverLastTransitionRecord();
-
-  const records = new Map();
-  let eventDispatchDepth = 0;
 
   function nowMs() {
     const value = clock();
@@ -1234,6 +1262,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       }
     };
     validateGovernedRuntimeIdentityState(nextState);
+    record.previous_state_digest = digestObject(before);
 
     let swapped;
     try {

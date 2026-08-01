@@ -918,6 +918,8 @@ test('10e. a failed terminal-index write is recovered before the next transition
   });
   const secondPrepared = run.coordinator.preview(secondRequest);
   assert.equal(secondPrepared.status, 'prepared');
+  assert.equal(run.observer.snapshot().terminal_successes, 1);
+  assert.equal(run.observer.snapshot().atomic_commits_verified, 1);
   assert.equal(
     durableRecords.get(firstRequest.transition_ref).status,
     'terminal'
@@ -1072,6 +1074,9 @@ test('13b1. retry recovers committed success after repeated readback faults', ()
   assert.equal(run.store.snapshot().store_version, 1);
   assert.equal(run.recordStore.get(request.transition_ref).status, 'terminal');
   assert.deepEqual(run.coordinator.protocol(request.transition_ref), recovered.protocol);
+  assert.equal(run.observer.snapshot().active_transitions, 0);
+  assert.equal(run.observer.snapshot().atomic_commits_verified, 1);
+  assert.equal(run.observer.snapshot().terminal_successes, 1);
 });
 
 test('13c. finalized protocols remain queryable after local record release', () => {

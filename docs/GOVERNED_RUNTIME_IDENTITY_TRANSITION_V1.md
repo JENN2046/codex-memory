@@ -190,6 +190,9 @@ Transient state readback failure after a successful CAS is recovered without
 writing a contradictory failure terminal. Once a terminal is durably indexed,
 the coordinator releases its local working record and protocol lookup uses the
 persistent terminal archive.
+If crash recovery finalizes a success that had not yet reached observers, the
+coordinator replays the missing post-preview receipts, atomic commit, and
+terminal event from the authoritative state before releasing the local record.
 
 The unique failure registry includes:
 
