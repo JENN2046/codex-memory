@@ -190,6 +190,12 @@ Transient state readback failure after a successful CAS is recovered without
 writing a contradictory failure terminal. Once a terminal is durably indexed,
 the coordinator releases its local working record and protocol lookup uses the
 persistent terminal archive.
+If a second coordinator commits one directly chained successor before the
+first coordinator reads back its winning CAS, the first commit remains a
+success only when both durable success records, the exact previous-state
+digest, the incremented store version, and the successor `from_runtime` form a
+complete canonical link. An unrelated or malformed later state is still a
+fatal partial transition.
 If crash recovery finalizes a success that had not yet reached observers, the
 coordinator replays the missing post-preview receipts, atomic commit, and
 terminal event from the authoritative state before releasing the local record.
@@ -200,9 +206,12 @@ removes only the exact head event. Archived protocol lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
 An unacknowledged new admission is discarded from the outbox and terminalized
 without Observer emission, so it cannot head-block terminal events for already
-active transitions. Thenable sinks are treated as unacknowledged synchronous
-delivery, and a post-reservation initial-state read fault closes the reservation
-with a canonical durable failure.
+active transitions. Event sinks must explicitly declare
+`synchronous_ack.v1`; declared async functions are rejected before use, while
+an undeclared thenable response raises
+`transition_observer_async_ack_invalid` and leaves its durable outbox entry for
+synchronous recovery. A post-reservation initial-state read fault closes the
+reservation with a canonical durable failure.
 Observer commit anchors retain the complete lifecycle projection, so later
 versions cannot replace the safe-stop receipt. A consumed
 `transition_terminal_missing` remains a recorded protocol violation but returns

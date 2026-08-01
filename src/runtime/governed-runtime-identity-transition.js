@@ -725,7 +725,8 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   authorityVerifier,
   candidateManifestVerifier,
   clock = () => new Date(),
-  eventSink
+  eventSink,
+  eventSinkMode = null
 } = {}) {
   if (!store || typeof store.snapshot !== 'function' ||
       typeof store.compareAndSwap !== 'function') {
@@ -755,6 +756,11 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
   if (typeof clock !== 'function') reject('transition_coordinator_clock_invalid');
   if (eventSink !== undefined && typeof eventSink !== 'function') {
+    reject('transition_coordinator_event_sink_invalid');
+  }
+  if (eventSink !== undefined &&
+      (eventSinkMode !== 'synchronous_ack.v1' ||
+        eventSink.constructor?.name === 'AsyncFunction')) {
     reject('transition_coordinator_event_sink_invalid');
   }
 
@@ -873,16 +879,17 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   function deliverObserverEvent(envelope) {
+    let outcome;
     try {
-      const outcome = eventSink(envelope);
-      if (outcome && typeof outcome.then === 'function') {
-        Promise.resolve(outcome).catch(() => {});
-        return false;
-      }
-      return outcome !== false;
+      outcome = eventSink(envelope);
     } catch {
       return false;
     }
+    if (outcome && typeof outcome.then === 'function') {
+      Promise.resolve(outcome).catch(() => {});
+      reject('transition_observer_async_ack_invalid');
+    }
+    return outcome !== false;
   }
 
   function releaseDeliveredTerminalRecords() {
@@ -1608,6 +1615,43 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       after.controller_binding.accepted_runtime_identity_digest ===
         newRuntime.identity_digest;
     if (!postMatches) {
+      const durableCommit = transitionRecordStore.get(
+        previewValue.request.transition_ref
+      );
+      let legalSuccessor = false;
+      try {
+        validateGovernedRuntimeIdentityState(after);
+        const successorProtocol = after.last_transition?.protocol;
+        const successorRef = successorProtocol?.request.transition_ref;
+        const successorRecord = successorRef
+          ? transitionRecordStore.get(successorRef)
+          : null;
+        legalSuccessor =
+          after.store_version === nextState.store_version + 1 &&
+          canonicalJson(successorProtocol?.request.from_runtime) ===
+            canonicalJson(nextState.accepted_runtime) &&
+          successorRecord?.status === 'terminal' &&
+          successorRecord.protocol.terminal.outcome === 'success' &&
+          successorRecord.previous_state_digest === digestObject(nextState) &&
+          canonicalJson(successorRecord.protocol) ===
+            canonicalJson(successorProtocol);
+      } catch {
+        legalSuccessor = false;
+      }
+      if (durableCommit?.status === 'terminal' &&
+          durableCommit.protocol.terminal.outcome === 'success' &&
+          canonicalJson(durableCommit.protocol) === canonicalJson(protocol) &&
+          legalSuccessor) {
+        flushPendingObserverEvents();
+        records.delete(previewValue.request.transition_ref);
+        return deepFreeze({
+          status: 'terminal_success',
+          protocol: durableCommit.protocol,
+          accepted_runtime: newRuntime,
+          controller_binding: controllerBinding,
+          state_digest: digestObject(nextState)
+        });
+      }
       return casFailure(
         previewValue,
         'partial_transition_detected',

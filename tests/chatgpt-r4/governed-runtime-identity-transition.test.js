@@ -197,7 +197,8 @@ function harness({
     authorityVerifier: authority,
     candidateManifestVerifier: manifest,
     clock,
-    eventSink: selectedObserver.observe
+    eventSink: selectedObserver.observe,
+    eventSinkMode: 'synchronous_ack.v1'
   });
   return {
     coordinator,
@@ -1126,6 +1127,66 @@ test('13b2. reconstruction replays post-CAS events from a reserved record', () =
   assert.equal(observer.snapshot().terminal_successes, 1);
 });
 
+test('13b3. a durable success survives an interleaved legal successor', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore();
+  const observer = { observe() { return true; } };
+  let current = structuredClone(state);
+  let advanceBeforeReadback = false;
+  const interleavedStore = {
+    snapshot() {
+      if (advanceBeforeReadback) {
+        advanceBeforeReadback = false;
+        const successorState = structuredClone(current);
+        const successor = harness({
+          state: successorState,
+          store: interleavedStore,
+          recordStore,
+          observer
+        });
+        const successorRequest = requestFor(successorState, {
+          suffix: 'S',
+          target: toRuntime('c'),
+          proofDigest: digestObject('interleaved-successor-proof'),
+          legacy: null
+        });
+        const successorPreview = successor.coordinator.preview(successorRequest);
+        assert.equal(successorPreview.status, 'prepared');
+        assert.equal(
+          successor.coordinator.commit(successorPreview.preview).status,
+          'terminal_success'
+        );
+      }
+      return structuredClone(current);
+    },
+    compareAndSwap(expectedVersion, candidate) {
+      if (current.store_version !== expectedVersion) return false;
+      current = structuredClone(candidate);
+      if (expectedVersion === 0) advanceBeforeReadback = true;
+      return true;
+    }
+  };
+  const first = harness({
+    state,
+    store: interleavedStore,
+    recordStore,
+    observer
+  });
+  const request = requestFor(state);
+  const prepared = first.coordinator.preview(request);
+  const committed = first.coordinator.commit(prepared.preview);
+
+  assert.equal(committed.status, 'terminal_success');
+  assert.equal(committed.accepted_runtime.source_head, toRuntime('b').source_head);
+  assert.equal(current.store_version, 2);
+  assert.equal(current.accepted_runtime.source_head, toRuntime('c').source_head);
+  assert.equal(recordStore.get(request.transition_ref).status, 'terminal');
+  assert.equal(
+    recordStore.get(request.transition_ref).protocol.terminal.outcome,
+    'success'
+  );
+});
+
 test('13c. finalized protocols remain queryable after local record release', () => {
   const result = prepareAndCommit();
   assert.deepEqual(
@@ -1243,14 +1304,26 @@ test('13d3. asynchronous Observer sinks are never acknowledged synchronously', a
     state,
     observer: { observe() { return Promise.resolve(true); } }
   });
-  const outcome = run.coordinator.preview(requestFor(state));
-  assert.equal(outcome.status, 'terminal_failure');
-  assert.equal(
-    outcome.protocol.terminal.reason_code,
-    'transition_record_store_unavailable'
+  assert.throws(
+    () => run.coordinator.preview(requestFor(state)),
+    { code: 'transition_observer_async_ack_invalid' }
   );
-  assert.equal(run.recordStore.pendingObserverEvents().length, 0);
+  assert.equal(run.recordStore.pendingObserverEvents().length, 1);
   await Promise.resolve();
+
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  const rebuiltRecords = createTransitionRecordStore(
+    run.recordStore.snapshot()
+  );
+  const rebuilt = harness({ state, recordStore: rebuiltRecords, observer });
+  assert.deepEqual(rebuilt.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 1,
+    terminals_fabricated: 0
+  });
+  assert.equal(rebuiltRecords.pendingObserverEvents().length, 0);
+  assert.equal(observer.snapshot().active_transitions, 0);
 });
 
 test('13d4. initial state read fault terminalizes the durable reservation', () => {
