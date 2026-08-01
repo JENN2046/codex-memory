@@ -1095,6 +1095,58 @@ test('13c. finalized protocols remain queryable after local record release', () 
   );
 });
 
+test('13d. failed Observer delivery is replayed before local terminal release', () => {
+  const state = initialState();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  let failTerminalOnce = true;
+  const transportObserver = {
+    observe(event) {
+      if (failTerminalOnce && event.event === 'transition_terminal_committed') {
+        failTerminalOnce = false;
+        throw new Error('synthetic-observer-transport-fault');
+      }
+      return observer.observe(event);
+    }
+  };
+  const run = harness({ state, observer: transportObserver });
+  const request = requestFor(state);
+  const prepared = run.coordinator.preview(request);
+  const committed = run.coordinator.commit(prepared.preview);
+  assert.equal(committed.status, 'terminal_success');
+  assert.equal(observer.snapshot().active_transitions, 1);
+  assert.deepEqual(run.coordinator.protocol(request.transition_ref), committed.protocol);
+  assert.equal(observer.snapshot().active_transitions, 0);
+  assert.equal(observer.snapshot().terminal_successes, 1);
+  assert.equal(observer.snapshot().protocol_violations, 0);
+});
+
+test('13e. archived protocol lookup does not require identity-state readback', () => {
+  const result = prepareAndCommit();
+  let stateReadsDenied = true;
+  const archiveOnlyStore = {
+    snapshot() {
+      if (stateReadsDenied) throw new Error('synthetic-state-read-denied');
+      return result.store.snapshot();
+    },
+    compareAndSwap() {
+      throw new Error('unexpected-cas');
+    }
+  };
+  stateReadsDenied = false;
+  const rebuilt = harness({
+    state: result.store.snapshot(),
+    store: archiveOnlyStore,
+    recordStore: result.recordStore
+  });
+  stateReadsDenied = true;
+  assert.deepEqual(
+    rebuilt.coordinator.protocol(result.request.transition_ref),
+    result.committed.protocol
+  );
+});
+
 test('14. transition success preserves stopped and held lifecycle exactly', () => {
   const result = prepareAndCommit();
   assert.deepEqual(

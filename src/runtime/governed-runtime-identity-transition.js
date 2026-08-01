@@ -604,6 +604,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   const records = new Map();
+  const pendingObserverEvents = [];
   let eventDispatchDepth = 0;
 
   function recoverLastTransitionRecord() {
@@ -670,7 +671,15 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         transition_ref: recoveryRef,
         terminal: recoveryProtocol.terminal
       });
-      records.delete(recoveryRef);
+      if (pendingObserverEvents.some(
+        event => event.transition_ref === recoveryRef
+      )) {
+        localRecord.status = 'terminal_delivery_pending';
+        localRecord.preview = null;
+        localRecord.protocol = recoveryProtocol;
+      } else {
+        records.delete(recoveryRef);
+      }
     }
   }
   recoverLastTransitionRecord();
@@ -684,17 +693,58 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     return milliseconds;
   }
 
-  function emit(event, payload = {}) {
-    if (!eventSink) return;
+  function deliverObserverEvent(envelope) {
+    try {
+      eventSink(envelope);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function releaseDeliveredTerminalRecords() {
+    const pendingRefs = new Set(
+      pendingObserverEvents.map(event => event.transition_ref)
+    );
+    for (const [transitionRef, record] of records) {
+      if (record.status === 'terminal_delivery_pending' &&
+          !pendingRefs.has(transitionRef)) {
+        records.delete(transitionRef);
+      }
+    }
+  }
+
+  function flushPendingObserverEvents() {
+    if (!eventSink) return true;
     eventDispatchDepth += 1;
     try {
-      eventSink(Object.freeze({
-        component: 'governed_runtime_identity_transition_coordinator',
-        event,
-        ...structuredClone(payload)
-      }));
-    } catch {
-      // Observation is independent from coordinator and CAS state.
+      while (pendingObserverEvents.length > 0) {
+        if (!deliverObserverEvent(pendingObserverEvents[0])) return false;
+        pendingObserverEvents.shift();
+      }
+      releaseDeliveredTerminalRecords();
+      return true;
+    } finally {
+      eventDispatchDepth -= 1;
+    }
+  }
+
+  function emit(event, payload = {}) {
+    if (!eventSink) return true;
+    const envelope = Object.freeze({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event,
+      ...structuredClone(payload)
+    });
+    if (!flushPendingObserverEvents()) {
+      pendingObserverEvents.push(envelope);
+      return false;
+    }
+    eventDispatchDepth += 1;
+    try {
+      if (deliverObserverEvent(envelope)) return true;
+      pendingObserverEvents.push(envelope);
+      return false;
     } finally {
       eventDispatchDepth -= 1;
     }
@@ -761,13 +811,22 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       if (finalized !== true) {
         reject('transition_record_store_context_mismatch');
       }
-      records.delete(request.transition_ref);
+      records.set(request.transition_ref, {
+        status: 'terminal_delivery_pending',
+        preview: null,
+        protocol
+      });
     }
     if (emitTerminal) {
       emit('transition_terminal_committed', {
         transition_ref: request.transition_ref,
         terminal
       });
+    }
+    if (storeRecord && !pendingObserverEvents.some(
+      event => event.transition_ref === request.transition_ref
+    )) {
+      records.delete(request.transition_ref);
     }
     return deepFreeze({ status: 'terminal_failure', protocol });
   }
@@ -1341,7 +1400,9 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       reject('transition_record_store_recovery_failed');
     }
     if (finalized !== true) reject('transition_record_store_recovery_failed');
-    records.delete(previewValue.request.transition_ref);
+    record.status = 'terminal_delivery_pending';
+    record.protocol = protocol;
+    record.preview = null;
     for (const receipt of workingSet.receipts.slice(
       previewValue.receipts.length
     )) {
@@ -1361,6 +1422,11 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       transition_ref: previewValue.request.transition_ref,
       terminal
     });
+    if (!pendingObserverEvents.some(
+      event => event.transition_ref === previewValue.request.transition_ref
+    )) {
+      records.delete(previewValue.request.transition_ref);
+    }
     return deepFreeze({
       status: 'terminal_success',
       protocol,
@@ -1371,6 +1437,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   function reportCoordinatorLoss() {
+    flushPendingObserverEvents();
     const missingRefs = new Set();
     for (const record of transitionRecordStore.snapshot()) {
       if (record.status === 'reserved') {
@@ -1380,7 +1447,14 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     for (const transitionRef of missingRefs) {
       emit('transition_terminal_missing', { transition_ref: transitionRef });
     }
-    records.clear();
+    for (const [transitionRef, record] of records) {
+      if (record.status === 'prepared' ||
+          !pendingObserverEvents.some(
+            event => event.transition_ref === transitionRef
+          )) {
+        records.delete(transitionRef);
+      }
+    }
     return Object.freeze({
       active_transitions_lost: missingRefs.size,
       terminals_fabricated: 0
@@ -1388,13 +1462,16 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   function protocol(transitionRef) {
+    flushPendingObserverEvents();
     const record = records.get(transitionRef);
     const persisted = transitionRecordStore.get(transitionRef);
-    const stateProtocol = store.snapshot().last_transition?.protocol;
-    const selected = record?.protocol || persisted?.protocol ||
-      (stateProtocol?.request?.transition_ref === transitionRef
+    let selected = record?.protocol || persisted?.protocol || null;
+    if (selected === null) {
+      const stateProtocol = store.snapshot().last_transition?.protocol;
+      selected = stateProtocol?.request?.transition_ref === transitionRef
         ? stateProtocol
-        : null);
+        : null;
+    }
     if (!selected) reject('transition_terminal_missing');
     validateGovernedRuntimeIdentityTransitionProtocol(selected);
     return selected;
