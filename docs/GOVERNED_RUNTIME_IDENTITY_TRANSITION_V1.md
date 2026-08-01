@@ -115,7 +115,8 @@ Coordinator-loss reporting enumerates durable reservations, reports each
 missing terminal, and never fabricates a default failure terminal. Once its
 missing event is synchronously acknowledged, the reservation is atomically
 archived as `lost`, so reconstruction cannot emit it again or wedge the global
-Observer outbox.
+Observer outbox. While that event remains unacknowledged, repeated loss audits
+detect the pending envelope and do not enqueue duplicates.
 
 Immediately before CAS, the coordinator revalidates store version, exact
 `from_runtime`, stopped/held state, safe-stop receipt, and candidate manifest.
@@ -197,12 +198,12 @@ Transient state readback failure after a successful CAS is recovered without
 writing a contradictory failure terminal. Once a terminal is durably indexed,
 the coordinator releases its local working record and protocol lookup uses the
 persistent terminal archive.
-If a second coordinator commits one directly chained successor before the
-first coordinator reads back its winning CAS, the first commit remains a
-success only when both durable success records, the exact previous-state
-digest, the incremented store version, and the successor `from_runtime` form a
-complete canonical link. An unrelated or malformed later state is still a
-fatal partial transition.
+If other coordinators commit one or more successors before the first
+coordinator reads back its winning CAS, the first commit remains a success only
+when the durable archive reconstructs every intervening state from exact
+previous-state digests, consecutive store versions, canonical protocols, and
+matching `from_runtime` identities. An unrelated, ambiguous, incomplete, or
+malformed later state is still a fatal partial transition.
 If crash recovery finalizes a success that had not yet reached observers, the
 coordinator replays the missing post-preview receipts, atomic commit, and
 terminal event from the authoritative state before releasing the local record.

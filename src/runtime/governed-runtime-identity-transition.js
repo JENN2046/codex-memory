@@ -657,6 +657,95 @@ function runtimeStoppedStatus(lifecycle) {
     lifecycle.running_component_count === 0;
 }
 
+function successfulTransitionState(previousState, protocol) {
+  validateGovernedRuntimeIdentityState(previousState);
+  validateGovernedRuntimeIdentityTransitionProtocol(protocol);
+  const request = protocol.request;
+  if (protocol.terminal.outcome !== 'success' ||
+      canonicalJson(request.from_runtime) !==
+        canonicalJson(previousState.accepted_runtime) ||
+      !lifecycleMatchesRequest(previousState.lifecycle, request) ||
+      !stableAuthorityMatches(previousState, request) ||
+      (previousState.controller_binding.model ===
+        LEGACY_CONTROLLER_BINDING_MODEL
+        ? !legacyEvidenceMatches(previousState, request)
+        : request.legacy_transition_evidence !== null)) {
+    reject('transition_store_last_transition_invalid');
+  }
+  const acceptedRuntime = createTransitionRuntimeIdentity({
+    fromRuntime: previousState.accepted_runtime,
+    toRuntime: request.to_runtime,
+    transitionRef: request.transition_ref
+  });
+  const controllerBinding = stableControllerBinding(request, acceptedRuntime);
+  const nextState = {
+    schema_version: STORE_SCHEMA_VERSION,
+    store_version: previousState.store_version + 1,
+    accepted_runtime: structuredClone(acceptedRuntime),
+    lifecycle: structuredClone(previousState.lifecycle),
+    controller_binding: structuredClone(controllerBinding),
+    legacy_migration: {
+      consumed: previousState.controller_binding.model ===
+        LEGACY_CONTROLLER_BINDING_MODEL
+        ? true
+        : previousState.legacy_migration.consumed,
+      evidence_digest: previousState.controller_binding.model ===
+        LEGACY_CONTROLLER_BINDING_MODEL
+        ? digestObject(request.legacy_transition_evidence)
+        : previousState.legacy_migration.evidence_digest
+    },
+    last_transition: {
+      transition_ref_digest: digestObject(request.transition_ref),
+      protocol_digest: digestObject(protocol),
+      terminal_digest: protocol.terminal.terminal_digest,
+      protocol: structuredClone(protocol),
+      side_effects: {
+        runtime_started: false,
+        repository_changed: false,
+        resolver_called: false,
+        search_called: false,
+        provider_called: false,
+        memory_called: false
+      }
+    }
+  };
+  validateGovernedRuntimeIdentityState(nextState);
+  return nextState;
+}
+
+function durableSuccessorChainMatches(startState, targetState, records) {
+  try {
+    validateGovernedRuntimeIdentityState(startState);
+    validateGovernedRuntimeIdentityState(targetState);
+    if (!Array.isArray(records) ||
+        targetState.store_version <= startState.store_version) {
+      return false;
+    }
+    const successorsByPreviousDigest = new Map();
+    for (const record of records) {
+      if (record.status !== 'terminal' ||
+          record.protocol?.terminal.outcome !== 'success' ||
+          !DIGEST_PATTERN.test(record.previous_state_digest || '')) {
+        continue;
+      }
+      const candidates = successorsByPreviousDigest.get(
+        record.previous_state_digest
+      ) || [];
+      candidates.push(record);
+      successorsByPreviousDigest.set(record.previous_state_digest, candidates);
+    }
+    let cursor = structuredClone(startState);
+    while (cursor.store_version < targetState.store_version) {
+      const candidates = successorsByPreviousDigest.get(digestObject(cursor));
+      if (!candidates || candidates.length !== 1) return false;
+      cursor = successfulTransitionState(cursor, candidates[0].protocol);
+    }
+    return canonicalJson(cursor) === canonicalJson(targetState);
+  } catch {
+    return false;
+  }
+}
+
 function fromRuntimeFailure(state, request) {
   const accepted = state.accepted_runtime;
   const from = request.from_runtime;
@@ -1535,40 +1624,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       receipts: workingSet.receipts,
       terminal
     });
-    const sideEffects = {
-      runtime_started: false,
-      repository_changed: false,
-      resolver_called: false,
-      search_called: false,
-      provider_called: false,
-      memory_called: false
-    };
-    const nextState = {
-      schema_version: STORE_SCHEMA_VERSION,
-      store_version: before.store_version + 1,
-      accepted_runtime: structuredClone(newRuntime),
-      lifecycle: structuredClone(before.lifecycle),
-      controller_binding: structuredClone(controllerBinding),
-      legacy_migration: {
-        consumed: before.controller_binding.model ===
-          LEGACY_CONTROLLER_BINDING_MODEL
-          ? true
-          : before.legacy_migration.consumed,
-        evidence_digest: before.controller_binding.model ===
-          LEGACY_CONTROLLER_BINDING_MODEL
-          ? digestObject(previewValue.request.legacy_transition_evidence)
-          : before.legacy_migration.evidence_digest
-      },
-      last_transition: {
-        transition_ref_digest:
-          digestObject(previewValue.request.transition_ref),
-        protocol_digest: digestObject(protocol),
-        terminal_digest: terminal.terminal_digest,
-        protocol: structuredClone(protocol),
-        side_effects: sideEffects
-      }
-    };
-    validateGovernedRuntimeIdentityState(nextState);
+    const nextState = successfulTransitionState(before, protocol);
     record.previous_state_digest = digestObject(before);
     transitionRecordStore.setCommitContext({
       transition_ref: previewValue.request.transition_ref,
@@ -1635,26 +1691,11 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       const durableCommit = transitionRecordStore.get(
         previewValue.request.transition_ref
       );
-      let legalSuccessor = false;
-      try {
-        validateGovernedRuntimeIdentityState(after);
-        const successorProtocol = after.last_transition?.protocol;
-        const successorRef = successorProtocol?.request.transition_ref;
-        const successorRecord = successorRef
-          ? transitionRecordStore.get(successorRef)
-          : null;
-        legalSuccessor =
-          after.store_version === nextState.store_version + 1 &&
-          canonicalJson(successorProtocol?.request.from_runtime) ===
-            canonicalJson(nextState.accepted_runtime) &&
-          successorRecord?.status === 'terminal' &&
-          successorRecord.protocol.terminal.outcome === 'success' &&
-          successorRecord.previous_state_digest === digestObject(nextState) &&
-          canonicalJson(successorRecord.protocol) ===
-            canonicalJson(successorProtocol);
-      } catch {
-        legalSuccessor = false;
-      }
+      const legalSuccessor = durableSuccessorChainMatches(
+        nextState,
+        after,
+        transitionRecordStore.snapshot()
+      );
       if (durableCommit?.status === 'terminal' &&
           durableCommit.protocol.terminal.outcome === 'success' &&
           canonicalJson(durableCommit.protocol) === canonicalJson(protocol) &&
@@ -1731,9 +1772,17 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
 
   function reportCoordinatorLoss() {
     flushPendingObserverEvents();
+    const pendingMissingRefs = new Set(
+      transitionRecordStore.pendingObserverEvents()
+        .filter(entry =>
+          entry.envelope.event === 'transition_terminal_missing'
+        )
+        .map(entry => entry.transition_ref)
+    );
     const missingRefs = new Set();
     for (const record of transitionRecordStore.snapshot()) {
-      if (record.status === 'reserved') {
+      if (record.status === 'reserved' &&
+          !pendingMissingRefs.has(record.transition_ref)) {
         missingRefs.add(record.transition_ref);
       }
     }

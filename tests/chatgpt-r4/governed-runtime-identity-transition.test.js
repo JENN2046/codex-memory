@@ -1137,7 +1137,7 @@ test('13b2. reconstruction replays post-CAS events from a reserved record', () =
   assert.equal(observer.snapshot().terminal_successes, 1);
 });
 
-test('13b3. a durable success survives an interleaved legal successor', () => {
+test('13b3. a durable success survives an arbitrary legal successor chain', () => {
   const state = initialState();
   const recordStore = createTransitionRecordStore();
   const observer = { observe() { return true; } };
@@ -1166,6 +1166,29 @@ test('13b3. a durable success survives an interleaved legal successor', () => {
           successor.coordinator.commit(successorPreview.preview).status,
           'terminal_success'
         );
+        const secondSuccessorState = structuredClone(current);
+        const secondSuccessor = harness({
+          state: secondSuccessorState,
+          store: interleavedStore,
+          recordStore,
+          observer
+        });
+        const secondSuccessorRequest = requestFor(secondSuccessorState, {
+          suffix: 'T',
+          target: toRuntime('d'),
+          proofDigest: digestObject('interleaved-second-successor-proof'),
+          legacy: null
+        });
+        const secondSuccessorPreview = secondSuccessor.coordinator.preview(
+          secondSuccessorRequest
+        );
+        assert.equal(secondSuccessorPreview.status, 'prepared');
+        assert.equal(
+          secondSuccessor.coordinator.commit(
+            secondSuccessorPreview.preview
+          ).status,
+          'terminal_success'
+        );
       }
       return structuredClone(current);
     },
@@ -1188,8 +1211,8 @@ test('13b3. a durable success survives an interleaved legal successor', () => {
 
   assert.equal(committed.status, 'terminal_success');
   assert.equal(committed.accepted_runtime.source_head, toRuntime('b').source_head);
-  assert.equal(current.store_version, 2);
-  assert.equal(current.accepted_runtime.source_head, toRuntime('c').source_head);
+  assert.equal(current.store_version, 3);
+  assert.equal(current.accepted_runtime.source_head, toRuntime('d').source_head);
   assert.equal(recordStore.get(request.transition_ref).status, 'terminal');
   assert.equal(
     recordStore.get(request.transition_ref).protocol.terminal.outcome,
@@ -2219,6 +2242,47 @@ test('18a. coordinator loss reports durable reservations after recreation', () =
     transition_ref: nextRequest.transition_ref,
     request_digest: runtimeIdentityTransitionRequestDigest(nextRequest)
   }), true);
+});
+
+test('18b. an unacknowledged missing event is queued only once', () => {
+  const state = initialState();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  let acknowledgeMissing = false;
+  const run = harness({
+    state,
+    observer: {
+      observe(event) {
+        if (event.event === 'transition_terminal_missing' &&
+            !acknowledgeMissing) {
+          return false;
+        }
+        return observer.observe(event);
+      }
+    }
+  });
+  const request = requestFor(state);
+  assert.equal(run.coordinator.preview(request).status, 'prepared');
+  assert.deepEqual(run.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 1,
+    terminals_fabricated: 0
+  });
+  assert.equal(run.recordStore.pendingObserverEvents().length, 1);
+  assert.deepEqual(run.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 0,
+    terminals_fabricated: 0
+  });
+  assert.equal(run.recordStore.pendingObserverEvents().length, 1);
+
+  acknowledgeMissing = true;
+  assert.deepEqual(run.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 0,
+    terminals_fabricated: 0
+  });
+  assert.equal(run.recordStore.pendingObserverEvents().length, 0);
+  assert.equal(run.recordStore.get(request.transition_ref).status, 'lost');
+  assert.equal(observer.snapshot().terminals_missing, 1);
 });
 
 test('19. unknown authority evidence remains unknown in receipt and terminal', () => {
