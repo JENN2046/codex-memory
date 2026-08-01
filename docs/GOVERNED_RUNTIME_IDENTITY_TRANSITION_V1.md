@@ -163,6 +163,10 @@ Compact terminal replay markers remain after full reconciliation records rotate
 out, and can be snapshotted into a rebuilt Observer. A live Observer adapter
 must persist or safely compact these markers so a rotated `transition_ref`
 cannot be admitted again.
+Observer reconstruction also takes the last complete governed atomic state,
+revalidates it, and restores its version, canonical state digest, accepted
+runtime, legacy marker, and terminal replay marker before consuming new events.
+Process restart therefore does not reset atomic-chain verification.
 
 The unique failure registry includes:
 

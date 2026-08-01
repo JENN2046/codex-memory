@@ -25,7 +25,8 @@ const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 
 function createGovernedRuntimeIdentityTransitionObserver({
   maxRetainedTransitions = 256,
-  initialTerminalReplayMarkers = []
+  initialTerminalReplayMarkers = [],
+  initialAuthoritativeState = null
 } = {}) {
   if (!Number.isInteger(maxRetainedTransitions) ||
       maxRetainedTransitions < 1 || maxRetainedTransitions > 4096 ||
@@ -43,6 +44,27 @@ function createGovernedRuntimeIdentityTransitionObserver({
     }
     terminalReplayMarkers.add(transitionRef);
   }
+  let lastAuthoritativeCommit = null;
+  if (initialAuthoritativeState !== null) {
+    validateGovernedRuntimeIdentityState(initialAuthoritativeState);
+    if (initialAuthoritativeState.store_version < 1) {
+      reject('transition_observer_authoritative_state_invalid');
+    }
+    lastAuthoritativeCommit = {
+      accepted_runtime: structuredClone(
+        initialAuthoritativeState.accepted_runtime
+      ),
+      legacy_migration: structuredClone(
+        initialAuthoritativeState.legacy_migration
+      ),
+      store_version: initialAuthoritativeState.store_version,
+      state_digest: digestObject(initialAuthoritativeState)
+    };
+    const lastTransitionRef =
+      initialAuthoritativeState.last_transition?.protocol?.request
+        ?.transition_ref;
+    if (lastTransitionRef) terminalReplayMarkers.add(lastTransitionRef);
+  }
   const counters = {
     transitions_accepted: 0,
     receipts_accepted: 0,
@@ -55,7 +77,6 @@ function createGovernedRuntimeIdentityTransitionObserver({
     unknown_evidence_receipts: 0
   };
   let lastViolationCode = null;
-  let lastAuthoritativeCommit = null;
 
   function violation(code) {
     counters.protocol_violations += 1;

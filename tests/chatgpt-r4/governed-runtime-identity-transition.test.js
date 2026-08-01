@@ -400,6 +400,21 @@ test('4. a running runtime rejects transition before candidate verification', ()
   assert.equal(manifestCalls, 0);
 });
 
+test('4a. stopped lifecycle with running components is not reported stopped', () => {
+  const state = initialState({
+    lifecycle: {
+      lifecycle_state: 'stopped',
+      held_stopped: true,
+      safe_stop_receipt_digest: SAFE_STOP_DIGEST,
+      running_component_count: 1
+    }
+  });
+  const run = harness({ state });
+  const outcome = run.coordinator.preview(requestFor(state));
+  assert.equal(outcome.protocol.terminal.reason_code, 'runtime_not_stopped');
+  assert.equal(outcome.protocol.terminal.runtime_stopped, false);
+});
+
 test('5. drift in any from-runtime digest is rejected', () => {
   for (const field of [
     'identity_digest',
@@ -1352,6 +1367,62 @@ test('17k. Observer rejects rollback of a consumed legacy migration marker', () 
   }), false);
   assert.equal(observer.snapshot().atomic_commits_verified, 1);
   assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
+test('17l. rebuilt Observer restores the authoritative commit chain anchor', () => {
+  const first = prepareAndCommit();
+  const afterFirst = first.store.snapshot();
+  const rebuilt = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: afterFirst
+  });
+  const fork = prepareAndCommit({
+    request: {
+      suffix: 'F',
+      target: toRuntime('f'),
+      proofDigest: digestObject('rebuild-fork-proof-F')
+    }
+  });
+  replayObserverPrelude(rebuilt, fork);
+  assert.equal(rebuilt.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: fork.request.transition_ref,
+    protocol: fork.committed.protocol,
+    accepted_runtime: fork.committed.accepted_runtime,
+    controller_binding: fork.committed.controller_binding,
+    store_version: 1,
+    previous_state_digest: first.committed.state_digest,
+    state_digest: fork.committed.state_digest,
+    state_projection: fork.store.snapshot()
+  }), false);
+  assert.equal(rebuilt.snapshot().atomic_commits_verified, 0);
+  assert.equal(rebuilt.snapshot().last_authoritative_store_version, 1);
+
+  const legitimate = prepareAndCommit({
+    state: afterFirst,
+    request: {
+      suffix: 'G',
+      target: toRuntime('d'),
+      fromRuntime: afterFirst.accepted_runtime,
+      proofDigest: digestObject('rebuild-monotonic-proof-G'),
+      legacy: null
+    }
+  });
+  replayObserverPrelude(rebuilt, legitimate);
+  assert.equal(rebuilt.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: legitimate.request.transition_ref,
+    protocol: legitimate.committed.protocol,
+    accepted_runtime: legitimate.committed.accepted_runtime,
+    controller_binding: legitimate.committed.controller_binding,
+    store_version: 2,
+    previous_state_digest: first.committed.state_digest,
+    state_digest: legitimate.committed.state_digest,
+    state_projection: legitimate.store.snapshot()
+  }), true);
+  assert.equal(rebuilt.snapshot().atomic_commits_verified, 1);
+  assert.equal(rebuilt.snapshot().last_authoritative_store_version, 2);
 });
 
 test('18. terminal missing records a violation and fabricates no failure terminal', () => {

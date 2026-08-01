@@ -455,6 +455,15 @@ function lifecycleMatchesRequest(lifecycle, request) {
       request.preconditions.safe_stop_receipt_digest;
 }
 
+function runtimeStoppedStatus(lifecycle) {
+  if (!isPlainObject(lifecycle) ||
+      !Number.isSafeInteger(lifecycle.running_component_count)) {
+    return null;
+  }
+  return lifecycle.lifecycle_state === 'stopped' &&
+    lifecycle.running_component_count === 0;
+}
+
 function fromRuntimeFailure(state, request) {
   const accepted = state.accepted_runtime;
   const from = request.from_runtime;
@@ -927,7 +936,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         'SAFE_STOP_VERIFIED',
         lifecycleReason,
         initial.lifecycle,
-        { runtimeStopped: initial.lifecycle.lifecycle_state === 'stopped' }
+        { runtimeStopped: runtimeStoppedStatus(initial.lifecycle) }
       );
     }
     workingSet = append(
@@ -1080,7 +1089,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
           expected_store_version: previewValue.expected_store_version,
           observed_store_version: before.store_version
         },
-        { runtimeStopped: before.lifecycle.lifecycle_state === 'stopped' }
+        { runtimeStopped: runtimeStoppedStatus(before.lifecycle) }
       );
     }
     let candidate;
@@ -1203,10 +1212,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
             : { atomic_state_consistent: false },
           {
             evidenceStatus: afterFailure ? 'verified' : 'unknown',
-            runtimeStopped:
-              afterFailure?.lifecycle?.lifecycle_state === 'stopped'
-                ? true
-                : null
+            runtimeStopped: runtimeStoppedStatus(afterFailure?.lifecycle)
           }
         );
       }
@@ -1233,9 +1239,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         'partial_transition_detected',
         { atomic_state_consistent: false },
         {
-          runtimeStopped: after.lifecycle?.lifecycle_state === 'stopped'
-            ? true
-            : null
+          runtimeStopped: runtimeStoppedStatus(after.lifecycle)
         }
       );
     }
