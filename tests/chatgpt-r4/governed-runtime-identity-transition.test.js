@@ -339,6 +339,38 @@ test('persisted stable authority IDs use the canonical request format', () => {
   );
 });
 
+test('persisted legacy migration consumption requires an evidence digest exactly once', () => {
+  for (const legacyMigration of [
+    { consumed: true, evidence_digest: null },
+    { consumed: false, evidence_digest: digestObject('orphan-migration-evidence') }
+  ]) {
+    const state = initialState();
+    state.legacy_migration = legacyMigration;
+    assert.throws(
+      () => validateGovernedRuntimeIdentityState(state),
+      { code: 'transition_store_migration_invalid' }
+    );
+  }
+});
+
+test('runtime protocol bindings reject non-positive numeric versions', () => {
+  const state = initialState();
+  for (const runtimeKey of ['from_runtime', 'to_runtime']) {
+    for (const version of [-1, 0]) {
+      const request = structuredClone(requestFor(state));
+      request[runtimeKey].protocol_versions.governed_read_attempt = version;
+      assert.throws(
+        () => validateRuntimeIdentityTransitionRequest(request),
+        {
+          code: runtimeKey === 'from_runtime'
+            ? 'transition_runtime_identity_invalid'
+            : 'transition_to_runtime_invalid'
+        }
+      );
+    }
+  }
+});
+
 test('persisted last transition is bound to the accepted runtime and binding', () => {
   const first = prepareAndCommit();
   const other = prepareAndCommit({

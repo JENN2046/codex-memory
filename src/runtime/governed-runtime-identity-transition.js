@@ -168,7 +168,9 @@ function validateGovernedRuntimeIdentityState(value) {
   if (!exactKeys(value.legacy_migration, MIGRATION_KEYS) ||
       typeof value.legacy_migration.consumed !== 'boolean' ||
       (value.legacy_migration.evidence_digest !== null &&
-        !DIGEST_PATTERN.test(value.legacy_migration.evidence_digest))) {
+        !DIGEST_PATTERN.test(value.legacy_migration.evidence_digest)) ||
+      value.legacy_migration.consumed !==
+        (value.legacy_migration.evidence_digest !== null)) {
     reject('transition_store_migration_invalid');
   }
   if (value.last_transition !== null) {

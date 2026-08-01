@@ -174,6 +174,10 @@ runtime, stable controller binding, legacy marker, and terminal replay marker
 before consuming new events. Later commits must retain the same stable
 authority ID and lineage; ordinary transitions cannot rotate authority.
 Process restart therefore does not reset atomic-chain verification.
+Persisted legacy migration state is valid only when `consumed: true` carries
+its exact evidence digest; unconsumed state must carry no evidence digest.
+Numeric protocol versions are positive safe integers (symbolic bounded version
+strings remain supported), so zero or negative bindings fail closed.
 
 The unique failure registry includes:
 

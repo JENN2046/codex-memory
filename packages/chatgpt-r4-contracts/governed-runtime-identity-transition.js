@@ -276,6 +276,7 @@ function validateProtocolVersions(value, code) {
   }
   for (const [name, version] of Object.entries(value)) {
     if (!PROTOCOL_NAME_PATTERN.test(name) ||
+        (Number.isSafeInteger(version) && version < 1) ||
         (!Number.isSafeInteger(version) &&
           (typeof version !== 'string' ||
             !/^[A-Za-z0-9][A-Za-z0-9_.-]{0,31}$/u.test(version)))) {
