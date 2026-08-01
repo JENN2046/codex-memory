@@ -13,6 +13,7 @@ const {
   createTerminalEnvelope,
   createContextResolutionHeader,
   createContextResolutionStageReceipt,
+  contextResolutionFailureRegistryEntry,
   validateGovernedContextResolutionProtocol,
   isGovernedContextResolutionWorkingSetExtension,
   isGovernedReadAttemptWorkingSetExtension,
@@ -625,10 +626,15 @@ function createTransientRequestBroker({
       )) {
         reject('edge_context_resolution_candidate_invalid');
       }
-      const responseResolved = response?.status === 'ok' &&
-        response?.structured_content?.context_status === 'resolved';
-      if ((governedContextResolutionCandidate.terminal.outcome ===
-          'success') !== responseResolved) {
+      const terminal = governedContextResolutionCandidate.terminal;
+      const expectedStatus = terminal.outcome === 'success'
+        ? 'resolved'
+        : contextResolutionFailureRegistryEntry(
+          terminal.reason_code
+        ).public_response_status;
+      if (expectedStatus === null ||
+          response?.status !== (expectedStatus === 'resolved' ? 'ok' : expectedStatus) ||
+          response?.structured_content?.context_status !== expectedStatus) {
         reject('edge_context_resolution_response_binding_invalid');
       }
     }

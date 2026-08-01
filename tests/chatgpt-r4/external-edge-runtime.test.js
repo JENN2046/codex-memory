@@ -618,7 +618,7 @@ test('external Edge replay capacity spans the request TTL across terminal turnov
   broker.close();
 });
 
-test('external Edge rejects a resolver failure terminal paired with a resolved response', async () => {
+test('external Edge binds resolver failure reasons to the signed response status', async () => {
   const current = new Date('2026-07-31T00:00:00.000Z');
   const broker = createTransientRequestBroker({
     async verifyRequest() {},
@@ -666,7 +666,10 @@ test('external Edge rejects a resolver failure terminal paired with a resolved r
     broker.complete(
       claim.request_id,
       claim.claim_token,
-      { status: 'ok', structured_content: { context_status: 'resolved' } },
+      {
+        status: 'unavailable',
+        structured_content: { context_status: 'unavailable' }
+      },
       null,
       candidate
     ),

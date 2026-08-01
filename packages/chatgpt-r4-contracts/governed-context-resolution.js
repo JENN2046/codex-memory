@@ -100,14 +100,16 @@ function failure({
   category,
   stage,
   origin,
-  terminalCandidateAllowed = true
+  terminalCandidateAllowed = true,
+  publicResponseStatus = null
 }) {
   return {
     category,
     stage,
     origin,
     fallback_policy: 'forbidden',
-    terminal_candidate_allowed: terminalCandidateAllowed
+    terminal_candidate_allowed: terminalCandidateAllowed,
+    public_response_status: publicResponseStatus
   };
 }
 
@@ -117,7 +119,8 @@ function validateFailureEntry(entry) {
     'stage',
     'origin',
     'fallback_policy',
-    'terminal_candidate_allowed'
+    'terminal_candidate_allowed',
+    'public_response_status'
   ], 'context_resolution_failure_registry_invalid');
   assertGovernedSafeCode(
     entry.category,
@@ -127,7 +130,8 @@ function validateFailureEntry(entry) {
       !Object.values(GOVERNED_CONTEXT_RESOLUTION_ORIGIN_BY_STAGE)
         .concat('observer').includes(entry.origin) ||
       entry.fallback_policy !== 'forbidden' ||
-      typeof entry.terminal_candidate_allowed !== 'boolean') {
+      typeof entry.terminal_candidate_allowed !== 'boolean' ||
+      ![null, 'denied', 'unavailable'].includes(entry.public_response_status)) {
     reject('context_resolution_failure_registry_invalid');
   }
   if (entry.stage !== 'TERMINAL_FAILURE' &&
@@ -157,17 +161,20 @@ const GOVERNED_CONTEXT_RESOLUTION_FAILURE_REGISTRY =
     context_mapping_not_found: failure({
       category: 'context_mapping_failed',
       stage: 'REGISTRY_RESOLVED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'denied'
     }),
     context_scope_denied: failure({
       category: 'context_scope_denied',
       stage: 'SCOPE_RESOLVED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'denied'
     }),
     context_issuance_unavailable: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'unavailable'
     }),
     context_issuance_failed: failure({
       category: 'context_issuance_failed',
