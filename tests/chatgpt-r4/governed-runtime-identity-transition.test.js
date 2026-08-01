@@ -883,6 +883,9 @@ test('10e. a failed terminal-index write is recovered before the next transition
   const durableRecords = createTransitionRecordStore();
   let failNextSuccessFinalization = true;
   const recordStore = {
+    ackObserverEvent: durableRecords.ackObserverEvent,
+    enqueueObserverEvent: durableRecords.enqueueObserverEvent,
+    pendingObserverEvents: durableRecords.pendingObserverEvents,
     reserve: durableRecords.reserve,
     get: durableRecords.get,
     snapshot: durableRecords.snapshot,
@@ -1105,7 +1108,7 @@ test('13d. failed Observer delivery is replayed before local terminal release', 
     observe(event) {
       if (failTerminalOnce && event.event === 'transition_terminal_committed') {
         failTerminalOnce = false;
-        throw new Error('synthetic-observer-transport-fault');
+        return false;
       }
       return observer.observe(event);
     }
@@ -1120,6 +1123,39 @@ test('13d. failed Observer delivery is replayed before local terminal release', 
   assert.equal(observer.snapshot().active_transitions, 0);
   assert.equal(observer.snapshot().terminal_successes, 1);
   assert.equal(observer.snapshot().protocol_violations, 0);
+});
+
+test('13d1. persisted Observer outbox survives coordinator reconstruction', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore();
+  const first = harness({
+    state,
+    recordStore,
+    observer: { observe() { return false; } }
+  });
+  const request = requestFor(state);
+  const prepared = first.coordinator.preview(request);
+  const committed = first.coordinator.commit(prepared.preview);
+  assert.equal(committed.status, 'terminal_success');
+  assert.equal(recordStore.pendingObserverEvents().length > 0, true);
+
+  const rebuiltRecords = createTransitionRecordStore(recordStore.snapshot());
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  const rebuilt = harness({
+    state: first.store.snapshot(),
+    recordStore: rebuiltRecords,
+    observer
+  });
+  assert.equal(rebuiltRecords.pendingObserverEvents().length, 0);
+  assert.equal(observer.snapshot().active_transitions, 0);
+  assert.equal(observer.snapshot().atomic_commits_verified, 1);
+  assert.equal(observer.snapshot().terminal_successes, 1);
+  assert.deepEqual(
+    rebuilt.coordinator.protocol(request.transition_ref),
+    committed.protocol
+  );
 });
 
 test('13e. archived protocol lookup does not require identity-state readback', () => {

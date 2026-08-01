@@ -23,6 +23,7 @@ const {
 } = require('../../packages/chatgpt-r4-contracts');
 
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
+const EVENT_NAME_PATTERN = /^[a-z][a-z0-9_]{0,79}$/u;
 const TRANSITION_REF_PATTERN = /^grit_[A-Za-z0-9_-]{24,96}$/u;
 const AUTHORITY_PROOF_REPLAY_LIMIT = 4096;
 const STORE_SCHEMA_VERSION = 1;
@@ -344,16 +345,45 @@ function createTransitionRecordStore(initialRecords = [], {
   // without terminal history permanently consuming admission capacity.
   const activeRecords = new Map();
   const terminalArchive = new Map();
+  let nextObserverSequence = 0;
+
+  function validateObserverOutbox(value) {
+    if (!Array.isArray(value)) reject('transition_record_store_invalid');
+    let previousSequence = -1;
+    for (const entry of value) {
+      if (!exactKeys(entry, ['sequence', 'event_digest', 'envelope']) ||
+          !Number.isSafeInteger(entry.sequence) ||
+          entry.sequence < 0 || entry.sequence <= previousSequence ||
+          !isPlainObject(entry.envelope) ||
+          entry.envelope.component !==
+            'governed_runtime_identity_transition_coordinator' ||
+          !EVENT_NAME_PATTERN.test(entry.envelope.event || '') ||
+          entry.envelope.transition_ref === undefined ||
+          digestObject(entry.envelope) !== entry.event_digest) {
+        reject('transition_record_store_invalid');
+      }
+      assertDigest(entry.event_digest, 'transition_record_store_invalid');
+      previousSequence = entry.sequence;
+      nextObserverSequence = Math.max(nextObserverSequence, entry.sequence + 1);
+    }
+  }
 
   function validateRecord(record) {
     if (!exactKeys(record, [
       'transition_ref',
       'request_digest',
       'status',
-      'protocol'
+      'protocol',
+      'observer_outbox'
     ]) ||
         !TRANSITION_REF_PATTERN.test(record.transition_ref || '') ||
         !['reserved', 'terminal'].includes(record.status)) {
+      reject('transition_record_store_invalid');
+    }
+    validateObserverOutbox(record.observer_outbox);
+    if (record.observer_outbox.some(
+      entry => entry.envelope.transition_ref !== record.transition_ref
+    )) {
       reject('transition_record_store_invalid');
     }
     assertDigest(record.request_digest, 'transition_record_store_invalid');
@@ -371,15 +401,20 @@ function createTransitionRecordStore(initialRecords = [], {
   }
 
   for (const record of initialRecords) {
-    validateRecord(record);
-    if (activeRecords.has(record.transition_ref) ||
-        terminalArchive.has(record.transition_ref)) {
+    const normalized = exactKeys(record, [
+      'transition_ref', 'request_digest', 'status', 'protocol'
+    ])
+      ? { ...structuredClone(record), observer_outbox: [] }
+      : structuredClone(record);
+    validateRecord(normalized);
+    if (activeRecords.has(normalized.transition_ref) ||
+        terminalArchive.has(normalized.transition_ref)) {
       reject('transition_record_store_invalid');
     }
-    const target = record.status === 'reserved'
+    const target = normalized.status === 'reserved'
       ? activeRecords
       : terminalArchive;
-    target.set(record.transition_ref, structuredClone(record));
+    target.set(normalized.transition_ref, normalized);
   }
   if (activeRecords.size > maxActiveReservations) {
     reject('transition_record_store_invalid');
@@ -398,7 +433,8 @@ function createTransitionRecordStore(initialRecords = [], {
       transition_ref: ref,
       request_digest: requestDigest,
       status: 'reserved',
-      protocol: null
+      protocol: null,
+      observer_outbox: []
     });
     return true;
   }
@@ -406,7 +442,8 @@ function createTransitionRecordStore(initialRecords = [], {
   function finalize({
     transition_ref: ref,
     request_digest: requestDigest,
-    protocol
+    protocol,
+    observer_events: observerEvents = []
   } = {}) {
     validateGovernedRuntimeIdentityTransitionProtocol(protocol);
     const current = activeRecords.get(ref) || terminalArchive.get(ref);
@@ -416,6 +453,12 @@ function createTransitionRecordStore(initialRecords = [], {
           requestDigest) {
       reject('transition_record_store_context_mismatch');
     }
+    if (!Array.isArray(observerEvents)) {
+      reject('transition_record_store_context_mismatch');
+    }
+    for (const envelope of observerEvents) {
+      enqueueObserverEvent({ transition_ref: ref, envelope });
+    }
     if (current.status === 'terminal') {
       return canonicalJson(current.protocol) === canonicalJson(protocol);
     }
@@ -423,7 +466,8 @@ function createTransitionRecordStore(initialRecords = [], {
       transition_ref: ref,
       request_digest: requestDigest,
       status: 'terminal',
-      protocol: structuredClone(protocol)
+      protocol: structuredClone(protocol),
+      observer_outbox: structuredClone(current.observer_outbox)
     };
     validateRecord(terminal);
     activeRecords.delete(ref);
@@ -446,7 +490,55 @@ function createTransitionRecordStore(initialRecords = [], {
     );
   }
 
-  return Object.freeze({ finalize, get, reserve, snapshot });
+  function enqueueObserverEvent({ transition_ref: ref, envelope } = {}) {
+    const current = activeRecords.get(ref) || terminalArchive.get(ref);
+    if (!current || !isPlainObject(envelope) ||
+        envelope.component !==
+          'governed_runtime_identity_transition_coordinator' ||
+        !EVENT_NAME_PATTERN.test(envelope.event || '') ||
+        envelope.transition_ref !== ref) {
+      reject('transition_record_store_context_mismatch');
+    }
+    const stored = structuredClone(envelope);
+    current.observer_outbox.push({
+      sequence: nextObserverSequence,
+      event_digest: digestObject(stored),
+      envelope: stored
+    });
+    nextObserverSequence += 1;
+    return true;
+  }
+
+  function pendingObserverEvents() {
+    return deepFreeze(
+      [...activeRecords.values(), ...terminalArchive.values()]
+        .flatMap(record => record.observer_outbox.map(entry => ({
+          transition_ref: record.transition_ref,
+          ...structuredClone(entry)
+        })))
+        .sort((left, right) => left.sequence - right.sequence)
+    );
+  }
+
+  function ackObserverEvent({ transition_ref: ref, event_digest: digest } = {}) {
+    const current = activeRecords.get(ref) || terminalArchive.get(ref);
+    const first = current?.observer_outbox?.[0];
+    if (!first || first.event_digest !== digest) {
+      reject('transition_record_store_context_mismatch');
+    }
+    current.observer_outbox.shift();
+    return true;
+  }
+
+  return Object.freeze({
+    ackObserverEvent,
+    enqueueObserverEvent,
+    finalize,
+    get,
+    pendingObserverEvents,
+    reserve,
+    snapshot
+  });
 }
 
 function stableControllerBinding(request, acceptedRuntime) {
@@ -589,6 +681,9 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       typeof transitionRecordStore.reserve !== 'function' ||
       typeof transitionRecordStore.finalize !== 'function' ||
       typeof transitionRecordStore.get !== 'function' ||
+      typeof transitionRecordStore.enqueueObserverEvent !== 'function' ||
+      typeof transitionRecordStore.pendingObserverEvents !== 'function' ||
+      typeof transitionRecordStore.ackObserverEvent !== 'function' ||
       typeof transitionRecordStore.snapshot !== 'function') {
     reject('transition_coordinator_record_store_invalid');
   }
@@ -604,7 +699,6 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   const records = new Map();
-  const pendingObserverEvents = [];
   let eventDispatchDepth = 0;
 
   function recoverLastTransitionRecord() {
@@ -626,6 +720,37 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       }
       recoveryRecord = transitionRecordStore.get(recoveryRef);
     }
+    const localRecord = records.get(recoveryRef);
+    let recoveryEvents = [];
+    if (localRecord?.status === 'prepared') {
+      if (!DIGEST_PATTERN.test(localRecord.previous_state_digest || '') ||
+          canonicalJson(localRecord.preview?.request) !==
+            canonicalJson(recoveryRequest)) {
+        reject('transition_record_store_recovery_failed');
+      }
+      recoveryEvents = [
+        ...recoveryProtocol.receipts.slice(
+          localRecord.preview.receipts.length
+        ).map(receipt => observerEnvelope('transition_receipt_appended', {
+          transition_ref: recoveryRef,
+          receipt
+        })),
+        observerEnvelope('transition_atomic_commit', {
+          transition_ref: recoveryRef,
+          protocol: recoveryProtocol,
+          accepted_runtime: recoveryState.accepted_runtime,
+          controller_binding: recoveryState.controller_binding,
+          store_version: recoveryState.store_version,
+          previous_state_digest: localRecord.previous_state_digest,
+          state_digest: digestObject(recoveryState),
+          state_projection: recoveryState
+        }),
+        observerEnvelope('transition_terminal_committed', {
+          transition_ref: recoveryRef,
+          terminal: recoveryProtocol.terminal
+        })
+      ];
+    }
     if (recoveryRecord.status === 'reserved') {
       let recovered;
       try {
@@ -633,7 +758,8 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
           transition_ref: recoveryRef,
           request_digest:
             runtimeIdentityTransitionRequestDigest(recoveryRequest),
-          protocol: recoveryProtocol
+          protocol: recoveryProtocol,
+          observer_events: recoveryEvents
         });
       } catch {
         reject('transition_record_store_recovery_failed');
@@ -645,33 +771,9 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         canonicalJson(recoveryProtocol)) {
       reject('transition_record_store_recovery_failed');
     }
-    const localRecord = records.get(recoveryRef);
     if (localRecord?.status === 'prepared') {
-      if (!DIGEST_PATTERN.test(localRecord.previous_state_digest || '') ||
-          canonicalJson(localRecord.preview?.request) !==
-            canonicalJson(recoveryRequest)) {
-        reject('transition_record_store_recovery_failed');
-      }
-      for (const receipt of recoveryProtocol.receipts.slice(
-        localRecord.preview.receipts.length
-      )) {
-        emitReceipt(receipt);
-      }
-      emit('transition_atomic_commit', {
-        transition_ref: recoveryRef,
-        protocol: recoveryProtocol,
-        accepted_runtime: recoveryState.accepted_runtime,
-        controller_binding: recoveryState.controller_binding,
-        store_version: recoveryState.store_version,
-        previous_state_digest: localRecord.previous_state_digest,
-        state_digest: digestObject(recoveryState),
-        state_projection: recoveryState
-      });
-      emit('transition_terminal_committed', {
-        transition_ref: recoveryRef,
-        terminal: recoveryProtocol.terminal
-      });
-      if (pendingObserverEvents.some(
+      flushPendingObserverEvents();
+      if (transitionRecordStore.pendingObserverEvents().some(
         event => event.transition_ref === recoveryRef
       )) {
         localRecord.status = 'terminal_delivery_pending';
@@ -683,6 +785,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     }
   }
   recoverLastTransitionRecord();
+  flushPendingObserverEvents();
 
   function nowMs() {
     const value = clock();
@@ -695,8 +798,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
 
   function deliverObserverEvent(envelope) {
     try {
-      eventSink(envelope);
-      return true;
+      return eventSink(envelope) !== false;
     } catch {
       return false;
     }
@@ -704,7 +806,8 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
 
   function releaseDeliveredTerminalRecords() {
     const pendingRefs = new Set(
-      pendingObserverEvents.map(event => event.transition_ref)
+      transitionRecordStore.pendingObserverEvents()
+        .map(event => event.transition_ref)
     );
     for (const [transitionRef, record] of records) {
       if (record.status === 'terminal_delivery_pending' &&
@@ -718,9 +821,15 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     if (!eventSink) return true;
     eventDispatchDepth += 1;
     try {
-      while (pendingObserverEvents.length > 0) {
-        if (!deliverObserverEvent(pendingObserverEvents[0])) return false;
-        pendingObserverEvents.shift();
+      while (true) {
+        const pending = transitionRecordStore.pendingObserverEvents();
+        if (pending.length === 0) break;
+        const next = pending[0];
+        if (!deliverObserverEvent(next.envelope)) return false;
+        transitionRecordStore.ackObserverEvent({
+          transition_ref: next.transition_ref,
+          event_digest: next.event_digest
+        });
       }
       releaseDeliveredTerminalRecords();
       return true;
@@ -729,25 +838,25 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     }
   }
 
-  function emit(event, payload = {}) {
-    if (!eventSink) return true;
-    const envelope = Object.freeze({
+  function observerEnvelope(event, payload = {}) {
+    const transitionRef = payload.transition_ref ||
+      payload.request?.transition_ref || payload.receipt?.transition_ref;
+    return Object.freeze({
       component: 'governed_runtime_identity_transition_coordinator',
       event,
+      transition_ref: transitionRef,
       ...structuredClone(payload)
     });
-    if (!flushPendingObserverEvents()) {
-      pendingObserverEvents.push(envelope);
-      return false;
-    }
-    eventDispatchDepth += 1;
-    try {
-      if (deliverObserverEvent(envelope)) return true;
-      pendingObserverEvents.push(envelope);
-      return false;
-    } finally {
-      eventDispatchDepth -= 1;
-    }
+  }
+
+  function emit(event, payload = {}) {
+    if (!eventSink) return true;
+    const envelope = observerEnvelope(event, payload);
+    transitionRecordStore.enqueueObserverEvent({
+      transition_ref: envelope.transition_ref,
+      envelope
+    });
+    return flushPendingObserverEvents();
   }
 
   function guard(operation) {
@@ -802,11 +911,18 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       receipts,
       terminal
     });
+    const terminalEnvelope = emitTerminal
+      ? observerEnvelope('transition_terminal_committed', {
+        transition_ref: request.transition_ref,
+        terminal
+      })
+      : null;
     if (storeRecord) {
       const finalized = transitionRecordStore.finalize({
         transition_ref: request.transition_ref,
         request_digest: runtimeIdentityTransitionRequestDigest(request),
-        protocol
+        protocol,
+        observer_events: terminalEnvelope ? [terminalEnvelope] : []
       });
       if (finalized !== true) {
         reject('transition_record_store_context_mismatch');
@@ -817,13 +933,15 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         protocol
       });
     }
-    if (emitTerminal) {
+    if (storeRecord) {
+      flushPendingObserverEvents();
+    } else if (emitTerminal) {
       emit('transition_terminal_committed', {
         transition_ref: request.transition_ref,
         terminal
       });
     }
-    if (storeRecord && !pendingObserverEvents.some(
+    if (storeRecord && !transitionRecordStore.pendingObserverEvents().some(
       event => event.transition_ref === request.transition_ref
     )) {
       records.delete(request.transition_ref);
@@ -1390,11 +1508,33 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       );
     }
     let finalized;
+    const observerEvents = [
+      ...workingSet.receipts.slice(previewValue.receipts.length)
+        .map(receipt => observerEnvelope('transition_receipt_appended', {
+          transition_ref: previewValue.request.transition_ref,
+          receipt
+        })),
+      observerEnvelope('transition_atomic_commit', {
+        transition_ref: previewValue.request.transition_ref,
+        protocol,
+        accepted_runtime: newRuntime,
+        controller_binding: controllerBinding,
+        store_version: after.store_version,
+        previous_state_digest: digestObject(before),
+        state_digest: digestObject(after),
+        state_projection: after
+      }),
+      observerEnvelope('transition_terminal_committed', {
+        transition_ref: previewValue.request.transition_ref,
+        terminal
+      })
+    ];
     try {
       finalized = transitionRecordStore.finalize({
         transition_ref: previewValue.request.transition_ref,
         request_digest: previewValue.request_digest,
-        protocol
+        protocol,
+        observer_events: observerEvents
       });
     } catch {
       reject('transition_record_store_recovery_failed');
@@ -1403,26 +1543,8 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     record.status = 'terminal_delivery_pending';
     record.protocol = protocol;
     record.preview = null;
-    for (const receipt of workingSet.receipts.slice(
-      previewValue.receipts.length
-    )) {
-      emitReceipt(receipt);
-    }
-    emit('transition_atomic_commit', {
-      transition_ref: previewValue.request.transition_ref,
-      protocol,
-      accepted_runtime: newRuntime,
-      controller_binding: controllerBinding,
-      store_version: after.store_version,
-      previous_state_digest: digestObject(before),
-      state_digest: digestObject(after),
-      state_projection: after
-    });
-    emit('transition_terminal_committed', {
-      transition_ref: previewValue.request.transition_ref,
-      terminal
-    });
-    if (!pendingObserverEvents.some(
+    flushPendingObserverEvents();
+    if (!transitionRecordStore.pendingObserverEvents().some(
       event => event.transition_ref === previewValue.request.transition_ref
     )) {
       records.delete(previewValue.request.transition_ref);
@@ -1449,7 +1571,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     }
     for (const [transitionRef, record] of records) {
       if (record.status === 'prepared' ||
-          !pendingObserverEvents.some(
+          !transitionRecordStore.pendingObserverEvents().some(
             event => event.transition_ref === transitionRef
           )) {
         records.delete(transitionRef);

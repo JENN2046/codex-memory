@@ -193,10 +193,11 @@ persistent terminal archive.
 If crash recovery finalizes a success that had not yet reached observers, the
 coordinator replays the missing post-preview receipts, atomic commit, and
 terminal event from the authoritative state before releasing the local record.
-Observer transport exceptions retain an ordered replay queue and the local
-terminal record until later synchronous delivery succeeds. Archived protocol
-lookup validates and returns the durable terminal before consulting identity
-state as a fallback.
+Observer transport exceptions and explicit `false` acknowledgements retain an
+ordered outbox inside the transition record store. Its snapshot carries pending
+envelopes and sequence numbers across coordinator reconstruction; delivery ack
+removes only the exact head event. Archived protocol lookup validates and
+returns the durable terminal before consulting identity state as a fallback.
 
 The unique failure registry includes:
 
