@@ -1704,6 +1704,43 @@ test('13d5. protocol lookup during Observer dispatch does not reenter outbox flu
   assert.equal(observer.snapshot().terminal_successes, 1);
 });
 
+test('13d6. shared-store duplicate acknowledgements are idempotent', () => {
+  const state = initialState();
+  const store = createGovernedRuntimeIdentityStateStore(state);
+  const recordStore = createTransitionRecordStore();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  let secondCoordinator;
+  let enteredSecondCoordinator = false;
+  let nestedLookupCode = null;
+  const transport = {
+    observe(event) {
+      const accepted = observer.observe(event);
+      if (!enteredSecondCoordinator) {
+        enteredSecondCoordinator = true;
+        try {
+          secondCoordinator.protocol(event.transition_ref);
+        } catch (error) {
+          nestedLookupCode = error.code;
+        }
+      }
+      return accepted;
+    }
+  };
+  const first = harness({ state, store, recordStore, observer: transport });
+  const second = harness({ state, store, recordStore, observer: transport });
+  secondCoordinator = second.coordinator;
+  const request = requestFor(state);
+  const prepared = first.coordinator.preview(request);
+  const committed = first.coordinator.commit(prepared.preview);
+  assert.equal(committed.status, 'terminal_success');
+  assert.equal(nestedLookupCode, 'transition_terminal_missing');
+  assert.equal(recordStore.pendingObserverEvents().length, 0);
+  assert.equal(observer.snapshot().terminal_successes, 1);
+  assert.equal(observer.snapshot().protocol_violations, 0);
+});
+
 test('13e. archived protocol lookup does not require identity-state readback', () => {
   const result = prepareAndCommit();
   let stateReadsDenied = true;

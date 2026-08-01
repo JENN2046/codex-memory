@@ -254,6 +254,10 @@ The Observer acknowledges an exact canonical event replay idempotently without
 incrementing counters or replaying state changes. A changed envelope for the
 same transition remains a protocol violation. This closes the crash window
 where the sink accepted an event but durable outbox acknowledgement failed.
+The shared record store likewise treats a repeated acknowledgement as success
+only when that exact digest is already present with its full delivered
+envelope. This serializes cross-coordinator dispatch races without accepting a
+different or out-of-order event.
 Event creation is independent of transport availability. When no `eventSink`
 is attached, acceptance, receipts, atomic commit, and terminal envelopes remain
 queued in full; a later synchronous Observer can consume the stream from its

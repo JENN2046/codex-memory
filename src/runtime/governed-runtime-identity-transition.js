@@ -601,6 +601,11 @@ function createTransitionRecordStore(initialRecords = [], {
     const current = activeRecords.get(ref) || terminalArchive.get(ref);
     const first = current?.observer_outbox?.[0];
     if (!first || first.event_digest !== digest) {
+      if (current?.observer_delivered_events.some(
+        delivered => delivered.event_digest === digest
+      )) {
+        return true;
+      }
       reject('transition_record_store_context_mismatch');
     }
     current.observer_outbox.shift();
