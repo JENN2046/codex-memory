@@ -14,6 +14,7 @@ const {
   createContextResolutionHeader,
   createContextResolutionStageReceipt,
   validateGovernedContextResolutionProtocol,
+  isGovernedContextResolutionWorkingSetExtension,
   isGovernedReadAttemptWorkingSetExtension,
   governedReadAttemptResponseBindingDigest,
   digestObject,
@@ -615,6 +616,21 @@ function createTransientRequestBroker({
             digestObject(currentRecord.request)) {
         reject('edge_context_resolution_candidate_invalid');
       }
+      if (!isGovernedContextResolutionWorkingSetExtension(
+        resolutionCoordinator.workingSet(currentRecord.resolution_ref),
+        {
+          header: governedContextResolutionCandidate.header,
+          receipts: governedContextResolutionCandidate.receipts
+        }
+      )) {
+        reject('edge_context_resolution_candidate_invalid');
+      }
+      const responseResolved = response?.status === 'ok' &&
+        response?.structured_content?.context_status === 'resolved';
+      if ((governedContextResolutionCandidate.terminal.outcome ===
+          'success') !== responseResolved) {
+        reject('edge_context_resolution_response_binding_invalid');
+      }
     }
     const acceptedResponse = structuredClone(response);
     if (currentRecord.attempt_ref) {
@@ -670,6 +686,15 @@ function createTransientRequestBroker({
         governedContextResolutionCandidate.header.request_digest !==
           digestObject(record.request) ||
         governedContextResolutionCandidate.terminal.outcome !== 'failure') {
+      reject('edge_context_resolution_candidate_invalid');
+    }
+    if (!isGovernedContextResolutionWorkingSetExtension(
+      resolutionCoordinator.workingSet(record.resolution_ref),
+      {
+        header: governedContextResolutionCandidate.header,
+        receipts: governedContextResolutionCandidate.receipts
+      }
+    )) {
       reject('edge_context_resolution_candidate_invalid');
     }
     resolutionCoordinator.commitProtocolCandidate(

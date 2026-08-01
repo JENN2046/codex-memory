@@ -618,6 +618,63 @@ test('external Edge replay capacity spans the request TTL across terminal turnov
   broker.close();
 });
 
+test('external Edge rejects a resolver failure terminal paired with a resolved response', async () => {
+  const current = new Date('2026-07-31T00:00:00.000Z');
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current
+  });
+  const request = {
+    request_id: 'req_external_resolution_outcome_binding_000001',
+    nonce: 'request_nonce_external_resolution_outcome_binding_01',
+    expires_at: new Date(current.getTime() + 60_000).toISOString(),
+    tool_request: {
+      name: 'resolve_memory_context',
+      arguments: {
+        project_alias: 'codex-memory',
+        requested_visibility: 'project'
+      }
+    }
+  };
+  await broker.submit(request);
+  const claim = broker.claim('external-resolution-binding-relay');
+  broker.acknowledge(claim.request_id, claim.claim_token);
+  let workingSet = appendGovernedContextResolutionStage(
+    claim.governed_context_resolution,
+    { stage: 'RELAY_CLAIMED' }
+  );
+  workingSet = appendGovernedContextResolutionStage(workingSet, {
+    stage: 'REGISTRY_RESOLVED',
+    outcome: 'failed',
+    reasonCode: 'context_mapping_not_found',
+    facts: { registry_resolved: true, mapping_resolved: false }
+  });
+  const terminal = createContextResolutionTerminalEnvelope({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    outcome: 'failure',
+    reasonCode: 'context_mapping_not_found',
+    evidenceComplete: true
+  });
+  const candidate = createGovernedContextResolutionProtocol({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    terminal
+  });
+  await assert.rejects(
+    broker.complete(
+      claim.request_id,
+      claim.claim_token,
+      { status: 'ok', structured_content: { context_status: 'resolved' } },
+      null,
+      candidate
+    ),
+    { code: 'edge_context_resolution_response_binding_invalid' }
+  );
+  broker.close();
+});
+
 test('external Edge preserves a positive subsecond attempt budget for one-second requests', async () => {
   const createdAt = new Date('2026-07-31T00:00:00.000Z');
   let current = new Date(createdAt);

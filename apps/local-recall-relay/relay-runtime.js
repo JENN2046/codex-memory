@@ -185,7 +185,8 @@ function createRelayRuntime({
               attempt: claim.attempt
             });
           }
-          const responseEnvelope = governedReadAttemptCandidate
+          const responseEnvelope = governedReadAttemptCandidate ||
+            governedContextResolutionCandidate
             ? response.response
             : response;
           await edgeClient.complete(claim, responseEnvelope, {
