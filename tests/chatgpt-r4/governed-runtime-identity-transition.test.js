@@ -884,6 +884,7 @@ test('10e. a failed terminal-index write is recovered before the next transition
   let failNextSuccessFinalization = true;
   const recordStore = {
     ackObserverEvent: durableRecords.ackObserverEvent,
+    discardObserverEvent: durableRecords.discardObserverEvent,
     enqueueObserverEvent: durableRecords.enqueueObserverEvent,
     pendingObserverEvents: durableRecords.pendingObserverEvents,
     reserve: durableRecords.reserve,
@@ -1128,21 +1129,27 @@ test('13d. failed Observer delivery is replayed before local terminal release', 
 test('13d1. persisted Observer outbox survives coordinator reconstruction', () => {
   const state = initialState();
   const recordStore = createTransitionRecordStore();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
   const first = harness({
     state,
     recordStore,
-    observer: { observe() { return false; } }
+    observer: {
+      observe(event) {
+        if (event.event === 'transition_terminal_committed') return false;
+        return observer.observe(event);
+      }
+    }
   });
   const request = requestFor(state);
   const prepared = first.coordinator.preview(request);
   const committed = first.coordinator.commit(prepared.preview);
   assert.equal(committed.status, 'terminal_success');
   assert.equal(recordStore.pendingObserverEvents().length > 0, true);
+  assert.equal(observer.snapshot().active_transitions, 1);
 
   const rebuiltRecords = createTransitionRecordStore(recordStore.snapshot());
-  const observer = createGovernedRuntimeIdentityTransitionObserver({
-    initialAuthoritativeState: state
-  });
   const rebuilt = harness({
     state: first.store.snapshot(),
     recordStore: rebuiltRecords,
@@ -1156,6 +1163,80 @@ test('13d1. persisted Observer outbox survives coordinator reconstruction', () =
     rebuilt.coordinator.protocol(request.transition_ref),
     committed.protocol
   );
+});
+
+test('13d2. rejected admission cannot head-block an existing terminal', () => {
+  const state = initialState();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    maxRetainedTransitions: 1,
+    initialAuthoritativeState: state
+  });
+  const run = harness({ state, observer });
+  const firstRequest = requestFor(state, {
+    suffix: 'A', proofDigest: digestObject('capacity-first-proof')
+  });
+  const firstPrepared = run.coordinator.preview(firstRequest);
+  assert.equal(firstPrepared.status, 'prepared');
+
+  const rejected = run.coordinator.preview(requestFor(state, {
+    suffix: 'B', proofDigest: digestObject('capacity-rejected-proof')
+  }));
+  assert.equal(rejected.status, 'terminal_failure');
+  assert.equal(
+    rejected.protocol.terminal.reason_code,
+    'transition_record_store_unavailable'
+  );
+  assert.equal(run.recordStore.pendingObserverEvents().length, 0);
+
+  const committed = run.coordinator.commit(firstPrepared.preview);
+  assert.equal(committed.status, 'terminal_success');
+  assert.equal(observer.snapshot().active_transitions, 0);
+  assert.equal(observer.snapshot().terminal_successes, 1);
+});
+
+test('13d3. asynchronous Observer sinks are never acknowledged synchronously', async () => {
+  const state = initialState();
+  const run = harness({
+    state,
+    observer: { observe() { return Promise.resolve(true); } }
+  });
+  const outcome = run.coordinator.preview(requestFor(state));
+  assert.equal(outcome.status, 'terminal_failure');
+  assert.equal(
+    outcome.protocol.terminal.reason_code,
+    'transition_record_store_unavailable'
+  );
+  assert.equal(run.recordStore.pendingObserverEvents().length, 0);
+  await Promise.resolve();
+});
+
+test('13d4. initial state read fault terminalizes the durable reservation', () => {
+  const state = initialState();
+  const innerStore = createGovernedRuntimeIdentityStateStore(state);
+  let snapshotCalls = 0;
+  const readFaultStore = {
+    snapshot() {
+      snapshotCalls += 1;
+      if (snapshotCalls === 3) throw new Error('synthetic-initial-read-fault');
+      return innerStore.snapshot();
+    },
+    compareAndSwap: innerStore.compareAndSwap
+  };
+  const run = harness({ state, store: readFaultStore });
+  const request = requestFor(state);
+  const outcome = run.coordinator.preview(request);
+  assert.equal(outcome.status, 'terminal_failure');
+  assert.equal(
+    outcome.protocol.terminal.reason_code,
+    'transition_record_store_unavailable'
+  );
+  assert.equal(run.recordStore.get(request.transition_ref).status, 'terminal');
+  assert.equal(
+    run.recordStore.snapshot().filter(record => record.status === 'reserved').length,
+    0
+  );
+  assert.equal(run.observer.snapshot().active_transitions, 0);
+  assert.equal(run.observer.snapshot().terminal_failures, 1);
 });
 
 test('13e. archived protocol lookup does not require identity-state readback', () => {

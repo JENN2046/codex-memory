@@ -530,8 +530,13 @@ function createTransitionRecordStore(initialRecords = [], {
     return true;
   }
 
+  function discardObserverEvent(input = {}) {
+    return ackObserverEvent(input);
+  }
+
   return Object.freeze({
     ackObserverEvent,
+    discardObserverEvent,
     enqueueObserverEvent,
     finalize,
     get,
@@ -684,6 +689,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       typeof transitionRecordStore.enqueueObserverEvent !== 'function' ||
       typeof transitionRecordStore.pendingObserverEvents !== 'function' ||
       typeof transitionRecordStore.ackObserverEvent !== 'function' ||
+      typeof transitionRecordStore.discardObserverEvent !== 'function' ||
       typeof transitionRecordStore.snapshot !== 'function') {
     reject('transition_coordinator_record_store_invalid');
   }
@@ -798,7 +804,12 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
 
   function deliverObserverEvent(envelope) {
     try {
-      return eventSink(envelope) !== false;
+      const outcome = eventSink(envelope);
+      if (outcome && typeof outcome.then === 'function') {
+        Promise.resolve(outcome).catch(() => {});
+        return false;
+      }
+      return outcome !== false;
     } catch {
       return false;
     }
@@ -1016,9 +1027,34 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         emitTerminal: false
       });
     }
-    emit('transition_accepted', { request });
-    const initial = store.snapshot();
-    validateGovernedRuntimeIdentityState(initial);
+    const acceptanceEnvelope = observerEnvelope(
+      'transition_accepted',
+      { request }
+    );
+    if (!emit('transition_accepted', { request })) {
+      transitionRecordStore.discardObserverEvent({
+        transition_ref: request.transition_ref,
+        event_digest: digestObject(acceptanceEnvelope)
+      });
+      return terminalFailure(
+        request,
+        [],
+        'transition_record_store_unavailable',
+        { runtimeStopped: null, emitTerminal: false }
+      );
+    }
+    let initial;
+    try {
+      initial = store.snapshot();
+      validateGovernedRuntimeIdentityState(initial);
+    } catch {
+      return terminalFailure(
+        request,
+        [],
+        'transition_record_store_unavailable',
+        { runtimeStopped: null }
+      );
+    }
     let workingSet = { request, receipts: [] };
     workingSet = append(workingSet, 'CREATED', {
       request_digest: runtimeIdentityTransitionRequestDigest(request)

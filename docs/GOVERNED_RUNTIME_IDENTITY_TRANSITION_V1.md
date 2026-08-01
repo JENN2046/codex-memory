@@ -198,6 +198,11 @@ ordered outbox inside the transition record store. Its snapshot carries pending
 envelopes and sequence numbers across coordinator reconstruction; delivery ack
 removes only the exact head event. Archived protocol lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
+An unacknowledged new admission is discarded from the outbox and terminalized
+without Observer emission, so it cannot head-block terminal events for already
+active transitions. Thenable sinks are treated as unacknowledged synchronous
+delivery, and a post-reservation initial-state read fault closes the reservation
+with a canonical durable failure.
 
 The unique failure registry includes:
 
