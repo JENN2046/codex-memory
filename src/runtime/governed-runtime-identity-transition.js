@@ -1,6 +1,7 @@
 'use strict';
 
 const {
+  GOVERNED_RUNTIME_IDENTITY_AUTHORITY_ID_PATTERN,
   GOVERNED_RUNTIME_IDENTITY_TRANSITION_PROTOCOL,
   GOVERNED_RUNTIME_IDENTITY_TRANSITION_SCHEMA_VERSION,
   appendRuntimeIdentityTransitionStage,
@@ -124,7 +125,9 @@ function validateControllerBinding(value) {
   }
   if (value?.model !== STABLE_CONTROLLER_BINDING_MODEL ||
       !exactKeys(value, STABLE_BINDING_KEYS) ||
-      typeof value.authority_id !== 'string') {
+      !GOVERNED_RUNTIME_IDENTITY_AUTHORITY_ID_PATTERN.test(
+        value.authority_id || ''
+      )) {
     reject('transition_store_controller_binding_invalid');
   }
   for (const key of [
@@ -182,6 +185,16 @@ function validateGovernedRuntimeIdentityState(value) {
     validateGovernedRuntimeIdentityTransitionProtocol(
       value.last_transition.protocol
     );
+    const lastProtocol = value.last_transition.protocol;
+    const derivedRuntime = createTransitionRuntimeIdentity({
+      fromRuntime: lastProtocol.request.from_runtime,
+      toRuntime: lastProtocol.request.to_runtime,
+      transitionRef: lastProtocol.request.transition_ref
+    });
+    const derivedBinding = stableControllerBinding(
+      lastProtocol.request,
+      derivedRuntime
+    );
     if (value.last_transition.protocol_digest !==
           digestObject(value.last_transition.protocol) ||
         value.last_transition.terminal_digest !==
@@ -189,7 +202,16 @@ function validateGovernedRuntimeIdentityState(value) {
         value.last_transition.transition_ref_digest !==
           digestObject(
             value.last_transition.protocol.request.transition_ref
-          )) {
+          ) ||
+        lastProtocol.terminal.outcome !== 'success' ||
+        canonicalJson(derivedRuntime) !==
+          canonicalJson(value.accepted_runtime) ||
+        canonicalJson(derivedBinding) !==
+          canonicalJson(value.controller_binding) ||
+        lastProtocol.terminal.new_runtime_identity_digest !==
+          value.accepted_runtime.identity_digest ||
+        lastProtocol.terminal.controller_binding_digest !==
+          value.controller_binding.binding_digest) {
       reject('transition_store_last_transition_invalid');
     }
     validateSideEffects(value.last_transition.side_effects);

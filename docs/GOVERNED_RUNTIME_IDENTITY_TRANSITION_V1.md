@@ -97,6 +97,11 @@ one versioned compare-and-swap. The CAS candidate simultaneously contains:
    search, provider, and memory effects.
 
 The CAS state retains the complete canonical protocol as well as its digests.
+State validation requires that retained protocol to be a success and
+independently re-derives its accepted runtime and stable authority binding;
+neither a failure protocol nor a self-consistent protocol from another branch
+can serve as `last_transition`. Stable binding authority IDs use the same
+canonical `grauth_...` format as requests.
 The transition-record store is a secondary durable replay index: coordinator
 construction and every new preview/commit boundary verify or reconstruct that
 index from the atomically committed protocol. No later transition is admitted

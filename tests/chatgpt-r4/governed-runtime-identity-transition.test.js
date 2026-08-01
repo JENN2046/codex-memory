@@ -329,6 +329,68 @@ test('successful legacy migration performs one atomic CAS and leaves runtime sto
   );
 });
 
+test('persisted stable authority IDs use the canonical request format', () => {
+  const result = prepareAndCommit();
+  const state = structuredClone(result.store.snapshot());
+  state.controller_binding.authority_id = '';
+  assert.throws(
+    () => validateGovernedRuntimeIdentityState(state),
+    { code: 'transition_store_controller_binding_invalid' }
+  );
+});
+
+test('persisted last transition is bound to the accepted runtime and binding', () => {
+  const first = prepareAndCommit();
+  const other = prepareAndCommit({
+    request: {
+      suffix: 'C',
+      target: toRuntime('c'),
+      proofDigest: digestObject('unrelated-last-transition-proof-C')
+    }
+  });
+  const state = structuredClone(first.store.snapshot());
+  state.last_transition.protocol = other.committed.protocol;
+  state.last_transition.transition_ref_digest = digestObject(
+    other.request.transition_ref
+  );
+  state.last_transition.protocol_digest = digestObject(
+    other.committed.protocol
+  );
+  state.last_transition.terminal_digest =
+    other.committed.protocol.terminal.terminal_digest;
+  assert.throws(
+    () => validateGovernedRuntimeIdentityState(state),
+    { code: 'transition_store_last_transition_invalid' }
+  );
+
+  const failureRequest = requestFor(initialState(), {
+    suffix: 'H',
+    proofDigest: digestObject('failure-last-transition-proof-H')
+  });
+  const failureTerminal = createRuntimeIdentityTransitionTerminal({
+    request: failureRequest,
+    receipts: [],
+    outcome: 'failure',
+    reasonCode: 'transition_replayed',
+    runtimeStopped: true
+  });
+  const failureProtocol = createGovernedRuntimeIdentityTransitionProtocol({
+    request: failureRequest,
+    receipts: [],
+    terminal: failureTerminal
+  });
+  state.last_transition.protocol = failureProtocol;
+  state.last_transition.transition_ref_digest = digestObject(
+    failureRequest.transition_ref
+  );
+  state.last_transition.protocol_digest = digestObject(failureProtocol);
+  state.last_transition.terminal_digest = failureTerminal.terminal_digest;
+  assert.throws(
+    () => validateGovernedRuntimeIdentityState(state),
+    { code: 'transition_store_last_transition_invalid' }
+  );
+});
+
 test('1. receipts from different transition requests cannot be spliced', () => {
   const state = initialState();
   const a = requestFor(state, { suffix: 'A' });
