@@ -250,6 +250,10 @@ missing post-CAS receipts, atomic commit, and terminal envelopes from the
 authoritative state even without a local preview record. Protocol lookup during
 event dispatch skips outbox flushing, so a synchronous Observer callback cannot
 recursively redeliver the queue head.
+A persisted success terminal without that previous-state digest is invalid;
+only uncommitted reservations, lost markers, or failure terminals may omit the
+anchor. The atomic `last_transition` stores the same digest, allowing a missing
+secondary record to recover its commit context before success finalization.
 The Observer acknowledges an exact canonical event replay idempotently without
 incrementing counters or replaying state changes. A changed envelope for the
 same transition remains a protocol violation. This closes the crash window

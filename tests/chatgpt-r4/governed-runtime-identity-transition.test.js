@@ -350,6 +350,17 @@ test('a stable controller binding requires its canonical last transition', () =>
   );
 });
 
+test('a persisted success terminal requires its previous-state digest', () => {
+  const result = prepareAndCommit();
+  const record = structuredClone(result.recordStore.snapshot()[0]);
+  assert.equal(record.protocol.terminal.outcome, 'success');
+  record.previous_state_digest = null;
+  assert.throws(
+    () => createTransitionRecordStore([record]),
+    { code: 'transition_record_store_invalid' }
+  );
+});
+
 test('persisted legacy migration consumption requires an evidence digest exactly once', () => {
   for (const legacyMigration of [
     { consumed: true, evidence_digest: null },

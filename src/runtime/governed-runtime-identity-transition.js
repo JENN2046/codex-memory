@@ -57,6 +57,7 @@ const MIGRATION_KEYS = Object.freeze([
   'evidence_digest'
 ]);
 const LAST_TRANSITION_KEYS = Object.freeze([
+  'previous_state_digest',
   'transition_ref_digest',
   'protocol_digest',
   'terminal_digest',
@@ -179,6 +180,7 @@ function validateGovernedRuntimeIdentityState(value) {
       reject('transition_store_last_transition_invalid');
     }
     for (const key of [
+      'previous_state_digest',
       'transition_ref_digest',
       'protocol_digest',
       'terminal_digest'
@@ -446,7 +448,9 @@ function createTransitionRecordStore(initialRecords = [], {
       validateGovernedRuntimeIdentityTransitionProtocol(record.protocol);
       if (record.protocol.request.transition_ref !== record.transition_ref ||
           runtimeIdentityTransitionRequestDigest(record.protocol.request) !==
-            record.request_digest) {
+            record.request_digest ||
+          (record.protocol.terminal.outcome === 'success' &&
+            record.previous_state_digest === null)) {
         reject('transition_record_store_invalid');
       }
     }
@@ -756,6 +760,7 @@ function successfulTransitionState(previousState, protocol) {
         : previousState.legacy_migration.evidence_digest
     },
     last_transition: {
+      previous_state_digest: digestObject(previousState),
       transition_ref_digest: digestObject(request.transition_ref),
       protocol_digest: digestObject(protocol),
       terminal_digest: protocol.terminal.terminal_digest,
@@ -954,6 +959,25 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         reject('transition_record_store_recovery_failed');
       }
       recoveryRecord = transitionRecordStore.get(recoveryRef);
+    }
+    const recoveryPreviousStateDigest =
+      recoveryState.last_transition.previous_state_digest;
+    if (recoveryRecord.status === 'reserved') {
+      if (recoveryRecord.previous_state_digest === null) {
+        try {
+          transitionRecordStore.setCommitContext({
+            transition_ref: recoveryRef,
+            previous_state_digest: recoveryPreviousStateDigest
+          });
+        } catch {
+          reject('transition_record_store_recovery_failed');
+        }
+        recoveryRecord = transitionRecordStore.get(recoveryRef);
+      }
+    }
+    if (recoveryRecord.previous_state_digest !==
+        recoveryPreviousStateDigest) {
+      reject('transition_record_store_recovery_failed');
     }
     const localRecord = records.get(recoveryRef);
     let recoveryEvents = [];
