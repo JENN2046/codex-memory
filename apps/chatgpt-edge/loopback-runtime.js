@@ -101,10 +101,12 @@ function createLoopbackEdgeRuntime({
         eventSink: attemptEventSink
       })
     : null;
-  const resolutionRetention = deriveGovernedContextResolutionRetention({
-    maxRecords,
-    requestRecordRetentionMs: terminalRetentionMs
-  });
+  const resolutionRetention = governedContextResolutions
+    ? deriveGovernedContextResolutionRetention({
+        maxRecords,
+        requestRecordRetentionMs: terminalRetentionMs
+      })
+    : null;
   const createDefaultResolutionCoordinator = () =>
     createGovernedContextResolutionCoordinator({
         clock,
@@ -117,6 +119,8 @@ function createLoopbackEdgeRuntime({
   let resolutionCoordinator = governedContextResolutions
     ? contextResolutionCoordinator || createDefaultResolutionCoordinator()
     : null;
+  const injectedResolutionCoordinator = contextResolutionCoordinator !== null;
+  let resolutionRestartBlocked = false;
   if (attemptCoordinator !== null && (
     !governedReadAttempts ||
     REQUIRED_ATTEMPT_COORDINATOR_METHODS.some(method =>
@@ -763,6 +767,9 @@ function createLoopbackEdgeRuntime({
   return Object.freeze({
     async start() {
       if (started) reject('edge_runtime_already_started');
+      if (resolutionRestartBlocked) {
+        reject('edge_context_resolution_restart_unsupported');
+      }
       if (governedContextResolutions && resolutionCoordinator === null) {
         resolutionCoordinator = createDefaultResolutionCoordinator();
       }
@@ -801,7 +808,10 @@ function createLoopbackEdgeRuntime({
         resolutionCoordinator?.reportCoordinatorLoss();
       } finally {
         records.clear();
-        if (governedContextResolutions) resolutionCoordinator = null;
+        if (governedContextResolutions) {
+          resolutionCoordinator = null;
+          resolutionRestartBlocked = injectedResolutionCoordinator;
+        }
       }
     },
     snapshot() {

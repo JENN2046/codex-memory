@@ -1702,6 +1702,37 @@ test('Edge validates every injected attempt coordinator lifecycle method', () =>
   }
 });
 
+test('legacy loopback configuration does not allocate resolver retention capacity', () => {
+  assert.doesNotThrow(() => createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    maxInFlight: 1,
+    maxRecords: 4096,
+    terminalRetentionMs: 10
+  }));
+});
+
+test('loopback rejects a restart that would replace an injected resolver coordinator', async t => {
+  let lossReports = 0;
+  const runtime = createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    governedContextResolutions: true,
+    contextResolutionCoordinator: {
+      reportCoordinatorLoss() { lossReports += 1; }
+    }
+  });
+  t.after(() => runtime.stop());
+
+  await runtime.start();
+  await runtime.stop();
+  assert.equal(lossReports, 1);
+  await assert.rejects(
+    runtime.start(),
+    { code: 'edge_context_resolution_restart_unsupported' }
+  );
+});
+
 test('Edge stop clears claimed governed records before the runtime restarts', async t => {
   const principal = signingIdentity('stop-restart-principal');
   const edgeIdentity = signingIdentity('stop-restart-edge');
