@@ -898,6 +898,8 @@ test('10e. a failed terminal-index write is recovered before the next transition
     discardObserverEvent: durableRecords.discardObserverEvent,
     enqueueObserverEvent: durableRecords.enqueueObserverEvent,
     pendingObserverEvents: durableRecords.pendingObserverEvents,
+    restoreObserverDeliveryPrefixes:
+      durableRecords.restoreObserverDeliveryPrefixes,
     setCommitContext: durableRecords.setCommitContext,
     reserve: durableRecords.reserve,
     get: durableRecords.get,
@@ -1481,12 +1483,89 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
     () => createTransitionRecordStore([{
       ...base,
       observer_delivered_events: [{
+        sequence: 0,
         event_digest: digestObject(envelope),
         envelope: { ...envelope, event: 'transition_preview_formed' }
       }]
     }]),
     { code: 'transition_record_store_invalid' }
   );
+});
+
+test('13d3c. a fresh Observer receives the delivered prefix before pending events', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore();
+  const firstObserver = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  let acknowledgements = 0;
+  const unreliableRecords = {
+    ...recordStore,
+    ackObserverEvent(input) {
+      acknowledgements += 1;
+      if (acknowledgements === 2) {
+        throw new Error('synthetic-second-durable-ack-failure');
+      }
+      return recordStore.ackObserverEvent(input);
+    }
+  };
+  const first = harness({
+    state,
+    recordStore: unreliableRecords,
+    observer: firstObserver
+  });
+  assert.throws(
+    () => first.coordinator.preview(requestFor(state)),
+    /synthetic-second-durable-ack-failure/u
+  );
+  const persisted = recordStore.snapshot()[0];
+  assert.equal(persisted.observer_delivered_events.length, 1);
+  assert.equal(persisted.observer_outbox.length, 1);
+
+  const freshObserver = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  const rebuilt = harness({ state, recordStore, observer: freshObserver });
+  assert.equal(recordStore.pendingObserverEvents().length, 0);
+  assert.equal(freshObserver.snapshot().transitions_accepted, 1);
+  assert.equal(freshObserver.snapshot().receipts_accepted, 1);
+  assert.equal(freshObserver.snapshot().protocol_violations, 0);
+  assert.deepEqual(rebuilt.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 1,
+    terminals_fabricated: 0
+  });
+  assert.equal(recordStore.get(requestFor(state).transition_ref).status, 'lost');
+});
+
+test('13d3d. a coordinator without a sink persists the complete event stream', () => {
+  const state = initialState();
+  const store = createGovernedRuntimeIdentityStateStore(state);
+  const recordStore = createTransitionRecordStore();
+  const coordinator = createGovernedRuntimeIdentityTransitionCoordinator({
+    store,
+    authorityProofReplayStore: createAuthorityProofReplayStore(),
+    transitionRecordStore: recordStore,
+    authorityVerifier,
+    candidateManifestVerifier: manifestVerifier,
+    clock: () => NOW
+  });
+  const request = requestFor(state);
+  const prepared = coordinator.preview(request);
+  assert.equal(prepared.status, 'prepared');
+  assert.equal(coordinator.commit(prepared.preview).status, 'terminal_success');
+  const pending = recordStore.pendingObserverEvents();
+  assert.equal(pending.length > 0, true);
+  assert.equal(pending[0].envelope.event, 'transition_accepted');
+
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  harness({ state, store, recordStore, observer });
+  assert.equal(recordStore.pendingObserverEvents().length, 0);
+  assert.equal(observer.snapshot().transitions_accepted, 1);
+  assert.equal(observer.snapshot().atomic_commits_verified, 1);
+  assert.equal(observer.snapshot().terminal_successes, 1);
+  assert.equal(observer.snapshot().protocol_violations, 0);
 });
 
 test('13d4. initial state read fault terminalizes the durable reservation', () => {

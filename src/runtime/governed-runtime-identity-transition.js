@@ -376,7 +376,8 @@ function createTransitionRecordStore(initialRecords = [], {
     if (!Array.isArray(value)) reject('transition_record_store_invalid');
     const digests = new Set();
     for (const entry of value) {
-      if (!exactKeys(entry, ['event_digest', 'envelope']) ||
+      if (!exactKeys(entry, ['sequence', 'event_digest', 'envelope']) ||
+          !Number.isSafeInteger(entry.sequence) || entry.sequence < 0 ||
           !isPlainObject(entry.envelope) ||
           entry.envelope.component !==
             'governed_runtime_identity_transition_coordinator' ||
@@ -388,6 +389,10 @@ function createTransitionRecordStore(initialRecords = [], {
       }
       assertDigest(entry.event_digest, 'transition_record_store_invalid');
       digests.add(entry.event_digest);
+      nextObserverSequence = Math.max(
+        nextObserverSequence,
+        entry.sequence + 1
+      );
     }
   }
 
@@ -413,6 +418,18 @@ function createTransitionRecordStore(initialRecords = [], {
     if (record.observer_outbox.some(
       entry => entry.envelope.transition_ref !== record.transition_ref
     )) {
+      reject('transition_record_store_invalid');
+    }
+    const deliverySequence = [
+      ...record.observer_delivered_events,
+      ...record.observer_outbox
+    ].map(entry => entry.sequence);
+    if (new Set(deliverySequence).size !== deliverySequence.length ||
+        record.observer_delivered_events.some(delivered =>
+          record.observer_outbox.some(pending =>
+            delivered.sequence >= pending.sequence
+          )
+        )) {
       reject('transition_record_store_invalid');
     }
     assertDigest(record.request_digest, 'transition_record_store_invalid');
@@ -587,10 +604,7 @@ function createTransitionRecordStore(initialRecords = [], {
       reject('transition_record_store_context_mismatch');
     }
     current.observer_outbox.shift();
-    current.observer_delivered_events.push({
-      event_digest: digest,
-      envelope: structuredClone(first.envelope)
-    });
+    current.observer_delivered_events.push(structuredClone(first));
     if (first.envelope.event === 'transition_terminal_missing' &&
         current.status === 'reserved' &&
         current.observer_outbox.length === 0) {
@@ -603,6 +617,26 @@ function createTransitionRecordStore(initialRecords = [], {
 
   function discardObserverEvent(input = {}) {
     return ackObserverEvent(input);
+  }
+
+  function restoreObserverDeliveryPrefixes() {
+    let restored = 0;
+    for (const record of [
+      ...activeRecords.values(),
+      ...terminalArchive.values()
+    ]) {
+      if (record.observer_outbox.length === 0 ||
+          record.observer_delivered_events.length === 0) {
+        continue;
+      }
+      restored += record.observer_delivered_events.length;
+      record.observer_outbox = [
+        ...record.observer_delivered_events,
+        ...record.observer_outbox
+      ].sort((left, right) => left.sequence - right.sequence);
+      record.observer_delivered_events = [];
+    }
+    return restored;
   }
 
   function setCommitContext({
@@ -631,6 +665,7 @@ function createTransitionRecordStore(initialRecords = [], {
     get,
     pendingObserverEvents,
     reserve,
+    restoreObserverDeliveryPrefixes,
     setCommitContext,
     snapshot
   });
@@ -870,6 +905,8 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       typeof transitionRecordStore.pendingObserverEvents !== 'function' ||
       typeof transitionRecordStore.ackObserverEvent !== 'function' ||
       typeof transitionRecordStore.discardObserverEvent !== 'function' ||
+      typeof transitionRecordStore.restoreObserverDeliveryPrefixes !==
+        'function' ||
       typeof transitionRecordStore.setCommitContext !== 'function' ||
       typeof transitionRecordStore.snapshot !== 'function') {
     reject('transition_coordinator_record_store_invalid');
@@ -996,6 +1033,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       }
     }
   }
+  transitionRecordStore.restoreObserverDeliveryPrefixes();
   recoverLastTransitionRecord();
   flushPendingObserverEvents();
 
@@ -1068,12 +1106,12 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   function emit(event, payload = {}) {
-    if (!eventSink) return true;
     const envelope = observerEnvelope(event, payload);
     transitionRecordStore.enqueueObserverEvent({
       transition_ref: envelope.transition_ref,
       envelope
     });
+    if (!eventSink) return true;
     return flushPendingObserverEvents();
   }
 

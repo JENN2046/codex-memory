@@ -220,7 +220,11 @@ envelopes and sequence numbers across coordinator reconstruction; delivery ack
 removes only the exact head event. The acknowledged-event ledger retains each
 complete canonical envelope with its verified digest; bare or mismatched digest
 claims are rejected, and recovery compares full envelopes before suppressing
-redelivery. Archived protocol lookup validates and
+redelivery. Delivered entries retain their original sequence. If any later
+event is still pending during reconstruction, the store restores the complete
+delivered prefix ahead of that suffix: an existing Observer consumes exact
+replays idempotently, while a fresh Observer rebuilds the active transition in
+canonical order. Archived protocol lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
 An unacknowledged new admission is discarded from the outbox and terminalized
 without Observer emission, so it cannot head-block terminal events for already
@@ -245,6 +249,10 @@ The Observer acknowledges an exact canonical event replay idempotently without
 incrementing counters or replaying state changes. A changed envelope for the
 same transition remains a protocol violation. This closes the crash window
 where the sink accepted an event but durable outbox acknowledgement failed.
+Event creation is independent of transport availability. When no `eventSink`
+is attached, acceptance, receipts, atomic commit, and terminal envelopes remain
+queued in full; a later synchronous Observer can consume the stream from its
+canonical beginning.
 
 The unique failure registry includes:
 
