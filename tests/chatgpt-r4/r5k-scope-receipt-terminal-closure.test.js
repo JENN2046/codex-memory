@@ -280,6 +280,21 @@ test('R5-K preserves issued, delivery, denied, and unknown resolver terminal fac
       receipt: 'unconfirmed',
       reference: 'unknown',
       text: /Project context reference status is unknown/u
+    },
+    {
+      name: 'complete_pre_issuance_unknown',
+      response: {
+        status: 'denied',
+        structured_content: { resolution: {
+          evidence_complete: true,
+          context_ref_issued: null,
+          context_ref_entered_response: null,
+          context_ref_delivered: null
+        } }
+      },
+      receipt: 'bound',
+      reference: 'unknown',
+      text: /TERMINAL GOVERNED RESULT/u
     }
   ];
 
@@ -294,6 +309,12 @@ test('R5-K preserves issued, delivery, denied, and unknown resolver terminal fac
       scenario.text,
       scenario.name
     );
+    if (scenario.name === 'complete_pre_issuance_unknown') {
+      assert.doesNotMatch(
+        modelVisibleResultText('resolve_memory_context', scenario.response),
+        /could not establish complete terminal evidence/u
+      );
+    }
   }
 });
 

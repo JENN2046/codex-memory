@@ -541,6 +541,10 @@ function contextReferenceStatus(response) {
   return 'unknown';
 }
 
+function contextResolutionEvidenceComplete(response) {
+  return response?.structured_content?.resolution?.evidence_complete === true;
+}
+
 function contextReferenceText(status) {
   switch (status) {
     case 'issued':
@@ -558,7 +562,7 @@ function modelVisibleResultText(name, response) {
   if (name === 'resolve_memory_context') {
     const referenceStatus = contextReferenceStatus(response);
     const referenceText = contextReferenceText(referenceStatus);
-    if (referenceStatus === 'unknown') {
+    if (!contextResolutionEvidenceComplete(response)) {
       return 'Governed resolve_memory_context could not establish complete terminal evidence. Project context reference status is unknown. Do not retry or infer a failure reason.';
     }
     if (response.status === 'ok' && referenceStatus === 'issued') {
@@ -591,8 +595,10 @@ function receiptPresentation(name, response) {
   const referenceStatus = name === 'resolve_memory_context'
     ? contextReferenceStatus(response)
     : 'not_applicable';
+  const evidenceComplete = name !== 'resolve_memory_context' ||
+    contextResolutionEvidenceComplete(response);
   return {
-    result_receipt_status: referenceStatus === 'unknown' ? 'unconfirmed' : 'bound',
+    result_receipt_status: evidenceComplete ? 'bound' : 'unconfirmed',
     context_reference_status: referenceStatus,
     raw_receipt_values_returned: false
   };
