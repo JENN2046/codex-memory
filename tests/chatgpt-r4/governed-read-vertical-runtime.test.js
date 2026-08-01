@@ -1785,7 +1785,8 @@ test('Edge stop clears claimed governed records before the runtime restarts', as
       claimed: 0,
       completed: 0,
       cancelled: 0,
-      expired: 0
+      expired: 0,
+      failed: 0
     },
     governed_read_attempts_enabled: true
   });
@@ -1897,7 +1898,8 @@ test('Edge reuses governed coordinator capacity at the request retention cadence
     claimed: 0,
     completed: 0,
     cancelled: 0,
-    expired: 0
+    expired: 0,
+    failed: 0
   });
   assert.equal(runtime.snapshot().request_count, 0);
 });
@@ -1962,7 +1964,8 @@ test('Edge anchors delayed timeout retention at the terminal commit time', async
     claimed: 0,
     completed: 0,
     cancelled: 0,
-    expired: 2
+    expired: 2,
+    failed: 0
   });
 
   const retryPrincipalAssertion = createPrincipalAssertion({

@@ -779,13 +779,21 @@ function createLoopbackEdgeRuntime({
       started = false;
       try {
         governedCoordinator?.reportCoordinatorLoss();
+        resolutionCoordinator?.reportCoordinatorLoss();
       } finally {
         records.clear();
       }
     },
     snapshot() {
       refreshAndPrune();
-      const counts = { queued: 0, claimed: 0, completed: 0, cancelled: 0, expired: 0 };
+      const counts = {
+        queued: 0,
+        claimed: 0,
+        completed: 0,
+        cancelled: 0,
+        expired: 0,
+        failed: 0
+      };
       for (const record of records.values()) {
         counts[record.status] += 1;
       }
