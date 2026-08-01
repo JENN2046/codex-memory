@@ -423,6 +423,25 @@ test('persisted last transition is bound to the accepted runtime and binding', (
   );
 });
 
+test('persisted transition binds the current stop receipt and legacy evidence', () => {
+  const result = prepareAndCommit();
+  const wrongStop = structuredClone(result.store.snapshot());
+  wrongStop.lifecycle.safe_stop_receipt_digest =
+    digestObject('unrelated-restored-safe-stop');
+  assert.throws(
+    () => validateGovernedRuntimeIdentityState(wrongStop),
+    { code: 'transition_store_last_transition_invalid' }
+  );
+
+  const wrongMigration = structuredClone(result.store.snapshot());
+  wrongMigration.legacy_migration.evidence_digest =
+    digestObject('wrong-retained-legacy-evidence');
+  assert.throws(
+    () => validateGovernedRuntimeIdentityState(wrongMigration),
+    { code: 'transition_store_last_transition_invalid' }
+  );
+});
+
 test('1. receipts from different transition requests cannot be spliced', () => {
   const state = initialState();
   const a = requestFor(state, { suffix: 'A' });

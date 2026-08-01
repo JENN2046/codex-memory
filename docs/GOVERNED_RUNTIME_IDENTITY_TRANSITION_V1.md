@@ -183,6 +183,9 @@ than the active-reservation admission bound; reconstructing the store preserves
 all consumed markers without making the 4097th proof unavailable. Observer
 reconstruction accepts the authoritative version-zero state and binds the first
 commit to its exact canonical state digest.
+Restored success protocols must bind the current lifecycle safe-stop receipt;
+when the retained success performed the one-shot legacy migration, its evidence
+digest is recomputed from the retained canonical request before acceptance.
 
 The unique failure registry includes:
 

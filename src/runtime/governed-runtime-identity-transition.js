@@ -206,6 +206,12 @@ function validateGovernedRuntimeIdentityState(value) {
             value.last_transition.protocol.request.transition_ref
           ) ||
         lastProtocol.terminal.outcome !== 'success' ||
+        lastProtocol.request.preconditions.safe_stop_receipt_digest !==
+          value.lifecycle.safe_stop_receipt_digest ||
+        (lastProtocol.request.legacy_transition_evidence !== null &&
+          value.legacy_migration.evidence_digest !== digestObject(
+            lastProtocol.request.legacy_transition_evidence
+          )) ||
         canonicalJson(derivedRuntime) !==
           canonicalJson(value.accepted_runtime) ||
         canonicalJson(derivedBinding) !==
