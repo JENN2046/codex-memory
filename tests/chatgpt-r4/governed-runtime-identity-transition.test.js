@@ -294,6 +294,10 @@ test('successful legacy migration performs one atomic CAS and leaves runtime sto
     snapshot.accepted_runtime.identity_digest
   );
   assert.equal(snapshot.legacy_migration.consumed, true);
+  assert.deepEqual(
+    snapshot.last_transition.protocol,
+    result.committed.protocol
+  );
   assert.equal(snapshot.lifecycle.lifecycle_state, 'stopped');
   assert.equal(snapshot.lifecycle.held_stopped, true);
   assert.equal(snapshot.lifecycle.running_component_count, 0);
@@ -570,6 +574,27 @@ test('10c. transition ref replay remains rejected after coordinator recreation',
   );
 });
 
+test('10d. coordinator recovers a reserved ref index from atomic state protocol', () => {
+  const first = prepareAndCommit();
+  const state = first.store.snapshot();
+  const recordStore = createTransitionRecordStore([{
+    transition_ref: first.request.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(first.request),
+    status: 'reserved',
+    protocol: null
+  }]);
+  const rebuiltStore = createGovernedRuntimeIdentityStateStore(state);
+  const rebuilt = harness({ state, store: rebuiltStore, recordStore });
+  assert.deepEqual(
+    recordStore.get(first.request.transition_ref).protocol,
+    first.committed.protocol
+  );
+  assert.deepEqual(
+    rebuilt.coordinator.protocol(first.request.transition_ref),
+    first.committed.protocol
+  );
+});
+
 test('11. a late candidate after terminal cannot overwrite accepted state', () => {
   const result = prepareAndCommit();
   const after = result.store.snapshot();
@@ -714,6 +739,50 @@ test('17a. Observer rejects a self-consistent commit not derived from its reques
     state_digest: digestObject('forged-state')
   }), false);
   assert.equal(observer.snapshot().atomic_commits_verified, 0);
+  assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
+test('17b. Observer binds the final terminal to the verified atomic commit', () => {
+  const result = prepareAndCommit();
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    request: result.request
+  });
+  for (const receipt of result.committed.protocol.receipts) {
+    observer.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_receipt_appended',
+      transition_ref: result.request.transition_ref,
+      receipt
+    });
+  }
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: result.request.transition_ref,
+    protocol: result.committed.protocol,
+    accepted_runtime: result.committed.accepted_runtime,
+    controller_binding: result.committed.controller_binding,
+    store_version: 1,
+    state_digest: result.committed.state_digest
+  }), true);
+  const conflictingTerminal = createRuntimeIdentityTransitionTerminal({
+    request: result.request,
+    receipts: result.committed.protocol.receipts,
+    outcome: 'failure',
+    reasonCode: 'transition_replayed',
+    runtimeStopped: true
+  });
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_terminal_committed',
+    transition_ref: result.request.transition_ref,
+    terminal: conflictingTerminal
+  }), false);
+  assert.equal(observer.snapshot().terminal_successes, 0);
+  assert.equal(observer.snapshot().terminal_failures, 0);
   assert.equal(observer.snapshot().protocol_violations, 1);
 });
 

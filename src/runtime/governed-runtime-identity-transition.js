@@ -58,6 +58,7 @@ const LAST_TRANSITION_KEYS = Object.freeze([
   'transition_ref_digest',
   'protocol_digest',
   'terminal_digest',
+  'protocol',
   'side_effects'
 ]);
 const SIDE_EFFECT_KEYS = Object.freeze([
@@ -177,6 +178,19 @@ function validateGovernedRuntimeIdentityState(value) {
       'terminal_digest'
     ]) {
       assertDigest(value.last_transition[key], 'transition_store_last_transition_invalid');
+    }
+    validateGovernedRuntimeIdentityTransitionProtocol(
+      value.last_transition.protocol
+    );
+    if (value.last_transition.protocol_digest !==
+          digestObject(value.last_transition.protocol) ||
+        value.last_transition.terminal_digest !==
+          value.last_transition.protocol.terminal.terminal_digest ||
+        value.last_transition.transition_ref_digest !==
+          digestObject(
+            value.last_transition.protocol.request.transition_ref
+          )) {
+      reject('transition_store_last_transition_invalid');
     }
     validateSideEffects(value.last_transition.side_effects);
   }
@@ -514,6 +528,40 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   if (typeof clock !== 'function') reject('transition_coordinator_clock_invalid');
   if (eventSink !== undefined && typeof eventSink !== 'function') {
     reject('transition_coordinator_event_sink_invalid');
+  }
+
+  const recoveryState = store.snapshot();
+  validateGovernedRuntimeIdentityState(recoveryState);
+  if (recoveryState.last_transition !== null) {
+    const recoveryProtocol = recoveryState.last_transition.protocol;
+    const recoveryRequest = recoveryProtocol.request;
+    const recoveryRef = recoveryRequest.transition_ref;
+    let recoveryRecord = transitionRecordStore.get(recoveryRef);
+    if (recoveryRecord === null) {
+      const reserved = transitionRecordStore.reserve({
+        transition_ref: recoveryRef,
+        request_digest:
+          runtimeIdentityTransitionRequestDigest(recoveryRequest)
+      });
+      if (reserved !== true) {
+        reject('transition_record_store_recovery_failed');
+      }
+      recoveryRecord = transitionRecordStore.get(recoveryRef);
+    }
+    if (recoveryRecord.status === 'reserved') {
+      const recovered = transitionRecordStore.finalize({
+        transition_ref: recoveryRef,
+        request_digest:
+          runtimeIdentityTransitionRequestDigest(recoveryRequest),
+        protocol: recoveryProtocol
+      });
+      if (recovered !== true) {
+        reject('transition_record_store_recovery_failed');
+      }
+    } else if (canonicalJson(recoveryRecord.protocol) !==
+        canonicalJson(recoveryProtocol)) {
+      reject('transition_record_store_recovery_failed');
+    }
   }
 
   const records = new Map();
@@ -1034,6 +1082,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
           digestObject(previewValue.request.transition_ref),
         protocol_digest: digestObject(protocol),
         terminal_digest: terminal.terminal_digest,
+        protocol: structuredClone(protocol),
         side_effects: sideEffects
       }
     };
@@ -1148,7 +1197,11 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   function protocol(transitionRef) {
     const record = records.get(transitionRef);
     const persisted = transitionRecordStore.get(transitionRef);
-    const selected = record?.protocol || persisted?.protocol;
+    const stateProtocol = store.snapshot().last_transition?.protocol;
+    const selected = record?.protocol || persisted?.protocol ||
+      (stateProtocol?.request?.transition_ref === transitionRef
+        ? stateProtocol
+        : null);
     if (!selected) reject('transition_terminal_missing');
     validateGovernedRuntimeIdentityTransitionProtocol(selected);
     return selected;

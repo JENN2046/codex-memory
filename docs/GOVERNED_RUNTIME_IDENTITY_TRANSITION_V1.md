@@ -86,6 +86,11 @@ one versioned compare-and-swap. The CAS candidate simultaneously contains:
 6. explicit false values for runtime start, repository change, resolver,
    search, provider, and memory effects.
 
+The CAS state retains the complete canonical protocol as well as its digests.
+The transition-record store is a secondary durable replay index: coordinator
+construction verifies or reconstructs that index from the atomically committed
+protocol, closing the crash window between state CAS and index finalization.
+
 Immediately before CAS, the coordinator revalidates store version, exact
 `from_runtime`, stopped/held state, safe-stop receipt, and candidate manifest.
 When the current controller binding already uses the stable authority model,
@@ -122,6 +127,8 @@ The Observer consumes only the canonical request, ordered receipt stream,
 atomic commit event, and terminal. It independently derives the accepted
 runtime identity and stable controller binding from the recorded request, then
 reconstructs the terminal
+and requires it to equal the terminal already bound to any verified atomic
+commit
 and rejects spliced transitions, incorrect receipt order or origin, duplicate
 atomic commits, terminal mismatch, missing terminals, and post-terminal
 events.

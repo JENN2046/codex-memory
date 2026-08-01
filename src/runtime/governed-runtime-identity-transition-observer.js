@@ -159,7 +159,12 @@ function createGovernedRuntimeIdentityTransitionObserver({
         });
         if (canonicalJson(independentlyDerived) !==
             canonicalJson(event.terminal) ||
-            (event.terminal.outcome === 'success' && !record.atomic_commit)) {
+            (event.terminal.outcome === 'success' && !record.atomic_commit) ||
+            (record.atomic_commit &&
+              (event.terminal.outcome !== 'success' ||
+                canonicalJson(event.terminal) !== canonicalJson(
+                  record.atomic_commit.protocol.terminal
+                )))) {
           return violation('transition_observer_terminal_reconciliation_invalid');
         }
         record.terminal = structuredClone(event.terminal);
