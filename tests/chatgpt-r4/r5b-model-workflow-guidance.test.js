@@ -76,14 +76,30 @@ test('R5-B keeps the approved current public tool set and schema digests', () =>
 test('R5-B model-visible results stop retries while preserving bounded status', () => {
   const resolved = modelVisibleResultText('resolve_memory_context', {
     status: 'ok',
-    structured_content: { context_status: 'resolved' }
+    structured_content: {
+      context_status: 'resolved',
+      resolution: {
+        evidence_complete: true,
+        context_ref_issued: true,
+        context_ref_entered_response: true,
+        context_ref_delivered: true
+      }
+    }
   });
   assert.match(resolved, /exactly one read tool/u);
   assert.match(resolved, /do not resolve again/u);
 
   const unresolved = modelVisibleResultText('resolve_memory_context', {
     status: 'unavailable',
-    structured_content: { context_status: 'unavailable' }
+    structured_content: {
+      context_status: 'unavailable',
+      resolution: {
+        evidence_complete: true,
+        context_ref_issued: false,
+        context_ref_entered_response: null,
+        context_ref_delivered: null
+      }
+    }
   });
   assert.match(unresolved, /returned unavailable/u);
   assert.match(unresolved, /do not retry alternative aliases or visibilities/u);

@@ -530,15 +530,41 @@ function resultCount(content) {
   return content?.context_status === 'resolved' ? 1 : 0;
 }
 
+function contextReferenceStatus(response) {
+  const resolution = response?.structured_content?.resolution;
+  if (!resolution || resolution.evidence_complete !== true) return 'unknown';
+  if (resolution.context_ref_issued === false) return 'not_issued';
+  if (resolution.context_ref_issued === true) {
+    if (resolution.context_ref_delivered === true) return 'issued';
+    if (resolution.context_ref_delivered === false) return 'issued_not_delivered';
+  }
+  return 'unknown';
+}
+
+function contextReferenceText(status) {
+  switch (status) {
+    case 'issued':
+      return 'issued and delivered';
+    case 'issued_not_delivered':
+      return 'issued but not delivered in the response';
+    case 'not_issued':
+      return 'not issued';
+    default:
+      return 'unknown';
+  }
+}
+
 function modelVisibleResultText(name, response) {
   if (name === 'resolve_memory_context') {
-    if (response.structured_content?.resolution?.evidence_complete === false) {
-      return 'Governed resolve_memory_context could not establish complete terminal evidence. Context status is unavailable; project context reference was not issued. Do not retry or infer a failure reason.';
+    const referenceStatus = contextReferenceStatus(response);
+    const referenceText = contextReferenceText(referenceStatus);
+    if (referenceStatus === 'unknown') {
+      return 'Governed resolve_memory_context could not establish complete terminal evidence. Project context reference status is unknown. Do not retry or infer a failure reason.';
     }
-    if (response.status === 'ok') {
-      return 'Receipt-bound governed project context status: resolved. GOVERNED RESULT RECEIPT: bound. Project context reference: issued. Use it for exactly one read tool chosen by the user intent; do not resolve again.';
+    if (response.status === 'ok' && referenceStatus === 'issued') {
+      return `Receipt-bound governed project context status: resolved. GOVERNED RESULT RECEIPT: bound. Project context reference: ${referenceText}. Use it for exactly one read tool chosen by the user intent; do not resolve again.`;
     }
-    return `Receipt-bound governed resolve_memory_context returned ${response.status}; status: ${response.status}. TERMINAL GOVERNED RESULT. Result receipt: bound; project context reference: not issued. This is not a transport timeout or another transport failure. Answer now and call no codex-memory tool. Ask for one exact project_alias and one exact requested_visibility only when either was missing; do not retry alternative aliases or visibilities; do not retry the same value or probe alternative aliases or visibilities; never guess or use current/default.`;
+    return `Receipt-bound governed resolve_memory_context returned ${response.status}; status: ${response.status}. TERMINAL GOVERNED RESULT. Result receipt: bound; project context reference: ${referenceText}. This is not a transport timeout or another transport failure. Answer now and call no codex-memory tool. Ask for one exact project_alias and one exact requested_visibility only when either was missing; do not retry alternative aliases or visibilities; do not retry the same value or probe alternative aliases or visibilities; never guess or use current/default.`;
   }
   if (response.status === 'ok') {
     const boundedStatus = response.structured_content?.status || 'completed';
@@ -562,15 +588,12 @@ function modelVisibleErrorText(errorCode) {
 }
 
 function receiptPresentation(name, response) {
-  const evidenceComplete = name === 'resolve_memory_context'
-    ? response.structured_content?.resolution?.evidence_complete
-    : true;
-  const contextReferenceStatus = name === 'resolve_memory_context'
-    ? (response.status === 'ok' ? 'issued' : 'not_issued')
+  const referenceStatus = name === 'resolve_memory_context'
+    ? contextReferenceStatus(response)
     : 'not_applicable';
   return {
-    result_receipt_status: evidenceComplete === false ? 'unconfirmed' : 'bound',
-    context_reference_status: contextReferenceStatus,
+    result_receipt_status: referenceStatus === 'unknown' ? 'unconfirmed' : 'bound',
+    context_reference_status: referenceStatus,
     raw_receipt_values_returned: false
   };
 }

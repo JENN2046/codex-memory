@@ -79,7 +79,15 @@ test('R5-I requires exact visibility in the public schema and request validator'
 test('R5-I projects verified governed outcomes separately from transport failures', () => {
   const resolved = modelVisibleResultText('resolve_memory_context', {
     status: 'ok',
-    structured_content: { context_status: 'resolved' }
+    structured_content: {
+      context_status: 'resolved',
+      resolution: {
+        evidence_complete: true,
+        context_ref_issued: true,
+        context_ref_entered_response: true,
+        context_ref_delivered: true
+      }
+    }
   });
   assert.match(resolved, /Receipt-bound.+status: resolved/u);
   assert.match(resolved, /exactly one read tool/u);
@@ -88,7 +96,15 @@ test('R5-I projects verified governed outcomes separately from transport failure
   for (const status of ['denied', 'unavailable']) {
     const resolveFailure = modelVisibleResultText('resolve_memory_context', {
       status,
-      structured_content: { context_status: status }
+      structured_content: {
+        context_status: status,
+        resolution: {
+          evidence_complete: true,
+          context_ref_issued: false,
+          context_ref_entered_response: null,
+          context_ref_delivered: null
+        }
+      }
     });
     assert.match(resolveFailure, new RegExp(`Receipt-bound.+status: ${status}`, 'u'));
     assert.match(resolveFailure, /not a transport timeout/u);

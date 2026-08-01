@@ -87,15 +87,31 @@ test('current profile keeps six tool names and matches the R5-O schema digests',
 test('R5-K makes governed result receipts and transport failures unambiguous and terminal', () => {
   const resolved = modelVisibleResultText('resolve_memory_context', {
     status: 'ok',
-    structured_content: { context_status: 'resolved' }
+    structured_content: {
+      context_status: 'resolved',
+      resolution: {
+        evidence_complete: true,
+        context_ref_issued: true,
+        context_ref_entered_response: true,
+        context_ref_delivered: true
+      }
+    }
   });
   assert.match(resolved, /GOVERNED RESULT RECEIPT: bound/u);
-  assert.match(resolved, /Project context reference: issued/u);
+  assert.match(resolved, /Project context reference: issued and delivered/u);
 
   for (const status of ['denied', 'unavailable']) {
     const denied = modelVisibleResultText('resolve_memory_context', {
       status,
-      structured_content: { context_status: status }
+      structured_content: {
+        context_status: status,
+        resolution: {
+          evidence_complete: true,
+          context_ref_issued: false,
+          context_ref_entered_response: null,
+          context_ref_delivered: null
+        }
+      }
     });
     assert.match(denied, /TERMINAL GOVERNED RESULT/u);
     assert.match(denied, /Result receipt: bound/u);
@@ -163,12 +179,26 @@ test('R5-O capability-honest bounded status routing keeps terminal closure', () 
 });
 
 test('R5-K projects only low-disclosure receipt presentation metadata to the widget', () => {
-  assert.deepEqual(receiptPresentation('resolve_memory_context', { status: 'ok' }), {
+  assert.deepEqual(receiptPresentation('resolve_memory_context', {
+    status: 'ok',
+    structured_content: { resolution: {
+      evidence_complete: true,
+      context_ref_issued: true,
+      context_ref_delivered: true
+    } }
+  }), {
     result_receipt_status: 'bound',
     context_reference_status: 'issued',
     raw_receipt_values_returned: false
   });
-  assert.deepEqual(receiptPresentation('resolve_memory_context', { status: 'denied' }), {
+  assert.deepEqual(receiptPresentation('resolve_memory_context', {
+    status: 'denied',
+    structured_content: { resolution: {
+      evidence_complete: true,
+      context_ref_issued: false,
+      context_ref_delivered: null
+    } }
+  }), {
     result_receipt_status: 'bound',
     context_reference_status: 'not_issued',
     raw_receipt_values_returned: false
@@ -182,10 +212,89 @@ test('R5-K projects only low-disclosure receipt presentation metadata to the wid
   assert.match(MEMORY_SCOPE_WIDGET_HTML, /toolResponseMetadata/u);
   assert.match(MEMORY_SCOPE_WIDGET_HTML, /Result receipt/u);
   assert.match(MEMORY_SCOPE_WIDGET_HTML, /Context reference/u);
+  assert.match(MEMORY_SCOPE_WIDGET_HTML, /context_reference_status,\n          'unknown'/u);
   assert.doesNotMatch(
     MEMORY_SCOPE_WIDGET_HTML,
     /receiptChainDigest|mapping[_ -]?digest|diary[_ -]?name|sha256:[a-f0-9]{64}/iu
   );
+});
+
+test('R5-K preserves issued, delivery, denied, and unknown resolver terminal facts', () => {
+  const cases = [
+    {
+      name: 'issued',
+      response: {
+        status: 'ok',
+        structured_content: { resolution: {
+          evidence_complete: true,
+          context_ref_issued: true,
+          context_ref_entered_response: true,
+          context_ref_delivered: true
+        } }
+      },
+      receipt: 'bound',
+      reference: 'issued',
+      text: /issued and delivered/u
+    },
+    {
+      name: 'issued_not_delivered',
+      response: {
+        status: 'unavailable',
+        structured_content: { resolution: {
+          evidence_complete: true,
+          context_ref_issued: true,
+          context_ref_entered_response: false,
+          context_ref_delivered: false
+        } }
+      },
+      receipt: 'bound',
+      reference: 'issued_not_delivered',
+      text: /issued but not delivered in the response/u
+    },
+    {
+      name: 'not_issued',
+      response: {
+        status: 'denied',
+        structured_content: { resolution: {
+          evidence_complete: true,
+          context_ref_issued: false,
+          context_ref_entered_response: null,
+          context_ref_delivered: null
+        } }
+      },
+      receipt: 'bound',
+      reference: 'not_issued',
+      text: /project context reference: not issued/u
+    },
+    {
+      name: 'unknown',
+      response: {
+        status: 'unavailable',
+        structured_content: { resolution: {
+          evidence_complete: false,
+          context_ref_issued: null,
+          context_ref_entered_response: null,
+          context_ref_delivered: null
+        } }
+      },
+      receipt: 'unconfirmed',
+      reference: 'unknown',
+      text: /Project context reference status is unknown/u
+    }
+  ];
+
+  for (const scenario of cases) {
+    assert.deepEqual(receiptPresentation('resolve_memory_context', scenario.response), {
+      result_receipt_status: scenario.receipt,
+      context_reference_status: scenario.reference,
+      raw_receipt_values_returned: false
+    }, scenario.name);
+    assert.match(
+      modelVisibleResultText('resolve_memory_context', scenario.response),
+      scenario.text,
+      scenario.name
+    );
+  }
 });
 
 test('R5-K unwraps direct and ChatGPT bridge envelope receipt metadata', () => {
