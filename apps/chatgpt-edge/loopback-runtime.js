@@ -544,6 +544,7 @@ function createLoopbackEdgeRuntime({
     )) {
       reject('edge_attempt_response_binding_invalid');
     }
+    const acceptedResponse = structuredClone(response);
     if (currentRecord.resolution_ref) {
       try {
         validateGovernedContextResolutionProtocol(
@@ -583,7 +584,6 @@ function createLoopbackEdgeRuntime({
         governedContextResolutionCandidate
       );
     }
-    const acceptedResponse = structuredClone(response);
     if (currentRecord.attempt_ref) {
       governedCoordinator.commitProtocolCandidate(
         currentRecord.attempt_ref,
