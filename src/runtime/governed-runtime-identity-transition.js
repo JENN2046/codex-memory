@@ -22,6 +22,8 @@ const {
 } = require('../../packages/chatgpt-r4-contracts');
 
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
+const TRANSITION_REF_PATTERN = /^grit_[A-Za-z0-9_-]{24,96}$/u;
+const AUTHORITY_PROOF_REPLAY_LIMIT = 4096;
 const STORE_SCHEMA_VERSION = 1;
 const LEGACY_CONTROLLER_BINDING_MODEL = 'legacy_source_coupled';
 const STABLE_CONTROLLER_BINDING_MODEL = 'stable_controller_authority.v1';
@@ -217,6 +219,77 @@ function createGovernedRuntimeIdentityStateStore(initialState) {
   return Object.freeze({ compareAndSwap, snapshot });
 }
 
+function createAuthorityProofReplayStore(initialEntries = []) {
+  if (!Array.isArray(initialEntries) ||
+      initialEntries.length > AUTHORITY_PROOF_REPLAY_LIMIT) {
+    reject('transition_authority_proof_store_invalid');
+  }
+  const consumed = new Map();
+  for (const entry of initialEntries) {
+    if (!exactKeys(entry, [
+      'authority_proof_digest',
+      'authority_context_digest',
+      'transition_ref'
+    ])) {
+      reject('transition_authority_proof_store_invalid');
+    }
+    assertDigest(
+      entry.authority_proof_digest,
+      'transition_authority_proof_store_invalid'
+    );
+    assertDigest(
+      entry.authority_context_digest,
+      'transition_authority_proof_store_invalid'
+    );
+    if (!TRANSITION_REF_PATTERN.test(entry.transition_ref || '') ||
+        consumed.has(entry.authority_proof_digest)) {
+      reject('transition_authority_proof_store_invalid');
+    }
+    consumed.set(
+      entry.authority_proof_digest,
+      structuredClone(entry)
+    );
+  }
+
+  function consume(entry) {
+    if (!exactKeys(entry, [
+      'authority_proof_digest',
+      'authority_context_digest',
+      'transition_ref'
+    ])) {
+      reject('transition_authority_proof_store_invalid');
+    }
+    assertDigest(
+      entry.authority_proof_digest,
+      'transition_authority_proof_store_invalid'
+    );
+    assertDigest(
+      entry.authority_context_digest,
+      'transition_authority_proof_store_invalid'
+    );
+    if (!TRANSITION_REF_PATTERN.test(entry.transition_ref || '')) {
+      reject('transition_authority_proof_store_invalid');
+    }
+    if (consumed.has(entry.authority_proof_digest)) return false;
+    if (consumed.size >= AUTHORITY_PROOF_REPLAY_LIMIT) {
+      reject('transition_authority_proof_store_capacity_exceeded');
+    }
+    consumed.set(
+      entry.authority_proof_digest,
+      deepFreeze(structuredClone(entry))
+    );
+    return true;
+  }
+
+  function snapshot() {
+    return deepFreeze(
+      [...consumed.values()].map(entry => structuredClone(entry))
+    );
+  }
+
+  return Object.freeze({ consume, snapshot });
+}
+
 function stableControllerBinding(request, acceptedRuntime) {
   const base = {
     model: STABLE_CONTROLLER_BINDING_MODEL,
@@ -302,6 +375,7 @@ function candidateVerificationFailure(verification, request) {
 
 function createGovernedRuntimeIdentityTransitionCoordinator({
   store,
+  authorityProofReplayStore,
   authorityVerifier,
   candidateManifestVerifier,
   clock = () => new Date(),
@@ -310,6 +384,10 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   if (!store || typeof store.snapshot !== 'function' ||
       typeof store.compareAndSwap !== 'function') {
     reject('transition_coordinator_store_invalid');
+  }
+  if (!authorityProofReplayStore ||
+      typeof authorityProofReplayStore.consume !== 'function') {
+    reject('transition_coordinator_authority_proof_store_invalid');
   }
   if (typeof authorityVerifier !== 'function') {
     reject('transition_coordinator_authority_verifier_invalid');
@@ -323,7 +401,6 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   const records = new Map();
-  const consumedAuthorityProofs = new Set();
   let eventDispatchDepth = 0;
 
   function nowMs() {
@@ -385,7 +462,11 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     request,
     receipts,
     reasonCode,
-    { runtimeStopped = null, storeRecord = true } = {}
+    {
+      runtimeStopped = null,
+      storeRecord = true,
+      emitTerminal = true
+    } = {}
   ) {
     const terminal = createRuntimeIdentityTransitionTerminal({
       request,
@@ -406,10 +487,12 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         protocol
       });
     }
-    emit('transition_terminal_committed', {
-      transition_ref: request.transition_ref,
-      terminal
-    });
+    if (emitTerminal) {
+      emit('transition_terminal_committed', {
+        transition_ref: request.transition_ref,
+        terminal
+      });
+    }
     return deepFreeze({ status: 'terminal_failure', protocol });
   }
 
@@ -433,13 +516,13 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   function preview(request) {
     validateRuntimeIdentityTransitionRequest(request);
     const currentMs = nowMs();
-    emit('transition_accepted', { request });
-    if (records.has(request.transition_ref) ||
-        consumedAuthorityProofs.has(
-          request.authority.authority_proof_digest
-        )) {
-      return terminalFailure(request, [], 'transition_replayed');
+    if (records.has(request.transition_ref)) {
+      return terminalFailure(request, [], 'transition_replayed', {
+        storeRecord: false,
+        emitTerminal: false
+      });
     }
+    emit('transition_accepted', { request });
     if (Date.parse(request.request.created_at) > currentMs ||
         Date.parse(request.request.expires_at) <= currentMs) {
       return terminalFailure(request, [], 'transition_expired');
@@ -494,7 +577,39 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         authority
       );
     }
-    consumedAuthorityProofs.add(request.authority.authority_proof_digest);
+    let proofConsumed;
+    try {
+      proofConsumed = authorityProofReplayStore.consume({
+        authority_proof_digest:
+          request.authority.authority_proof_digest,
+        authority_context_digest: authorityContextDigest,
+        transition_ref: request.transition_ref
+      });
+    } catch {
+      return failedStage(
+        workingSet,
+        'AUTHORITY_VERIFIED',
+        'authority_unverified',
+        null,
+        { evidenceStatus: 'unknown' }
+      );
+    }
+    if (proofConsumed === false) {
+      return terminalFailure(
+        request,
+        workingSet.receipts,
+        'transition_replayed'
+      );
+    }
+    if (proofConsumed !== true) {
+      return failedStage(
+        workingSet,
+        'AUTHORITY_VERIFIED',
+        'authority_unverified',
+        null,
+        { evidenceStatus: 'unknown' }
+      );
+    }
     workingSet = append(workingSet, 'AUTHORITY_VERIFIED', authority);
 
     let lifecycleReason = null;
@@ -870,6 +985,7 @@ module.exports = {
   LEGACY_CONTROLLER_BINDING_MODEL,
   STABLE_CONTROLLER_BINDING_MODEL,
   STORE_SCHEMA_VERSION,
+  createAuthorityProofReplayStore,
   createGovernedRuntimeIdentityStateStore,
   createGovernedRuntimeIdentityTransitionCoordinator,
   stableControllerBinding,

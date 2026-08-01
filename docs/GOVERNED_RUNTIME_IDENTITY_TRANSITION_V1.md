@@ -18,7 +18,10 @@ The contract keeps two identities distinct:
 
 An authority may manage a runtime identity. A checkout, candidate tree, or
 runtime manifest cannot establish authority by itself, and the authority proof
-is bound to one transition request.
+is bound to one transition request. The coordinator requires an atomic
+authority-proof replay store; a live adapter must persist it across coordinator
+or process restarts. The included in-memory adapter is synthetic but retains
+consumption across coordinator recreation when the same store is reused.
 
 ## Canonical request and digests
 
@@ -61,6 +64,10 @@ origin, predecessor digest, transition reference, and evidence state are
 validated. Unknown evidence remains `unknown`; it is never upgraded to
 verified. A missing terminal is an Observer protocol violation, not a synthetic
 default failure terminal.
+
+A replay of an existing `transition_ref` returns a separate canonical replay
+failure without replacing or emitting over the authoritative prepared or
+terminal record for that reference.
 
 ## Atomic commit
 

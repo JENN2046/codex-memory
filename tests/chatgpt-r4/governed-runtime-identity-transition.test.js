@@ -22,6 +22,7 @@ const {
 const {
   LEGACY_CONTROLLER_BINDING_MODEL,
   STABLE_CONTROLLER_BINDING_MODEL,
+  createAuthorityProofReplayStore,
   createGovernedRuntimeIdentityStateStore,
   createGovernedRuntimeIdentityTransitionCoordinator,
   validateGovernedRuntimeIdentityState
@@ -175,13 +176,16 @@ function harness({
   manifest = manifestVerifier,
   clock = () => NOW,
   store = null,
+  proofStore = null,
   observer = null
 } = {}) {
   const selectedStore = store || createGovernedRuntimeIdentityStateStore(state);
+  const selectedProofStore = proofStore || createAuthorityProofReplayStore();
   const selectedObserver = observer ||
     createGovernedRuntimeIdentityTransitionObserver();
   const coordinator = createGovernedRuntimeIdentityTransitionCoordinator({
     store: selectedStore,
+    authorityProofReplayStore: selectedProofStore,
     authorityVerifier: authority,
     candidateManifestVerifier: manifest,
     clock,
@@ -190,6 +194,7 @@ function harness({
   return {
     coordinator,
     observer: selectedObserver,
+    proofStore: selectedProofStore,
     store: selectedStore,
     state
   };
@@ -481,6 +486,54 @@ test('10. authority proof cannot replay across transition refs', () => {
     suffix: 'B', proofDigest: proof
   }));
   assert.equal(second.protocol.terminal.reason_code, 'transition_replayed');
+});
+
+test('10a. authority proof replay remains rejected after coordinator recreation', () => {
+  const state = initialState();
+  const first = harness({ state });
+  const proof = digestObject('durable-one-proof');
+  const prepared = first.coordinator.preview(requestFor(state, {
+    suffix: 'A', proofDigest: proof
+  }));
+  assert.equal(prepared.status, 'prepared');
+
+  const rebuilt = harness({
+    state,
+    store: first.store,
+    proofStore: first.proofStore
+  });
+  const replay = rebuilt.coordinator.preview(requestFor(state, {
+    suffix: 'B', proofDigest: proof
+  }));
+  assert.equal(replay.status, 'terminal_failure');
+  assert.equal(replay.protocol.terminal.reason_code, 'transition_replayed');
+  assert.equal(first.proofStore.snapshot().length, 1);
+});
+
+test('10b. same-ref replay cannot overwrite prepared or successful authority records', () => {
+  const state = initialState();
+  const run = harness({ state });
+  const request = requestFor(state);
+  const prepared = run.coordinator.preview(request);
+  assert.equal(prepared.status, 'prepared');
+
+  const preparedReplay = run.coordinator.preview(request);
+  assert.equal(preparedReplay.protocol.terminal.reason_code, 'transition_replayed');
+  const committed = run.coordinator.commit(prepared.preview);
+  assert.equal(committed.status, 'terminal_success');
+
+  const authoritative = run.coordinator.protocol(request.transition_ref);
+  const terminalDigest = authoritative.terminal.terminal_digest;
+  const successfulReplay = run.coordinator.preview(request);
+  assert.equal(successfulReplay.protocol.terminal.reason_code, 'transition_replayed');
+  assert.equal(
+    run.coordinator.protocol(request.transition_ref).terminal.terminal_digest,
+    terminalDigest
+  );
+  assert.equal(
+    run.store.snapshot().last_transition.terminal_digest,
+    terminalDigest
+  );
 });
 
 test('11. a late candidate after terminal cannot overwrite accepted state', () => {
