@@ -186,6 +186,10 @@ commit to its exact canonical state digest.
 Restored success protocols must bind the current lifecycle safe-stop receipt;
 when the retained success performed the one-shot legacy migration, its evidence
 digest is recomputed from the retained canonical request before acceptance.
+Transient state readback failure after a successful CAS is recovered without
+writing a contradictory failure terminal. Once a terminal is durably indexed,
+the coordinator releases its local working record and protocol lookup uses the
+persistent terminal archive.
 
 The unique failure registry includes:
 

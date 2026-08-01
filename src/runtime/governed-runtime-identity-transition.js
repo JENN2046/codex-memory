@@ -733,11 +733,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       if (finalized !== true) {
         reject('transition_record_store_context_mismatch');
       }
-      records.set(request.transition_ref, {
-        status: 'terminal',
-        preview: null,
-        protocol
-      });
+      records.delete(request.transition_ref);
     }
     if (emitTerminal) {
       emit('transition_terminal_committed', {
@@ -1093,6 +1089,29 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         canonicalJson(record.preview) !== canonicalJson(previewValue)) {
       reject('transition_preview_context_invalid');
     }
+    recoverLastTransitionRecord();
+    const recoveredRecord = transitionRecordStore.get(
+      previewValue.request.transition_ref
+    );
+    if (recoveredRecord?.status === 'terminal') {
+      const recoveredState = store.snapshot();
+      validateGovernedRuntimeIdentityState(recoveredState);
+      if (recoveredRecord.protocol.terminal.outcome !== 'success' ||
+          canonicalJson(recoveredRecord.protocol.request) !==
+            canonicalJson(previewValue.request) ||
+          canonicalJson(recoveredState.last_transition?.protocol) !==
+            canonicalJson(recoveredRecord.protocol)) {
+        reject('transition_preview_context_invalid');
+      }
+      records.delete(previewValue.request.transition_ref);
+      return deepFreeze({
+        status: 'terminal_success',
+        protocol: recoveredRecord.protocol,
+        accepted_runtime: recoveredState.accepted_runtime,
+        controller_binding: recoveredState.controller_binding,
+        state_digest: digestObject(recoveredState)
+      });
+    }
     if (Date.parse(previewValue.request.request.expires_at) <= nowMs()) {
       return terminalFailure(
         previewValue.request,
@@ -1101,7 +1120,6 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         { runtimeStopped: null }
       );
     }
-    recoverLastTransitionRecord();
     const before = store.snapshot();
     validateGovernedRuntimeIdentityState(before);
     if (before.store_version !== previewValue.expected_store_version ||
@@ -1251,7 +1269,21 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         { runtimeStopped: true }
       );
     }
-    const after = store.snapshot();
+    let after;
+    try {
+      after = store.snapshot();
+    } catch {
+      // A true CAS result is authoritative. Retry the readback so a transient
+      // post-commit read failure cannot be converted into a contradictory
+      // failure terminal. If the store stays unavailable, preserve the
+      // prepared local record and durable atomic state for the retry recovery
+      // path above.
+      try {
+        after = store.snapshot();
+      } catch {
+        reject('transition_post_commit_state_recovery_failed');
+      }
+    }
     const postMatches = canonicalJson(after) === canonicalJson(nextState) &&
       after.lifecycle.lifecycle_state === 'stopped' &&
       after.lifecycle.held_stopped === true &&
@@ -1280,9 +1312,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       reject('transition_record_store_recovery_failed');
     }
     if (finalized !== true) reject('transition_record_store_recovery_failed');
-    record.status = 'terminal';
-    record.protocol = protocol;
-    record.preview = null;
+    records.delete(previewValue.request.transition_ref);
     for (const receipt of workingSet.receipts.slice(
       previewValue.receipts.length
     )) {

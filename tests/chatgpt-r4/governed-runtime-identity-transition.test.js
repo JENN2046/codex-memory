@@ -1012,6 +1012,84 @@ test('13a. a committed CAS with a lost acknowledgement remains success', () => {
   );
 });
 
+test('13b. a transient snapshot fault after successful CAS recovers success', () => {
+  const state = initialState();
+  let current = structuredClone(state);
+  let failPostCommitSnapshot = false;
+  const readbackFaultStore = {
+    snapshot() {
+      if (failPostCommitSnapshot) {
+        failPostCommitSnapshot = false;
+        throw new Error('synthetic-post-commit-readback-fault');
+      }
+      return structuredClone(current);
+    },
+    compareAndSwap(expectedVersion, candidate) {
+      assert.equal(expectedVersion, current.store_version);
+      current = structuredClone(candidate);
+      failPostCommitSnapshot = true;
+      return true;
+    }
+  };
+  const run = harness({ state, store: readbackFaultStore });
+  const request = requestFor(state);
+  const prepared = run.coordinator.preview(request);
+  const outcome = run.coordinator.commit(prepared.preview);
+  assert.equal(outcome.status, 'terminal_success');
+  assert.equal(run.store.snapshot().store_version, 1);
+  assert.equal(run.recordStore.get(request.transition_ref).status, 'terminal');
+  assert.deepEqual(run.coordinator.protocol(request.transition_ref), outcome.protocol);
+});
+
+test('13b1. retry recovers committed success after repeated readback faults', () => {
+  const state = initialState();
+  let current = structuredClone(state);
+  let postCommitReadFailures = 0;
+  const readbackFaultStore = {
+    snapshot() {
+      if (postCommitReadFailures > 0) {
+        postCommitReadFailures -= 1;
+        throw new Error('synthetic-repeated-post-commit-readback-fault');
+      }
+      return structuredClone(current);
+    },
+    compareAndSwap(expectedVersion, candidate) {
+      assert.equal(expectedVersion, current.store_version);
+      current = structuredClone(candidate);
+      postCommitReadFailures = 2;
+      return true;
+    }
+  };
+  const run = harness({ state, store: readbackFaultStore });
+  const request = requestFor(state);
+  const prepared = run.coordinator.preview(request);
+  assert.throws(
+    () => run.coordinator.commit(prepared.preview),
+    { code: 'transition_post_commit_state_recovery_failed' }
+  );
+  const recovered = run.coordinator.commit(prepared.preview);
+  assert.equal(recovered.status, 'terminal_success');
+  assert.equal(run.store.snapshot().store_version, 1);
+  assert.equal(run.recordStore.get(request.transition_ref).status, 'terminal');
+  assert.deepEqual(run.coordinator.protocol(request.transition_ref), recovered.protocol);
+});
+
+test('13c. finalized protocols remain queryable after local record release', () => {
+  const result = prepareAndCommit();
+  assert.deepEqual(
+    result.coordinator.protocol(result.request.transition_ref),
+    result.committed.protocol
+  );
+  assert.deepEqual(result.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 0,
+    terminals_fabricated: 0
+  });
+  assert.deepEqual(
+    result.coordinator.protocol(result.request.transition_ref),
+    result.committed.protocol
+  );
+});
+
 test('14. transition success preserves stopped and held lifecycle exactly', () => {
   const result = prepareAndCommit();
   assert.deepEqual(
