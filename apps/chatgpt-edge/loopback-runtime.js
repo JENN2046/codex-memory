@@ -44,6 +44,15 @@ const REQUIRED_ATTEMPT_COORDINATOR_METHODS = Object.freeze([
   'timeoutAttempt',
   'workingSet'
 ]);
+const REQUIRED_CONTEXT_RESOLUTION_COORDINATOR_METHODS = Object.freeze([
+  'acceptResolution',
+  'appendReceipt',
+  'cancelResolution',
+  'commitProtocolCandidate',
+  'reportCoordinatorLoss',
+  'timeoutResolution',
+  'workingSet'
+]);
 
 function createLoopbackEdgeRuntime({
   verifyRequest,
@@ -85,6 +94,14 @@ function createLoopbackEdgeRuntime({
       (contextResolutionEventSink !== undefined &&
        typeof contextResolutionEventSink !== 'function')) {
     reject('edge_context_resolution_runtime_invalid');
+  }
+  if (contextResolutionCoordinator !== null && (
+    !governedContextResolutions ||
+    REQUIRED_CONTEXT_RESOLUTION_COORDINATOR_METHODS.some(method =>
+      typeof contextResolutionCoordinator[method] !== 'function'
+    )
+  )) {
+    reject('edge_context_resolution_coordinator_invalid');
   }
   const attemptRetention = governedReadAttempts
     ? deriveGovernedReadAttemptRetention({

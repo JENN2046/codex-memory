@@ -1702,6 +1702,49 @@ test('Edge validates every injected attempt coordinator lifecycle method', () =>
   }
 });
 
+test('Edge validates every injected resolver coordinator lifecycle method', () => {
+  const required = [
+    'acceptResolution',
+    'appendReceipt',
+    'cancelResolution',
+    'commitProtocolCandidate',
+    'reportCoordinatorLoss',
+    'timeoutResolution',
+    'workingSet'
+  ];
+  const completeCoordinator = Object.fromEntries(
+    required.map(method => [method, () => {}])
+  );
+  assert.doesNotThrow(() => createLoopbackEdgeRuntime({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    governedContextResolutions: true,
+    contextResolutionCoordinator: completeCoordinator
+  }));
+  assert.throws(
+    () => createLoopbackEdgeRuntime({
+      async verifyRequest() {},
+      async verifyResponse() {},
+      contextResolutionCoordinator: completeCoordinator
+    }),
+    { code: 'edge_context_resolution_coordinator_invalid' }
+  );
+  for (const missing of required) {
+    const incomplete = { ...completeCoordinator };
+    delete incomplete[missing];
+    assert.throws(
+      () => createLoopbackEdgeRuntime({
+        async verifyRequest() {},
+        async verifyResponse() {},
+        governedContextResolutions: true,
+        contextResolutionCoordinator: incomplete
+      }),
+      { code: 'edge_context_resolution_coordinator_invalid' },
+      missing
+    );
+  }
+});
+
 test('legacy loopback configuration does not allocate resolver retention capacity', () => {
   assert.doesNotThrow(() => createLoopbackEdgeRuntime({
     async verifyRequest() {},
@@ -1714,13 +1757,20 @@ test('legacy loopback configuration does not allocate resolver retention capacit
 
 test('loopback rejects a restart that would replace an injected resolver coordinator', async t => {
   let lossReports = 0;
+  const injectedCoordinator = Object.fromEntries([
+    'acceptResolution',
+    'appendReceipt',
+    'cancelResolution',
+    'commitProtocolCandidate',
+    'timeoutResolution',
+    'workingSet'
+  ].map(method => [method, () => {}]));
+  injectedCoordinator.reportCoordinatorLoss = () => { lossReports += 1; };
   const runtime = createLoopbackEdgeRuntime({
     async verifyRequest() {},
     async verifyResponse() {},
     governedContextResolutions: true,
-    contextResolutionCoordinator: {
-      reportCoordinatorLoss() { lossReports += 1; }
-    }
+    contextResolutionCoordinator: injectedCoordinator
   });
   t.after(() => runtime.stop());
 
