@@ -83,12 +83,13 @@ This gap means the consumed R5-O `_005` result cannot be reconstructed or
 attributed to activation, mapping, scope, issuance, projection, or expiry from
 the available low-disclosure facts.
 
-## Next source phase
+## Follow-on dormant contract
 
-The next source phase may introduce a dormant, transport-neutral
-`governed_context_resolution.v1` contract. It should share canonical failure
-registry infrastructure and Observer validation methods with governed reads,
-while retaining a separate operation identity and smaller stage/counter model.
+The independent follow-on source change introduces a dormant,
+transport-neutral `governed_context_resolution.v1` contract. It shares neutral
+failure-registry infrastructure and the governed Observer verification model,
+while retaining a separate operation identity and a resolver-specific evidence
+model with no read counters. See `GOVERNED_CONTEXT_RESOLUTION_V1.md`.
 
 Any change that adds its terminal projection to the public ChatGPT Edge v2
 output schema remains outside this characterization and requires the applicable
