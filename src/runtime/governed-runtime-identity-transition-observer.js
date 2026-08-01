@@ -54,6 +54,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
       controller_binding: structuredClone(
         initialAuthoritativeState.controller_binding
       ),
+      lifecycle: structuredClone(initialAuthoritativeState.lifecycle),
       legacy_migration: structuredClone(
         initialAuthoritativeState.legacy_migration
       ),
@@ -181,6 +182,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
                 canonicalJson(record.request.from_runtime) !== canonicalJson(
                   lastAuthoritativeCommit.accepted_runtime
                 ) ||
+                canonicalJson(event.state_projection.lifecycle) !==
+                  canonicalJson(lastAuthoritativeCommit.lifecycle) ||
                 (lastAuthoritativeCommit.controller_binding.model ===
                   'stable_controller_authority.v1' &&
                   (record.request.authority.authority_id !==
@@ -217,6 +220,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         record.atomic_commit = {
           accepted_runtime: structuredClone(event.accepted_runtime),
           controller_binding: structuredClone(event.controller_binding),
+          lifecycle: structuredClone(event.state_projection.lifecycle),
           protocol: structuredClone(event.protocol),
           store_version: event.store_version,
           state_digest: event.state_digest
@@ -224,6 +228,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         lastAuthoritativeCommit = {
           accepted_runtime: structuredClone(event.accepted_runtime),
           controller_binding: structuredClone(event.controller_binding),
+          lifecycle: structuredClone(event.state_projection.lifecycle),
           legacy_migration: structuredClone(
             event.state_projection.legacy_migration
           ),
@@ -283,7 +288,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
         record.missing = true;
         counters.terminals_missing += 1;
         retainTerminal(event.transition_ref, record);
-        return violation('terminal_missing');
+        violation('terminal_missing');
+        return true;
       }
       if (event.event === 'transition_preview_formed') return true;
       return false;

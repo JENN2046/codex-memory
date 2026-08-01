@@ -203,6 +203,11 @@ without Observer emission, so it cannot head-block terminal events for already
 active transitions. Thenable sinks are treated as unacknowledged synchronous
 delivery, and a post-reservation initial-state read fault closes the reservation
 with a canonical durable failure.
+Observer commit anchors retain the complete lifecycle projection, so later
+versions cannot replace the safe-stop receipt. A consumed
+`transition_terminal_missing` remains a recorded protocol violation but returns
+delivery acknowledgement, preventing its durable outbox entry from wedging the
+stream.
 
 The unique failure registry includes:
 

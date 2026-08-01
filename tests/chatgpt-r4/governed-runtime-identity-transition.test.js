@@ -1907,6 +1907,65 @@ test('17n. Observer anchors the first commit to an authoritative version-zero st
   assert.equal(anchored.snapshot().last_authoritative_store_version, 1);
 });
 
+test('17o. Observer rejects lifecycle receipt replacement across commits', () => {
+  const first = prepareAndCommit();
+  const afterFirst = first.store.snapshot();
+  const branchState = structuredClone(afterFirst);
+  branchState.lifecycle.safe_stop_receipt_digest =
+    digestObject('replacement-safe-stop-receipt');
+  branchState.last_transition = null;
+  const branch = prepareAndCommit({
+    state: branchState,
+    request: {
+      suffix: 'K',
+      target: toRuntime('c'),
+      fromRuntime: branchState.accepted_runtime,
+      safeStopDigest: branchState.lifecycle.safe_stop_receipt_digest,
+      proofDigest: digestObject('replacement-stop-proof-K'),
+      legacy: null
+    }
+  });
+
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: first.state
+  });
+  replayObserverPrelude(observer, first);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: first.request.transition_ref,
+    protocol: first.committed.protocol,
+    accepted_runtime: first.committed.accepted_runtime,
+    controller_binding: first.committed.controller_binding,
+    store_version: 1,
+    previous_state_digest: digestObject(first.state),
+    state_digest: first.committed.state_digest,
+    state_projection: first.store.snapshot()
+  }), true);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_terminal_committed',
+    transition_ref: first.request.transition_ref,
+    terminal: first.committed.protocol.terminal
+  }), true);
+
+  replayObserverPrelude(observer, branch);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: branch.request.transition_ref,
+    protocol: branch.committed.protocol,
+    accepted_runtime: branch.committed.accepted_runtime,
+    controller_binding: branch.committed.controller_binding,
+    store_version: 2,
+    previous_state_digest: first.committed.state_digest,
+    state_digest: branch.committed.state_digest,
+    state_projection: branch.store.snapshot()
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 1);
+  assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
 test('18. terminal missing records a violation and fabricates no failure terminal', () => {
   const state = initialState();
   const run = harness({ state });
@@ -1920,6 +1979,7 @@ test('18. terminal missing records a violation and fabricates no failure termina
   assert.equal(snapshot.terminals_missing, 1);
   assert.equal(snapshot.terminals_fabricated, 0);
   assert.equal(snapshot.last_violation_code, 'terminal_missing');
+  assert.equal(run.recordStore.pendingObserverEvents().length, 0);
   assert.throws(
     () => run.observer.reconcile(request.transition_ref),
     { code: 'transition_terminal_missing' }
