@@ -31,7 +31,7 @@ const {
 } = require('../../src/runtime/chatgpt-r4/private-runtime-preparation');
 
 const EXPECTED_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
-  resolve_memory_context: 'sha256:cb9ac038e2d3565307c1733cc48757fe60bd5f527c7ede8ee844a21e1abf53e5',
+  resolve_memory_context: 'sha256:5e978d8e56d53de05c048bd1273a028ffccc75779916ad9858e86743b4bb8fe5',
   memory_overview: 'sha256:e4d89bb2c92a82465ecf77bc041a6a07d14eff7fcc1be34441cf39da78adf893',
   search_memory: 'sha256:fe367042ee3029f616e4f5f96df560f1d51be4fbc568aab69fb787711a479c05',
   audit_memory: 'sha256:a30070847cee6b1b17fb10fbd74f117d013f65516a933de8d1e034cf69e61414',

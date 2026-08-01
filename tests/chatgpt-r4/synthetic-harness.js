@@ -20,7 +20,8 @@ const { createGovernanceAdapter } = require('../../src/adapters/chatgpt-r4');
 const {
   addZeroMemoryAttemptContinuation,
   createAttemptHeaderForRequest,
-  createEdgeValidatedAttemptWorkingSet
+  createEdgeValidatedAttemptWorkingSet,
+  createEdgeValidatedContextResolutionWorkingSet
 } = require('./governed-read-test-helpers');
 
 const FIXED_NOW = new Date('2026-07-18T00:00:00.000Z');
@@ -99,11 +100,19 @@ async function runZeroMemorySyntheticE2E() {
     resolveContextPublicKey: resolveContextKey,
     contextReplayGuard,
     clock,
-    async issueProjectContext({ principalFingerprint, safeProjectAlias, requestedVisibility, now }) {
+    async issueProjectContext({
+      principalFingerprint,
+      safeProjectAlias,
+      requestedVisibility,
+      now,
+      onResolutionStage
+    }) {
       observations.context_resolutions += 1;
       if (safeProjectAlias === 'denied-project') return { status: 'denied' };
       if (safeProjectAlias === 'unavailable-project') return { status: 'unavailable' };
       if (safeProjectAlias !== 'project-alpha') throw new Error('synthetic_project_not_registered');
+      onResolutionStage?.('REGISTRY_RESOLVED');
+      onResolutionStage?.('SCOPE_RESOLVED');
       const projectContextRef = createOpaqueId('pctx_');
       const claim = createProjectContextClaim({
         projectContextRef,
@@ -147,11 +156,15 @@ async function runZeroMemorySyntheticE2E() {
     requestReplayGuard,
     responseSigning: signing(relayIdentity),
     clock,
+    governedContextResolutions: true,
     async forwardToUds(payload) {
       observations.relay_requests += 1;
       const invocation = await governanceAdapter.handle({
         request: payload.request,
-        relayReceipt: payload.relayReceipt
+        relayReceipt: payload.relayReceipt,
+        ...(payload.governedContextResolution
+          ? { governedContextResolution: payload.governedContextResolution }
+          : {})
       });
       return payload.governedReadAttempt
         ? addZeroMemoryAttemptContinuation(
@@ -174,7 +187,13 @@ async function runZeroMemorySyntheticE2E() {
     nonce: 'request_nonce_resolve_00001',
     signing: signing(edgeIdentity)
   });
-  const resolveResponse = await relay.handle(resolveRequest);
+  const resolveResponseResult = await relay.handle(resolveRequest, {
+    governedContextResolution:
+      createEdgeValidatedContextResolutionWorkingSet(resolveRequest, {
+        now: clock()
+      })
+  });
+  const resolveResponse = resolveResponseResult.response;
   validateResponseEnvelope(resolveResponse, {
     now: clock(),
     resolveResponsePublicKey: resolveRelayKey,

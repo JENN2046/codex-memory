@@ -26,7 +26,9 @@ const {
 } = require('./synthetic-harness');
 const {
   createAttemptHeaderForRequest,
-  createEdgeValidatedAttemptWorkingSet
+  createEdgeValidatedAttemptWorkingSet,
+  createEdgeValidatedContextResolutionWorkingSet,
+  addContextResolutionContinuation
 } = require('./governed-read-test-helpers');
 const { validateRelayReceipt } = require('../../src/adapters/chatgpt-r4/governance-adapter');
 
@@ -116,9 +118,9 @@ test('forged public authority fields fail before Relay forwarding', async () => 
 
 test('context resolution returns signed low-disclosure denials without a context ref', async () => {
   const result = await runZeroMemorySyntheticE2E();
-  for (const [projectAlias, expectedStatus, suffix] of [
-    ['denied-project', 'denied', 'denied'],
-    ['unavailable-project', 'unavailable', 'unavailable']
+  for (const [projectAlias, expectedStatus, suffix, reasonCode] of [
+    ['denied-project', 'denied', 'denied', 'context_scope_preflight_denied'],
+    ['unavailable-project', 'unavailable', 'unavailable', 'context_issuance_preflight_unavailable']
   ]) {
     const request = buildCandidateEdgeRequest({
       principalAssertion: result.internal.principalAssertion,
@@ -132,12 +134,29 @@ test('context resolution returns signed low-disclosure denials without a context
       nonce: `request_nonce_${suffix}_00000001`,
       signing: signing(result.internal.identities.edgeIdentity)
     });
-    const response = await result.internal.relay.handle(request);
-    assert.equal(response.status, expectedStatus);
-    assert.deepEqual(response.structured_content, {
-      schema_version: 2,
-      context_status: expectedStatus
+    const responseResult = await result.internal.relay.handle(request, {
+      governedContextResolution:
+        createEdgeValidatedContextResolutionWorkingSet(request, {
+          now: result.internal.clock()
+        })
     });
+    const response = responseResult.response;
+    assert.equal(response.status, expectedStatus);
+    assert.equal(response.structured_content.schema_version, 2);
+    assert.equal(response.structured_content.context_status, expectedStatus);
+    assert.equal(
+      response.structured_content.resolution.protocol,
+      'governed_context_resolution.v1'
+    );
+    assert.equal(response.structured_content.resolution.outcome, 'failure');
+    assert.equal(
+      response.structured_content.resolution.reason_code,
+      reasonCode
+    );
+    assert.equal(
+      response.structured_content.resolution.evidence_complete,
+      true
+    );
     assert.equal(Object.hasOwn(response.structured_content, 'project_context_ref'), false);
     assert.deepEqual(response.counters, ZERO_MEMORY_COUNTERS);
     assert.doesNotThrow(() => validateResponseEnvelope(response, {
@@ -254,14 +273,19 @@ test('Relay stamps the response after a slow injected UDS invocation completes',
     requestReplayGuard: new InMemoryReplayGuard({ clock }),
     responseSigning: signing(relayIdentity),
     clock,
-    async forwardToUds({ request: forwardedRequest, relayReceipt }) {
+    governedContextResolutions: true,
+    async forwardToUds({
+      request: forwardedRequest,
+      relayReceipt,
+      governedContextResolution
+    }) {
       assert.equal(Object.isFrozen(forwardedRequest), true);
       assert.equal(Object.isFrozen(forwardedRequest.tool_request), true);
       assert.throws(() => {
         forwardedRequest.request_id = 'req_mutated_request_000000001';
       }, TypeError);
       nowMs += 40_000;
-      return {
+      return addContextResolutionContinuation({
         status: 'ok',
         structured_content: {
           project_context_ref: `pctx_${'z'.repeat(32)}`,
@@ -275,11 +299,15 @@ test('Relay stamps the response after a slow injected UDS invocation completes',
         receipt_digests: {
           governance: sha256(relayReceipt.request_digest),
           context: sha256('slow-context')
-        }
-      };
+        },
+      }, governedContextResolution);
     }
   });
-  const response = await processor.handle(request);
+  const responseResult = await processor.handle(request, {
+    governedContextResolution:
+      createEdgeValidatedContextResolutionWorkingSet(request, { now: clock() })
+  });
+  const response = responseResult.response;
   assert.equal(response.issued_at, clock().toISOString());
   assert.doesNotThrow(() => validateResponseEnvelope(response, {
     now: clock(),

@@ -8,8 +8,8 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
-  CHATGPT_EDGE_DATA_SCHEMA_VERSION,
   ZERO_MEMORY_COUNTERS,
+  createChatGptEdgeDataResponseV2,
   createResponseEnvelope,
   digestObject,
   sha256
@@ -26,6 +26,9 @@ const {
   createLocalIntegrationHarness,
   runR4CLocalIntegrationProof
 } = require('./local-integration-harness');
+const {
+  createSuccessfulContextResolutionProtocol
+} = require('./governed-read-test-helpers');
 
 test('R4-C uses actual loopback HTTP and temporary UDS with zero memory counters and no body events', async () => {
   const result = await runR4CLocalIntegrationProof();
@@ -87,6 +90,11 @@ test('R4-C first stale lookup and snapshot purge untouched records past retentio
   }, { ttlSeconds: 1 });
   await harness.edgeClient.submit(lookupRecord);
   harness.advance(1_051);
+  assert.equal(
+    (await harness.edgeClient.result(lookupRecord.request_id)).status,
+    'expired'
+  );
+  harness.advance(51);
   await assert.rejects(() => harness.edgeClient.result(lookupRecord.request_id), {
     code: 'edge_request_not_found'
   });
@@ -97,19 +105,23 @@ test('R4-C first stale lookup and snapshot purge untouched records past retentio
   }, { ttlSeconds: 1 });
   await harness.edgeClient.submit(snapshotRecord);
   harness.advance(1_051);
-  assert.deepEqual(harness.edgeRuntime.snapshot(), {
-    in_memory_only: true,
-    request_count: 0,
-    states: {
-      queued: 0,
-      claimed: 0,
-      completed: 0,
-      cancelled: 0,
-      expired: 0,
-      failed: 0
-    },
-    governed_read_attempts_enabled: true
+  assert.equal(
+    (await harness.edgeClient.result(snapshotRecord.request_id)).status,
+    'expired'
+  );
+  harness.advance(51);
+  const snapshot = harness.edgeRuntime.snapshot();
+  assert.equal(snapshot.in_memory_only, true);
+  assert.equal(snapshot.request_count, 0);
+  assert.deepEqual(snapshot.states, {
+    queued: 0,
+    claimed: 0,
+    completed: 0,
+    cancelled: 0,
+    expired: 0,
+    failed: 0
   });
+  assert.equal(snapshot.governed_read_attempts_enabled, true);
 });
 
 test('R4-C event-sink failures cannot corrupt Edge or Relay state transitions', async t => {
@@ -132,10 +144,10 @@ test('R4-C event-sink failures cannot corrupt Edge or Relay state transitions', 
     project_alias: 'project-alpha',
     requested_visibility: 'project'
   });
-  assert.deepEqual(await harness.edgeClient.submit(request), {
-    request_id: request.request_id,
-    status: 'queued'
-  });
+  const submitted = await harness.edgeClient.submit(request);
+  assert.equal(submitted.request_id, request.request_id);
+  assert.equal(submitted.status, 'queued');
+  assert.match(submitted.resolution_ref, /^gcr_[A-Za-z0-9_-]{32}$/u);
   assert.equal((await harness.relayRuntime.processNext()).status, 'completed');
   assert.equal((await harness.edgeClient.result(request.request_id)).status, 'completed');
   assert.equal(edgeSinkCalls, 4);
@@ -192,14 +204,16 @@ test('R4-C submit refreshes and prunes untouched expired records before capacity
   }, { ttlSeconds: 1 });
   await harness.edgeClient.submit(expired);
   harness.advance(1_051);
+  assert.equal((await harness.edgeClient.result(expired.request_id)).status, 'expired');
+  harness.advance(51);
   const replacement = harness.buildRequest('resolve_memory_context', {
     project_alias: 'project-alpha',
     requested_visibility: 'project'
   });
-  assert.deepEqual(await harness.edgeClient.submit(replacement), {
-    request_id: replacement.request_id,
-    status: 'queued'
-  });
+  const replacementSubmission = await harness.edgeClient.submit(replacement);
+  assert.equal(replacementSubmission.request_id, replacement.request_id);
+  assert.equal(replacementSubmission.status, 'queued');
+  assert.match(replacementSubmission.resolution_ref, /^gcr_[A-Za-z0-9_-]{32}$/u);
   assert.deepEqual(harness.edgeRuntime.snapshot().states, {
     queued: 1,
     claimed: 0,
@@ -230,7 +244,7 @@ test('R4-C reconnect reclaims an unacknowledged request only after the claim lea
   });
 });
 
-test('R4-C never requeues an acknowledged in-flight request after its claim lease expires', async t => {
+test('R4-C keeps an acknowledged resolver claim alive to its operation deadline', async t => {
   const harness = await createLocalIntegrationHarness({
     claimLeaseMs: 50,
     governanceDelayMs: 150,
@@ -246,9 +260,9 @@ test('R4-C never requeues an acknowledged in-flight request after its claim leas
   await waitFor(() => harness.relayEvents.some(event => event.event === 'uds_forward_started'));
   harness.advance(51);
   const result = await processing;
-  assert.equal(result.status, 'expired');
+  assert.equal(result.status, 'completed');
   assert.equal(await harness.edgeClient.claim('second-relay'), null);
-  assert.equal((await harness.edgeClient.result(request.request_id)).status, 'expired');
+  assert.equal((await harness.edgeClient.result(request.request_id)).status, 'completed');
   assert.equal(harness.observations.uds_connections, 1);
   assert.equal(harness.observations.governance_invocations, 0);
 });
@@ -341,15 +355,24 @@ test('R4-C rejects completion before ack and a signed response with the wrong re
     requestDigest: digestObject(request),
     toolName: 'resolve_memory_context',
     status: 'ok',
-    structuredContent: {
-      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+    structuredContent: createChatGptEdgeDataResponseV2({
+      toolName: 'resolve_memory_context',
+      structuredContent: {
       project_context_ref: `pctx_${'x'.repeat(32)}`,
       safe_project_alias: 'project-alpha',
       expires_at:
         new Date(harness.clock().getTime() + 30_000).toISOString(),
       visibility_labels: ['project'],
-      context_status: 'resolved'
-    },
+        context_status: 'resolved'
+      },
+      governedContextResolution: createSuccessfulContextResolutionProtocol(
+        request,
+        {
+          now: harness.clock(),
+          resolutionRef: `gcr_${'x'.repeat(32)}`
+        }
+      )
+    }),
     counters: { ...ZERO_MEMORY_COUNTERS },
     receiptChain: {
       edge_request: digestObject(request),
