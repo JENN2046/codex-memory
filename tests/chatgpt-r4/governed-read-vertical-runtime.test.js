@@ -16,8 +16,10 @@ const {
   LIMITS,
   InMemoryReplayGuard,
   aggregateAttemptCounters,
+  appendGovernedContextResolutionStage,
   appendGovernedReadAttemptStage,
   createAttemptHeader,
+  createContextResolutionHeader,
   createGovernedReadAttemptProtocol,
   createPrincipalAssertion,
   createRequestEnvelope,
@@ -430,6 +432,25 @@ function bridgeWorkingSet(suffix) {
   return { header, receipts };
 }
 
+function resolverWorkingSet(suffix) {
+  const header = createContextResolutionHeader({
+    resolutionRef: `gcr_uds_resolution_${suffix.padEnd(24, 'x')}`,
+    requestDigest: digestObject(`uds-context-resolution-${suffix}`),
+    now: NOW,
+    ttlSeconds: 60
+  });
+  let workingSet = { header, receipts: [] };
+  workingSet = appendGovernedContextResolutionStage(workingSet, {
+    stage: 'CREATED'
+  });
+  workingSet = appendGovernedContextResolutionStage(workingSet, {
+    stage: 'EDGE_VALIDATED'
+  });
+  return appendGovernedContextResolutionStage(workingSet, {
+    stage: 'RELAY_CLAIMED'
+  });
+}
+
 function leaseTaskWorkingSet(suffix) {
   let workingSet = bridgeWorkingSet(suffix);
   workingSet = appendGovernedReadAttemptStage(workingSet, {
@@ -566,6 +587,99 @@ test('attempt deadline outranks legacy Bridge and UDS transport timeouts', async
   );
   assert.equal(httpRequests, 1);
   assert.equal(udsServer.snapshot().connections, 1);
+});
+
+test('Governance UDS accepts resolver payloads and preserves canonical failures', async t => {
+  const workingSet = resolverWorkingSet('uds-failure');
+  const udsRoot = fs.mkdtempSync(path.join(
+    os.tmpdir(),
+    'codex-memory-context-resolution-uds-'
+  ));
+  fs.chmodSync(udsRoot, 0o700);
+  const socketPath = path.join(udsRoot, 'governance.sock');
+  let invocations = 0;
+  const udsServer = createGovernanceUdsServer({
+    socketPath,
+    clock: () => NOW,
+    governanceRuntime: {
+      async handle(payload) {
+        invocations += 1;
+        assert.deepEqual(payload.governedContextResolution, workingSet);
+        if (payload.request.mode === 'success') return { accepted: true };
+        const failedWorkingSet = appendGovernedContextResolutionStage(
+          workingSet,
+          {
+            stage: 'REGISTRY_RESOLVED',
+            outcome: 'failed',
+            reasonCode: 'context_registry_unavailable',
+            facts: { registry_resolved: false }
+          }
+        );
+        const error = Object.assign(new Error('context_registry_unavailable'), {
+          code: 'context_registry_unavailable'
+        });
+        Object.defineProperty(error, 'governed_context_resolution', {
+          value: {
+            working_set: failedWorkingSet,
+            terminal_failure: {
+              reason_code: 'context_registry_unavailable',
+              failure_origin: 'governance'
+            },
+            evidence_complete: true
+          }
+        });
+        throw error;
+      }
+    }
+  });
+  await udsServer.start();
+  t.after(async () => {
+    await udsServer.stop();
+    fs.rmSync(udsRoot, { recursive: true, force: true });
+  });
+  const forward = createUdsForwarder({ socketPath, clock: () => NOW });
+  const basePayload = {
+    governedContextResolution: workingSet,
+    relayReceipt: { safe: true }
+  };
+  assert.deepEqual(await forward({
+    ...basePayload,
+    request: { mode: 'success' }
+  }), { accepted: true });
+  let failure;
+  await assert.rejects(
+    forward({
+      ...basePayload,
+      request: { mode: 'failure' }
+    }),
+    error => {
+      failure = error;
+      return error.code === 'context_registry_unavailable';
+    }
+  );
+  assert.equal(
+    failure.governed_context_resolution.terminal_failure.reason_code,
+    'context_registry_unavailable'
+  );
+  assert.equal(
+    failure.governed_context_resolution.working_set.receipts.at(-1).stage,
+    'REGISTRY_RESOLVED'
+  );
+  assert.equal(invocations, 2);
+  assert.equal(udsServer.snapshot().accepted_frames, 2);
+
+  const expiredForward = createUdsForwarder({
+    socketPath,
+    clock: () => new Date(workingSet.header.deadline_at)
+  });
+  await assert.rejects(
+    expiredForward({
+      ...basePayload,
+      request: { mode: 'success' }
+    }),
+    { code: 'relay_request_expired_before_response' }
+  );
+  assert.equal(invocations, 2);
 });
 
 test('Bridge HTTP attempt deadline is absolute despite response activity', async t => {

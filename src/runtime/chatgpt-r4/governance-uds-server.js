@@ -5,16 +5,25 @@ const net = require('node:net');
 const path = require('node:path');
 
 const {
+  GOVERNED_CONTEXT_RESOLUTION_LIMITS,
   GOVERNED_READ_ATTEMPT_LIMITS,
   LIMITS,
+  contextResolutionDeadlineBudgetMs,
   governedReadAttemptDeadlineBudgetMs,
+  validateGovernedContextResolutionWorkingSet,
   reject
 } = require('../../../packages/chatgpt-r4-contracts');
 
 const MAX_REQUEST_BYTES = LIMITS.maxRequestBytes +
-  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes + 8192;
+  Math.max(
+    GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes,
+    GOVERNED_CONTEXT_RESOLUTION_LIMITS.protocolBytes
+  ) + 8192;
 const MAX_RESPONSE_BYTES = LIMITS.maxResponseBytes +
-  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes;
+  Math.max(
+    GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes,
+    GOVERNED_CONTEXT_RESOLUTION_LIMITS.protocolBytes
+  );
 const MAX_CONCURRENT_CONNECTIONS = 32;
 const SOCKET_IDLE_TIMEOUT_MS = 30_000;
 const GOVERNANCE_UDS_ATTEMPT_DEADLINE_MARGIN_MS = 2_000;
@@ -138,21 +147,29 @@ function createGovernanceUdsServer({
         ? Object.keys(payload).sort().join(',')
         : '';
       if (payloadKeys !== 'relayReceipt,request' &&
+          payloadKeys !== 'governedReadAttempt,relayReceipt,request' &&
           payloadKeys !==
-            'governedReadAttempt,relayReceipt,request') {
+            'governedContextResolution,relayReceipt,request') {
         return rejectFrame();
       }
-      if (payload.governedReadAttempt) {
+      if (payload.governedReadAttempt || payload.governedContextResolution) {
         let governedTimeoutMs;
         try {
-          governedTimeoutMs =
-            governedReadAttemptDeadlineBudgetMs(
-              payload.governedReadAttempt.header,
-              {
-                now: clock(),
-                marginMs: attemptDeadlineMarginMs
-              }
-            );
+          governedTimeoutMs = payload.governedReadAttempt
+            ? governedReadAttemptDeadlineBudgetMs(
+                payload.governedReadAttempt.header,
+                {
+                  now: clock(),
+                  marginMs: attemptDeadlineMarginMs
+                }
+              )
+            : contextResolutionDeadlineBudgetMs(
+                payload.governedContextResolution.header,
+                {
+                  now: clock(),
+                  marginMs: attemptDeadlineMarginMs
+                }
+              );
         } catch {
           return rejectFrame();
         }
@@ -182,8 +199,17 @@ function createGovernanceUdsServer({
         socket.setTimeout(0);
         observations.accepted_frames += 1;
         socket.end(encoded);
-      } catch {
-        rejectFrame();
+      } catch (error) {
+        const failureFrame = contextResolutionFailureFrame(error);
+        if (!failureFrame) return rejectFrame();
+        const encoded = Buffer.from(`${JSON.stringify(failureFrame)}\n`, 'utf8');
+        if (encoded.length > MAX_RESPONSE_BYTES) return rejectFrame();
+        settled = true;
+        processingAbortController = null;
+        clearAttemptDeadlineTimer();
+        socket.setTimeout(0);
+        observations.accepted_frames += 1;
+        socket.end(encoded);
       }
     });
     socket.on('error', () => {});
@@ -237,6 +263,39 @@ function createGovernanceUdsServer({
         durable_request_state_written: false
       });
     }
+  });
+}
+
+function contextResolutionFailureFrame(error) {
+  const continuation = error?.governed_context_resolution;
+  if (!continuation || typeof continuation !== 'object' ||
+      Array.isArray(continuation) ||
+      Object.keys(continuation).sort().join(',') !==
+        'evidence_complete,terminal_failure,working_set' ||
+      typeof continuation.evidence_complete !== 'boolean' ||
+      !continuation.terminal_failure ||
+      typeof continuation.terminal_failure !== 'object' ||
+      Array.isArray(continuation.terminal_failure) ||
+      Object.keys(continuation.terminal_failure).sort().join(',') !==
+        'failure_origin,reason_code' ||
+      typeof continuation.terminal_failure.reason_code !== 'string' ||
+      typeof continuation.terminal_failure.failure_origin !== 'string') {
+    return null;
+  }
+  try {
+    validateGovernedContextResolutionWorkingSet(continuation.working_set);
+  } catch {
+    return null;
+  }
+  const code = typeof error?.code === 'string' &&
+    /^[a-z][a-z0-9_]{0,79}$/u.test(error.code)
+    ? error.code
+    : 'context_issuance_failed';
+  return Object.freeze({
+    governance_error: Object.freeze({
+      code,
+      governed_context_resolution: continuation
+    })
   });
 }
 
