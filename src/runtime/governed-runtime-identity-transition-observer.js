@@ -78,6 +78,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
     unknown_evidence_receipts: 0
   };
   let lastViolationCode = null;
+  const acknowledgedEventDigests = new Set();
 
   function violation(code) {
     counters.protocol_violations += 1;
@@ -96,7 +97,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
     }
   }
 
-  function observe(event) {
+  function observeOnce(event) {
     if (!event || typeof event !== 'object' || Array.isArray(event) ||
         event.component !==
           'governed_runtime_identity_transition_coordinator') {
@@ -296,6 +297,19 @@ function createGovernedRuntimeIdentityTransitionObserver({
     } catch (error) {
       return violation(error?.code);
     }
+  }
+
+  function observe(event) {
+    let eventDigest;
+    try {
+      eventDigest = digestObject(event);
+    } catch {
+      return false;
+    }
+    if (acknowledgedEventDigests.has(eventDigest)) return true;
+    const accepted = observeOnce(event);
+    if (accepted === true) acknowledgedEventDigests.add(eventDigest);
+    return accepted;
   }
 
   function reconcile(transitionRef) {

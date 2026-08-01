@@ -372,6 +372,25 @@ function createTransitionRecordStore(initialRecords = [], {
     }
   }
 
+  function validateDeliveredEvents(value, transitionRef) {
+    if (!Array.isArray(value)) reject('transition_record_store_invalid');
+    const digests = new Set();
+    for (const entry of value) {
+      if (!exactKeys(entry, ['event_digest', 'envelope']) ||
+          !isPlainObject(entry.envelope) ||
+          entry.envelope.component !==
+            'governed_runtime_identity_transition_coordinator' ||
+          !EVENT_NAME_PATTERN.test(entry.envelope.event || '') ||
+          entry.envelope.transition_ref !== transitionRef ||
+          digestObject(entry.envelope) !== entry.event_digest ||
+          digests.has(entry.event_digest)) {
+        reject('transition_record_store_invalid');
+      }
+      assertDigest(entry.event_digest, 'transition_record_store_invalid');
+      digests.add(entry.event_digest);
+    }
+  }
+
   function validateRecord(record) {
     if (!exactKeys(record, [
       'transition_ref',
@@ -379,7 +398,7 @@ function createTransitionRecordStore(initialRecords = [], {
       'status',
       'protocol',
       'observer_outbox',
-      'observer_delivered_digests',
+      'observer_delivered_events',
       'previous_state_digest'
     ]) ||
         !TRANSITION_REF_PATTERN.test(record.transition_ref || '') ||
@@ -387,19 +406,17 @@ function createTransitionRecordStore(initialRecords = [], {
       reject('transition_record_store_invalid');
     }
     validateObserverOutbox(record.observer_outbox);
+    validateDeliveredEvents(
+      record.observer_delivered_events,
+      record.transition_ref
+    );
     if (record.observer_outbox.some(
       entry => entry.envelope.transition_ref !== record.transition_ref
     )) {
       reject('transition_record_store_invalid');
     }
     assertDigest(record.request_digest, 'transition_record_store_invalid');
-    if (!Array.isArray(record.observer_delivered_digests) ||
-        record.observer_delivered_digests.some(
-          digest => !DIGEST_PATTERN.test(digest)
-        ) ||
-        new Set(record.observer_delivered_digests).size !==
-          record.observer_delivered_digests.length ||
-        (record.previous_state_digest !== null &&
+    if ((record.previous_state_digest !== null &&
           !DIGEST_PATTERN.test(record.previous_state_digest))) {
       reject('transition_record_store_invalid');
     }
@@ -436,7 +453,7 @@ function createTransitionRecordStore(initialRecords = [], {
         observer_outbox: preAnchorOutboxRecord
           ? structuredClone(record.observer_outbox)
           : [],
-        observer_delivered_digests: [],
+        observer_delivered_events: [],
         previous_state_digest: null
       }
       : structuredClone(record);
@@ -469,7 +486,7 @@ function createTransitionRecordStore(initialRecords = [], {
       status: 'reserved',
       protocol: null,
       observer_outbox: [],
-      observer_delivered_digests: [],
+      observer_delivered_events: [],
       previous_state_digest: null
     });
     return true;
@@ -507,8 +524,8 @@ function createTransitionRecordStore(initialRecords = [], {
       status: 'terminal',
       protocol: structuredClone(protocol),
       observer_outbox: structuredClone(current.observer_outbox),
-      observer_delivered_digests: structuredClone(
-        current.observer_delivered_digests
+      observer_delivered_events: structuredClone(
+        current.observer_delivered_events
       ),
       previous_state_digest: current.previous_state_digest
     };
@@ -570,7 +587,10 @@ function createTransitionRecordStore(initialRecords = [], {
       reject('transition_record_store_context_mismatch');
     }
     current.observer_outbox.shift();
-    current.observer_delivered_digests.push(digest);
+    current.observer_delivered_events.push({
+      event_digest: digest,
+      envelope: structuredClone(first.envelope)
+    });
     if (first.envelope.event === 'transition_terminal_missing' &&
         current.status === 'reserved' &&
         current.observer_outbox.length === 0) {
@@ -926,12 +946,16 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
           terminal: recoveryProtocol.terminal
         })
       ];
-      const knownDigests = new Set([
-        ...recoveryRecord.observer_delivered_digests,
-        ...recoveryRecord.observer_outbox.map(entry => entry.event_digest)
-      ]);
+      const knownEvents = [
+        ...recoveryRecord.observer_delivered_events.map(
+          entry => entry.envelope
+        ),
+        ...recoveryRecord.observer_outbox.map(entry => entry.envelope)
+      ];
       recoveryEvents = expectedEvents.filter(
-        envelope => !knownDigests.has(digestObject(envelope))
+        envelope => !knownEvents.some(
+          known => canonicalJson(known) === canonicalJson(envelope)
+        )
       );
       if (recoveryEvents.some(
         envelope => envelope.event === 'transition_atomic_commit'

@@ -217,7 +217,10 @@ terminal event from the authoritative state before releasing the local record.
 Observer transport exceptions and explicit `false` acknowledgements retain an
 ordered outbox inside the transition record store. Its snapshot carries pending
 envelopes and sequence numbers across coordinator reconstruction; delivery ack
-removes only the exact head event. Archived protocol lookup validates and
+removes only the exact head event. The acknowledged-event ledger retains each
+complete canonical envelope with its verified digest; bare or mismatched digest
+claims are rejected, and recovery compares full envelopes before suppressing
+redelivery. Archived protocol lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
 An unacknowledged new admission is discarded from the outbox and terminalized
 without Observer emission, so it cannot head-block terminal events for already
@@ -233,11 +236,15 @@ versions cannot replace the safe-stop receipt. A consumed
 delivery acknowledgement, preventing its durable outbox entry from wedging the
 stream.
 Before CAS, the reserved record persists the exact previous-state digest and
-retains delivered event digests. Reconstruction can therefore regenerate only
+retains validated delivered event envelopes. Reconstruction can therefore regenerate only
 missing post-CAS receipts, atomic commit, and terminal envelopes from the
 authoritative state even without a local preview record. Protocol lookup during
 event dispatch skips outbox flushing, so a synchronous Observer callback cannot
 recursively redeliver the queue head.
+The Observer acknowledges an exact canonical event replay idempotently without
+incrementing counters or replaying state changes. A changed envelope for the
+same transition remains a protocol violation. This closes the crash window
+where the sink accepted an event but durable outbox acknowledgement failed.
 
 The unique failure registry includes:
 

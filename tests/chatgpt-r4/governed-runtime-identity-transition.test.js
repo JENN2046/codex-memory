@@ -1412,6 +1412,83 @@ test('13d3. asynchronous Observer sinks are never acknowledged synchronously', a
   assert.equal(observer.snapshot().active_transitions, 0);
 });
 
+test('13d3a. Observer redelivery is idempotent after durable ack failure', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  let failAckOnce = true;
+  const unreliableRecords = {
+    ...recordStore,
+    ackObserverEvent(input) {
+      if (failAckOnce) {
+        failAckOnce = false;
+        throw new Error('synthetic-durable-ack-failure');
+      }
+      return recordStore.ackObserverEvent(input);
+    }
+  };
+  const first = harness({
+    state,
+    recordStore: unreliableRecords,
+    observer
+  });
+  const request = requestFor(state);
+  assert.throws(
+    () => first.coordinator.preview(request),
+    /synthetic-durable-ack-failure/u
+  );
+  assert.equal(observer.snapshot().transitions_accepted, 1);
+  assert.equal(recordStore.pendingObserverEvents().length, 1);
+
+  const rebuilt = harness({ state, recordStore, observer });
+  assert.equal(recordStore.pendingObserverEvents().length, 0);
+  assert.equal(observer.snapshot().transitions_accepted, 1);
+  assert.equal(observer.snapshot().protocol_violations, 0);
+  assert.deepEqual(rebuilt.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 1,
+    terminals_fabricated: 0
+  });
+  assert.equal(recordStore.get(request.transition_ref).status, 'lost');
+});
+
+test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
+  const state = initialState();
+  const request = requestFor(state);
+  const envelope = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    transition_ref: request.transition_ref,
+    request
+  };
+  const base = {
+    transition_ref: request.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(request),
+    status: 'reserved',
+    protocol: null,
+    observer_outbox: [],
+    previous_state_digest: null
+  };
+  assert.throws(
+    () => createTransitionRecordStore([{
+      ...base,
+      observer_delivered_digests: [digestObject(envelope)]
+    }]),
+    { code: 'transition_record_store_invalid' }
+  );
+  assert.throws(
+    () => createTransitionRecordStore([{
+      ...base,
+      observer_delivered_events: [{
+        event_digest: digestObject(envelope),
+        envelope: { ...envelope, event: 'transition_preview_formed' }
+      }]
+    }]),
+    { code: 'transition_record_store_invalid' }
+  );
+});
+
 test('13d4. initial state read fault terminalizes the durable reservation', () => {
   const state = initialState();
   const innerStore = createGovernedRuntimeIdentityStateStore(state);
@@ -1739,7 +1816,7 @@ test('17e. Observer rotates terminal history without exhausting active capacity'
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
     request: earliestRequest
-  }), false);
+  }), true);
   assert.equal(observer.snapshot().transitions_accepted, 5);
   assert.equal(
     observer.reconcile(latestRequest.transition_ref).terminal.reason_code,
