@@ -233,6 +233,10 @@ function validateGovernedRuntimeIdentityState(value) {
         value.accepted_runtime.manifest_digest) {
     reject('transition_store_binding_runtime_mismatch');
   }
+  if (value.controller_binding.model === STABLE_CONTROLLER_BINDING_MODEL &&
+      value.last_transition === null) {
+    reject('transition_store_last_transition_invalid');
+  }
   if (value.controller_binding.model === LEGACY_CONTROLLER_BINDING_MODEL &&
       value.legacy_migration.consumed) {
     reject('transition_store_migration_invalid');
@@ -379,7 +383,7 @@ function createTransitionRecordStore(initialRecords = [], {
       'previous_state_digest'
     ]) ||
         !TRANSITION_REF_PATTERN.test(record.transition_ref || '') ||
-        !['reserved', 'terminal'].includes(record.status)) {
+        !['reserved', 'lost', 'terminal'].includes(record.status)) {
       reject('transition_record_store_invalid');
     }
     validateObserverOutbox(record.observer_outbox);
@@ -399,8 +403,11 @@ function createTransitionRecordStore(initialRecords = [], {
           !DIGEST_PATTERN.test(record.previous_state_digest))) {
       reject('transition_record_store_invalid');
     }
-    if (record.status === 'reserved') {
+    if (record.status === 'reserved' || record.status === 'lost') {
       if (record.protocol !== null) reject('transition_record_store_invalid');
+      if (record.status === 'lost' && record.observer_outbox.length !== 0) {
+        reject('transition_record_store_invalid');
+      }
     } else {
       validateGovernedRuntimeIdentityTransitionProtocol(record.protocol);
       if (record.protocol.request.transition_ref !== record.transition_ref ||
@@ -485,6 +492,9 @@ function createTransitionRecordStore(initialRecords = [], {
     if (!Array.isArray(observerEvents)) {
       reject('transition_record_store_context_mismatch');
     }
+    if (current.status === 'lost') {
+      reject('transition_record_store_context_mismatch');
+    }
     for (const envelope of observerEvents) {
       enqueueObserverEvent({ transition_ref: ref, envelope });
     }
@@ -561,6 +571,13 @@ function createTransitionRecordStore(initialRecords = [], {
     }
     current.observer_outbox.shift();
     current.observer_delivered_digests.push(digest);
+    if (first.envelope.event === 'transition_terminal_missing' &&
+        current.status === 'reserved' &&
+        current.observer_outbox.length === 0) {
+      current.status = 'lost';
+      activeRecords.delete(ref);
+      terminalArchive.set(ref, current);
+    }
     return true;
   }
 

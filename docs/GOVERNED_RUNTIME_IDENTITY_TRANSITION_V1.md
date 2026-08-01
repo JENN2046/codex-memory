@@ -27,7 +27,9 @@ reserves each `transition_ref` with its request digest and retains the terminal
 protocol. Active reservations use a bounded admission set; finalization moves
 the complete protocol into a separate durable archive whose replay marker is
 still consulted on every reservation. Archived terminals do not count against
-the active-reservation limit. A live adapter must persist both tiers and back
+the active-reservation limit. Observer-acknowledged coordinator loss likewise
+moves a reservation to a protocol-free `lost` replay marker, freeing admission
+capacity without fabricating a terminal. A live adapter must persist both tiers and back
 the terminal archive with scalable storage or an equivalent compacted replay
 index. Expired requests are rejected before reservation and cannot consume
 either tier.
@@ -101,14 +103,19 @@ State validation requires that retained protocol to be a success and
 independently re-derives its accepted runtime and stable authority binding;
 neither a failure protocol nor a self-consistent protocol from another branch
 can serve as `last_transition`. Stable binding authority IDs use the same
-canonical `grauth_...` format as requests.
+canonical `grauth_...` format as requests. A stable controller binding without
+that matching `last_transition` is invalid; only the initial legacy-coupled
+state may omit it.
 The transition-record store is a secondary durable replay index: coordinator
 construction and every new preview/commit boundary verify or reconstruct that
 index from the atomically committed protocol. No later transition is admitted
 while the preceding CAS terminal is missing from the secondary index, closing
 the crash window between state CAS and index finalization.
 Coordinator-loss reporting enumerates durable reservations, reports each
-missing terminal, and never fabricates a default failure terminal.
+missing terminal, and never fabricates a default failure terminal. Once its
+missing event is synchronously acknowledged, the reservation is atomically
+archived as `lost`, so reconstruction cannot emit it again or wedge the global
+Observer outbox.
 
 Immediately before CAS, the coordinator revalidates store version, exact
 `from_runtime`, stopped/held state, safe-stop receipt, and candidate manifest.

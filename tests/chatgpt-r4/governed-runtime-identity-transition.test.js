@@ -340,6 +340,16 @@ test('persisted stable authority IDs use the canonical request format', () => {
   );
 });
 
+test('a stable controller binding requires its canonical last transition', () => {
+  const result = prepareAndCommit();
+  const state = structuredClone(result.store.snapshot());
+  state.last_transition = null;
+  assert.throws(
+    () => validateGovernedRuntimeIdentityState(state),
+    { code: 'transition_store_last_transition_invalid' }
+  );
+});
+
 test('persisted legacy migration consumption requires an evidence digest exactly once', () => {
   for (const legacyMigration of [
     { consumed: true, evidence_digest: null },
@@ -1956,8 +1966,22 @@ test('17m. Observer rejects stable authority rotation on a later commit', () => 
   const afterFirst = first.store.snapshot();
   const otherAuthorityId = `grauth_${'Z'.repeat(24)}`;
   const otherAuthorityLineage = digestObject('observer-other-authority-lineage');
-  const branchState = structuredClone(afterFirst);
-  branchState.last_transition = null;
+  const rotatedBaseline = prepareAndCommit({
+    authority({ authority, authority_context_digest: context }) {
+      return {
+        verified: true,
+        authority_id: authority.authority_id,
+        authority_lineage_digest: authority.authority_lineage_digest,
+        authority_context_digest: context,
+        authority_proof_digest: authority.authority_proof_digest
+      };
+    },
+    request: {
+      authorityId: otherAuthorityId,
+      authorityLineage: otherAuthorityLineage
+    }
+  });
+  const branchState = rotatedBaseline.store.snapshot();
   const requestOptions = {
     suffix: 'J',
     target: toRuntime('c'),
@@ -1967,11 +1991,6 @@ test('17m. Observer rejects stable authority rotation on a later commit', () => 
     proofDigest: digestObject('observer-other-authority-proof-J'),
     legacy: null
   };
-  const bindingRequest = requestFor(branchState, requestOptions);
-  branchState.controller_binding = stableControllerBinding(
-    bindingRequest,
-    branchState.accepted_runtime
-  );
   const branch = harness({
     state: branchState,
     authority({ authority, authority_context_digest: context }) {
@@ -2054,11 +2073,17 @@ test('17n. Observer anchors the first commit to an authoritative version-zero st
 
 test('17o. Observer rejects lifecycle receipt replacement across commits', () => {
   const first = prepareAndCommit();
-  const afterFirst = first.store.snapshot();
-  const branchState = structuredClone(afterFirst);
-  branchState.lifecycle.safe_stop_receipt_digest =
-    digestObject('replacement-safe-stop-receipt');
-  branchState.last_transition = null;
+  const replacementReceipt = digestObject('replacement-safe-stop-receipt');
+  const replacementInitial = initialState({
+    lifecycle: {
+      lifecycle_state: 'stopped',
+      held_stopped: true,
+      safe_stop_receipt_digest: replacementReceipt,
+      running_component_count: 0
+    }
+  });
+  const replacementBaseline = prepareAndCommit({ state: replacementInitial });
+  const branchState = replacementBaseline.store.snapshot();
   const branch = prepareAndCommit({
     state: branchState,
     request: {
@@ -2139,7 +2164,7 @@ test('18a. coordinator loss reports durable reservations after recreation', () =
     request_digest: runtimeIdentityTransitionRequestDigest(request),
     status: 'reserved',
     protocol: null
-  }]);
+  }], { maxActiveReservations: 1 });
   const events = [];
   const run = harness({
     state,
@@ -2158,7 +2183,42 @@ test('18a. coordinator loss reports durable reservations after recreation', () =
   assert.equal(events.length, 1);
   assert.equal(events[0].event, 'transition_terminal_missing');
   assert.equal(events[0].transition_ref, request.transition_ref);
-  assert.equal(recordStore.get(request.transition_ref).status, 'reserved');
+  assert.equal(recordStore.get(request.transition_ref).status, 'lost');
+  assert.deepEqual(run.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 0,
+    terminals_fabricated: 0
+  });
+  assert.equal(events.length, 1);
+
+  const rebuiltRecords = createTransitionRecordStore(recordStore.snapshot());
+  const rebuiltEvents = [];
+  const rebuilt = harness({
+    state,
+    recordStore: rebuiltRecords,
+    observer: {
+      observe(event) {
+        rebuiltEvents.push(event);
+        return true;
+      }
+    }
+  });
+  assert.deepEqual(rebuilt.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 0,
+    terminals_fabricated: 0
+  });
+  assert.deepEqual(rebuiltEvents, []);
+  assert.equal(
+    rebuiltRecords.get(request.transition_ref).status,
+    'lost'
+  );
+  const nextRequest = requestFor(state, {
+    suffix: 'B',
+    proofDigest: digestObject('post-loss-capacity-proof')
+  });
+  assert.equal(recordStore.reserve({
+    transition_ref: nextRequest.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(nextRequest)
+  }), true);
 });
 
 test('19. unknown authority evidence remains unknown in receipt and terminal', () => {
