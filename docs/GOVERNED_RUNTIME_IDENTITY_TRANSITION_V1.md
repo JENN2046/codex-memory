@@ -120,6 +120,9 @@ detect the pending envelope and do not enqueue duplicates.
 
 Immediately before CAS, the coordinator revalidates store version, exact
 `from_runtime`, stopped/held state, safe-stop receipt, and candidate manifest.
+It checks request expiry again after candidate revalidation and state
+construction, directly before establishing commit context and invoking CAS, so
+a slow verifier cannot carry expired authority into the atomic write.
 When the current controller binding already uses the stable authority model,
 the request authority ID and lineage must match it both during preview and
 immediately before CAS. Authority rotation requires a separate protocol.
@@ -204,6 +207,10 @@ when the durable archive reconstructs every intervening state from exact
 previous-state digests, consecutive store versions, canonical protocols, and
 matching `from_runtime` identities. An unrelated, ambiguous, incomplete, or
 malformed later state is still a fatal partial transition.
+The same chain reconstruction applies when an original coordinator retries
+after post-CAS readback failure: a later legal transition does not hide or
+invalidate the earlier durable success, and the retry returns the earlier
+transition's own runtime, binding, and state digest.
 If crash recovery finalizes a success that had not yet reached observers, the
 coordinator replays the missing post-preview receipts, atomic commit, and
 terminal event from the authoritative state before releasing the local record.

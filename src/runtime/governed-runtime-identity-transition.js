@@ -1472,7 +1472,9 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     records.set(request.transition_ref, {
       status: 'prepared',
       preview: formed,
-      protocol: null
+      protocol: null,
+      previous_state: null,
+      previous_state_digest: null
     });
     emit('transition_preview_formed', {
       transition_ref: request.transition_ref,
@@ -1520,20 +1522,40 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     if (recoveredRecord?.status === 'terminal') {
       const recoveredState = store.snapshot();
       validateGovernedRuntimeIdentityState(recoveredState);
+      let committedState = null;
+      if (canonicalJson(recoveredState.last_transition?.protocol) ===
+          canonicalJson(recoveredRecord.protocol)) {
+        committedState = recoveredState;
+      } else if (record.previous_state !== null &&
+          digestObject(record.previous_state) ===
+            recoveredRecord.previous_state_digest) {
+        try {
+          const candidateCommittedState = successfulTransitionState(
+            record.previous_state,
+            recoveredRecord.protocol
+          );
+          if (durableSuccessorChainMatches(
+            candidateCommittedState,
+            recoveredState,
+            transitionRecordStore.snapshot()
+          )) {
+            committedState = candidateCommittedState;
+          }
+        } catch {}
+      }
       if (recoveredRecord.protocol.terminal.outcome !== 'success' ||
           canonicalJson(recoveredRecord.protocol.request) !==
             canonicalJson(previewValue.request) ||
-          canonicalJson(recoveredState.last_transition?.protocol) !==
-            canonicalJson(recoveredRecord.protocol)) {
+          committedState === null) {
         reject('transition_preview_context_invalid');
       }
       records.delete(previewValue.request.transition_ref);
       return deepFreeze({
         status: 'terminal_success',
         protocol: recoveredRecord.protocol,
-        accepted_runtime: recoveredState.accepted_runtime,
-        controller_binding: recoveredState.controller_binding,
-        state_digest: digestObject(recoveredState)
+        accepted_runtime: committedState.accepted_runtime,
+        controller_binding: committedState.controller_binding,
+        state_digest: digestObject(committedState)
       });
     }
     if (Date.parse(previewValue.request.request.expires_at) <= nowMs()) {
@@ -1625,6 +1647,15 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       terminal
     });
     const nextState = successfulTransitionState(before, protocol);
+    if (Date.parse(previewValue.request.request.expires_at) <= nowMs()) {
+      return terminalFailure(
+        previewValue.request,
+        previewValue.receipts,
+        'transition_expired',
+        { runtimeStopped: true }
+      );
+    }
+    record.previous_state = structuredClone(before);
     record.previous_state_digest = digestObject(before);
     transitionRecordStore.setCommitContext({
       transition_ref: previewValue.request.transition_ref,

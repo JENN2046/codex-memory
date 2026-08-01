@@ -1095,6 +1095,59 @@ test('13b1. retry recovers committed success after repeated readback faults', ()
   assert.equal(run.observer.snapshot().terminal_successes, 1);
 });
 
+test('13b1a. retry recovers its success after a later legal commit', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore();
+  let current = structuredClone(state);
+  let postCommitReadFailures = 0;
+  const store = {
+    snapshot() {
+      if (postCommitReadFailures > 0) {
+        postCommitReadFailures -= 1;
+        throw new Error('synthetic-repeated-post-commit-readback-fault');
+      }
+      return structuredClone(current);
+    },
+    compareAndSwap(expectedVersion, candidate) {
+      if (expectedVersion !== current.store_version) return false;
+      current = structuredClone(candidate);
+      if (expectedVersion === 0) postCommitReadFailures = 2;
+      return true;
+    }
+  };
+  const first = harness({ state, store, recordStore });
+  const request = requestFor(state);
+  const prepared = first.coordinator.preview(request);
+  assert.throws(
+    () => first.coordinator.commit(prepared.preview),
+    { code: 'transition_post_commit_state_recovery_failed' }
+  );
+
+  const successorState = structuredClone(current);
+  const successor = harness({
+    state: successorState,
+    store,
+    recordStore,
+    observer: first.observer
+  });
+  const successorRequest = requestFor(successorState, {
+    suffix: 'U',
+    target: toRuntime('c'),
+    proofDigest: digestObject('post-recovery-successor-proof'),
+    legacy: null
+  });
+  const successorPreview = successor.coordinator.preview(successorRequest);
+  assert.equal(
+    successor.coordinator.commit(successorPreview.preview).status,
+    'terminal_success'
+  );
+  const recovered = first.coordinator.commit(prepared.preview);
+  assert.equal(recovered.status, 'terminal_success');
+  assert.equal(recovered.accepted_runtime.source_head, toRuntime('b').source_head);
+  assert.equal(current.store_version, 2);
+  assert.equal(current.accepted_runtime.source_head, toRuntime('c').source_head);
+});
+
 test('13b2. reconstruction replays post-CAS events from a reserved record', () => {
   const state = initialState();
   const durableRecords = createTransitionRecordStore();
@@ -2395,6 +2448,30 @@ test('expired transition is canonical terminal failure without store mutation', 
   assert.equal(outcome.protocol.terminal.reason_code, 'transition_expired');
   assert.deepEqual(run.store.snapshot(), state);
   assert.deepEqual(run.recordStore.snapshot(), []);
+});
+
+test('candidate revalidation cannot carry an expired request into CAS', () => {
+  const state = initialState();
+  let currentTime = NOW;
+  let manifestCalls = 0;
+  const run = harness({
+    state,
+    clock: () => currentTime,
+    manifest(input) {
+      manifestCalls += 1;
+      if (manifestCalls === 2) {
+        currentTime = new Date(NOW.getTime() + 121_000);
+      }
+      return manifestVerifier(input);
+    }
+  });
+  const prepared = run.coordinator.preview(requestFor(state));
+  assert.equal(prepared.status, 'prepared');
+  const outcome = run.coordinator.commit(prepared.preview);
+  assert.equal(outcome.status, 'terminal_failure');
+  assert.equal(outcome.protocol.terminal.reason_code, 'transition_expired');
+  assert.equal(run.store.snapshot().store_version, 0);
+  assert.equal(manifestCalls, 2);
 });
 
 test('expired previews cannot exhaust transition record admission capacity', () => {
