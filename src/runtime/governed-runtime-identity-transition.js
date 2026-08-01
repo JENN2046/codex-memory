@@ -516,7 +516,8 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   if (!transitionRecordStore ||
       typeof transitionRecordStore.reserve !== 'function' ||
       typeof transitionRecordStore.finalize !== 'function' ||
-      typeof transitionRecordStore.get !== 'function') {
+      typeof transitionRecordStore.get !== 'function' ||
+      typeof transitionRecordStore.snapshot !== 'function') {
     reject('transition_coordinator_record_store_invalid');
   }
   if (typeof authorityVerifier !== 'function') {
@@ -1181,15 +1182,18 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   function reportCoordinatorLoss() {
-    let missing = 0;
-    for (const [transitionRef, record] of records) {
-      if (record.status !== 'prepared') continue;
+    const missingRefs = new Set();
+    for (const record of transitionRecordStore.snapshot()) {
+      if (record.status === 'reserved') {
+        missingRefs.add(record.transition_ref);
+      }
+    }
+    for (const transitionRef of missingRefs) {
       emit('transition_terminal_missing', { transition_ref: transitionRef });
-      missing += 1;
     }
     records.clear();
     return Object.freeze({
-      active_transitions_lost: missing,
+      active_transitions_lost: missingRefs.size,
       terminals_fabricated: 0
     });
   }

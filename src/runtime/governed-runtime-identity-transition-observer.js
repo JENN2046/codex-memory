@@ -18,6 +18,7 @@ const {
 } = require('./governed-runtime-identity-transition');
 
 const SAFE_CODE = /^[a-z][a-z0-9_]{0,79}$/u;
+const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 
 function createGovernedRuntimeIdentityTransitionObserver({
   maxRetainedTransitions = 256
@@ -124,7 +125,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
               event.accepted_runtime.identity_digest ||
             !Number.isSafeInteger(event.store_version) ||
             event.store_version < 1 ||
-            typeof event.state_digest !== 'string') {
+            !DIGEST_PATTERN.test(event.state_digest || '')) {
           return violation('transition_observer_atomic_commit_invalid');
         }
         record.atomic_commit = {

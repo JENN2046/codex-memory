@@ -90,6 +90,8 @@ The CAS state retains the complete canonical protocol as well as its digests.
 The transition-record store is a secondary durable replay index: coordinator
 construction verifies or reconstructs that index from the atomically committed
 protocol, closing the crash window between state CAS and index finalization.
+Coordinator-loss reporting enumerates durable reservations, reports each
+missing terminal, and never fabricates a default failure terminal.
 
 Immediately before CAS, the coordinator revalidates store version, exact
 `from_runtime`, stopped/held state, safe-stop receipt, and candidate manifest.

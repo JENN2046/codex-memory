@@ -786,6 +786,36 @@ test('17b. Observer binds the final terminal to the verified atomic commit', () 
   assert.equal(observer.snapshot().protocol_violations, 1);
 });
 
+test('17c. Observer rejects a non-canonical atomic state digest', () => {
+  const result = prepareAndCommit();
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    request: result.request
+  });
+  for (const receipt of result.committed.protocol.receipts) {
+    observer.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_receipt_appended',
+      transition_ref: result.request.transition_ref,
+      receipt
+    });
+  }
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: result.request.transition_ref,
+    protocol: result.committed.protocol,
+    accepted_runtime: result.committed.accepted_runtime,
+    controller_binding: result.committed.controller_binding,
+    store_version: 1,
+    state_digest: 'not-a-digest'
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 0);
+  assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
 test('18. terminal missing records a violation and fabricates no failure terminal', () => {
   const state = initialState();
   const run = harness({ state });
@@ -803,6 +833,36 @@ test('18. terminal missing records a violation and fabricates no failure termina
     () => run.observer.reconcile(request.transition_ref),
     { code: 'transition_terminal_missing' }
   );
+});
+
+test('18a. coordinator loss reports durable reservations after recreation', () => {
+  const state = initialState();
+  const request = requestFor(state);
+  const recordStore = createTransitionRecordStore([{
+    transition_ref: request.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(request),
+    status: 'reserved',
+    protocol: null
+  }]);
+  const events = [];
+  const run = harness({
+    state,
+    recordStore,
+    observer: {
+      observe(event) {
+        events.push(event);
+        return true;
+      }
+    }
+  });
+  assert.deepEqual(run.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 1,
+    terminals_fabricated: 0
+  });
+  assert.equal(events.length, 1);
+  assert.equal(events[0].event, 'transition_terminal_missing');
+  assert.equal(events[0].transition_ref, request.transition_ref);
+  assert.equal(recordStore.get(request.transition_ref).status, 'reserved');
 });
 
 test('19. unknown authority evidence remains unknown in receipt and terminal', () => {
