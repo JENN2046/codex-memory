@@ -94,9 +94,17 @@ async function createLocalIntegrationHarness({
     resolveContextPublicKey: resolveContextKey,
     contextReplayGuard,
     clock,
-    async issueProjectContext({ principalFingerprint, safeProjectAlias, requestedVisibility, now }) {
+    async issueProjectContext({
+      principalFingerprint,
+      safeProjectAlias,
+      requestedVisibility,
+      now,
+      onResolutionStage
+    }) {
       observations.context_resolutions += 1;
       if (safeProjectAlias !== 'project-alpha') return { status: 'denied' };
+      onResolutionStage?.('REGISTRY_RESOLVED');
+      onResolutionStage?.('SCOPE_RESOLVED');
       const projectContextRef = createOpaqueId('pctx_');
       const claim = createProjectContextClaim({
         projectContextRef,
@@ -163,8 +171,9 @@ async function createLocalIntegrationHarness({
       }
       const payloadKeys = Object.keys(payload || {}).sort().join(',');
       if (payloadKeys !== 'relayReceipt,request' &&
+          payloadKeys !== 'governedReadAttempt,relayReceipt,request' &&
           payloadKeys !==
-            'governedReadAttempt,relayReceipt,request') {
+            'governedContextResolution,relayReceipt,request') {
         socket.destroy();
         return;
       }
@@ -174,7 +183,10 @@ async function createLocalIntegrationHarness({
       try {
         const invocation = await governanceAdapter.handle({
           request: payload.request,
-          relayReceipt: payload.relayReceipt
+          relayReceipt: payload.relayReceipt,
+          ...(payload.governedContextResolution
+            ? { governedContextResolution: payload.governedContextResolution }
+            : {})
         });
         const response = payload.governedReadAttempt
           ? addZeroMemoryAttemptContinuation(
@@ -204,6 +216,7 @@ async function createLocalIntegrationHarness({
     clock,
     eventSink: edgeEventSink === undefined ? event => edgeEvents.push(event) : edgeEventSink,
     governedReadAttempts: true,
+    governedContextResolutions: true,
     verifyRequest(request) {
       return validateRequestEnvelope(request, {
         now: clock(),

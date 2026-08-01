@@ -22,6 +22,7 @@ const {
   WIDGET_DTO_SCHEMA,
   ZERO_MEMORY_COUNTERS,
   canonicalJson,
+  createChatGptEdgeDataResponseV2,
   createPrincipalAssertion,
   createProjectContextClaim,
   createRequestEnvelope,
@@ -45,6 +46,10 @@ const {
   SYNTHETIC_ISSUER,
   SYNTHETIC_AUDIENCE
 } = require('./synthetic-harness');
+const {
+  createFailedContextResolutionProtocol,
+  createSuccessfulContextResolutionProtocol
+} = require('./governed-read-test-helpers');
 
 function fixture() {
   const principal = generateSigningIdentity('principal-test-key');
@@ -529,19 +534,27 @@ test('response binds request, counters, receipts, and relay signature', () => {
     nonce: 'request_nonce_response_0001',
     signing: signing(edge)
   });
-  const response = createResponseEnvelope({
-    requestId: request.request_id,
-    requestDigest: digestObject(request),
+  const contextResolution = createSuccessfulContextResolutionProtocol(request, {
+    now: clock(),
+    resolutionRef: `gcr_${'h'.repeat(32)}`
+  });
+  const structuredContent = createChatGptEdgeDataResponseV2({
     toolName: 'resolve_memory_context',
-    status: 'ok',
     structuredContent: {
-      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
       project_context_ref: `pctx_${'h'.repeat(32)}`,
       safe_project_alias: 'project-alpha',
       expires_at: '2026-07-18T00:05:00.000Z',
       visibility_labels: ['project'],
       context_status: 'resolved'
     },
+    governedContextResolution: contextResolution
+  });
+  const response = createResponseEnvelope({
+    requestId: request.request_id,
+    requestDigest: digestObject(request),
+    toolName: 'resolve_memory_context',
+    status: 'ok',
+    structuredContent,
     counters: ZERO_MEMORY_COUNTERS,
     receiptChain: {
       edge_request: digestObject(request),
@@ -573,14 +586,7 @@ test('response binds request, counters, receipts, and relay signature', () => {
     requestDigest: digestObject(request),
     toolName: 'resolve_memory_context',
     status: 'ok',
-    structuredContent: {
-      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
-      project_context_ref: `pctx_${'h'.repeat(32)}`,
-      safe_project_alias: 'project-alpha',
-      expires_at: '2026-07-18T00:05:00.000Z',
-      visibility_labels: ['project'],
-      context_status: 'resolved'
-    },
+    structuredContent,
     counters: ZERO_MEMORY_COUNTERS,
     receiptChain: {
       edge_request: sha256('different-request'),
@@ -625,38 +631,43 @@ test('response binds request, counters, receipts, and relay signature', () => {
     requireZeroCounters: true
   }), { code: 'response_structured_content_shape_invalid' });
 
-  assert.doesNotThrow(() => validateToolStructuredContent('resolve_memory_context', {
-    schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
-    project_context_ref: `pctx_${'j'.repeat(32)}`,
-    safe_project_alias: 'project-alpha',
-    expires_at: '2026-07-18T00:05:00.000Z',
-    visibility_labels: ['project', 'workspace'],
-    context_status: 'resolved'
-  }));
+  const deniedProjection = createChatGptEdgeDataResponseV2({
+    toolName: 'resolve_memory_context',
+    structuredContent: { context_status: 'denied' },
+    governedContextResolution: createFailedContextResolutionProtocol(
+      request,
+      'context_scope_denied',
+      { now: clock(), resolutionRef: `gcr_${'d'.repeat(32)}` }
+    )
+  });
+  const unavailableProjection = createChatGptEdgeDataResponseV2({
+    toolName: 'resolve_memory_context',
+    structuredContent: { context_status: 'unavailable' },
+    governedContextResolution: createFailedContextResolutionProtocol(
+      request,
+      'context_issuance_unavailable',
+      { now: clock(), resolutionRef: `gcr_${'u'.repeat(32)}` }
+    )
+  });
   assert.doesNotThrow(() => validateToolStructuredContent(
     'resolve_memory_context',
-    {
-      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
-      context_status: 'denied'
-    },
+    structuredContent
+  ));
+  assert.doesNotThrow(() => validateToolStructuredContent(
+    'resolve_memory_context',
+    deniedProjection,
     { status: 'denied' }
   ));
   assert.doesNotThrow(() => validateToolStructuredContent(
     'resolve_memory_context',
-    {
-      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
-      context_status: 'unavailable'
-    },
+    unavailableProjection,
     { status: 'unavailable' }
   ));
   assert.throws(() => validateToolStructuredContent(
     'resolve_memory_context',
-    {
-      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
-      context_status: 'resolved'
-    },
+    structuredContent,
     { status: 'denied' }
-  ), { code: 'response_context_status_invalid' });
+  ), { code: 'response_context_resolution_status_mismatch' });
   const deniedContextRequest = createRequestEnvelope({
     principalAssertion,
     toolName: 'resolve_memory_context',
@@ -674,10 +685,15 @@ test('response binds request, counters, receipts, and relay signature', () => {
     requestDigest: digestObject(deniedContextRequest),
     toolName: 'resolve_memory_context',
     status: 'denied',
-    structuredContent: {
-      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
-      context_status: 'denied'
-    },
+    structuredContent: createChatGptEdgeDataResponseV2({
+      toolName: 'resolve_memory_context',
+      structuredContent: { context_status: 'denied' },
+      governedContextResolution: createFailedContextResolutionProtocol(
+        deniedContextRequest,
+        'context_mapping_not_found',
+        { now: clock(), resolutionRef: `gcr_${'n'.repeat(32)}` }
+      )
+    }),
     counters: ZERO_MEMORY_COUNTERS,
     receiptChain: {
       edge_request: digestObject(deniedContextRequest),

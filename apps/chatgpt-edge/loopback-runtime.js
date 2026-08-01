@@ -10,11 +10,13 @@ const {
   createOpaqueId,
   createContextResolutionHeader,
   createContextResolutionStageReceipt,
-  contextResolutionFailureRegistryEntry,
+  contextResolutionPublicResponseStatus,
+  contextResolutionResponseBindingDigest,
   createStageReceipt,
   digestObject,
   governedReadAttemptResponseBindingDigest,
   projectGovernedReadAttemptPublic,
+  projectGovernedContextResolutionPublic,
   isGovernedContextResolutionWorkingSetExtension,
   validateAttemptHeader,
   validateGovernedContextResolutionProtocol,
@@ -49,6 +51,7 @@ const REQUIRED_CONTEXT_RESOLUTION_COORDINATOR_METHODS = Object.freeze([
   'appendReceipt',
   'cancelResolution',
   'commitProtocolCandidate',
+  'recordResponseVerification',
   'reportCoordinatorLoss',
   'timeoutResolution',
   'workingSet'
@@ -569,15 +572,38 @@ function createLoopbackEdgeRuntime({
         reject('edge_context_resolution_candidate_invalid');
       }
       const terminal = governedContextResolutionCandidate.terminal;
-      const expectedStatus = terminal.outcome === 'success'
+      const publicStatus = contextResolutionPublicResponseStatus(terminal);
+      const expectedContextStatus = publicStatus === 'ok'
         ? 'resolved'
-        : contextResolutionFailureRegistryEntry(
-          terminal.reason_code
-        ).public_response_status;
-      if (expectedStatus === null ||
-          response?.status !== (expectedStatus === 'resolved' ? 'ok' : expectedStatus) ||
-          response?.structured_content?.context_status !== expectedStatus) {
+        : publicStatus;
+      const expectedBinding = contextResolutionResponseBindingDigest({
+        requestDigest: digestObject(currentRecord.request),
+        resolutionRef: currentRecord.resolution_ref,
+        terminalDigest: terminal.terminal_digest,
+        structuredContentDigest: digestObject(response?.structured_content)
+      });
+      if (response?.status !== publicStatus ||
+          response?.structured_content?.context_status !== expectedContextStatus ||
+          canonicalJson(response?.structured_content?.resolution) !==
+            canonicalJson(projectGovernedContextResolutionPublic(
+              governedContextResolutionCandidate
+            )) ||
+          response?.receipt_chain?.relay !== expectedBinding) {
         reject('edge_context_resolution_response_binding_invalid');
+      }
+      if (governedContextResolutionCandidate.terminal.outcome === 'success') {
+        resolutionCoordinator.recordResponseVerification(
+          currentRecord.resolution_ref,
+          {
+            terminal_digest:
+              governedContextResolutionCandidate.terminal.terminal_digest,
+            public_content_digest:
+              digestObject(acceptedResponse.structured_content),
+            relay_binding_digest: acceptedResponse.receipt_chain.relay,
+            public_resolution:
+              structuredClone(acceptedResponse.structured_content.resolution)
+          }
+        );
       }
       resolutionCoordinator.commitProtocolCandidate(
         currentRecord.resolution_ref,

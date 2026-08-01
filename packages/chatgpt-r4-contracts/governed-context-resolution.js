@@ -12,7 +12,8 @@ const { reject } = require('./errors');
 const {
   assertGovernedSafeCode,
   defineGovernedFailureRegistry,
-  governedFailureRegistryEntry
+  governedFailureRegistryEntry,
+  GOVERNED_SAFE_CODE_PATTERN
 } = require('./governed-failure-registry');
 
 const GOVERNED_CONTEXT_RESOLUTION_PROTOCOL =
@@ -74,7 +75,9 @@ const FACT_STAGE = Object.freeze({
   scope_resolved: 'SCOPE_RESOLVED',
   context_ref_issued: 'CONTEXT_ISSUED',
   context_ref_shape_valid: 'CONTEXT_ISSUED',
-  context_ref_unexpired: 'CONTEXT_ISSUED'
+  context_ref_unexpired: 'CONTEXT_ISSUED',
+  context_ref_entered_response: 'RESPONSE_FINALIZED',
+  context_ref_delivered: 'RESPONSE_FINALIZED'
 });
 
 const COMPLETED_FACTS_BY_STAGE = deepFreeze({
@@ -93,7 +96,10 @@ const COMPLETED_FACTS_BY_STAGE = deepFreeze({
     context_ref_shape_valid: true,
     context_ref_unexpired: true
   },
-  RESPONSE_FINALIZED: {}
+  RESPONSE_FINALIZED: {
+    context_ref_entered_response: true,
+    context_ref_delivered: true
+  }
 });
 
 function failure({
@@ -101,7 +107,8 @@ function failure({
   stage,
   origin,
   terminalCandidateAllowed = true,
-  publicResponseStatus = null
+  publicResponseStatus = null,
+  publicProjectionSafe = false
 }) {
   return {
     category,
@@ -109,7 +116,8 @@ function failure({
     origin,
     fallback_policy: 'forbidden',
     terminal_candidate_allowed: terminalCandidateAllowed,
-    public_response_status: publicResponseStatus
+    public_response_status: publicResponseStatus,
+    public_projection_safe: publicProjectionSafe
   };
 }
 
@@ -120,7 +128,8 @@ function validateFailureEntry(entry) {
     'origin',
     'fallback_policy',
     'terminal_candidate_allowed',
-    'public_response_status'
+    'public_response_status',
+    'public_projection_safe'
   ], 'context_resolution_failure_registry_invalid');
   assertGovernedSafeCode(
     entry.category,
@@ -131,7 +140,9 @@ function validateFailureEntry(entry) {
         .concat('observer').includes(entry.origin) ||
       entry.fallback_policy !== 'forbidden' ||
       typeof entry.terminal_candidate_allowed !== 'boolean' ||
-      ![null, 'denied', 'unavailable'].includes(entry.public_response_status)) {
+      ![null, 'denied', 'unavailable'].includes(entry.public_response_status) ||
+      typeof entry.public_projection_safe !== 'boolean' ||
+      (entry.public_projection_safe && entry.public_response_status === null)) {
     reject('context_resolution_failure_registry_invalid');
   }
   if (entry.stage !== 'TERMINAL_FAILURE' &&
@@ -146,99 +157,128 @@ const GOVERNED_CONTEXT_RESOLUTION_FAILURE_REGISTRY =
     resolution_edge_request_invalid: failure({
       category: 'validation',
       stage: 'EDGE_VALIDATED',
-      origin: 'edge_broker'
+      origin: 'edge_broker',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     resolution_relay_claim_failed: failure({
       category: 'transport',
       stage: 'RELAY_CLAIMED',
-      origin: 'relay'
+      origin: 'relay',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_registry_unavailable: failure({
       category: 'context_registry_failed',
       stage: 'REGISTRY_RESOLVED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_scope_preflight_denied: failure({
       category: 'context_scope_denied',
       stage: 'REGISTRY_RESOLVED',
       origin: 'governance',
-      publicResponseStatus: 'denied'
+      publicResponseStatus: 'denied',
+      publicProjectionSafe: true
     }),
     context_issuance_preflight_unavailable: failure({
       category: 'context_issuance_failed',
       stage: 'REGISTRY_RESOLVED',
       origin: 'governance',
-      publicResponseStatus: 'unavailable'
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_mapping_not_found: failure({
       category: 'context_mapping_failed',
       stage: 'REGISTRY_RESOLVED',
       origin: 'governance',
-      publicResponseStatus: 'denied'
+      publicResponseStatus: 'denied',
+      publicProjectionSafe: true
     }),
     context_scope_denied: failure({
       category: 'context_scope_denied',
       stage: 'SCOPE_RESOLVED',
       origin: 'governance',
-      publicResponseStatus: 'denied'
+      publicResponseStatus: 'denied',
+      publicProjectionSafe: true
     }),
     context_scope_unavailable: failure({
       category: 'context_scope_failed',
       stage: 'SCOPE_RESOLVED',
       origin: 'governance',
-      publicResponseStatus: 'unavailable'
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_issuance_unavailable: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
       origin: 'governance',
-      publicResponseStatus: 'unavailable'
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_issuance_denied: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
       origin: 'governance',
-      publicResponseStatus: 'denied'
+      publicResponseStatus: 'denied',
+      publicProjectionSafe: true
     }),
     context_issuance_failed: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_issue_result_invalid: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_ref_invalid: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_ref_expired: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_response_projection_invalid: failure({
       category: 'context_response_failed',
       stage: 'RESPONSE_FINALIZED',
-      origin: 'relay'
+      origin: 'relay',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     context_response_finalization_failed: failure({
       category: 'context_response_failed',
       stage: 'RESPONSE_FINALIZED',
-      origin: 'relay'
+      origin: 'relay',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     resolution_timeout: failure({
       category: 'timeout',
       stage: 'TERMINAL_FAILURE',
-      origin: 'edge_broker'
+      origin: 'edge_broker',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     resolution_cancelled: failure({
       category: 'cancelled',
       stage: 'TERMINAL_FAILURE',
-      origin: 'edge_broker'
+      origin: 'edge_broker',
+      publicResponseStatus: 'unavailable',
+      publicProjectionSafe: true
     }),
     terminal_missing: failure({
       category: 'protocol',
@@ -288,8 +328,14 @@ const FAILED_FACTS_BY_REASON = deepFreeze({
     context_ref_shape_valid: true,
     context_ref_unexpired: false
   },
-  context_response_projection_invalid: {},
-  context_response_finalization_failed: {}
+  context_response_projection_invalid: {
+    context_ref_entered_response: false,
+    context_ref_delivered: false
+  },
+  context_response_finalization_failed: {
+    context_ref_entered_response: false,
+    context_ref_delivered: false
+  }
 });
 
 const HEADER_KEYS = Object.freeze([
@@ -333,6 +379,8 @@ const TERMINAL_KEYS = Object.freeze([
   'context_ref_issued',
   'context_ref_shape_valid',
   'context_ref_unexpired',
+  'context_ref_entered_response',
+  'context_ref_delivered',
   'read_attempt_created',
   'receipt_count',
   'last_receipt_digest',
@@ -519,7 +567,9 @@ function createContextResolutionStageReceipt({
   const selectedOrigin = origin ||
     GOVERNED_CONTEXT_RESOLUTION_ORIGIN_BY_STAGE[selectedStage];
   const selectedFacts = facts === undefined
-    ? COMPLETED_FACTS_BY_STAGE[selectedStage]
+    ? (outcome === 'completed'
+      ? COMPLETED_FACTS_BY_STAGE[selectedStage]
+      : FAILED_FACTS_BY_REASON[reasonCode])
     : facts;
   const previousDigest = receipts.length === 0
     ? digestObject(header)
@@ -719,7 +769,9 @@ function deriveResolutionFacts(receipts) {
     scope_resolved: null,
     context_ref_issued: null,
     context_ref_shape_valid: null,
-    context_ref_unexpired: null
+    context_ref_unexpired: null,
+    context_ref_entered_response: null,
+    context_ref_delivered: null
   };
   for (const receipt of receipts) {
     for (const [name, value] of Object.entries(receipt.facts)) {
@@ -728,22 +780,42 @@ function deriveResolutionFacts(receipts) {
   }
   if (facts.mapping_resolved === false &&
       [facts.scope_resolved, facts.context_ref_issued,
-        facts.context_ref_shape_valid, facts.context_ref_unexpired]
+        facts.context_ref_shape_valid, facts.context_ref_unexpired,
+        facts.context_ref_entered_response,
+        facts.context_ref_delivered]
         .some(value => value !== null)) {
     reject('context_resolution_terminal_facts_invalid');
   }
   if (facts.scope_resolved === false &&
       [facts.context_ref_issued, facts.context_ref_shape_valid,
-        facts.context_ref_unexpired].some(value => value !== null)) {
+        facts.context_ref_unexpired, facts.context_ref_entered_response,
+        facts.context_ref_delivered]
+        .some(value => value !== null)) {
     reject('context_resolution_terminal_facts_invalid');
   }
   if (facts.context_ref_issued !== true &&
-      [facts.context_ref_shape_valid, facts.context_ref_unexpired]
+      [facts.context_ref_shape_valid, facts.context_ref_unexpired,
+        facts.context_ref_entered_response,
+        facts.context_ref_delivered]
         .some(value => value !== null)) {
     reject('context_resolution_terminal_facts_invalid');
   }
   if (facts.context_ref_shape_valid !== true &&
       facts.context_ref_unexpired !== null) {
+    reject('context_resolution_terminal_facts_invalid');
+  }
+  if (facts.context_ref_entered_response !== null &&
+      (facts.context_ref_issued !== true ||
+       facts.context_ref_shape_valid !== true ||
+       facts.context_ref_unexpired !== true)) {
+    reject('context_resolution_terminal_facts_invalid');
+  }
+  if (facts.context_ref_delivered !== null &&
+      (facts.context_ref_issued !== true ||
+       facts.context_ref_shape_valid !== true ||
+       facts.context_ref_unexpired !== true ||
+       (facts.context_ref_delivered === true &&
+        facts.context_ref_entered_response !== true))) {
     reject('context_resolution_terminal_facts_invalid');
   }
   return facts;
@@ -870,6 +942,179 @@ function createContextResolutionTerminalEnvelope({
   return deepFreeze(terminal);
 }
 
+function contextResolutionPublicResponseStatus(terminal) {
+  if (!isPlainObject(terminal) ||
+      !['success', 'failure'].includes(terminal.outcome)) {
+    reject('context_resolution_public_terminal_invalid');
+  }
+  if (terminal.outcome === 'success') return 'ok';
+  const entry = contextResolutionFailureRegistryEntry(terminal.reason_code);
+  if (terminal.failure_category !== entry.category ||
+      terminal.failure_origin !== entry.origin ||
+      entry.public_projection_safe !== true ||
+      entry.public_response_status === null) {
+    reject('context_resolution_public_terminal_invalid');
+  }
+  return entry.public_response_status;
+}
+
+function projectGovernedContextResolutionPublic(protocol) {
+  validateGovernedContextResolutionProtocol(protocol);
+  const terminal = protocol.terminal;
+  contextResolutionPublicResponseStatus(terminal);
+  return deepFreeze({
+    protocol: terminal.protocol,
+    outcome: terminal.outcome,
+    last_completed_stage: terminal.last_completed_stage,
+    failed_stage: terminal.failed_stage,
+    reason_code: terminal.reason_code,
+    failure_category: terminal.failure_category,
+    failure_origin: terminal.failure_origin,
+    context_ref_issued: terminal.context_ref_issued,
+    context_ref_entered_response: terminal.context_ref_entered_response,
+    context_ref_delivered: terminal.context_ref_delivered,
+    evidence_complete: terminal.evidence_complete
+  });
+}
+
+function projectUnknownGovernedContextResolutionPublic() {
+  return deepFreeze({
+    protocol: GOVERNED_CONTEXT_RESOLUTION_PROTOCOL,
+    outcome: 'failure',
+    last_completed_stage: null,
+    failed_stage: null,
+    reason_code: null,
+    failure_category: null,
+    failure_origin: null,
+    context_ref_issued: null,
+    context_ref_entered_response: null,
+    context_ref_delivered: null,
+    evidence_complete: false
+  });
+}
+
+function validateGovernedContextResolutionPublicProjection(projection) {
+  assertExactKeys(projection, [
+    'protocol',
+    'outcome',
+    'last_completed_stage',
+    'failed_stage',
+    'reason_code',
+    'failure_category',
+    'failure_origin',
+    'context_ref_issued',
+    'context_ref_entered_response',
+    'context_ref_delivered',
+    'evidence_complete'
+  ], 'context_resolution_public_projection_shape_invalid');
+  if (projection.protocol !== GOVERNED_CONTEXT_RESOLUTION_PROTOCOL ||
+      !['success', 'failure'].includes(projection.outcome) ||
+      ![null, ...GOVERNED_CONTEXT_RESOLUTION_NON_TERMINAL_STAGES]
+        .includes(projection.last_completed_stage) ||
+      ![null, ...GOVERNED_CONTEXT_RESOLUTION_NON_TERMINAL_STAGES,
+        'TERMINAL_FAILURE'].includes(projection.failed_stage) ||
+      ![null, true, false].includes(projection.context_ref_issued) ||
+      ![null, true, false].includes(projection.context_ref_entered_response) ||
+      ![null, true, false].includes(projection.context_ref_delivered) ||
+      typeof projection.evidence_complete !== 'boolean') {
+    reject('context_resolution_public_projection_invalid');
+  }
+  const nullableSafeCode = value => value === null ||
+    (typeof value === 'string' && GOVERNED_SAFE_CODE_PATTERN.test(value));
+  if (!nullableSafeCode(projection.reason_code) ||
+      !nullableSafeCode(projection.failure_category) ||
+      (projection.failure_origin !== null &&
+       !Object.values(GOVERNED_CONTEXT_RESOLUTION_ORIGIN_BY_STAGE)
+         .includes(projection.failure_origin))) {
+    reject('context_resolution_public_projection_invalid');
+  }
+  if (projection.outcome === 'success') {
+    if (projection.last_completed_stage !== 'RESPONSE_FINALIZED' ||
+        projection.failed_stage !== null ||
+        projection.reason_code !== null ||
+        projection.failure_category !== null ||
+        projection.failure_origin !== null ||
+        projection.context_ref_issued !== true ||
+        projection.context_ref_entered_response !== true ||
+        projection.context_ref_delivered !== true ||
+        projection.evidence_complete !== true) {
+      reject('context_resolution_public_projection_invalid');
+    }
+    return projection;
+  }
+  if (projection.evidence_complete === false) {
+    if (projection.last_completed_stage !== null ||
+        projection.failed_stage !== null ||
+        projection.reason_code !== null ||
+        projection.failure_category !== null ||
+        projection.failure_origin !== null ||
+        projection.context_ref_issued !== null ||
+        projection.context_ref_entered_response !== null ||
+        projection.context_ref_delivered !== null) {
+      reject('context_resolution_public_projection_unknown_invalid');
+    }
+    return projection;
+  }
+  if (projection.reason_code === null) {
+    reject('context_resolution_public_projection_invalid');
+  }
+  const entry = contextResolutionFailureRegistryEntry(projection.reason_code);
+  if (entry.public_projection_safe !== true ||
+      entry.public_response_status === null ||
+      projection.failure_category !== entry.category ||
+      projection.failure_origin !== entry.origin ||
+      projection.failed_stage !== entry.stage) {
+    reject('context_resolution_public_projection_invalid');
+  }
+  if (projection.context_ref_delivered === true ||
+      (projection.context_ref_delivered === false &&
+       projection.context_ref_issued !== true)) {
+    reject('context_resolution_public_projection_delivery_invalid');
+  }
+  if (projection.context_ref_entered_response !== null &&
+      projection.context_ref_issued !== true) {
+    reject('context_resolution_public_projection_delivery_invalid');
+  }
+  if (projection.context_ref_delivered === true &&
+      projection.context_ref_entered_response !== true) {
+    reject('context_resolution_public_projection_delivery_invalid');
+  }
+  if (projection.reason_code === 'context_response_finalization_failed' ||
+      projection.reason_code === 'context_response_projection_invalid') {
+    if (projection.context_ref_issued !== true ||
+        projection.context_ref_entered_response !== false ||
+        projection.context_ref_delivered !== false) {
+      reject('context_resolution_public_projection_delivery_invalid');
+    }
+  }
+  return projection;
+}
+
+function contextResolutionResponseBindingDigest({
+  requestDigest,
+  resolutionRef,
+  terminalDigest,
+  structuredContentDigest
+} = {}) {
+  assertDigest(requestDigest, 'context_resolution_response_binding_invalid');
+  if (typeof resolutionRef !== 'string' ||
+      !GOVERNED_CONTEXT_RESOLUTION_REF_PATTERN.test(resolutionRef)) {
+    reject('context_resolution_response_binding_invalid');
+  }
+  assertDigest(terminalDigest, 'context_resolution_response_binding_invalid');
+  assertDigest(
+    structuredContentDigest,
+    'context_resolution_response_binding_invalid'
+  );
+  return digestObject({
+    protocol: GOVERNED_CONTEXT_RESOLUTION_PROTOCOL,
+    request_digest: requestDigest,
+    resolution_ref: resolutionRef,
+    terminal_digest: terminalDigest,
+    structured_content_digest: structuredContentDigest
+  });
+}
+
 function validateContextResolutionTerminalEnvelope(
   terminal,
   { header, receipts = [] } = {}
@@ -986,6 +1231,8 @@ module.exports = {
   GOVERNED_CONTEXT_RESOLUTION_TERMINAL_STAGES,
   appendGovernedContextResolutionStage,
   contextResolutionDeadlineBudgetMs,
+  contextResolutionPublicResponseStatus,
+  contextResolutionResponseBindingDigest,
   contextResolutionFailureFacts,
   contextResolutionFailureRegistryEntry,
   contextResolutionRef,
@@ -995,10 +1242,13 @@ module.exports = {
   createGovernedContextResolutionProtocol,
   createGovernedContextResolutionWorkingSet,
   isGovernedContextResolutionWorkingSetExtension,
+  projectGovernedContextResolutionPublic,
+  projectUnknownGovernedContextResolutionPublic,
   validateContextResolutionHeader,
   validateContextResolutionReceiptChain,
   validateContextResolutionStageReceipt,
   validateContextResolutionTerminalEnvelope,
+  validateGovernedContextResolutionPublicProjection,
   validateGovernedContextResolutionProtocol,
   validateGovernedContextResolutionWorkingSet
 };

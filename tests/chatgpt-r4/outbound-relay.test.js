@@ -31,6 +31,10 @@ const {
 const {
   DEFAULT_UDS_TIMEOUT_MS
 } = require('../../apps/local-recall-relay/uds-transport');
+const {
+  addContextResolutionContinuation,
+  createEdgeValidatedContextResolutionWorkingSet
+} = require('./governed-read-test-helpers');
 
 const ISSUER = 'https://tenant.jenn.dev/';
 const ORIGIN = 'https://memory.jenn.dev';
@@ -45,6 +49,19 @@ function resolvedContext(suffix, expiresAt) {
     visibility_labels: ['project'],
     context_status: 'resolved'
   };
+}
+
+function governedContextResolutionClaim(request) {
+  return createEdgeValidatedContextResolutionWorkingSet(request, {
+    now: new Date(request.issued_at)
+  });
+}
+
+function completedContextResolution(payload, invocation) {
+  return addContextResolutionContinuation(
+    invocation,
+    payload.governedContextResolution
+  );
 }
 
 test('R4-D Relay preserves the legacy non-attempt UDS timeout', () => {
@@ -82,7 +99,8 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
     request_id: request.request_id,
     claim_token: 'r5o-remaining-ttl-claim',
     attempt: 1,
-    request
+    request,
+    governed_context_resolution: governedContextResolutionClaim(request)
   };
   let claimAvailable = true;
   let completedResponse = null;
@@ -105,8 +123,8 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
         return { status: 'claimed' };
       }
     },
-    async forwardToUds() {
-      return {
+    async forwardToUds(payload) {
+      return completedContextResolution(payload, {
         status: 'ok',
         structured_content:
           resolvedContext('t', request.expires_at),
@@ -115,7 +133,7 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
           governance: sha256('r5o-remaining-ttl-governance'),
           context: sha256('r5o-remaining-ttl-context')
         }
-      };
+      });
     },
     relayId: 'local-relay-r5o-remaining-ttl',
     expectedIssuer: ISSUER,
@@ -159,7 +177,9 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
     request_id: expiredRequest.request_id,
     claim_token: 'r5o-expired-before-response-claim',
     attempt: 1,
-    request: expiredRequest
+    request: expiredRequest,
+    governed_context_resolution:
+      governedContextResolutionClaim(expiredRequest)
   };
   const observer = createLowDisclosureRelayObserver();
   let expiredClaimAvailable = true;
@@ -181,8 +201,8 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
         return { status: 'claimed' };
       }
     },
-    async forwardToUds() {
-      return {
+    async forwardToUds(payload) {
+      return completedContextResolution(payload, {
         status: 'ok',
         structured_content:
           resolvedContext('e', expiredRequest.expires_at),
@@ -191,7 +211,7 @@ test('R5-O Relay response expiry never exceeds the accepted request expiry', asy
           governance: sha256('r5o-expired-response-governance'),
           context: sha256('r5o-expired-response-context')
         }
-      };
+      });
     },
     relayId: 'local-relay-r5o-expired-response',
     expectedIssuer: ISSUER,
@@ -247,7 +267,9 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
     request_id: requestEnvelope.request_id,
     claim_token: 'opaque-claim-control-only',
     attempt: 1,
-    request: requestEnvelope
+    request: requestEnvelope,
+    governed_context_resolution:
+      governedContextResolutionClaim(requestEnvelope)
   };
   const requests = [];
   let completedResponse = null;
@@ -268,7 +290,9 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
     return { statusCode: 404, body: { error: 'edge_route_not_found' } };
   });
   const server = net.createServer(socket => {
-    socket.once('data', () => socket.end(`${JSON.stringify({
+    socket.once('data', chunk => {
+      const payload = JSON.parse(chunk.toString('utf8').trim());
+      socket.end(`${JSON.stringify(completedContextResolution(payload, {
       status: 'ok',
       structured_content:
         resolvedContext('x', requestEnvelope.expires_at),
@@ -277,7 +301,8 @@ test('R4-D D2B outbound Relay uses authenticated canonical HTTPS and completes s
         governance: sha256('d2b-governance'),
         context: sha256('d2b-context')
       }
-    })}\n`));
+    }))}\n`);
+    });
   });
   await new Promise((resolve, reject) => {
     server.once('error', reject);
@@ -385,7 +410,8 @@ test('R4-D Relay observer distinguishes Edge completion failure without retainin
     request_id: request.request_id,
     claim_token: 'completion-observer-claim-token',
     attempt: 1,
-    request
+    request,
+    governed_context_resolution: governedContextResolutionClaim(request)
   };
   let claimed = false;
   const observer = createLowDisclosureRelayObserver();
@@ -408,8 +434,8 @@ test('R4-D Relay observer distinguishes Edge completion failure without retainin
         return { status: 'claimed' };
       }
     },
-    async forwardToUds() {
-      return {
+    async forwardToUds(payload) {
+      return completedContextResolution(payload, {
         status: 'ok',
         structured_content:
           resolvedContext('z', request.expires_at),
@@ -418,7 +444,7 @@ test('R4-D Relay observer distinguishes Edge completion failure without retainin
           governance: sha256('completion-observer-governance'),
           context: sha256('completion-observer-context')
         }
-      };
+      });
     },
     relayId: 'local-relay-completion-observer',
     expectedIssuer: ISSUER,
@@ -680,12 +706,14 @@ test('R4-D Relay drains a returned claim after shutdown cancellation', async () 
     request_id: request.request_id,
     claim_token: 'r4d-shutdown-drain-claim',
     attempt: 1,
-    request
+    request,
+    governed_context_resolution: governedContextResolutionClaim(request)
   };
   let acknowledged = false;
   let completed = false;
   let udsSignal = null;
   let forwardStartedResolve;
+  let forwardedResolution = null;
   let releaseForward;
   const forwardStarted = new Promise(resolve => {
     forwardStartedResolve = resolve;
@@ -710,7 +738,8 @@ test('R4-D Relay drains a returned claim after shutdown cancellation', async () 
         return { status: 'claimed' };
       }
     },
-    forwardToUds(_payload, { signal }) {
+    forwardToUds(payload, { signal }) {
+      forwardedResolution = payload.governedContextResolution;
       udsSignal = signal;
       forwardStartedResolve();
       return forwardResult;
@@ -734,7 +763,7 @@ test('R4-D Relay drains a returned claim after shutdown cancellation', async () 
   assert.equal(acknowledged, true);
   cancellation.abort();
   assert.equal(udsSignal?.aborted, false);
-  releaseForward({
+  releaseForward(addContextResolutionContinuation({
     status: 'ok',
     structured_content:
       resolvedContext('d', request.expires_at),
@@ -743,7 +772,7 @@ test('R4-D Relay drains a returned claim after shutdown cancellation', async () 
       governance: sha256('r4d-shutdown-drain-governance'),
       context: sha256('r4d-shutdown-drain-context')
     }
-  });
+  }, forwardedResolution));
   const result = await pending;
   assert.equal(result.status, 'completed');
   assert.equal(completed, true);

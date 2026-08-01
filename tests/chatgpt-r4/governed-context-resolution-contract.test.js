@@ -12,6 +12,7 @@ const {
   GOVERNED_CONTEXT_RESOLUTION_PROTOCOL,
   appendGovernedContextResolutionStage,
   canonicalJson,
+  contextResolutionResponseBindingDigest,
   contextResolutionFailureRegistryEntry,
   createContextResolutionHeader,
   createContextResolutionStageReceipt,
@@ -19,11 +20,15 @@ const {
   createGovernedContextResolutionProtocol,
   createGovernedContextResolutionWorkingSet,
   digestObject,
+  projectGovernedContextResolutionPublic,
+  projectUnknownGovernedContextResolutionPublic,
   utf8ByteLength,
   validateContextResolutionHeader,
   validateContextResolutionStageReceipt,
   validateContextResolutionTerminalEnvelope,
-  validateGovernedContextResolutionProtocol
+  validateGovernedContextResolutionProtocol,
+  validateGovernedContextResolutionPublicProjection,
+  validateToolStructuredContent
 } = require('../../packages/chatgpt-r4-contracts');
 const {
   createGovernedContextResolutionCoordinator
@@ -74,13 +79,19 @@ const FAILURE_FACTS = Object.freeze({
     context_ref_shape_valid: true,
     context_ref_unexpired: false
   },
-  context_response_projection_invalid: {},
-  context_response_finalization_failed: {}
+  context_response_projection_invalid: {
+    context_ref_entered_response: false,
+    context_ref_delivered: false
+  },
+  context_response_finalization_failed: {
+    context_ref_entered_response: false,
+    context_ref_delivered: false
+  }
 });
 
 const EXPECTED_PUBLIC_SCHEMA_DIGESTS = Object.freeze({
   resolve_memory_context:
-    'sha256:cb9ac038e2d3565307c1733cc48757fe60bd5f527c7ede8ee844a21e1abf53e5',
+    'sha256:5e978d8e56d53de05c048bd1273a028ffccc75779916ad9858e86743b4bb8fe5',
   memory_overview:
     'sha256:e4d89bb2c92a82465ecf77bc041a6a07d14eff7fcc1be34441cf39da78adf893',
   search_memory:
@@ -211,6 +222,26 @@ function commitCoordinatorSuccess(coordinator, value) {
     outcome: 'success',
     evidenceComplete: true
   });
+  const publicResolution = projectGovernedContextResolutionPublic({
+    header: value,
+    receipts: workingSet.receipts,
+    terminal
+  });
+  const structuredContentDigest = digestObject({
+    context_status: 'resolved',
+    resolution: publicResolution
+  });
+  coordinator.recordResponseVerification(value.resolution_ref, {
+    terminal_digest: terminal.terminal_digest,
+    public_content_digest: structuredContentDigest,
+    relay_binding_digest: contextResolutionResponseBindingDigest({
+      requestDigest: value.request_digest,
+      resolutionRef: value.resolution_ref,
+      terminalDigest: terminal.terminal_digest,
+      structuredContentDigest
+    }),
+    public_resolution: publicResolution
+  });
   return coordinator.commitTerminal(value.resolution_ref, terminal);
 }
 
@@ -251,6 +282,8 @@ test('complete success proves context issuance and forbids read-attempt or count
   assert.equal(protocol.terminal.context_ref_issued, true);
   assert.equal(protocol.terminal.context_ref_shape_valid, true);
   assert.equal(protocol.terminal.context_ref_unexpired, true);
+  assert.equal(protocol.terminal.context_ref_entered_response, true);
+  assert.equal(protocol.terminal.context_ref_delivered, true);
   assert.equal(protocol.terminal.read_attempt_created, false);
   for (const forbidden of [
     'attempt_ref', 'counters', 'provider', 'native_invocation',
@@ -340,6 +373,132 @@ test('missing issuance evidence remains unknown and never becomes false', () => 
       facts: { context_ref_issued: false }
     }
   ), { code: 'context_resolution_facts_invalid' });
+});
+
+test('public resolver projections preserve canonical facts and never invent unknown reasons', () => {
+  const success = successfulProtocol(header('public-success'));
+  const successProjection = projectGovernedContextResolutionPublic(success);
+  assert.deepEqual(successProjection, {
+    protocol: GOVERNED_CONTEXT_RESOLUTION_PROTOCOL,
+    outcome: 'success',
+    last_completed_stage: 'RESPONSE_FINALIZED',
+    failed_stage: null,
+    reason_code: null,
+    failure_category: null,
+    failure_origin: null,
+    context_ref_issued: true,
+    context_ref_entered_response: true,
+    context_ref_delivered: true,
+    evidence_complete: true
+  });
+  assert.equal(Object.hasOwn(successProjection, 'resolution_ref'), false);
+  assert.equal(Object.hasOwn(successProjection, 'terminal_digest'), false);
+  validateGovernedContextResolutionPublicProjection(successProjection);
+
+  const finalized = failedProtocol(
+    'context_response_finalization_failed',
+    header('public-finalization')
+  );
+  const finalizedProjection = projectGovernedContextResolutionPublic(finalized);
+  assert.equal(finalizedProjection.context_ref_issued, true);
+  assert.equal(finalizedProjection.context_ref_entered_response, false);
+  assert.equal(finalizedProjection.context_ref_delivered, false);
+  assert.equal(finalizedProjection.failed_stage, 'RESPONSE_FINALIZED');
+  assert.equal(finalizedProjection.reason_code,
+    'context_response_finalization_failed');
+  validateGovernedContextResolutionPublicProjection(finalizedProjection);
+
+  const unknown = projectUnknownGovernedContextResolutionPublic();
+  assert.deepEqual(unknown, {
+    protocol: GOVERNED_CONTEXT_RESOLUTION_PROTOCOL,
+    outcome: 'failure',
+    last_completed_stage: null,
+    failed_stage: null,
+    reason_code: null,
+    failure_category: null,
+    failure_origin: null,
+    context_ref_issued: null,
+    context_ref_entered_response: null,
+    context_ref_delivered: null,
+    evidence_complete: false
+  });
+  validateGovernedContextResolutionPublicProjection(unknown);
+  assert.throws(() => validateGovernedContextResolutionPublicProjection({
+    ...unknown,
+    reason_code: 'context_issuance_unavailable'
+  }), { code: 'context_resolution_public_projection_unknown_invalid' });
+  assert.throws(() => validateGovernedContextResolutionPublicProjection({
+    ...unknown,
+    context_ref_entered_response: true
+  }), { code: 'context_resolution_public_projection_unknown_invalid' });
+  assert.throws(() => validateGovernedContextResolutionPublicProjection({
+    ...unknown,
+    context_ref_delivered: true
+  }), { code: 'context_resolution_public_projection_unknown_invalid' });
+  for (const [field, value] of [
+    ['context_ref_issued', true],
+    ['last_completed_stage', 'CONTEXT_ISSUED'],
+    ['failed_stage', 'TERMINAL_FAILURE']
+  ]) {
+    assert.throws(() => validateGovernedContextResolutionPublicProjection({
+      ...unknown,
+      [field]: value
+    }), { code: 'context_resolution_public_projection_unknown_invalid' });
+  }
+  assert.throws(() => validateGovernedContextResolutionPublicProjection({
+    ...finalizedProjection,
+    context_ref_delivered: true
+  }), { code: 'context_resolution_public_projection_delivery_invalid' });
+
+  const requestDigest = digestObject('public-projection-request');
+  const structuredContentDigest = digestObject(successProjection);
+  const binding = contextResolutionResponseBindingDigest({
+    requestDigest,
+    resolutionRef: success.header.resolution_ref,
+    terminalDigest: success.terminal.terminal_digest,
+    structuredContentDigest
+  });
+  assert.notEqual(binding, contextResolutionResponseBindingDigest({
+    requestDigest: digestObject('other-request'),
+    resolutionRef: success.header.resolution_ref,
+    terminalDigest: success.terminal.terminal_digest,
+    structuredContentDigest
+  }));
+  assert.notEqual(binding, contextResolutionResponseBindingDigest({
+    requestDigest,
+    resolutionRef: header('other-resolution').resolution_ref,
+    terminalDigest: success.terminal.terminal_digest,
+    structuredContentDigest
+  }));
+  assert.notEqual(binding, contextResolutionResponseBindingDigest({
+    requestDigest,
+    resolutionRef: success.header.resolution_ref,
+    terminalDigest: finalized.terminal.terminal_digest,
+    structuredContentDigest
+  }));
+  assert.notEqual(binding, contextResolutionResponseBindingDigest({
+    requestDigest,
+    resolutionRef: success.header.resolution_ref,
+    terminalDigest: success.terminal.terminal_digest,
+    structuredContentDigest: digestObject(finalizedProjection)
+  }));
+
+  assert.throws(() => validateToolStructuredContent(
+    'resolve_memory_context',
+    {
+      schema_version: 2,
+      context_status: 'denied'
+    },
+    { status: 'denied' }
+  ), { code: 'response_structured_content_shape_invalid' });
+  assert.throws(() => validateToolStructuredContent(
+    'resolve_memory_context',
+    {
+      schema_version: 1,
+      context_status: 'denied'
+    },
+    { status: 'denied' }
+  ), { code: 'response_data_schema_version_invalid' });
 });
 
 test('receipts from different resolver requests cannot be spliced', () => {
@@ -588,6 +747,106 @@ test('Edge CAS is first-terminal-wins and rejects a late success', () => {
   );
 });
 
+test('Edge refuses an unverified success terminal without mutating its receipt prefix', () => {
+  const events = [];
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS),
+    eventSink: event => events.push(event)
+  });
+  const value = header('unverified-success');
+  coordinator.acceptResolution(value);
+  const candidate = successfulProtocol(value);
+  const before = coordinator.workingSet(value.resolution_ref);
+
+  assert.throws(() => coordinator.commitProtocolCandidate(
+    value.resolution_ref,
+    candidate
+  ), { code: 'context_resolution_response_evidence_missing' });
+  assert.deepEqual(
+    coordinator.workingSet(value.resolution_ref),
+    before
+  );
+  assert.equal(
+    events.some(event => event.event === 'resolution_terminal_committed'),
+    false
+  );
+
+  const publicResolution = projectGovernedContextResolutionPublic(candidate);
+  const publicContentDigest = digestObject({
+    context_status: 'resolved',
+    resolution: publicResolution
+  });
+  coordinator.recordResponseVerification(value.resolution_ref, {
+    terminal_digest: candidate.terminal.terminal_digest,
+    public_content_digest: publicContentDigest,
+    relay_binding_digest: contextResolutionResponseBindingDigest({
+      requestDigest: value.request_digest,
+      resolutionRef: value.resolution_ref,
+      terminalDigest: candidate.terminal.terminal_digest,
+      structuredContentDigest: publicContentDigest
+    }),
+    public_resolution: publicResolution
+  });
+  assert.equal(coordinator.commitProtocolCandidate(
+    value.resolution_ref,
+    candidate
+  ).accepted, true);
+});
+
+test('Observer rejects a success terminal that lacks edge response verification', () => {
+  const observer = createGovernedContextResolutionObserver({
+    clock: () => new Date(NOW_MS)
+  });
+  const protocol = successfulProtocol(header('observer-unverified-success'));
+  assert.equal(observer.observe({
+    component: 'governed_context_resolution_coordinator',
+    event: 'resolution_accepted',
+    header: protocol.header,
+    accepted_at_ms: NOW_MS
+  }), true);
+  for (const receipt of protocol.receipts) {
+    assert.equal(observer.observe({
+      component: 'governed_context_resolution_coordinator',
+      event: 'resolution_receipt_appended',
+      resolution_ref: protocol.header.resolution_ref,
+      receipt
+    }), true);
+  }
+  assert.equal(observer.observe({
+    component: 'governed_context_resolution_coordinator',
+    event: 'resolution_terminal_committed',
+    resolution_ref: protocol.header.resolution_ref,
+    terminal: protocol.terminal,
+    response_verified: false
+  }), false);
+  assert.equal(observer.snapshot().terminal_successes, 0);
+  assert.equal(
+    observer.snapshot().last_violation_code,
+    'context_resolution_observer_response_evidence_missing'
+  );
+});
+
+test('Edge cancellation wins over a later resolver failure candidate', () => {
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => new Date(NOW_MS)
+  });
+  const value = header('cancel-over-failure');
+  coordinator.acceptResolution(value);
+  coordinator.cancelResolution(value.resolution_ref);
+  const lateFailure = failedProtocol(
+    'context_issuance_unavailable',
+    value
+  );
+  assert.throws(() => coordinator.commitProtocolCandidate(
+    value.resolution_ref,
+    lateFailure
+  ), { code: 'context_resolution_terminal_already_committed' });
+  assert.equal(
+    coordinator.protocol(value.resolution_ref).terminal.reason_code,
+    'resolution_cancelled'
+  );
+});
+
 test('Edge coordinator capacity is reusable across cancel, timeout, and success', () => {
   const coordinator = createGovernedContextResolutionCoordinator({
     clock: () => new Date(NOW_MS),
@@ -729,6 +988,32 @@ test('deadline wins over a success candidate validated at the boundary', () => {
   assert.equal(accepted.terminal.context_ref_issued, null);
 });
 
+test('Edge preserves a candidate finalized before the deadline while appending its receipt prefix', () => {
+  const value = header('candidate-finalization-deadline', { ttlSeconds: 1 });
+  const deadlineMs = Date.parse(value.deadline_at);
+  let boundaryReads = null;
+  const coordinator = createGovernedContextResolutionCoordinator({
+    clock: () => {
+      if (boundaryReads === null) return new Date(NOW_MS);
+      boundaryReads += 1;
+      return new Date(boundaryReads <= 2 ? deadlineMs - 1 : deadlineMs);
+    }
+  });
+  coordinator.acceptResolution(value);
+  const candidate = failedProtocol('context_mapping_not_found', value);
+
+  boundaryReads = 0;
+  const accepted = coordinator.commitProtocolCandidate(
+    value.resolution_ref,
+    candidate
+  );
+  assert.equal(accepted.accepted, true);
+  const protocol = coordinator.protocol(value.resolution_ref);
+  assert.equal(protocol.terminal.reason_code, 'context_mapping_not_found');
+  assert.equal(protocol.receipts.length, candidate.receipts.length);
+  assert.equal(coordinator.snapshot(value.resolution_ref).terminal_committed, true);
+});
+
 test('deadline wins when failed receipt validation crosses the boundary', () => {
   const value = header('receipt-validation-deadline', { ttlSeconds: 1 });
   const deadlineMs = Date.parse(value.deadline_at);
@@ -850,11 +1135,13 @@ test('Edge preserves Observer event order for a promise-returning sink', async (
   assert.deepEqual(delivered, [
     'resolution_accepted',
     ...Array(7).fill('resolution_receipt_appended'),
+    'resolution_response_verified',
     'resolution_terminal_committed'
   ]);
   const snapshot = observer.snapshot();
   assert.equal(snapshot.resolutions_accepted, 1);
   assert.equal(snapshot.receipts_accepted, 7);
+  assert.equal(snapshot.response_verifications_accepted, 1);
   assert.equal(snapshot.terminal_successes, 1);
   assert.equal(snapshot.protocol_violations, 0);
 });
@@ -886,7 +1173,7 @@ test('Edge bounds events queued behind a stalled promise-returning sink', async 
     event_sink_configured: true,
     max_pending_events: 2,
     pending_events: 2,
-    dropped_events: 7,
+    dropped_events: 8,
     delivery_compromised: true
   });
   assert.throws(() => coordinator.acceptResolution(
@@ -932,6 +1219,7 @@ test('Edge fails closed after a promise-returning Observer sink rejects', async 
   assert.deepEqual(delivered, [
     'resolution_accepted',
     ...Array(7).fill('resolution_receipt_appended'),
+    'resolution_response_verified',
     'resolution_terminal_committed'
   ]);
   assert.deepEqual(coordinator.observerDeliverySnapshot(), {
@@ -1218,7 +1506,7 @@ test('Observer rejects a tampered receipt independently', () => {
   assert.equal(snapshot.terminals_fabricated, 0);
 });
 
-test('live resolver imports the internal protocol without changing public v2 schemas', () => {
+test('resolver terminal projection updates only the public resolve output schema', () => {
   const repositoryRoot = path.resolve(__dirname, '../..');
   for (const relativePath of [
     'apps/chatgpt-edge/transient-request-broker.js',

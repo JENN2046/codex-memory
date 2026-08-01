@@ -119,7 +119,7 @@ const MEMORY_SCOPE_WIDGET_HTML = String.raw`<!doctype html>
         );
         document.querySelector('#context-reference').textContent = safeText(
           presentation && presentation.context_reference_status,
-          scope.context_status === 'resolved' ? 'issued' : 'not issued'
+          'unknown'
         );
       };
       const renderGlobals = globals => {

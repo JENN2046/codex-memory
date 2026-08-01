@@ -23,6 +23,10 @@ const {
   GOVERNED_READ_ATTEMPT_PROTOCOL,
   GOVERNED_READ_ATTEMPT_REF_PATTERN
 } = require('./governed-read-attempt');
+const {
+  GOVERNED_CONTEXT_RESOLUTION_NON_TERMINAL_STAGES,
+  GOVERNED_CONTEXT_RESOLUTION_PROTOCOL
+} = require('./governed-context-resolution');
 
 const projectContextReference = {
   type: 'string',
@@ -182,18 +186,68 @@ const GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA = deepFreeze(exactArguments
   }
 }));
 
-function edgeDataContent({ required, properties, attempt = false }) {
+const GOVERNED_CONTEXT_RESOLUTION_PUBLIC_PROJECTION_SCHEMA =
+  deepFreeze(exactArguments({
+    required: [
+      'protocol',
+      'outcome',
+      'last_completed_stage',
+      'failed_stage',
+      'reason_code',
+      'failure_category',
+      'failure_origin',
+      'context_ref_issued',
+      'context_ref_entered_response',
+      'context_ref_delivered',
+      'evidence_complete'
+    ],
+    properties: {
+      protocol: { const: GOVERNED_CONTEXT_RESOLUTION_PROTOCOL },
+      outcome: { enum: ['success', 'failure'] },
+      last_completed_stage: {
+        enum: [null, ...GOVERNED_CONTEXT_RESOLUTION_NON_TERMINAL_STAGES]
+      },
+      failed_stage: {
+        enum: [
+          null,
+          ...GOVERNED_CONTEXT_RESOLUTION_NON_TERMINAL_STAGES,
+          'TERMINAL_FAILURE'
+        ]
+      },
+      reason_code: { type: ['string', 'null'], pattern: '^[a-z][a-z0-9_]{0,79}$' },
+      failure_category: { type: ['string', 'null'], pattern: '^[a-z][a-z0-9_]{0,79}$' },
+      failure_origin: {
+        type: ['string', 'null'],
+        enum: [null, 'edge_broker', 'relay', 'governance']
+      },
+      context_ref_issued: { type: ['boolean', 'null'] },
+      context_ref_entered_response: { type: ['boolean', 'null'] },
+      context_ref_delivered: { type: ['boolean', 'null'] },
+      evidence_complete: { type: 'boolean' }
+    }
+  }));
+
+function edgeDataContent({
+  required,
+  properties,
+  attempt = false,
+  contextResolution = false
+}) {
   return exactArguments({
     required: [
       'schema_version',
       ...required,
-      ...(attempt ? ['attempt'] : [])
+      ...(attempt ? ['attempt'] : []),
+      ...(contextResolution ? ['resolution'] : [])
     ],
     properties: {
       schema_version: { const: CHATGPT_EDGE_DATA_SCHEMA_VERSION },
       ...properties,
       ...(attempt
         ? { attempt: GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA }
+        : {}),
+      ...(contextResolution
+        ? { resolution: GOVERNED_CONTEXT_RESOLUTION_PUBLIC_PROJECTION_SCHEMA }
         : {})
     }
   });
@@ -262,6 +316,7 @@ const toolResponseVariants = [
       'project_context_ref', 'safe_project_alias', 'expires_at',
       'visibility_labels', 'context_status'
     ],
+    contextResolution: true,
     properties: {
       project_context_ref: projectContextReference,
       safe_project_alias: {
@@ -282,10 +337,12 @@ const toolResponseVariants = [
   }), 'ok', { requireZeroCounters: true }),
   toolResponse('resolve_memory_context', edgeDataContent({
     required: ['context_status'],
+    contextResolution: true,
     properties: { context_status: { const: 'denied' } }
   }), 'denied', { requireZeroCounters: true }),
   toolResponse('resolve_memory_context', edgeDataContent({
     required: ['context_status'],
+    contextResolution: true,
     properties: { context_status: { const: 'unavailable' } }
   }), 'unavailable', { requireZeroCounters: true }),
   toolResponse('memory_overview', boundedStatusContent('overview'), 'ok'),
@@ -502,6 +559,7 @@ const WIDGET_DTO_SCHEMA = deepFreeze({
 
 module.exports = {
   GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA,
+  GOVERNED_CONTEXT_RESOLUTION_PUBLIC_PROJECTION_SCHEMA,
   PRINCIPAL_ASSERTION_SCHEMA,
   PROJECT_CONTEXT_CLAIM_SCHEMA,
   REQUEST_ENVELOPE_SCHEMA,

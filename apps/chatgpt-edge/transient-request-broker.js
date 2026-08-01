@@ -13,13 +13,15 @@ const {
   createTerminalEnvelope,
   createContextResolutionHeader,
   createContextResolutionStageReceipt,
-  contextResolutionFailureRegistryEntry,
+  contextResolutionPublicResponseStatus,
+  contextResolutionResponseBindingDigest,
   validateGovernedContextResolutionProtocol,
   isGovernedContextResolutionWorkingSetExtension,
   isGovernedReadAttemptWorkingSetExtension,
   governedReadAttemptResponseBindingDigest,
   digestObject,
   projectGovernedReadAttemptPublic,
+  projectGovernedContextResolutionPublic,
   validateAttemptCounterRelationships,
   validateAttemptHeader,
   validateGovernedReadAttemptProtocol,
@@ -44,6 +46,10 @@ const GOVERNED_ATTEMPT_FAILURE_RESULT_KIND =
   'governed_read_attempt_terminal_result';
 const GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND =
   'governed_read_attempt_response_result';
+const GOVERNED_CONTEXT_RESOLUTION_RESPONSE_RESULT_KIND =
+  'governed_context_resolution_response_result';
+const GOVERNED_CONTEXT_RESOLUTION_TERMINAL_RESULT_KIND =
+  'governed_context_resolution_terminal_result';
 const REQUIRED_ATTEMPT_COORDINATOR_METHODS = Object.freeze([
   'acceptAttempt',
   'appendReceipt',
@@ -60,6 +66,7 @@ const REQUIRED_CONTEXT_RESOLUTION_COORDINATOR_METHODS = Object.freeze([
   'cancelResolution',
   'commitProtocolCandidate',
   'protocol',
+  'recordResponseVerification',
   'reportCoordinatorLoss',
   'timeoutResolution',
   'workingSet'
@@ -214,10 +221,37 @@ function createTransientRequestBroker({
     });
   }
 
+  function contextResolutionResponseResult(record) {
+    if (!record.context_resolution_protocol || !record.response) {
+      reject('edge_context_resolution_response_missing');
+    }
+    return Object.freeze({
+      kind: GOVERNED_CONTEXT_RESOLUTION_RESPONSE_RESULT_KIND,
+      request_id: record.request.request_id,
+      tool_name: record.request.tool_request.name,
+      response: structuredClone(record.response),
+      governed_context_resolution:
+        structuredClone(record.context_resolution_protocol)
+    });
+  }
+
+  function contextResolutionTerminalResult(record) {
+    if (!record.context_resolution_protocol) {
+      reject('edge_context_resolution_terminal_missing');
+    }
+    return Object.freeze({
+      kind: GOVERNED_CONTEXT_RESOLUTION_TERMINAL_RESULT_KIND,
+      request_id: record.request.request_id,
+      tool_name: record.request.tool_request.name,
+      governed_context_resolution:
+        structuredClone(record.context_resolution_protocol)
+    });
+  }
+
   function completedBrokerResult(record) {
-    return record.attempt_ref
-      ? attemptResponseResult(record)
-      : structuredClone(record.response);
+    if (record.attempt_ref) return attemptResponseResult(record);
+    if (record.resolution_ref) return contextResolutionResponseResult(record);
+    return structuredClone(record.response);
   }
 
   function settleWaiters(record) {
@@ -230,6 +264,8 @@ function createTransientRequestBroker({
         waiter.resolve(completedBrokerResult(record));
       } else if (record.attempt_protocol) {
         waiter.resolve(attemptFailureResult(record));
+      } else if (record.context_resolution_protocol) {
+        waiter.resolve(contextResolutionTerminalResult(record));
       } else {
         const code = terminalError(record) || 'edge_request_not_completed';
         waiter.reject(Object.assign(new Error(code), { code }));
@@ -637,14 +673,23 @@ function createTransientRequestBroker({
         reject('edge_context_resolution_candidate_invalid');
       }
       const terminal = governedContextResolutionCandidate.terminal;
-      const expectedStatus = terminal.outcome === 'success'
+      const publicStatus = contextResolutionPublicResponseStatus(terminal);
+      const expectedContextStatus = publicStatus === 'ok'
         ? 'resolved'
-        : contextResolutionFailureRegistryEntry(
-          terminal.reason_code
-        ).public_response_status;
-      if (expectedStatus === null ||
-          response?.status !== (expectedStatus === 'resolved' ? 'ok' : expectedStatus) ||
-          response?.structured_content?.context_status !== expectedStatus) {
+        : publicStatus;
+      const expectedBinding = contextResolutionResponseBindingDigest({
+        requestDigest: digestObject(currentRecord.request),
+        resolutionRef: currentRecord.resolution_ref,
+        terminalDigest: terminal.terminal_digest,
+        structuredContentDigest: digestObject(response?.structured_content)
+      });
+      if (response?.status !== publicStatus ||
+          response?.structured_content?.context_status !== expectedContextStatus ||
+          canonicalJson(response?.structured_content?.resolution) !==
+            canonicalJson(projectGovernedContextResolutionPublic(
+              governedContextResolutionCandidate
+            )) ||
+          response?.receipt_chain?.relay !== expectedBinding) {
         reject('edge_context_resolution_response_binding_invalid');
       }
     }
@@ -658,6 +703,20 @@ function createTransientRequestBroker({
         governedCoordinator.protocol(currentRecord.attempt_ref);
     }
     if (currentRecord.resolution_ref) {
+      if (governedContextResolutionCandidate.terminal.outcome === 'success') {
+        resolutionCoordinator.recordResponseVerification(
+          currentRecord.resolution_ref,
+          {
+            terminal_digest:
+              governedContextResolutionCandidate.terminal.terminal_digest,
+            public_content_digest:
+              digestObject(acceptedResponse.structured_content),
+            relay_binding_digest: acceptedResponse.receipt_chain.relay,
+            public_resolution:
+              structuredClone(acceptedResponse.structured_content.resolution)
+          }
+        );
+      }
       resolutionCoordinator.commitProtocolCandidate(
         currentRecord.resolution_ref,
         governedContextResolutionCandidate
@@ -765,6 +824,14 @@ function createTransientRequestBroker({
             attemptFailureResult(record)
         };
       }
+      if (record.context_resolution_protocol) {
+        return {
+          request_id: requestId,
+          status: record.status,
+          governed_context_resolution_result:
+            contextResolutionTerminalResult(record)
+        };
+      }
       return { request_id: requestId, status: record.status };
     }
     return {
@@ -784,6 +851,9 @@ function createTransientRequestBroker({
     }
     if (record.attempt_protocol) {
       return Promise.resolve(attemptFailureResult(record));
+    }
+    if (record.context_resolution_protocol) {
+      return Promise.resolve(contextResolutionTerminalResult(record));
     }
     const code = terminalError(record);
     if (code) return Promise.reject(Object.assign(new Error(code), { code }));
@@ -1317,6 +1387,8 @@ function createGovernedReadAttemptCoordinator({
 module.exports = {
   GOVERNED_ATTEMPT_FAILURE_RESULT_KIND,
   GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND,
+  GOVERNED_CONTEXT_RESOLUTION_RESPONSE_RESULT_KIND,
+  GOVERNED_CONTEXT_RESOLUTION_TERMINAL_RESULT_KIND,
   TERMINAL_STATES,
   createGovernedReadAttemptCoordinator,
   createTransientRequestBroker

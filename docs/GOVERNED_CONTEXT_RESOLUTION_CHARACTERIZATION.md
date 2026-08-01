@@ -35,8 +35,8 @@ read tool, hydrate a store, read memory, or perform a lifecycle action.
 | Mapping not matched | signed low-disclosure `denied`; no context ref |
 | Requested scope not allowed | signed low-disclosure `denied`; no context ref |
 | Issuer reports unavailable | signed low-disclosure `unavailable`; no context ref |
-| Issuer throws a coded failure | exact boundary error code is preserved; no signed resolver terminal |
-| Issuer returns an invalid result | exact `context_issue_result_invalid` boundary failure |
+| Issuer throws a coded failure | signed canonical `context_issuance_failed`; no context ref |
+| Issuer returns an invalid result | signed canonical `context_issue_result_invalid`; no context ref |
 | Response projection drops the ref | exact `response_structured_content_shape_invalid` rejection at Edge and external-MCP validation |
 | Response projection carries a malformed ref | exact `project_context_ref_invalid` rejection at Edge and external-MCP validation |
 | Response projection carries an expired ref | exact `response_context_expired` rejection at Edge and external-MCP validation |
@@ -55,52 +55,35 @@ a canonical timestamp. The verifier now rejects a successful resolve response
 when that projected expiry is not later than both its validation clock and the
 response issuance time.
 
-This is a validation tightening only. It does not add a tool, input, output
-field, public schema variant, provider path, fallback, or memory-read path.
+This is a validation tightening only. The later resolver-terminal projection
+adds only the authorized v2 `resolution` output object; it does not add a tool,
+change an input schema, add a provider path or fallback, or read memory.
 
-## Terminal evidence gap
+## Resolver terminal evidence
 
 The active source keeps `resolve_memory_context` outside
-`governed_read_attempt.v1`, as intended. Governance currently creates context
-and governance receipts, but Relay and Edge receive only their digests.
-Resolver failures therefore have either:
+`governed_read_attempt.v1`, as intended. It now has an immutable
+`resolution_ref`, ordered resolver receipts, canonical terminal envelope,
+first-terminal CAS, and an independent Observer. Relay signs the terminal's
+binding to both the exact request and public structured-content digest. Edge
+and external MCP independently re-derive that binding before public output.
 
-- a signed status-only public projection (`denied` or `unavailable`); or
-- an exact boundary error code rejected before a signed resolver result exists.
-
-The tests preserve this distinction: they prove exact coded-error propagation
-at the boundary and prove by exact shape checks that status-only projections do
-not invent a reason. They do not relabel either form as a resolver terminal.
-
-There is no immutable resolver operation identity, ordered resolver receipt
-chain, canonical resolver terminal envelope, or protocol-level first-terminal
-CAS. The existing transient request state prevents a normal late completion
-from replacing a completed/cancelled/expired transport record, but that state is
-not a resolver terminal receipt and does not preserve a canonical resolver
-reason for Observer verification.
-
-This gap means the consumed R5-O `_005` result cannot be reconstructed or
-attributed to activation, mapping, scope, issuance, projection, or expiry from
-the available low-disclosure facts.
-
-## Follow-on dormant contract
-
-The independent follow-on source change introduces a dormant,
-transport-neutral `governed_context_resolution.v1` contract. It shares neutral
-failure-registry infrastructure and the governed Observer verification model,
-while retaining a separate operation identity and a resolver-specific evidence
-model with no read counters. See `GOVERNED_CONTEXT_RESOLUTION_V1.md`.
-
-Any change that adds its terminal projection to the public ChatGPT Edge v2
-output schema remains outside this characterization and requires the applicable
-current exact authorization before implementation.
+The authorized public projection carries only low-disclosure terminal facts.
+It distinguishes context creation, Relay response inclusion, and Edge-verified
+delivery through `context_ref_issued`, `context_ref_entered_response`, and
+`context_ref_delivered`. Response-finalization failure can prove issuance while
+retaining inclusion and delivery false. Status-only v2 resolver output cannot
+pretend to have canonical evidence. The explicit Edge terminal-result and
+confirmed transport-loss paths project incomplete evidence as `unavailable`
+with null reason/category/origin; `terminal_missing` remains an Observer
+violation that does not manufacture a canonical failure.
 
 ## Validation
 
 ```bash
 node --check packages/chatgpt-r4-contracts/validators.js
 node --check tests/chatgpt-r4/governed-context-resolution-characterization.test.js
-node --test tests/chatgpt-r4-governed-context-resolution-characterization.test.js
+node --test tests/chatgpt-r4/governed-context-resolution-characterization.test.js
 ```
 
 This evidence is synthetic and source-only. It does not establish R5-O, R5-H,

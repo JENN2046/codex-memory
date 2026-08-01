@@ -3,9 +3,13 @@
 const {
   GOVERNED_CONTEXT_RESOLUTION_EVENT_COMPONENT,
   GOVERNED_CONTEXT_RESOLUTION_LIMITS,
+  canonicalJson,
+  contextResolutionResponseBindingDigest,
   createContextResolutionTerminalEnvelope,
+  projectGovernedContextResolutionPublic,
   reject,
   validateContextResolutionHeader,
+  validateGovernedContextResolutionPublicProjection,
   validateContextResolutionStageReceipt,
   validateContextResolutionTerminalEnvelope
 } = require('../../packages/chatgpt-r4-contracts');
@@ -38,6 +42,7 @@ function createGovernedContextResolutionObserver({
     receipts_accepted: 0,
     terminal_successes: 0,
     terminal_failures: 0,
+    response_verifications_accepted: 0,
     terminals_rejected: 0,
     terminals_missing: 0,
     protocol_violations: 0
@@ -159,6 +164,7 @@ function createGovernedContextResolutionObserver({
           header: structuredClone(event.header),
           receipts: [],
           terminal: null,
+          response_verification: null,
           missing: false,
           purge_after_ms: null
         });
@@ -209,7 +215,37 @@ function createGovernedContextResolutionObserver({
           header: record.header,
           receipts: record.receipts
         });
+        if (event.response_verified !== undefined &&
+            typeof event.response_verified !== 'boolean') {
+          return violation(
+            'context_resolution_observer_response_evidence_invalid'
+          );
+        }
+        if (event.terminal.outcome === 'success' &&
+            event.response_verified !== true) {
+          return violation(
+            'context_resolution_observer_response_evidence_missing'
+          );
+        }
+        if (event.terminal.outcome === 'success') {
+          const evidence = record.response_verification;
+          const protocol = {
+            header: record.header,
+            receipts: record.receipts,
+            terminal: event.terminal
+          };
+          if (!evidence ||
+              evidence.terminal_digest !== event.terminal.terminal_digest ||
+              canonicalJson(evidence.public_resolution) !== canonicalJson(
+                projectGovernedContextResolutionPublic(protocol)
+              )) {
+            return violation(
+              'context_resolution_observer_response_evidence_missing'
+            );
+          }
+        }
         record.terminal = structuredClone(event.terminal);
+        record.response_verification = null;
         record.purge_after_ms = retainedUntil(record, currentMs);
         markReplayTombstoneClosure(event.resolution_ref, 'terminal');
         if (event.terminal.outcome === 'success') {
@@ -217,6 +253,36 @@ function createGovernedContextResolutionObserver({
         } else {
           counters.terminal_failures += 1;
         }
+        return true;
+      }
+      if (event.event === 'resolution_response_verified') {
+        const record = resolutions.get(event.resolution_ref);
+        if (!record || record.terminal || record.missing ||
+            record.response_verification !== null ||
+            event.request_digest !== record.header.request_digest) {
+          return violation(
+            'context_resolution_observer_response_evidence_invalid'
+          );
+        }
+        validateGovernedContextResolutionPublicProjection(
+          event.public_resolution
+        );
+        const expectedBinding = contextResolutionResponseBindingDigest({
+          requestDigest: record.header.request_digest,
+          resolutionRef: event.resolution_ref,
+          terminalDigest: event.terminal_digest,
+          structuredContentDigest: event.public_content_digest
+        });
+        if (event.relay_binding_digest !== expectedBinding) {
+          return violation(
+            'context_resolution_observer_response_evidence_invalid'
+          );
+        }
+        record.response_verification = Object.freeze({
+          terminal_digest: event.terminal_digest,
+          public_resolution: structuredClone(event.public_resolution)
+        });
+        counters.response_verifications_accepted += 1;
         return true;
       }
       if (event.event === 'resolution_terminal_rejected') {

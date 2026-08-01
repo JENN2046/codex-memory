@@ -19,6 +19,9 @@ const {
 const {
   toolDescriptors
 } = require('../../apps/chatgpt-edge');
+const {
+  createSuccessfulContextResolutionProtocol
+} = require('./governed-read-test-helpers');
 
 const NOW = new Date('2026-07-31T00:00:00.000Z');
 const INPUT_SCHEMA_DIGESTS = Object.freeze({
@@ -191,6 +194,13 @@ test('data response v2 keeps resolve outside attempts and binds every read', () 
       toolName
     );
   }
+  const resolutionProtocol = createSuccessfulContextResolutionProtocol({
+    request_id: 'req_cutover_resolution_0000001',
+    expires_at: '2026-07-31T00:01:00.000Z'
+  }, {
+    now: NOW,
+    resolutionRef: `gcr_${'r'.repeat(32)}`
+  });
   const resolved = createChatGptEdgeDataResponseV2({
     toolName: 'resolve_memory_context',
     structuredContent: {
@@ -199,13 +209,15 @@ test('data response v2 keeps resolve outside attempts and binds every read', () 
       expires_at: '2026-07-31T00:01:00.000Z',
       visibility_labels: ['project'],
       context_status: 'resolved'
-    }
+    },
+    governedContextResolution: resolutionProtocol
   });
   assert.equal(
     resolved.schema_version,
     CHATGPT_EDGE_DATA_SCHEMA_VERSION
   );
   assert.equal(Object.hasOwn(resolved, 'attempt'), false);
+  assert.equal(resolved.resolution.protocol, 'governed_context_resolution.v1');
   assert.doesNotThrow(() => validateToolStructuredContent(
     'resolve_memory_context',
     resolved

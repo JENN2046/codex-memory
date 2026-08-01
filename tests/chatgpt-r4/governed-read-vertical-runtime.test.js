@@ -1822,6 +1822,7 @@ test('Edge validates every injected resolver coordinator lifecycle method', () =
     'appendReceipt',
     'cancelResolution',
     'commitProtocolCandidate',
+    'recordResponseVerification',
     'reportCoordinatorLoss',
     'timeoutResolution',
     'workingSet'
@@ -1876,6 +1877,7 @@ test('loopback rejects a restart that would replace an injected resolver coordin
     'appendReceipt',
     'cancelResolution',
     'commitProtocolCandidate',
+    'recordResponseVerification',
     'timeoutResolution',
     'workingSet'
   ].map(method => [method, () => {}]));

@@ -27,15 +27,45 @@ validated separately; it is not an active public v1 response path.
 
 ## Resolve remains context setup
 
-`resolve_memory_context` does not create an attempt. Its successful or
-low-disclosure denied/unavailable result adds only:
+`resolve_memory_context` does not create a read attempt. Its existing context
+result fields remain unchanged and its v2 output now adds the low-disclosure
+terminal projection from the separate `governed_context_resolution.v1`
+protocol:
 
 ```yaml
 schema_version: 2
+resolution:
+  protocol: governed_context_resolution.v1
+  outcome: success | failure
+  last_completed_stage: STAGE | null
+  failed_stage: STAGE | null
+  reason_code: safe_code | null
+  failure_category: safe_category | null
+  failure_origin: safe_origin | null
+  context_ref_issued: true | false | null
+  context_ref_entered_response: true | false | null
+  context_ref_delivered: true | false | null
+  evidence_complete: true | false
 ```
 
-The existing context result fields remain unchanged. An `attempt` field on a
-resolve result is rejected.
+Successful resolve output has `context_status: resolved`, a valid unexpired
+`project_context_ref`, and separate issued, entered-response, and delivered
+evidence all true. A canonical failure has `context_status: denied` or
+`unavailable` and can disclose only a failure-registry entry explicitly marked
+projection-safe. A response finalization failure preserves issuance while
+reporting entered-response and delivery false at `RESPONSE_FINALIZED`.
+
+The Relay signature binds request digest, resolver identity, terminal digest,
+and public structured-content digest. Edge and external MCP validation
+independently re-derive that binding and the projection. A v1 resolver output,
+a status-only v2 downgrade, or a relayed resolver response lacking canonical
+terminal evidence is rejected. Incomplete evidence may not invent a reason: it
+has `evidence_complete: false` and null reason/category/origin. Only the
+external Edge's terminal-result or confirmed transport-loss path may locally
+construct that unconfirmed fallback; it is not a Relay-signed/bound result.
+
+An `attempt` field on a resolve result is rejected, and a `resolution` field on
+a governed read result is rejected.
 
 ## Every read has one attempt
 

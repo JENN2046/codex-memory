@@ -17,11 +17,14 @@ const {
   appendGovernedContextResolutionStage,
   appendGovernedReadAttemptStage,
   createChatGptEdgeDataResponseV2,
+  createContextResolutionHeader,
   createGovernedReadAttemptProtocol,
   createGovernedContextResolutionProtocol,
+  createGovernedContextResolutionWorkingSet,
   createContextResolutionTerminalEnvelope,
   createResponseEnvelope,
   createTerminalEnvelope,
+  contextResolutionResponseBindingDigest,
   digestObject,
   governedReadAttemptResponseBindingDigest,
   projectLegacyCountersFromGovernedReadAttempt,
@@ -33,7 +36,9 @@ const {
   createAuth0TokenVerifier,
   createExternalEdgeRuntime,
   createExternalMcpHandler,
+  createUnknownContextResolutionResponse,
   createTransientRequestBroker,
+  GOVERNED_CONTEXT_RESOLUTION_TERMINAL_RESULT_KIND,
   normalizeBrokerResult,
   validateExternalEdgeRuntimeConfig
 } = require('../../apps/chatgpt-edge');
@@ -288,23 +293,35 @@ test('external Edge serves PRMD and returns governed data response v2', async t 
     request_id: resolveClaim.body.request_id,
     claim_token: resolveClaim.body.claim_token
   });
-  const resolveResponse = createResponseEnvelope({
-    requestId: resolveClaim.body.request.request_id,
-    requestDigest: digestObject(resolveClaim.body.request),
+  const resolveCandidate = successfulContextResolutionCandidate(
+    resolveClaim.body.governed_context_resolution
+  );
+  const resolveStructuredContent = createChatGptEdgeDataResponseV2({
     toolName: 'resolve_memory_context',
-    status: 'ok',
     structuredContent: {
-      schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
       project_context_ref: `pctx_${'A'.repeat(32)}`,
       safe_project_alias: 'project-alpha',
       expires_at: new Date(Date.now() + 60_000).toISOString(),
       visibility_labels: ['project'],
       context_status: 'resolved'
     },
+    governedContextResolution: resolveCandidate
+  });
+  const resolveResponse = createResponseEnvelope({
+    requestId: resolveClaim.body.request.request_id,
+    requestDigest: digestObject(resolveClaim.body.request),
+    toolName: 'resolve_memory_context',
+    status: 'ok',
+    structuredContent: resolveStructuredContent,
     counters: { ...ZERO_MEMORY_COUNTERS },
     receiptChain: {
       edge_request: digestObject(resolveClaim.body.request),
-      relay: sha256('r4d-resolve-relay-receipt'),
+      relay: contextResolutionResponseBindingDigest({
+        requestDigest: digestObject(resolveClaim.body.request),
+        resolutionRef: resolveCandidate.header.resolution_ref,
+        terminalDigest: resolveCandidate.terminal.terminal_digest,
+        structuredContentDigest: digestObject(resolveStructuredContent)
+      }),
       governance: sha256('r4d-resolve-governance-receipt'),
       context: sha256('r4d-resolve-context-receipt')
     },
@@ -314,10 +331,7 @@ test('external Edge serves PRMD and returns governed data response v2', async t 
     request_id: resolveClaim.body.request_id,
     claim_token: resolveClaim.body.claim_token,
     response: resolveResponse,
-    governed_context_resolution_candidate:
-      successfulContextResolutionCandidate(
-        resolveClaim.body.governed_context_resolution
-      )
+    governed_context_resolution_candidate: resolveCandidate
   });
   const resolved = await resolveCall;
   assert.equal(
@@ -327,6 +341,10 @@ test('external Edge serves PRMD and returns governed data response v2', async t 
   assert.equal(
     Object.hasOwn(resolved.body.result.structuredContent, 'attempt'),
     false
+  );
+  assert.equal(
+    resolved.body.result.structuredContent.resolution.outcome,
+    'success'
   );
 
   const toolCall = mcpRequest(address, rpcRequest(9, 'tools/call', {
@@ -979,6 +997,272 @@ test('external MCP independently requires signed canonical broker evidence befor
     ),
     { code: 'edge_attempt_response_binding_invalid' }
   );
+});
+
+test('external MCP re-derives resolver terminal bindings and rejects projection injection', async t => {
+  const now = new Date('2026-07-31T00:00:00.000Z');
+  const relayIdentity = signingIdentity('resolver-normalization-relay');
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    verifyResponse(response, expectedRequest) {
+      return validateResponseEnvelope(response, {
+        now,
+        resolveResponsePublicKey: keyId =>
+          keyId === relayIdentity.keyId ? relayIdentity.publicKey : null,
+        expectedRequest
+      });
+    },
+    clock: () => now
+  });
+  t.after(() => broker.close());
+  const request = {
+    request_id: 'req_external_resolver_projection_00001',
+    nonce: 'request_nonce_external_resolver_projection_01',
+    expires_at: new Date(now.getTime() + 60_000).toISOString(),
+    tool_request: {
+      name: 'resolve_memory_context',
+      arguments: {
+        project_alias: 'codex-memory',
+        requested_visibility: 'project'
+      }
+    }
+  };
+  const buildResponse = (boundRequest, candidate, safeProjectAlias) => {
+    const structuredContent = createChatGptEdgeDataResponseV2({
+      toolName: 'resolve_memory_context',
+      structuredContent: {
+        project_context_ref: `pctx_${'P'.repeat(32)}`,
+        safe_project_alias: safeProjectAlias,
+        expires_at: new Date(now.getTime() + 60_000).toISOString(),
+        visibility_labels: ['project'],
+        context_status: 'resolved'
+      },
+      governedContextResolution: candidate
+    });
+    return createResponseEnvelope({
+      requestId: boundRequest.request_id,
+      requestDigest: digestObject(boundRequest),
+      toolName: 'resolve_memory_context',
+      status: 'ok',
+      structuredContent,
+      counters: ZERO_MEMORY_COUNTERS,
+      receiptChain: {
+        edge_request: digestObject(boundRequest),
+        relay: contextResolutionResponseBindingDigest({
+          requestDigest: digestObject(boundRequest),
+          resolutionRef: candidate.header.resolution_ref,
+          terminalDigest: candidate.terminal.terminal_digest,
+          structuredContentDigest: digestObject(structuredContent)
+        }),
+        governance: sha256('resolver-normalization-governance'),
+        context: sha256('resolver-normalization-context')
+      },
+      now,
+      signing: signing(relayIdentity)
+    });
+  };
+
+  await broker.submit(request);
+  const claim = broker.claim('resolver-normalization-relay');
+  broker.acknowledge(claim.request_id, claim.claim_token);
+  const candidate = successfulContextResolutionCandidate(
+    claim.governed_context_resolution
+  );
+
+  let alternateWorkingSet = createGovernedContextResolutionWorkingSet({
+    header: createContextResolutionHeader({
+      resolutionRef: `gcr_${'R'.repeat(32)}`,
+      requestDigest: digestObject(request),
+      now,
+      ttlSeconds: 60
+    })
+  });
+  for (const stage of ['CREATED', 'EDGE_VALIDATED']) {
+    alternateWorkingSet = appendGovernedContextResolutionStage(
+      alternateWorkingSet,
+      { stage }
+    );
+  }
+  const alternateCandidate = successfulContextResolutionCandidate(
+    alternateWorkingSet
+  );
+  const alternateResponse = buildResponse(
+    request,
+    alternateCandidate,
+    'codex-memory'
+  );
+  await assert.rejects(
+    broker.complete(
+      claim.request_id,
+      claim.claim_token,
+      alternateResponse,
+      null,
+      alternateCandidate
+    ),
+    { code: 'edge_context_resolution_candidate_invalid' }
+  );
+  const response = buildResponse(request, candidate, 'codex-memory');
+  await broker.complete(
+    claim.request_id,
+    claim.claim_token,
+    response,
+    null,
+    candidate
+  );
+  const brokerResult = await broker.waitForResult(request.request_id);
+  const verifyBrokerResponse = (value, expectedRequest) =>
+    validateResponseEnvelope(value, {
+      now,
+      resolveResponsePublicKey: keyId =>
+        keyId === relayIdentity.keyId ? relayIdentity.publicKey : null,
+      expectedRequest
+    });
+  assert.deepEqual(
+    normalizeBrokerResult(
+      'resolve_memory_context',
+      request,
+      brokerResult,
+      { verifyBrokerResponse }
+    ),
+    response
+  );
+
+  assert.throws(() => normalizeBrokerResult(
+    'resolve_memory_context',
+    request,
+    response,
+    { verifyBrokerResponse }
+  ), { code: 'edge_context_resolution_response_result_required' });
+
+  const terminalTamper = structuredClone(brokerResult);
+  terminalTamper.governed_context_resolution.terminal.terminal_digest =
+    sha256('resolver-terminal-tamper');
+  assert.throws(() => normalizeBrokerResult(
+    'resolve_memory_context',
+    request,
+    terminalTamper,
+    { verifyBrokerResponse }
+  ), { code: 'edge_context_resolution_response_binding_invalid' });
+
+  const projectedContentTamper = createResponseEnvelope({
+    requestId: request.request_id,
+    requestDigest: digestObject(request),
+    toolName: 'resolve_memory_context',
+    status: 'ok',
+    structuredContent: {
+      ...response.structured_content,
+      safe_project_alias: 'other-safe-project'
+    },
+    counters: ZERO_MEMORY_COUNTERS,
+    receiptChain: response.receipt_chain,
+    now,
+    signing: signing(relayIdentity)
+  });
+  assert.throws(() => normalizeBrokerResult(
+    'resolve_memory_context',
+    request,
+    { ...brokerResult, response: projectedContentTamper },
+    { verifyBrokerResponse }
+  ), { code: 'edge_context_resolution_response_binding_invalid' });
+
+  const downgradedV1Response = createResponseEnvelope({
+    requestId: request.request_id,
+    requestDigest: digestObject(request),
+    toolName: 'resolve_memory_context',
+    status: 'ok',
+    structuredContent: {
+      ...response.structured_content,
+      schema_version: 1
+    },
+    counters: ZERO_MEMORY_COUNTERS,
+    receiptChain: response.receipt_chain,
+    now,
+    signing: signing(relayIdentity)
+  });
+  assert.throws(() => normalizeBrokerResult(
+    'resolve_memory_context',
+    request,
+    { ...brokerResult, response: downgradedV1Response },
+    { verifyBrokerResponse }
+  ), { code: 'response_data_schema_version_invalid' });
+
+  const otherRequest = {
+    ...request,
+    request_id: 'req_external_resolver_projection_00002',
+    nonce: 'request_nonce_external_resolver_projection_02'
+  };
+  await broker.submit(otherRequest);
+  const otherClaim = broker.claim('resolver-normalization-relay');
+  broker.acknowledge(otherClaim.request_id, otherClaim.claim_token);
+  const otherCandidate = successfulContextResolutionCandidate(
+    otherClaim.governed_context_resolution
+  );
+  const crossRequestInjection = {
+    ...brokerResult,
+    governed_context_resolution: otherCandidate
+  };
+  assert.throws(() => normalizeBrokerResult(
+    'resolve_memory_context',
+    request,
+    crossRequestInjection,
+    { verifyBrokerResponse }
+  ), { code: 'edge_context_resolution_response_binding_invalid' });
+});
+
+test('external resolver output keeps incomplete terminal evidence unknown', async t => {
+  const now = new Date('2026-07-31T00:00:00.000Z');
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => now
+  });
+  t.after(() => broker.close());
+  const request = {
+    request_id: 'req_external_resolver_unknown_000001',
+    nonce: 'request_nonce_external_resolver_unknown_0001',
+    expires_at: new Date(now.getTime() + 60_000).toISOString(),
+    tool_request: {
+      name: 'resolve_memory_context',
+      arguments: {
+        project_alias: 'codex-memory',
+        requested_visibility: 'project'
+      }
+    }
+  };
+  await broker.submit(request);
+  const claim = broker.claim('resolver-unknown-relay');
+  broker.acknowledge(claim.request_id, claim.claim_token);
+  broker.cancel(request.request_id);
+  assert.equal(
+    broker.result(request.request_id)
+      .governed_context_resolution_result.kind,
+    GOVERNED_CONTEXT_RESOLUTION_TERMINAL_RESULT_KIND
+  );
+  const terminalResult = await broker.waitForResult(request.request_id);
+  assert.equal(
+    terminalResult.kind,
+    GOVERNED_CONTEXT_RESOLUTION_TERMINAL_RESULT_KIND
+  );
+  const normalized = normalizeBrokerResult(
+    'resolve_memory_context',
+    request,
+    terminalResult,
+    { verifyBrokerResponse() {} }
+  );
+  assert.deepEqual(normalized, createUnknownContextResolutionResponse());
+  assert.deepEqual(normalized.structured_content.resolution, {
+    protocol: 'governed_context_resolution.v1',
+    outcome: 'failure',
+    last_completed_stage: null,
+    failed_stage: null,
+    reason_code: null,
+    failure_category: null,
+    failure_origin: null,
+    context_ref_issued: null,
+    context_ref_entered_response: null,
+    context_ref_delivered: null,
+    evidence_complete: false
+  });
 });
 
 test('external Edge configuration rejects non-public origins, unsafe bind, and non-Ed25519 signing', () => {

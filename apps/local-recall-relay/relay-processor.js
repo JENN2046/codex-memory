@@ -3,6 +3,7 @@
 const {
   COUNTER_MODES,
   LIMITS,
+  ZERO_MEMORY_COUNTERS,
   appendGovernedContextResolutionStage,
   appendGovernedReadAttemptStage,
   createChatGptEdgeDataResponseV2,
@@ -10,6 +11,8 @@ const {
   createGovernedReadAttemptProtocol,
   createGovernedContextResolutionProtocol,
   createContextResolutionTerminalEnvelope,
+  contextResolutionPublicResponseStatus,
+  contextResolutionResponseBindingDigest,
   createResponseEnvelope,
   createTerminalEnvelope,
   digestObject,
@@ -43,9 +46,14 @@ function createRelayProcessor({
   clock = () => new Date(),
   governedReadAttemptStageHooks,
   governedContextResolutionStageHooks,
-  governedContextResolutions = false
+  governedContextResolutions = false,
+  contextResolutionResponseResultFactory =
+    contextResolutionResponseResult
 }) {
   if (typeof forwardToUds !== 'function') reject('relay_forwarder_missing');
+  if (typeof contextResolutionResponseResultFactory !== 'function') {
+    reject('relay_context_resolution_response_factory_invalid');
+  }
 
   return Object.freeze({
     async handle(request, {
@@ -145,12 +153,21 @@ function createRelayProcessor({
           error.governed_context_resolution,
           relayContextResolution
         );
-        return createContextResolutionFailureResult({
+        const failure = createContextResolutionFailureResult({
           workingSet: continuation.working_set,
           reasonCode: continuation.terminal_failure?.reason_code ||
             'context_issuance_failed',
           errorCode: error.code,
           evidenceComplete: continuation.evidence_complete
+        });
+        return contextResolutionResponseResultFactory({
+          requestId,
+          requestDigest: validation.requestDigest,
+          responseNow: clock(),
+          requestExpiresAt: request.expires_at,
+          relayReceipt,
+          candidate: failure.governed_context_resolution_failure_candidate,
+          responseSigning
         });
       }
       const responseNow = clock();
@@ -197,37 +214,8 @@ function createRelayProcessor({
           invocation.governed_context_resolution,
           relayContextResolution
         );
-        let response;
-        try {
-          response = createResponseEnvelope({
-            requestId,
-            requestDigest: validation.requestDigest,
-            toolName,
-            status: invocation.status,
-            structuredContent: createChatGptEdgeDataResponseV2({
-              toolName,
-              structuredContent: invocation.structured_content
-            }),
-            counters: invocation.counters,
-            receiptChain,
-            now: responseNow,
-            ttlSeconds: Math.min(
-              LIMITS.maxEnvelopeTtlSeconds,
-              remainingRequestTtlMs / 1000
-            ),
-            signing: responseSigning
-          });
-        } catch (error) {
-          return createContextResolutionFailureResult({
-            workingSet: continuation.working_set,
-            reasonCode: 'context_response_projection_invalid',
-            errorCode: error.code,
-            evidenceComplete: true
-          });
-        }
         let candidateWorkingSet = continuation.working_set;
         let terminal;
-        let responseFinalizationFailed = false;
         const lastReceipt = candidateWorkingSet.receipts.at(-1);
         if (continuation.terminal_failure) {
           terminal = createContextResolutionTerminalEnvelope({
@@ -271,7 +259,6 @@ function createRelayProcessor({
               evidenceComplete: true
             });
           } catch {
-            responseFinalizationFailed = true;
             candidateWorkingSet = appendGovernedContextResolutionStage(
               candidateWorkingSet,
               {
@@ -295,16 +282,37 @@ function createRelayProcessor({
           receipts: candidateWorkingSet.receipts,
           terminal
         });
-        if (responseFinalizationFailed) {
-          return Object.freeze({
-            governed_context_resolution_failure_candidate: candidate,
-            error_code: 'context_response_finalization_failed'
+        try {
+          return contextResolutionResponseResultFactory({
+            requestId,
+            requestDigest: validation.requestDigest,
+            responseNow,
+            requestExpiresAt: request.expires_at,
+            relayReceipt,
+            receiptChain,
+            invocation,
+            candidate,
+            responseSigning
+          });
+        } catch (error) {
+          if (candidate.terminal.outcome !== 'success') throw error;
+          const failure = createContextResolutionFailureResult({
+            workingSet: continuation.working_set,
+            reasonCode: 'context_response_projection_invalid',
+            errorCode: error.code,
+            evidenceComplete: true
+          });
+          return contextResolutionResponseResultFactory({
+            requestId,
+            requestDigest: validation.requestDigest,
+            responseNow,
+            requestExpiresAt: request.expires_at,
+            relayReceipt,
+            receiptChain,
+            candidate: failure.governed_context_resolution_failure_candidate,
+            responseSigning
           });
         }
-        return Object.freeze({
-          response,
-          governed_context_resolution_candidate: candidate
-        });
       }
 
       const continuation = validateAttemptContinuation(
@@ -509,6 +517,80 @@ function validateContextResolutionContinuation(value, prefix) {
   return value;
 }
 
+function contextResolutionResponseResult({
+  requestId,
+  requestDigest,
+  responseNow,
+  requestExpiresAt,
+  relayReceipt,
+  receiptChain = null,
+  invocation = null,
+  candidate,
+  responseSigning
+}) {
+  const terminal = candidate?.terminal;
+  const publicStatus = contextResolutionPublicResponseStatus(terminal);
+  const status = publicStatus === 'ok' ? 'ok' : publicStatus;
+  const legacyContent = terminal.outcome === 'success'
+    ? invocation?.structured_content
+    : { context_status: publicStatus };
+  const structuredContent = createChatGptEdgeDataResponseV2({
+    toolName: 'resolve_memory_context',
+    structuredContent: legacyContent,
+    governedContextResolution: candidate
+  });
+  const baseReceiptChain = receiptChain || {
+    edge_request: requestDigest,
+    relay: digestObject(relayReceipt),
+    governance: contextResolutionReceiptDigest(candidate, 'governance'),
+    context: contextResolutionReceiptDigest(candidate, 'context')
+  };
+  const boundReceiptChain = {
+    ...baseReceiptChain,
+    relay: contextResolutionResponseBindingDigest({
+      requestDigest,
+      resolutionRef: candidate.header.resolution_ref,
+      terminalDigest: terminal.terminal_digest,
+      structuredContentDigest: digestObject(structuredContent)
+    })
+  };
+  validateReceiptChain(boundReceiptChain);
+  const remainingRequestTtlMs =
+    Date.parse(requestExpiresAt) - responseNow.getTime();
+  if (!Number.isFinite(remainingRequestTtlMs) || remainingRequestTtlMs <= 0) {
+    reject('relay_request_expired_before_response');
+  }
+  return Object.freeze({
+    response: createResponseEnvelope({
+      requestId,
+      requestDigest,
+      toolName: 'resolve_memory_context',
+      status,
+      structuredContent,
+      counters: ZERO_MEMORY_COUNTERS,
+      receiptChain: boundReceiptChain,
+      now: responseNow,
+      ttlSeconds: Math.min(
+        LIMITS.maxEnvelopeTtlSeconds,
+        remainingRequestTtlMs / 1000
+      ),
+      signing: responseSigning
+    }),
+    governed_context_resolution_candidate: candidate
+  });
+}
+
+function contextResolutionReceiptDigest(candidate, origin) {
+  const receipt = [...candidate.receipts].reverse().find(value =>
+    value.origin === origin
+  );
+  return receipt?.receipt_digest || digestObject({
+    protocol: candidate.terminal.protocol,
+    terminal_digest: candidate.terminal.terminal_digest,
+    component: origin
+  });
+}
+
 function createContextResolutionFailureResult({
   workingSet,
   reasonCode,
@@ -524,8 +606,7 @@ function createContextResolutionFailureResult({
       {
         stage: 'RESPONSE_FINALIZED',
         outcome: 'failed',
-        reasonCode,
-        facts: {}
+        reasonCode
       }
     );
   }
@@ -624,6 +705,7 @@ module.exports = {
   validateInvocationCounterAgreement,
   validateTerminalResponseAgreement,
   validateContextResolutionContinuation,
+  contextResolutionResponseResult,
   createContextResolutionFailureResult,
   validateInvocation
 };

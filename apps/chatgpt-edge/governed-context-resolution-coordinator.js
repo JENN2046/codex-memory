@@ -3,12 +3,16 @@
 const {
   GOVERNED_CONTEXT_RESOLUTION_LIMITS,
   GOVERNED_CONTEXT_RESOLUTION_EVENT_COMPONENT,
+  canonicalJson,
   createContextResolutionStageReceipt,
   createContextResolutionTerminalEnvelope,
   createGovernedContextResolutionProtocol,
   createGovernedContextResolutionWorkingSet,
+  contextResolutionResponseBindingDigest,
   isGovernedContextResolutionWorkingSetExtension,
+  projectGovernedContextResolutionPublic,
   reject,
+  validateGovernedContextResolutionPublicProjection,
   validateContextResolutionHeader,
   validateContextResolutionStageReceipt,
   validateContextResolutionTerminalEnvelope,
@@ -243,6 +247,7 @@ function createGovernedContextResolutionCoordinator({
       header: acceptedHeader,
       receipts: [structuredClone(created)],
       terminal: null,
+      response_verification: null,
       purge_after_ms: null
     };
     resolutions.set(header.resolution_ref, record);
@@ -332,37 +337,111 @@ function createGovernedContextResolutionCoordinator({
     });
   }
 
-  function emitTerminalCommitted(resolutionRef, terminal) {
+  function emitTerminalCommitted(
+    resolutionRef,
+    terminal,
+    responseVerified = false
+  ) {
     emit('resolution_terminal_committed', {
       resolution_ref: resolutionRef,
-      terminal: structuredClone(terminal)
+      terminal: structuredClone(terminal),
+      response_verified: responseVerified
     });
+  }
+
+  function recordResponseVerification(resolutionRef, evidence) {
+    const record = requireResolution(resolutionRef);
+    if (record.terminal) rejectTerminalCandidate(resolutionRef);
+    if (deadlineReached(record)) {
+      commitCoordinatorFailure(resolutionRef, 'resolution_timeout');
+      rejectTerminalCandidate(resolutionRef);
+    }
+    if (!evidence || typeof evidence !== 'object' || Array.isArray(evidence) ||
+        Object.keys(evidence).sort().join(',') !==
+          'public_content_digest,public_resolution,relay_binding_digest,terminal_digest') {
+      reject('context_resolution_response_evidence_invalid');
+    }
+    if (typeof evidence.terminal_digest !== 'string' ||
+        typeof evidence.public_content_digest !== 'string' ||
+        typeof evidence.relay_binding_digest !== 'string') {
+      reject('context_resolution_response_evidence_invalid');
+    }
+    validateGovernedContextResolutionPublicProjection(
+      evidence.public_resolution
+    );
+    const expectedBinding = contextResolutionResponseBindingDigest({
+      requestDigest: record.header.request_digest,
+      resolutionRef,
+      terminalDigest: evidence.terminal_digest,
+      structuredContentDigest: evidence.public_content_digest
+    });
+    if (evidence.relay_binding_digest !== expectedBinding ||
+        record.response_verification !== null) {
+      reject('context_resolution_response_evidence_invalid');
+    }
+    record.response_verification = Object.freeze({
+      terminal_digest: evidence.terminal_digest,
+      public_content_digest: evidence.public_content_digest,
+      relay_binding_digest: evidence.relay_binding_digest,
+      public_resolution: structuredClone(evidence.public_resolution)
+    });
+    emit('resolution_response_verified', {
+      resolution_ref: resolutionRef,
+      request_digest: record.header.request_digest,
+      terminal_digest: evidence.terminal_digest,
+      public_content_digest: evidence.public_content_digest,
+      relay_binding_digest: evidence.relay_binding_digest,
+      public_resolution: structuredClone(evidence.public_resolution)
+    });
+    return Object.freeze({
+      resolution_ref: resolutionRef,
+      terminal_digest: evidence.terminal_digest,
+      accepted: true
+    });
+  }
+
+  function requireSuccessResponseVerification(record, protocol) {
+    if (protocol.terminal.outcome !== 'success') return;
+    const evidence = record.response_verification;
+    if (!evidence ||
+        evidence.terminal_digest !== protocol.terminal.terminal_digest ||
+        canonicalJson(evidence.public_resolution) !== canonicalJson(
+          projectGovernedContextResolutionPublic(protocol)
+        )) {
+      reject('context_resolution_response_evidence_missing');
+    }
   }
 
   function acceptTerminalCandidate(
     resolutionRef,
     record,
     terminal,
-    { deadlineWins = false } = {}
+    { deadlineWins = false, committedAtMs } = {}
   ) {
     if (record.terminal) rejectTerminalCandidate(resolutionRef);
     validateContextResolutionTerminalEnvelope(terminal, {
       header: record.header,
       receipts: record.receipts
     });
-    const committedAtMs = nowMs();
+    requireSuccessResponseVerification(record, {
+      header: record.header,
+      receipts: record.receipts,
+      terminal
+    });
+    const finalizationMs = committedAtMs ?? nowMs();
     if (deadlineWins &&
-        Date.parse(record.header.deadline_at) <= committedAtMs) {
+        Date.parse(record.header.deadline_at) <= finalizationMs) {
       commitCoordinatorFailure(resolutionRef, 'resolution_timeout');
       rejectTerminalCandidate(resolutionRef);
     }
+    const responseVerified = record.response_verification !== null;
     const acceptance = finalizeTerminal(
       resolutionRef,
       record,
       terminal,
-      committedAtMs
+      finalizationMs
     );
-    emitTerminalCommitted(resolutionRef, terminal);
+    emitTerminalCommitted(resolutionRef, terminal, responseVerified);
     return acceptance;
   }
 
@@ -433,6 +512,7 @@ function createGovernedContextResolutionCoordinator({
       header: record.header,
       receipts: acceptedReceipts
     });
+    requireSuccessResponseVerification(record, candidate);
     const committedAtMs = nowMs();
     if (Date.parse(record.header.deadline_at) <= committedAtMs) {
       commitCoordinatorFailure(resolutionRef, 'resolution_timeout');
@@ -442,20 +522,18 @@ function createGovernedContextResolutionCoordinator({
       .slice(record.receipts.length)
       .map(receipt => structuredClone(receipt));
     record.receipts.push(...appendedReceipts);
-    const acceptance = finalizeTerminal(
-      resolutionRef,
-      record,
-      candidate.terminal,
-      committedAtMs
-    );
     for (const receipt of appendedReceipts) {
       emit('resolution_receipt_appended', {
         resolution_ref: resolutionRef,
         receipt: structuredClone(receipt)
       });
     }
-    emitTerminalCommitted(resolutionRef, candidate.terminal);
-    return acceptance;
+    return acceptTerminalCandidate(
+      resolutionRef,
+      record,
+      candidate.terminal,
+      { deadlineWins: true, committedAtMs }
+    );
   }
 
   function timeoutResolution(resolutionRef) {
@@ -554,6 +632,7 @@ function createGovernedContextResolutionCoordinator({
     expireDueResolutions: guardMutation(expireDueResolutions),
     observerDeliverySnapshot,
     protocol,
+    recordResponseVerification: guardMutation(recordResponseVerification),
     reportCoordinatorLoss: guardMutation(reportCoordinatorLoss),
     snapshot,
     timeoutResolution: guardMutation(timeoutResolution),
