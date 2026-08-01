@@ -437,7 +437,11 @@ function failContextResolution(workingSet, reasonCode) {
     ? {
         effectiveReasonCode: requestedEntry.stage === 'REGISTRY_RESOLVED'
           ? reasonCode
-          : 'context_registry_unavailable',
+          : reasonCode === 'context_scope_denied'
+            ? 'context_scope_preflight_denied'
+            : reasonCode === 'context_issuance_unavailable'
+              ? 'context_issuance_preflight_unavailable'
+              : 'context_registry_unavailable',
         failedStage: 'REGISTRY_RESOLVED'
       }
     : lastStage === 'REGISTRY_RESOLVED'

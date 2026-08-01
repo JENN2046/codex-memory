@@ -43,6 +43,12 @@ const FAILURE_FACTS = Object.freeze({
   context_registry_unavailable: {
     registry_resolved: false
   },
+  context_scope_preflight_denied: {
+    registry_resolved: false
+  },
+  context_issuance_preflight_unavailable: {
+    registry_resolved: false
+  },
   context_mapping_not_found: {
     registry_resolved: true,
     mapping_resolved: false

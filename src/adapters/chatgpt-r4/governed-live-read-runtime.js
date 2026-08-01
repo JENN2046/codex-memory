@@ -96,16 +96,6 @@ function createContextAuthority({
           ? { resolution_reason: resolutionReason }
           : {})
       });
-      const registeredAlias = registryState.registry.projects.find(project =>
-        project.safeProjectAlias === safeProjectAlias
-      );
-      if (!registeredAlias ||
-          registeredAlias.projectId !== selectedProject.projectId) {
-        return withResolutionReason({
-          status: 'denied'
-        }, 'context_mapping_not_found');
-      }
-      onResolutionStage?.('REGISTRY_RESOLVED');
       const preauthorization = activationController?.checkContextIssueAuthorization({
         principalFingerprint,
         safeProjectAlias,
@@ -120,6 +110,19 @@ function createContextAuthority({
           ? 'context_scope_denied'
           : 'context_issuance_unavailable');
       }
+      const registeredAlias = registryState.registry.projects.find(project =>
+        project.safeProjectAlias === safeProjectAlias
+      );
+      if (!registeredAlias ||
+          registeredAlias.projectId !== selectedProject.projectId) {
+        return activationController ? withResolutionReason({
+          status: 'denied',
+          activation_receipt_digest: preauthorization.receipt_digest
+        }, 'context_mapping_not_found') : withResolutionReason({
+          status: 'denied'
+        }, 'context_mapping_not_found');
+      }
+      onResolutionStage?.('REGISTRY_RESOLVED');
       const project = resolveRegisteredProject(
         registryState,
         safeProjectAlias,

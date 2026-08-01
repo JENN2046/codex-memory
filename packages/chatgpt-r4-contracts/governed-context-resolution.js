@@ -158,6 +158,18 @@ const GOVERNED_CONTEXT_RESOLUTION_FAILURE_REGISTRY =
       stage: 'REGISTRY_RESOLVED',
       origin: 'governance'
     }),
+    context_scope_preflight_denied: failure({
+      category: 'context_scope_denied',
+      stage: 'REGISTRY_RESOLVED',
+      origin: 'governance',
+      publicResponseStatus: 'denied'
+    }),
+    context_issuance_preflight_unavailable: failure({
+      category: 'context_issuance_failed',
+      stage: 'REGISTRY_RESOLVED',
+      origin: 'governance',
+      publicResponseStatus: 'unavailable'
+    }),
     context_mapping_not_found: failure({
       category: 'context_mapping_failed',
       stage: 'REGISTRY_RESOLVED',
@@ -237,6 +249,12 @@ const FAILED_FACTS_BY_REASON = deepFreeze({
   resolution_edge_request_invalid: {},
   resolution_relay_claim_failed: {},
   context_registry_unavailable: {
+    registry_resolved: false
+  },
+  context_scope_preflight_denied: {
+    registry_resolved: false
+  },
+  context_issuance_preflight_unavailable: {
     registry_resolved: false
   },
   context_mapping_not_found: {
