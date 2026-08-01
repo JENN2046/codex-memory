@@ -1,6 +1,7 @@
 'use strict';
 
 const {
+  GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN,
   canonicalJson,
   createGovernedRuntimeIdentityTransitionProtocol,
   createRuntimeIdentityTransitionTerminal,
@@ -23,14 +24,25 @@ const SAFE_CODE = /^[a-z][a-z0-9_]{0,79}$/u;
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 
 function createGovernedRuntimeIdentityTransitionObserver({
-  maxRetainedTransitions = 256
+  maxRetainedTransitions = 256,
+  initialTerminalReplayMarkers = []
 } = {}) {
   if (!Number.isInteger(maxRetainedTransitions) ||
-      maxRetainedTransitions < 1 || maxRetainedTransitions > 4096) {
+      maxRetainedTransitions < 1 || maxRetainedTransitions > 4096 ||
+      !Array.isArray(initialTerminalReplayMarkers)) {
     reject('transition_observer_capacity_invalid');
   }
   const transitions = new Map();
   const terminalHistory = new Map();
+  const terminalReplayMarkers = new Set();
+  for (const transitionRef of initialTerminalReplayMarkers) {
+    if (!GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN.test(
+      transitionRef || ''
+    ) || terminalReplayMarkers.has(transitionRef)) {
+      reject('transition_observer_replay_markers_invalid');
+    }
+    terminalReplayMarkers.add(transitionRef);
+  }
   const counters = {
     transitions_accepted: 0,
     receipts_accepted: 0,
@@ -55,6 +67,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
 
   function retainTerminal(transitionRef, record) {
     transitions.delete(transitionRef);
+    terminalReplayMarkers.add(transitionRef);
     terminalHistory.set(transitionRef, record);
     while (terminalHistory.size > maxRetainedTransitions) {
       terminalHistory.delete(terminalHistory.keys().next().value);
@@ -71,7 +84,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
       if (event.event === 'transition_accepted') {
         validateRuntimeIdentityTransitionRequest(event.request);
         if (transitions.has(event.request.transition_ref) ||
-            terminalHistory.has(event.request.transition_ref)) {
+            terminalReplayMarkers.has(event.request.transition_ref)) {
           return violation('transition_observer_duplicate_accept');
         }
         if (transitions.size >= maxRetainedTransitions) {
@@ -165,6 +178,10 @@ function createGovernedRuntimeIdentityTransitionObserver({
                   digestObject(
                     record.request.legacy_transition_evidence
                   ))) ||
+            (lastAuthoritativeCommit !== null &&
+              record.request.legacy_transition_evidence === null &&
+              canonicalJson(event.state_projection.legacy_migration) !==
+                canonicalJson(lastAuthoritativeCommit.legacy_migration)) ||
             !DIGEST_PATTERN.test(event.state_digest || '') ||
             digestObject(event.state_projection) !== event.state_digest) {
           return violation('transition_observer_atomic_commit_invalid');
@@ -178,6 +195,9 @@ function createGovernedRuntimeIdentityTransitionObserver({
         };
         lastAuthoritativeCommit = {
           accepted_runtime: structuredClone(event.accepted_runtime),
+          legacy_migration: structuredClone(
+            event.state_projection.legacy_migration
+          ),
           store_version: event.store_version,
           state_digest: event.state_digest
         };
@@ -265,6 +285,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
       ...counters,
       active_transitions: transitions.size,
       retained_terminals: terminalHistory.size,
+      terminal_replay_markers: terminalReplayMarkers.size,
       last_authoritative_store_version:
         lastAuthoritativeCommit?.store_version ?? null,
       last_authoritative_state_digest:
@@ -284,7 +305,11 @@ function createGovernedRuntimeIdentityTransitionObserver({
     });
   }
 
-  return Object.freeze({ observe, reconcile, snapshot });
+  function replayMarkers() {
+    return Object.freeze([...terminalReplayMarkers]);
+  }
+
+  return Object.freeze({ observe, reconcile, replayMarkers, snapshot });
 }
 
 module.exports = {

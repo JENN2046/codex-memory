@@ -514,6 +514,25 @@ function candidateVerificationFailure(verification, request) {
   return null;
 }
 
+function normalizeCandidateVerification(verification) {
+  if (!isPlainObject(verification)) return null;
+  try {
+    const normalized = {
+      verified: verification.verified,
+      complete: verification.complete,
+      scope_clean: verification.scope_clean,
+      source_head: verification.source_head,
+      manifest_schema: verification.manifest_schema,
+      manifest_digest: verification.manifest_digest,
+      candidate_tree_digest: verification.candidate_tree_digest,
+      protocol_versions: verification.protocol_versions
+    };
+    return JSON.parse(canonicalJson(normalized));
+  } catch {
+    return null;
+  }
+}
+
 function createGovernedRuntimeIdentityTransitionCoordinator({
   store,
   authorityProofReplayStore,
@@ -962,11 +981,11 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
 
     let candidate;
     try {
-      candidate = candidateManifestVerifier({
+      candidate = normalizeCandidateVerification(candidateManifestVerifier({
         to_runtime: structuredClone(request.to_runtime),
         transition_ref: request.transition_ref,
         request_digest: runtimeIdentityTransitionRequestDigest(request)
-      });
+      }));
     } catch {
       candidate = null;
     }
@@ -1066,11 +1085,11 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     }
     let candidate;
     try {
-      candidate = candidateManifestVerifier({
+      candidate = normalizeCandidateVerification(candidateManifestVerifier({
         to_runtime: structuredClone(previewValue.request.to_runtime),
         transition_ref: previewValue.request.transition_ref,
         request_digest: previewValue.request_digest
-      });
+      }));
     } catch {
       candidate = null;
     }

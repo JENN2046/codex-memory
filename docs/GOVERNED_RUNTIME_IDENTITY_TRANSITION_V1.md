@@ -50,7 +50,9 @@ The authority proof context binds the full request with the proof value
 replaced by `null`. This prevents a proof from approving itself while retaining
 all other transition bindings. Verifier output is reduced to a canonical,
 allowlisted authority-evidence projection before the one-shot proof is
-consumed. Preview validation also binds the request,
+consumed. Candidate-verifier output is likewise reduced to its canonical
+allowlisted manifest-evidence projection before receipt hashing or commit-time
+revalidation. Preview validation also binds the request,
 authority context, expected store version, and ordered receipt digests.
 
 ## State machine
@@ -148,7 +150,8 @@ shaped digest string. Across verified atomic commits it also retains the last
 authoritative store version, state digest, and accepted runtime. The next
 commit must advance the version by exactly one and its `from_runtime` must
 equal that accepted runtime, so mutually exclusive CAS forks cannot both be
-reported as verified. It then
+reported as verified. The one-time legacy migration marker must also remain
+unchanged on later non-migration commits. It then
 reconstructs the terminal and requires it to equal the terminal already bound
 to the verified atomic commit. It rejects spliced transitions, incorrect
 receipt order or origin, duplicate atomic commits, terminal mismatch, missing
@@ -156,6 +159,10 @@ terminals, and post-terminal events. Terminal records move out of the bounded
 active set into a bounded reconciliation history, so completed transitions do
 not permanently consume admission capacity while cumulative governance
 counters remain intact.
+Compact terminal replay markers remain after full reconciliation records rotate
+out, and can be snapshotted into a rebuilt Observer. A live Observer adapter
+must persist or safely compact these markers so a rotated `transition_ref`
+cannot be admitted again.
 
 The unique failure registry includes:
 
