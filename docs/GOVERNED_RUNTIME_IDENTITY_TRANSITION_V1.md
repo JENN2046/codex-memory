@@ -88,8 +88,10 @@ one versioned compare-and-swap. The CAS candidate simultaneously contains:
 
 The CAS state retains the complete canonical protocol as well as its digests.
 The transition-record store is a secondary durable replay index: coordinator
-construction verifies or reconstructs that index from the atomically committed
-protocol, closing the crash window between state CAS and index finalization.
+construction and every new preview/commit boundary verify or reconstruct that
+index from the atomically committed protocol. No later transition is admitted
+while the preceding CAS terminal is missing from the secondary index, closing
+the crash window between state CAS and index finalization.
 Coordinator-loss reporting enumerates durable reservations, reports each
 missing terminal, and never fabricates a default failure terminal.
 
@@ -126,14 +128,17 @@ authority.
 ## Observer and failure registry
 
 The Observer consumes only the canonical request, ordered receipt stream,
-atomic commit event, and terminal. It independently derives the accepted
-runtime identity and stable controller binding from the recorded request, then
-reconstructs the terminal
-and requires it to equal the terminal already bound to any verified atomic
-commit
-and rejects spliced transitions, incorrect receipt order or origin, duplicate
-atomic commits, terminal mismatch, missing terminals, and post-terminal
-events.
+governed atomic-state projection, atomic commit event, and terminal. It
+independently derives the accepted runtime identity and stable controller
+binding from the recorded request, validates the governed state projection,
+and recomputes its digest instead of trusting a shaped digest string. It then
+reconstructs the terminal and requires it to equal the terminal already bound
+to the verified atomic commit. It rejects spliced transitions, incorrect
+receipt order or origin, duplicate atomic commits, terminal mismatch, missing
+terminals, and post-terminal events. Terminal records move out of the bounded
+active set into a bounded reconciliation history, so completed transitions do
+not permanently consume admission capacity while cumulative governance
+counters remain intact.
 
 The unique failure registry includes:
 

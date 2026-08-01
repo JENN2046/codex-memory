@@ -595,6 +595,60 @@ test('10d. coordinator recovers a reserved ref index from atomic state protocol'
   );
 });
 
+test('10e. a failed terminal-index write is recovered before the next transition', () => {
+  const state = initialState();
+  const durableRecords = createTransitionRecordStore();
+  let failNextSuccessFinalization = true;
+  const recordStore = {
+    reserve: durableRecords.reserve,
+    get: durableRecords.get,
+    snapshot: durableRecords.snapshot,
+    finalize(input) {
+      if (failNextSuccessFinalization &&
+          input.protocol.terminal.outcome === 'success') {
+        failNextSuccessFinalization = false;
+        throw new Error('synthetic-finalize-crash');
+      }
+      return durableRecords.finalize(input);
+    }
+  };
+  const run = harness({ state, recordStore });
+  const firstRequest = requestFor(state);
+  const firstPrepared = run.coordinator.preview(firstRequest);
+  assert.throws(
+    () => run.coordinator.commit(firstPrepared.preview),
+    { code: 'transition_record_store_recovery_failed' }
+  );
+  const afterFirstCas = run.store.snapshot();
+  assert.equal(afterFirstCas.store_version, 1);
+  assert.equal(
+    durableRecords.get(firstRequest.transition_ref).status,
+    'reserved'
+  );
+
+  const secondRequest = requestFor(afterFirstCas, {
+    suffix: 'B',
+    target: toRuntime('c'),
+    fromRuntime: afterFirstCas.accepted_runtime,
+    proofDigest: digestObject('proof-after-finalize-recovery'),
+    legacy: null
+  });
+  const secondPrepared = run.coordinator.preview(secondRequest);
+  assert.equal(secondPrepared.status, 'prepared');
+  assert.equal(
+    durableRecords.get(firstRequest.transition_ref).status,
+    'terminal'
+  );
+  assert.deepEqual(
+    durableRecords.get(firstRequest.transition_ref).protocol,
+    afterFirstCas.last_transition.protocol
+  );
+  assert.equal(
+    run.coordinator.commit(secondPrepared.preview).status,
+    'terminal_success'
+  );
+});
+
 test('11. a late candidate after terminal cannot overwrite accepted state', () => {
   const result = prepareAndCommit();
   const after = result.store.snapshot();
@@ -736,7 +790,8 @@ test('17a. Observer rejects a self-consistent commit not derived from its reques
     accepted_runtime: forgedRuntime,
     controller_binding: forgedBinding,
     store_version: 1,
-    state_digest: digestObject('forged-state')
+    state_digest: result.committed.state_digest,
+    state_projection: result.store.snapshot()
   }), false);
   assert.equal(observer.snapshot().atomic_commits_verified, 0);
   assert.equal(observer.snapshot().protocol_violations, 1);
@@ -766,7 +821,8 @@ test('17b. Observer binds the final terminal to the verified atomic commit', () 
     accepted_runtime: result.committed.accepted_runtime,
     controller_binding: result.committed.controller_binding,
     store_version: 1,
-    state_digest: result.committed.state_digest
+    state_digest: result.committed.state_digest,
+    state_projection: result.store.snapshot()
   }), true);
   const conflictingTerminal = createRuntimeIdentityTransitionTerminal({
     request: result.request,
@@ -810,10 +866,85 @@ test('17c. Observer rejects a non-canonical atomic state digest', () => {
     accepted_runtime: result.committed.accepted_runtime,
     controller_binding: result.committed.controller_binding,
     store_version: 1,
-    state_digest: 'not-a-digest'
+    state_digest: 'not-a-digest',
+    state_projection: result.store.snapshot()
   }), false);
   assert.equal(observer.snapshot().atomic_commits_verified, 0);
   assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
+test('17d. Observer recomputes a shaped atomic state digest', () => {
+  const result = prepareAndCommit();
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    request: result.request
+  });
+  for (const receipt of result.committed.protocol.receipts) {
+    observer.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_receipt_appended',
+      transition_ref: result.request.transition_ref,
+      receipt
+    });
+  }
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: result.request.transition_ref,
+    protocol: result.committed.protocol,
+    accepted_runtime: result.committed.accepted_runtime,
+    controller_binding: result.committed.controller_binding,
+    store_version: 1,
+    state_digest: digestObject('different-validly-shaped-state'),
+    state_projection: result.store.snapshot()
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 0);
+  assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
+test('17e. Observer rotates terminal history without exhausting active capacity', () => {
+  const state = initialState();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    maxRetainedTransitions: 2
+  });
+  let latestRequest;
+  for (let index = 0; index < 5; index += 1) {
+    const transitionRef = `grit_${index.toString(36).padStart(32, '0')}`;
+    const request = requestFor(state, {
+      transitionRef,
+      proofDigest: digestObject(`retained-proof-${index}`)
+    });
+    const terminal = createRuntimeIdentityTransitionTerminal({
+      request,
+      receipts: [],
+      outcome: 'failure',
+      reasonCode: 'transition_replayed',
+      runtimeStopped: true
+    });
+    assert.equal(observer.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_accepted',
+      request
+    }), true);
+    assert.equal(observer.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_terminal_committed',
+      transition_ref: transitionRef,
+      terminal
+    }), true);
+    latestRequest = request;
+  }
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.transitions_accepted, 5);
+  assert.equal(snapshot.terminal_failures, 5);
+  assert.equal(snapshot.active_transitions, 0);
+  assert.equal(snapshot.retained_terminals, 2);
+  assert.equal(
+    observer.reconcile(latestRequest.transition_ref).terminal.reason_code,
+    'transition_replayed'
+  );
 });
 
 test('18. terminal missing records a violation and fabricates no failure terminal', () => {

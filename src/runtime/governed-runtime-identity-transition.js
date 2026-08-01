@@ -531,9 +531,10 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     reject('transition_coordinator_event_sink_invalid');
   }
 
-  const recoveryState = store.snapshot();
-  validateGovernedRuntimeIdentityState(recoveryState);
-  if (recoveryState.last_transition !== null) {
+  function recoverLastTransitionRecord() {
+    const recoveryState = store.snapshot();
+    validateGovernedRuntimeIdentityState(recoveryState);
+    if (recoveryState.last_transition === null) return;
     const recoveryProtocol = recoveryState.last_transition.protocol;
     const recoveryRequest = recoveryProtocol.request;
     const recoveryRef = recoveryRequest.transition_ref;
@@ -550,12 +551,17 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       recoveryRecord = transitionRecordStore.get(recoveryRef);
     }
     if (recoveryRecord.status === 'reserved') {
-      const recovered = transitionRecordStore.finalize({
-        transition_ref: recoveryRef,
-        request_digest:
-          runtimeIdentityTransitionRequestDigest(recoveryRequest),
-        protocol: recoveryProtocol
-      });
+      let recovered;
+      try {
+        recovered = transitionRecordStore.finalize({
+          transition_ref: recoveryRef,
+          request_digest:
+            runtimeIdentityTransitionRequestDigest(recoveryRequest),
+          protocol: recoveryProtocol
+        });
+      } catch {
+        reject('transition_record_store_recovery_failed');
+      }
       if (recovered !== true) {
         reject('transition_record_store_recovery_failed');
       }
@@ -564,6 +570,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       reject('transition_record_store_recovery_failed');
     }
   }
+  recoverLastTransitionRecord();
 
   const records = new Map();
   let eventDispatchDepth = 0;
@@ -688,6 +695,10 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
 
   function preview(request) {
     validateRuntimeIdentityTransitionRequest(request);
+    // The atomic state is authoritative. Repair its secondary terminal index
+    // before accepting another request so a later CAS cannot overwrite the
+    // only crash-recovery anchor for the previous transition.
+    recoverLastTransitionRecord();
     const currentMs = nowMs();
     const requestDigest = runtimeIdentityTransitionRequestDigest(request);
     let persistedRecord;
@@ -981,6 +992,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         { runtimeStopped: null }
       );
     }
+    recoverLastTransitionRecord();
     const before = store.snapshot();
     validateGovernedRuntimeIdentityState(before);
     if (before.store_version !== previewValue.expected_store_version ||
@@ -1139,20 +1151,18 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         }
       );
     }
-    record.status = 'terminal';
-    const finalized = transitionRecordStore.finalize({
-      transition_ref: previewValue.request.transition_ref,
-      request_digest: previewValue.request_digest,
-      protocol
-    });
-    if (finalized !== true) {
-      return casFailure(
-        previewValue,
-        'partial_transition_detected',
-        { transition_record_finalized: false },
-        { runtimeStopped: true }
-      );
+    let finalized;
+    try {
+      finalized = transitionRecordStore.finalize({
+        transition_ref: previewValue.request.transition_ref,
+        request_digest: previewValue.request_digest,
+        protocol
+      });
+    } catch {
+      reject('transition_record_store_recovery_failed');
     }
+    if (finalized !== true) reject('transition_record_store_recovery_failed');
+    record.status = 'terminal';
     record.protocol = protocol;
     record.preview = null;
     for (const receipt of workingSet.receipts.slice(
@@ -1166,7 +1176,8 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       accepted_runtime: newRuntime,
       controller_binding: controllerBinding,
       store_version: after.store_version,
-      state_digest: digestObject(after)
+      state_digest: digestObject(after),
+      state_projection: after
     });
     emit('transition_terminal_committed', {
       transition_ref: previewValue.request.transition_ref,

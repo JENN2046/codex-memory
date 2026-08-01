@@ -5,6 +5,7 @@ const {
   createGovernedRuntimeIdentityTransitionProtocol,
   createRuntimeIdentityTransitionTerminal,
   createTransitionRuntimeIdentity,
+  digestObject,
   reject,
   validateGovernedRuntimeIdentityTransitionProtocol,
   validateRuntimeIdentity,
@@ -14,7 +15,8 @@ const {
 } = require('../../packages/chatgpt-r4-contracts');
 const {
   stableControllerBinding,
-  validateControllerBinding
+  validateControllerBinding,
+  validateGovernedRuntimeIdentityState
 } = require('./governed-runtime-identity-transition');
 
 const SAFE_CODE = /^[a-z][a-z0-9_]{0,79}$/u;
@@ -28,6 +30,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
     reject('transition_observer_capacity_invalid');
   }
   const transitions = new Map();
+  const terminalHistory = new Map();
   const counters = {
     transitions_accepted: 0,
     receipts_accepted: 0,
@@ -49,6 +52,14 @@ function createGovernedRuntimeIdentityTransitionObserver({
     return false;
   }
 
+  function retainTerminal(transitionRef, record) {
+    transitions.delete(transitionRef);
+    terminalHistory.set(transitionRef, record);
+    while (terminalHistory.size > maxRetainedTransitions) {
+      terminalHistory.delete(terminalHistory.keys().next().value);
+    }
+  }
+
   function observe(event) {
     if (!event || typeof event !== 'object' || Array.isArray(event) ||
         event.component !==
@@ -58,7 +69,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
     try {
       if (event.event === 'transition_accepted') {
         validateRuntimeIdentityTransitionRequest(event.request);
-        if (transitions.has(event.request.transition_ref)) {
+        if (transitions.has(event.request.transition_ref) ||
+            terminalHistory.has(event.request.transition_ref)) {
           return violation('transition_observer_duplicate_accept');
         }
         if (transitions.size >= maxRetainedTransitions) {
@@ -99,6 +111,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         validateGovernedRuntimeIdentityTransitionProtocol(event.protocol);
         validateRuntimeIdentity(event.accepted_runtime);
         validateControllerBinding(event.controller_binding);
+        validateGovernedRuntimeIdentityState(event.state_projection);
         const derivedRuntime = createTransitionRuntimeIdentity({
           fromRuntime: record.request.from_runtime,
           toRuntime: record.request.to_runtime,
@@ -125,7 +138,18 @@ function createGovernedRuntimeIdentityTransitionObserver({
               event.accepted_runtime.identity_digest ||
             !Number.isSafeInteger(event.store_version) ||
             event.store_version < 1 ||
-            !DIGEST_PATTERN.test(event.state_digest || '')) {
+            event.state_projection.store_version !== event.store_version ||
+            canonicalJson(event.state_projection.accepted_runtime) !==
+              canonicalJson(event.accepted_runtime) ||
+            canonicalJson(event.state_projection.controller_binding) !==
+              canonicalJson(event.controller_binding) ||
+            canonicalJson(event.state_projection.last_transition?.protocol) !==
+              canonicalJson(event.protocol) ||
+            event.state_projection.lifecycle.lifecycle_state !== 'stopped' ||
+            event.state_projection.lifecycle.held_stopped !== true ||
+            event.state_projection.lifecycle.running_component_count !== 0 ||
+            !DIGEST_PATTERN.test(event.state_digest || '') ||
+            digestObject(event.state_projection) !== event.state_digest) {
           return violation('transition_observer_atomic_commit_invalid');
         }
         record.atomic_commit = {
@@ -177,6 +201,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         if (event.terminal.fatal_inconsistency) {
           counters.fatal_inconsistencies += 1;
         }
+        retainTerminal(event.transition_ref, record);
         return true;
       }
       if (event.event === 'transition_terminal_missing') {
@@ -186,6 +211,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         }
         record.missing = true;
         counters.terminals_missing += 1;
+        retainTerminal(event.transition_ref, record);
         return violation('terminal_missing');
       }
       if (event.event === 'transition_preview_formed') return true;
@@ -196,7 +222,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
   }
 
   function reconcile(transitionRef) {
-    const record = transitions.get(transitionRef);
+    const record = transitions.get(transitionRef) ||
+      terminalHistory.get(transitionRef);
     if (!record || record.missing || !record.terminal) {
       reject('transition_terminal_missing');
     }
@@ -214,6 +241,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
       schema_version: 1,
       component: 'governed_runtime_identity_transition_observer',
       ...counters,
+      active_transitions: transitions.size,
+      retained_terminals: terminalHistory.size,
       last_violation_code: lastViolationCode,
       terminals_fabricated: 0,
       runtime_started: false,
