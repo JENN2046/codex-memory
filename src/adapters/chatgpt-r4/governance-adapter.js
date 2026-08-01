@@ -273,7 +273,8 @@ async function handleResolve({
         (issued.activation_receipt_digest &&
          !/^sha256:[a-f0-9]{64}$/u.test(issued.activation_receipt_digest)) ||
         (resolution && !['context_mapping_not_found', 'context_scope_denied',
-          'context_issuance_unavailable'].includes(reasonCode))) {
+          'context_issuance_unavailable',
+          'context_issuance_denied'].includes(reasonCode))) {
       reject('context_issue_denial_shape_invalid');
     }
     const result = buildResolveResult({

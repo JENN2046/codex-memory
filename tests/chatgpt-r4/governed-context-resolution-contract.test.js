@@ -60,6 +60,9 @@ const FAILURE_FACTS = Object.freeze({
   context_issuance_unavailable: {
     context_ref_issued: false
   },
+  context_issuance_denied: {
+    context_ref_issued: false
+  },
   context_issuance_failed: {},
   context_issue_result_invalid: {},
   context_ref_invalid: {

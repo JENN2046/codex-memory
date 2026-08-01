@@ -24,6 +24,7 @@ const {
   createGovernedContextResolutionObserver
 } = require('../../apps/local-recall-relay');
 const {
+  createContextAuthority,
   createGovernanceAdapter,
   createGovernedReadV2Runtime,
   validateProjectRegistry
@@ -171,6 +172,12 @@ function createCharacterizationFixture({
       onResolutionStage?.('SCOPE_RESOLVED');
       if (issueOutcome === 'unavailable') {
         return { status: 'unavailable' };
+      }
+      if (issueOutcome === 'issuance_denied') {
+        return {
+          status: 'denied',
+          resolution_reason: 'context_issuance_denied'
+        };
       }
       if (issueOutcome === 'invalid') return null;
       throw Object.assign(new Error('synthetic_context_issuance_failed'), {
@@ -418,6 +425,76 @@ test('resolver-only issuance unavailability does not create or disclose a contex
   );
   assert.deepEqual(result.response.counters, ZERO_MEMORY_COUNTERS);
   assertResolverOnly(fixture.snapshot());
+});
+
+test('resolver-only final issuance denial preserves its denied terminal', async () => {
+  const fixture = createCharacterizationFixture({
+    issueOutcome: 'issuance_denied'
+  });
+  const result = await fixture.resolve();
+
+  assert.equal(result.response.status, 'denied');
+  assert.deepEqual(result.response.structured_content, {
+    schema_version: 2,
+    context_status: 'denied'
+  });
+  assert.equal(result.terminal.outcome, 'failure');
+  assert.equal(result.terminal.reason_code, 'context_issuance_denied');
+  assert.equal(result.terminal.last_completed_stage, 'SCOPE_RESOLVED');
+  assert.equal(result.terminal.failed_stage, 'CONTEXT_ISSUED');
+  assert.equal(result.terminal.context_ref_issued, false);
+  assertResolverOnly(fixture.snapshot());
+});
+
+test('context authority labels final activation denial as issuance denial', async () => {
+  const mappingState = loadDiaryScopeMapping({ mapping: mapping() });
+  const registryState = validateProjectRegistry(
+    registry(mappingState),
+    mappingState,
+    { resolveDiaryRead: resolveRead }
+  );
+  const context = identity('gcr-final-activation-denial-context');
+  const stages = [];
+  const authority = createContextAuthority({
+    registryState,
+    mappingState,
+    selectedProjectAlias: PROJECT_ALIAS,
+    signing: signing(context),
+    activationController: {
+      checkContextIssueAuthorization() {
+        return {
+          accepted: true,
+          receipt_digest: `sha256:${'a'.repeat(64)}`
+        };
+      },
+      authorizeContextIssue() {
+        return {
+          accepted: false,
+          governed_status: 'denied',
+          receipt_digest: `sha256:${'b'.repeat(64)}`
+        };
+      },
+      bindContext() {},
+      checkReadAuthorization() {}
+    },
+    clock: () => NOW
+  });
+
+  const result = await authority.issue({
+    principalFingerprint: digestObject('gcr-final-activation-denial-principal'),
+    safeProjectAlias: PROJECT_ALIAS,
+    requestedVisibility: 'project',
+    now: NOW,
+    governedContextResolution: true,
+    onResolutionStage: stage => stages.push(stage)
+  });
+
+  assert.deepEqual(stages, ['REGISTRY_RESOLVED', 'SCOPE_RESOLVED']);
+  assert.deepEqual(result, {
+    status: 'denied',
+    activation_receipt_digest: `sha256:${'b'.repeat(64)}`,
+    resolution_reason: 'context_issuance_denied'
+  });
 });
 
 test('resolver boundary preserves exact failure codes for issuance and public projection validation', async () => {

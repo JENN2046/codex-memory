@@ -157,7 +157,7 @@ function createContextAuthority({
           status: activation.governed_status || 'unavailable',
           activation_receipt_digest: activation.receipt_digest
         }, activation.governed_status === 'denied'
-          ? 'context_scope_denied'
+          ? 'context_issuance_denied'
           : 'context_issuance_unavailable');
       }
       const projectContextRef = createOpaqueId('pctx_', randomBytes);

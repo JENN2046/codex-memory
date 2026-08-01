@@ -194,6 +194,12 @@ const GOVERNED_CONTEXT_RESOLUTION_FAILURE_REGISTRY =
       origin: 'governance',
       publicResponseStatus: 'unavailable'
     }),
+    context_issuance_denied: failure({
+      category: 'context_issuance_failed',
+      stage: 'CONTEXT_ISSUED',
+      origin: 'governance',
+      publicResponseStatus: 'denied'
+    }),
     context_issuance_failed: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
@@ -266,6 +272,9 @@ const FAILED_FACTS_BY_REASON = deepFreeze({
   },
   context_scope_unavailable: {},
   context_issuance_unavailable: {
+    context_ref_issued: false
+  },
+  context_issuance_denied: {
     context_ref_issued: false
   },
   context_issuance_failed: {},

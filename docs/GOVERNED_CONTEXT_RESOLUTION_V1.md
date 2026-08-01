@@ -1,6 +1,7 @@
 # Governed Context Resolution v1
 
-Status: dormant source contract; no live resolver or readiness claim
+Status: resolver terminal wiring active in source; public terminal projection,
+runtime rebind, and readiness claims remain pending
 
 Task: `CM-2159 / governed_read_attempt_refactor`
 
@@ -14,10 +15,12 @@ Base: `e7f8e233b7455ea913d7f7d574d72ec67b7dec79`
 protocol therefore uses one immutable `resolution_ref` and never creates an
 `attempt_ref`. It is intentionally separate from `governed_read_attempt.v1`.
 
-This delivery is dormant. The contract, transient coordinator, and Observer
-are not imported by the live Edge broker, Relay processor, Governance resolver,
-or governed-read runtime. It does not alter a tool descriptor, public input or
-output schema, runtime binding, lifecycle state, provider path, or memory path.
+The contract is wired through the source-level Edge broker, Relay processor,
+Governance resolver, and context issuer. Each resolver operation now receives
+one internal terminal candidate under this protocol. It does not alter a tool
+descriptor, public input or output schema, runtime binding, lifecycle state,
+provider path, or memory path. In particular, the existing public resolver
+response remains status-only until the separate public-projection change.
 
 ## Ordered evidence
 
@@ -95,8 +98,8 @@ terminal candidate. It records a protocol violation only.
 ## First-terminal CAS
 
 `apps/chatgpt-edge/governed-context-resolution-coordinator.js` is an isolated,
-in-memory first-terminal-wins coordinator. It is not exported by the live Edge
-application.
+in-memory first-terminal-wins coordinator used by the Edge broker. It does not
+introduce a new public Edge surface.
 
 - the first valid downstream terminal, timeout, or cancellation commits;
 - a candidate at or after the immutable deadline loses to timeout;
@@ -148,29 +151,35 @@ terminal_max_bytes: 4096
 complete_protocol_max_bytes: 16384
 ttl_max_seconds: 60
 replay_tombstones_default: 4096
-replay_tombstones_max: 65536
+replay_tombstones_max: 8388608
 pending_observer_events_default: 256
 pending_observer_events_max: 4096
 ```
 
+The live broker derives replay-tombstone capacity from `maxRecords` and the
+configured retention window. Configurations requiring more than the bounded
+maximum are rejected at construction rather than failing later during valid
+resolver turnover.
+
 ## Synthetic evidence
 
-The source-only tests cover the complete success chain, every registered
-stage-failure path, first-terminal competition, deadline ordering, cancellation,
-timeout, active-capacity reuse beyond 64 lifetime operations, coordinator loss,
-Observer retention-window divergence and tamper rejection, malformed and
-expired refs, post-eviction ref replay, missing issuance evidence,
-cross-request receipt splicing, and fake read-counter injection.
+The source-level tests cover the complete success chain, every registered
+stage-failure path (including final issuance denial), first-terminal competition,
+deadline ordering, cancellation, timeout, active-capacity reuse beyond 64
+lifetime operations, coordinator loss, Observer retention-window divergence
+and tamper rejection, malformed and expired refs, post-eviction ref replay,
+missing issuance evidence, cross-request receipt splicing, and fake read-counter
+injection.
 
-The dormancy test also pins all six existing ChatGPT Edge tool input/output
-schema digests and asserts that no live resolver or governed-read module imports
-this protocol.
+Characterization tests pin all six existing ChatGPT Edge tool input/output
+schema digests and prove that this internal wiring leaves the public resolver
+schema unchanged.
 
 ## Non-claims
 
-This dormant source contract does not:
+This source-level terminal wiring does not:
 
-- activate resolver terminal receipts or add them to public Edge response v2;
+- add resolver terminal receipts to the public Edge response v2;
 - call `resolve_memory_context`, a provider, a search tool, or private memory;
 - rebind, start, stop, restart, deploy, release, or publish a runtime;
 - create or authorize a governed read attempt;
