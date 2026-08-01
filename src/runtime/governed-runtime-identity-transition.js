@@ -752,6 +752,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     const authorityContextDigest =
       runtimeIdentityTransitionAuthorityContextDigest(request);
     let authority;
+    let authorityUnavailable = false;
     try {
       authority = authorityVerifier({
         authority: structuredClone(request.authority),
@@ -760,9 +761,9 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         transition_ref: request.transition_ref
       });
     } catch {
-      authority = { status: 'unknown' };
+      authorityUnavailable = true;
     }
-    if (authority?.status === 'unknown') {
+    if (authorityUnavailable) {
       return failedStage(
         workingSet,
         'AUTHORITY_VERIFIED',
@@ -771,25 +772,58 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         { evidenceStatus: 'unknown' }
       );
     }
-    if (authority?.verified !== true ||
-        authority.authority_id !== request.authority.authority_id) {
+    let authorityEvidence;
+    let authorityStatus;
+    try {
+      if (!isPlainObject(authority)) throw new TypeError('invalid authority');
+      authorityStatus = authority.status;
+      if (authorityStatus !== 'unknown') {
+        authorityEvidence = {
+          verified: authority.verified,
+          authority_id: authority.authority_id,
+          authority_lineage_digest: authority.authority_lineage_digest,
+          authority_context_digest: authority.authority_context_digest,
+          authority_proof_digest: authority.authority_proof_digest
+        };
+        // Canonicalize the allowlisted projection before consuming the proof.
+        digestObject(authorityEvidence);
+      }
+    } catch {
       return failedStage(
         workingSet,
         'AUTHORITY_VERIFIED',
         'authority_unverified',
-        authority || { verified: false }
+        { authority_output_canonical: false }
       );
     }
-    if (authority.authority_lineage_digest !==
+    if (authorityStatus === 'unknown') {
+      return failedStage(
+        workingSet,
+        'AUTHORITY_VERIFIED',
+        'authority_unverified',
+        null,
+        { evidenceStatus: 'unknown' }
+      );
+    }
+    if (authorityEvidence.verified !== true ||
+        authorityEvidence.authority_id !== request.authority.authority_id) {
+      return failedStage(
+        workingSet,
+        'AUTHORITY_VERIFIED',
+        'authority_unverified',
+        authorityEvidence
+      );
+    }
+    if (authorityEvidence.authority_lineage_digest !==
         request.authority.authority_lineage_digest ||
-        authority.authority_context_digest !== authorityContextDigest ||
-        authority.authority_proof_digest !==
+        authorityEvidence.authority_context_digest !== authorityContextDigest ||
+        authorityEvidence.authority_proof_digest !==
           request.authority.authority_proof_digest) {
       return failedStage(
         workingSet,
         'AUTHORITY_VERIFIED',
         'authority_lineage_mismatch',
-        authority
+        authorityEvidence
       );
     }
     if (!stableAuthorityMatches(initial, request)) {
@@ -836,7 +870,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         { evidenceStatus: 'unknown' }
       );
     }
-    workingSet = append(workingSet, 'AUTHORITY_VERIFIED', authority);
+    workingSet = append(workingSet, 'AUTHORITY_VERIFIED', authorityEvidence);
 
     let lifecycleReason = null;
     if (initial.lifecycle.lifecycle_state !== 'stopped' ||
@@ -1115,21 +1149,28 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     } catch {
       let afterFailure = null;
       try { afterFailure = store.snapshot(); } catch {}
-      const unchanged = afterFailure &&
-        canonicalJson(afterFailure) === canonicalJson(before);
-      return casFailure(
-        previewValue,
-        unchanged ? 'transition_cas_lost' : 'partial_transition_detected',
-        unchanged
-          ? { cas_exception_before_mutation: true }
-          : { atomic_state_consistent: false },
-        {
-          evidenceStatus: afterFailure ? 'verified' : 'unknown',
-          runtimeStopped: afterFailure?.lifecycle?.lifecycle_state === 'stopped'
-            ? true
-            : null
-        }
-      );
+      const committedDespiteLostAck = afterFailure &&
+        canonicalJson(afterFailure) === canonicalJson(nextState);
+      if (committedDespiteLostAck) {
+        swapped = true;
+      } else {
+        const unchanged = afterFailure &&
+          canonicalJson(afterFailure) === canonicalJson(before);
+        return casFailure(
+          previewValue,
+          unchanged ? 'transition_cas_lost' : 'partial_transition_detected',
+          unchanged
+            ? { cas_exception_before_mutation: true }
+            : { atomic_state_consistent: false },
+          {
+            evidenceStatus: afterFailure ? 'verified' : 'unknown',
+            runtimeStopped:
+              afterFailure?.lifecycle?.lifecycle_state === 'stopped'
+                ? true
+                : null
+          }
+        );
+      }
     }
     if (swapped !== true) {
       return casFailure(

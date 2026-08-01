@@ -516,6 +516,26 @@ test('8. controller checkout identity cannot automatically become authority', ()
   assert.equal(outcome.protocol.terminal.reason_code, 'authority_unverified');
 });
 
+test('8a. authority evidence is allowlist-normalized before proof consumption', () => {
+  const state = initialState();
+  const run = harness({
+    state,
+    authority(input) {
+      const verification = authorityVerifier(input);
+      verification.undefined_extra = undefined;
+      verification.circular_extra = verification;
+      return verification;
+    }
+  });
+  const prepared = run.coordinator.preview(requestFor(state));
+  assert.equal(prepared.status, 'prepared');
+  assert.equal(run.proofStore.snapshot().length, 1);
+  assert.equal(
+    run.coordinator.commit(prepared.preview).status,
+    'terminal_success'
+  );
+});
+
 test('9. candidate source cannot approve itself', () => {
   const state = initialState();
   const target = toRuntime('b');
@@ -753,6 +773,31 @@ test('13. partial state write is marked fatal and never reported as success', ()
     'partial_transition_detected'
   );
   assert.equal(outcome.protocol.terminal.fatal_inconsistency, true);
+});
+
+test('13a. a committed CAS with a lost acknowledgement remains success', () => {
+  const state = initialState();
+  let current = structuredClone(state);
+  const lostAckStore = {
+    snapshot() { return structuredClone(current); },
+    compareAndSwap(expectedVersion, candidate) {
+      assert.equal(expectedVersion, 0);
+      current = structuredClone(candidate);
+      throw new Error('synthetic-acknowledgement-loss');
+    }
+  };
+  const run = harness({ state, store: lostAckStore });
+  const request = requestFor(state);
+  const prepared = run.coordinator.preview(request);
+  const outcome = run.coordinator.commit(prepared.preview);
+  assert.equal(outcome.status, 'terminal_success');
+  assert.equal(run.store.snapshot().store_version, 1);
+  assert.equal(run.recordStore.get(request.transition_ref).status, 'terminal');
+  assert.equal(run.observer.snapshot().terminal_successes, 1);
+  assert.deepEqual(
+    run.coordinator.protocol(request.transition_ref),
+    outcome.protocol
+  );
 });
 
 test('14. transition success preserves stopped and held lifecycle exactly', () => {

@@ -42,7 +42,9 @@ fields:
 
 The authority proof context binds the full request with the proof value
 replaced by `null`. This prevents a proof from approving itself while retaining
-all other transition bindings. Preview validation also binds the request,
+all other transition bindings. Verifier output is reduced to a canonical,
+allowlisted authority-evidence projection before the one-shot proof is
+consumed. Preview validation also binds the request,
 authority context, expected store version, and ordered receipt digests.
 
 ## State machine
@@ -103,7 +105,10 @@ immediately before CAS. Authority rotation requires a separate protocol.
 CAS loss leaves the old state unchanged. A store that reports a write without
 the exact committed state is classified as fatal
 `partial_transition_detected`. A successful transition never starts the
-runtime.
+runtime. If the store atomically commits the exact candidate but loses its
+acknowledgement, the subsequent exact snapshot comparison recognizes the
+commit as success and completes the same terminal instead of writing a
+conflicting failure.
 
 ## One-time legacy migration
 
