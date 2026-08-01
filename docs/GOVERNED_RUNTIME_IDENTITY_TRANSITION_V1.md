@@ -178,6 +178,11 @@ Persisted legacy migration state is valid only when `consumed: true` carries
 its exact evidence digest; unconsumed state must carry no evidence digest.
 Numeric protocol versions are positive safe integers (symbolic bounded version
 strings remain supported), so zero or negative bindings fail closed.
+Authority-proof replay markers use an expandable snapshot-backed index rather
+than the active-reservation admission bound; reconstructing the store preserves
+all consumed markers without making the 4097th proof unavailable. Observer
+reconstruction accepts the authoritative version-zero state and binds the first
+commit to its exact canonical state digest.
 
 The unique failure registry includes:
 

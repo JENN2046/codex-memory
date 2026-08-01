@@ -258,8 +258,7 @@ function createGovernedRuntimeIdentityStateStore(initialState) {
 }
 
 function createAuthorityProofReplayStore(initialEntries = []) {
-  if (!Array.isArray(initialEntries) ||
-      initialEntries.length > AUTHORITY_PROOF_REPLAY_LIMIT) {
+  if (!Array.isArray(initialEntries)) {
     reject('transition_authority_proof_store_invalid');
   }
   const consumed = new Map();
@@ -309,9 +308,6 @@ function createAuthorityProofReplayStore(initialEntries = []) {
       reject('transition_authority_proof_store_invalid');
     }
     if (consumed.has(entry.authority_proof_digest)) return false;
-    if (consumed.size >= AUTHORITY_PROOF_REPLAY_LIMIT) {
-      reject('transition_authority_proof_store_capacity_exceeded');
-    }
     consumed.set(
       entry.authority_proof_digest,
       deepFreeze(structuredClone(entry))

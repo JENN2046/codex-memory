@@ -47,9 +47,6 @@ function createGovernedRuntimeIdentityTransitionObserver({
   let lastAuthoritativeCommit = null;
   if (initialAuthoritativeState !== null) {
     validateGovernedRuntimeIdentityState(initialAuthoritativeState);
-    if (initialAuthoritativeState.store_version < 1) {
-      reject('transition_observer_authoritative_state_invalid');
-    }
     lastAuthoritativeCommit = {
       accepted_runtime: structuredClone(
         initialAuthoritativeState.accepted_runtime

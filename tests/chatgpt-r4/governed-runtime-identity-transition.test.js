@@ -727,6 +727,22 @@ test('10a. authority proof replay remains rejected after coordinator recreation'
   assert.equal(first.proofStore.snapshot().length, 1);
 });
 
+test('10a1. consumed authority proof markers do not exhaust at 4096 entries', () => {
+  const proofStore = createAuthorityProofReplayStore();
+  for (let index = 0; index < 4097; index += 1) {
+    assert.equal(proofStore.consume({
+      authority_proof_digest: digestObject(`durable-proof-${index}`),
+      authority_context_digest: digestObject(`durable-context-${index}`),
+      transition_ref: `grit_${index.toString(36).padStart(32, 'A')}`
+    }), true);
+  }
+  const snapshot = proofStore.snapshot();
+  assert.equal(snapshot.length, 4097);
+  const rebuilt = createAuthorityProofReplayStore(snapshot);
+  assert.equal(rebuilt.consume(snapshot[0]), false);
+  assert.equal(rebuilt.snapshot().length, 4097);
+});
+
 test('10b. same-ref replay cannot overwrite prepared or successful authority records', () => {
   const state = initialState();
   const run = harness({ state });
@@ -1580,6 +1596,44 @@ test('17m. Observer rejects stable authority rotation on a later commit', () => 
   }), false);
   assert.equal(observer.snapshot().atomic_commits_verified, 0);
   assert.equal(observer.snapshot().last_authoritative_store_version, 1);
+});
+
+test('17n. Observer anchors the first commit to an authoritative version-zero state', () => {
+  const result = prepareAndCommit();
+  const initialDigest = digestObject(result.state);
+  const atomicEvent = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: result.request.transition_ref,
+    protocol: result.committed.protocol,
+    accepted_runtime: result.committed.accepted_runtime,
+    controller_binding: result.committed.controller_binding,
+    store_version: 1,
+    state_digest: result.committed.state_digest,
+    state_projection: result.store.snapshot()
+  };
+
+  const forged = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: result.state
+  });
+  assert.equal(forged.snapshot().last_authoritative_store_version, 0);
+  replayObserverPrelude(forged, result);
+  assert.equal(forged.observe({
+    ...atomicEvent,
+    previous_state_digest: digestObject('forged-version-zero-state')
+  }), false);
+  assert.equal(forged.snapshot().atomic_commits_verified, 0);
+
+  const anchored = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: result.state
+  });
+  replayObserverPrelude(anchored, result);
+  assert.equal(anchored.observe({
+    ...atomicEvent,
+    previous_state_digest: initialDigest
+  }), true);
+  assert.equal(anchored.snapshot().atomic_commits_verified, 1);
+  assert.equal(anchored.snapshot().last_authoritative_store_version, 1);
 });
 
 test('18. terminal missing records a violation and fabricates no failure terminal', () => {
