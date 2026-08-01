@@ -8,11 +8,14 @@ const {
   LIMITS,
   canonicalJson,
   createOpaqueId,
+  createContextResolutionHeader,
+  createContextResolutionStageReceipt,
   createStageReceipt,
   digestObject,
   governedReadAttemptResponseBindingDigest,
   projectGovernedReadAttemptPublic,
   validateAttemptHeader,
+  validateGovernedContextResolutionProtocol,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
 const {
@@ -21,6 +24,8 @@ const {
 const {
   deriveGovernedReadAttemptRetention
 } = require('./governed-read-attempt-retention');
+const { createGovernedContextResolutionCoordinator } =
+  require('./governed-context-resolution-coordinator');
 
 const LOOPBACK_HOST = '127.0.0.1';
 const MAX_CONTROL_BODY_BYTES = LIMITS.maxResponseBytes + LIMITS.maxRequestBytes + 4096;
@@ -46,7 +51,10 @@ function createLoopbackEdgeRuntime({
   eventSink,
   governedReadAttempts = false,
   attemptCoordinator = null,
-  attemptEventSink
+  attemptEventSink,
+  governedContextResolutions = false,
+  contextResolutionCoordinator = null,
+  contextResolutionEventSink
 } = {}) {
   if (typeof verifyRequest !== 'function') reject('edge_request_verifier_missing');
   if (typeof verifyResponse !== 'function') reject('edge_response_verifier_missing');
@@ -68,6 +76,11 @@ function createLoopbackEdgeRuntime({
        typeof attemptEventSink !== 'function')) {
     reject('edge_attempt_runtime_invalid');
   }
+  if (typeof governedContextResolutions !== 'boolean' ||
+      (contextResolutionEventSink !== undefined &&
+       typeof contextResolutionEventSink !== 'function')) {
+    reject('edge_context_resolution_runtime_invalid');
+  }
   const attemptRetention = governedReadAttempts
     ? deriveGovernedReadAttemptRetention({
         maxRecords,
@@ -81,6 +94,15 @@ function createLoopbackEdgeRuntime({
         maxRetainedAttempts: attemptRetention.maxRetainedAttempts,
         terminalRetentionMs: attemptRetention.terminalRetentionMs,
         eventSink: attemptEventSink
+      })
+    : null;
+  const resolutionCoordinator = governedContextResolutions
+    ? contextResolutionCoordinator || createGovernedContextResolutionCoordinator({
+        clock,
+        maxResolutions: maxInFlight,
+        maxRetainedResolutions: Math.max(maxInFlight, maxRecords),
+        terminalRetentionMs,
+        eventSink: contextResolutionEventSink
       })
     : null;
   if (attemptCoordinator !== null && (
@@ -143,12 +165,27 @@ function createLoopbackEdgeRuntime({
     }
   }
 
+  function confirmResolutionTimeout(record) {
+    if (!record.resolution_ref) return;
+    const confirmation = resolutionCoordinator.timeoutResolution(
+      record.resolution_ref
+    );
+    if (confirmation?.accepted !== true ||
+        confirmation.resolution_ref !== record.resolution_ref ||
+        confirmation.outcome !== 'failure') {
+      reject('edge_context_resolution_timeout_terminal_invalid');
+    }
+  }
+
   function refresh(record) {
     if (TERMINAL_STATES.has(record.status)) return;
     const currentMs = nowMs();
-    if (record.attempt_deadline_ms !== null &&
-        record.attempt_deadline_ms <= currentMs) {
+    if ((record.attempt_deadline_ms !== null &&
+         record.attempt_deadline_ms <= currentMs) ||
+        (record.resolution_deadline_ms !== null &&
+         record.resolution_deadline_ms <= currentMs)) {
       confirmAttemptTimeout(record);
+      confirmResolutionTimeout(record);
       record.status = 'expired';
       record.claim = null;
       record.purge_after_ms =
@@ -159,6 +196,7 @@ function createLoopbackEdgeRuntime({
     const requestExpiresMs = Date.parse(record.request.expires_at);
     if (requestExpiresMs <= currentMs) {
       confirmAttemptTimeout(record);
+      confirmResolutionTimeout(record);
       record.status = 'expired';
       record.claim = null;
       record.purge_after_ms = requestExpiresMs + terminalRetentionMs;
@@ -168,7 +206,10 @@ function createLoopbackEdgeRuntime({
     if (record.status === 'claimed' && record.claim.expires_ms <= currentMs) {
       const acknowledged = record.claim.acked;
       const claimExpiresMs = record.claim.expires_ms;
-      if (acknowledged) confirmAttemptTimeout(record);
+      if (acknowledged) {
+        confirmAttemptTimeout(record);
+        confirmResolutionTimeout(record);
+      }
       record.status = acknowledged ? 'expired' : 'queued';
       record.claim = null;
       if (acknowledged) record.purge_after_ms = claimExpiresMs + terminalRetentionMs;
@@ -234,6 +275,16 @@ function createLoopbackEdgeRuntime({
         reject('edge_attempt_header_binding_invalid');
       }
     }
+    const contextResolutionHeader = governedContextResolutions &&
+        request?.tool_request?.name === 'resolve_memory_context'
+      ? createContextResolutionHeader({
+          requestDigest: digestObject(request),
+          now: clock(),
+          deadlineAt: new Date(Math.min(
+            Date.parse(request.expires_at), nowMs() + 60_000
+          )).toISOString()
+        })
+      : null;
     refreshAndPrune();
     if (records.has(request.request_id)) reject('replay_detected');
     if (records.size >= maxRecords) reject('edge_record_capacity_exceeded');
@@ -251,6 +302,13 @@ function createLoopbackEdgeRuntime({
             key: attemptHeader.attempt_ref,
             expiresAt: attemptHeader.deadline_at
           }]
+        : []),
+      ...(contextResolutionHeader
+        ? [{
+            namespace: 'edge_submission_resolution_ref',
+            key: contextResolutionHeader.resolution_ref,
+            expiresAt: contextResolutionHeader.deadline_at
+          }]
         : [])
     ]);
     const record = {
@@ -263,6 +321,10 @@ function createLoopbackEdgeRuntime({
       attempt_ref: attemptHeader?.attempt_ref || null,
       attempt_deadline_ms: attemptHeader
         ? Date.parse(attemptHeader.deadline_at)
+        : null,
+      resolution_ref: contextResolutionHeader?.resolution_ref || null,
+      resolution_deadline_ms: contextResolutionHeader
+        ? Date.parse(contextResolutionHeader.deadline_at)
         : null
     };
     if (attemptHeader) {
@@ -295,10 +357,46 @@ function createLoopbackEdgeRuntime({
         throw error;
       }
     }
+    if (contextResolutionHeader) {
+      let resolutionAccepted = false;
+      try {
+        resolutionCoordinator.acceptResolution(contextResolutionHeader);
+        resolutionAccepted = true;
+        const workingSet = resolutionCoordinator.workingSet(
+          contextResolutionHeader.resolution_ref
+        );
+        resolutionCoordinator.appendReceipt(
+          contextResolutionHeader.resolution_ref,
+          createContextResolutionStageReceipt({
+            header: workingSet.header,
+            receipts: workingSet.receipts,
+            stage: 'EDGE_VALIDATED'
+          })
+        );
+      } catch (error) {
+        if (resolutionAccepted) {
+          try {
+            resolutionCoordinator.cancelResolution(
+              contextResolutionHeader.resolution_ref
+            );
+          } catch {
+            // The terminal CAS may already have selected timeout.
+          }
+        }
+        replayReservation.rollback();
+        throw error;
+      }
+    }
     replayReservation.commit();
     records.set(request.request_id, record);
     emit('request_queued', record);
-    return { request_id: request.request_id, status: record.status };
+    return {
+      request_id: request.request_id,
+      status: record.status,
+      ...(contextResolutionHeader
+        ? { resolution_ref: contextResolutionHeader.resolution_ref }
+        : {})
+    };
   }
 
   function claim(relayId) {
@@ -309,12 +407,11 @@ function createLoopbackEdgeRuntime({
     for (const record of records.values()) {
       if (record.status !== 'queued') continue;
       const configuredExpiresMs = nowMs() + claimLeaseMs;
-      const expiresMs = record.attempt_deadline_ms === null
-        ? configuredExpiresMs
-        : Math.min(
-            configuredExpiresMs,
-            record.attempt_deadline_ms
-          );
+      const expiresMs = Math.min(
+        configuredExpiresMs,
+        record.attempt_deadline_ms ?? Number.POSITIVE_INFINITY,
+        record.resolution_deadline_ms ?? Number.POSITIVE_INFINITY
+      );
       record.status = 'claimed';
       record.attempt += 1;
       record.claim = {
@@ -335,6 +432,12 @@ function createLoopbackEdgeRuntime({
               governed_read_attempt:
                 governedCoordinator.workingSet(record.attempt_ref)
             }
+          : {}),
+        ...(record.resolution_ref
+          ? {
+              governed_context_resolution:
+                resolutionCoordinator.workingSet(record.resolution_ref)
+            }
           : {})
       };
     }
@@ -346,8 +449,12 @@ function createLoopbackEdgeRuntime({
     const activeClaim = requireLiveClaim(record, claimToken);
     if (activeClaim.acked) reject('edge_claim_ack_replay');
     activeClaim.acked = true;
-    if (record.attempt_deadline_ms !== null) {
-      activeClaim.expires_ms = record.attempt_deadline_ms;
+    if (record.attempt_deadline_ms !== null ||
+        record.resolution_deadline_ms !== null) {
+      activeClaim.expires_ms = Math.min(
+        record.attempt_deadline_ms ?? Number.POSITIVE_INFINITY,
+        record.resolution_deadline_ms ?? Number.POSITIVE_INFINITY
+      );
       if (activeClaim.expires_ms <= nowMs()) {
         refresh(record);
         reject('edge_claim_expired');
@@ -361,7 +468,8 @@ function createLoopbackEdgeRuntime({
     requestId,
     claimToken,
     response,
-    governedReadAttemptCandidate = null
+    governedReadAttemptCandidate = null,
+    governedContextResolutionCandidate = null
   ) {
     const record = requireRecord(requestId);
     const activeClaim = requireLiveClaim(record, claimToken);
@@ -373,6 +481,10 @@ function createLoopbackEdgeRuntime({
     if ((currentRecord.attempt_ref === null) !==
         (governedReadAttemptCandidate === null)) {
       reject('edge_attempt_candidate_required');
+    }
+    if ((currentRecord.resolution_ref === null) !==
+        (governedContextResolutionCandidate === null)) {
+      reject('edge_context_resolution_candidate_required');
     }
     if (currentRecord.attempt_ref) {
       let expectedBinding;
@@ -399,6 +511,25 @@ function createLoopbackEdgeRuntime({
     )) {
       reject('edge_attempt_response_binding_invalid');
     }
+    if (currentRecord.resolution_ref) {
+      try {
+        validateGovernedContextResolutionProtocol(
+          governedContextResolutionCandidate
+        );
+      } catch {
+        reject('edge_context_resolution_candidate_invalid');
+      }
+      if (governedContextResolutionCandidate.header.resolution_ref !==
+            currentRecord.resolution_ref ||
+          governedContextResolutionCandidate.header.request_digest !==
+            digestObject(currentRecord.request)) {
+        reject('edge_context_resolution_candidate_invalid');
+      }
+      resolutionCoordinator.commitProtocolCandidate(
+        currentRecord.resolution_ref,
+        governedContextResolutionCandidate
+      );
+    }
     const acceptedResponse = structuredClone(response);
     if (currentRecord.attempt_ref) {
       governedCoordinator.commitProtocolCandidate(
@@ -419,6 +550,9 @@ function createLoopbackEdgeRuntime({
     if (TERMINAL_STATES.has(record.status)) reject('edge_request_terminal');
     if (record.attempt_ref) {
       governedCoordinator.cancelAttempt(record.attempt_ref);
+    }
+    if (record.resolution_ref) {
+      resolutionCoordinator.cancelResolution(record.resolution_ref);
     }
     record.status = 'cancelled';
     record.claim = null;
@@ -486,20 +620,24 @@ function createLoopbackEdgeRuntime({
         const body = await readJsonBody(incoming);
         assertControlKeys(
           body,
-          body.governed_read_attempt_candidate
-            ? [
-                'claim_token',
-                'governed_read_attempt_candidate',
-                'request_id',
-                'response'
-              ]
-            : ['request_id', 'claim_token', 'response']
+          [
+            'request_id',
+            'claim_token',
+            'response',
+            ...(body.governed_read_attempt_candidate
+              ? ['governed_read_attempt_candidate']
+              : []),
+            ...(body.governed_context_resolution_candidate
+              ? ['governed_context_resolution_candidate']
+              : [])
+          ]
         );
         return sendJson(outgoing, 200, await complete(
           body.request_id,
           body.claim_token,
           body.response,
-          body.governed_read_attempt_candidate || null
+          body.governed_read_attempt_candidate || null,
+          body.governed_context_resolution_candidate || null
         ));
       }
       if (route === 'POST /v1/relay/state') {

@@ -26,15 +26,22 @@ function createLoopbackEdgeClient(edgeUrl, { timeoutMs = 1_000 } = {}) {
       return requestJson(baseUrl, '/v1/relay/ack', claimControl(claim), timeoutMs);
     },
     complete(claim, response, {
-      governedReadAttemptCandidate
+      governedReadAttemptCandidate,
+      governedContextResolutionCandidate
     } = {}) {
       return requestJson(baseUrl, '/v1/relay/complete', {
         ...claimControl(claim),
         response,
         ...(governedReadAttemptCandidate
-          ? {
+            ? {
               governed_read_attempt_candidate:
                 governedReadAttemptCandidate
+            }
+          : {}),
+        ...(governedContextResolutionCandidate
+          ? {
+              governed_context_resolution_candidate:
+                governedContextResolutionCandidate
             }
           : {})
       }, timeoutMs);

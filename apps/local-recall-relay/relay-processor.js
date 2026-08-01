@@ -3,15 +3,19 @@
 const {
   COUNTER_MODES,
   LIMITS,
+  appendGovernedContextResolutionStage,
   appendGovernedReadAttemptStage,
   createChatGptEdgeDataResponseV2,
   createGovernedReadFailureLegacyContent,
   createGovernedReadAttemptProtocol,
+  createGovernedContextResolutionProtocol,
+  createContextResolutionTerminalEnvelope,
   createResponseEnvelope,
   createTerminalEnvelope,
   digestObject,
   governedReadAttemptResponseBindingDigest,
   isGovernedReadAttemptWorkingSetExtension,
+  isGovernedContextResolutionWorkingSetExtension,
   validateCounters,
   validateCounterMode,
   validateRequestEnvelope,
@@ -20,6 +24,7 @@ const {
   validateLegacyToolStructuredContent,
   validateGovernedReadResponseStatus,
   validateGovernedReadAttemptWorkingSet,
+  validateGovernedContextResolutionWorkingSet,
   GOVERNED_READ_ATTEMPT_READ_TOOLS,
   projectLegacyCountersFromGovernedReadAttempt,
   deepFreeze,
@@ -36,13 +41,16 @@ function createRelayProcessor({
   responseSigning,
   counterMode = COUNTER_MODES.zeroMemory,
   clock = () => new Date(),
-  governedReadAttemptStageHooks
+  governedReadAttemptStageHooks,
+  governedContextResolutionStageHooks,
+  governedContextResolutions = false
 }) {
   if (typeof forwardToUds !== 'function') reject('relay_forwarder_missing');
 
   return Object.freeze({
     async handle(request, {
-      governedReadAttempt
+      governedReadAttempt,
+      governedContextResolution
     } = {}) {
       const now = clock();
       const validation = validateRequestEnvelope(request, {
@@ -65,7 +73,16 @@ function createRelayProcessor({
           governedReadAttempt !== undefined) {
         reject('relay_attempt_forbidden');
       }
+      if (governedContextResolutions && toolName === 'resolve_memory_context' &&
+          governedContextResolution === undefined) {
+        reject('relay_context_resolution_required');
+      }
+      if (governedContextResolutions && toolName !== 'resolve_memory_context' &&
+          governedContextResolution !== undefined) {
+        reject('relay_context_resolution_forbidden');
+      }
       let relayWorkingSet = null;
+      let relayContextResolution = null;
       if (governedReadAttempt !== undefined) {
         validateGovernedReadAttemptWorkingSet(governedReadAttempt);
         const lastReceipt = governedReadAttempt.receipts.at(-1);
@@ -78,6 +95,21 @@ function createRelayProcessor({
         }
         relayWorkingSet = appendGovernedReadAttemptStage(
           governedReadAttempt,
+          { stage: 'RELAY_CLAIMED' }
+        );
+      }
+      if (governedContextResolution !== undefined) {
+        validateGovernedContextResolutionWorkingSet(governedContextResolution);
+        const lastReceipt = governedContextResolution.receipts.at(-1);
+        if (lastReceipt?.stage !== 'EDGE_VALIDATED' ||
+            lastReceipt.outcome !== 'completed' ||
+            governedContextResolution.header.operation !== toolName ||
+            governedContextResolution.header.request_digest !==
+              validation.requestDigest) {
+          reject('relay_context_resolution_binding_invalid');
+        }
+        relayContextResolution = appendGovernedContextResolutionStage(
+          governedContextResolution,
           { stage: 'RELAY_CLAIMED' }
         );
       }
@@ -97,6 +129,9 @@ function createRelayProcessor({
         relayReceipt,
         ...(relayWorkingSet
           ? { governedReadAttempt: relayWorkingSet }
+          : {}),
+        ...(relayContextResolution
+          ? { governedContextResolution: relayContextResolution }
           : {})
       });
       const responseNow = clock();
@@ -107,7 +142,8 @@ function createRelayProcessor({
       }
       validateInvocation(invocation, toolName, {
         counterMode,
-        governedReadAttempt: relayWorkingSet !== null
+        governedReadAttempt: relayWorkingSet !== null,
+        governedContextResolution: relayContextResolution !== null
       });
       const receiptChain = {
         edge_request: validation.requestDigest,
@@ -118,7 +154,7 @@ function createRelayProcessor({
       validateReceiptChain(receiptChain);
 
       if (!relayWorkingSet) {
-        return createResponseEnvelope({
+        const response = createResponseEnvelope({
           requestId,
           requestDigest: validation.requestDigest,
           toolName,
@@ -135,6 +171,83 @@ function createRelayProcessor({
             remainingRequestTtlMs / 1000
           ),
           signing: responseSigning
+        });
+        if (!relayContextResolution) return response;
+        const continuation = validateContextResolutionContinuation(
+          invocation.governed_context_resolution,
+          relayContextResolution
+        );
+        let candidateWorkingSet = continuation.working_set;
+        let terminal;
+        const lastReceipt = candidateWorkingSet.receipts.at(-1);
+        if (continuation.terminal_failure) {
+          terminal = createContextResolutionTerminalEnvelope({
+            header: candidateWorkingSet.header,
+            receipts: candidateWorkingSet.receipts,
+            outcome: 'failure',
+            reasonCode: continuation.terminal_failure.reason_code,
+            evidenceComplete: continuation.evidence_complete,
+            failureOrigin: continuation.terminal_failure.failure_origin
+          });
+        } else if (lastReceipt?.outcome === 'failed') {
+          terminal = createContextResolutionTerminalEnvelope({
+            header: candidateWorkingSet.header,
+            receipts: candidateWorkingSet.receipts,
+            outcome: 'failure',
+            reasonCode: lastReceipt.reason_code,
+            evidenceComplete: continuation.evidence_complete,
+            failureOrigin: lastReceipt.origin
+          });
+        } else {
+          if (lastReceipt?.stage !== 'CONTEXT_ISSUED' ||
+              continuation.evidence_complete !== true) {
+            reject('relay_context_resolution_continuation_invalid');
+          }
+          try {
+            const hook = governedContextResolutionStageHooks?.RESPONSE_FINALIZED;
+            if (hook !== undefined) {
+              if (typeof hook !== 'function') {
+                reject('relay_context_resolution_stage_hook_invalid');
+              }
+              await hook({ resolution_ref: candidateWorkingSet.header.resolution_ref });
+            }
+            candidateWorkingSet = appendGovernedContextResolutionStage(
+              candidateWorkingSet,
+              { stage: 'RESPONSE_FINALIZED' }
+            );
+            terminal = createContextResolutionTerminalEnvelope({
+              header: candidateWorkingSet.header,
+              receipts: candidateWorkingSet.receipts,
+              outcome: 'success',
+              evidenceComplete: true
+            });
+          } catch {
+            candidateWorkingSet = appendGovernedContextResolutionStage(
+              candidateWorkingSet,
+              {
+                stage: 'RESPONSE_FINALIZED',
+                outcome: 'failed',
+                reasonCode: 'context_response_finalization_failed'
+              }
+            );
+            terminal = createContextResolutionTerminalEnvelope({
+              header: candidateWorkingSet.header,
+              receipts: candidateWorkingSet.receipts,
+              outcome: 'failure',
+              reasonCode: 'context_response_finalization_failed',
+              evidenceComplete: true,
+              failureOrigin: 'relay'
+            });
+          }
+        }
+        return Object.freeze({
+          response,
+          governed_context_resolution_candidate:
+            createGovernedContextResolutionProtocol({
+              header: candidateWorkingSet.header,
+              receipts: candidateWorkingSet.receipts,
+              terminal
+            })
         });
       }
 
@@ -277,7 +390,8 @@ function validateInvocationCounterAgreement(invocation, terminal) {
 
 function validateInvocation(invocation, toolName, {
   counterMode = COUNTER_MODES.zeroMemory,
-  governedReadAttempt = false
+  governedReadAttempt = false,
+  governedContextResolution = false
 } = {}) {
   if (!invocation || typeof invocation !== 'object' || Array.isArray(invocation)) {
     reject('relay_invocation_invalid');
@@ -287,6 +401,7 @@ function validateInvocation(invocation, toolName, {
   const expectedKeys = [
     'counters',
     ...(governedReadAttempt ? ['governed_read_attempt'] : []),
+    ...(governedContextResolution ? ['governed_context_resolution'] : []),
     'receipt_digests',
     'status',
     'structured_content'
@@ -313,6 +428,29 @@ function validateInvocation(invocation, toolName, {
       !/^sha256:[a-f0-9]{64}$/u.test(invocation.receipt_digests.context || '')) {
     reject('relay_invocation_receipt_invalid');
   }
+}
+
+function validateContextResolutionContinuation(value, prefix) {
+  if (!value || typeof value !== 'object' || Array.isArray(value) ||
+      Object.keys(value).sort().join(',') !==
+        'evidence_complete,terminal_failure,working_set' ||
+      typeof value.evidence_complete !== 'boolean') {
+    reject('relay_context_resolution_continuation_invalid');
+  }
+  validateGovernedContextResolutionWorkingSet(value.working_set);
+  if (!isGovernedContextResolutionWorkingSetExtension(prefix, value.working_set)) {
+    reject('relay_context_resolution_continuation_invalid');
+  }
+  if (value.terminal_failure !== null &&
+      (!value.terminal_failure || typeof value.terminal_failure !== 'object' ||
+       Array.isArray(value.terminal_failure) ||
+       Object.keys(value.terminal_failure).sort().join(',') !==
+         'failure_origin,reason_code' ||
+       typeof value.terminal_failure.reason_code !== 'string' ||
+       typeof value.terminal_failure.failure_origin !== 'string')) {
+    reject('relay_context_resolution_continuation_invalid');
+  }
+  return value;
 }
 
 function validateAttemptContinuation(value, prefix) {
@@ -382,5 +520,6 @@ module.exports = {
   validateGovernedReadInvocationCounters,
   validateInvocationCounterAgreement,
   validateTerminalResponseAgreement,
+  validateContextResolutionContinuation,
   validateInvocation
 };

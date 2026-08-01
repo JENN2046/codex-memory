@@ -7,6 +7,7 @@ module.exports = {
   ...require('./loopback-runtime'),
   ...require('./low-disclosure-observer'),
   ...require('./governed-read-attempt-observer'),
+  ...require('./governed-context-resolution-observer'),
   ...require('./outbound-https-client'),
   ...require('./outbound-runtime'),
   ...require('./runtime-authority'),

@@ -1208,24 +1208,20 @@ test('Observer rejects a tampered receipt independently', () => {
   assert.equal(snapshot.terminals_fabricated, 0);
 });
 
-test('dormant contract leaves live resolver imports and public v2 schemas unchanged', () => {
+test('live resolver imports the internal protocol without changing public v2 schemas', () => {
   const repositoryRoot = path.resolve(__dirname, '../..');
-  const liveFiles = [
-    'apps/chatgpt-edge/index.js',
+  for (const relativePath of [
     'apps/chatgpt-edge/transient-request-broker.js',
-    'apps/local-recall-relay/index.js',
     'apps/local-recall-relay/relay-processor.js',
-    'src/adapters/chatgpt-r4/governance-adapter.js',
-    'src/adapters/chatgpt-r4/governed-read-v2-runtime.js'
-  ];
-  for (const relativePath of liveFiles) {
+    'src/adapters/chatgpt-r4/governance-adapter.js'
+  ]) {
     const source = fs.readFileSync(
       path.join(repositoryRoot, relativePath),
       'utf8'
     );
-    assert.doesNotMatch(
+    assert.match(
       source,
-      /governed-context-resolution/u,
+      /ContextResolution/u,
       relativePath
     );
   }

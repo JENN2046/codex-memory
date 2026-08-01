@@ -20,7 +20,8 @@ const {
   normalizeBrokerResult
 } = require('../../apps/chatgpt-edge');
 const {
-  createRelayProcessor
+  createRelayProcessor,
+  createGovernedContextResolutionObserver
 } = require('../../apps/local-recall-relay');
 const {
   createGovernanceAdapter,
@@ -112,6 +113,9 @@ function createCharacterizationFixture({ issueOutcome = 'production' } = {}) {
     governance_calls: 0,
     bridge_calls: 0
   };
+  const resolutionObserver = createGovernedContextResolutionObserver({
+    clock: () => NOW
+  });
   const resolveEdgeKey = keyId =>
     keyId === edge.keyId ? edge.publicKey : null;
   const resolvePrincipalKey = candidate =>
@@ -190,6 +194,7 @@ function createCharacterizationFixture({ issueOutcome = 'production' } = {}) {
     responseSigning: signing(relayIdentity),
     counterMode: COUNTER_MODES.governedLiveReadV1,
     clock: () => NOW,
+    governedContextResolutions: true,
     async forwardToUds(payload) {
       observations.governance_calls += 1;
       return governance.handle(payload);
@@ -208,7 +213,8 @@ function createCharacterizationFixture({ issueOutcome = 'production' } = {}) {
     },
     verifyResponse,
     clock: () => NOW,
-    eventComponent: 'gcr_characterization_edge'
+    eventComponent: 'gcr_characterization_edge',
+    contextResolutionEventSink: event => resolutionObserver.observe(event)
   });
   let sequence = 0;
 
@@ -239,18 +245,28 @@ function createCharacterizationFixture({ issueOutcome = 'production' } = {}) {
     assert.ok(claim);
     broker.acknowledge(claim.request_id, claim.claim_token);
     observations.relay_calls += 1;
-    const relayResponse = await relay.handle(claim.request);
+    const relayResult = await relay.handle(claim.request, {
+      governedContextResolution: claim.governed_context_resolution
+    });
+    const relayResponse = relayResult.response;
     const response = transformResponse(relayResponse, {
       request: signedRequest
     });
-    await broker.complete(claim.request_id, claim.claim_token, response);
+    await broker.complete(
+      claim.request_id,
+      claim.claim_token,
+      response,
+      null,
+      relayResult.governed_context_resolution_candidate
+    );
     const brokerResult = await broker.waitForResult(signedRequest.request_id, {
       timeoutMs: 100
     });
     const publicResult = normalize(signedRequest, brokerResult);
     return Object.freeze({
       request: signedRequest,
-      response: publicResult
+      response: publicResult,
+      terminal: relayResult.governed_context_resolution_candidate.terminal
     });
   }
 
@@ -286,6 +302,7 @@ function createCharacterizationFixture({ issueOutcome = 'production' } = {}) {
     snapshot() {
       return Object.freeze({
         ...observations,
+        resolution_observer: resolutionObserver.snapshot(),
         ...(runtime ? { runtime: runtime.snapshot() } : {})
       });
     }
@@ -320,12 +337,16 @@ test('resolver-only signed vertical slice issues and client-validates one v2 con
   assert.deepEqual(Object.keys(result.response.receipt_chain).sort(), [
     'context', 'edge_request', 'governance', 'relay'
   ]);
+  assert.equal(result.terminal.outcome, 'success');
+  assert.equal(result.terminal.last_completed_stage, 'RESPONSE_FINALIZED');
+  assert.equal(result.terminal.read_attempt_created, false);
 
   const snapshot = fixture.snapshot();
   assert.equal(snapshot.relay_calls, 1);
   assert.equal(snapshot.governance_calls, 1);
   assert.equal(snapshot.runtime.active_context_count, 1);
   assert.equal(snapshot.runtime.completed_requests, 1);
+  assert.equal(snapshot.resolution_observer.terminal_successes, 1);
   assertResolverOnly(snapshot);
 });
 

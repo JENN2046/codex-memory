@@ -59,6 +59,7 @@ function createExternalEdgeRuntime(options = {}) {
     maxRecords: config.maxRecords,
     eventSink: config.eventSink,
     attemptEventSink: config.attemptEventSink,
+    contextResolutionEventSink: config.contextResolutionEventSink,
     eventComponent: 'external_edge_broker',
     verifyRequest(request) {
       return validateRequestEnvelope(request, {
@@ -252,6 +253,10 @@ function validateExternalEdgeRuntimeConfig(options) {
       typeof options.attemptEventSink !== 'function') {
     reject('edge_attempt_event_sink_invalid');
   }
+  if (options.contextResolutionEventSink !== undefined &&
+      typeof options.contextResolutionEventSink !== 'function') {
+    reject('edge_context_resolution_event_sink_invalid');
+  }
   if (options.broker !== undefined) {
     reject('edge_custom_broker_forbidden');
   }
@@ -280,6 +285,7 @@ function validateExternalEdgeRuntimeConfig(options) {
     verifyAccessToken: options.verifyAccessToken,
     eventSink: options.eventSink,
     attemptEventSink: options.attemptEventSink,
+    contextResolutionEventSink: options.contextResolutionEventSink,
     counterMode
   });
 }
@@ -333,27 +339,37 @@ function handleRelay(pathname, body, broker, outgoing) {
     return sendJson(outgoing, 200, broker.acknowledge(body.request_id, body.claim_token));
   }
   if (pathname === '/v1/relay/complete') {
-    const hasCandidate = Object.hasOwn(
+    const hasAttemptCandidate = Object.hasOwn(
       body,
       'governed_read_attempt_candidate'
     );
+    const hasContextResolutionCandidate = Object.hasOwn(
+      body,
+      'governed_context_resolution_candidate'
+    );
     assertControlKeys(
       body,
-      hasCandidate
-        ? [
-            'request_id',
-            'claim_token',
-            'response',
-            'governed_read_attempt_candidate'
-          ]
-        : ['request_id', 'claim_token', 'response']
+      [
+        'request_id',
+        'claim_token',
+        'response',
+        ...(hasAttemptCandidate
+          ? ['governed_read_attempt_candidate']
+          : []),
+        ...(hasContextResolutionCandidate
+          ? ['governed_context_resolution_candidate']
+          : [])
+      ]
     );
     return Promise.resolve(broker.complete(
       body.request_id,
       body.claim_token,
       body.response,
-      hasCandidate
+      hasAttemptCandidate
         ? body.governed_read_attempt_candidate
+        : null,
+      hasContextResolutionCandidate
+        ? body.governed_context_resolution_candidate
         : null
     ))
       .then(result => sendJson(outgoing, 200, result));

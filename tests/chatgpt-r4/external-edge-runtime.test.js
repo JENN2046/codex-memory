@@ -14,9 +14,12 @@ const {
 const {
   CHATGPT_EDGE_DATA_SCHEMA_VERSION,
   ZERO_MEMORY_COUNTERS,
+  appendGovernedContextResolutionStage,
   appendGovernedReadAttemptStage,
   createChatGptEdgeDataResponseV2,
   createGovernedReadAttemptProtocol,
+  createGovernedContextResolutionProtocol,
+  createContextResolutionTerminalEnvelope,
   createResponseEnvelope,
   createTerminalEnvelope,
   digestObject,
@@ -310,7 +313,11 @@ test('external Edge serves PRMD and returns governed data response v2', async t 
   await relayRequest(address, '/v1/relay/complete', {
     request_id: resolveClaim.body.request_id,
     claim_token: resolveClaim.body.claim_token,
-    response: resolveResponse
+    response: resolveResponse,
+    governed_context_resolution_candidate:
+      successfulContextResolutionCandidate(
+        resolveClaim.body.governed_context_resolution
+      )
   });
   const resolved = await resolveCall;
   assert.equal(
@@ -1027,6 +1034,30 @@ function successfulAttemptCandidate(initialWorkingSet) {
     evidenceComplete: true
   });
   return createGovernedReadAttemptProtocol({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    terminal
+  });
+}
+
+function successfulContextResolutionCandidate(initialWorkingSet) {
+  let workingSet = initialWorkingSet;
+  for (const stage of [
+    'RELAY_CLAIMED',
+    'REGISTRY_RESOLVED',
+    'SCOPE_RESOLVED',
+    'CONTEXT_ISSUED',
+    'RESPONSE_FINALIZED'
+  ]) {
+    workingSet = appendGovernedContextResolutionStage(workingSet, { stage });
+  }
+  const terminal = createContextResolutionTerminalEnvelope({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    outcome: 'success',
+    evidenceComplete: true
+  });
+  return createGovernedContextResolutionProtocol({
     header: workingSet.header,
     receipts: workingSet.receipts,
     terminal

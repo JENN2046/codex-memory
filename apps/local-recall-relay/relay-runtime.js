@@ -21,7 +21,9 @@ function createRelayRuntime({
   cancelPollMs = 10,
   eventComponent = 'outbound_relay',
   eventSink,
-  governedReadAttemptStageHooks
+  governedReadAttemptStageHooks,
+  governedContextResolutionStageHooks,
+  governedContextResolutions = false
 } = {}) {
   validateEdgeClient(edgeClient);
   if (typeof forwardToUds !== 'function') reject('relay_forwarder_missing');
@@ -121,6 +123,9 @@ function createRelayRuntime({
         counterMode,
         clock,
         governedReadAttemptStageHooks,
+        governedContextResolutionStageHooks,
+        governedContextResolutions: governedContextResolutions ||
+          Boolean(claim.governed_context_resolution),
         async forwardToUds(payload) {
           emit('uds_forward_started', claim.request_id, { attempt: claim.attempt });
           const invocation = await forwardToUds(payload, { signal: cancellation.signal });
@@ -139,6 +144,12 @@ function createRelayRuntime({
                     claim.governed_read_attempt
                 }
               : {})
+            , ...(claim.governed_context_resolution
+              ? {
+                  governedContextResolution:
+                    claim.governed_context_resolution
+                }
+              : {})
           });
           emit('response_prepared', claim.request_id, { attempt: claim.attempt });
         } catch (error) {
@@ -148,6 +159,8 @@ function createRelayRuntime({
           emit('edge_complete_started', claim.request_id, { attempt: claim.attempt });
           const governedReadAttemptCandidate =
             response?.governed_read_attempt_candidate || null;
+          const governedContextResolutionCandidate =
+            response?.governed_context_resolution_candidate || null;
           const responseEnvelope = governedReadAttemptCandidate
             ? response.response
             : response;
@@ -157,6 +170,9 @@ function createRelayRuntime({
               ? {
                   governedReadAttemptCandidate
                 }
+              : {}),
+            ...(governedContextResolutionCandidate
+              ? { governedContextResolutionCandidate }
               : {})
           });
         } catch (error) {
@@ -172,6 +188,12 @@ function createRelayRuntime({
             ? {
                 governed_read_attempt_candidate:
                   response.governed_read_attempt_candidate
+              }
+            : {}),
+          ...(response?.governed_context_resolution_candidate
+            ? {
+                governed_context_resolution_candidate:
+                  response.governed_context_resolution_candidate
               }
             : {})
         });

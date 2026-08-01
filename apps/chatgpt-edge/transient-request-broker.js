@@ -11,6 +11,9 @@ const {
   createGovernedReadAttemptWorkingSet,
   createStageReceipt,
   createTerminalEnvelope,
+  createContextResolutionHeader,
+  createContextResolutionStageReceipt,
+  validateGovernedContextResolutionProtocol,
   isGovernedReadAttemptWorkingSetExtension,
   governedReadAttemptResponseBindingDigest,
   digestObject,
@@ -27,6 +30,9 @@ const {
 const {
   deriveGovernedReadAttemptRetention
 } = require('./governed-read-attempt-retention');
+const {
+  createGovernedContextResolutionCoordinator
+} = require('./governed-context-resolution-coordinator');
 
 const TERMINAL_STATES = new Set(['completed', 'cancelled', 'expired']);
 const GOVERNED_ATTEMPT_FAILURE_RESULT_KIND =
@@ -43,6 +49,16 @@ const REQUIRED_ATTEMPT_COORDINATOR_METHODS = Object.freeze([
   'timeoutAttempt',
   'workingSet'
 ]);
+const REQUIRED_CONTEXT_RESOLUTION_COORDINATOR_METHODS = Object.freeze([
+  'acceptResolution',
+  'appendReceipt',
+  'cancelResolution',
+  'commitProtocolCandidate',
+  'protocol',
+  'reportCoordinatorLoss',
+  'timeoutResolution',
+  'workingSet'
+]);
 
 function createTransientRequestBroker({
   verifyRequest,
@@ -55,7 +71,9 @@ function createTransientRequestBroker({
   eventSink,
   eventComponent = 'transient_edge_broker',
   attemptCoordinator = null,
-  attemptEventSink
+  attemptEventSink,
+  contextResolutionCoordinator = null,
+  contextResolutionEventSink
 } = {}) {
   if (typeof verifyRequest !== 'function') reject('edge_request_verifier_missing');
   if (typeof verifyResponse !== 'function') reject('edge_response_verifier_missing');
@@ -75,6 +93,10 @@ function createTransientRequestBroker({
   if (attemptEventSink !== undefined &&
       typeof attemptEventSink !== 'function') {
     reject('edge_attempt_event_sink_invalid');
+  }
+  if (contextResolutionEventSink !== undefined &&
+      typeof contextResolutionEventSink !== 'function') {
+    reject('edge_context_resolution_event_sink_invalid');
   }
   if (typeof eventComponent !== 'string' || !/^[a-z][a-z0-9_]{0,79}$/u.test(eventComponent)) {
     reject('edge_event_component_invalid');
@@ -99,6 +121,19 @@ function createTransientRequestBroker({
     typeof governedCoordinator?.[method] !== 'function'
   )) {
     reject('edge_attempt_coordinator_invalid');
+  }
+  const resolutionCoordinator = contextResolutionCoordinator ||
+    createGovernedContextResolutionCoordinator({
+      clock,
+      maxResolutions: maxInFlight,
+      maxRetainedResolutions: Math.max(maxInFlight, maxRecords),
+      terminalRetentionMs,
+      eventSink: contextResolutionEventSink || eventSink
+    });
+  if (REQUIRED_CONTEXT_RESOLUTION_COORDINATOR_METHODS.some(method =>
+    typeof resolutionCoordinator?.[method] !== 'function'
+  )) {
+    reject('edge_context_resolution_coordinator_invalid');
   }
   const submissionReplayGuard = new InMemoryReplayGuard({
     maxEntries:
@@ -206,17 +241,35 @@ function createTransientRequestBroker({
     return acceptance;
   }
 
+  function commitContextResolutionFailure(record, reasonCode) {
+    if (!record.resolution_ref) return null;
+    const acceptance = reasonCode === 'resolution_timeout'
+      ? resolutionCoordinator.timeoutResolution(record.resolution_ref)
+      : resolutionCoordinator.cancelResolution(record.resolution_ref);
+    if (acceptance?.accepted !== true ||
+        acceptance.resolution_ref !== record.resolution_ref ||
+        acceptance.outcome !== 'failure') {
+      reject('edge_context_resolution_terminal_invalid');
+    }
+    record.context_resolution_protocol =
+      resolutionCoordinator.protocol(record.resolution_ref);
+    return acceptance;
+  }
+
   function refresh(record) {
     if (TERMINAL_STATES.has(record.status)) return;
     const currentMs = nowMs();
     const requestExpiresMs = Date.parse(record.request.expires_at);
     if ((record.attempt_deadline_ms !== null &&
          record.attempt_deadline_ms <= currentMs) ||
+        (record.resolution_deadline_ms !== null &&
+         record.resolution_deadline_ms <= currentMs) ||
         requestExpiresMs <= currentMs) {
       commitAttemptFailure(record, 'attempt_timeout');
+      commitContextResolutionFailure(record, 'resolution_timeout');
       record.status = 'expired';
       record.claim = null;
-      record.purge_after_ms = record.attempt_ref
+      record.purge_after_ms = (record.attempt_ref || record.resolution_ref)
         ? currentMs + terminalRetentionMs
         : requestExpiresMs + terminalRetentionMs;
       emit('request_expired', record);
@@ -230,7 +283,8 @@ function createTransientRequestBroker({
       record.claim = null;
       if (acknowledged) {
         commitAttemptFailure(record, 'attempt_timeout');
-        record.purge_after_ms = record.attempt_ref
+        commitContextResolutionFailure(record, 'resolution_timeout');
+        record.purge_after_ms = (record.attempt_ref || record.resolution_ref)
           ? currentMs + terminalRetentionMs
           : claimExpiresMs + terminalRetentionMs;
         settleWaiters(record);
@@ -286,6 +340,7 @@ function createTransientRequestBroker({
       request?.tool_request?.name
     );
     let attemptHeader = null;
+    let contextResolutionHeader = null;
     if (attemptTool) {
       const currentMs = nowMs();
       const requestDeadlineMs = Date.parse(request.expires_at);
@@ -309,6 +364,21 @@ function createTransientRequestBroker({
         deadlineAt: new Date(attemptDeadlineMs).toISOString()
       });
     }
+    if (request?.tool_request?.name === 'resolve_memory_context') {
+      const currentMs = nowMs();
+      const deadlineAtMs = Math.min(
+        Date.parse(request.expires_at),
+        currentMs + 60_000
+      );
+      if (!Number.isFinite(deadlineAtMs) || deadlineAtMs <= currentMs) {
+        reject('edge_context_resolution_header_binding_invalid');
+      }
+      contextResolutionHeader = createContextResolutionHeader({
+        requestDigest: digestObject(request),
+        now: new Date(currentMs),
+        deadlineAt: new Date(deadlineAtMs).toISOString()
+      });
+    }
     const replayReservation = submissionReplayGuard.reserveMany([
       { namespace: 'edge_submission_request_id', key: request.request_id, expiresAt: request.expires_at },
       { namespace: 'edge_submission_nonce', key: request.nonce, expiresAt: request.expires_at },
@@ -317,6 +387,13 @@ function createTransientRequestBroker({
             namespace: 'edge_submission_attempt_ref',
             key: attemptHeader.attempt_ref,
             expiresAt: attemptHeader.deadline_at
+          }]
+        : []),
+      ...(contextResolutionHeader
+        ? [{
+            namespace: 'edge_submission_resolution_ref',
+            key: contextResolutionHeader.resolution_ref,
+            expiresAt: contextResolutionHeader.deadline_at
           }]
         : [])
     ]);
@@ -331,7 +408,12 @@ function createTransientRequestBroker({
       attempt_deadline_ms: attemptHeader
         ? Date.parse(attemptHeader.deadline_at)
         : null,
-      attempt_protocol: null
+      attempt_protocol: null,
+      resolution_ref: contextResolutionHeader?.resolution_ref || null,
+      resolution_deadline_ms: contextResolutionHeader
+        ? Date.parse(contextResolutionHeader.deadline_at)
+        : null,
+      context_resolution_protocol: null
     };
     if (attemptHeader) {
       let accepted = false;
@@ -361,6 +443,36 @@ function createTransientRequestBroker({
         throw error;
       }
     }
+    if (contextResolutionHeader) {
+      let accepted = false;
+      try {
+        resolutionCoordinator.acceptResolution(contextResolutionHeader);
+        accepted = true;
+        const workingSet = resolutionCoordinator.workingSet(
+          contextResolutionHeader.resolution_ref
+        );
+        resolutionCoordinator.appendReceipt(
+          contextResolutionHeader.resolution_ref,
+          createContextResolutionStageReceipt({
+            header: workingSet.header,
+            receipts: workingSet.receipts,
+            stage: 'EDGE_VALIDATED'
+          })
+        );
+      } catch (error) {
+        if (accepted) {
+          try {
+            resolutionCoordinator.cancelResolution(
+              contextResolutionHeader.resolution_ref
+            );
+          } catch {
+            // A deadline can win while submission is rolling back.
+          }
+        }
+        replayReservation.rollback();
+        throw error;
+      }
+    }
     replayReservation.commit();
     records.set(request.request_id, record);
     emit('request_queued', record);
@@ -369,6 +481,9 @@ function createTransientRequestBroker({
       status: record.status,
       ...(attemptHeader
         ? { attempt_ref: attemptHeader.attempt_ref }
+        : {}),
+      ...(contextResolutionHeader
+        ? { resolution_ref: contextResolutionHeader.resolution_ref }
         : {})
     };
   }
@@ -382,8 +497,11 @@ function createTransientRequestBroker({
       if (record.status !== 'queued') continue;
       const configuredExpiresMs = nowMs() + claimLeaseMs;
       const expiresMs = record.attempt_deadline_ms === null
-        ? configuredExpiresMs
-        : Math.min(configuredExpiresMs, record.attempt_deadline_ms);
+        ? (record.resolution_deadline_ms === null
+          ? configuredExpiresMs
+          : Math.min(configuredExpiresMs, record.resolution_deadline_ms))
+        : Math.min(configuredExpiresMs, record.attempt_deadline_ms,
+          record.resolution_deadline_ms ?? Number.POSITIVE_INFINITY);
       record.status = 'claimed';
       record.attempt += 1;
       record.claim = {
@@ -403,6 +521,12 @@ function createTransientRequestBroker({
           ? {
               governed_read_attempt:
                 governedCoordinator.workingSet(record.attempt_ref)
+            }
+          : {}),
+        ...(record.resolution_ref
+          ? {
+              governed_context_resolution:
+                resolutionCoordinator.workingSet(record.resolution_ref)
             }
           : {})
       };
@@ -430,7 +554,8 @@ function createTransientRequestBroker({
     requestId,
     claimToken,
     response,
-    governedReadAttemptCandidate = null
+    governedReadAttemptCandidate = null,
+    governedContextResolutionCandidate = null
   ) {
     const record = requireRecord(requestId);
     const activeClaim = requireLiveClaim(record, claimToken);
@@ -442,6 +567,10 @@ function createTransientRequestBroker({
     if ((currentRecord.attempt_ref === null) !==
         (governedReadAttemptCandidate === null)) {
       reject('edge_attempt_candidate_required');
+    }
+    if ((currentRecord.resolution_ref === null) !==
+        (governedContextResolutionCandidate === null)) {
+      reject('edge_context_resolution_candidate_required');
     }
     if (currentRecord.attempt_ref) {
       let expectedBinding;
@@ -470,6 +599,21 @@ function createTransientRequestBroker({
     )) {
       reject('edge_attempt_response_binding_invalid');
     }
+    if (currentRecord.resolution_ref) {
+      try {
+        validateGovernedContextResolutionProtocol(
+          governedContextResolutionCandidate
+        );
+      } catch {
+        reject('edge_context_resolution_candidate_invalid');
+      }
+      if (governedContextResolutionCandidate.header.resolution_ref !==
+            currentRecord.resolution_ref ||
+          governedContextResolutionCandidate.header.request_digest !==
+            digestObject(currentRecord.request)) {
+        reject('edge_context_resolution_candidate_invalid');
+      }
+    }
     const acceptedResponse = structuredClone(response);
     if (currentRecord.attempt_ref) {
       governedCoordinator.commitProtocolCandidate(
@@ -478,6 +622,14 @@ function createTransientRequestBroker({
       );
       currentRecord.attempt_protocol =
         governedCoordinator.protocol(currentRecord.attempt_ref);
+    }
+    if (currentRecord.resolution_ref) {
+      resolutionCoordinator.commitProtocolCandidate(
+        currentRecord.resolution_ref,
+        governedContextResolutionCandidate
+      );
+      currentRecord.context_resolution_protocol =
+        resolutionCoordinator.protocol(currentRecord.resolution_ref);
     }
     currentRecord.response = acceptedResponse;
     currentRecord.status = 'completed';
@@ -492,6 +644,7 @@ function createTransientRequestBroker({
     const record = requireRecord(requestId);
     if (TERMINAL_STATES.has(record.status)) reject('edge_request_terminal');
     commitAttemptFailure(record, 'attempt_cancelled');
+    commitContextResolutionFailure(record, 'resolution_cancelled');
     record.status = 'cancelled';
     record.claim = null;
     record.purge_after_ms = nowMs() + terminalRetentionMs;
@@ -572,6 +725,7 @@ function createTransientRequestBroker({
           const currentRecord = requireRecord(requestId);
           if (!TERMINAL_STATES.has(currentRecord.status)) {
             commitAttemptFailure(currentRecord, 'attempt_timeout');
+            commitContextResolutionFailure(currentRecord, 'resolution_timeout');
             currentRecord.status = 'expired';
             currentRecord.claim = null;
             currentRecord.purge_after_ms =
@@ -624,6 +778,7 @@ function createTransientRequestBroker({
       if (!TERMINAL_STATES.has(record.status)) {
         try {
           commitAttemptFailure(record, 'attempt_cancelled');
+          commitContextResolutionFailure(record, 'resolution_cancelled');
         } catch {
           // Coordinator-loss reporting below preserves fail-closed evidence.
         }
@@ -634,11 +789,13 @@ function createTransientRequestBroker({
       }
     }
     governedCoordinator.reportCoordinatorLoss();
+    resolutionCoordinator.reportCoordinatorLoss();
     records.clear();
   }
 
   return Object.freeze({
     governedReadAttempts: true,
+    governedContextResolutions: true,
     submit,
     claim,
     acknowledge,

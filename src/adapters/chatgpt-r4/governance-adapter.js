@@ -3,7 +3,9 @@
 const {
   COUNTER_MODES,
   ZERO_MEMORY_COUNTERS,
+  appendGovernedContextResolutionStage,
   digestObject,
+  validateGovernedContextResolutionWorkingSet,
   validateCounters,
   validateProjectContextClaim,
   validatePublicStructuredContent,
@@ -55,7 +57,7 @@ function createGovernanceAdapter({
   }
 
   return Object.freeze({
-    async handle({ request, relayReceipt }) {
+    async handle({ request, relayReceipt, governedContextResolution }) {
       const now = clock();
       const validation = validateRequestEnvelope(request, {
         now,
@@ -76,7 +78,8 @@ function createGovernanceAdapter({
           principalFingerprint,
           now,
           issueProjectContext,
-          resolveContextPublicKey
+          resolveContextPublicKey,
+          governedContextResolution
         });
       }
 
@@ -203,11 +206,16 @@ async function handleResolve({
   principalFingerprint,
   now,
   issueProjectContext,
-  resolveContextPublicKey
+  resolveContextPublicKey,
+  governedContextResolution
 }) {
+  const resolution = prepareContextResolution(
+    governedContextResolution,
+    request
+  );
   const args = request.tool_request.arguments;
   if (args.requested_visibility === undefined) {
-    return buildResolveResult({
+    const result = buildResolveResult({
       request,
       relayReceipt,
       status: 'denied',
@@ -222,25 +230,37 @@ async function handleResolve({
         legacy_partition_access: false
       }
     });
+    return withResolutionContinuation(
+      result,
+      failContextResolution(resolution, 'context_mapping_not_found')
+    );
   }
   const issued = await issueProjectContext({
     principalFingerprint,
     safeProjectAlias: args.project_alias,
     requestedVisibility: args.requested_visibility,
-    now
+    now,
+    governedContextResolution: resolution !== null
   });
   if (issued && typeof issued === 'object' && !Array.isArray(issued) &&
       ['denied', 'unavailable'].includes(issued.status)) {
     const keys = Object.keys(issued).sort();
     const expected = issued.activation_receipt_digest
-      ? ['activation_receipt_digest', 'status']
-      : ['status'];
+      ? ['activation_receipt_digest',
+        ...(issued.resolution_reason ? ['resolution_reason'] : []), 'status']
+      : [...(issued.resolution_reason ? ['resolution_reason'] : []), 'status'];
+    const reasonCode = issued.resolution_reason ||
+      (issued.status === 'denied'
+        ? 'context_scope_denied'
+        : 'context_issuance_unavailable');
     if (keys.length !== expected.length || keys.some((key, index) => key !== expected[index]) ||
         (issued.activation_receipt_digest &&
-         !/^sha256:[a-f0-9]{64}$/u.test(issued.activation_receipt_digest))) {
+         !/^sha256:[a-f0-9]{64}$/u.test(issued.activation_receipt_digest)) ||
+        (resolution && !['context_mapping_not_found', 'context_scope_denied',
+          'context_issuance_unavailable'].includes(reasonCode))) {
       reject('context_issue_denial_shape_invalid');
     }
-    return buildResolveResult({
+    const result = buildResolveResult({
       request,
       relayReceipt,
       status: issued.status,
@@ -258,19 +278,50 @@ async function handleResolve({
           : {})
       }
     });
+    return withResolutionContinuation(
+      result,
+      failContextResolution(resolution, reasonCode)
+    );
   }
   if (!issued || typeof issued !== 'object' || Array.isArray(issued) ||
       typeof issued.safe_project_alias !== 'string') {
     reject('context_issue_result_invalid');
   }
-  validateProjectContextClaim(issued.claim, {
-    now,
-    resolvePublicKey: resolveContextPublicKey,
-    expectedPrincipalFingerprint: principalFingerprint
-  });
+  try {
+    validateProjectContextClaim(issued.claim, {
+      now,
+      resolvePublicKey: resolveContextPublicKey,
+      expectedPrincipalFingerprint: principalFingerprint
+    });
+  } catch (error) {
+    if (!resolution) throw error;
+    const reasonCode = error?.code === 'project_context_claim_expired'
+      ? 'context_ref_expired'
+      : 'context_ref_invalid';
+    return withResolutionContinuation(
+      buildResolveResult({
+        request,
+        relayReceipt,
+        status: 'unavailable',
+        structuredContent: { context_status: 'unavailable' },
+        contextReceipt: unavailableContextReceipt()
+      }),
+      failContextResolution(resolution, reasonCode)
+    );
+  }
   const requestedVisibility = args.requested_visibility;
   if (!issued.claim.visibility_allowlist.includes(requestedVisibility)) {
-    reject('context_issue_visibility_mismatch');
+    if (!resolution) reject('context_issue_visibility_mismatch');
+    return withResolutionContinuation(
+      buildResolveResult({
+        request,
+        relayReceipt,
+        status: 'unavailable',
+        structuredContent: { context_status: 'unavailable' },
+        contextReceipt: unavailableContextReceipt()
+      }),
+      failContextResolution(resolution, 'context_ref_invalid')
+    );
   }
 
   const structuredContent = {
@@ -300,12 +351,116 @@ async function handleResolve({
       ? { activation_receipt_digest: issued.activation_receipt_digest }
       : {})
   };
-  return buildResolveResult({
+  const result = buildResolveResult({
     request,
     relayReceipt,
     status: 'ok',
     structuredContent,
     contextReceipt
+  });
+  return withResolutionContinuation(result, completeContextResolution(resolution));
+}
+
+function unavailableContextReceipt() {
+  return {
+    schema_version: 1,
+    kind: 'chatgpt_r4_context_receipt',
+    context_status: 'unavailable',
+    context_issued: false,
+    principal_bound: true,
+    private_partition_access: false,
+    legacy_partition_access: false
+  };
+}
+
+function prepareContextResolution(value, request) {
+  if (value === undefined) return null;
+  validateGovernedContextResolutionWorkingSet(value);
+  const lastReceipt = value.receipts.at(-1);
+  if (request?.tool_request?.name !== 'resolve_memory_context' ||
+      lastReceipt?.stage !== 'RELAY_CLAIMED' ||
+      lastReceipt.outcome !== 'completed' ||
+      value.header.request_digest !== digestObject(request)) {
+    reject('governance_context_resolution_binding_invalid');
+  }
+  return value;
+}
+
+function appendResolutionStages(workingSet, stages) {
+  let result = workingSet;
+  for (const input of stages) {
+    result = appendGovernedContextResolutionStage(result, input);
+  }
+  return result;
+}
+
+function completeContextResolution(workingSet) {
+  if (!workingSet) return null;
+  return Object.freeze({
+    working_set: appendResolutionStages(workingSet, [
+      { stage: 'REGISTRY_RESOLVED' },
+      { stage: 'SCOPE_RESOLVED' },
+      { stage: 'CONTEXT_ISSUED' }
+    ]),
+    terminal_failure: null,
+    evidence_complete: true
+  });
+}
+
+function failContextResolution(workingSet, reasonCode) {
+  if (!workingSet) return null;
+  const failureFacts = {
+    context_mapping_not_found: {
+      registry_resolved: true,
+      mapping_resolved: false
+    },
+    context_scope_denied: { scope_resolved: false },
+    context_issuance_unavailable: { context_ref_issued: false },
+    context_issuance_failed: {},
+    context_issue_result_invalid: {},
+    context_ref_invalid: {
+      context_ref_issued: true,
+      context_ref_shape_valid: false
+    },
+    context_ref_expired: {
+      context_ref_issued: true,
+      context_ref_shape_valid: true,
+      context_ref_unexpired: false
+    }
+  };
+  const failed = stage => ({
+    stage,
+    outcome: 'failed',
+    reasonCode,
+    facts: failureFacts[reasonCode]
+  });
+  const stages = reasonCode === 'context_mapping_not_found'
+    ? [failed('REGISTRY_RESOLVED')]
+    : reasonCode === 'context_scope_denied'
+      ? [
+          { stage: 'REGISTRY_RESOLVED' },
+          failed('SCOPE_RESOLVED')
+        ]
+      : [
+          { stage: 'REGISTRY_RESOLVED' },
+          { stage: 'SCOPE_RESOLVED' },
+          failed('CONTEXT_ISSUED')
+        ];
+  return Object.freeze({
+    working_set: appendResolutionStages(workingSet, stages),
+    terminal_failure: Object.freeze({
+      reason_code: reasonCode,
+      failure_origin: 'governance'
+    }),
+    evidence_complete: true
+  });
+}
+
+function withResolutionContinuation(result, continuation) {
+  if (!continuation) return result;
+  return Object.freeze({
+    ...result,
+    governed_context_resolution: continuation
   });
 }
 

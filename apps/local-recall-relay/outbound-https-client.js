@@ -45,6 +45,8 @@ function createOutboundEdgeClient(edgeOrigin, {
     complete(claim, response, options) {
       const governedReadAttemptCandidate =
         options?.governedReadAttemptCandidate;
+      const governedContextResolutionCandidate =
+        options?.governedContextResolutionCandidate;
       return invoke(
         '/v1/relay/complete',
         {
@@ -54,6 +56,12 @@ function createOutboundEdgeClient(edgeOrigin, {
             ? {
                 governed_read_attempt_candidate:
                   governedReadAttemptCandidate
+              }
+            : {}),
+          ...(governedContextResolutionCandidate
+            ? {
+                governed_context_resolution_candidate:
+                  governedContextResolutionCandidate
               }
             : {})
         },
