@@ -625,8 +625,9 @@ function createTransitionRecordStore(initialRecords = [], {
       ...activeRecords.values(),
       ...terminalArchive.values()
     ]) {
-      if (record.observer_outbox.length === 0 ||
-          record.observer_delivered_events.length === 0) {
+      if (record.observer_delivered_events.length === 0 ||
+          (record.observer_outbox.length === 0 &&
+            record.status !== 'reserved')) {
         continue;
       }
       restored += record.observer_delivered_events.length;
@@ -1731,7 +1732,12 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       let afterFailure = null;
       try { afterFailure = store.snapshot(); } catch {}
       const committedDespiteLostAck = afterFailure &&
-        canonicalJson(afterFailure) === canonicalJson(nextState);
+        (canonicalJson(afterFailure) === canonicalJson(nextState) ||
+          durableSuccessorChainMatches(
+            nextState,
+            afterFailure,
+            transitionRecordStore.snapshot()
+          ));
       if (committedDespiteLostAck) {
         swapped = true;
       } else {

@@ -1032,6 +1032,58 @@ test('13a. a committed CAS with a lost acknowledgement remains success', () => {
   );
 });
 
+test('13a1. lost CAS acknowledgement tolerates a legal successor', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore();
+  const observer = { observe() { return true; } };
+  let current = structuredClone(state);
+  let commitSuccessorBeforeReadback = false;
+  const store = {
+    snapshot() {
+      if (commitSuccessorBeforeReadback) {
+        commitSuccessorBeforeReadback = false;
+        const successorState = structuredClone(current);
+        const successor = harness({
+          state: successorState,
+          store,
+          recordStore,
+          observer
+        });
+        const successorRequest = requestFor(successorState, {
+          suffix: 'V',
+          target: toRuntime('c'),
+          proofDigest: digestObject('lost-ack-successor-proof'),
+          legacy: null
+        });
+        const successorPreview = successor.coordinator.preview(successorRequest);
+        assert.equal(successorPreview.status, 'prepared');
+        assert.equal(
+          successor.coordinator.commit(successorPreview.preview).status,
+          'terminal_success'
+        );
+      }
+      return structuredClone(current);
+    },
+    compareAndSwap(expectedVersion, candidate) {
+      if (expectedVersion !== current.store_version) return false;
+      current = structuredClone(candidate);
+      if (expectedVersion === 0) {
+        commitSuccessorBeforeReadback = true;
+        throw new Error('synthetic-acknowledgement-loss-before-successor');
+      }
+      return true;
+    }
+  };
+  const first = harness({ state, store, recordStore, observer });
+  const request = requestFor(state);
+  const prepared = first.coordinator.preview(request);
+  const committed = first.coordinator.commit(prepared.preview);
+  assert.equal(committed.status, 'terminal_success');
+  assert.equal(committed.accepted_runtime.source_head, toRuntime('b').source_head);
+  assert.equal(current.store_version, 2);
+  assert.equal(current.accepted_runtime.source_head, toRuntime('c').source_head);
+});
+
 test('13b. a transient snapshot fault after successful CAS recovers success', () => {
   const state = initialState();
   let current = structuredClone(state);
@@ -1535,6 +1587,32 @@ test('13d3c. a fresh Observer receives the delivered prefix before pending event
     terminals_fabricated: 0
   });
   assert.equal(recordStore.get(requestFor(state).transition_ref).status, 'lost');
+});
+
+test('13d3c1. active delivery prefixes recover even with an empty outbox', () => {
+  const state = initialState();
+  const recordStore = createTransitionRecordStore();
+  const first = harness({ state, recordStore });
+  const request = requestFor(state);
+  assert.equal(first.coordinator.preview(request).status, 'prepared');
+  const persisted = recordStore.snapshot()[0];
+  assert.equal(persisted.status, 'reserved');
+  assert.equal(persisted.observer_outbox.length, 0);
+  assert.equal(persisted.observer_delivered_events.length > 0, true);
+
+  const freshObserver = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  const rebuilt = harness({ state, recordStore, observer: freshObserver });
+  assert.equal(recordStore.pendingObserverEvents().length, 0);
+  assert.equal(freshObserver.snapshot().active_transitions, 1);
+  assert.equal(freshObserver.snapshot().protocol_violations, 0);
+  assert.deepEqual(rebuilt.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 1,
+    terminals_fabricated: 0
+  });
+  assert.equal(recordStore.get(request.transition_ref).status, 'lost');
+  assert.equal(freshObserver.snapshot().terminals_missing, 1);
 });
 
 test('13d3d. a coordinator without a sink persists the complete event stream', () => {

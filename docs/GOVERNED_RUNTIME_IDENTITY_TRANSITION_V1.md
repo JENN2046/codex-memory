@@ -211,6 +211,9 @@ The same chain reconstruction applies when an original coordinator retries
 after post-CAS readback failure: a later legal transition does not hide or
 invalidate the earlier durable success, and the retry returns the earlier
 transition's own runtime, binding, and state digest.
+It also applies when CAS committed but threw instead of acknowledging: a
+successor committed before the exception readback is verified through the
+durable chain and cannot turn the earlier success into a conflicting failure.
 If crash recovery finalizes a success that had not yet reached observers, the
 coordinator replays the missing post-preview receipts, atomic commit, and
 terminal event from the authoritative state before releasing the local record.
@@ -224,7 +227,9 @@ redelivery. Delivered entries retain their original sequence. If any later
 event is still pending during reconstruction, the store restores the complete
 delivered prefix ahead of that suffix: an existing Observer consumes exact
 replays idempotently, while a fresh Observer rebuilds the active transition in
-canonical order. Archived protocol lookup validates and
+canonical order. Active reservations also restore their delivered prefix when
+the outbox is empty, ensuring a later coordinator-loss report has an active
+Observer record to close. Archived protocol lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
 An unacknowledged new admission is discarded from the outbox and terminalized
 without Observer emission, so it cannot head-block terminal events for already
