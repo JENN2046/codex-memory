@@ -90,7 +90,10 @@ function registry(mappingState) {
   };
 }
 
-function createCharacterizationFixture({ issueOutcome = 'production' } = {}) {
+function createCharacterizationFixture({
+  issueOutcome = 'production',
+  responseFinalizationHook
+} = {}) {
   const edge = identity('gcr-characterization-edge');
   const relayIdentity = identity('gcr-characterization-relay');
   const context = identity('gcr-characterization-context');
@@ -111,7 +114,8 @@ function createCharacterizationFixture({ issueOutcome = 'production' } = {}) {
   const observations = {
     relay_calls: 0,
     governance_calls: 0,
-    bridge_calls: 0
+    bridge_calls: 0,
+    last_terminal_reason: null
   };
   const resolutionObserver = createGovernedContextResolutionObserver({
     clock: () => NOW
@@ -195,6 +199,10 @@ function createCharacterizationFixture({ issueOutcome = 'production' } = {}) {
     counterMode: COUNTER_MODES.governedLiveReadV1,
     clock: () => NOW,
     governedContextResolutions: true,
+    governedContextResolutionStageHooks:
+      responseFinalizationHook === undefined
+        ? undefined
+        : { RESPONSE_FINALIZED: responseFinalizationHook },
     async forwardToUds(payload) {
       observations.governance_calls += 1;
       return governance.handle(payload);
@@ -248,6 +256,20 @@ function createCharacterizationFixture({ issueOutcome = 'production' } = {}) {
     const relayResult = await relay.handle(claim.request, {
       governedContextResolution: claim.governed_context_resolution
     });
+    if (relayResult.governed_context_resolution_failure_candidate) {
+      observations.last_terminal_reason =
+        relayResult.governed_context_resolution_failure_candidate
+          .terminal.reason_code;
+      broker.fail(
+        claim.request_id,
+        claim.claim_token,
+        relayResult.governed_context_resolution_failure_candidate,
+        relayResult.error_code
+      );
+      return broker.waitForResult(signedRequest.request_id, {
+        timeoutMs: 100
+      });
+    }
     const relayResponse = relayResult.response;
     const response = transformResponse(relayResponse, {
       request: signedRequest
@@ -394,12 +416,20 @@ test('resolver boundary preserves exact failure codes for issuance and public pr
     issuerFailure.resolve(),
     { code: 'synthetic_context_issuance_failed' }
   );
+  assert.equal(
+    issuerFailure.snapshot().last_terminal_reason,
+    'context_issuance_failed'
+  );
   assertResolverOnly(issuerFailure.snapshot());
 
   const invalidIssuance = createCharacterizationFixture({ issueOutcome: 'invalid' });
   await assert.rejects(
     invalidIssuance.resolve(),
     { code: 'context_issue_result_invalid' }
+  );
+  assert.equal(
+    invalidIssuance.snapshot().last_terminal_reason,
+    'context_issue_result_invalid'
   );
   assertResolverOnly(invalidIssuance.snapshot());
 
@@ -449,6 +479,25 @@ test('resolver boundary preserves exact failure codes for issuance and public pr
     { code: 'project_context_ref_invalid' }
   );
   assertResolverOnly(malformedReference.snapshot());
+});
+
+test('resolver response-finalization failure commits a canonical terminal while preserving a safe error', async () => {
+  const fixture = createCharacterizationFixture({
+    responseFinalizationHook() {
+      throw Object.assign(new Error('synthetic_response_finalization_failed'), {
+        code: 'synthetic_response_finalization_failed'
+      });
+    }
+  });
+  await assert.rejects(
+    fixture.resolve(),
+    { code: 'context_response_finalization_failed' }
+  );
+  assert.equal(
+    fixture.snapshot().last_terminal_reason,
+    'context_response_finalization_failed'
+  );
+  assertResolverOnly(fixture.snapshot());
 });
 
 test('resolver client validation rejects an already expired issued context ref', async () => {

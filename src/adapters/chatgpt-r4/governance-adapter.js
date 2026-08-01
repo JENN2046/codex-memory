@@ -235,13 +235,21 @@ async function handleResolve({
       failContextResolution(resolution, 'context_mapping_not_found')
     );
   }
-  const issued = await issueProjectContext({
-    principalFingerprint,
-    safeProjectAlias: args.project_alias,
-    requestedVisibility: args.requested_visibility,
-    now,
-    governedContextResolution: resolution !== null
-  });
+  let issued;
+  try {
+    issued = await issueProjectContext({
+      principalFingerprint,
+      safeProjectAlias: args.project_alias,
+      requestedVisibility: args.requested_visibility,
+      now,
+      governedContextResolution: resolution !== null
+    });
+  } catch (error) {
+    throwWithContextResolutionFailure(
+      error,
+      failContextResolution(resolution, 'context_issuance_failed')
+    );
+  }
   if (issued && typeof issued === 'object' && !Array.isArray(issued) &&
       ['denied', 'unavailable'].includes(issued.status)) {
     const keys = Object.keys(issued).sort();
@@ -285,7 +293,13 @@ async function handleResolve({
   }
   if (!issued || typeof issued !== 'object' || Array.isArray(issued) ||
       typeof issued.safe_project_alias !== 'string') {
-    reject('context_issue_result_invalid');
+    const error = Object.assign(new Error('context_issue_result_invalid'), {
+      code: 'context_issue_result_invalid'
+    });
+    throwWithContextResolutionFailure(
+      error,
+      failContextResolution(resolution, 'context_issue_result_invalid')
+    );
   }
   try {
     validateProjectContextClaim(issued.claim, {
@@ -298,28 +312,19 @@ async function handleResolve({
     const reasonCode = error?.code === 'project_context_claim_expired'
       ? 'context_ref_expired'
       : 'context_ref_invalid';
-    return withResolutionContinuation(
-      buildResolveResult({
-        request,
-        relayReceipt,
-        status: 'unavailable',
-        structuredContent: { context_status: 'unavailable' },
-        contextReceipt: unavailableContextReceipt()
-      }),
+    throwWithContextResolutionFailure(
+      error,
       failContextResolution(resolution, reasonCode)
     );
   }
   const requestedVisibility = args.requested_visibility;
   if (!issued.claim.visibility_allowlist.includes(requestedVisibility)) {
     if (!resolution) reject('context_issue_visibility_mismatch');
-    return withResolutionContinuation(
-      buildResolveResult({
-        request,
-        relayReceipt,
-        status: 'unavailable',
-        structuredContent: { context_status: 'unavailable' },
-        contextReceipt: unavailableContextReceipt()
-      }),
+    const error = Object.assign(new Error('context_issue_visibility_mismatch'), {
+      code: 'context_issue_visibility_mismatch'
+    });
+    throwWithContextResolutionFailure(
+      error,
       failContextResolution(resolution, 'context_ref_invalid')
     );
   }
@@ -361,16 +366,19 @@ async function handleResolve({
   return withResolutionContinuation(result, completeContextResolution(resolution));
 }
 
-function unavailableContextReceipt() {
-  return {
-    schema_version: 1,
-    kind: 'chatgpt_r4_context_receipt',
-    context_status: 'unavailable',
-    context_issued: false,
-    principal_bound: true,
-    private_partition_access: false,
-    legacy_partition_access: false
-  };
+function throwWithContextResolutionFailure(error, continuation) {
+  if (!continuation) throw error;
+  const code = typeof error?.code === 'string'
+    ? error.code
+    : 'context_issuance_failed';
+  const wrapped = Object.assign(new Error(code), { code });
+  Object.defineProperty(wrapped, 'governed_context_resolution', {
+    value: continuation,
+    enumerable: false,
+    configurable: false,
+    writable: false
+  });
+  throw wrapped;
 }
 
 function prepareContextResolution(value, request) {

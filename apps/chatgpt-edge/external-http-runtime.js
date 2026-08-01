@@ -22,6 +22,7 @@ const RELAY_PATHS = new Set([
   '/v1/relay/claim',
   '/v1/relay/ack',
   '/v1/relay/complete',
+  '/v1/relay/fail',
   '/v1/relay/state'
 ]);
 const MAX_HTTP_BODY_BYTES = LIMITS.maxResponseBytes + LIMITS.maxRequestBytes + 4096;
@@ -373,6 +374,20 @@ function handleRelay(pathname, body, broker, outgoing) {
         : null
     ))
       .then(result => sendJson(outgoing, 200, result));
+  }
+  if (pathname === '/v1/relay/fail') {
+    assertControlKeys(body, [
+      'request_id',
+      'claim_token',
+      'governed_context_resolution_candidate',
+      'error_code'
+    ]);
+    return Promise.resolve(broker.fail(
+      body.request_id,
+      body.claim_token,
+      body.governed_context_resolution_candidate,
+      body.error_code
+    )).then(result => sendJson(outgoing, 200, result));
   }
   assertControlKeys(body, ['request_id', 'claim_token']);
   return sendJson(outgoing, 200, broker.state(body.request_id, body.claim_token));

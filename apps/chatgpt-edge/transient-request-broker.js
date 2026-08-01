@@ -34,7 +34,7 @@ const {
   createGovernedContextResolutionCoordinator
 } = require('./governed-context-resolution-coordinator');
 
-const TERMINAL_STATES = new Set(['completed', 'cancelled', 'expired']);
+const TERMINAL_STATES = new Set(['completed', 'cancelled', 'expired', 'failed']);
 const GOVERNED_ATTEMPT_FAILURE_RESULT_KIND =
   'governed_read_attempt_terminal_result';
 const GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND =
@@ -174,6 +174,7 @@ function createTransientRequestBroker({
   function terminalError(record) {
     if (record.status === 'cancelled') return 'edge_request_cancelled';
     if (record.status === 'expired') return 'edge_request_expired';
+    if (record.status === 'failed') return record.failure_code;
     return null;
   }
 
@@ -400,6 +401,7 @@ function createTransientRequestBroker({
     const record = {
       request: structuredClone(request),
       response: null,
+      failure_code: null,
       status: 'queued',
       attempt: 0,
       claim: null,
@@ -640,6 +642,51 @@ function createTransientRequestBroker({
     return { request_id: requestId, status: currentRecord.status };
   }
 
+  function fail(
+    requestId,
+    claimToken,
+    governedContextResolutionCandidate,
+    errorCode
+  ) {
+    const record = requireRecord(requestId);
+    const activeClaim = requireLiveClaim(record, claimToken);
+    if (!activeClaim.acked) reject('edge_claim_not_acknowledged');
+    if (!record.resolution_ref || record.attempt_ref) {
+      reject('edge_context_resolution_failure_forbidden');
+    }
+    if (typeof errorCode !== 'string' ||
+        !/^[a-z][a-z0-9_]{0,79}$/u.test(errorCode)) {
+      reject('edge_context_resolution_failure_code_invalid');
+    }
+    try {
+      validateGovernedContextResolutionProtocol(
+        governedContextResolutionCandidate
+      );
+    } catch {
+      reject('edge_context_resolution_candidate_invalid');
+    }
+    if (governedContextResolutionCandidate.header.resolution_ref !==
+          record.resolution_ref ||
+        governedContextResolutionCandidate.header.request_digest !==
+          digestObject(record.request) ||
+        governedContextResolutionCandidate.terminal.outcome !== 'failure') {
+      reject('edge_context_resolution_candidate_invalid');
+    }
+    resolutionCoordinator.commitProtocolCandidate(
+      record.resolution_ref,
+      governedContextResolutionCandidate
+    );
+    record.context_resolution_protocol =
+      resolutionCoordinator.protocol(record.resolution_ref);
+    record.failure_code = errorCode;
+    record.status = 'failed';
+    record.claim = null;
+    record.purge_after_ms = nowMs() + terminalRetentionMs;
+    emit('request_failed', record, { error_code: errorCode });
+    settleWaiters(record);
+    return { request_id: requestId, status: record.status };
+  }
+
   function cancel(requestId) {
     const record = requireRecord(requestId);
     if (TERMINAL_STATES.has(record.status)) reject('edge_request_terminal');
@@ -763,7 +810,7 @@ function createTransientRequestBroker({
 
   function snapshot() {
     refreshAndPrune();
-    const counts = { queued: 0, claimed: 0, completed: 0, cancelled: 0, expired: 0 };
+    const counts = { queued: 0, claimed: 0, completed: 0, cancelled: 0, expired: 0, failed: 0 };
     for (const record of records.values()) counts[record.status] += 1;
     return Object.freeze({
       in_memory_only: true,
@@ -800,6 +847,7 @@ function createTransientRequestBroker({
     claim,
     acknowledge,
     complete,
+    fail,
     cancel,
     state,
     result,

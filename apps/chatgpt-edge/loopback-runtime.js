@@ -29,7 +29,7 @@ const { createGovernedContextResolutionCoordinator } =
 
 const LOOPBACK_HOST = '127.0.0.1';
 const MAX_CONTROL_BODY_BYTES = LIMITS.maxResponseBytes + LIMITS.maxRequestBytes + 4096;
-const TERMINAL_STATES = new Set(['completed', 'cancelled', 'expired']);
+const TERMINAL_STATES = new Set(['completed', 'cancelled', 'expired', 'failed']);
 const REQUIRED_ATTEMPT_COORDINATOR_METHODS = Object.freeze([
   'acceptAttempt',
   'appendReceipt',
@@ -545,6 +545,46 @@ function createLoopbackEdgeRuntime({
     return { request_id: requestId, status: currentRecord.status };
   }
 
+  function fail(
+    requestId,
+    claimToken,
+    governedContextResolutionCandidate,
+    errorCode
+  ) {
+    const record = requireRecord(requestId);
+    const activeClaim = requireLiveClaim(record, claimToken);
+    if (!activeClaim.acked || !record.resolution_ref || record.attempt_ref) {
+      reject('edge_context_resolution_failure_forbidden');
+    }
+    if (typeof errorCode !== 'string' ||
+        !/^[a-z][a-z0-9_]{0,79}$/u.test(errorCode)) {
+      reject('edge_context_resolution_failure_code_invalid');
+    }
+    try {
+      validateGovernedContextResolutionProtocol(
+        governedContextResolutionCandidate
+      );
+    } catch {
+      reject('edge_context_resolution_candidate_invalid');
+    }
+    if (governedContextResolutionCandidate.header.resolution_ref !==
+          record.resolution_ref ||
+        governedContextResolutionCandidate.header.request_digest !==
+          digestObject(record.request) ||
+        governedContextResolutionCandidate.terminal.outcome !== 'failure') {
+      reject('edge_context_resolution_candidate_invalid');
+    }
+    resolutionCoordinator.commitProtocolCandidate(
+      record.resolution_ref,
+      governedContextResolutionCandidate
+    );
+    record.status = 'failed';
+    record.claim = null;
+    record.purge_after_ms = nowMs() + terminalRetentionMs;
+    emit('request_failed', record, { error_code: errorCode });
+    return { request_id: requestId, status: record.status };
+  }
+
   function cancel(requestId) {
     const record = requireRecord(requestId);
     if (TERMINAL_STATES.has(record.status)) reject('edge_request_terminal');
@@ -638,6 +678,21 @@ function createLoopbackEdgeRuntime({
           body.response,
           body.governed_read_attempt_candidate || null,
           body.governed_context_resolution_candidate || null
+        ));
+      }
+      if (route === 'POST /v1/relay/fail') {
+        const body = await readJsonBody(incoming);
+        assertControlKeys(body, [
+          'request_id',
+          'claim_token',
+          'governed_context_resolution_candidate',
+          'error_code'
+        ]);
+        return sendJson(outgoing, 200, fail(
+          body.request_id,
+          body.claim_token,
+          body.governed_context_resolution_candidate,
+          body.error_code
         ));
       }
       if (route === 'POST /v1/relay/state') {

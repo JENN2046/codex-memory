@@ -68,6 +68,17 @@ function createOutboundEdgeClient(edgeOrigin, {
         options
       );
     },
+    fail(claim, governedContextResolutionCandidate, {
+      errorCode,
+      ...options
+    } = {}) {
+      return invoke('/v1/relay/fail', {
+        ...claimControl(claim),
+        governed_context_resolution_candidate:
+          governedContextResolutionCandidate,
+        error_code: errorCode
+      }, options);
+    },
     state(claim, options) {
       return invoke('/v1/relay/state', claimControl(claim), options);
     }

@@ -161,6 +161,30 @@ function createRelayRuntime({
             response?.governed_read_attempt_candidate || null;
           const governedContextResolutionCandidate =
             response?.governed_context_resolution_candidate || null;
+          const governedContextResolutionFailureCandidate =
+            response?.governed_context_resolution_failure_candidate || null;
+          if (governedContextResolutionFailureCandidate) {
+            if (typeof edgeClient.fail !== 'function') {
+              reject('relay_edge_failure_reporter_missing');
+            }
+            await edgeClient.fail(
+              claim,
+              governedContextResolutionFailureCandidate,
+              {
+                signal: cancellation.signal,
+                errorCode: response.error_code
+              }
+            );
+            emit('response_failed', claim.request_id, {
+              attempt: claim.attempt,
+              error_code: response.error_code
+            });
+            return Object.freeze({
+              status: 'failed',
+              request_id: claim.request_id,
+              attempt: claim.attempt
+            });
+          }
           const responseEnvelope = governedReadAttemptCandidate
             ? response.response
             : response;

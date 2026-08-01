@@ -46,6 +46,14 @@ function createLoopbackEdgeClient(edgeUrl, { timeoutMs = 1_000 } = {}) {
           : {})
       }, timeoutMs);
     },
+    fail(claim, governedContextResolutionCandidate, { errorCode } = {}) {
+      return requestJson(baseUrl, '/v1/relay/fail', {
+        ...claimControl(claim),
+        governed_context_resolution_candidate:
+          governedContextResolutionCandidate,
+        error_code: errorCode
+      }, timeoutMs);
+    },
     state(claim) {
       return requestJson(baseUrl, '/v1/relay/state', claimControl(claim), timeoutMs);
     },
