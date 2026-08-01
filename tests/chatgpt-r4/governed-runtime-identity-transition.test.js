@@ -1487,6 +1487,69 @@ test('17l. rebuilt Observer restores the authoritative commit chain anchor', () 
   assert.equal(rebuilt.snapshot().last_authoritative_store_version, 2);
 });
 
+test('17m. Observer rejects stable authority rotation on a later commit', () => {
+  const first = prepareAndCommit();
+  const afterFirst = first.store.snapshot();
+  const otherAuthorityId = `grauth_${'Z'.repeat(24)}`;
+  const otherAuthorityLineage = digestObject('observer-other-authority-lineage');
+  const branchState = structuredClone(afterFirst);
+  branchState.last_transition = null;
+  const requestOptions = {
+    suffix: 'J',
+    target: toRuntime('c'),
+    fromRuntime: branchState.accepted_runtime,
+    authorityId: otherAuthorityId,
+    authorityLineage: otherAuthorityLineage,
+    proofDigest: digestObject('observer-other-authority-proof-J'),
+    legacy: null
+  };
+  const bindingRequest = requestFor(branchState, requestOptions);
+  branchState.controller_binding = stableControllerBinding(
+    bindingRequest,
+    branchState.accepted_runtime
+  );
+  const branch = harness({
+    state: branchState,
+    authority({ authority, authority_context_digest: context }) {
+      return {
+        verified: true,
+        authority_id: authority.authority_id,
+        authority_lineage_digest: authority.authority_lineage_digest,
+        authority_context_digest: context,
+        authority_proof_digest: authority.authority_proof_digest
+      };
+    }
+  });
+  const branchRequest = requestFor(branchState, requestOptions);
+  const branchPrepared = branch.coordinator.preview(branchRequest);
+  assert.equal(branchPrepared.status, 'prepared');
+  const branchCommitted = branch.coordinator.commit(branchPrepared.preview);
+  assert.equal(branchCommitted.status, 'terminal_success');
+
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: afterFirst
+  });
+  const branchResult = {
+    request: branchRequest,
+    committed: branchCommitted
+  };
+  replayObserverPrelude(observer, branchResult);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: branchRequest.transition_ref,
+    protocol: branchCommitted.protocol,
+    accepted_runtime: branchCommitted.accepted_runtime,
+    controller_binding: branchCommitted.controller_binding,
+    store_version: 2,
+    previous_state_digest: first.committed.state_digest,
+    state_digest: branchCommitted.state_digest,
+    state_projection: branch.store.snapshot()
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 0);
+  assert.equal(observer.snapshot().last_authoritative_store_version, 1);
+});
+
 test('18. terminal missing records a violation and fabricates no failure terminal', () => {
   const state = initialState();
   const run = harness({ state });

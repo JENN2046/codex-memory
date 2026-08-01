@@ -170,7 +170,9 @@ must persist or safely compact these markers so a rotated `transition_ref`
 cannot be admitted again.
 Observer reconstruction also takes the last complete governed atomic state,
 revalidates it, and restores its version, canonical state digest, accepted
-runtime, legacy marker, and terminal replay marker before consuming new events.
+runtime, stable controller binding, legacy marker, and terminal replay marker
+before consuming new events. Later commits must retain the same stable
+authority ID and lineage; ordinary transitions cannot rotate authority.
 Process restart therefore does not reset atomic-chain verification.
 
 The unique failure registry includes:

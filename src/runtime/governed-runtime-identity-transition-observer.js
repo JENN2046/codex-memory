@@ -54,6 +54,9 @@ function createGovernedRuntimeIdentityTransitionObserver({
       accepted_runtime: structuredClone(
         initialAuthoritativeState.accepted_runtime
       ),
+      controller_binding: structuredClone(
+        initialAuthoritativeState.controller_binding
+      ),
       legacy_migration: structuredClone(
         initialAuthoritativeState.legacy_migration
       ),
@@ -180,7 +183,14 @@ function createGovernedRuntimeIdentityTransitionObserver({
                   lastAuthoritativeCommit.state_digest ||
                 canonicalJson(record.request.from_runtime) !== canonicalJson(
                   lastAuthoritativeCommit.accepted_runtime
-                ))) ||
+                ) ||
+                (lastAuthoritativeCommit.controller_binding.model ===
+                  'stable_controller_authority.v1' &&
+                  (record.request.authority.authority_id !==
+                    lastAuthoritativeCommit.controller_binding.authority_id ||
+                    record.request.authority.authority_lineage_digest !==
+                      lastAuthoritativeCommit.controller_binding
+                        .authority_lineage_digest)))) ||
             event.state_projection.store_version !== event.store_version ||
             canonicalJson(event.state_projection.accepted_runtime) !==
               canonicalJson(event.accepted_runtime) ||
@@ -216,6 +226,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         };
         lastAuthoritativeCommit = {
           accepted_runtime: structuredClone(event.accepted_runtime),
+          controller_binding: structuredClone(event.controller_binding),
           legacy_migration: structuredClone(
             event.state_projection.legacy_migration
           ),
