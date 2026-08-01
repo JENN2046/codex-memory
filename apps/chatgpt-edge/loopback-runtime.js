@@ -26,6 +26,9 @@ const {
 const {
   deriveGovernedReadAttemptRetention
 } = require('./governed-read-attempt-retention');
+const {
+  deriveGovernedContextResolutionRetention
+} = require('./governed-context-resolution-retention');
 const { createGovernedContextResolutionCoordinator } =
   require('./governed-context-resolution-coordinator');
 
@@ -98,14 +101,21 @@ function createLoopbackEdgeRuntime({
         eventSink: attemptEventSink
       })
     : null;
-  const resolutionCoordinator = governedContextResolutions
-    ? contextResolutionCoordinator || createGovernedContextResolutionCoordinator({
+  const resolutionRetention = deriveGovernedContextResolutionRetention({
+    maxRecords,
+    requestRecordRetentionMs: terminalRetentionMs
+  });
+  const createDefaultResolutionCoordinator = () =>
+    createGovernedContextResolutionCoordinator({
         clock,
         maxResolutions: maxInFlight,
-        maxRetainedResolutions: Math.max(maxInFlight, maxRecords),
+        maxRetainedResolutions: resolutionRetention.maxRetainedResolutions,
+        maxReplayTombstones: resolutionRetention.maxReplayTombstones,
         terminalRetentionMs,
         eventSink: contextResolutionEventSink
-      })
+      });
+  let resolutionCoordinator = governedContextResolutions
+    ? contextResolutionCoordinator || createDefaultResolutionCoordinator()
     : null;
   if (attemptCoordinator !== null && (
     !governedReadAttempts ||
@@ -753,6 +763,9 @@ function createLoopbackEdgeRuntime({
   return Object.freeze({
     async start() {
       if (started) reject('edge_runtime_already_started');
+      if (governedContextResolutions && resolutionCoordinator === null) {
+        resolutionCoordinator = createDefaultResolutionCoordinator();
+      }
       await new Promise((resolve, rejectStart) => {
         const onError = error => {
           server.off('listening', onListening);
@@ -788,6 +801,7 @@ function createLoopbackEdgeRuntime({
         resolutionCoordinator?.reportCoordinatorLoss();
       } finally {
         records.clear();
+        if (governedContextResolutions) resolutionCoordinator = null;
       }
     },
     snapshot() {

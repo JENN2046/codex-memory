@@ -33,6 +33,9 @@ const {
   deriveGovernedReadAttemptRetention
 } = require('./governed-read-attempt-retention');
 const {
+  deriveGovernedContextResolutionRetention
+} = require('./governed-context-resolution-retention');
+const {
   createGovernedContextResolutionCoordinator
 } = require('./governed-context-resolution-coordinator');
 
@@ -110,6 +113,10 @@ function createTransientRequestBroker({
     maxRecords,
     requestRecordRetentionMs: terminalRetentionMs
   });
+  const resolutionRetention = deriveGovernedContextResolutionRetention({
+    maxRecords,
+    requestRecordRetentionMs: terminalRetentionMs
+  });
   const governedCoordinator =
     attemptCoordinator || createGovernedReadAttemptCoordinator({
       clock,
@@ -128,7 +135,8 @@ function createTransientRequestBroker({
     createGovernedContextResolutionCoordinator({
       clock,
       maxResolutions: maxInFlight,
-      maxRetainedResolutions: Math.max(maxInFlight, maxRecords),
+      maxRetainedResolutions: resolutionRetention.maxRetainedResolutions,
+      maxReplayTombstones: resolutionRetention.maxReplayTombstones,
       terminalRetentionMs,
       eventSink: contextResolutionEventSink || eventSink
     });
