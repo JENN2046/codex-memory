@@ -45,6 +45,8 @@ function createOutboundEdgeClient(edgeOrigin, {
     complete(claim, response, options) {
       const governedReadAttemptCandidate =
         options?.governedReadAttemptCandidate;
+      const governedContextResolutionCandidate =
+        options?.governedContextResolutionCandidate;
       return invoke(
         '/v1/relay/complete',
         {
@@ -55,10 +57,27 @@ function createOutboundEdgeClient(edgeOrigin, {
                 governed_read_attempt_candidate:
                   governedReadAttemptCandidate
               }
+            : {}),
+          ...(governedContextResolutionCandidate
+            ? {
+                governed_context_resolution_candidate:
+                  governedContextResolutionCandidate
+              }
             : {})
         },
         options
       );
+    },
+    fail(claim, governedContextResolutionCandidate, {
+      errorCode,
+      ...options
+    } = {}) {
+      return invoke('/v1/relay/fail', {
+        ...claimControl(claim),
+        governed_context_resolution_candidate:
+          governedContextResolutionCandidate,
+        error_code: errorCode
+      }, options);
     },
     state(claim, options) {
       return invoke('/v1/relay/state', claimControl(claim), options);

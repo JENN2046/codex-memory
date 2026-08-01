@@ -22,6 +22,7 @@ const RELAY_PATHS = new Set([
   '/v1/relay/claim',
   '/v1/relay/ack',
   '/v1/relay/complete',
+  '/v1/relay/fail',
   '/v1/relay/state'
 ]);
 const MAX_HTTP_BODY_BYTES = LIMITS.maxResponseBytes + LIMITS.maxRequestBytes + 4096;
@@ -51,7 +52,8 @@ function createExternalEdgeRuntime(options = {}) {
       expectedRequest: request,
       counterMode: config.counterMode
     });
-  const broker = createTransientRequestBroker({
+  function createBroker() {
+    return createTransientRequestBroker({
     clock: config.clock,
     claimLeaseMs: config.claimLeaseMs,
     terminalRetentionMs: config.terminalRetentionMs,
@@ -59,6 +61,7 @@ function createExternalEdgeRuntime(options = {}) {
     maxRecords: config.maxRecords,
     eventSink: config.eventSink,
     attemptEventSink: config.attemptEventSink,
+    contextResolutionEventSink: config.contextResolutionEventSink,
     eventComponent: 'external_edge_broker',
     verifyRequest(request) {
       return validateRequestEnvelope(request, {
@@ -71,8 +74,10 @@ function createExternalEdgeRuntime(options = {}) {
       });
     },
     verifyResponse: verifyBrokerResponse
-  });
-  const mcp = createExternalMcpHandler({
+    });
+  }
+  function createMcp(broker) {
+    return createExternalMcpHandler({
     broker,
     issuer: config.issuer,
     audience: mcpResource,
@@ -81,7 +86,10 @@ function createExternalEdgeRuntime(options = {}) {
     requestTtlSeconds: config.requestTtlSeconds,
     responseTimeoutMs: config.responseTimeoutMs,
     verifyBrokerResponse
-  });
+    });
+  }
+  let broker = createBroker();
+  let mcp = createMcp(broker);
   let started = false;
 
   const server = http.createServer(async (incoming, outgoing) => {
@@ -160,10 +168,12 @@ function createExternalEdgeRuntime(options = {}) {
       return Object.freeze({ host: address.address, port: address.port });
     },
     async stop() {
-      broker.close();
       if (!started) return;
+      broker.close();
       await stopServer(server);
       started = false;
+      broker = createBroker();
+      mcp = createMcp(broker);
     },
     snapshot() {
       return Object.freeze({
@@ -173,7 +183,9 @@ function createExternalEdgeRuntime(options = {}) {
         broker: broker.snapshot()
       });
     },
-    broker,
+    get broker() {
+      return broker;
+    },
     handleRequest: server.listeners('request')[0]
   });
 }
@@ -252,6 +264,10 @@ function validateExternalEdgeRuntimeConfig(options) {
       typeof options.attemptEventSink !== 'function') {
     reject('edge_attempt_event_sink_invalid');
   }
+  if (options.contextResolutionEventSink !== undefined &&
+      typeof options.contextResolutionEventSink !== 'function') {
+    reject('edge_context_resolution_event_sink_invalid');
+  }
   if (options.broker !== undefined) {
     reject('edge_custom_broker_forbidden');
   }
@@ -280,6 +296,7 @@ function validateExternalEdgeRuntimeConfig(options) {
     verifyAccessToken: options.verifyAccessToken,
     eventSink: options.eventSink,
     attemptEventSink: options.attemptEventSink,
+    contextResolutionEventSink: options.contextResolutionEventSink,
     counterMode
   });
 }
@@ -333,30 +350,54 @@ function handleRelay(pathname, body, broker, outgoing) {
     return sendJson(outgoing, 200, broker.acknowledge(body.request_id, body.claim_token));
   }
   if (pathname === '/v1/relay/complete') {
-    const hasCandidate = Object.hasOwn(
+    const hasAttemptCandidate = Object.hasOwn(
       body,
       'governed_read_attempt_candidate'
     );
+    const hasContextResolutionCandidate = Object.hasOwn(
+      body,
+      'governed_context_resolution_candidate'
+    );
     assertControlKeys(
       body,
-      hasCandidate
-        ? [
-            'request_id',
-            'claim_token',
-            'response',
-            'governed_read_attempt_candidate'
-          ]
-        : ['request_id', 'claim_token', 'response']
+      [
+        'request_id',
+        'claim_token',
+        'response',
+        ...(hasAttemptCandidate
+          ? ['governed_read_attempt_candidate']
+          : []),
+        ...(hasContextResolutionCandidate
+          ? ['governed_context_resolution_candidate']
+          : [])
+      ]
     );
     return Promise.resolve(broker.complete(
       body.request_id,
       body.claim_token,
       body.response,
-      hasCandidate
+      hasAttemptCandidate
         ? body.governed_read_attempt_candidate
+        : null,
+      hasContextResolutionCandidate
+        ? body.governed_context_resolution_candidate
         : null
     ))
       .then(result => sendJson(outgoing, 200, result));
+  }
+  if (pathname === '/v1/relay/fail') {
+    assertControlKeys(body, [
+      'request_id',
+      'claim_token',
+      'governed_context_resolution_candidate',
+      'error_code'
+    ]);
+    return Promise.resolve(broker.fail(
+      body.request_id,
+      body.claim_token,
+      body.governed_context_resolution_candidate,
+      body.error_code
+    )).then(result => sendJson(outgoing, 200, result));
   }
   assertControlKeys(body, ['request_id', 'claim_token']);
   return sendJson(outgoing, 200, broker.state(body.request_id, body.claim_token));

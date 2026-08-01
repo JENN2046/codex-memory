@@ -15,6 +15,8 @@ const {
   validateGovernedContextResolutionProtocol
 } = require('../../packages/chatgpt-r4-contracts');
 
+const MAX_REPLAY_TOMBSTONES = 8_388_608;
+
 function createGovernedContextResolutionCoordinator({
   clock = () => new Date(),
   maxResolutions = 64,
@@ -39,7 +41,7 @@ function createGovernedContextResolutionCoordinator({
   }
   if (!Number.isInteger(maxReplayTombstones) ||
       maxReplayTombstones < maxResolutions ||
-      maxReplayTombstones > 65536) {
+      maxReplayTombstones > MAX_REPLAY_TOMBSTONES) {
     reject('context_resolution_coordinator_tombstone_capacity_invalid');
   }
   if (!Number.isInteger(maxPendingObserverEvents) ||

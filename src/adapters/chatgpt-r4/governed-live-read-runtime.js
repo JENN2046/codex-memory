@@ -79,7 +79,23 @@ function createContextAuthority({
     resolvePublicKey(keyId) {
       return keyId === signing.keyId ? publicKey : null;
     },
-    async issue({ principalFingerprint, safeProjectAlias, requestedVisibility, now }) {
+    async issue({
+      principalFingerprint,
+      safeProjectAlias,
+      requestedVisibility,
+      now,
+      governedContextResolution = false,
+      onResolutionStage = null
+    }) {
+      if (onResolutionStage !== null && typeof onResolutionStage !== 'function') {
+        reject('r4_context_resolution_stage_callback_invalid');
+      }
+      const withResolutionReason = (value, resolutionReason) => ({
+        ...value,
+        ...(governedContextResolution
+          ? { resolution_reason: resolutionReason }
+          : {})
+      });
       const preauthorization = activationController?.checkContextIssueAuthorization({
         principalFingerprint,
         safeProjectAlias,
@@ -87,30 +103,48 @@ function createContextAuthority({
         now
       });
       if (preauthorization && preauthorization.accepted !== true) {
-        return {
+        return withResolutionReason({
           status: preauthorization.governed_status || 'unavailable',
           activation_receipt_digest: preauthorization.receipt_digest
-        };
+        }, preauthorization.governed_status === 'denied'
+          ? 'context_scope_denied'
+          : 'context_issuance_unavailable');
       }
+      const registeredAlias = registryState.registry.projects.find(project =>
+        project.safeProjectAlias === safeProjectAlias
+      );
+      if (!registeredAlias ||
+          registeredAlias.projectId !== selectedProject.projectId) {
+        return activationController ? withResolutionReason({
+          status: 'denied',
+          activation_receipt_digest: preauthorization.receipt_digest
+        }, 'context_mapping_not_found') : withResolutionReason({
+          status: 'denied'
+        }, 'context_mapping_not_found');
+      }
+      onResolutionStage?.('REGISTRY_RESOLVED');
       const project = resolveRegisteredProject(
         registryState,
         safeProjectAlias,
         requestedVisibility
       );
       if (!project || project.projectId !== selectedProject.projectId) {
-        return activationController ? {
+        return activationController ? withResolutionReason({
           status: 'denied',
           activation_receipt_digest: preauthorization.receipt_digest
-        } : { status: 'denied' };
+        }, 'context_scope_denied') : withResolutionReason({
+          status: 'denied'
+        }, 'context_scope_denied');
       }
+      onResolutionStage?.('SCOPE_RESOLVED');
       prune(now.getTime());
       if (contexts.size >= MAX_CONTEXTS) {
-        return {
+        return withResolutionReason({
           status: 'unavailable',
           ...(preauthorization
             ? { activation_receipt_digest: preauthorization.receipt_digest }
             : {})
-        };
+        }, 'context_issuance_unavailable');
       }
       const activation = activationController?.authorizeContextIssue({
         principalFingerprint,
@@ -119,10 +153,12 @@ function createContextAuthority({
         now
       });
       if (activation && activation.accepted !== true) {
-        return {
+        return withResolutionReason({
           status: activation.governed_status || 'unavailable',
           activation_receipt_digest: activation.receipt_digest
-        };
+        }, activation.governed_status === 'denied'
+          ? 'context_issuance_denied'
+          : 'context_issuance_unavailable');
       }
       const projectContextRef = createOpaqueId('pctx_', randomBytes);
       const claim = createProjectContextClaim({

@@ -14,9 +14,12 @@ const {
 const {
   CHATGPT_EDGE_DATA_SCHEMA_VERSION,
   ZERO_MEMORY_COUNTERS,
+  appendGovernedContextResolutionStage,
   appendGovernedReadAttemptStage,
   createChatGptEdgeDataResponseV2,
   createGovernedReadAttemptProtocol,
+  createGovernedContextResolutionProtocol,
+  createContextResolutionTerminalEnvelope,
   createResponseEnvelope,
   createTerminalEnvelope,
   digestObject,
@@ -310,7 +313,11 @@ test('external Edge serves PRMD and returns governed data response v2', async t 
   await relayRequest(address, '/v1/relay/complete', {
     request_id: resolveClaim.body.request_id,
     claim_token: resolveClaim.body.claim_token,
-    response: resolveResponse
+    response: resolveResponse,
+    governed_context_resolution_candidate:
+      successfulContextResolutionCandidate(
+        resolveClaim.body.governed_context_resolution
+      )
   });
   const resolved = await resolveCall;
   assert.equal(
@@ -607,6 +614,103 @@ test('external Edge replay capacity spans the request TTL across terminal turnov
   assert.equal(
     (await broker.submit(request('fresh'))).status,
     'queued'
+  );
+  broker.close();
+});
+
+test('external Edge binds resolver failure reasons to the signed response status', async () => {
+  const current = new Date('2026-07-31T00:00:00.000Z');
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current
+  });
+  const request = {
+    request_id: 'req_external_resolution_outcome_binding_000001',
+    nonce: 'request_nonce_external_resolution_outcome_binding_01',
+    expires_at: new Date(current.getTime() + 60_000).toISOString(),
+    tool_request: {
+      name: 'resolve_memory_context',
+      arguments: {
+        project_alias: 'codex-memory',
+        requested_visibility: 'project'
+      }
+    }
+  };
+  await broker.submit(request);
+  const claim = broker.claim('external-resolution-binding-relay');
+  broker.acknowledge(claim.request_id, claim.claim_token);
+  let workingSet = appendGovernedContextResolutionStage(
+    claim.governed_context_resolution,
+    { stage: 'RELAY_CLAIMED' }
+  );
+  workingSet = appendGovernedContextResolutionStage(workingSet, {
+    stage: 'REGISTRY_RESOLVED',
+    outcome: 'failed',
+    reasonCode: 'context_mapping_not_found',
+    facts: { registry_resolved: true, mapping_resolved: false }
+  });
+  const terminal = createContextResolutionTerminalEnvelope({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    outcome: 'failure',
+    reasonCode: 'context_mapping_not_found',
+    evidenceComplete: true
+  });
+  const candidate = createGovernedContextResolutionProtocol({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    terminal
+  });
+  await assert.rejects(
+    broker.complete(
+      claim.request_id,
+      claim.claim_token,
+      {
+        status: 'unavailable',
+        structured_content: { context_status: 'unavailable' }
+      },
+      null,
+      candidate
+    ),
+    { code: 'edge_context_resolution_response_binding_invalid' }
+  );
+  broker.close();
+});
+
+test('external Edge extends an acknowledged resolver claim through its resolution deadline', async () => {
+  const createdAt = new Date('2026-07-31T00:00:00.000Z');
+  let current = new Date(createdAt);
+  const broker = createTransientRequestBroker({
+    async verifyRequest() {},
+    async verifyResponse() {},
+    clock: () => current,
+    claimLeaseMs: 10
+  });
+  const request = {
+    request_id: 'req_external_resolution_ack_deadline_000001',
+    nonce: 'request_nonce_external_resolution_ack_deadline_01',
+    expires_at: new Date(createdAt.getTime() + 60_000).toISOString(),
+    tool_request: {
+      name: 'resolve_memory_context',
+      arguments: {
+        project_alias: 'codex-memory',
+        requested_visibility: 'project'
+      }
+    }
+  };
+  await broker.submit(request);
+  const claim = broker.claim('external-resolution-ack-deadline-relay');
+  broker.acknowledge(claim.request_id, claim.claim_token);
+  current = new Date(createdAt.getTime() + 11);
+  assert.deepEqual(
+    broker.state(claim.request_id, claim.claim_token),
+    {
+      request_id: claim.request_id,
+      status: 'claimed',
+      attempt: 1,
+      claim_state: 'acked'
+    }
   );
   broker.close();
 });
@@ -1027,6 +1131,30 @@ function successfulAttemptCandidate(initialWorkingSet) {
     evidenceComplete: true
   });
   return createGovernedReadAttemptProtocol({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    terminal
+  });
+}
+
+function successfulContextResolutionCandidate(initialWorkingSet) {
+  let workingSet = initialWorkingSet;
+  for (const stage of [
+    'RELAY_CLAIMED',
+    'REGISTRY_RESOLVED',
+    'SCOPE_RESOLVED',
+    'CONTEXT_ISSUED',
+    'RESPONSE_FINALIZED'
+  ]) {
+    workingSet = appendGovernedContextResolutionStage(workingSet, { stage });
+  }
+  const terminal = createContextResolutionTerminalEnvelope({
+    header: workingSet.header,
+    receipts: workingSet.receipts,
+    outcome: 'success',
+    evidenceComplete: true
+  });
+  return createGovernedContextResolutionProtocol({
     header: workingSet.header,
     receipts: workingSet.receipts,
     terminal

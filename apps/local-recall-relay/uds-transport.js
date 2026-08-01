@@ -3,16 +3,24 @@
 const net = require('node:net');
 
 const {
+  GOVERNED_CONTEXT_RESOLUTION_LIMITS,
   GOVERNED_READ_ATTEMPT_LIMITS,
   LIMITS,
+  contextResolutionDeadlineBudgetMs,
   governedReadAttemptDeadlineBudgetMs,
   reject
 } = require('../../packages/chatgpt-r4-contracts');
 
 const MAX_UDS_REQUEST_BYTES = LIMITS.maxRequestBytes +
-  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes + 8192;
+  Math.max(
+    GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes,
+    GOVERNED_CONTEXT_RESOLUTION_LIMITS.protocolBytes
+  ) + 8192;
 const MAX_UDS_RESPONSE_BYTES = LIMITS.maxResponseBytes +
-  GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes;
+  Math.max(
+    GOVERNED_READ_ATTEMPT_LIMITS.protocolBytes,
+    GOVERNED_CONTEXT_RESOLUTION_LIMITS.protocolBytes
+  );
 const DEFAULT_UDS_TIMEOUT_MS = 15_000;
 const GOVERNED_READ_UDS_DEADLINE_MARGIN_MS = 3_000;
 
@@ -53,14 +61,23 @@ function createUdsForwarder({
     const encoded = Buffer.from(`${JSON.stringify(payload)}\n`, 'utf8');
     if (encoded.length > MAX_UDS_REQUEST_BYTES) reject('relay_uds_request_too_large');
     let requestTimeoutMs = timeoutMs;
-    if (payload?.governedReadAttempt?.header) {
-      requestTimeoutMs = governedReadAttemptDeadlineBudgetMs(
-        payload.governedReadAttempt.header,
-        {
-          now: clock(),
-          marginMs: GOVERNED_READ_UDS_DEADLINE_MARGIN_MS
-        }
-      );
+    if (payload?.governedReadAttempt?.header ||
+        payload?.governedContextResolution?.header) {
+      requestTimeoutMs = payload.governedReadAttempt?.header
+        ? governedReadAttemptDeadlineBudgetMs(
+            payload.governedReadAttempt.header,
+            {
+              now: clock(),
+              marginMs: GOVERNED_READ_UDS_DEADLINE_MARGIN_MS
+            }
+          )
+        : contextResolutionDeadlineBudgetMs(
+            payload.governedContextResolution.header,
+            {
+              now: clock(),
+              marginMs: GOVERNED_READ_UDS_DEADLINE_MARGIN_MS
+            }
+          );
       if (requestTimeoutMs === 0) {
         return Promise.reject(Object.assign(
           new Error('relay_request_expired_before_response'),
@@ -107,6 +124,14 @@ function createUdsForwarder({
         }
         try {
           const parsed = JSON.parse(frame.subarray(0, newline).toString('utf8'));
+          const governanceError = parseContextResolutionFailure(parsed);
+          if (governanceError) {
+            settled = true;
+            cleanup();
+            socket.destroy();
+            rejectForward(governanceError);
+            return;
+          }
           settled = true;
           cleanup();
           socket.destroy();
@@ -177,6 +202,32 @@ function createUdsForwarder({
       }
     });
   };
+}
+
+function parseContextResolutionFailure(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value) ||
+      Object.keys(value).sort().join(',') !== 'governance_error') {
+    return null;
+  }
+  const failure = value.governance_error;
+  if (!failure || typeof failure !== 'object' || Array.isArray(failure) ||
+      Object.keys(failure).sort().join(',') !==
+        'code,governed_context_resolution' ||
+      typeof failure.code !== 'string' ||
+      !/^[a-z][a-z0-9_]{0,79}$/u.test(failure.code) ||
+      !failure.governed_context_resolution ||
+      typeof failure.governed_context_resolution !== 'object' ||
+      Array.isArray(failure.governed_context_resolution)) {
+    return null;
+  }
+  const error = Object.assign(new Error(failure.code), { code: failure.code });
+  Object.defineProperty(error, 'governed_context_resolution', {
+    value: failure.governed_context_resolution,
+    enumerable: false,
+    configurable: false,
+    writable: false
+  });
+  return error;
 }
 
 module.exports = {

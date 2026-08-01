@@ -100,14 +100,16 @@ function failure({
   category,
   stage,
   origin,
-  terminalCandidateAllowed = true
+  terminalCandidateAllowed = true,
+  publicResponseStatus = null
 }) {
   return {
     category,
     stage,
     origin,
     fallback_policy: 'forbidden',
-    terminal_candidate_allowed: terminalCandidateAllowed
+    terminal_candidate_allowed: terminalCandidateAllowed,
+    public_response_status: publicResponseStatus
   };
 }
 
@@ -117,7 +119,8 @@ function validateFailureEntry(entry) {
     'stage',
     'origin',
     'fallback_policy',
-    'terminal_candidate_allowed'
+    'terminal_candidate_allowed',
+    'public_response_status'
   ], 'context_resolution_failure_registry_invalid');
   assertGovernedSafeCode(
     entry.category,
@@ -127,7 +130,8 @@ function validateFailureEntry(entry) {
       !Object.values(GOVERNED_CONTEXT_RESOLUTION_ORIGIN_BY_STAGE)
         .concat('observer').includes(entry.origin) ||
       entry.fallback_policy !== 'forbidden' ||
-      typeof entry.terminal_candidate_allowed !== 'boolean') {
+      typeof entry.terminal_candidate_allowed !== 'boolean' ||
+      ![null, 'denied', 'unavailable'].includes(entry.public_response_status)) {
     reject('context_resolution_failure_registry_invalid');
   }
   if (entry.stage !== 'TERMINAL_FAILURE' &&
@@ -154,20 +158,47 @@ const GOVERNED_CONTEXT_RESOLUTION_FAILURE_REGISTRY =
       stage: 'REGISTRY_RESOLVED',
       origin: 'governance'
     }),
+    context_scope_preflight_denied: failure({
+      category: 'context_scope_denied',
+      stage: 'REGISTRY_RESOLVED',
+      origin: 'governance',
+      publicResponseStatus: 'denied'
+    }),
+    context_issuance_preflight_unavailable: failure({
+      category: 'context_issuance_failed',
+      stage: 'REGISTRY_RESOLVED',
+      origin: 'governance',
+      publicResponseStatus: 'unavailable'
+    }),
     context_mapping_not_found: failure({
       category: 'context_mapping_failed',
       stage: 'REGISTRY_RESOLVED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'denied'
     }),
     context_scope_denied: failure({
       category: 'context_scope_denied',
       stage: 'SCOPE_RESOLVED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'denied'
+    }),
+    context_scope_unavailable: failure({
+      category: 'context_scope_failed',
+      stage: 'SCOPE_RESOLVED',
+      origin: 'governance',
+      publicResponseStatus: 'unavailable'
     }),
     context_issuance_unavailable: failure({
       category: 'context_issuance_failed',
       stage: 'CONTEXT_ISSUED',
-      origin: 'governance'
+      origin: 'governance',
+      publicResponseStatus: 'unavailable'
+    }),
+    context_issuance_denied: failure({
+      category: 'context_issuance_failed',
+      stage: 'CONTEXT_ISSUED',
+      origin: 'governance',
+      publicResponseStatus: 'denied'
     }),
     context_issuance_failed: failure({
       category: 'context_issuance_failed',
@@ -226,6 +257,12 @@ const FAILED_FACTS_BY_REASON = deepFreeze({
   context_registry_unavailable: {
     registry_resolved: false
   },
+  context_scope_preflight_denied: {
+    registry_resolved: false
+  },
+  context_issuance_preflight_unavailable: {
+    registry_resolved: false
+  },
   context_mapping_not_found: {
     registry_resolved: true,
     mapping_resolved: false
@@ -233,7 +270,11 @@ const FAILED_FACTS_BY_REASON = deepFreeze({
   context_scope_denied: {
     scope_resolved: false
   },
+  context_scope_unavailable: {},
   context_issuance_unavailable: {
+    context_ref_issued: false
+  },
+  context_issuance_denied: {
     context_ref_issued: false
   },
   context_issuance_failed: {},
@@ -424,6 +465,11 @@ function contextResolutionFailureRegistryEntry(reasonCode) {
       unknownReasonCode: 'context_resolution_reason_unknown'
     }
   );
+}
+
+function contextResolutionFailureFacts(reasonCode) {
+  contextResolutionFailureRegistryEntry(reasonCode);
+  return structuredClone(FAILED_FACTS_BY_REASON[reasonCode]);
 }
 
 function nextReceiptStage(receipts) {
@@ -940,6 +986,7 @@ module.exports = {
   GOVERNED_CONTEXT_RESOLUTION_TERMINAL_STAGES,
   appendGovernedContextResolutionStage,
   contextResolutionDeadlineBudgetMs,
+  contextResolutionFailureFacts,
   contextResolutionFailureRegistryEntry,
   contextResolutionRef,
   createContextResolutionHeader,

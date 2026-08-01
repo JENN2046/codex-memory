@@ -3,7 +3,11 @@
 const {
   COUNTER_MODES,
   ZERO_MEMORY_COUNTERS,
+  appendGovernedContextResolutionStage,
+  contextResolutionFailureFacts,
+  contextResolutionFailureRegistryEntry,
   digestObject,
+  validateGovernedContextResolutionWorkingSet,
   validateCounters,
   validateProjectContextClaim,
   validatePublicStructuredContent,
@@ -55,7 +59,7 @@ function createGovernanceAdapter({
   }
 
   return Object.freeze({
-    async handle({ request, relayReceipt }) {
+    async handle({ request, relayReceipt, governedContextResolution }) {
       const now = clock();
       const validation = validateRequestEnvelope(request, {
         now,
@@ -76,7 +80,8 @@ function createGovernanceAdapter({
           principalFingerprint,
           now,
           issueProjectContext,
-          resolveContextPublicKey
+          resolveContextPublicKey,
+          governedContextResolution
         });
       }
 
@@ -203,11 +208,16 @@ async function handleResolve({
   principalFingerprint,
   now,
   issueProjectContext,
-  resolveContextPublicKey
+  resolveContextPublicKey,
+  governedContextResolution
 }) {
+  const resolution = prepareContextResolution(
+    governedContextResolution,
+    request
+  );
   const args = request.tool_request.arguments;
   if (args.requested_visibility === undefined) {
-    return buildResolveResult({
+    const result = buildResolveResult({
       request,
       relayReceipt,
       status: 'denied',
@@ -222,25 +232,52 @@ async function handleResolve({
         legacy_partition_access: false
       }
     });
+    return withResolutionContinuation(
+      result,
+      failContextResolution(resolution, 'context_mapping_not_found')
+    );
   }
-  const issued = await issueProjectContext({
-    principalFingerprint,
-    safeProjectAlias: args.project_alias,
-    requestedVisibility: args.requested_visibility,
-    now
-  });
+  let resolutionProgress = resolution;
+  const recordResolutionStage = stage => {
+    if (!resolutionProgress) return;
+    resolutionProgress = appendResolutionStages(resolutionProgress, [{ stage }]);
+  };
+  let issued;
+  try {
+    issued = await issueProjectContext({
+      principalFingerprint,
+      safeProjectAlias: args.project_alias,
+      requestedVisibility: args.requested_visibility,
+      now,
+      governedContextResolution: resolution !== null,
+      onResolutionStage: recordResolutionStage
+    });
+  } catch (error) {
+    throwWithContextResolutionFailure(
+      error,
+      failContextResolution(resolutionProgress, 'context_issuance_failed')
+    );
+  }
   if (issued && typeof issued === 'object' && !Array.isArray(issued) &&
       ['denied', 'unavailable'].includes(issued.status)) {
     const keys = Object.keys(issued).sort();
     const expected = issued.activation_receipt_digest
-      ? ['activation_receipt_digest', 'status']
-      : ['status'];
+      ? ['activation_receipt_digest',
+        ...(issued.resolution_reason ? ['resolution_reason'] : []), 'status']
+      : [...(issued.resolution_reason ? ['resolution_reason'] : []), 'status'];
+    const reasonCode = issued.resolution_reason ||
+      (issued.status === 'denied'
+        ? 'context_scope_denied'
+        : 'context_issuance_unavailable');
     if (keys.length !== expected.length || keys.some((key, index) => key !== expected[index]) ||
         (issued.activation_receipt_digest &&
-         !/^sha256:[a-f0-9]{64}$/u.test(issued.activation_receipt_digest))) {
+         !/^sha256:[a-f0-9]{64}$/u.test(issued.activation_receipt_digest)) ||
+        (resolution && !['context_mapping_not_found', 'context_scope_denied',
+          'context_issuance_unavailable',
+          'context_issuance_denied'].includes(reasonCode))) {
       reject('context_issue_denial_shape_invalid');
     }
-    return buildResolveResult({
+    const result = buildResolveResult({
       request,
       relayReceipt,
       status: issued.status,
@@ -258,19 +295,47 @@ async function handleResolve({
           : {})
       }
     });
+    return withResolutionContinuation(
+      result,
+      failContextResolution(resolutionProgress, reasonCode)
+    );
   }
   if (!issued || typeof issued !== 'object' || Array.isArray(issued) ||
       typeof issued.safe_project_alias !== 'string') {
-    reject('context_issue_result_invalid');
+    const error = Object.assign(new Error('context_issue_result_invalid'), {
+      code: 'context_issue_result_invalid'
+    });
+    throwWithContextResolutionFailure(
+      error,
+      failContextResolution(resolutionProgress, 'context_issue_result_invalid')
+    );
   }
-  validateProjectContextClaim(issued.claim, {
-    now,
-    resolvePublicKey: resolveContextPublicKey,
-    expectedPrincipalFingerprint: principalFingerprint
-  });
+  try {
+    validateProjectContextClaim(issued.claim, {
+      now,
+      resolvePublicKey: resolveContextPublicKey,
+      expectedPrincipalFingerprint: principalFingerprint
+    });
+  } catch (error) {
+    if (!resolution) throw error;
+    const reasonCode = error?.code === 'project_context_claim_expired'
+      ? 'context_ref_expired'
+      : 'context_ref_invalid';
+    throwWithContextResolutionFailure(
+      error,
+      failContextResolution(resolutionProgress, reasonCode)
+    );
+  }
   const requestedVisibility = args.requested_visibility;
   if (!issued.claim.visibility_allowlist.includes(requestedVisibility)) {
-    reject('context_issue_visibility_mismatch');
+    if (!resolution) reject('context_issue_visibility_mismatch');
+    const error = Object.assign(new Error('context_issue_visibility_mismatch'), {
+      code: 'context_issue_visibility_mismatch'
+    });
+    throwWithContextResolutionFailure(
+      error,
+      failContextResolution(resolutionProgress, 'context_ref_invalid')
+    );
   }
 
   const structuredContent = {
@@ -300,12 +365,123 @@ async function handleResolve({
       ? { activation_receipt_digest: issued.activation_receipt_digest }
       : {})
   };
-  return buildResolveResult({
+  const result = buildResolveResult({
     request,
     relayReceipt,
     status: 'ok',
     structuredContent,
     contextReceipt
+  });
+  try {
+    return withResolutionContinuation(
+      result,
+      completeContextResolution(resolutionProgress)
+    );
+  } catch (error) {
+    throwWithContextResolutionFailure(
+      error,
+      failContextResolution(resolutionProgress, 'context_issuance_failed')
+    );
+  }
+}
+
+function throwWithContextResolutionFailure(error, continuation) {
+  if (!continuation) throw error;
+  const code = typeof error?.code === 'string'
+    ? error.code
+    : 'context_issuance_failed';
+  const wrapped = Object.assign(new Error(code), { code });
+  Object.defineProperty(wrapped, 'governed_context_resolution', {
+    value: continuation,
+    enumerable: false,
+    configurable: false,
+    writable: false
+  });
+  throw wrapped;
+}
+
+function prepareContextResolution(value, request) {
+  if (value === undefined) return null;
+  validateGovernedContextResolutionWorkingSet(value);
+  const lastReceipt = value.receipts.at(-1);
+  if (request?.tool_request?.name !== 'resolve_memory_context' ||
+      lastReceipt?.stage !== 'RELAY_CLAIMED' ||
+      lastReceipt.outcome !== 'completed' ||
+      value.header.request_digest !== digestObject(request)) {
+    reject('governance_context_resolution_binding_invalid');
+  }
+  return value;
+}
+
+function appendResolutionStages(workingSet, stages) {
+  let result = workingSet;
+  for (const input of stages) {
+    result = appendGovernedContextResolutionStage(result, input);
+  }
+  return result;
+}
+
+function completeContextResolution(workingSet) {
+  if (!workingSet) return null;
+  return Object.freeze({
+    working_set: appendResolutionStages(workingSet, [{ stage: 'CONTEXT_ISSUED' }]),
+    terminal_failure: null,
+    evidence_complete: true
+  });
+}
+
+function failContextResolution(workingSet, reasonCode) {
+  if (!workingSet) return null;
+  const lastStage = workingSet.receipts.at(-1)?.stage;
+  const requestedEntry = contextResolutionFailureRegistryEntry(reasonCode);
+  const stagePlan = lastStage === 'RELAY_CLAIMED'
+    ? {
+        effectiveReasonCode: requestedEntry.stage === 'REGISTRY_RESOLVED'
+          ? reasonCode
+          : reasonCode === 'context_scope_denied'
+            ? 'context_scope_preflight_denied'
+            : reasonCode === 'context_issuance_unavailable'
+              ? 'context_issuance_preflight_unavailable'
+              : 'context_registry_unavailable',
+        failedStage: 'REGISTRY_RESOLVED'
+      }
+    : lastStage === 'REGISTRY_RESOLVED'
+      ? {
+          effectiveReasonCode: requestedEntry.stage === 'SCOPE_RESOLVED'
+            ? reasonCode
+            : 'context_scope_unavailable',
+          failedStage: 'SCOPE_RESOLVED'
+        }
+      : {
+          effectiveReasonCode: requestedEntry.stage === 'CONTEXT_ISSUED'
+            ? reasonCode
+            : 'context_issuance_failed',
+          failedStage: 'CONTEXT_ISSUED'
+        };
+  const effectiveFacts = contextResolutionFailureFacts(
+    stagePlan.effectiveReasonCode
+  );
+  const stages = [{
+    stage: stagePlan.failedStage,
+    outcome: 'failed',
+    reasonCode: stagePlan.effectiveReasonCode,
+    facts: effectiveFacts
+  }];
+  return Object.freeze({
+    working_set: appendResolutionStages(workingSet, stages),
+    terminal_failure: Object.freeze({
+      reason_code: stagePlan.effectiveReasonCode,
+      failure_origin: 'governance'
+    }),
+    evidence_complete: true
+  });
+}
+
+function withResolutionContinuation(result, continuation) {
+  if (!continuation) return result;
+  return Object.freeze({
+    ...result,
+    governed_context_resolution: continuation
   });
 }
 

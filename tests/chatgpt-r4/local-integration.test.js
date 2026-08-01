@@ -51,7 +51,8 @@ test('R4-C uses actual loopback HTTP and temporary UDS with zero memory counters
     claimed: 0,
     completed: 2,
     cancelled: 0,
-    expired: 0
+    expired: 0,
+    failed: 0
   });
 });
 
@@ -99,7 +100,14 @@ test('R4-C first stale lookup and snapshot purge untouched records past retentio
   assert.deepEqual(harness.edgeRuntime.snapshot(), {
     in_memory_only: true,
     request_count: 0,
-    states: { queued: 0, claimed: 0, completed: 0, cancelled: 0, expired: 0 },
+    states: {
+      queued: 0,
+      claimed: 0,
+      completed: 0,
+      cancelled: 0,
+      expired: 0,
+      failed: 0
+    },
     governed_read_attempts_enabled: true
   });
 });
@@ -197,7 +205,8 @@ test('R4-C submit refreshes and prunes untouched expired records before capacity
     claimed: 0,
     completed: 0,
     cancelled: 0,
-    expired: 0
+    expired: 0,
+    failed: 0
   });
 });
 

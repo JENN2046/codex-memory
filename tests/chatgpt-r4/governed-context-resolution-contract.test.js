@@ -43,6 +43,12 @@ const FAILURE_FACTS = Object.freeze({
   context_registry_unavailable: {
     registry_resolved: false
   },
+  context_scope_preflight_denied: {
+    registry_resolved: false
+  },
+  context_issuance_preflight_unavailable: {
+    registry_resolved: false
+  },
   context_mapping_not_found: {
     registry_resolved: true,
     mapping_resolved: false
@@ -50,7 +56,11 @@ const FAILURE_FACTS = Object.freeze({
   context_scope_denied: {
     scope_resolved: false
   },
+  context_scope_unavailable: {},
   context_issuance_unavailable: {
+    context_ref_issued: false
+  },
+  context_issuance_denied: {
     context_ref_issued: false
   },
   context_issuance_failed: {},
@@ -1208,24 +1218,20 @@ test('Observer rejects a tampered receipt independently', () => {
   assert.equal(snapshot.terminals_fabricated, 0);
 });
 
-test('dormant contract leaves live resolver imports and public v2 schemas unchanged', () => {
+test('live resolver imports the internal protocol without changing public v2 schemas', () => {
   const repositoryRoot = path.resolve(__dirname, '../..');
-  const liveFiles = [
-    'apps/chatgpt-edge/index.js',
+  for (const relativePath of [
     'apps/chatgpt-edge/transient-request-broker.js',
-    'apps/local-recall-relay/index.js',
     'apps/local-recall-relay/relay-processor.js',
-    'src/adapters/chatgpt-r4/governance-adapter.js',
-    'src/adapters/chatgpt-r4/governed-read-v2-runtime.js'
-  ];
-  for (const relativePath of liveFiles) {
+    'src/adapters/chatgpt-r4/governance-adapter.js'
+  ]) {
     const source = fs.readFileSync(
       path.join(repositoryRoot, relativePath),
       'utf8'
     );
-    assert.doesNotMatch(
+    assert.match(
       source,
-      /governed-context-resolution/u,
+      /ContextResolution/u,
       relativePath
     );
   }
