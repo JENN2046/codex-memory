@@ -24,6 +24,10 @@ const {
   validateGovernedReadAttemptPublicProjection
 } = require('./governed-read-attempt');
 const {
+  contextResolutionPublicResponseStatus,
+  validateGovernedContextResolutionPublicProjection
+} = require('./governed-context-resolution');
+const {
   governedReadTerminalResponseStatus,
   validateLegacyResponseCountersAgainstAttemptPublic
 } = require('./edge-data-response-v2');
@@ -496,10 +500,22 @@ function validateToolStructuredContent(
     reject('response_data_schema_version_invalid');
   }
   if (toolName === 'resolve_memory_context') {
-    if (Object.hasOwn(content, 'attempt')) {
+    if (Object.hasOwn(content, 'attempt') ||
+        !Object.hasOwn(content, 'resolution')) {
       reject('response_structured_content_shape_invalid');
     }
-    const { schema_version: ignored, ...legacy } = content;
+    validateGovernedContextResolutionPublicProjection(content.resolution);
+    const expectedStatus = content.resolution.evidence_complete
+      ? contextResolutionPublicResponseStatus(content.resolution)
+      : 'unavailable';
+    if (status !== expectedStatus) {
+      reject('response_context_resolution_status_mismatch');
+    }
+    const {
+      schema_version: ignored,
+      resolution: ignoredResolution,
+      ...legacy
+    } = content;
     return validateLegacyToolStructuredContent(
       toolName,
       legacy,

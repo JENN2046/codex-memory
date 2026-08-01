@@ -21,6 +21,7 @@ const {
 } = require('../../apps/chatgpt-edge');
 const {
   createRelayProcessor,
+  contextResolutionResponseResult,
   createGovernedContextResolutionObserver
 } = require('../../apps/local-recall-relay');
 const {
@@ -93,7 +94,8 @@ function registry(mappingState) {
 
 function createCharacterizationFixture({
   issueOutcome = 'production',
-  responseFinalizationHook
+  responseFinalizationHook,
+  responseResultFactory
 } = {}) {
   const edge = identity('gcr-characterization-edge');
   const relayIdentity = identity('gcr-characterization-relay');
@@ -218,6 +220,7 @@ function createCharacterizationFixture({
       responseFinalizationHook === undefined
         ? undefined
         : { RESPONSE_FINALIZED: responseFinalizationHook },
+    contextResolutionResponseResultFactory: responseResultFactory,
     async forwardToUds(payload) {
       observations.governance_calls += 1;
       return governance.handle(payload);
@@ -271,7 +274,15 @@ function createCharacterizationFixture({
     const relayResult = await relay.handle(claim.request, {
       governedContextResolution: claim.governed_context_resolution
     });
-    if (relayResult.governed_context_resolution_failure_candidate) {
+    const terminalCandidate =
+      relayResult.governed_context_resolution_candidate ||
+      relayResult.governed_context_resolution_failure_candidate || null;
+    if (terminalCandidate?.terminal?.outcome === 'failure') {
+      observations.last_terminal_reason = terminalCandidate.terminal.reason_code;
+      observations.last_terminal = terminalCandidate.terminal;
+    }
+    if (relayResult.governed_context_resolution_failure_candidate &&
+        !relayResult.response) {
       observations.last_terminal_reason =
         relayResult.governed_context_resolution_failure_candidate
           .terminal.reason_code;
@@ -372,6 +383,19 @@ test('resolver-only signed vertical slice issues and client-validates one v2 con
     /^pctx_[A-Za-z0-9_-]{32,96}$/u
   );
   assert.equal(Object.hasOwn(result.response.structured_content, 'attempt'), false);
+  assert.deepEqual(result.response.structured_content.resolution, {
+    protocol: 'governed_context_resolution.v1',
+    outcome: 'success',
+    last_completed_stage: 'RESPONSE_FINALIZED',
+    failed_stage: null,
+    reason_code: null,
+    failure_category: null,
+    failure_origin: null,
+    context_ref_issued: true,
+    context_ref_entered_response: true,
+    context_ref_delivered: true,
+    evidence_complete: true
+  });
   assert.deepEqual(result.response.counters, ZERO_MEMORY_COUNTERS);
   assert.deepEqual(Object.keys(result.response.receipt_chain).sort(), [
     'context', 'edge_request', 'governance', 'relay'
@@ -386,6 +410,11 @@ test('resolver-only signed vertical slice issues and client-validates one v2 con
   assert.equal(snapshot.runtime.active_context_count, 1);
   assert.equal(snapshot.runtime.completed_requests, 1);
   assert.equal(snapshot.resolution_observer.terminal_successes, 1);
+  assert.equal(
+    snapshot.resolution_observer.response_verifications_accepted,
+    1
+  );
+  assert.equal(snapshot.resolution_observer.protocol_violations, 0);
   assertResolverOnly(snapshot);
 });
 
@@ -397,10 +426,10 @@ test('resolver-only mapping miss and scope denial remain signed low-disclosure f
   ]) {
     const result = await fixture.resolve(input);
     assert.equal(result.response.status, 'denied');
-    assert.deepEqual(result.response.structured_content, {
-      schema_version: 2,
-      context_status: 'denied'
-    });
+    assert.equal(result.response.structured_content.schema_version, 2);
+    assert.equal(result.response.structured_content.context_status, 'denied');
+    assert.equal(result.response.structured_content.resolution.outcome, 'failure');
+    assert.equal(result.response.structured_content.resolution.evidence_complete, true);
     assert.deepEqual(result.response.counters, ZERO_MEMORY_COUNTERS);
   }
 
@@ -415,10 +444,12 @@ test('resolver-only issuance unavailability does not create or disclose a contex
   const result = await fixture.resolve();
 
   assert.equal(result.response.status, 'unavailable');
-  assert.deepEqual(result.response.structured_content, {
-    schema_version: 2,
-    context_status: 'unavailable'
-  });
+  assert.equal(result.response.structured_content.schema_version, 2);
+  assert.equal(result.response.structured_content.context_status, 'unavailable');
+  assert.equal(
+    result.response.structured_content.resolution.reason_code,
+    'context_issuance_unavailable'
+  );
   assert.equal(
     Object.hasOwn(result.response.structured_content, 'project_context_ref'),
     false
@@ -434,10 +465,12 @@ test('resolver-only final issuance denial preserves its denied terminal', async 
   const result = await fixture.resolve();
 
   assert.equal(result.response.status, 'denied');
-  assert.deepEqual(result.response.structured_content, {
-    schema_version: 2,
-    context_status: 'denied'
-  });
+  assert.equal(result.response.structured_content.schema_version, 2);
+  assert.equal(result.response.structured_content.context_status, 'denied');
+  assert.equal(
+    result.response.structured_content.resolution.reason_code,
+    'context_issuance_denied'
+  );
   assert.equal(result.terminal.outcome, 'failure');
   assert.equal(result.terminal.reason_code, 'context_issuance_denied');
   assert.equal(result.terminal.last_completed_stage, 'SCOPE_RESOLVED');
@@ -499,9 +532,11 @@ test('context authority labels final activation denial as issuance denial', asyn
 
 test('resolver boundary preserves exact failure codes for issuance and public projection validation', async () => {
   const issuerFailure = createCharacterizationFixture({ issueOutcome: 'failure' });
-  await assert.rejects(
-    issuerFailure.resolve(),
-    { code: 'synthetic_context_issuance_failed' }
+  const issuerFailureResult = await issuerFailure.resolve();
+  assert.equal(issuerFailureResult.response.status, 'unavailable');
+  assert.equal(
+    issuerFailureResult.response.structured_content.resolution.reason_code,
+    'context_issuance_failed'
   );
   assert.equal(
     issuerFailure.snapshot().last_terminal_reason,
@@ -510,9 +545,11 @@ test('resolver boundary preserves exact failure codes for issuance and public pr
   assertResolverOnly(issuerFailure.snapshot());
 
   const invalidIssuance = createCharacterizationFixture({ issueOutcome: 'invalid' });
-  await assert.rejects(
-    invalidIssuance.resolve(),
-    { code: 'context_issue_result_invalid' }
+  const invalidIssuanceResult = await invalidIssuance.resolve();
+  assert.equal(invalidIssuanceResult.response.status, 'unavailable');
+  assert.equal(
+    invalidIssuanceResult.response.structured_content.resolution.reason_code,
+    'context_issue_result_invalid'
   );
   assert.equal(
     invalidIssuance.snapshot().last_terminal_reason,
@@ -541,7 +578,7 @@ test('resolver boundary preserves exact failure codes for issuance and public pr
   );
   assert.throws(
     () => missingField.normalize(missingFieldRequest, missingFieldResponse),
-    { code: 'response_structured_content_shape_invalid' }
+    { code: 'edge_context_resolution_response_result_required' }
   );
   assertResolverOnly(missingField.snapshot());
 
@@ -563,7 +600,7 @@ test('resolver boundary preserves exact failure codes for issuance and public pr
   );
   assert.throws(
     () => malformedReference.normalize(malformedRequest, malformedResponse),
-    { code: 'project_context_ref_invalid' }
+    { code: 'edge_context_resolution_response_result_required' }
   );
   assertResolverOnly(malformedReference.snapshot());
 });
@@ -572,9 +609,11 @@ test('issuer failure before resolution progress fails closed without invented st
   const fixture = createCharacterizationFixture({
     issueOutcome: 'failure_before_resolution'
   });
-  await assert.rejects(
-    fixture.resolve(),
-    { code: 'synthetic_context_issuer_preflight_failed' }
+  const result = await fixture.resolve();
+  assert.equal(result.response.status, 'unavailable');
+  assert.equal(
+    result.response.structured_content.resolution.reason_code,
+    'context_registry_unavailable'
   );
   const snapshot = fixture.snapshot();
   assert.equal(snapshot.last_terminal_reason, 'context_registry_unavailable');
@@ -585,7 +624,7 @@ test('issuer failure before resolution progress fails closed without invented st
   assertResolverOnly(snapshot);
 });
 
-test('resolver response-finalization failure commits a canonical terminal while preserving a safe error', async () => {
+test('resolver response-finalization failure proves issuance without claiming delivery', async () => {
   const fixture = createCharacterizationFixture({
     responseFinalizationHook() {
       throw Object.assign(new Error('synthetic_response_finalization_failed'), {
@@ -593,13 +632,42 @@ test('resolver response-finalization failure commits a canonical terminal while 
       });
     }
   });
-  await assert.rejects(
-    fixture.resolve(),
-    { code: 'context_response_finalization_failed' }
-  );
+  const result = await fixture.resolve();
+  assert.equal(result.response.status, 'unavailable');
+  assert.equal(result.response.structured_content.context_status, 'unavailable');
+  assert.equal(result.response.structured_content.resolution.context_ref_issued, true);
+  assert.equal(result.response.structured_content.resolution.context_ref_entered_response, false);
+  assert.equal(result.response.structured_content.resolution.context_ref_delivered, false);
+  assert.equal(result.response.structured_content.resolution.failed_stage, 'RESPONSE_FINALIZED');
   assert.equal(
     fixture.snapshot().last_terminal_reason,
     'context_response_finalization_failed'
+  );
+  assertResolverOnly(fixture.snapshot());
+});
+
+test('Relay replaces an unprojectable success candidate with a signed failure terminal', async () => {
+  const fixture = createCharacterizationFixture({
+    responseResultFactory(input) {
+      if (input.candidate.terminal.outcome === 'success') {
+        throw Object.assign(new Error('synthetic_projection_invalid'), {
+          code: 'synthetic_projection_invalid'
+        });
+      }
+      return contextResolutionResponseResult(input);
+    }
+  });
+  const result = await fixture.resolve();
+  const resolution = result.response.structured_content.resolution;
+  assert.equal(result.response.status, 'unavailable');
+  assert.equal(resolution.reason_code, 'context_response_projection_invalid');
+  assert.equal(resolution.failed_stage, 'RESPONSE_FINALIZED');
+  assert.equal(resolution.context_ref_issued, true);
+  assert.equal(resolution.context_ref_entered_response, false);
+  assert.equal(resolution.context_ref_delivered, false);
+  assert.equal(
+    fixture.snapshot().last_terminal_reason,
+    'context_response_projection_invalid'
   );
   assertResolverOnly(fixture.snapshot());
 });
@@ -623,7 +691,7 @@ test('resolver client validation rejects an already expired issued context ref',
   );
   assert.throws(
     () => fixture.normalize(signedRequest, expiredResponse),
-    { code: 'response_context_expired' }
+    { code: 'edge_context_resolution_response_result_required' }
   );
   assertResolverOnly(fixture.snapshot());
 });

@@ -4,6 +4,7 @@ const {
   DATA_TOOL_NAMES,
   CHATGPT_EDGE_DATA_SCHEMA_VERSION,
   GOVERNED_READ_ATTEMPT_PUBLIC_PROJECTION_SCHEMA,
+  GOVERNED_CONTEXT_RESOLUTION_PUBLIC_PROJECTION_SCHEMA,
   RENDER_TOOL_NAMES,
   CONTEXT_VISIBILITIES,
   PROJECT_CONTEXT_REF_PATTERN_SOURCE,
@@ -212,7 +213,8 @@ function contextResolutionOutputSchema() {
           'safe_project_alias',
           'expires_at',
           'visibility_labels',
-          'context_status'
+          'context_status',
+          'resolution'
         ],
         properties: {
           schema_version: {
@@ -222,7 +224,8 @@ function contextResolutionOutputSchema() {
           safe_project_alias: { type: 'string', pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' },
           expires_at: { type: 'string' },
           visibility_labels: { type: 'array', items: { type: 'string' } },
-          context_status: { const: 'resolved' }
+          context_status: { const: 'resolved' },
+          resolution: GOVERNED_CONTEXT_RESOLUTION_PUBLIC_PROJECTION_SCHEMA
         }
       },
       denialContextSchema('denied'),
@@ -235,12 +238,13 @@ function denialContextSchema(status) {
   return {
     type: 'object',
     additionalProperties: false,
-    required: ['schema_version', 'context_status'],
+    required: ['schema_version', 'context_status', 'resolution'],
     properties: {
       schema_version: {
         const: CHATGPT_EDGE_DATA_SCHEMA_VERSION
       },
-      context_status: { const: status }
+      context_status: { const: status },
+      resolution: GOVERNED_CONTEXT_RESOLUTION_PUBLIC_PROJECTION_SCHEMA
     }
   };
 }

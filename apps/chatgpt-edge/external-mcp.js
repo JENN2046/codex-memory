@@ -13,19 +13,24 @@ const {
   DATA_TOOL_NAMES,
   GOVERNED_READ_ATTEMPT_READ_TOOLS,
   RENDER_TOOL_NAMES,
+  ZERO_MEMORY_COUNTERS,
   createChatGptEdgeDataResponseV2,
   createGovernedReadFailureLegacyContent,
   createPrincipalAssertion,
   createRequestEnvelope,
   canonicalJson,
   digestObject,
+  contextResolutionPublicResponseStatus,
+  contextResolutionResponseBindingDigest,
   governedReadAttemptResponseBindingDigest,
   governedReadTerminalResponseStatus,
   projectGovernedReadAttemptPublic,
+  projectGovernedContextResolutionPublic,
   projectLegacyCountersFromGovernedReadAttempt,
   projectLegacyCountersFromGovernedReadAttemptPublic,
   validateCounters,
   validateGovernedReadAttemptProtocol,
+  validateGovernedContextResolutionProtocol,
   validateGovernedReadResponseStatus,
   validateLegacyResponseCountersAgainstAttemptPublic,
   validateToolStructuredContent,
@@ -35,7 +40,9 @@ const {
 } = require('../../packages/chatgpt-r4-contracts');
 const {
   GOVERNED_ATTEMPT_FAILURE_RESULT_KIND,
-  GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND
+  GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND,
+  GOVERNED_CONTEXT_RESOLUTION_RESPONSE_RESULT_KIND,
+  GOVERNED_CONTEXT_RESOLUTION_TERMINAL_RESULT_KIND
 } = require('./transient-request-broker');
 const {
   MEMORY_SCOPE_WIDGET_HTML,
@@ -176,6 +183,7 @@ function createMcpProtocolServer({
       signing: edgeSigning
     });
     let response;
+    let responseUnconfirmed = false;
     try {
       await broker.submit(envelope);
       response = await broker.waitForResult(envelope.request_id, {
@@ -183,14 +191,22 @@ function createMcpProtocolServer({
         timeoutMs: responseTimeoutMs
       });
     } catch (error) {
-      throw safeMcpError(error, 'edge_governed_read_unavailable');
+      if (name === 'resolve_memory_context' &&
+          isUnconfirmedResolverError(error)) {
+        response = createUnknownContextResolutionResponse();
+        responseUnconfirmed = true;
+      } else {
+        throw safeMcpError(error, 'edge_governed_read_unavailable');
+      }
     }
-    response = normalizeBrokerResult(
-      name,
-      envelope,
-      response,
-      { verifyBrokerResponse }
-    );
+    if (!responseUnconfirmed) {
+      response = normalizeBrokerResult(
+        name,
+        envelope,
+        response,
+        { verifyBrokerResponse }
+      );
+    }
     const result = {
       content: [{
         type: 'text',
@@ -227,6 +243,70 @@ function normalizeBrokerResult(
   }
   const attemptTool =
     GOVERNED_READ_ATTEMPT_READ_TOOLS.includes(toolName);
+  if (toolName === 'resolve_memory_context') {
+    if (value?.kind === GOVERNED_CONTEXT_RESOLUTION_TERMINAL_RESULT_KIND) {
+      assertExactBrokerResultKeys(value, [
+        'governed_context_resolution',
+        'kind',
+        'request_id',
+        'tool_name'
+      ]);
+      if (value.request_id !== request.request_id ||
+          value.tool_name !== toolName) {
+        reject('edge_context_resolution_response_binding_invalid');
+      }
+      const protocol = validateContextResolutionProtocolRequestBinding(
+        request,
+        value.governed_context_resolution
+      );
+      if (protocol.terminal.outcome !== 'failure' ||
+          protocol.terminal.evidence_complete !== false) {
+        reject('edge_context_resolution_response_result_required');
+      }
+      return createUnknownContextResolutionResponse();
+    }
+    if (value?.kind !== GOVERNED_CONTEXT_RESOLUTION_RESPONSE_RESULT_KIND) {
+      reject('edge_context_resolution_response_result_required');
+    }
+    assertExactBrokerResultKeys(value, [
+      'governed_context_resolution',
+      'kind',
+      'request_id',
+      'response',
+      'tool_name'
+    ]);
+    if (value.request_id !== request.request_id ||
+        value.tool_name !== toolName) {
+      reject('edge_context_resolution_response_binding_invalid');
+    }
+    const protocol = validateContextResolutionProtocolRequestBinding(
+      request,
+      value.governed_context_resolution
+    );
+    verifyBrokerResponse(value.response, request);
+    const publicStatus = contextResolutionPublicResponseStatus(
+      protocol.terminal
+    );
+    const expectedContextStatus = publicStatus === 'ok'
+      ? 'resolved'
+      : publicStatus;
+    const expectedBinding = contextResolutionResponseBindingDigest({
+      requestDigest: digestObject(request),
+      resolutionRef: protocol.header.resolution_ref,
+      terminalDigest: protocol.terminal.terminal_digest,
+      structuredContentDigest: digestObject(value.response.structured_content)
+    });
+    if (value.response.status !== publicStatus ||
+        value.response.structured_content?.context_status !==
+          expectedContextStatus ||
+        canonicalJson(value.response.structured_content?.resolution) !==
+          canonicalJson(projectGovernedContextResolutionPublic(protocol)) ||
+        value.response.receipt_chain?.relay !== expectedBinding) {
+      reject('edge_context_resolution_response_binding_invalid');
+    }
+    validateNormalizedBrokerData(toolName, value.response);
+    return value.response;
+  }
   if (!attemptTool) {
     if (value?.kind === GOVERNED_ATTEMPT_FAILURE_RESULT_KIND ||
         value?.kind === GOVERNED_ATTEMPT_RESPONSE_RESULT_KIND ||
@@ -318,6 +398,53 @@ function normalizeBrokerResult(
   return normalized;
 }
 
+function createUnknownContextResolutionResponse() {
+  const value = Object.freeze({
+    status: 'unavailable',
+    structured_content: createChatGptEdgeDataResponseV2({
+      toolName: 'resolve_memory_context',
+      structuredContent: { context_status: 'unavailable' },
+      allowUnknownContextResolution: true
+    }),
+    counters: { ...ZERO_MEMORY_COUNTERS },
+    receipt_chain_digest: digestObject({
+      protocol: 'governed_context_resolution.v1',
+      public_evidence_complete: false
+    })
+  });
+  validateNormalizedBrokerData('resolve_memory_context', value);
+  return value;
+}
+
+function isUnconfirmedResolverError(error) {
+  return new Set([
+    'context_resolution_coordinator_lost',
+    'context_resolution_not_found',
+    'context_resolution_terminal_missing',
+    'edge_context_resolution_response_missing',
+    'edge_context_resolution_terminal_missing',
+    'edge_request_cancelled',
+    'edge_request_expired',
+    'edge_request_not_completed',
+    'edge_response_timeout'
+  ]).has(error?.code);
+}
+
+function validateContextResolutionProtocolRequestBinding(request, protocol) {
+  try {
+    validateGovernedContextResolutionProtocol(protocol);
+    if (protocol.header.operation !== 'resolve_memory_context' ||
+        protocol.header.request_digest !== digestObject(request) ||
+        Date.parse(protocol.header.deadline_at) >
+          Date.parse(request.expires_at)) {
+      reject('edge_context_resolution_response_binding_invalid');
+    }
+  } catch {
+    reject('edge_context_resolution_response_binding_invalid');
+  }
+  return protocol;
+}
+
 function assertExactBrokerResultKeys(value, expected) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     reject('edge_broker_result_shape_invalid');
@@ -405,6 +532,9 @@ function resultCount(content) {
 
 function modelVisibleResultText(name, response) {
   if (name === 'resolve_memory_context') {
+    if (response.structured_content?.resolution?.evidence_complete === false) {
+      return 'Governed resolve_memory_context could not establish complete terminal evidence. Context status is unavailable; project context reference was not issued. Do not retry or infer a failure reason.';
+    }
     if (response.status === 'ok') {
       return 'Receipt-bound governed project context status: resolved. GOVERNED RESULT RECEIPT: bound. Project context reference: issued. Use it for exactly one read tool chosen by the user intent; do not resolve again.';
     }
@@ -432,11 +562,14 @@ function modelVisibleErrorText(errorCode) {
 }
 
 function receiptPresentation(name, response) {
+  const evidenceComplete = name === 'resolve_memory_context'
+    ? response.structured_content?.resolution?.evidence_complete
+    : true;
   const contextReferenceStatus = name === 'resolve_memory_context'
     ? (response.status === 'ok' ? 'issued' : 'not_issued')
     : 'not_applicable';
   return {
-    result_receipt_status: 'bound',
+    result_receipt_status: evidenceComplete === false ? 'unconfirmed' : 'bound',
     context_reference_status: contextReferenceStatus,
     raw_receipt_values_returned: false
   };
@@ -460,9 +593,12 @@ function safeMcpError(error, fallback) {
 
 module.exports = {
   createExternalMcpHandler,
+  createUnknownContextResolutionResponse,
   createMcpProtocolServer,
   normalizeBrokerResult,
+  validateContextResolutionProtocolRequestBinding,
   validateNormalizedBrokerData,
+  isUnconfirmedResolverError,
   modelVisibleErrorText,
   modelVisibleResultText,
   receiptPresentation,

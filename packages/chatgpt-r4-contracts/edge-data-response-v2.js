@@ -17,6 +17,12 @@ const {
   validateGovernedReadAttemptPublicProjection,
   validateGovernedReadAttemptWorkingSet
 } = require('./governed-read-attempt');
+const {
+  contextResolutionPublicResponseStatus,
+  projectGovernedContextResolutionPublic,
+  projectUnknownGovernedContextResolutionPublic,
+  validateGovernedContextResolutionProtocol
+} = require('./governed-context-resolution');
 
 function governedReadTerminalResponseStatus(terminal) {
   if (!isPlainObject(terminal) ||
@@ -49,22 +55,58 @@ function validateGovernedReadResponseStatus(status, terminal) {
 function createChatGptEdgeDataResponseV2({
   toolName,
   structuredContent,
-  governedReadAttempt = null
+  governedReadAttempt = null,
+  governedContextResolution = null,
+  allowUnknownContextResolution = false
 } = {}) {
   if (!isPlainObject(structuredContent)) {
     reject('response_structured_content_shape_invalid');
   }
   if (Object.hasOwn(structuredContent, 'schema_version') ||
-      Object.hasOwn(structuredContent, 'attempt')) {
+      Object.hasOwn(structuredContent, 'attempt') ||
+      Object.hasOwn(structuredContent, 'resolution')) {
     reject('response_structured_content_shape_invalid');
   }
   if (toolName === 'resolve_memory_context') {
     if (governedReadAttempt !== null) {
       reject('edge_data_response_attempt_forbidden');
     }
+    if (governedContextResolution === null) {
+      if (allowUnknownContextResolution !== true ||
+          structuredContent.context_status !== 'unavailable' ||
+          Object.hasOwn(structuredContent, 'project_context_ref')) {
+        reject('edge_data_response_context_resolution_unknown_invalid');
+      }
+      return deepFreeze({
+        schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
+        ...structuredClone(structuredContent),
+        resolution: projectUnknownGovernedContextResolutionPublic()
+      });
+    }
+    if (allowUnknownContextResolution !== false) {
+      reject('edge_data_response_context_resolution_unknown_invalid');
+    }
+    validateGovernedContextResolutionProtocol(governedContextResolution);
+    const terminal = governedContextResolution.terminal;
+    const status = contextResolutionPublicResponseStatus(terminal);
+    const expectedContextStatus = status === 'ok' ? 'resolved' : status;
+    if (structuredContent.context_status !== expectedContextStatus) {
+      reject('edge_data_response_context_resolution_binding_invalid');
+    }
+    if (terminal.outcome === 'success' &&
+        typeof structuredContent.project_context_ref !== 'string') {
+      reject('edge_data_response_context_resolution_binding_invalid');
+    }
+    if (terminal.outcome === 'failure' &&
+        Object.hasOwn(structuredContent, 'project_context_ref')) {
+      reject('edge_data_response_context_resolution_binding_invalid');
+    }
     return deepFreeze({
       schema_version: CHATGPT_EDGE_DATA_SCHEMA_VERSION,
-      ...structuredClone(structuredContent)
+      ...structuredClone(structuredContent),
+      resolution: projectGovernedContextResolutionPublic(
+        governedContextResolution
+      )
     });
   }
   if (!GOVERNED_READ_ATTEMPT_READ_TOOLS.includes(toolName) ||

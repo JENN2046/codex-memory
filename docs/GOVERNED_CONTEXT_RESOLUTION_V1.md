@@ -1,7 +1,7 @@
 # Governed Context Resolution v1
 
-Status: resolver terminal wiring active in source; public terminal projection,
-runtime rebind, and readiness claims remain pending
+Status: resolver terminal wiring and public terminal projection active in
+source; runtime rebind and readiness claims remain pending
 
 Task: `CM-2159 / governed_read_attempt_refactor`
 
@@ -16,11 +16,12 @@ protocol therefore uses one immutable `resolution_ref` and never creates an
 `attempt_ref`. It is intentionally separate from `governed_read_attempt.v1`.
 
 The contract is wired through the source-level Edge broker, Relay processor,
-Governance resolver, and context issuer. Each resolver operation now receives
-one internal terminal candidate under this protocol. It does not alter a tool
-descriptor, public input or output schema, runtime binding, lifecycle state,
-provider path, or memory path. In particular, the existing public resolver
-response remains status-only until the separate public-projection change.
+Governance resolver, and context issuer. Each resolver operation receives one
+internal terminal candidate under this protocol. The source-level public
+`resolve_memory_context` output now adds its low-disclosure terminal projection;
+tool names and resolver input schema remain unchanged. This change does not
+rebind runtime source, change lifecycle state, call a provider, or enter a
+memory path.
 
 ## Ordered evidence
 
@@ -69,6 +70,8 @@ scope_resolved: true | false | null
 context_ref_issued: true | false | null
 context_ref_shape_valid: true | false | null
 context_ref_unexpired: true | false | null
+context_ref_entered_response: true | false | null
+context_ref_delivered: true | false | null
 read_attempt_created: false
 ```
 
@@ -94,6 +97,61 @@ allowlists.
 
 `terminal_missing` is registered for safe Observer attribution but cannot be a
 terminal candidate. It records a protocol violation only.
+
+Each failure-registry entry also declares whether its canonical
+reason/category/stage/origin facts are safe for this public projection. Edge
+and Relay use that one registry declaration; they do not maintain a second
+public-reason allowlist.
+
+## Public response-v2 projection
+
+The signed `resolve_memory_context` response now contains its existing context
+fields plus the following low-disclosure `resolution` object:
+
+```yaml
+resolution:
+  protocol: governed_context_resolution.v1
+  outcome: success | failure
+  last_completed_stage: STAGE | null
+  failed_stage: STAGE | null
+  reason_code: safe_code | null
+  failure_category: safe_category | null
+  failure_origin: safe_origin | null
+  context_ref_issued: true | false | null
+  context_ref_entered_response: true | false | null
+  context_ref_delivered: true | false | null
+  evidence_complete: true | false
+```
+
+It excludes `resolution_ref`, terminal and receipt digests, project mapping,
+context token contents, paths, registry internals, counters, provider facts,
+and raw response data. A successful response requires `context_status:
+resolved`, a syntactically valid unexpired `project_context_ref`,
+`context_ref_issued: true`, `context_ref_entered_response: true`, and
+`context_ref_delivered: true`. Governance proves issuance, Relay proves that
+the ref entered public content, and Edge verifies the signed content/binding,
+clones it, records low-disclosure digest evidence, and only then permits
+terminal CAS. For a response finalization or projection failure, issuance
+remains true while inclusion and delivery are explicitly false at
+`RESPONSE_FINALIZED`; it is never relabelled as issuance failure.
+
+Relay signs a binding digest over the request digest, `resolution_ref`,
+terminal digest, and public structured-content digest. Edge re-derives that
+binding before terminal CAS and emits low-disclosure response-verification
+evidence. Observer independently reconciles that evidence with the terminal
+and public projection without retaining a context ref or response body. The
+external MCP validator verifies the Relay signature and independently
+re-derives the protocol, projection, status, and binding before exposing
+output. A relayed v2 resolver response without canonical terminal evidence,
+and every v1 response, is rejected.
+
+When evidence is genuinely incomplete, only the external Edge's explicit
+terminal-result wrapper or confirmed transport-loss path can locally emit the
+low-disclosure fallback: `context_status: unavailable`,
+`evidence_complete: false`, and `reason_code`, category, and origin all
+`null`. It is unconfirmed rather than Relay-signed/bound. Callers must not
+infer a likely canonical reason. `terminal_missing` remains an Observer
+violation and never becomes a fabricated public terminal.
 
 ## First-terminal CAS
 
@@ -171,15 +229,17 @@ and tamper rejection, malformed and expired refs, post-eviction ref replay,
 missing issuance evidence, cross-request receipt splicing, and fake read-counter
 injection.
 
-Characterization tests pin all six existing ChatGPT Edge tool input/output
-schema digests and prove that this internal wiring leaves the public resolver
-schema unchanged.
+Characterization and external-MCP tests pin all six ChatGPT Edge tool input
+schemas, the five non-resolver outputs, and the resolver's deliberate output
+projection. They cover terminal/public-content splicing, request/ref injection,
+terminal-digest tampering, response-content tampering, v1/status-only
+downgrade rejection, first-terminal competition, and Observer missing-terminal
+non-fabrication.
 
 ## Non-claims
 
-This source-level terminal wiring does not:
+This source-level terminal wiring and public projection do not:
 
-- add resolver terminal receipts to the public Edge response v2;
 - call `resolve_memory_context`, a provider, a search tool, or private memory;
 - rebind, start, stop, restart, deploy, release, or publish a runtime;
 - create or authorize a governed read attempt;
