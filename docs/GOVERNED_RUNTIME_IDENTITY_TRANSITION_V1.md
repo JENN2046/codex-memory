@@ -116,6 +116,11 @@ digest. Loss reporting is scoped to that exact owner, so one failed coordinator
 cannot terminalize a live peer's prepared transition in a shared record store;
 restart supervision must reuse the failed coordinator's governed owner digest
 to audit its reservations.
+Before loss reporting emits any missing-terminal event, it first reconciles the
+authoritative state's `last_transition`. A CAS that succeeded before readback
+failure is therefore recovered and finalized as success; an unavailable or
+contradictory authority state fails closed instead of converting that
+reservation into a permanent `lost` marker.
 Coordinator-loss reporting enumerates durable reservations, reports each
 missing terminal, and never fabricates a default failure terminal. Once its
 missing event is synchronously acknowledged, the reservation is atomically

@@ -1352,7 +1352,43 @@ test('13b1. retry recovers committed success after repeated readback faults', ()
   assert.equal(run.observer.snapshot().terminal_successes, 1);
 });
 
-test('13b1a. retry recovers its success after a later legal commit', () => {
+test('13b1a. loss audit recovers success before reporting missing', () => {
+  const state = initialState();
+  let current = structuredClone(state);
+  let postCommitReadFailures = 0;
+  const store = {
+    snapshot() {
+      if (postCommitReadFailures > 0) {
+        postCommitReadFailures -= 1;
+        throw new Error('synthetic-loss-audit-readback-fault');
+      }
+      return structuredClone(current);
+    },
+    compareAndSwap(expectedVersion, candidate) {
+      assert.equal(expectedVersion, current.store_version);
+      current = structuredClone(candidate);
+      postCommitReadFailures = 2;
+      return true;
+    }
+  };
+  const run = harness({ state, store });
+  const request = requestFor(state);
+  const prepared = run.coordinator.preview(request);
+  assert.throws(
+    () => run.coordinator.commit(prepared.preview),
+    { code: 'transition_post_commit_state_recovery_failed' }
+  );
+
+  assert.deepEqual(run.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 0,
+    terminals_fabricated: 0
+  });
+  assert.equal(run.recordStore.get(request.transition_ref).status, 'terminal');
+  assert.equal(run.observer.snapshot().terminals_missing, 0);
+  assert.equal(run.observer.snapshot().terminal_successes, 1);
+});
+
+test('13b1b. retry recovers its success after a later legal commit', () => {
   const state = initialState();
   const recordStore = createTransitionRecordStore();
   let current = structuredClone(state);

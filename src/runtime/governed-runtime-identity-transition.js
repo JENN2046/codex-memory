@@ -2196,6 +2196,12 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   }
 
   function reportCoordinatorLoss() {
+    // A failed post-CAS readback can leave this owner's record reserved even
+    // though the authoritative state already proves success. Recover that
+    // terminal before classifying any reservation as coordinator loss; if the
+    // state cannot be read or reconciled, fail closed without emitting a
+    // contradictory missing-terminal event.
+    recoverLastTransitionRecord();
     flushPendingObserverEvents();
     const pendingMissingRefs = new Set(
       transitionRecordStore.pendingObserverEvents()
