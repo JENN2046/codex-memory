@@ -831,8 +831,12 @@ function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound =
     /^\s*(?:but|yet|although|however|and)\b\s*,?\s*/i,
     ""
   );
-  const coordination = withoutTransition.match(/\b(?:and|but|yet)\b([^.!?;]*)$/i);
-  const subjectWindow = coordination ? coordination[1] : withoutTransition;
+  const withoutParenthetical = withoutTransition.replace(
+    /^\s*(?:(?:according\s+to|per|as\s+(?:documented|noted|reported)\s+by)\b[^,\n]{1,80},\s*)+/i,
+    ""
+  );
+  const coordination = withoutParenthetical.match(/\b(?:and|but|yet)\b([^.!?;]*)$/i);
+  const subjectWindow = coordination ? coordination[1] : withoutParenthetical;
   const modifiers = String.raw`(?:(?:actually|currently|directly|ever|explicitly|falsely|incorrectly|now|still|wrongly)\s+){0,2}`;
   const auxiliary = String.raw`(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|need|shall|should)(?:\s+(?:not|no\s+longer))?|(?:don't|doesn't|didn't|hasn't|haven't|hadn't|isn't|aren't|wasn't|weren't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't)|never|cannot|no\s+longer|ought(?:\s+not|n't)\s+to)`;
   const functionWordsOnly = new RegExp(`^\\s*${modifiers}(?:${auxiliary}\\s+${modifiers})?$`, "i");
@@ -842,9 +846,15 @@ function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound =
   );
   if (branchSubject.test(subjectWindow)) return true;
   if (functionWordsOnly.test(subjectWindow)) {
-    return (coordination || leadingCoordination) && previousSubjectIsBranchBound !== null
-      ? previousSubjectIsBranchBound
-      : true;
+    if ((coordination || leadingCoordination) && previousSubjectIsBranchBound !== null) {
+      return previousSubjectIsBranchBound;
+    }
+    if (coordination) {
+      const leadingClause = withoutParenthetical.slice(0, coordination.index);
+      const explicitForeignSubject = /^\s*(?:`?[\p{L}\p{N}_./-]+\.(?:md|json|ya?ml|txt)`?\b|(?:the|a|an|this|that)\s+(?!(?:current\s+task\s+)?branch\b))/iu;
+      return !explicitForeignSubject.test(leadingClause);
+    }
+    return true;
   }
   return false;
 }
@@ -852,7 +862,9 @@ function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound =
 function containsAffirmativeAuthorityContinuation(text, suffix, suffixStart) {
   const lineEnd = suffix.indexOf("\n");
   const lineSuffix = lineEnd === -1 ? suffix : suffix.slice(0, lineEnd);
-  const transition = lineSuffix.match(/\b(?:but|yet|although|however|and)\b[^.!?;]*/i);
+  const transition = lineSuffix.match(
+    /\b(?:but|yet|although|however|and)\b(?:[^.!?;]|\.(?=[\p{L}\p{N}_]))*/iu
+  );
   if (transition) {
     const predicatePattern = new RegExp(`\\b(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\\b`, "gi");
     let previousPredicateEnd = 0;

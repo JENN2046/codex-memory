@@ -1306,6 +1306,8 @@ test("current facts validator permits unknown branch-state guidance", () => {
       "The current task branch is unknown, but CURRENT_STATE.md provides canonical status.",
       "The current task branch is unresolved, yet STATUS.md will determine its own summary.",
       "The current task branch is unknown, but CURRENT_STATE.md provides and determines canonical status.",
+      "The current task branch is unknown, but CURRENT_STATE.md reads metadata and provides canonical status.",
+      "The current task branch is unknown, but CURRENT_STATE.md quotes \"provides\" and determines canonical status.",
       "The current task branch is unresolved; query whether it provides status."
   ]) {
     const root = workspace();
@@ -1326,7 +1328,8 @@ test("current facts validator rejects authority assertions after unknown-state t
     "The current task branch is unknown but no longer doubts it provides canonical status.",
     "The current task branch is unknown but does not provide and determines active identity.",
     "The current task branch is unknown but it provides the canonical status.",
-    "The current task branch is unresolved yet the current task branch determines active identity."
+    "The current task branch is unresolved yet the current task branch determines active identity.",
+    "The current task branch is unknown but, according to CURRENT_STATE.md, provides canonical status."
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
