@@ -1219,6 +1219,10 @@ test("current facts validator rejects qualified branch-relative assertions", () 
       "The current task branch records the active state. Does anything else?",
       "The current task branch records the active state; why would it change?",
       "The current task branch records the text \"why?\" as metadata.",
+      "The current task branch does record the active state.",
+      "The current task branch will provide canonical status.",
+      "The current task branch can determine active identity.",
+      "The current task branch will still directly provide canonical status.",
       "The current task branch records the active state—why query Git?",
       "The current task branch records the active state, doesn't it?",
       ""
@@ -1287,6 +1291,9 @@ test("current facts validator permits directly negated branch predicates", () =>
       "The current task branch contains no current facts.",
       "The current task branch holds neither authority nor status.",
       "The current task branch now points to no canonical state.",
+      "The current task branch does not record active state.",
+      "The current task branch will not provide canonical status.",
+      "The current task branch can't determine active identity.",
       ""
     ].join("\n"),
     "utf8"

@@ -149,11 +149,12 @@ const STALE_ACTIVE_PHRASES = Object.freeze([
   "next exact-head CI pending"
 ]);
 const BRANCH_AUTHORITY_PREDICATE_SOURCE = String.raw`is|was|remains?|has|records?|contains?|holds?|owns?|tracks?|stores?|persists?|keeps?|represents?|identifies?|points?\s+to|serves?\s+as|acts?\s+as|functions?\s+as|provides?|supplies?|defines?|declares?|establishes?|determines?|governs?|controls?|authorizes?`;
+const BRANCH_AUTHORITY_AUXILIARY_SOURCE = String.raw`do|does|did|has|have|had|will|would|can|could|may|might|must|need|shall|should|ought\s+to`;
 const STALE_ACTIVE_ASSERTIONS = Object.freeze([
   Object.freeze({
     phrase: "current task branch",
     pattern: new RegExp(
-      String.raw`\bcurrent task branch\s+(?:(?:currently|now)\s+)?(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\b`,
+      String.raw`\bcurrent task branch\s+(?:(?:currently|now)\s+)?(?:(?:${BRANCH_AUTHORITY_AUXILIARY_SOURCE})\s+(?:(?:actually|currently|directly|now|still)\s+){0,2})?(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\b`,
       "gi"
     )
   })
