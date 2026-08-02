@@ -1221,6 +1221,20 @@ test("current facts validator rejects qualified branch-relative assertions", () 
   assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
 });
 
+test("current facts validator does not let unrelated question marks hide branch assertions", () => {
+  for (const staleText of [
+    "The current task branch records the text \"why? \" as metadata.",
+    "The current task branch records the active state\nDoes anything else?"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
 test("current facts validator fails closed when baseline objects are unreadable", () => {
   const root = workspace();
   const gitRunner = (_root, args) => {

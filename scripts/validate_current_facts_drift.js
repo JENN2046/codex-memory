@@ -789,6 +789,17 @@ function isInsideQuotedSegment(text, index) {
   );
 }
 
+function firstUnquotedClauseTerminator(text, startIndex) {
+  const lineEndCandidate = text.indexOf("\n", startIndex);
+  const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+  for (let index = startIndex; index < lineEnd; index += 1) {
+    if (".!?;".includes(text[index]) && !isInsideQuotedSegment(text, index)) {
+      return text[index];
+    }
+  }
+  return null;
+}
+
 function containsStaleAssertion(text, assertion) {
   for (const match of text.matchAll(assertion.pattern)) {
     if (isInsideQuotedSegment(text, match.index)) continue;
@@ -800,9 +811,9 @@ function containsStaleAssertion(text, assertion) {
       text.lastIndexOf("?", match.index - 1)
     ) + 1;
     const prefix = text.slice(clauseStart, match.index);
-    const suffix = text.slice(match.index + match[0].length);
-    const clauseTerminator = suffix.match(/[.!?;](?=\s|$)/);
-    if (clauseTerminator && clauseTerminator[0] === "?") continue;
+    const suffixStart = match.index + match[0].length;
+    const suffix = text.slice(suffixStart);
+    if (firstUnquotedClauseTerminator(text, suffixStart) === "?") continue;
     if (/\b(?:do not|don't|never|must not|should not|cannot|can't)\b[^.!?;]*$/i.test(prefix)) {
       continue;
     }
