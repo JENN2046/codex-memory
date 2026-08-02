@@ -544,6 +544,7 @@ test('profile-gate CLI should fail require-pass when thresholds are missed', asy
   const dataDir = path.join(tempBasePath, 'data');
   const dbPath = path.join(dataDir, 'codex-memory.sqlite');
   const suitePath = path.join(tempBasePath, 'suite.json');
+  const unavailableSuitePath = path.join(tempBasePath, 'unavailable-suite.json');
   const currentFingerprint = 'bge-m3-local__1024__gate-fail-test';
   const baselineFingerprint = 'baseline-model__1024__v1';
 
@@ -559,6 +560,18 @@ test('profile-gate CLI should fail require-pass when thresholds are missed', asy
       },
       queries: [
         { id: 'alpha', query: 'alpha migration' }
+      ]
+    }), 'utf8');
+    await fs.writeFile(unavailableSuitePath, JSON.stringify({
+      name: 'unavailable-metrics-suite',
+      limit: 3,
+      thresholds: {
+        minAverageJaccard: 1,
+        minAverageOverlap: 1,
+        allowNoBaseline: false
+      },
+      queries: [
+        { id: 'gamma', query: 'gamma only' }
       ]
     }), 'utf8');
 
@@ -616,6 +629,28 @@ test('profile-gate CLI should fail require-pass when thresholds are missed', asy
     assert.equal(payload.summary.averageOverlap, 0);
     assert.equal(payload.checks.some(check => check.code === 'average-jaccard-low'), true);
     assert.equal(payload.checks.some(check => check.code === 'average-overlap-low'), true);
+
+    const unavailableResult = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/profile-gate.js',
+      args: ['--suite', unavailableSuitePath, '--baseline-fingerprint', baselineFingerprint, '--json', '--require-pass'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'gate-fail-test'
+      }
+    });
+    assert.equal(unavailableResult.code, 1);
+    const unavailablePayload = JSON.parse(unavailableResult.stdout);
+    assert.equal(unavailablePayload.status, 'fail');
+    assert.equal(unavailablePayload.summary.averageJaccard, null);
+    assert.equal(unavailablePayload.summary.averageOverlap, null);
+    assert.equal(unavailablePayload.summary.comparableStatus, 'lexical-only');
+    assert.equal(unavailablePayload.checks.some(check => check.code === 'average-jaccard-unavailable'), true);
+    assert.equal(unavailablePayload.checks.some(check => check.code === 'average-overlap-unavailable'), true);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }

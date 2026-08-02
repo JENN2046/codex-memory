@@ -164,6 +164,24 @@ function evaluateGate(compare, suite, options) {
     });
   }
 
+  if (!['no-baseline', 'no-queries'].includes(compare.status) &&
+      averageJaccard === null && thresholds.minAverageJaccard > 0) {
+    checks.push({
+      level: 'fail',
+      code: 'average-jaccard-unavailable',
+      message: 'Average Jaccard is unavailable because no query has non-empty current and baseline results.'
+    });
+  }
+
+  if (!['no-baseline', 'no-queries'].includes(compare.status) &&
+      averageOverlap === null && thresholds.minAverageOverlap > 0) {
+    checks.push({
+      level: 'fail',
+      code: 'average-overlap-unavailable',
+      message: 'Average overlap is unavailable because no query has non-empty current and baseline results.'
+    });
+  }
+
   if (averageJaccard !== null && averageJaccard < thresholds.minAverageJaccard) {
     checks.push({
       level: 'fail',
