@@ -19,7 +19,9 @@ const {
   validateGovernedRuntimeIdentityTransitionProtocol,
   validateRuntimeIdentity,
   validateRuntimeIdentityTransitionPreview,
-  validateRuntimeIdentityTransitionRequest
+  validateRuntimeIdentityTransitionReceipt,
+  validateRuntimeIdentityTransitionRequest,
+  validateRuntimeIdentityTransitionTerminal
 } = require('../../packages/chatgpt-r4-contracts');
 
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
@@ -398,6 +400,152 @@ function createTransitionRecordStore(initialRecords = [], {
     }
   }
 
+  function validateObserverEventStream(record) {
+    const entries = [
+      ...record.observer_delivered_events,
+      ...record.observer_outbox
+    ].sort((left, right) => left.sequence - right.sequence);
+    let request = null;
+    const receipts = [];
+    let previewSeen = false;
+    let atomicSeen = false;
+    let atomicTerminal = null;
+    let terminalSeen = false;
+    for (const entry of entries) {
+      const envelope = entry.envelope;
+      if (envelope.event === 'transition_accepted') {
+        if (!exactKeys(envelope, [
+          'component', 'event', 'transition_ref', 'request'
+        ]) || request !== null || terminalSeen) {
+          reject('transition_record_store_invalid');
+        }
+        validateRuntimeIdentityTransitionRequest(envelope.request);
+        if (envelope.request.transition_ref !== record.transition_ref ||
+            runtimeIdentityTransitionRequestDigest(envelope.request) !==
+              record.request_digest) {
+          reject('transition_record_store_invalid');
+        }
+        request = envelope.request;
+      } else if (envelope.event === 'transition_receipt_appended') {
+        if (!exactKeys(envelope, [
+          'component', 'event', 'transition_ref', 'receipt'
+        ]) || request === null || terminalSeen) {
+          reject('transition_record_store_invalid');
+        }
+        validateRuntimeIdentityTransitionReceipt(envelope.receipt, {
+          request,
+          receipts
+        });
+        receipts.push(envelope.receipt);
+      } else if (envelope.event === 'transition_preview_formed') {
+        if (!exactKeys(envelope, [
+          'component',
+          'event',
+          'transition_ref',
+          'preview'
+        ]) || request === null || previewSeen || atomicSeen || terminalSeen) {
+          reject('transition_record_store_invalid');
+        }
+        validateRuntimeIdentityTransitionPreview(envelope.preview);
+        if (canonicalJson(envelope.preview.request) !== canonicalJson(request) ||
+            canonicalJson(envelope.preview.receipts) !==
+              canonicalJson(receipts)) {
+          reject('transition_record_store_invalid');
+        }
+        previewSeen = true;
+      } else if (envelope.event === 'transition_atomic_commit') {
+        if (!exactKeys(envelope, [
+          'component',
+          'event',
+          'transition_ref',
+          'protocol',
+          'accepted_runtime',
+          'controller_binding',
+          'store_version',
+          'previous_state_digest',
+          'state_digest',
+          'state_projection'
+        ]) || request === null || !previewSeen || atomicSeen || terminalSeen ||
+            !Number.isSafeInteger(envelope.store_version) ||
+            envelope.store_version < 1) {
+          reject('transition_record_store_invalid');
+        }
+        validateGovernedRuntimeIdentityTransitionProtocol(envelope.protocol);
+        validateRuntimeIdentity(envelope.accepted_runtime);
+        validateControllerBinding(envelope.controller_binding);
+        validateGovernedRuntimeIdentityState(envelope.state_projection);
+        assertDigest(
+          envelope.previous_state_digest,
+          'transition_record_store_invalid'
+        );
+        assertDigest(envelope.state_digest, 'transition_record_store_invalid');
+        const expectedRuntime = createTransitionRuntimeIdentity({
+          fromRuntime: request.from_runtime,
+          toRuntime: request.to_runtime,
+          transitionRef: request.transition_ref
+        });
+        const expectedBinding = stableControllerBinding(
+          request,
+          expectedRuntime
+        );
+        if (envelope.transition_ref !== record.transition_ref ||
+            canonicalJson(envelope.protocol.request) !==
+              canonicalJson(request) ||
+            canonicalJson(envelope.protocol.receipts) !==
+              canonicalJson(receipts) ||
+            envelope.protocol.terminal.outcome !== 'success' ||
+            canonicalJson(envelope.accepted_runtime) !==
+              canonicalJson(expectedRuntime) ||
+            canonicalJson(envelope.controller_binding) !==
+              canonicalJson(expectedBinding) ||
+            envelope.store_version !== envelope.state_projection.store_version ||
+            envelope.previous_state_digest !==
+              envelope.state_projection.last_transition
+                ?.previous_state_digest ||
+            envelope.state_digest !== digestObject(envelope.state_projection) ||
+            canonicalJson(envelope.accepted_runtime) !== canonicalJson(
+              envelope.state_projection.accepted_runtime
+            ) ||
+            canonicalJson(envelope.controller_binding) !== canonicalJson(
+              envelope.state_projection.controller_binding
+            ) ||
+            canonicalJson(envelope.protocol) !== canonicalJson(
+              envelope.state_projection.last_transition?.protocol
+            )) {
+          reject('transition_record_store_invalid');
+        }
+        atomicSeen = true;
+        atomicTerminal = envelope.protocol.terminal;
+      } else if (envelope.event === 'transition_terminal_committed') {
+        if (!exactKeys(envelope, [
+          'component', 'event', 'transition_ref', 'terminal'
+        ]) || request === null || terminalSeen) {
+          reject('transition_record_store_invalid');
+        }
+        validateRuntimeIdentityTransitionTerminal(envelope.terminal, {
+          request,
+          receipts
+        });
+        if ((envelope.terminal.outcome === 'success') !== atomicSeen ||
+            (atomicSeen && canonicalJson(envelope.terminal) !== canonicalJson(
+              atomicTerminal
+            ))) {
+          reject('transition_record_store_invalid');
+        }
+        terminalSeen = true;
+      } else if (envelope.event === 'transition_terminal_missing') {
+        if (!exactKeys(envelope, [
+          'component', 'event', 'transition_ref'
+        ]) || request === null || atomicSeen || terminalSeen) {
+          reject('transition_record_store_invalid');
+        }
+        terminalSeen = true;
+      } else {
+        reject('transition_record_store_invalid');
+      }
+    }
+  }
+
   function validateRecord(record) {
     if (!exactKeys(record, [
       'transition_ref',
@@ -434,6 +582,7 @@ function createTransitionRecordStore(initialRecords = [], {
         )) {
       reject('transition_record_store_invalid');
     }
+    validateObserverEventStream(record);
     assertDigest(record.request_digest, 'transition_record_store_invalid');
     if ((record.previous_state_digest !== null &&
           !DIGEST_PATTERN.test(record.previous_state_digest))) {
@@ -581,11 +730,15 @@ function createTransitionRecordStore(initialRecords = [], {
       reject('transition_record_store_context_mismatch');
     }
     const stored = structuredClone(envelope);
-    current.observer_outbox.push({
+    const nextEntry = {
       sequence: nextObserverSequence,
       event_digest: digestObject(stored),
       envelope: stored
-    });
+    };
+    const candidate = structuredClone(current);
+    candidate.observer_outbox.push(structuredClone(nextEntry));
+    validateRecord(candidate);
+    current.observer_outbox.push(nextEntry);
     nextObserverSequence += 1;
     return true;
   }
@@ -989,12 +1142,33 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       reject('transition_record_store_recovery_failed');
     }
     if (recoveryRecord.previous_state_digest !== null) {
+      const preparedReceiptIndex = recoveryProtocol.receipts.findIndex(
+        receipt => receipt.stage === 'TRANSITION_PREPARED'
+      );
+      const preparedReceipts = recoveryProtocol.receipts.slice(
+        0,
+        preparedReceiptIndex + 1
+      );
+      const recoveryPreview = createRuntimeIdentityTransitionPreview({
+        request: recoveryRequest,
+        receipts: preparedReceipts,
+        expectedStoreVersion: recoveryState.store_version - 1
+      });
       const expectedEvents = [
         observerEnvelope('transition_accepted', {
           request: recoveryRequest
         }),
-        ...recoveryProtocol.receipts.map(receipt =>
+        ...preparedReceipts.map(receipt =>
           observerEnvelope('transition_receipt_appended', {
+            transition_ref: recoveryRef,
+            receipt
+          })),
+        observerEnvelope('transition_preview_formed', {
+          transition_ref: recoveryRef,
+          preview: recoveryPreview
+        }),
+        ...recoveryProtocol.receipts.slice(preparedReceiptIndex + 1)
+          .map(receipt => observerEnvelope('transition_receipt_appended', {
             transition_ref: recoveryRef,
             receipt
           })),
@@ -1570,7 +1744,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     });
     emit('transition_preview_formed', {
       transition_ref: request.transition_ref,
-      preview_context_digest: formed.preview_context_digest
+      preview: formed
     });
     return deepFreeze({ status: 'prepared', preview: formed });
   }

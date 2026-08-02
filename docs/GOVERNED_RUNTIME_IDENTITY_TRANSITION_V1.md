@@ -233,6 +233,13 @@ canonical order. Active reservations also restore their delivered prefix when
 the outbox is empty, ensuring a later coordinator-loss report has an active
 Observer record to close. Archived protocol lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
+Persisted envelopes use a closed event registry with exact payload shapes.
+Unknown event names, missing required payloads, invalid receipt chains, and
+malformed atomic projections are rejected during store reconstruction and
+before live enqueue, so they cannot wedge the global FIFO.
+`transition_preview_formed` persists the complete canonical preview rather
+than an unauditable standalone digest, allowing reconstruction to validate its
+request, receipt prefix, expected store version, and context digest together.
 An unacknowledged new admission is discarded from the outbox and terminalized
 without Observer emission, so it cannot head-block terminal events for already
 active transitions. Event sinks must explicitly declare
@@ -272,6 +279,9 @@ When an Observer starts from a committed authoritative state, it derives the
 exact canonical event set for that state's `last_transition` and acknowledges
 matching pending envelopes idempotently. Events that do not match the state
 remain subject to ordinary validation and rejection.
+For every atomic event, the top-level `previous_state_digest` must also equal
+`state_projection.last_transition.previous_state_digest`; the Observer never
+anchors a projection to a different predecessor than the event it verified.
 
 The unique failure registry includes:
 

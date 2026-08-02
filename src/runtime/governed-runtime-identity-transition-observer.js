@@ -4,12 +4,14 @@ const {
   GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN,
   canonicalJson,
   createGovernedRuntimeIdentityTransitionProtocol,
+  createRuntimeIdentityTransitionPreview,
   createRuntimeIdentityTransitionTerminal,
   createTransitionRuntimeIdentity,
   digestObject,
   reject,
   validateGovernedRuntimeIdentityTransitionProtocol,
   validateRuntimeIdentity,
+  validateRuntimeIdentityTransitionPreview,
   validateRuntimeIdentityTransitionReceipt,
   validateRuntimeIdentityTransitionRequest,
   validateRuntimeIdentityTransitionTerminal
@@ -68,6 +70,18 @@ function createGovernedRuntimeIdentityTransitionObserver({
     if (lastTransitionRef) {
       terminalReplayMarkers.add(lastTransitionRef);
       const protocol = initialAuthoritativeState.last_transition.protocol;
+      const preparedReceiptIndex = protocol.receipts.findIndex(
+        receipt => receipt.stage === 'TRANSITION_PREPARED'
+      );
+      const preparedReceipts = protocol.receipts.slice(
+        0,
+        preparedReceiptIndex + 1
+      );
+      const preview = createRuntimeIdentityTransitionPreview({
+        request: protocol.request,
+        receipts: preparedReceipts,
+        expectedStoreVersion: initialAuthoritativeState.store_version - 1
+      });
       const canonicalEvents = [
         {
           component: 'governed_runtime_identity_transition_coordinator',
@@ -75,7 +89,19 @@ function createGovernedRuntimeIdentityTransitionObserver({
           transition_ref: lastTransitionRef,
           request: structuredClone(protocol.request)
         },
-        ...protocol.receipts.map(receipt => ({
+        ...preparedReceipts.map(receipt => ({
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_receipt_appended',
+          transition_ref: lastTransitionRef,
+          receipt: structuredClone(receipt)
+        })),
+        {
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_preview_formed',
+          transition_ref: lastTransitionRef,
+          preview: structuredClone(preview)
+        },
+        ...protocol.receipts.slice(preparedReceiptIndex + 1).map(receipt => ({
           component: 'governed_runtime_identity_transition_coordinator',
           event: 'transition_receipt_appended',
           transition_ref: lastTransitionRef,
@@ -242,6 +268,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
               canonicalJson(event.controller_binding) ||
             canonicalJson(event.state_projection.last_transition?.protocol) !==
               canonicalJson(event.protocol) ||
+            event.state_projection.last_transition?.previous_state_digest !==
+              event.previous_state_digest ||
             event.state_projection.lifecycle.lifecycle_state !== 'stopped' ||
             event.state_projection.lifecycle.held_stopped !== true ||
             event.state_projection.lifecycle.running_component_count !== 0 ||
@@ -335,7 +363,20 @@ function createGovernedRuntimeIdentityTransitionObserver({
         violation('terminal_missing');
         return true;
       }
-      if (event.event === 'transition_preview_formed') return true;
+      if (event.event === 'transition_preview_formed') {
+        const record = transitions.get(event.transition_ref);
+        if (!record || record.terminal || record.missing) {
+          return violation('transition_observer_preview_invalid');
+        }
+        validateRuntimeIdentityTransitionPreview(event.preview);
+        if (canonicalJson(event.preview.request) !==
+              canonicalJson(record.request) ||
+            canonicalJson(event.preview.receipts) !==
+              canonicalJson(record.receipts)) {
+          return violation('transition_observer_preview_invalid');
+        }
+        return true;
+      }
       return false;
     } catch (error) {
       return violation(error?.code);

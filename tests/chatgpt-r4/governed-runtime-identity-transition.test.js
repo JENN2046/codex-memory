@@ -1553,6 +1553,23 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
     }]),
     { code: 'transition_record_store_invalid' }
   );
+  const unknownEnvelope = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_unknown_future_event',
+    transition_ref: request.transition_ref
+  };
+  assert.throws(
+    () => createTransitionRecordStore([{
+      ...base,
+      observer_delivered_events: [],
+      observer_outbox: [{
+        sequence: 0,
+        event_digest: digestObject(unknownEnvelope),
+        envelope: unknownEnvelope
+      }]
+    }]),
+    { code: 'transition_record_store_invalid' }
+  );
 });
 
 test('13d3c. a fresh Observer receives the delivered prefix before pending events', () => {
@@ -1920,6 +1937,7 @@ test('17b. Observer binds the final terminal to the verified atomic commit', () 
     accepted_runtime: result.committed.accepted_runtime,
     controller_binding: result.committed.controller_binding,
     store_version: 1,
+    previous_state_digest: digestObject(result.state),
     state_digest: result.committed.state_digest,
     state_projection: result.store.snapshot()
   }), true);
@@ -2085,6 +2103,31 @@ test('17f. Observer binds atomic state to the request safe-stop receipt', () => 
   assert.equal(observer.snapshot().protocol_violations, 1);
 });
 
+test('17f1. Observer binds projected and event previous-state digests', () => {
+  const result = prepareAndCommit();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: result.state
+  });
+  replayObserverPrelude(observer, result);
+  const projection = structuredClone(result.store.snapshot());
+  projection.last_transition.previous_state_digest =
+    digestObject('forged-projected-previous-state');
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: result.request.transition_ref,
+    protocol: result.committed.protocol,
+    accepted_runtime: result.committed.accepted_runtime,
+    controller_binding: result.committed.controller_binding,
+    store_version: projection.store_version,
+    previous_state_digest: digestObject(result.state),
+    state_digest: digestObject(projection),
+    state_projection: projection
+  }), false);
+  assert.equal(observer.snapshot().atomic_commits_verified, 0);
+  assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
 test('17g. Observer verifies one-shot legacy migration consumption', () => {
   const result = prepareAndCommit();
   const observer = createGovernedRuntimeIdentityTransitionObserver();
@@ -2128,6 +2171,7 @@ test('17h. Observer rejects a fork that reuses an authoritative store version', 
     accepted_runtime: first.committed.accepted_runtime,
     controller_binding: first.committed.controller_binding,
     store_version: 1,
+    previous_state_digest: digestObject(first.state),
     state_digest: first.committed.state_digest,
     state_projection: first.store.snapshot()
   }), true);
@@ -2174,6 +2218,7 @@ test('17i. Observer rejects a monotonic version whose from identity is stale', (
     accepted_runtime: first.committed.accepted_runtime,
     controller_binding: first.committed.controller_binding,
     store_version: 1,
+    previous_state_digest: digestObject(first.state),
     state_digest: first.committed.state_digest,
     state_projection: first.store.snapshot()
   }), true);
@@ -2257,6 +2302,7 @@ test('17k. Observer rejects rollback of a consumed legacy migration marker', () 
     accepted_runtime: first.committed.accepted_runtime,
     controller_binding: first.committed.controller_binding,
     store_version: 1,
+    previous_state_digest: digestObject(first.state),
     state_digest: first.committed.state_digest,
     state_projection: first.store.snapshot()
   }), true);
@@ -2543,11 +2589,24 @@ test('18. terminal missing records a violation and fabricates no failure termina
 test('18a. coordinator loss reports durable reservations after recreation', () => {
   const state = initialState();
   const request = requestFor(state);
+  const acceptedEnvelope = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    transition_ref: request.transition_ref,
+    request
+  };
   const recordStore = createTransitionRecordStore([{
     transition_ref: request.transition_ref,
     request_digest: runtimeIdentityTransitionRequestDigest(request),
     status: 'reserved',
-    protocol: null
+    protocol: null,
+    observer_outbox: [],
+    observer_delivered_events: [{
+      sequence: 0,
+      event_digest: digestObject(acceptedEnvelope),
+      envelope: acceptedEnvelope
+    }],
+    previous_state_digest: null
   }], { maxActiveReservations: 1 });
   const events = [];
   const run = harness({
@@ -2564,15 +2623,16 @@ test('18a. coordinator loss reports durable reservations after recreation', () =
     active_transitions_lost: 1,
     terminals_fabricated: 0
   });
-  assert.equal(events.length, 1);
-  assert.equal(events[0].event, 'transition_terminal_missing');
-  assert.equal(events[0].transition_ref, request.transition_ref);
+  assert.equal(events.length, 2);
+  assert.equal(events[0].event, 'transition_accepted');
+  assert.equal(events[1].event, 'transition_terminal_missing');
+  assert.equal(events[1].transition_ref, request.transition_ref);
   assert.equal(recordStore.get(request.transition_ref).status, 'lost');
   assert.deepEqual(run.coordinator.reportCoordinatorLoss(), {
     active_transitions_lost: 0,
     terminals_fabricated: 0
   });
-  assert.equal(events.length, 1);
+  assert.equal(events.length, 2);
 
   const rebuiltRecords = createTransitionRecordStore(recordStore.snapshot());
   const rebuiltEvents = [];
