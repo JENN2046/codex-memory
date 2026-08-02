@@ -148,10 +148,14 @@ const STALE_ACTIVE_PHRASES = Object.freeze([
   "merge remains separate",
   "next exact-head CI pending"
 ]);
+const BRANCH_AUTHORITY_PREDICATE_SOURCE = String.raw`is|was|remains?|has|records?|contains?|holds?|owns?|tracks?|stores?|persists?|keeps?|represents?|identifies?|points?\s+to|serves?\s+as|acts?\s+as|functions?\s+as|provides?|supplies?|defines?|declares?|establishes?|determines?|governs?|controls?|authorizes?`;
 const STALE_ACTIVE_ASSERTIONS = Object.freeze([
   Object.freeze({
     phrase: "current task branch",
-    pattern: /\bcurrent task branch\s+(?:(?:currently|now)\s+)?(is|was|remains?|has|records?|contains?|holds?|owns?|tracks?|stores?|persists?|keeps?|represents?|identifies?|points?\s+to|serves?\s+as|acts?\s+as|functions?\s+as|provides?|supplies?|defines?|declares?|establishes?|determines?|governs?|controls?|authorizes?)\b/gi
+    pattern: new RegExp(
+      String.raw`\bcurrent task branch\s+(?:(?:currently|now)\s+)?(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\b`,
+      "gi"
+    )
   })
 ]);
 const NEGATED_REPORTING_PREFIX_RE = /\b(?:(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|should)\s+not)|(?:don't|doesn't|didn't|hasn't|haven't|hadn't|isn't|aren't|wasn't|weren't|won't|wouldn't|can't|couldn't|mightn't|mustn't|shouldn't)|never|cannot)\s+(?:(?:explicitly|falsely|incorrectly|wrongly|ever)\s+){0,2}(?:claims?|claimed|claiming|states?|stated|stating|asserts?|asserted|asserting|says?|said|saying|reports?|reported|reporting)\s*(?::\s*(?:the\s+)?|\s+(?:(?:that\s+)?(?:the\s+)?|the\s+following\s*:\s*(?:the\s+)?))$/i;
@@ -820,6 +824,25 @@ function firstUnquotedClauseTerminator(text, startIndex) {
   return null;
 }
 
+function containsAffirmativeAuthorityContinuation(text, suffix, suffixStart) {
+  const lineEnd = suffix.indexOf("\n");
+  const lineSuffix = lineEnd === -1 ? suffix : suffix.slice(0, lineEnd);
+  for (const transition of lineSuffix.matchAll(/\b(?:but|yet|although|however|and)\b[^.!?;]*/gi)) {
+    const predicatePattern = new RegExp(`\\b(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\\b`, "gi");
+    for (const predicate of transition[0].matchAll(predicatePattern)) {
+      const predicateIndex = transition.index + predicate.index;
+      if (isInsideQuotedSegment(text, suffixStart + predicateIndex)) continue;
+      const prefix = transition[0].slice(0, predicate.index);
+      const predicateSuffix = transition[0].slice(predicate.index + predicate[0].length);
+      const negatedPrefix = /\b(?:(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|should)\s+not)|never|cannot|can't)(?:\s+[a-z-]+){0,2}\s*$/i.test(prefix);
+      const queriedPrefix = /\b(?:whether|if)\b[^.!?;]*$/i.test(prefix);
+      const negatedSuffix = /^\s+(?:not(?!\s+only\b)|never|no longer|no|neither)\b/i.test(predicateSuffix);
+      if (!negatedPrefix && !queriedPrefix && !negatedSuffix) return true;
+    }
+  }
+  return false;
+}
+
 function containsStaleAssertion(text, assertion) {
   for (const match of text.matchAll(assertion.pattern)) {
     if (isInsideMarkdownFence(text, match.index) || isInsideQuotedSegment(text, match.index)) {
@@ -841,7 +864,8 @@ function containsStaleAssertion(text, assertion) {
     }
     if (/\b(?:whether|if)\s+(?:the\s+)?$/i.test(prefix)) continue;
     if (/^(?:is|was|remains?)$/i.test(match[1]) &&
-        /^\s+(?:(?:currently|still)\s+)?(?:unknown|unavailable|unverified|undetermined|unresolved|unspecified|not known|yet to be (?:determined|queried|verified))\b/i.test(suffix)) {
+        /^\s+(?:(?:currently|still)\s+)?(?:unknown|unavailable|unverified|undetermined|unresolved|unspecified|not known|yet to be (?:determined|queried|verified))\b/i.test(suffix) &&
+        !containsAffirmativeAuthorityContinuation(text, suffix, suffixStart)) {
       continue;
     }
     if (/^\s+(?:not(?!\s+only\b)|never|no longer|no|neither)\b/i.test(suffix)) continue;

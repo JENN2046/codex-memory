@@ -1295,12 +1295,29 @@ test("current facts validator permits unknown branch-state guidance", () => {
       "The current task branch remains unverified until Git is queried.",
       "The current task branch is still unavailable to this document.",
       "The current task branch is yet to be determined.",
+      "The current task branch is unknown but does not provide canonical status.",
+      "The current task branch is unresolved; query whether it provides status.",
       ""
     ].join("\n"),
     "utf8"
   );
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects authority assertions after unknown-state transitions", () => {
+  for (const staleText of [
+    "The current task branch is unknown but provides the canonical status.",
+    "The current task branch is unresolved, yet serves as the current authority.",
+    "The current task branch is still unavailable although it determines the active identity."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
 });
 
 test("current facts validator rejects equivalent affirmative branch-authority predicates", () => {
