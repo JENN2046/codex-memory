@@ -53,6 +53,7 @@ Long-term goal and boundary documents:
 - [ChatGPT Web R5-O Relay Completion, Tool Routing, And Explicit Visibility](docs/CHATGPT_WEB_R5O_RELAY_ROUTING_EXPLICIT_VISIBILITY.md)
 - [ChatGPT Web R5-O Public Contract Independent Review](docs/CHATGPT_WEB_R5O_PUBLIC_CONTRACT_INDEPENDENT_REVIEW.md)
 - [CM-2157 Canonical Relay Observer Wiring](docs/CM2157_CANONICAL_RELAY_OBSERVER_WIRING.md)
+- [Governed Runtime Identity Transition v1](docs/GOVERNED_RUNTIME_IDENTITY_TRANSITION_V1.md)
 - [Near-Model Memory Plan Pack](docs/near-model-memory-plan-pack/00_README.md)
 - [Memory Access Contract](docs/MEMORY_ACCESS_CONTRACT.md)
 

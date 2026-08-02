@@ -27,7 +27,7 @@ the Edge v2 hard cut. PR `#76` head `912a5c05...` was squash-merged as
 runtime identity, and v2/attempt-v1/v1-rejection. Single-use R5-O `_005`
 received no usable project_context_ref; search_memory was not invoked and no
 attempt terminal exists. Its canonical reason remains unknown and is not
-inferred. `_005` is consumed; no retry or readiness claim is authorized.
+inferred. `_005` is consumed; no retry or readiness claim is authorized. The current task branch adds dormant, transport-neutral `governed_runtime_identity_transition.v1` contract, atomic CAS coordinator, independent Observer, one-time legacy authority migration, and synthetic attack tests. This is source-only construction: no live controller wiring, identity transition, lifecycle action, accepted runtime fact change, blocker closure, or readiness claim.
 
 ## Last Accepted Product Baseline
 

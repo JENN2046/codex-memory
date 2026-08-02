@@ -1,0 +1,728 @@
+'use strict';
+
+const {
+  GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN,
+  canonicalJson,
+  createGovernedRuntimeIdentityTransitionProtocol,
+  createRuntimeIdentityTransitionPreview,
+  createRuntimeIdentityTransitionTerminal,
+  createTransitionRuntimeIdentity,
+  digestObject,
+  isPlainObject,
+  reject,
+  validateGovernedRuntimeIdentityTransitionProtocol,
+  validateRuntimeIdentity,
+  validateRuntimeIdentityTransitionPreview,
+  validateRuntimeIdentityTransitionReceipt,
+  validateRuntimeIdentityTransitionRequest,
+  validateRuntimeIdentityTransitionTerminal
+} = require('../../packages/chatgpt-r4-contracts');
+const {
+  DEFAULT_ACTIVE_TRANSITION_LIMIT,
+  stableControllerBinding,
+  validateControllerBinding,
+  validateGovernedRuntimeIdentityState
+} = require('./governed-runtime-identity-transition');
+
+const SAFE_CODE = /^[a-z][a-z0-9_]{0,79}$/u;
+const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
+
+function exactKeys(value, expected) {
+  if (!isPlainObject(value)) return false;
+  const actual = Object.keys(value).sort();
+  const wanted = [...expected].sort();
+  return actual.length === wanted.length &&
+    actual.every((key, index) => key === wanted[index]);
+}
+
+function createGovernedRuntimeIdentityTransitionObserver({
+  maxRetainedTransitions = DEFAULT_ACTIVE_TRANSITION_LIMIT,
+  initialTerminalReplayMarkers = [],
+  initialAuthoritativeState = null
+} = {}) {
+  if (!Number.isInteger(maxRetainedTransitions) ||
+      maxRetainedTransitions < 1 || maxRetainedTransitions > 4096 ||
+      !Array.isArray(initialTerminalReplayMarkers)) {
+    reject('transition_observer_capacity_invalid');
+  }
+  const transitions = new Map();
+  const terminalHistory = new Map();
+  const provisionalHistoricalTerminals = new Map();
+  const terminalReplayMarkers = new Set();
+  const acknowledgedEventsByTransition = new Map();
+
+  function acknowledgeEvent(event) {
+    const transitionRef = event?.transition_ref;
+    const eventDigest = digestObject(event);
+    const transitionEvents =
+      acknowledgedEventsByTransition.get(transitionRef) || new Map();
+    transitionEvents.set(eventDigest, structuredClone(event));
+    acknowledgedEventsByTransition.set(
+      transitionRef,
+      transitionEvents
+    );
+  }
+  let lastAuthoritativeCommit = null;
+  let initialAuthoritativeAnchor = null;
+  let authoritativeReplayMarkerRef = null;
+  let historicalCheckpointRef = null;
+  let historicalReplayCommit = null;
+  let pendingHistoricalAtomicCount = 0;
+  let pendingHistoricalTerminalCount = 0;
+  if (initialAuthoritativeState !== null) {
+    validateGovernedRuntimeIdentityState(initialAuthoritativeState);
+    lastAuthoritativeCommit = {
+      accepted_runtime: structuredClone(
+        initialAuthoritativeState.accepted_runtime
+      ),
+      controller_binding: structuredClone(
+        initialAuthoritativeState.controller_binding
+      ),
+      lifecycle: structuredClone(initialAuthoritativeState.lifecycle),
+      legacy_migration: structuredClone(
+        initialAuthoritativeState.legacy_migration
+      ),
+      store_version: initialAuthoritativeState.store_version,
+      state_digest: digestObject(initialAuthoritativeState)
+    };
+    initialAuthoritativeAnchor = {
+      ...structuredClone(lastAuthoritativeCommit),
+      previous_state_digest:
+        initialAuthoritativeState.last_transition?.previous_state_digest ??
+          null,
+      from_runtime: structuredClone(
+        initialAuthoritativeState.last_transition?.protocol?.request
+          ?.from_runtime ?? null
+      )
+    };
+    const lastTransitionRef =
+      initialAuthoritativeState.last_transition?.protocol?.request
+        ?.transition_ref;
+    if (lastTransitionRef) {
+      authoritativeReplayMarkerRef = lastTransitionRef;
+      terminalReplayMarkers.add(lastTransitionRef);
+      const protocol = initialAuthoritativeState.last_transition.protocol;
+      const preparedReceiptIndex = protocol.receipts.findIndex(
+        receipt => receipt.stage === 'TRANSITION_PREPARED'
+      );
+      const preparedReceipts = protocol.receipts.slice(
+        0,
+        preparedReceiptIndex + 1
+      );
+      const preview = createRuntimeIdentityTransitionPreview({
+        request: protocol.request,
+        receipts: preparedReceipts,
+        expectedStoreVersion: initialAuthoritativeState.store_version - 1
+      });
+      const canonicalEvents = [
+        {
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_accepted',
+          transition_ref: lastTransitionRef,
+          request: structuredClone(protocol.request)
+        },
+        ...preparedReceipts.map(receipt => ({
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_receipt_appended',
+          transition_ref: lastTransitionRef,
+          receipt: structuredClone(receipt)
+        })),
+        {
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_preview_formed',
+          transition_ref: lastTransitionRef,
+          preview: structuredClone(preview)
+        },
+        ...protocol.receipts.slice(preparedReceiptIndex + 1).map(receipt => ({
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_receipt_appended',
+          transition_ref: lastTransitionRef,
+          receipt: structuredClone(receipt)
+        })),
+        {
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_atomic_commit',
+          transition_ref: lastTransitionRef,
+          protocol: structuredClone(protocol),
+          accepted_runtime: structuredClone(
+            initialAuthoritativeState.accepted_runtime
+          ),
+          controller_binding: structuredClone(
+            initialAuthoritativeState.controller_binding
+          ),
+          store_version: initialAuthoritativeState.store_version,
+          previous_state_digest:
+            initialAuthoritativeState.last_transition.previous_state_digest,
+          state_digest: digestObject(initialAuthoritativeState),
+          state_projection: structuredClone(initialAuthoritativeState)
+        },
+        {
+          component: 'governed_runtime_identity_transition_coordinator',
+          event: 'transition_terminal_committed',
+          transition_ref: lastTransitionRef,
+          terminal: structuredClone(protocol.terminal)
+        }
+      ];
+      for (const event of canonicalEvents) {
+        acknowledgeEvent(event);
+      }
+    }
+  }
+  const counters = {
+    transitions_accepted: 0,
+    receipts_accepted: 0,
+    atomic_commits_verified: 0,
+    terminal_successes: 0,
+    terminal_failures: 0,
+    terminals_missing: 0,
+    protocol_violations: 0,
+    fatal_inconsistencies: 0,
+    unknown_evidence_receipts: 0
+  };
+  let lastViolationCode = null;
+
+  function violation(code) {
+    counters.protocol_violations += 1;
+    lastViolationCode = typeof code === 'string' && SAFE_CODE.test(code)
+      ? code
+      : 'transition_observer_protocol_invalid';
+    return false;
+  }
+
+  function hasTerminalReplayCapacity(transitionRef) {
+    if (terminalReplayMarkers.has(transitionRef)) return true;
+    const retainedMarkerCount = terminalReplayMarkers.size -
+      (authoritativeReplayMarkerRef !== null &&
+        terminalReplayMarkers.has(authoritativeReplayMarkerRef) ? 1 : 0) -
+      (historicalCheckpointRef !== null &&
+        terminalReplayMarkers.has(historicalCheckpointRef) ? 1 : 0);
+    return retainedMarkerCount < maxRetainedTransitions;
+  }
+
+  function compactOldestHistoricalTerminal() {
+    let selected = provisionalHistoricalTerminals.entries().next().value;
+    if (!selected) {
+      selected = [...terminalHistory.entries()].find(([, record]) =>
+        record.historical_replay
+      );
+    }
+    if (!selected) return false;
+    const [transitionRef] = selected;
+    provisionalHistoricalTerminals.delete(transitionRef);
+    terminalHistory.delete(transitionRef);
+    if (historicalCheckpointRef !== null &&
+        historicalCheckpointRef !== transitionRef) {
+      terminalReplayMarkers.delete(historicalCheckpointRef);
+      acknowledgedEventsByTransition.delete(historicalCheckpointRef);
+    }
+    historicalCheckpointRef = transitionRef;
+    return true;
+  }
+
+  function ensureTerminalReplayCapacity(transitionRef) {
+    if (hasTerminalReplayCapacity(transitionRef)) return true;
+    return compactOldestHistoricalTerminal() &&
+      hasTerminalReplayCapacity(transitionRef);
+  }
+
+  function retainTerminal(transitionRef, record) {
+    transitions.delete(transitionRef);
+    provisionalHistoricalTerminals.delete(transitionRef);
+    terminalReplayMarkers.add(transitionRef);
+    terminalHistory.set(transitionRef, record);
+    while (terminalHistory.size > maxRetainedTransitions) {
+      terminalHistory.delete(terminalHistory.keys().next().value);
+    }
+  }
+
+  function retainVerifiedTerminal(transitionRef, record) {
+    if (record.terminal.outcome === 'success') {
+      counters.terminal_successes += 1;
+    } else {
+      counters.terminal_failures += 1;
+    }
+    if (record.terminal.fatal_inconsistency) {
+      counters.fatal_inconsistencies += 1;
+    }
+    retainTerminal(transitionRef, record);
+  }
+
+  function observeOnce(event) {
+    if (!event || typeof event !== 'object' || Array.isArray(event) ||
+        event.component !==
+          'governed_runtime_identity_transition_coordinator') {
+      return false;
+    }
+    try {
+      if (event.event === 'transition_accepted') {
+        if (!exactKeys(event, [
+          'component', 'event', 'transition_ref', 'request'
+        ])) {
+          return violation('transition_observer_accept_invalid');
+        }
+        validateRuntimeIdentityTransitionRequest(event.request);
+        if (event.transition_ref !== event.request.transition_ref) {
+          return violation('transition_observer_accept_ref_mismatch');
+        }
+        if (transitions.has(event.request.transition_ref) ||
+            provisionalHistoricalTerminals.has(
+              event.request.transition_ref
+            ) ||
+            terminalReplayMarkers.has(event.request.transition_ref)) {
+          return violation('transition_observer_duplicate_accept');
+        }
+        if (transitions.size >= maxRetainedTransitions) {
+          return violation('transition_observer_capacity_exceeded');
+        }
+        transitions.set(event.request.transition_ref, {
+          request: structuredClone(event.request),
+          receipts: [],
+          preview: null,
+          terminal: null,
+          atomic_commit: null,
+          atomic_verified: false,
+          historical_replay: false,
+          missing: false
+        });
+        counters.transitions_accepted += 1;
+        return true;
+      }
+      if (event.event === 'transition_receipt_appended') {
+        if (!exactKeys(event, [
+          'component', 'event', 'transition_ref', 'receipt'
+        ])) {
+          return violation('transition_observer_receipt_invalid');
+        }
+        const record = transitions.get(event.transition_ref);
+        if (!record || record.terminal || record.missing) {
+          return violation('transition_observer_receipt_without_active_transition');
+        }
+        validateRuntimeIdentityTransitionReceipt(event.receipt, {
+          request: record.request,
+          receipts: record.receipts
+        });
+        record.receipts.push(structuredClone(event.receipt));
+        counters.receipts_accepted += 1;
+        if (event.receipt.evidence_status === 'unknown') {
+          counters.unknown_evidence_receipts += 1;
+        }
+        return true;
+      }
+      if (event.event === 'transition_atomic_commit') {
+        if (!exactKeys(event, [
+          'component',
+          'event',
+          'transition_ref',
+          'protocol',
+          'accepted_runtime',
+          'controller_binding',
+          'store_version',
+          'previous_state_digest',
+          'state_digest',
+          'state_projection'
+        ])) {
+          return violation('transition_observer_atomic_commit_invalid');
+        }
+        const record = transitions.get(event.transition_ref);
+        if (!record || record.terminal || record.missing ||
+            record.atomic_commit || !record.preview) {
+          return violation('transition_observer_atomic_commit_invalid');
+        }
+        validateGovernedRuntimeIdentityTransitionProtocol(event.protocol);
+        validateRuntimeIdentity(event.accepted_runtime);
+        validateControllerBinding(event.controller_binding);
+        validateGovernedRuntimeIdentityState(event.state_projection);
+        const derivedRuntime = createTransitionRuntimeIdentity({
+          fromRuntime: record.request.from_runtime,
+          toRuntime: record.request.to_runtime,
+          transitionRef: record.request.transition_ref
+        });
+        const derivedBinding = stableControllerBinding(
+          record.request,
+          derivedRuntime
+        );
+        const historicalReplay = initialAuthoritativeAnchor !== null &&
+          event.store_version < initialAuthoritativeAnchor.store_version;
+        const chainAnchor = historicalReplay
+          ? historicalReplayCommit
+          : lastAuthoritativeCommit;
+        const closesHistoricalPrefix = historicalReplay &&
+          event.store_version ===
+            initialAuthoritativeAnchor.store_version - 1;
+        if (event.protocol.terminal.outcome !== 'success' ||
+            canonicalJson(event.protocol.request) !==
+              canonicalJson(record.request) ||
+            canonicalJson(event.protocol.receipts) !==
+              canonicalJson(record.receipts) ||
+            canonicalJson(event.accepted_runtime) !==
+              canonicalJson(derivedRuntime) ||
+            canonicalJson(event.controller_binding) !==
+              canonicalJson(derivedBinding) ||
+            event.protocol.terminal.new_runtime_identity_digest !==
+              event.accepted_runtime.identity_digest ||
+            event.protocol.terminal.controller_binding_digest !==
+              event.controller_binding.binding_digest ||
+            event.controller_binding.accepted_runtime_identity_digest !==
+              event.accepted_runtime.identity_digest ||
+            !Number.isSafeInteger(event.store_version) ||
+            event.store_version < 1 ||
+            record.preview.expected_store_version + 1 !==
+              event.store_version ||
+            (chainAnchor !== null &&
+              (event.store_version !==
+                chainAnchor.store_version + 1 ||
+                event.previous_state_digest !==
+                  chainAnchor.state_digest ||
+                canonicalJson(record.request.from_runtime) !== canonicalJson(
+                  chainAnchor.accepted_runtime
+                ) ||
+                canonicalJson(event.state_projection.lifecycle) !==
+                  canonicalJson(chainAnchor.lifecycle) ||
+                (chainAnchor.controller_binding.model ===
+                  'stable_controller_authority.v1' &&
+                  (record.request.authority.authority_id !==
+                    chainAnchor.controller_binding.authority_id ||
+                    record.request.authority.authority_lineage_digest !==
+                      chainAnchor.controller_binding
+                        .authority_lineage_digest)))) ||
+            (historicalReplay &&
+              (canonicalJson(event.state_projection.lifecycle) !==
+                canonicalJson(initialAuthoritativeAnchor.lifecycle) ||
+                canonicalJson(event.state_projection.legacy_migration) !==
+                  canonicalJson(
+                    initialAuthoritativeAnchor.legacy_migration
+                  ) ||
+                (initialAuthoritativeAnchor.controller_binding.model ===
+                  'stable_controller_authority.v1' &&
+                  (event.controller_binding.authority_id !==
+                    initialAuthoritativeAnchor.controller_binding.authority_id ||
+                    event.controller_binding.authority_lineage_digest !==
+                      initialAuthoritativeAnchor.controller_binding
+                        .authority_lineage_digest)) ||
+                (closesHistoricalPrefix &&
+                  (event.state_digest !==
+                    initialAuthoritativeAnchor.previous_state_digest ||
+                    canonicalJson(event.accepted_runtime) !== canonicalJson(
+                      initialAuthoritativeAnchor.from_runtime
+                    ))))) ||
+            event.state_projection.store_version !== event.store_version ||
+            canonicalJson(event.state_projection.accepted_runtime) !==
+              canonicalJson(event.accepted_runtime) ||
+            canonicalJson(event.state_projection.controller_binding) !==
+              canonicalJson(event.controller_binding) ||
+            canonicalJson(event.state_projection.last_transition?.protocol) !==
+              canonicalJson(event.protocol) ||
+            event.state_projection.last_transition?.previous_state_digest !==
+              event.previous_state_digest ||
+            event.state_projection.lifecycle.lifecycle_state !== 'stopped' ||
+            event.state_projection.lifecycle.held_stopped !== true ||
+            event.state_projection.lifecycle.running_component_count !== 0 ||
+            event.state_projection.lifecycle.safe_stop_receipt_digest !==
+              record.request.preconditions.safe_stop_receipt_digest ||
+            (record.request.legacy_transition_evidence !== null &&
+              (event.state_projection.legacy_migration.consumed !== true ||
+                event.state_projection.legacy_migration.evidence_digest !==
+                  digestObject(
+                    record.request.legacy_transition_evidence
+                  ))) ||
+            (chainAnchor !== null &&
+              record.request.legacy_transition_evidence === null &&
+              canonicalJson(event.state_projection.legacy_migration) !==
+                canonicalJson(chainAnchor.legacy_migration)) ||
+            !DIGEST_PATTERN.test(event.state_digest || '') ||
+            digestObject(event.state_projection) !== event.state_digest) {
+          return violation('transition_observer_atomic_commit_invalid');
+        }
+        record.atomic_commit = {
+          accepted_runtime: structuredClone(event.accepted_runtime),
+          controller_binding: structuredClone(event.controller_binding),
+          lifecycle: structuredClone(event.state_projection.lifecycle),
+          protocol: structuredClone(event.protocol),
+          store_version: event.store_version,
+          state_digest: event.state_digest
+        };
+        record.historical_replay = historicalReplay;
+        const verifiedCommit = {
+          accepted_runtime: structuredClone(event.accepted_runtime),
+          controller_binding: structuredClone(event.controller_binding),
+          lifecycle: structuredClone(event.state_projection.lifecycle),
+          legacy_migration: structuredClone(
+            event.state_projection.legacy_migration
+          ),
+          store_version: event.store_version,
+          state_digest: event.state_digest
+        };
+        if (historicalReplay) {
+          historicalReplayCommit = verifiedCommit;
+          pendingHistoricalAtomicCount += 1;
+          if (closesHistoricalPrefix) {
+            counters.atomic_commits_verified += pendingHistoricalAtomicCount;
+            counters.terminal_successes += pendingHistoricalTerminalCount;
+            for (const records of [
+              [...transitions.entries()],
+              [...provisionalHistoricalTerminals.entries()]
+            ]) {
+              for (const [transitionRef, historicalRecord] of records) {
+                if (!historicalRecord.historical_replay ||
+                    historicalRecord.atomic_verified) {
+                  continue;
+                }
+                historicalRecord.atomic_verified = true;
+                if (historicalRecord.terminal) {
+                  retainTerminal(transitionRef, historicalRecord);
+                }
+              }
+            }
+            pendingHistoricalAtomicCount = 0;
+            pendingHistoricalTerminalCount = 0;
+          }
+        } else {
+          lastAuthoritativeCommit = verifiedCommit;
+          record.atomic_verified = true;
+          counters.atomic_commits_verified += 1;
+        }
+        return true;
+      }
+      if (event.event === 'transition_terminal_committed') {
+        if (!exactKeys(event, [
+          'component', 'event', 'transition_ref', 'terminal'
+        ])) {
+          return violation('transition_observer_terminal_invalid');
+        }
+        const record = transitions.get(event.transition_ref);
+        if (!record || record.terminal || record.missing) {
+          return violation('transition_observer_terminal_without_active_transition');
+        }
+        validateRuntimeIdentityTransitionTerminal(event.terminal, {
+          request: record.request,
+          receipts: record.receipts
+        });
+        const independentlyDerived = createRuntimeIdentityTransitionTerminal({
+          request: record.request,
+          receipts: record.receipts,
+          outcome: event.terminal.outcome,
+          reasonCode: event.terminal.reason_code,
+          newRuntimeIdentityDigest:
+            event.terminal.new_runtime_identity_digest,
+          controllerBindingDigest:
+            event.terminal.controller_binding_digest,
+          runtimeStopped: event.terminal.runtime_stopped
+        });
+        if (canonicalJson(independentlyDerived) !==
+            canonicalJson(event.terminal) ||
+            (event.terminal.outcome === 'success' && !record.atomic_commit) ||
+            (record.atomic_commit &&
+              (event.terminal.outcome !== 'success' ||
+                canonicalJson(event.terminal) !== canonicalJson(
+                  record.atomic_commit.protocol.terminal
+                )))) {
+          return violation('transition_observer_terminal_reconciliation_invalid');
+        }
+        if (!ensureTerminalReplayCapacity(event.transition_ref)) {
+          return violation('transition_observer_capacity_exceeded');
+        }
+        record.terminal = structuredClone(event.terminal);
+        if (record.historical_replay && !record.atomic_verified) {
+          transitions.delete(event.transition_ref);
+          terminalReplayMarkers.add(event.transition_ref);
+          provisionalHistoricalTerminals.set(event.transition_ref, record);
+          pendingHistoricalTerminalCount += 1;
+          return true;
+        }
+        retainVerifiedTerminal(event.transition_ref, record);
+        return true;
+      }
+      if (event.event === 'transition_terminal_missing') {
+        if (!exactKeys(event, [
+          'component', 'event', 'transition_ref'
+        ])) {
+          return violation('transition_observer_terminal_missing_invalid');
+        }
+        const record = transitions.get(event.transition_ref);
+        if (!record || record.terminal || record.missing) {
+          return violation('transition_observer_terminal_missing_invalid');
+        }
+        if (!ensureTerminalReplayCapacity(event.transition_ref)) {
+          return violation('transition_observer_capacity_exceeded');
+        }
+        record.missing = true;
+        counters.terminals_missing += 1;
+        retainTerminal(event.transition_ref, record);
+        violation('terminal_missing');
+        return true;
+      }
+      if (event.event === 'transition_preview_formed') {
+        if (!exactKeys(event, [
+          'component', 'event', 'transition_ref', 'preview'
+        ])) {
+          return violation('transition_observer_preview_invalid');
+        }
+        const record = transitions.get(event.transition_ref);
+        if (!record || record.terminal || record.missing ||
+            record.atomic_commit || record.preview) {
+          return violation('transition_observer_preview_invalid');
+        }
+        validateRuntimeIdentityTransitionPreview(event.preview);
+        if (canonicalJson(event.preview.request) !==
+              canonicalJson(record.request) ||
+            canonicalJson(event.preview.receipts) !==
+              canonicalJson(record.receipts)) {
+          return violation('transition_observer_preview_invalid');
+        }
+        record.preview = structuredClone(event.preview);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      return violation(error?.code);
+    }
+  }
+
+  function observe(event) {
+    if (!isPlainObject(event)) return false;
+    let eventDigest;
+    try {
+      eventDigest = digestObject(event);
+    } catch {
+      return false;
+    }
+    if (acknowledgedEventsByTransition.get(event.transition_ref)
+      ?.has(eventDigest)) {
+      return true;
+    }
+    const accepted = observeOnce(event);
+    if (accepted === true) {
+      acknowledgeEvent(event);
+    }
+    return accepted;
+  }
+
+  function restoreTerminalReplayMarkers(markers) {
+    const restoredRefs = new Set();
+    const restoredDigests = new Set();
+    for (const marker of markers) {
+      if (!exactKeys(marker, ['transition_ref', 'acknowledged_events']) ||
+          !GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN.test(
+            marker.transition_ref || ''
+          ) ||
+          !Array.isArray(marker.acknowledged_events) ||
+          marker.acknowledged_events.length === 0 ||
+          restoredRefs.has(marker.transition_ref)) {
+        reject('transition_observer_replay_markers_invalid');
+      }
+      restoredRefs.add(marker.transition_ref);
+      for (const event of marker.acknowledged_events) {
+        let eventDigest;
+        try {
+          eventDigest = digestObject(event);
+        } catch {
+          reject('transition_observer_replay_markers_invalid');
+        }
+        if (!isPlainObject(event) ||
+            event.transition_ref !== marker.transition_ref ||
+            restoredDigests.has(eventDigest) || observe(event) !== true) {
+          reject('transition_observer_replay_markers_invalid');
+        }
+        restoredDigests.add(eventDigest);
+      }
+      const acknowledged = [
+        ...(acknowledgedEventsByTransition.get(marker.transition_ref)
+          ?.values() || [])
+      ];
+      if (!terminalReplayMarkers.has(marker.transition_ref) ||
+          canonicalJson(acknowledged) !==
+            canonicalJson(marker.acknowledged_events)) {
+        reject('transition_observer_replay_markers_invalid');
+      }
+    }
+    if (transitions.size !== 0 || provisionalHistoricalTerminals.size !== 0) {
+      reject('transition_observer_replay_markers_invalid');
+    }
+  }
+
+  function reconcile(transitionRef) {
+    const record = transitions.get(transitionRef) ||
+      provisionalHistoricalTerminals.get(transitionRef) ||
+      terminalHistory.get(transitionRef);
+    if (!record || record.missing || !record.terminal ||
+        (record.historical_replay && !record.atomic_verified)) {
+      reject('transition_terminal_missing');
+    }
+    const protocol = createGovernedRuntimeIdentityTransitionProtocol({
+      request: record.request,
+      receipts: record.receipts,
+      terminal: record.terminal
+    });
+    validateGovernedRuntimeIdentityTransitionProtocol(protocol);
+    return protocol;
+  }
+
+  function snapshot() {
+    return Object.freeze({
+      schema_version: 1,
+      component: 'governed_runtime_identity_transition_observer',
+      ...counters,
+      active_transitions: transitions.size,
+      provisional_historical_transitions:
+        provisionalHistoricalTerminals.size,
+      retained_terminals: terminalHistory.size,
+      terminal_replay_markers: terminalReplayMarkers.size,
+      last_authoritative_store_version:
+        lastAuthoritativeCommit?.store_version ?? null,
+      last_authoritative_state_digest:
+        lastAuthoritativeCommit?.state_digest ?? null,
+      last_accepted_runtime_identity_digest:
+        lastAuthoritativeCommit?.accepted_runtime.identity_digest ?? null,
+      last_violation_code: lastViolationCode,
+      terminals_fabricated: 0,
+      runtime_started: false,
+      repository_changed: false,
+      resolver_called: false,
+      search_called: false,
+      provider_called: false,
+      memory_called: false,
+      raw_paths_retained: false,
+      secret_values_retained: false
+    });
+  }
+
+  function replayMarkers() {
+    const markers = [...terminalReplayMarkers].map((transitionRef, index) => {
+      const acknowledgedEvents = [
+        ...(acknowledgedEventsByTransition.get(transitionRef)?.values() || [])
+      ];
+      const atomicStoreVersion = acknowledgedEvents.find(event =>
+        event.event === 'transition_atomic_commit'
+      )?.store_version ?? null;
+      return {
+        index,
+        atomicStoreVersion,
+        marker: Object.freeze({
+          transition_ref: transitionRef,
+          acknowledged_events: Object.freeze(acknowledgedEvents.map(event =>
+            Object.freeze(structuredClone(event))
+          ))
+        })
+      };
+    });
+    markers.sort((left, right) => {
+      const leftAtomic = left.atomicStoreVersion !== null;
+      const rightAtomic = right.atomicStoreVersion !== null;
+      if (leftAtomic && rightAtomic) {
+        return left.atomicStoreVersion - right.atomicStoreVersion ||
+          left.index - right.index;
+      }
+      if (leftAtomic !== rightAtomic) return leftAtomic ? -1 : 1;
+      return left.index - right.index;
+    });
+    return Object.freeze(markers.map(entry => entry.marker));
+  }
+
+  restoreTerminalReplayMarkers(initialTerminalReplayMarkers);
+
+  return Object.freeze({ observe, reconcile, replayMarkers, snapshot });
+}
+
+module.exports = {
+  createGovernedRuntimeIdentityTransitionObserver
+};

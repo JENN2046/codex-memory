@@ -13,6 +13,7 @@ module.exports = {
   ...require('./self-hosted-binding-amendment'),
   ...require('./governed-failure-registry'),
   ...require('./governed-read-attempt'),
+  ...require('./governed-runtime-identity-transition'),
   ...require('./governed-context-resolution'),
   ...require('./edge-data-response-v2')
 };
