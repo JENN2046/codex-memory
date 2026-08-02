@@ -1311,6 +1311,10 @@ test("current facts validator permits unknown branch-state guidance", () => {
       "The current task branch is unknown, but Git reads metadata and provides canonical status.",
       "The current task branch is unknown, but config.toml reads metadata and provides canonical status.",
       "The current task branch is unknown, but module.v2 quotes \"provides\" and determines canonical status.",
+      "The current task branch is unknown, but branch.md reads metadata and provides canonical status.",
+      "The current task branch is unknown, but Branch.md reads metadata and provides canonical status.",
+      "The current task branch is unknown, but branch-status.md reads metadata and determines status.",
+      "The current task branch is unknown, but It.md reads metadata and provides canonical status.",
       "The current task branch is unresolved; query whether it provides status."
   ]) {
     const root = workspace();
