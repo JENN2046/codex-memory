@@ -111,6 +111,11 @@ construction and every new preview/commit boundary verify or reconstruct that
 index from the atomically committed protocol. No later transition is admitted
 while the preceding CAS terminal is missing from the secondary index, closing
 the crash window between state CAS and index finalization.
+Every reservation also carries an adapter-supplied stable coordinator-owner
+digest. Loss reporting is scoped to that exact owner, so one failed coordinator
+cannot terminalize a live peer's prepared transition in a shared record store;
+restart supervision must reuse the failed coordinator's governed owner digest
+to audit its reservations.
 Coordinator-loss reporting enumerates durable reservations, reports each
 missing terminal, and never fabricates a default failure terminal. Once its
 missing event is synchronously acknowledged, the reservation is atomically
@@ -242,9 +247,12 @@ the outbox is empty, ensuring a later coordinator-loss report has an active
 Observer record to close. Archived protocol lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
 Concurrent recovery uses reserve-or-reread semantics: a loser validates the
-matching reservation established by the winner. Replayed finalization checks
-an existing canonical terminal before appending recovery events, so identical
-recovery cannot duplicate a terminal event stream.
+matching reservation established by the winner. If the winner finalizes after
+that reread but before the loser persists commit context, the loser rereads and
+accepts only a terminal with the exact authoritative protocol and predecessor
+digest. Replayed finalization checks an existing canonical terminal before
+appending recovery events, so identical recovery cannot duplicate a terminal
+event stream.
 Observer delivery sequences are globally unique across every persisted record;
 per-record validity cannot introduce ambiguous equal-position FIFO entries.
 For each archived terminal, the record store also treats its event stream and

@@ -40,6 +40,7 @@ const NOW = new Date('2026-08-01T00:00:00.000Z');
 const SAFE_STOP_DIGEST = digestObject('safe-stop-runtime-A');
 const AUTHORITY_ID = `grauth_${'A'.repeat(24)}`;
 const AUTHORITY_LINEAGE = digestObject('stable-authority-lineage');
+const COORDINATOR_OWNER = digestObject('coordinator-owner-default');
 
 function protocolVersions(suffix = 'a') {
   return {
@@ -184,7 +185,8 @@ function harness({
   store = null,
   proofStore = null,
   recordStore = null,
-  observer = null
+  observer = null,
+  ownerDigest = COORDINATOR_OWNER
 } = {}) {
   const selectedStore = store || createGovernedRuntimeIdentityStateStore(state);
   const selectedProofStore = proofStore || createAuthorityProofReplayStore();
@@ -195,6 +197,7 @@ function harness({
     store: selectedStore,
     authorityProofReplayStore: selectedProofStore,
     transitionRecordStore: selectedRecordStore,
+    coordinatorOwnerDigest: ownerDigest,
     authorityVerifier: authority,
     candidateManifestVerifier: manifest,
     clock,
@@ -880,7 +883,8 @@ test('10c1. archived terminals preserve replay markers without consuming admissi
   });
   assert.equal(recordStore.reserve({
     transition_ref: firstRequest.transition_ref,
-    request_digest: firstDigest
+    request_digest: firstDigest,
+    owner_digest: COORDINATOR_OWNER
   }), true);
   assert.equal(recordStore.finalize({
     transition_ref: firstRequest.transition_ref,
@@ -894,11 +898,13 @@ test('10c1. archived terminals preserve replay markers without consuming admissi
   });
   assert.equal(recordStore.reserve({
     transition_ref: secondRequest.transition_ref,
-    request_digest: runtimeIdentityTransitionRequestDigest(secondRequest)
+    request_digest: runtimeIdentityTransitionRequestDigest(secondRequest),
+    owner_digest: COORDINATOR_OWNER
   }), true);
   assert.equal(recordStore.reserve({
     transition_ref: firstRequest.transition_ref,
-    request_digest: firstDigest
+    request_digest: firstDigest,
+    owner_digest: COORDINATOR_OWNER
   }), false);
   assert.equal(recordStore.get(firstRequest.transition_ref).status, 'terminal');
 });
@@ -909,6 +915,7 @@ test('10d. coordinator recovers a reserved ref index from atomic state protocol'
   const recordStore = createTransitionRecordStore([{
     transition_ref: first.request.transition_ref,
     request_digest: runtimeIdentityTransitionRequestDigest(first.request),
+    owner_digest: COORDINATOR_OWNER,
     status: 'reserved',
     protocol: null
   }]);
@@ -952,6 +959,42 @@ test('10d1. concurrent recovery accepts the matching reservation winner', () => 
   assert.deepEqual(
     durableRecords.get(first.request.transition_ref).protocol,
     first.committed.protocol
+  );
+  assert.deepEqual(
+    rebuilt.coordinator.protocol(first.request.transition_ref),
+    first.committed.protocol
+  );
+});
+
+test('10d1a. recovery rereads a terminal after commit-context race loss', () => {
+  const first = prepareAndCommit();
+  const state = first.store.snapshot();
+  const durableRecords = createTransitionRecordStore();
+  let raceContextWrite = true;
+  const racingRecords = {
+    ...durableRecords,
+    setCommitContext(input) {
+      if (!raceContextWrite) return durableRecords.setCommitContext(input);
+      raceContextWrite = false;
+      durableRecords.setCommitContext(input);
+      durableRecords.finalize({
+        transition_ref: first.request.transition_ref,
+        request_digest: runtimeIdentityTransitionRequestDigest(first.request),
+        protocol: first.committed.protocol
+      });
+      throw new Error('synthetic-context-write-race-loss');
+    }
+  };
+  const rebuiltStore = createGovernedRuntimeIdentityStateStore(state);
+  const rebuilt = harness({
+    state,
+    store: rebuiltStore,
+    recordStore: racingRecords
+  });
+
+  assert.equal(
+    durableRecords.get(first.request.transition_ref).status,
+    'terminal'
   );
   assert.deepEqual(
     rebuilt.coordinator.protocol(first.request.transition_ref),
@@ -1731,6 +1774,7 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
   const base = {
     transition_ref: request.transition_ref,
     request_digest: runtimeIdentityTransitionRequestDigest(request),
+    owner_digest: COORDINATOR_OWNER,
     status: 'reserved',
     protocol: null,
     observer_outbox: [],
@@ -1919,6 +1963,7 @@ test('13d3d. a coordinator without a sink persists the complete event stream', (
     store,
     authorityProofReplayStore: createAuthorityProofReplayStore(),
     transitionRecordStore: recordStore,
+    coordinatorOwnerDigest: COORDINATOR_OWNER,
     authorityVerifier,
     candidateManifestVerifier: manifestVerifier,
     clock: () => NOW
@@ -1950,6 +1995,7 @@ test('13d3e. current authoritative state acknowledges its pending commit events'
     store,
     authorityProofReplayStore: createAuthorityProofReplayStore(),
     transitionRecordStore: recordStore,
+    coordinatorOwnerDigest: COORDINATOR_OWNER,
     authorityVerifier,
     candidateManifestVerifier: manifestVerifier,
     clock: () => NOW
@@ -1976,6 +2022,7 @@ test('13d3f. current state anchors an offline historical commit backlog', () => 
     store,
     authorityProofReplayStore: createAuthorityProofReplayStore(),
     transitionRecordStore: recordStore,
+    coordinatorOwnerDigest: COORDINATOR_OWNER,
     authorityVerifier,
     candidateManifestVerifier: manifestVerifier,
     clock: () => NOW
@@ -3036,6 +3083,7 @@ test('18a. coordinator loss reports durable reservations after recreation', () =
   const recordStore = createTransitionRecordStore([{
     transition_ref: request.transition_ref,
     request_digest: runtimeIdentityTransitionRequestDigest(request),
+    owner_digest: COORDINATOR_OWNER,
     status: 'reserved',
     protocol: null,
     observer_outbox: [],
@@ -3099,8 +3147,52 @@ test('18a. coordinator loss reports durable reservations after recreation', () =
   });
   assert.equal(recordStore.reserve({
     transition_ref: nextRequest.transition_ref,
-    request_digest: runtimeIdentityTransitionRequestDigest(nextRequest)
+    request_digest: runtimeIdentityTransitionRequestDigest(nextRequest),
+    owner_digest: COORDINATOR_OWNER
   }), true);
+});
+
+test('18a1. loss reporting cannot terminate another coordinator owner', () => {
+  const state = initialState();
+  const store = createGovernedRuntimeIdentityStateStore(state);
+  const recordStore = createTransitionRecordStore();
+  const observer = { observe() { return true; } };
+  const coordinatorA = harness({
+    state,
+    store,
+    recordStore,
+    observer,
+    ownerDigest: digestObject('coordinator-owner-A')
+  });
+  const requestA = requestFor(state, {
+    suffix: 'A',
+    proofDigest: digestObject('owner-A-proof')
+  });
+  const previewA = coordinatorA.coordinator.preview(requestA);
+  assert.equal(previewA.status, 'prepared');
+
+  const coordinatorB = harness({
+    state,
+    store,
+    recordStore,
+    observer,
+    ownerDigest: digestObject('coordinator-owner-B')
+  });
+  const requestB = requestFor(state, {
+    suffix: 'B',
+    proofDigest: digestObject('owner-B-proof')
+  });
+  assert.equal(coordinatorB.coordinator.preview(requestB).status, 'prepared');
+  assert.deepEqual(coordinatorB.coordinator.reportCoordinatorLoss(), {
+    active_transitions_lost: 1,
+    terminals_fabricated: 0
+  });
+  assert.equal(recordStore.get(requestB.transition_ref).status, 'lost');
+  assert.equal(recordStore.get(requestA.transition_ref).status, 'reserved');
+  assert.equal(
+    coordinatorA.coordinator.commit(previewA.preview).status,
+    'terminal_success'
+  );
 });
 
 test('18b. an unacknowledged missing event is queued only once', () => {

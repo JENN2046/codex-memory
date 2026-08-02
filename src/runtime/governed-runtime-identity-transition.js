@@ -571,6 +571,7 @@ function createTransitionRecordStore(initialRecords = [], {
     if (!exactKeys(record, [
       'transition_ref',
       'request_digest',
+      'owner_digest',
       'status',
       'protocol',
       'observer_outbox',
@@ -605,6 +606,7 @@ function createTransitionRecordStore(initialRecords = [], {
     }
     const observerStream = validateObserverEventStream(record);
     assertDigest(record.request_digest, 'transition_record_store_invalid');
+    assertDigest(record.owner_digest, 'transition_record_store_invalid');
     if ((record.previous_state_digest !== null &&
           !DIGEST_PATTERN.test(record.previous_state_digest))) {
       reject('transition_record_store_invalid');
@@ -664,11 +666,12 @@ function createTransitionRecordStore(initialRecords = [], {
 
   for (const record of initialRecords) {
     const legacyRecord = exactKeys(record, [
-      'transition_ref', 'request_digest', 'status', 'protocol'
+      'transition_ref', 'request_digest', 'owner_digest', 'status', 'protocol'
     ]);
     const preAnchorOutboxRecord = exactKeys(record, [
       'transition_ref',
       'request_digest',
+      'owner_digest',
       'status',
       'protocol',
       'observer_outbox'
@@ -706,11 +709,16 @@ function createTransitionRecordStore(initialRecords = [], {
     reject('transition_record_store_invalid');
   }
 
-  function reserve({ transition_ref: ref, request_digest: requestDigest } = {}) {
+  function reserve({
+    transition_ref: ref,
+    request_digest: requestDigest,
+    owner_digest: ownerDigest
+  } = {}) {
     if (!TRANSITION_REF_PATTERN.test(ref || '')) {
       reject('transition_record_store_invalid');
     }
     assertDigest(requestDigest, 'transition_record_store_invalid');
+    assertDigest(ownerDigest, 'transition_record_store_invalid');
     if (activeRecords.has(ref) || terminalArchive.has(ref)) return false;
     if (activeRecords.size >= maxActiveReservations) {
       reject('transition_record_store_capacity_exceeded');
@@ -718,6 +726,7 @@ function createTransitionRecordStore(initialRecords = [], {
     activeRecords.set(ref, {
       transition_ref: ref,
       request_digest: requestDigest,
+      owner_digest: ownerDigest,
       status: 'reserved',
       protocol: null,
       observer_outbox: [],
@@ -756,6 +765,7 @@ function createTransitionRecordStore(initialRecords = [], {
     const terminal = {
       transition_ref: ref,
       request_digest: requestDigest,
+      owner_digest: current.owner_digest,
       status: 'terminal',
       protocol: structuredClone(protocol),
       observer_outbox: structuredClone(current.observer_outbox),
@@ -1130,6 +1140,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
   store,
   authorityProofReplayStore,
   transitionRecordStore,
+  coordinatorOwnerDigest,
   authorityVerifier,
   candidateManifestVerifier,
   clock = () => new Date(),
@@ -1144,6 +1155,10 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       typeof authorityProofReplayStore.consume !== 'function') {
     reject('transition_coordinator_authority_proof_store_invalid');
   }
+  assertDigest(
+    coordinatorOwnerDigest,
+    'transition_coordinator_owner_invalid'
+  );
   if (!transitionRecordStore ||
       typeof transitionRecordStore.reserve !== 'function' ||
       typeof transitionRecordStore.finalize !== 'function' ||
@@ -1189,7 +1204,8 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
       const reserved = transitionRecordStore.reserve({
         transition_ref: recoveryRef,
         request_digest:
-          runtimeIdentityTransitionRequestDigest(recoveryRequest)
+          runtimeIdentityTransitionRequestDigest(recoveryRequest),
+        owner_digest: coordinatorOwnerDigest
       });
       if (reserved !== true && reserved !== false) {
         reject('transition_record_store_recovery_failed');
@@ -1211,9 +1227,19 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
             previous_state_digest: recoveryPreviousStateDigest
           });
         } catch {
-          reject('transition_record_store_recovery_failed');
+          const racedRecord = transitionRecordStore.get(recoveryRef);
+          if (racedRecord?.status !== 'terminal' ||
+              racedRecord.previous_state_digest !==
+                recoveryPreviousStateDigest ||
+              canonicalJson(racedRecord.protocol) !==
+                canonicalJson(recoveryProtocol)) {
+            reject('transition_record_store_recovery_failed');
+          }
+          recoveryRecord = racedRecord;
         }
-        recoveryRecord = transitionRecordStore.get(recoveryRef);
+        if (recoveryRecord.status !== 'terminal') {
+          recoveryRecord = transitionRecordStore.get(recoveryRef);
+        }
       }
     }
     if (recoveryRecord.previous_state_digest !==
@@ -1550,7 +1576,8 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     try {
       refReserved = transitionRecordStore.reserve({
         transition_ref: request.transition_ref,
-        request_digest: requestDigest
+        request_digest: requestDigest,
+        owner_digest: coordinatorOwnerDigest
       });
     } catch {
       return terminalFailure(request, [], 'transition_record_store_unavailable', {
@@ -2180,6 +2207,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
     const missingRefs = new Set();
     for (const record of transitionRecordStore.snapshot()) {
       if (record.status === 'reserved' &&
+          record.owner_digest === coordinatorOwnerDigest &&
           !pendingMissingRefs.has(record.transition_ref)) {
         missingRefs.add(record.transition_ref);
       }
