@@ -1250,6 +1250,21 @@ test("current facts validator does not let unrelated negation hide branch assert
   }
 });
 
+test("current facts validator permits bounded negated reporting contexts", () => {
+  for (const guidanceText of [
+    "This document does not claim that the current task branch records the active state.",
+    "Do not explicitly claim that the current task branch records the active state.",
+    "Never falsely assert that the current task branch records the active state.",
+    "Do not claim the following: the current task branch records the active state."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${guidanceText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${guidanceText}\n${result.failures.join("\n")}`);
+  }
+});
+
 test("current facts validator fails closed when baseline objects are unreadable", () => {
   const root = workspace();
   const gitRunner = (_root, args) => {
