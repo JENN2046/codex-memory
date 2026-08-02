@@ -293,7 +293,13 @@ reconstruction nevertheless restores the ordered complete acknowledged event
 envelopes, not bare digests. Every restored envelope is replayed through the
 same acceptance, receipt, preview, atomic-commit, and terminal validation, and
 the restored list must exactly match the complete terminal chain before
-idempotent suppression is enabled.
+idempotent suppression is enabled. The complete-envelope replay ledger retains
+at most `maxRetainedTransitions` terminal transitions in addition to the
+current authoritative-state anchor. When that integrity-preserving ledger is
+full, the Observer applies backpressure before acknowledging another terminal
+or missing-terminal event; it does not evict the record while retaining an
+unbounded hidden event chain, and it does not downgrade to a forgeable bare
+digest marker.
 Persisted envelopes use a closed event registry with exact payload shapes.
 Unknown event names, missing required payloads, invalid receipt chains, and
 malformed atomic projections are rejected during store reconstruction and

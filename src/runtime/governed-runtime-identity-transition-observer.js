@@ -64,6 +64,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
   }
   let lastAuthoritativeCommit = null;
   let initialAuthoritativeAnchor = null;
+  let authoritativeReplayMarkerRef = null;
   let historicalReplayCommit = null;
   let pendingHistoricalAtomicCount = 0;
   let pendingHistoricalTerminalCount = 0;
@@ -97,6 +98,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
       initialAuthoritativeState.last_transition?.protocol?.request
         ?.transition_ref;
     if (lastTransitionRef) {
+      authoritativeReplayMarkerRef = lastTransitionRef;
       terminalReplayMarkers.add(lastTransitionRef);
       const protocol = initialAuthoritativeState.last_transition.protocol;
       const preparedReceiptIndex = protocol.receipts.findIndex(
@@ -184,6 +186,14 @@ function createGovernedRuntimeIdentityTransitionObserver({
       ? code
       : 'transition_observer_protocol_invalid';
     return false;
+  }
+
+  function hasTerminalReplayCapacity(transitionRef) {
+    if (terminalReplayMarkers.has(transitionRef)) return true;
+    const retainedMarkerCount = terminalReplayMarkers.size -
+      (authoritativeReplayMarkerRef !== null &&
+        terminalReplayMarkers.has(authoritativeReplayMarkerRef) ? 1 : 0);
+    return retainedMarkerCount < maxRetainedTransitions;
   }
 
   function retainTerminal(transitionRef, record) {
@@ -479,18 +489,15 @@ function createGovernedRuntimeIdentityTransitionObserver({
                 )))) {
           return violation('transition_observer_terminal_reconciliation_invalid');
         }
+        if (!hasTerminalReplayCapacity(event.transition_ref)) {
+          return violation('transition_observer_capacity_exceeded');
+        }
         record.terminal = structuredClone(event.terminal);
         if (record.historical_replay && !record.atomic_verified) {
           transitions.delete(event.transition_ref);
           terminalReplayMarkers.add(event.transition_ref);
           provisionalHistoricalTerminals.set(event.transition_ref, record);
           pendingHistoricalTerminalCount += 1;
-          while (provisionalHistoricalTerminals.size >
-              maxRetainedTransitions) {
-            provisionalHistoricalTerminals.delete(
-              provisionalHistoricalTerminals.keys().next().value
-            );
-          }
           return true;
         }
         retainVerifiedTerminal(event.transition_ref, record);
@@ -505,6 +512,9 @@ function createGovernedRuntimeIdentityTransitionObserver({
         const record = transitions.get(event.transition_ref);
         if (!record || record.terminal || record.missing) {
           return violation('transition_observer_terminal_missing_invalid');
+        }
+        if (!hasTerminalReplayCapacity(event.transition_ref)) {
+          return violation('transition_observer_capacity_exceeded');
         }
         record.missing = true;
         counters.terminals_missing += 1;

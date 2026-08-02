@@ -2314,7 +2314,7 @@ test('13d3f. current state anchors an offline historical commit backlog', () => 
 
   const provisionalObserver = createGovernedRuntimeIdentityTransitionObserver({
     initialAuthoritativeState: current,
-    maxRetainedTransitions: 2
+    maxRetainedTransitions: 3
   });
   const firstHistoricalRecord = recordStore.snapshot()
     .find(record => record.protocol?.request.from_runtime.identity_digest ===
@@ -2338,7 +2338,7 @@ test('13d3f. current state anchors an offline historical commit backlog', () => 
 
   const observer = createGovernedRuntimeIdentityTransitionObserver({
     initialAuthoritativeState: current,
-    maxRetainedTransitions: 2
+    maxRetainedTransitions: 3
   });
   harness({ state: current, store, recordStore, observer });
   const snapshot = observer.snapshot();
@@ -2389,19 +2389,31 @@ test('13d3f1. an unclosed historical prefix retains only bounded records', () =>
     record.protocol?.request.transition_ref !==
       current.last_transition.protocol.request.transition_ref
   );
+  let terminalBackpressure = 0;
   for (const record of historicalRecords.slice(0, 3)) {
     for (const entry of record.observer_outbox) {
-      assert.equal(observer.observe(entry.envelope), true);
+      const accepted = observer.observe(entry.envelope);
+      if (entry.envelope.event === 'transition_terminal_committed' &&
+          accepted === false) {
+        terminalBackpressure += 1;
+      } else {
+        assert.equal(accepted, true);
+      }
     }
   }
   const snapshot = observer.snapshot();
   assert.equal(snapshot.atomic_commits_verified, 0);
   assert.equal(snapshot.terminal_successes, 0);
-  assert.equal(snapshot.active_transitions, 0);
+  assert.equal(snapshot.active_transitions, 1);
   assert.equal(snapshot.provisional_historical_transitions, 2);
-  assert.equal(snapshot.terminal_replay_markers, 4);
-  assert.equal(observer.replayMarkers().length, 4);
-  assert.equal(snapshot.protocol_violations, 0);
+  assert.equal(snapshot.terminal_replay_markers, 3);
+  assert.equal(observer.replayMarkers().length, 3);
+  assert.equal(terminalBackpressure, 1);
+  assert.equal(snapshot.protocol_violations, 1);
+  assert.equal(
+    snapshot.last_violation_code,
+    'transition_observer_capacity_exceeded'
+  );
 });
 
 test('13d4. initial state read fault terminalizes the durable reservation', () => {
@@ -2741,14 +2753,13 @@ test('17d. Observer recomputes a shaped atomic state digest', () => {
   assert.equal(observer.snapshot().protocol_violations, 1);
 });
 
-test('17e. Observer rotates terminal history without exhausting active capacity', () => {
+test('17e. Observer backpressures before its replay ledger exceeds capacity', () => {
   const state = initialState();
   const observer = createGovernedRuntimeIdentityTransitionObserver({
     maxRetainedTransitions: 2
   });
-  let earliestRequest;
-  let latestRequest;
-  for (let index = 0; index < 5; index += 1) {
+  const retainedRequests = [];
+  for (let index = 0; index < 2; index += 1) {
     const transitionRef = `grit_${index.toString(36).padStart(32, '0')}`;
     const request = requestFor(state, {
       transitionRef,
@@ -2773,24 +2784,52 @@ test('17e. Observer rotates terminal history without exhausting active capacity'
       transition_ref: transitionRef,
       terminal
     }), true);
-    earliestRequest ||= request;
-    latestRequest = request;
+    retainedRequests.push(request);
   }
-  const snapshot = observer.snapshot();
-  assert.equal(snapshot.transitions_accepted, 5);
-  assert.equal(snapshot.terminal_failures, 5);
-  assert.equal(snapshot.active_transitions, 0);
-  assert.equal(snapshot.retained_terminals, 2);
-  assert.equal(snapshot.terminal_replay_markers, 5);
+  const overflowRequest = requestFor(state, {
+    transitionRef: `grit_${'2'.padStart(32, '0')}`,
+    proofDigest: digestObject('retained-proof-overflow')
+  });
+  const overflowTerminal = createRuntimeIdentityTransitionTerminal({
+    request: overflowRequest,
+    receipts: [],
+    outcome: 'failure',
+    reasonCode: 'transition_replayed',
+    runtimeStopped: true
+  });
   assert.equal(observer.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
-    transition_ref: earliestRequest.transition_ref,
-    request: earliestRequest
+    transition_ref: overflowRequest.transition_ref,
+    request: overflowRequest
   }), true);
-  assert.equal(observer.snapshot().transitions_accepted, 5);
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_terminal_committed',
+    transition_ref: overflowRequest.transition_ref,
+    terminal: overflowTerminal
+  }), false);
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.transitions_accepted, 3);
+  assert.equal(snapshot.terminal_failures, 2);
+  assert.equal(snapshot.active_transitions, 1);
+  assert.equal(snapshot.retained_terminals, 2);
+  assert.equal(snapshot.terminal_replay_markers, 2);
+  assert.equal(observer.replayMarkers().length, 2);
+  assert.equal(snapshot.protocol_violations, 1);
   assert.equal(
-    observer.reconcile(latestRequest.transition_ref).terminal.reason_code,
+    snapshot.last_violation_code,
+    'transition_observer_capacity_exceeded'
+  );
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    transition_ref: retainedRequests[0].transition_ref,
+    request: retainedRequests[0]
+  }), true);
+  assert.equal(observer.snapshot().transitions_accepted, 3);
+  assert.equal(
+    observer.reconcile(retainedRequests[1].transition_ref).terminal.reason_code,
     'transition_replayed'
   );
   const rebuilt = createGovernedRuntimeIdentityTransitionObserver({
@@ -2799,10 +2838,10 @@ test('17e. Observer rotates terminal history without exhausting active capacity'
   assert.equal(rebuilt.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
-    transition_ref: earliestRequest.transition_ref,
-    request: earliestRequest
+    transition_ref: retainedRequests[0].transition_ref,
+    request: retainedRequests[0]
   }), true);
-  const conflictingReplay = structuredClone(earliestRequest);
+  const conflictingReplay = structuredClone(retainedRequests[0]);
   conflictingReplay.request.nonce = `nonce_${'Z'.repeat(24)}`;
   assert.equal(rebuilt.observe({
     component: 'governed_runtime_identity_transition_coordinator',
