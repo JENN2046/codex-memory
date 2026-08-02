@@ -17,7 +17,7 @@ deploy, cutover, complete-V8, or readiness claim.
 
 `activeTask: CM-2159`
 
-`activePhase: governed_read_attempt_refactor`
+`activePhase: identity_transition_semantic_closeout`
 
 PRs `#73`-`#76` delivered all four items: attempt contract/terminal CAS,
 two-pass source projection/exact-writer authority, lease-scoped runtime, and
@@ -27,7 +27,14 @@ the Edge v2 hard cut. PR `#76` head `912a5c05...` was squash-merged as
 runtime identity, and v2/attempt-v1/v1-rejection. Single-use R5-O `_005`
 received no usable project_context_ref; search_memory was not invoked and no
 attempt terminal exists. Its canonical reason remains unknown and is not
-inferred. `_005` is consumed; no retry or readiness claim is authorized. The current task branch adds dormant, transport-neutral `governed_runtime_identity_transition.v1` contract, atomic CAS coordinator, independent Observer, one-time legacy authority migration, and synthetic attack tests. This is source-only construction: no live controller wiring, identity transition, lifecycle action, accepted runtime fact change, blocker closure, or readiness claim.
+inferred. `_005` is consumed; no retry or readiness claim is authorized. PR
+`#82` merged the dormant, transport-neutral
+`governed_runtime_identity_transition.v1` reference Saga. Its source is
+attempt-scoped proof, dormant, non-live, and not wired to the controller. The
+active closeout corrects Observer disposition and commit-time candidate reason
+fidelity without changing accepted runtime facts. This remains source-only
+construction: no live controller wiring, identity transition, lifecycle action,
+blocker closure, or readiness claim.
 
 ## Last Accepted Product Baseline
 
@@ -50,9 +57,10 @@ future task.
 
 ## Next Safe Action
 
-Do not retry or reconstruct `_005`. Keep CM-2159 open and preserve the accepted
-runtime identity without another probe or lifecycle action. Any such action or
-provider/memory-tool call requires a separately scoped proposal and authority.
+Complete the dormant identity-transition source closeout and exact-head review.
+Do not retry or reconstruct `_005`; preserve the accepted runtime identity
+without another probe or lifecycle action. Any live transition, runtime start,
+provider call, or memory-tool action remains separately governed.
 
 ## Authority Boundaries
 
@@ -71,6 +79,8 @@ provider/memory-tool call requires a separately scoped proposal and authority.
 - PRs `#73`-`#76` are merged source construction. The authorized rebind accepted
   that source as the schema-v6 runtime identity; it did not establish R5-O,
   change a tool name/input schema, or authorize further execution.
+- PR `#82` is merged dormant protocol source only. It does not authorize live
+  wiring, a profile transaction, lifecycle action, or readiness claim.
 
 ## Evidence And History
 
@@ -79,19 +89,12 @@ Last completed: `CM-2158 / CMV-2243`.
 - Active task: `CM-2159`; its validation receipt will not replace
   the unique completed ledger/validation pair until the successful R5-O
   verification and governance closeout are complete.
-- PRs `#67`-`#71` delivered source-manifest identity, canonical schema-v6
-  binding, selected-diary hydration, and stopped-state rebind. `_001` and
-  `_002` failed closed; `_003` exposed the sparse `chunk_index` and collapsed
-  hydration-reason defect without an accepted result.
-- PR `#72` merged that source/test repair as `e07d3f15...`.
-- PR `#73` merged dormant attempt-v1 and the synthetic Edge-to-Observer slice as
-  `6fe2b532...`; merged-main CI run `30501105867` passed.
-- PR `#74` merged the production two-pass source projection, streaming atomic
-  materialization, and exact-VCP writer authority harness as `dcd2c42a...`.
-- PR `#75` merged the lease-scoped runtime as `75838ae5...`; CI `30570842512` passed.
-- PR `#76` hard-cut Edge data/request/response to v2, preserving tool/input
-  schemas and rejecting v1. Head `912a5c05...` was squash-merged as
-  `4b3d1173...`; merged-main CI run `30617653640` passed.
+- PRs `#67`-`#76` delivered the schema-v6 source binding and four governed-read
+  construction items; PR `#76` merged as `4b3d1173...` and main CI passed.
+- PR `#82` merged the dormant governed runtime identity transition reference
+  Saga. Its post-merge source requires semantic closeout before any later live
+  transaction work; it remains non-live and does not alter accepted runtime
+  identity.
 - Single-use authorization `_004` was consumed and failed closed. It did not
   establish a receipt-bound R5-O result. Exact stage and counter facts that
   were not present in component evidence remain unknown and are not inferred
@@ -110,9 +113,6 @@ Last completed: `CM-2158 / CMV-2243`.
   no usable project_context_ref, so search_memory was not invoked and no attempt
   terminal exists. No retry occurred; the canonical reason is not inferred,
   CM-2159 remains open, and `lastCompleted` remains unchanged.
-- PR `#65` and the exact V5 transition are historical closeout evidence only.
-  They store no live locator or private payload and do not claim current health
-  or authorize runtime, mutation, release, or deploy work.
 - Controller contract: `docs/CODEX_MEMORY_FULL_STACK_CONTROL.md`; compact snapshot: `.agent_board/CURRENT_FACTS.json`.
 - Historical recovery index: `docs/archive/CM2155_GOVERNANCE_SURFACE_RESET_HISTORY_INDEX.md`.
 - Pre-compaction history is permanently recoverable from `ef62d4819ece3d93cb90e2d55fa84973cf43b7d1`.

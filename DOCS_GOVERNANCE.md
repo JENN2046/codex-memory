@@ -6,6 +6,25 @@ Current authority rule: normal work starts only from `CURRENT_STATE.md`.
 Everything else in this document is a navigation, machine-validation, or
 historical surface and must not independently select an active task.
 
+## A/B/C Evidence Matrix
+
+Source closeout, security, runtime, transition, and readiness-adjacent reviews
+must classify every material statement before disposition:
+
+- `A` — a fact independently verified against the exact current head. Record
+  the head, observation time, and validation scope with the finding.
+- `B` — an external report or historical result that is useful as a lead but
+  has not been independently reproduced on the exact current head. `B` cannot
+  approve or block work by itself.
+- `C` — an architectural inference. Every `C` statement must cite the `A` and/or
+  `B` item numbers from which it is derived.
+
+After every merge, refresh the exact head, `observed_at`, and validation scope.
+Earlier `A` items become historical evidence and cannot be reused as exact-head
+approval. Findings close only as `fixed`, `rejected-with-reason`, or
+`deferred-with-gate`; any post-review source change invalidates the exact-head
+review and requires a fresh pass.
+
 ## 目的
 
 `codex-memory` 已从阶段推进进入维护期。维护期最大风险不是缺少文档，而是当前状态、历史记录、任务队列和运行证据混在一起。

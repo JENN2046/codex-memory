@@ -163,6 +163,24 @@ function acceptanceEvent(request) {
   };
 }
 
+function observerDeliveryEntry(envelope, sequence, disposition = 'pending') {
+  const attempted = disposition !== 'pending';
+  return {
+    sequence,
+    event_digest: digestObject(envelope),
+    envelope,
+    durable_disposition: disposition,
+    attempt_metadata: attempted
+      ? {
+        attempt_count: 1,
+        last_attempt_outcome: disposition === 'acknowledged'
+          ? 'observer_acknowledged'
+          : 'observer_negative_ack'
+      }
+      : { attempt_count: 0, last_attempt_outcome: 'never_attempted' }
+  };
+}
+
 function authorityVerifier({ authority, authority_context_digest: context }) {
   return {
     verified: authority.authority_id === AUTHORITY_ID,
@@ -309,6 +327,10 @@ test('failure registry is unique, closed, and contains every required canonical 
     'from_manifest_changed',
     'candidate_manifest_invalid',
     'candidate_manifest_scope_dirty',
+    'candidate_manifest_changed_after_preview',
+    'candidate_scope_changed_after_preview',
+    'candidate_protocol_binding_changed_after_preview',
+    'candidate_revalidation_unavailable',
     'profile_schema_mismatch',
     'endpoint_identity_mismatch',
     'protocol_binding_invalid',
@@ -683,24 +705,96 @@ test('6a. malformed candidate verifier output becomes a canonical failure', () =
   assert.equal(outcome.protocol.terminal.reason_code, 'candidate_manifest_invalid');
 });
 
-test('6b. malformed candidate revalidation is a canonical failure without CAS', () => {
-  const state = initialState();
-  let calls = 0;
-  const run = harness({
-    state,
-    manifest(input) {
-      calls += 1;
+test('6b. unavailable candidate revalidation preserves exact terminal provenance', () => {
+  for (const unavailable of [
+    () => { throw new Error('synthetic verifier failure'); },
+    () => null,
+    input => {
       const verification = manifestVerifier(input);
-      if (calls === 2) delete verification.protocol_versions;
+      delete verification.protocol_versions;
       return verification;
+    },
+    input => ({ ...manifestVerifier(input), source_head: 'bad' }),
+    input => ({ ...manifestVerifier(input), manifest_digest: 'sha256:bad' }),
+    input => ({
+      ...manifestVerifier(input),
+      candidate_tree_digest: 'sha256:bad'
+    }),
+    input => ({
+      ...manifestVerifier(input),
+      protocol_versions: { governed_read_attempt: -1 }
+    })
+  ]) {
+    const state = initialState();
+    let calls = 0;
+    const run = harness({
+      state,
+      manifest(input) {
+        calls += 1;
+        return calls === 1 ? manifestVerifier(input) : unavailable(input);
+      }
+    });
+    const prepared = run.coordinator.preview(requestFor(state));
+    assert.equal(prepared.status, 'prepared');
+    const outcome = run.coordinator.commit(prepared.preview);
+    assert.equal(outcome.status, 'terminal_failure');
+    assert.equal(
+      outcome.protocol.terminal.reason_code,
+      'candidate_revalidation_unavailable'
+    );
+    assert.equal(
+      outcome.protocol.terminal.failed_stage,
+      'TRANSITION_COMMITTED'
+    );
+    assert.equal(outcome.protocol.terminal.failure_origin, 'manifest_verifier');
+    assert.equal(outcome.protocol.terminal.failure_category, 'candidate');
+    assert.equal(outcome.protocol.terminal.evidence_complete, false);
+    assert.equal(run.store.snapshot().store_version, 0);
+  }
+});
+
+test('6b1. commit-time candidate drift reasons remain distinct from CAS loss', () => {
+  const cases = [
+    {
+      reason: 'candidate_manifest_changed_after_preview',
+      mutate(value) { value.candidate_tree_digest = digestObject('changed-tree'); }
+    },
+    {
+      reason: 'candidate_scope_changed_after_preview',
+      mutate(value) { value.scope_clean = false; }
+    },
+    {
+      reason: 'candidate_protocol_binding_changed_after_preview',
+      category: 'binding',
+      mutate(value) { value.protocol_versions = { changed: 'v2' }; }
     }
-  });
-  const prepared = run.coordinator.preview(requestFor(state));
-  assert.equal(prepared.status, 'prepared');
-  const outcome = run.coordinator.commit(prepared.preview);
-  assert.equal(outcome.status, 'terminal_failure');
-  assert.equal(outcome.protocol.terminal.reason_code, 'transition_cas_lost');
-  assert.equal(run.store.snapshot().store_version, 0);
+  ];
+  for (const item of cases) {
+    const state = initialState();
+    let calls = 0;
+    const run = harness({
+      state,
+      manifest(input) {
+        calls += 1;
+        const verification = manifestVerifier(input);
+        if (calls === 2) item.mutate(verification);
+        return verification;
+      }
+    });
+    const prepared = run.coordinator.preview(requestFor(state));
+    const outcome = run.coordinator.commit(prepared.preview);
+    assert.equal(outcome.protocol.terminal.reason_code, item.reason);
+    assert.equal(
+      outcome.protocol.terminal.failed_stage,
+      'TRANSITION_COMMITTED'
+    );
+    assert.equal(outcome.protocol.terminal.failure_origin, 'manifest_verifier');
+    assert.equal(
+      outcome.protocol.terminal.failure_category,
+      item.category || 'candidate'
+    );
+    assert.equal(run.store.snapshot().store_version, 0);
+  }
 });
 
 test('6c. candidate evidence is allowlist-normalized before receipt hashing', () => {
@@ -1049,7 +1143,7 @@ test('10d1a. recovery rereads a terminal after commit-context race loss', () => 
   const state = first.store.snapshot();
   const firstRecord = first.recordStore.get(first.request.transition_ref);
   const canonicalEvents = [
-    ...firstRecord.observer_delivered_events,
+    ...firstRecord.observer_acknowledged_events,
     ...firstRecord.observer_outbox
   ].map(entry => entry.envelope)
     .filter(envelope => envelope.event !== 'transition_accepted');
@@ -1091,7 +1185,7 @@ test('10d2. terminal recovery finalization is event-idempotent', () => {
   const result = prepareAndCommit();
   const before = result.recordStore.get(result.request.transition_ref);
   const observerEvents = [
-    ...before.observer_delivered_events,
+    ...before.observer_acknowledged_events,
     ...before.observer_outbox
   ].map(entry => entry.envelope);
   const pendingBefore = result.recordStore.pendingObserverEvents().length;
@@ -1111,7 +1205,7 @@ test('10d2a. finalization validates its complete Observer event batch atomically
   const result = prepareAndCommit();
   const persisted = result.recordStore.get(result.request.transition_ref);
   const entries = [
-    ...persisted.observer_delivered_events,
+    ...persisted.observer_acknowledged_events,
     ...persisted.observer_outbox
   ].sort((left, right) => left.sequence - right.sequence);
   const observerEvents = entries.slice(1).map(entry => entry.envelope);
@@ -1119,11 +1213,12 @@ test('10d2a. finalization validates its complete Observer event batch atomically
     ...structuredClone(persisted),
     status: 'reserved',
     protocol: null,
-    observer_outbox: [{
-      ...structuredClone(entries[0]),
-      sequence: Number.MAX_SAFE_INTEGER - 2
-    }],
-    observer_delivered_events: []
+    observer_outbox: [observerDeliveryEntry(
+      entries[0].envelope,
+      Number.MAX_SAFE_INTEGER - 2
+    )],
+    observer_acknowledged_events: [],
+    observer_rejected_events: []
   };
   const exhausted = createTransitionRecordStore([recoveryRecord]);
   const exhaustedBefore = exhausted.snapshot();
@@ -1169,9 +1264,10 @@ test('10e. a failed terminal-index write is recovered before the next transition
   let failNextSuccessFinalization = true;
   const recordStore = {
     ackObserverEvent: durableRecords.ackObserverEvent,
-    discardObserverEvent: durableRecords.discardObserverEvent,
     enqueueObserverEvent: durableRecords.enqueueObserverEvent,
     pendingObserverEvents: durableRecords.pendingObserverEvents,
+    recordObserverAttempt: durableRecords.recordObserverAttempt,
+    rejectObserverEvent: durableRecords.rejectObserverEvent,
     restoreObserverDeliveryPrefixes:
       durableRecords.restoreObserverDeliveryPrefixes,
     setCommitContext: durableRecords.setCommitContext,
@@ -1818,17 +1914,138 @@ test('13d2. rejected admission cannot head-block an existing terminal', () => {
   assert.equal(observer.snapshot().terminal_successes, 1);
 });
 
+test('13d2a. only an initial explicit false is durably rejected', () => {
+  const state = initialState();
+  const run = harness({
+    state,
+    observer: { observe() { return false; } }
+  });
+  const request = requestFor(state);
+  const outcome = run.coordinator.preview(request);
+  assert.equal(outcome.status, 'terminal_failure');
+  const persisted = run.recordStore.get(request.transition_ref);
+  assert.equal(persisted.observer_outbox.length, 0);
+  assert.equal(persisted.observer_acknowledged_events.length, 0);
+  assert.equal(persisted.observer_rejected_events.length, 1);
+  assert.equal(
+    persisted.observer_rejected_events[0].durable_disposition,
+    'rejected_before_observation'
+  );
+  assert.deepEqual(
+    persisted.observer_rejected_events[0].attempt_metadata,
+    { attempt_count: 1, last_attempt_outcome: 'observer_negative_ack' }
+  );
+  assert.equal(Object.hasOwn(persisted, 'observer_delivered_events'), false);
+
+  let reconstructedEvents = 0;
+  harness({
+    state,
+    recordStore: createTransitionRecordStore(run.recordStore.snapshot()),
+    observer: { observe() { reconstructedEvents += 1; return true; } }
+  });
+  assert.equal(reconstructedEvents, 0);
+});
+
+test('13d2b. initial delivery exceptions remain pending and reconstruct', () => {
+  const state = initialState();
+  const run = harness({
+    state,
+    observer: { observe() { throw new Error('synthetic-transport-fault'); } }
+  });
+  const request = requestFor(state);
+  assert.equal(run.coordinator.preview(request).status, 'terminal_failure');
+  const persisted = run.recordStore.get(request.transition_ref);
+  assert.equal(persisted.observer_rejected_events.length, 0);
+  assert.equal(persisted.observer_outbox.length > 0, true);
+  assert.equal(
+    persisted.observer_outbox[0].attempt_metadata.last_attempt_outcome,
+    'delivery_exception'
+  );
+
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  const rebuilt = createTransitionRecordStore(run.recordStore.snapshot());
+  harness({ state, recordStore: rebuilt, observer });
+  assert.equal(rebuilt.pendingObserverEvents().length, 0);
+  assert.equal(observer.snapshot().active_transitions, 0);
+});
+
+test('13d2c. later false and exception outcomes stay pending, never rejected', () => {
+  for (const terminalOutcome of ['false', 'throw']) {
+    const state = initialState();
+    const observer = createGovernedRuntimeIdentityTransitionObserver({
+      initialAuthoritativeState: state
+    });
+    const run = harness({
+      state,
+      observer: {
+        observe(event) {
+          if (event.event === 'transition_terminal_committed') {
+            if (terminalOutcome === 'throw') {
+              throw new Error('synthetic-terminal-delivery-fault');
+            }
+            return false;
+          }
+          return observer.observe(event);
+        }
+      }
+    });
+    const request = requestFor(state);
+    const prepared = run.coordinator.preview(request);
+    assert.equal(run.coordinator.commit(prepared.preview).status, 'terminal_success');
+    const persisted = run.recordStore.get(request.transition_ref);
+    assert.equal(persisted.observer_rejected_events.length, 0);
+    assert.equal(persisted.observer_outbox.length, 1);
+    assert.equal(
+      persisted.observer_outbox[0].attempt_metadata.last_attempt_outcome,
+      terminalOutcome === 'throw'
+        ? 'delivery_exception'
+        : 'observer_negative_ack'
+    );
+  }
+});
+
+test('13d2d. legacy delivered snapshots normalize to acknowledged-only output', () => {
+  const result = prepareAndCommit();
+  const legacy = structuredClone(result.recordStore.snapshot()[0]);
+  legacy.observer_delivered_events = legacy.observer_acknowledged_events.map(
+    ({ sequence, event_digest, envelope }) => ({
+      sequence, event_digest, envelope
+    })
+  );
+  legacy.observer_outbox = legacy.observer_outbox.map(
+    ({ sequence, event_digest, envelope }) => ({
+      sequence, event_digest, envelope
+    })
+  );
+  delete legacy.observer_acknowledged_events;
+  delete legacy.observer_rejected_events;
+
+  const normalized = createTransitionRecordStore([legacy]).snapshot()[0];
+  assert.equal(Object.hasOwn(normalized, 'observer_delivered_events'), false);
+  assert.equal(normalized.observer_acknowledged_events.length > 0, true);
+  assert.equal(normalized.observer_rejected_events.length, 0);
+  assert.equal(
+    normalized.observer_acknowledged_events.every(entry =>
+      entry.durable_disposition === 'acknowledged' &&
+      entry.attempt_metadata.last_attempt_outcome === 'observer_acknowledged'
+    ),
+    true
+  );
+});
+
 test('13d3. asynchronous Observer sinks are never acknowledged synchronously', async () => {
   const state = initialState();
   const run = harness({
     state,
     observer: { observe() { return Promise.resolve(true); } }
   });
-  assert.throws(
-    () => run.coordinator.preview(requestFor(state)),
-    { code: 'transition_observer_async_ack_invalid' }
+  assert.equal(
+    run.coordinator.preview(requestFor(state)).status,
+    'terminal_failure'
   );
-  assert.equal(run.recordStore.pendingObserverEvents().length, 1);
+  assert.equal(run.recordStore.pendingObserverEvents().length > 0, true);
   await Promise.resolve();
 
   const observer = createGovernedRuntimeIdentityTransitionObserver({
@@ -1839,7 +2056,7 @@ test('13d3. asynchronous Observer sinks are never acknowledged synchronously', a
   );
   const rebuilt = harness({ state, recordStore: rebuiltRecords, observer });
   assert.deepEqual(rebuilt.coordinator.reportCoordinatorLoss(), {
-    active_transitions_lost: 1,
+    active_transitions_lost: 0,
     terminals_fabricated: 0
   });
   assert.equal(rebuiltRecords.pendingObserverEvents().length, 0);
@@ -1852,16 +2069,9 @@ test('13d3a. Observer redelivery is idempotent after durable ack failure', () =>
   const observer = createGovernedRuntimeIdentityTransitionObserver({
     initialAuthoritativeState: state
   });
-  let failAckOnce = true;
   const unreliableRecords = {
     ...recordStore,
-    ackObserverEvent(input) {
-      if (failAckOnce) {
-        failAckOnce = false;
-        throw new Error('synthetic-durable-ack-failure');
-      }
-      return recordStore.ackObserverEvent(input);
-    }
+    ackObserverEvent() { throw new Error('synthetic-durable-ack-failure'); }
   };
   const first = harness({
     state,
@@ -1869,22 +2079,20 @@ test('13d3a. Observer redelivery is idempotent after durable ack failure', () =>
     observer
   });
   const request = requestFor(state);
-  assert.throws(
-    () => first.coordinator.preview(request),
-    /synthetic-durable-ack-failure/u
-  );
+  const failed = first.coordinator.preview(request);
+  assert.equal(failed.status, 'terminal_failure');
   assert.equal(observer.snapshot().transitions_accepted, 1);
-  assert.equal(recordStore.pendingObserverEvents().length, 1);
+  assert.equal(recordStore.pendingObserverEvents().length > 0, true);
 
   const rebuilt = harness({ state, recordStore, observer });
   assert.equal(recordStore.pendingObserverEvents().length, 0);
   assert.equal(observer.snapshot().transitions_accepted, 1);
   assert.equal(observer.snapshot().protocol_violations, 0);
   assert.deepEqual(rebuilt.coordinator.reportCoordinatorLoss(), {
-    active_transitions_lost: 1,
+    active_transitions_lost: 0,
     terminals_fabricated: 0
   });
-  assert.equal(recordStore.get(request.transition_ref).status, 'lost');
+  assert.equal(recordStore.get(request.transition_ref).status, 'terminal');
 });
 
 test('13d3a1. rebuilt Observer acknowledges an exact failed-terminal replay', () => {
@@ -1918,9 +2126,9 @@ test('13d3a1. rebuilt Observer acknowledges an exact failed-terminal replay', ()
     recordStore: unreliableRecords,
     observer
   });
-  assert.throws(
-    () => first.coordinator.preview(requestFor(state)),
-    /synthetic-failed-terminal-ack-failure/u
+  assert.equal(
+    first.coordinator.preview(requestFor(state)).status,
+    'terminal_failure'
   );
   assert.equal(recordStore.pendingObserverEvents().length, 1);
   assert.equal(observer.snapshot().terminal_failures, 1);
@@ -2044,7 +2252,7 @@ test('13d3a3. replay markers preserve atomic commit order', () => {
     current = store.snapshot();
   }
   const streams = recordStore.snapshot().map(record => [
-    ...record.observer_delivered_events,
+    ...record.observer_acknowledged_events,
     ...record.observer_outbox
   ].sort((left, right) => left.sequence - right.sequence)
     .map(entry => entry.envelope))
@@ -2107,7 +2315,7 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
   assert.throws(
     () => createTransitionRecordStore([{
       ...base,
-      observer_delivered_events: [{
+      observer_acknowledged_events: [{
         sequence: 0,
         event_digest: digestObject(envelope),
         envelope: { ...envelope, event: 'transition_preview_formed' }
@@ -2123,7 +2331,7 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
   assert.throws(
     () => createTransitionRecordStore([{
       ...base,
-      observer_delivered_events: [],
+      observer_acknowledged_events: [],
       observer_outbox: [{
         sequence: 0,
         event_digest: digestObject(unknownEnvelope),
@@ -2145,7 +2353,7 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
   assert.throws(
     () => createTransitionRecordStore([{
       ...base,
-      observer_delivered_events: [{
+      observer_acknowledged_events: [{
         sequence: 0,
         event_digest: digestObject(envelope),
         envelope
@@ -2154,7 +2362,7 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
       ...base,
       transition_ref: secondRequest.transition_ref,
       request_digest: runtimeIdentityTransitionRequestDigest(secondRequest),
-      observer_delivered_events: [{
+      observer_acknowledged_events: [{
         sequence: 0,
         event_digest: digestObject(secondEnvelope),
         envelope: secondEnvelope
@@ -2174,12 +2382,11 @@ test('13d3b0. persisted Observer sequences retain a safe successor', () => {
     owner_digest: COORDINATOR_OWNER,
     status: 'reserved',
     protocol: null,
-    observer_outbox: [{
-      sequence: Number.MAX_SAFE_INTEGER,
-      event_digest: digestObject(envelope),
-      envelope
-    }],
-    observer_delivered_events: [],
+    observer_outbox: [observerDeliveryEntry(
+      envelope, Number.MAX_SAFE_INTEGER
+    )],
+    observer_acknowledged_events: [],
+    observer_rejected_events: [],
     previous_state_digest: null
   };
   assert.throws(
@@ -2216,6 +2423,77 @@ test('13d3b0. persisted Observer sequences retain a safe successor', () => {
     { code: 'transition_record_store_invalid' }
   );
   assert.equal(exhausted.snapshot().length, 1);
+});
+
+test('13d3b00. all disposition sets enforce sequence and attempt invariants', () => {
+  const committed = prepareAndCommit();
+  const valid = structuredClone(
+    committed.recordStore.get(committed.request.transition_ref)
+  );
+  const dispositionMismatch = structuredClone(valid);
+  dispositionMismatch.observer_acknowledged_events[0].durable_disposition =
+    'pending';
+  assert.throws(
+    () => createTransitionRecordStore([dispositionMismatch]),
+    { code: 'transition_record_store_invalid' }
+  );
+
+  const invalidAttempt = structuredClone(valid);
+  invalidAttempt.observer_acknowledged_events[0].attempt_metadata = {
+    attempt_count: 0,
+    last_attempt_outcome: 'observer_acknowledged'
+  };
+  assert.throws(
+    () => createTransitionRecordStore([invalidAttempt]),
+    { code: 'transition_record_store_invalid' }
+  );
+
+  const state = initialState();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  const pendingRun = harness({
+    state,
+    observer: {
+      observe(event) {
+        if (event.event === 'transition_terminal_committed') return false;
+        return observer.observe(event);
+      }
+    }
+  });
+  const request = requestFor(state);
+  const prepared = pendingRun.coordinator.preview(request);
+  pendingRun.coordinator.commit(prepared.preview);
+  const duplicateSequence = structuredClone(
+    pendingRun.recordStore.get(request.transition_ref)
+  );
+  duplicateSequence.observer_outbox[0].sequence =
+    duplicateSequence.observer_acknowledged_events[0].sequence;
+  assert.throws(
+    () => createTransitionRecordStore([duplicateSequence]),
+    { code: 'transition_record_store_invalid' }
+  );
+
+  const rejectedRun = harness({
+    state,
+    observer: { observe() { return false; } }
+  });
+  const rejectedRequest = requestFor(state, {
+    suffix: 'R', proofDigest: digestObject('rejected-shape-proof')
+  });
+  rejectedRun.coordinator.preview(rejectedRequest);
+  const invalidRejected = structuredClone(
+    rejectedRun.recordStore.get(rejectedRequest.transition_ref)
+  );
+  invalidRejected.observer_rejected_events[0].envelope.event =
+    'transition_terminal_missing';
+  invalidRejected.observer_rejected_events[0].event_digest = digestObject(
+    invalidRejected.observer_rejected_events[0].envelope
+  );
+  assert.throws(
+    () => createTransitionRecordStore([invalidRejected]),
+    { code: 'transition_record_store_invalid' }
+  );
 });
 
 test('13d3b1. archived protocols cannot be spliced from Observer event streams', () => {
@@ -2260,7 +2538,7 @@ test('13d3b3. successful archives require a complete Observer event chain', () =
   const record = structuredClone(
     result.recordStore.get(result.request.transition_ref)
   );
-  record.observer_delivered_events = [];
+  record.observer_acknowledged_events = [];
   record.observer_outbox = [];
 
   assert.throws(
@@ -2293,7 +2571,7 @@ test('13d3b4. reserved records reject atomic and committed-terminal events', () 
     status: 'reserved',
     protocol: null,
     observer_outbox: [],
-    observer_delivered_events: [acceptance, terminalEnvelope]
+    observer_acknowledged_events: [acceptance, terminalEnvelope]
       .map((envelope, sequence) => ({
         sequence,
         event_digest: digestObject(envelope),
@@ -2329,8 +2607,8 @@ test('13d3b4. reserved records reject atomic and committed-terminal events', () 
   );
   successfulRecord.status = 'reserved';
   successfulRecord.protocol = null;
-  successfulRecord.observer_delivered_events = [
-    ...successfulRecord.observer_delivered_events,
+  successfulRecord.observer_acknowledged_events = [
+    ...successfulRecord.observer_acknowledged_events,
     ...successfulRecord.observer_outbox
   ].sort((left, right) => left.sequence - right.sequence)
     .filter(entry =>
@@ -2338,7 +2616,7 @@ test('13d3b4. reserved records reject atomic and committed-terminal events', () 
     );
   successfulRecord.observer_outbox = [];
   assert.equal(
-    successfulRecord.observer_delivered_events.at(-1).envelope.event,
+    successfulRecord.observer_acknowledged_events.at(-1).envelope.event,
     'transition_atomic_commit'
   );
   assert.throws(
@@ -2358,7 +2636,7 @@ test('13d3c. a fresh Observer receives the delivered prefix before pending event
     ...recordStore,
     ackObserverEvent(input) {
       acknowledgements += 1;
-      if (acknowledgements === 2) {
+      if (acknowledgements >= 2) {
         throw new Error('synthetic-second-durable-ack-failure');
       }
       return recordStore.ackObserverEvent(input);
@@ -2369,13 +2647,11 @@ test('13d3c. a fresh Observer receives the delivered prefix before pending event
     recordStore: unreliableRecords,
     observer: firstObserver
   });
-  assert.throws(
-    () => first.coordinator.preview(requestFor(state)),
-    /synthetic-second-durable-ack-failure/u
-  );
+  const prepared = first.coordinator.preview(requestFor(state));
+  assert.equal(prepared.status, 'prepared');
   const persisted = recordStore.snapshot()[0];
-  assert.equal(persisted.observer_delivered_events.length, 1);
-  assert.equal(persisted.observer_outbox.length, 1);
+  assert.equal(persisted.observer_acknowledged_events.length, 1);
+  assert.equal(persisted.observer_outbox.length > 0, true);
 
   const freshObserver = createGovernedRuntimeIdentityTransitionObserver({
     initialAuthoritativeState: state
@@ -2383,7 +2659,10 @@ test('13d3c. a fresh Observer receives the delivered prefix before pending event
   const rebuilt = harness({ state, recordStore, observer: freshObserver });
   assert.equal(recordStore.pendingObserverEvents().length, 0);
   assert.equal(freshObserver.snapshot().transitions_accepted, 1);
-  assert.equal(freshObserver.snapshot().receipts_accepted, 1);
+  assert.equal(
+    freshObserver.snapshot().receipts_accepted,
+    prepared.preview.receipts.length
+  );
   assert.equal(freshObserver.snapshot().protocol_violations, 0);
   assert.deepEqual(rebuilt.coordinator.reportCoordinatorLoss(), {
     active_transitions_lost: 1,
@@ -2401,7 +2680,7 @@ test('13d3c1. active delivery prefixes recover even with an empty outbox', () =>
   const persisted = recordStore.snapshot()[0];
   assert.equal(persisted.status, 'reserved');
   assert.equal(persisted.observer_outbox.length, 0);
-  assert.equal(persisted.observer_delivered_events.length > 0, true);
+  assert.equal(persisted.observer_acknowledged_events.length > 0, true);
 
   const freshObserver = createGovernedRuntimeIdentityTransitionObserver({
     initialAuthoritativeState: state
@@ -2416,6 +2695,41 @@ test('13d3c1. active delivery prefixes recover even with an empty outbox', () =>
   });
   assert.equal(recordStore.get(request.transition_ref).status, 'lost');
   assert.equal(freshObserver.snapshot().terminals_missing, 1);
+});
+
+test('13d3c2. completed terminals retain acknowledged delivery state', () => {
+  const result = prepareAndCommit();
+  const before = result.recordStore.snapshot();
+  const terminal = before[0];
+  assert.equal(terminal.status, 'terminal');
+  assert.equal(terminal.observer_outbox.length, 0);
+  assert.equal(terminal.observer_acknowledged_events.length > 0, true);
+
+  createGovernedRuntimeIdentityTransitionCoordinator({
+    store: result.store,
+    authorityProofReplayStore: createAuthorityProofReplayStore(),
+    transitionRecordStore: result.recordStore,
+    coordinatorOwnerDigest: COORDINATOR_OWNER,
+    authorityVerifier,
+    candidateManifestVerifier: manifestVerifier,
+    clock: () => NOW
+  });
+  assert.deepEqual(result.recordStore.snapshot(), before);
+
+  let redeliveries = 0;
+  harness({
+    state: result.store.snapshot(),
+    store: result.store,
+    recordStore: result.recordStore,
+    observer: {
+      observe() {
+        redeliveries += 1;
+        return true;
+      }
+    }
+  });
+  assert.equal(redeliveries, 0);
+  assert.deepEqual(result.recordStore.snapshot(), before);
 });
 
 test('13d3d. a coordinator without a sink persists the complete event stream', () => {
@@ -3641,11 +3955,10 @@ test('18a. coordinator loss reports durable reservations after recreation', () =
     status: 'reserved',
     protocol: null,
     observer_outbox: [],
-    observer_delivered_events: [{
-      sequence: 0,
-      event_digest: digestObject(acceptedEnvelope),
-      envelope: acceptedEnvelope
-    }],
+    observer_acknowledged_events: [observerDeliveryEntry(
+      acceptedEnvelope, 0, 'acknowledged'
+    )],
+    observer_rejected_events: [],
     previous_state_digest: null
   }], { maxActiveReservations: 1 });
   const events = [];
@@ -3718,6 +4031,11 @@ test('18a00. lost records retain their acknowledged missing-event evidence', () 
     acceptance_event: acceptanceEvent(request)
   }), true);
   let pending = recordStore.pendingObserverEvents()[0];
+  assert.equal(recordStore.recordObserverAttempt({
+    transition_ref: request.transition_ref,
+    event_digest: pending.event_digest,
+    outcome: 'observer_acknowledged'
+  }), true);
   assert.equal(recordStore.ackObserverEvent({
     transition_ref: request.transition_ref,
     event_digest: pending.event_digest
@@ -3732,6 +4050,11 @@ test('18a00. lost records retain their acknowledged missing-event evidence', () 
     envelope: missingEnvelope
   }), true);
   pending = recordStore.pendingObserverEvents()[0];
+  assert.equal(recordStore.recordObserverAttempt({
+    transition_ref: request.transition_ref,
+    event_digest: pending.event_digest,
+    outcome: 'observer_acknowledged'
+  }), true);
   assert.equal(recordStore.ackObserverEvent({
     transition_ref: request.transition_ref,
     event_digest: pending.event_digest
@@ -3740,13 +4063,13 @@ test('18a00. lost records retain their acknowledged missing-event evidence', () 
   assert.equal(legalLost.status, 'lost');
   assert.equal(legalLost.observer_outbox.length, 0);
   assert.equal(
-    legalLost.observer_delivered_events.at(-1).envelope.event,
+    legalLost.observer_acknowledged_events.at(-1).envelope.event,
     'transition_terminal_missing'
   );
   assert.doesNotThrow(() => createTransitionRecordStore([legalLost]));
 
   const missingEvidenceRemoved = structuredClone(legalLost);
-  missingEvidenceRemoved.observer_delivered_events.pop();
+  missingEvidenceRemoved.observer_acknowledged_events.pop();
   assert.throws(
     () => createTransitionRecordStore([missingEvidenceRemoved]),
     { code: 'transition_record_store_invalid' }
@@ -3758,8 +4081,8 @@ test('18a00. lost records retain their acknowledged missing-event evidence', () 
   );
   successfulRecord.status = 'lost';
   successfulRecord.protocol = null;
-  successfulRecord.observer_delivered_events = [
-    ...successfulRecord.observer_delivered_events,
+  successfulRecord.observer_acknowledged_events = [
+    ...successfulRecord.observer_acknowledged_events,
     ...successfulRecord.observer_outbox
   ].sort((left, right) => left.sequence - right.sequence);
   successfulRecord.observer_outbox = [];

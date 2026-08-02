@@ -5,6 +5,14 @@ source contract for changing an accepted runtime source identity while the
 runtime remains stopped and held. It is not wired to the lifecycle controller,
 an MCP tool, a CLI, or a live identity store.
 
+This reference Saga is attempt-scoped proof only. It preserves the identity
+separation, stopped/held preconditions, request binding, candidate
+revalidation, CAS, reason-fidelity, and attack-test assets needed for the live
+design, but it is dormant and non-live. It is not a second live transaction
+system. A future owner-only profile transaction uses commit-success consumption
+semantics: preview, verification, or a pre-commit failure does not consume its
+proof.
+
 ## Identity separation
 
 The contract keeps two identities distinct:
@@ -250,23 +258,38 @@ closed.
 If crash recovery finalizes a success that had not yet reached observers, the
 coordinator replays the missing post-preview receipts, atomic commit, and
 terminal event from the authoritative state before releasing the local record.
-Observer transport exceptions and explicit `false` acknowledgements retain an
-ordered outbox inside the transition record store. Its snapshot carries pending
-envelopes and sequence numbers across coordinator reconstruction; delivery ack
-removes only the exact head event. The acknowledged-event ledger retains each
-complete canonical envelope with its verified digest; bare or mismatched digest
-claims are rejected, and recovery compares full envelopes before suppressing
-redelivery. Multi-event finalization stages and validates the complete cloned
-outbox and every required sequence before replacing the shared record, so a
-later invalid envelope or exhausted sequence cannot leave a partially appended
-recovery stream. Delivered entries retain their original sequence. If any later
-event is still pending during reconstruction, the store restores the complete
-delivered prefix ahead of that suffix: an existing Observer consumes exact
-replays idempotently, while a fresh Observer rebuilds the active transition in
-canonical order. Active reservations also restore their delivered prefix when
+Observer delivery has three durable dispositions: `pending` in
+`observer_outbox`, `acknowledged` in `observer_acknowledged_events`, and
+`rejected_before_observation` in `observer_rejected_events`. Every event keeps
+bounded attempt metadata: a safe-integer `attempt_count` and one exact
+`last_attempt_outcome` from `never_attempted`, `observer_acknowledged`,
+`observer_negative_ack`, or `delivery_exception`. Only a synchronous explicit
+`false` for the initial `transition_accepted` event is rejected before
+observation. Transport/Observer exceptions, later-event `false`, and durable
+ack failures remain pending. Rejected events never participate in Observer
+reconstruction.
+
+The snapshot carries canonical envelopes, sequence numbers, dispositions, and
+attempt metadata across coordinator reconstruction. Acknowledgement removes
+only the exact FIFO head. The acknowledged-event ledger retains each complete
+canonical envelope with its verified digest; bare or mismatched digest claims
+are rejected, and recovery compares full envelopes before suppressing
+redelivery. The three sets share global sequence and digest uniqueness, require
+strict per-set ordering and a safe successor, and bind disposition to attempt
+metadata. New snapshots never emit the legacy `observer_delivered_events`
+field. Recovery alone accepts that legacy field and normalizes its complete
+envelopes to acknowledged entries.
+
+If any later event is pending during reconstruction, the store restores the
+complete acknowledged prefix ahead of that suffix: an existing Observer
+consumes exact replays idempotently, while a fresh Observer rebuilds the active
+transition in canonical order. Active reservations also restore their
+acknowledged prefix when
 the outbox is empty, ensuring a later coordinator-loss report has an active
-Observer record to close. A persisted `lost` record is valid only when its
-outbox is empty and its delivered stream ends in exactly one canonical
+Observer record to close. A completed terminal with no pending suffix retains
+its acknowledged disposition across coordinator reconstruction and is not
+redelivered. A persisted `lost` record is valid only when its
+outbox is empty and its acknowledged stream ends in exactly one canonical
 `transition_terminal_missing`; it cannot substitute a successful atomic or
 committed-terminal stream while leaving `protocol` null. A `reserved` record
 may retain only a non-terminal prefix or a pending `transition_terminal_missing`;
@@ -322,13 +345,12 @@ before live enqueue, so they cannot wedge the global FIFO.
 `transition_preview_formed` persists the complete canonical preview rather
 than an unauditable standalone digest, allowing reconstruction to validate its
 request, receipt prefix, expected store version, and context digest together.
-An unacknowledged new admission is discarded from the outbox and terminalized
-without Observer emission, so it cannot head-block terminal events for already
-active transitions. Event sinks must explicitly declare
+An initial admission explicitly rejected by the Observer moves to the rejected
+ledger and terminalizes without Observer reconstruction, so it cannot
+head-block terminal events for already active transitions. Event sinks must explicitly declare
 `synchronous_ack.v1`; declared async functions are rejected before use, while
-an undeclared thenable response raises
-`transition_observer_async_ack_invalid` and leaves its durable outbox entry for
-synchronous recovery. A post-reservation initial-state read fault closes the
+an undeclared thenable response is recorded as `delivery_exception` and leaves
+its durable outbox entry for synchronous recovery. A post-reservation initial-state read fault closes the
 reservation with a canonical durable failure.
 Observer commit anchors retain the complete lifecycle projection, so later
 versions cannot replace the safe-stop receipt. A consumed
@@ -398,6 +420,10 @@ from_identity_changed
 from_manifest_changed
 candidate_manifest_invalid
 candidate_manifest_scope_dirty
+candidate_manifest_changed_after_preview
+candidate_scope_changed_after_preview
+candidate_protocol_binding_changed_after_preview
+candidate_revalidation_unavailable
 profile_schema_mismatch
 endpoint_identity_mismatch
 protocol_binding_invalid
@@ -409,6 +435,16 @@ post_identity_mismatch
 partial_transition_detected
 terminal_missing
 ```
+
+Commit-time verifier exceptions, non-object output, and malformed output map to
+`candidate_revalidation_unavailable` with unknown evidence. Source head,
+manifest, tree, or integrity-evidence drift maps to
+`candidate_manifest_changed_after_preview`; clean-to-dirty drift maps to
+`candidate_scope_changed_after_preview`; protocol binding drift maps to
+`candidate_protocol_binding_changed_after_preview`. These failures retain
+`TRANSITION_COMMITTED` as the commit-time revalidation stage and
+`manifest_verifier` as their origin. `transition_cas_lost` is reserved for
+authoritative store version/state drift or a genuine CAS race.
 
 ## Synthetic attack coverage
 

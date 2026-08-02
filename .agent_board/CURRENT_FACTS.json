@@ -1,7 +1,7 @@
 {
   "schemaVersion": 5,
   "factsMode": "committed_status_snapshot",
-  "updatedAt": "2026-07-31",
+  "updatedAt": "2026-08-03",
   "baseBranch": "main",
   "status": {
     "project": "NOT_READY_BLOCKED",
@@ -49,6 +49,17 @@
       "responseEnvelopeSchemaVersion": 2,
       "governedReadAttemptProtocol": "governed_read_attempt.v1",
       "legacyV1Accepted": false
+    },
+    "governedRuntimeIdentityTransition": {
+      "protocol": "governed_runtime_identity_transition.v1",
+      "referenceSagaDisposition": "attempt_scoped_dormant_non_live",
+      "liveControllerWired": false,
+      "observerDurableDispositions": [
+        "pending",
+        "acknowledged",
+        "rejected_before_observation"
+      ],
+      "legacyDeliveredEventsOutput": false
     }
   },
   "blockers": [
