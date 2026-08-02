@@ -924,6 +924,61 @@ test('10d. coordinator recovers a reserved ref index from atomic state protocol'
   );
 });
 
+test('10d1. concurrent recovery accepts the matching reservation winner', () => {
+  const first = prepareAndCommit();
+  const state = first.store.snapshot();
+  const durableRecords = createTransitionRecordStore();
+  let initialRead = true;
+  const racingRecords = {
+    ...durableRecords,
+    get(ref) {
+      if (initialRead) {
+        initialRead = false;
+        return null;
+      }
+      return durableRecords.get(ref);
+    },
+    reserve(input) {
+      assert.equal(durableRecords.reserve(input), true);
+      return false;
+    }
+  };
+  const rebuiltStore = createGovernedRuntimeIdentityStateStore(state);
+  const rebuilt = harness({
+    state,
+    store: rebuiltStore,
+    recordStore: racingRecords
+  });
+  assert.deepEqual(
+    durableRecords.get(first.request.transition_ref).protocol,
+    first.committed.protocol
+  );
+  assert.deepEqual(
+    rebuilt.coordinator.protocol(first.request.transition_ref),
+    first.committed.protocol
+  );
+});
+
+test('10d2. terminal recovery finalization is event-idempotent', () => {
+  const result = prepareAndCommit();
+  const before = result.recordStore.get(result.request.transition_ref);
+  const observerEvents = [
+    ...before.observer_delivered_events,
+    ...before.observer_outbox
+  ].map(entry => entry.envelope);
+  const pendingBefore = result.recordStore.pendingObserverEvents().length;
+  assert.equal(result.recordStore.finalize({
+    transition_ref: result.request.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(result.request),
+    protocol: result.committed.protocol,
+    observer_events: observerEvents
+  }), true);
+  assert.equal(
+    result.recordStore.pendingObserverEvents().length,
+    pendingBefore
+  );
+});
+
 test('10e. a failed terminal-index write is recovered before the next transition', () => {
   const state = initialState();
   const durableRecords = createTransitionRecordStore();

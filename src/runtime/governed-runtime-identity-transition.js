@@ -682,11 +682,11 @@ function createTransitionRecordStore(initialRecords = [], {
     if (current.status === 'lost') {
       reject('transition_record_store_context_mismatch');
     }
-    for (const envelope of observerEvents) {
-      enqueueObserverEvent({ transition_ref: ref, envelope });
-    }
     if (current.status === 'terminal') {
       return canonicalJson(current.protocol) === canonicalJson(protocol);
+    }
+    for (const envelope of observerEvents) {
+      enqueueObserverEvent({ transition_ref: ref, envelope });
     }
     const terminal = {
       transition_ref: ref,
@@ -1108,10 +1108,15 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         request_digest:
           runtimeIdentityTransitionRequestDigest(recoveryRequest)
       });
-      if (reserved !== true) {
+      if (reserved !== true && reserved !== false) {
         reject('transition_record_store_recovery_failed');
       }
       recoveryRecord = transitionRecordStore.get(recoveryRef);
+      if (recoveryRecord === null ||
+          recoveryRecord.request_digest !==
+            runtimeIdentityTransitionRequestDigest(recoveryRequest)) {
+        reject('transition_record_store_recovery_failed');
+      }
     }
     const recoveryPreviousStateDigest =
       recoveryState.last_transition.previous_state_digest;

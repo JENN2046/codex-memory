@@ -233,6 +233,10 @@ canonical order. Active reservations also restore their delivered prefix when
 the outbox is empty, ensuring a later coordinator-loss report has an active
 Observer record to close. Archived protocol lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
+Concurrent recovery uses reserve-or-reread semantics: a loser validates the
+matching reservation established by the winner. Replayed finalization checks
+an existing canonical terminal before appending recovery events, so identical
+recovery cannot duplicate a terminal event stream.
 Persisted envelopes use a closed event registry with exact payload shapes.
 Unknown event names, missing required payloads, invalid receipt chains, and
 malformed atomic projections are rejected during store reconstruction and
