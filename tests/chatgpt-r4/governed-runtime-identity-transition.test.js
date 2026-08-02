@@ -10,6 +10,7 @@ const {
   appendRuntimeIdentityTransitionStage,
   canonicalJson,
   createGovernedRuntimeIdentityTransitionProtocol,
+  createRuntimeIdentityTransitionPreview,
   createRuntimeIdentityTransitionRequest,
   createRuntimeIdentityTransitionTerminal,
   digestObject,
@@ -220,13 +221,35 @@ function prepareAndCommit(options = {}) {
 }
 
 function replayObserverPrelude(observer, result) {
+  const preparedReceiptIndex = result.committed.protocol.receipts.findIndex(
+    receipt => receipt.stage === 'TRANSITION_PREPARED'
+  );
   observer.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
     transition_ref: result.request.transition_ref,
     request: result.request
   });
-  for (const receipt of result.committed.protocol.receipts) {
+  for (const receipt of result.committed.protocol.receipts.slice(
+    0,
+    preparedReceiptIndex + 1
+  )) {
+    observer.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_receipt_appended',
+      transition_ref: result.request.transition_ref,
+      receipt
+    });
+  }
+  observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_preview_formed',
+    transition_ref: result.request.transition_ref,
+    preview: result.prepared.preview
+  });
+  for (const receipt of result.committed.protocol.receipts.slice(
+    preparedReceiptIndex + 1
+  )) {
     observer.observe({
       component: 'governed_runtime_identity_transition_coordinator',
       event: 'transition_receipt_appended',
@@ -2006,20 +2029,7 @@ test('17a. Observer rejects a self-consistent commit not derived from its reques
 test('17b. Observer binds the final terminal to the verified atomic commit', () => {
   const result = prepareAndCommit();
   const observer = createGovernedRuntimeIdentityTransitionObserver();
-  observer.observe({
-    component: 'governed_runtime_identity_transition_coordinator',
-    event: 'transition_accepted',
-    transition_ref: result.request.transition_ref,
-    request: result.request
-  });
-  for (const receipt of result.committed.protocol.receipts) {
-    observer.observe({
-      component: 'governed_runtime_identity_transition_coordinator',
-      event: 'transition_receipt_appended',
-      transition_ref: result.request.transition_ref,
-      receipt
-    });
-  }
+  replayObserverPrelude(observer, result);
   assert.equal(observer.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_atomic_commit',
@@ -2222,6 +2232,85 @@ test('17f1. Observer binds projected and event previous-state digests', () => {
   }), false);
   assert.equal(observer.snapshot().atomic_commits_verified, 0);
   assert.equal(observer.snapshot().protocol_violations, 1);
+});
+
+test('17f2. Observer requires one preview bound to the atomic store version', () => {
+  const result = prepareAndCommit();
+  const atomicEvent = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_atomic_commit',
+    transition_ref: result.request.transition_ref,
+    protocol: result.committed.protocol,
+    accepted_runtime: result.committed.accepted_runtime,
+    controller_binding: result.committed.controller_binding,
+    store_version: 1,
+    previous_state_digest: digestObject(result.state),
+    state_digest: result.committed.state_digest,
+    state_projection: result.store.snapshot()
+  };
+  const withoutPreview = createGovernedRuntimeIdentityTransitionObserver();
+  withoutPreview.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    transition_ref: result.request.transition_ref,
+    request: result.request
+  });
+  for (const receipt of result.committed.protocol.receipts) {
+    withoutPreview.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_receipt_appended',
+      transition_ref: result.request.transition_ref,
+      receipt
+    });
+  }
+  assert.equal(withoutPreview.observe(atomicEvent), false);
+  assert.equal(withoutPreview.snapshot().atomic_commits_verified, 0);
+
+  const wrongVersion = createGovernedRuntimeIdentityTransitionObserver();
+  const preparedIndex = result.committed.protocol.receipts.findIndex(
+    receipt => receipt.stage === 'TRANSITION_PREPARED'
+  );
+  const preparedReceipts = result.committed.protocol.receipts.slice(
+    0,
+    preparedIndex + 1
+  );
+  assert.equal(wrongVersion.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    transition_ref: result.request.transition_ref,
+    request: result.request
+  }), true);
+  for (const receipt of preparedReceipts) {
+    assert.equal(wrongVersion.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_receipt_appended',
+      transition_ref: result.request.transition_ref,
+      receipt
+    }), true);
+  }
+  const forgedPreview = createRuntimeIdentityTransitionPreview({
+    request: result.request,
+    receipts: preparedReceipts,
+    expectedStoreVersion: 7
+  });
+  assert.equal(wrongVersion.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_preview_formed',
+    transition_ref: result.request.transition_ref,
+    preview: forgedPreview
+  }), true);
+  for (const receipt of result.committed.protocol.receipts.slice(
+    preparedIndex + 1
+  )) {
+    assert.equal(wrongVersion.observe({
+      component: 'governed_runtime_identity_transition_coordinator',
+      event: 'transition_receipt_appended',
+      transition_ref: result.request.transition_ref,
+      receipt
+    }), true);
+  }
+  assert.equal(wrongVersion.observe(atomicEvent), false);
+  assert.equal(wrongVersion.snapshot().atomic_commits_verified, 0);
 });
 
 test('17g. Observer verifies one-shot legacy migration consumption', () => {
@@ -2540,7 +2629,8 @@ test('17m. Observer rejects stable authority rotation on a later commit', () => 
   });
   const branchResult = {
     request: branchRequest,
-    committed: branchCommitted
+    committed: branchCommitted,
+    prepared: branchPrepared
   };
   replayObserverPrelude(observer, branchResult);
   assert.equal(observer.observe({

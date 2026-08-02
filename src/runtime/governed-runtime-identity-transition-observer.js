@@ -232,6 +232,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         transitions.set(event.request.transition_ref, {
           request: structuredClone(event.request),
           receipts: [],
+          preview: null,
           terminal: null,
           atomic_commit: null,
           atomic_verified: false,
@@ -279,7 +280,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         }
         const record = transitions.get(event.transition_ref);
         if (!record || record.terminal || record.missing ||
-            record.atomic_commit) {
+            record.atomic_commit || !record.preview) {
           return violation('transition_observer_atomic_commit_invalid');
         }
         validateGovernedRuntimeIdentityTransitionProtocol(event.protocol);
@@ -320,6 +321,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
               event.accepted_runtime.identity_digest ||
             !Number.isSafeInteger(event.store_version) ||
             event.store_version < 1 ||
+            record.preview.expected_store_version + 1 !==
+              event.store_version ||
             (chainAnchor !== null &&
               (event.store_version !==
                 chainAnchor.store_version + 1 ||
@@ -495,7 +498,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
           return violation('transition_observer_preview_invalid');
         }
         const record = transitions.get(event.transition_ref);
-        if (!record || record.terminal || record.missing) {
+        if (!record || record.terminal || record.missing ||
+            record.atomic_commit || record.preview) {
           return violation('transition_observer_preview_invalid');
         }
         validateRuntimeIdentityTransitionPreview(event.preview);
@@ -505,6 +509,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
               canonicalJson(record.receipts)) {
           return violation('transition_observer_preview_invalid');
         }
+        record.preview = structuredClone(event.preview);
         return true;
       }
       return false;

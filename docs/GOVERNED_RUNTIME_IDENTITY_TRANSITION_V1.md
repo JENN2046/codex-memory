@@ -293,6 +293,10 @@ the commit that closes the prefix. Acceptance also requires its envelope
 `transition_ref` to equal the canonical request reference. The Observer applies
 the same closed event registry and exact envelope shapes to direct delivery as
 the durable record store applies during enqueue and reconstruction.
+Every successful atomic observation requires exactly one prior canonical
+preview, and its `expected_store_version + 1` must equal the atomic
+`store_version`; a syntactically valid preview for another CAS context cannot
+authorize the commit.
 
 The unique failure registry includes:
 
