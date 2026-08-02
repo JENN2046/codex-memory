@@ -273,6 +273,10 @@ appending recovery events, so identical recovery cannot duplicate a terminal
 event stream.
 Observer delivery sequences are globally unique across every persisted record;
 per-record validity cannot introduce ambiguous equal-position FIFO entries.
+Every accepted sequence must also be strictly below
+`Number.MAX_SAFE_INTEGER`, preserving a safe integer successor for the next
+allocation. Recovery rejects an exhausted maximum sequence, and live
+allocation fails closed before assigning a value without a safe successor.
 For each archived terminal, the record store also treats its event stream and
 protocol as one governance artifact. The observed request and receipt prefix
 must match the archive; any delivered terminal must match its exact terminal,

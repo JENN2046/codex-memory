@@ -2044,6 +2044,60 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
   );
 });
 
+test('13d3b0. persisted Observer sequences retain a safe successor', () => {
+  const state = initialState();
+  const request = requestFor(state);
+  const envelope = acceptanceEvent(request);
+  const record = {
+    transition_ref: request.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(request),
+    owner_digest: COORDINATOR_OWNER,
+    status: 'reserved',
+    protocol: null,
+    observer_outbox: [{
+      sequence: Number.MAX_SAFE_INTEGER,
+      event_digest: digestObject(envelope),
+      envelope
+    }],
+    observer_delivered_events: [],
+    previous_state_digest: null
+  };
+  assert.throws(
+    () => createTransitionRecordStore([record]),
+    { code: 'transition_record_store_invalid' }
+  );
+
+  record.observer_outbox[0].sequence = Number.MAX_SAFE_INTEGER - 1;
+  const exhausted = createTransitionRecordStore([record], {
+    maxActiveReservations: 2
+  });
+  const nextRequest = requestFor(state, {
+    suffix: 'B',
+    proofDigest: digestObject('observer-sequence-exhaustion-proof-B')
+  });
+  assert.throws(
+    () => exhausted.reserve({
+      transition_ref: nextRequest.transition_ref,
+      request_digest: runtimeIdentityTransitionRequestDigest(nextRequest),
+      owner_digest: COORDINATOR_OWNER,
+      acceptance_event: acceptanceEvent(nextRequest)
+    }),
+    { code: 'transition_record_store_invalid' }
+  );
+  assert.throws(
+    () => exhausted.enqueueObserverEvent({
+      transition_ref: request.transition_ref,
+      envelope: {
+        component: 'governed_runtime_identity_transition_coordinator',
+        event: 'transition_terminal_missing',
+        transition_ref: request.transition_ref
+      }
+    }),
+    { code: 'transition_record_store_invalid' }
+  );
+  assert.equal(exhausted.snapshot().length, 1);
+});
+
 test('13d3b1. archived protocols cannot be spliced from Observer event streams', () => {
   const result = prepareAndCommit();
   const record = structuredClone(

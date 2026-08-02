@@ -370,13 +370,18 @@ function createTransitionRecordStore(initialRecords = [], {
   const initialObserverSequences = new Set();
   let nextObserverSequence = 0;
 
+  function isAllocatableObserverSequence(value) {
+    return Number.isSafeInteger(value) &&
+      value >= 0 && value < Number.MAX_SAFE_INTEGER;
+  }
+
   function validateObserverOutbox(value) {
     if (!Array.isArray(value)) reject('transition_record_store_invalid');
     let previousSequence = -1;
     for (const entry of value) {
       if (!exactKeys(entry, ['sequence', 'event_digest', 'envelope']) ||
-          !Number.isSafeInteger(entry.sequence) ||
-          entry.sequence < 0 || entry.sequence <= previousSequence ||
+          !isAllocatableObserverSequence(entry.sequence) ||
+          entry.sequence <= previousSequence ||
           !isPlainObject(entry.envelope) ||
           entry.envelope.component !==
             'governed_runtime_identity_transition_coordinator' ||
@@ -387,7 +392,6 @@ function createTransitionRecordStore(initialRecords = [], {
       }
       assertDigest(entry.event_digest, 'transition_record_store_invalid');
       previousSequence = entry.sequence;
-      nextObserverSequence = Math.max(nextObserverSequence, entry.sequence + 1);
     }
   }
 
@@ -396,7 +400,7 @@ function createTransitionRecordStore(initialRecords = [], {
     const digests = new Set();
     for (const entry of value) {
       if (!exactKeys(entry, ['sequence', 'event_digest', 'envelope']) ||
-          !Number.isSafeInteger(entry.sequence) || entry.sequence < 0 ||
+          !isAllocatableObserverSequence(entry.sequence) ||
           !isPlainObject(entry.envelope) ||
           entry.envelope.component !==
             'governed_runtime_identity_transition_coordinator' ||
@@ -408,10 +412,6 @@ function createTransitionRecordStore(initialRecords = [], {
       }
       assertDigest(entry.event_digest, 'transition_record_store_invalid');
       digests.add(entry.event_digest);
-      nextObserverSequence = Math.max(
-        nextObserverSequence,
-        entry.sequence + 1
-      );
     }
   }
 
@@ -718,6 +718,10 @@ function createTransitionRecordStore(initialRecords = [], {
         reject('transition_record_store_invalid');
       }
       initialObserverSequences.add(entry.sequence);
+      nextObserverSequence = Math.max(
+        nextObserverSequence,
+        entry.sequence + 1
+      );
     }
     if (activeRecords.has(normalized.transition_ref) ||
         terminalArchive.has(normalized.transition_ref)) {
@@ -747,6 +751,9 @@ function createTransitionRecordStore(initialRecords = [], {
     if (activeRecords.size >= maxActiveReservations) {
       reject('transition_record_store_capacity_exceeded');
     }
+    if (!isAllocatableObserverSequence(nextObserverSequence)) {
+      reject('transition_record_store_invalid');
+    }
     const storedAcceptance = structuredClone(acceptanceEvent);
     const acceptanceEntry = {
       sequence: nextObserverSequence,
@@ -765,7 +772,7 @@ function createTransitionRecordStore(initialRecords = [], {
     };
     validateRecord(reservation);
     activeRecords.set(ref, reservation);
-    nextObserverSequence += 1;
+    nextObserverSequence = acceptanceEntry.sequence + 1;
     return true;
   }
 
@@ -837,6 +844,9 @@ function createTransitionRecordStore(initialRecords = [], {
         envelope.transition_ref !== ref) {
       reject('transition_record_store_context_mismatch');
     }
+    if (!isAllocatableObserverSequence(nextObserverSequence)) {
+      reject('transition_record_store_invalid');
+    }
     const stored = structuredClone(envelope);
     const nextEntry = {
       sequence: nextObserverSequence,
@@ -847,7 +857,7 @@ function createTransitionRecordStore(initialRecords = [], {
     candidate.observer_outbox.push(structuredClone(nextEntry));
     validateRecord(candidate);
     current.observer_outbox.push(nextEntry);
-    nextObserverSequence += 1;
+    nextObserverSequence = nextEntry.sequence + 1;
     return true;
   }
 
