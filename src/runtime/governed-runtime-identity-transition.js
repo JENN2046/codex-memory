@@ -353,6 +353,7 @@ function createTransitionRecordStore(initialRecords = [], {
   // without terminal history permanently consuming admission capacity.
   const activeRecords = new Map();
   const terminalArchive = new Map();
+  const initialObserverSequences = new Set();
   let nextObserverSequence = 0;
 
   function validateObserverOutbox(value) {
@@ -628,6 +629,15 @@ function createTransitionRecordStore(initialRecords = [], {
       }
       : structuredClone(record);
     validateRecord(normalized);
+    for (const entry of [
+      ...normalized.observer_delivered_events,
+      ...normalized.observer_outbox
+    ]) {
+      if (initialObserverSequences.has(entry.sequence)) {
+        reject('transition_record_store_invalid');
+      }
+      initialObserverSequences.add(entry.sequence);
+    }
     if (activeRecords.has(normalized.transition_ref) ||
         terminalArchive.has(normalized.transition_ref)) {
       reject('transition_record_store_invalid');

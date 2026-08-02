@@ -1649,6 +1649,36 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
     }]),
     { code: 'transition_record_store_invalid' }
   );
+  const secondRequest = requestFor(state, {
+    suffix: 'B',
+    proofDigest: digestObject('global-observer-sequence-proof-B')
+  });
+  const secondEnvelope = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    transition_ref: secondRequest.transition_ref,
+    request: secondRequest
+  };
+  assert.throws(
+    () => createTransitionRecordStore([{
+      ...base,
+      observer_delivered_events: [{
+        sequence: 0,
+        event_digest: digestObject(envelope),
+        envelope
+      }]
+    }, {
+      ...base,
+      transition_ref: secondRequest.transition_ref,
+      request_digest: runtimeIdentityTransitionRequestDigest(secondRequest),
+      observer_delivered_events: [{
+        sequence: 0,
+        event_digest: digestObject(secondEnvelope),
+        envelope: secondEnvelope
+      }]
+    }]),
+    { code: 'transition_record_store_invalid' }
+  );
 });
 
 test('13d3c. a fresh Observer receives the delivered prefix before pending events', () => {

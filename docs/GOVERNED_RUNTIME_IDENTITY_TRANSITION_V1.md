@@ -237,6 +237,8 @@ Concurrent recovery uses reserve-or-reread semantics: a loser validates the
 matching reservation established by the winner. Replayed finalization checks
 an existing canonical terminal before appending recovery events, so identical
 recovery cannot duplicate a terminal event stream.
+Observer delivery sequences are globally unique across every persisted record;
+per-record validity cannot introduce ambiguous equal-position FIFO entries.
 Persisted envelopes use a closed event registry with exact payload shapes.
 Unknown event names, missing required payloads, invalid receipt chains, and
 malformed atomic projections are rejected during store reconstruction and
