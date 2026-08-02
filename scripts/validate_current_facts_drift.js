@@ -151,7 +151,7 @@ const STALE_ACTIVE_PHRASES = Object.freeze([
 const STALE_ACTIVE_ASSERTIONS = Object.freeze([
   Object.freeze({
     phrase: "current task branch",
-    pattern: /\bcurrent task branch\s+(?:is|was|records?|contains?|holds?|owns?|tracks?|represents?|identifies?|points?\s+to)\b/i
+    pattern: /\bcurrent task branch\s+(?:(?:currently|now)\s+)?(is|was|remains?|records?|contains?|holds?|owns?|tracks?|represents?|identifies?|points?\s+to)\b/gi
   })
 ]);
 const POINTER_SELF_AUTHORITY_RE =
@@ -761,6 +761,40 @@ function validateSizeBudgets(root, failures) {
   }
 }
 
+function isInsideQuotedSegment(text, index) {
+  const lineStart = text.lastIndexOf("\n", index - 1) + 1;
+  const lineEndCandidate = text.indexOf("\n", index);
+  const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+  const before = text.slice(lineStart, index);
+  const after = text.slice(index, lineEnd);
+  return ["\"", "`"].some(delimiter =>
+    before.split(delimiter).length % 2 === 0 && after.includes(delimiter)
+  );
+}
+
+function containsStaleAssertion(text, assertion) {
+  for (const match of text.matchAll(assertion.pattern)) {
+    if (isInsideQuotedSegment(text, match.index)) continue;
+    const clauseStart = Math.max(
+      text.lastIndexOf("\n", match.index - 1),
+      text.lastIndexOf(".", match.index - 1),
+      text.lastIndexOf(";", match.index - 1),
+      text.lastIndexOf("!", match.index - 1),
+      text.lastIndexOf("?", match.index - 1)
+    ) + 1;
+    const prefix = text.slice(clauseStart, match.index);
+    if (/\b(?:do not|don't|never|must not|should not|cannot|can't)\b[^.!?;]*$/i.test(prefix)) {
+      continue;
+    }
+    if (/^(?:is|was|remains?)$/i.test(match[1])) {
+      const suffix = text.slice(match.index + match[0].length);
+      if (/^\s+(?:not|never|no longer)\b/i.test(suffix)) continue;
+    }
+    return true;
+  }
+  return false;
+}
+
 function validateStalePhrases(root, failures) {
   for (const relativePath of ACTIVE_SURFACE_FILES) {
     const text = readText(root, relativePath, failures);
@@ -770,7 +804,7 @@ function validateStalePhrases(root, failures) {
       }
     }
     for (const assertion of STALE_ACTIVE_ASSERTIONS) {
-      if (assertion.pattern.test(text)) {
+      if (containsStaleAssertion(text, assertion)) {
         failures.push(`${relativePath} contains stale active phrase: ${assertion.phrase}`);
       }
     }

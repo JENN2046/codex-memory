@@ -1177,11 +1177,31 @@ test("current facts validator permits instructions to re-query the current task 
   const currentStatePath = path.join(root, "CURRENT_STATE.md");
   fs.appendFileSync(
     currentStatePath,
-    "\nDo not infer the current task branch; query it fresh before reporting Git state.\n",
+    [
+      "",
+      "Do not infer the current task branch; query it fresh before reporting Git state.",
+      "Do not claim the current task branch is authoritative; query Git fresh.",
+      "The current task branch is not recorded by this document.",
+      "The phrase `current task branch records the active state` is a stale assertion.",
+      ""
+    ].join("\n"),
     "utf8"
   );
   const result = validateCurrentFactsDrift(root);
   assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects qualified branch-relative assertions", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    "\nThe current task branch currently records the active state.\n",
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
 });
 
 test("current facts validator fails closed when baseline objects are unreadable", () => {
