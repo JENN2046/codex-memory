@@ -800,12 +800,14 @@ function containsStaleAssertion(text, assertion) {
       text.lastIndexOf("?", match.index - 1)
     ) + 1;
     const prefix = text.slice(clauseStart, match.index);
+    const suffix = text.slice(match.index + match[0].length);
+    const clauseTerminator = suffix.match(/[.!?;](?=\s|$)/);
+    if (clauseTerminator && clauseTerminator[0] === "?") continue;
     if (/\b(?:do not|don't|never|must not|should not|cannot|can't)\b[^.!?;]*$/i.test(prefix)) {
       continue;
     }
     if (/\b(?:whether|if)\s+(?:the\s+)?$/i.test(prefix)) continue;
     if (/^(?:is|was|remains?)$/i.test(match[1])) {
-      const suffix = text.slice(match.index + match[0].length);
       if (/^\s+(?:not|never|no longer)\b/i.test(suffix)) continue;
     }
     return true;
