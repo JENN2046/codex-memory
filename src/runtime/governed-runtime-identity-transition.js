@@ -620,6 +620,11 @@ function createTransitionRecordStore(initialRecords = [], {
     const observerStream = validateObserverEventStream(record);
     assertDigest(record.request_digest, 'transition_record_store_invalid');
     assertDigest(record.owner_digest, 'transition_record_store_invalid');
+    if (observerStream.request === null ||
+        runtimeIdentityTransitionRequestDigest(observerStream.request) !==
+          record.request_digest) {
+      reject('transition_record_store_invalid');
+    }
     if ((record.previous_state_digest !== null &&
           !DIGEST_PATTERN.test(record.previous_state_digest))) {
       reject('transition_record_store_invalid');
@@ -729,7 +734,8 @@ function createTransitionRecordStore(initialRecords = [], {
   function reserve({
     transition_ref: ref,
     request_digest: requestDigest,
-    owner_digest: ownerDigest
+    owner_digest: ownerDigest,
+    acceptance_event: acceptanceEvent
   } = {}) {
     if (!TRANSITION_REF_PATTERN.test(ref || '')) {
       reject('transition_record_store_invalid');
@@ -740,16 +746,25 @@ function createTransitionRecordStore(initialRecords = [], {
     if (activeRecords.size >= maxActiveReservations) {
       reject('transition_record_store_capacity_exceeded');
     }
-    activeRecords.set(ref, {
+    const storedAcceptance = structuredClone(acceptanceEvent);
+    const acceptanceEntry = {
+      sequence: nextObserverSequence,
+      event_digest: digestObject(storedAcceptance),
+      envelope: storedAcceptance
+    };
+    const reservation = {
       transition_ref: ref,
       request_digest: requestDigest,
       owner_digest: ownerDigest,
       status: 'reserved',
       protocol: null,
-      observer_outbox: [],
+      observer_outbox: [acceptanceEntry],
       observer_delivered_events: [],
       previous_state_digest: null
-    });
+    };
+    validateRecord(reservation);
+    activeRecords.set(ref, reservation);
+    nextObserverSequence += 1;
     return true;
   }
 
@@ -1222,7 +1237,10 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         transition_ref: recoveryRef,
         request_digest:
           runtimeIdentityTransitionRequestDigest(recoveryRequest),
-        owner_digest: coordinatorOwnerDigest
+        owner_digest: coordinatorOwnerDigest,
+        acceptance_event: observerEnvelope('transition_accepted', {
+          request: recoveryRequest
+        })
       });
       if (reserved !== true && reserved !== false) {
         reject('transition_record_store_recovery_failed');
@@ -1589,12 +1607,17 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         emitTerminal: false
       });
     }
+    const acceptanceEnvelope = observerEnvelope(
+      'transition_accepted',
+      { request }
+    );
     let refReserved;
     try {
       refReserved = transitionRecordStore.reserve({
         transition_ref: request.transition_ref,
         request_digest: requestDigest,
-        owner_digest: coordinatorOwnerDigest
+        owner_digest: coordinatorOwnerDigest,
+        acceptance_event: acceptanceEnvelope
       });
     } catch {
       return terminalFailure(request, [], 'transition_record_store_unavailable', {
@@ -1608,11 +1631,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
         emitTerminal: false
       });
     }
-    const acceptanceEnvelope = observerEnvelope(
-      'transition_accepted',
-      { request }
-    );
-    if (!emit('transition_accepted', { request })) {
+    if (eventSink && !flushPendingObserverEvents()) {
       transitionRecordStore.discardObserverEvent({
         transition_ref: request.transition_ref,
         event_digest: digestObject(acceptanceEnvelope)

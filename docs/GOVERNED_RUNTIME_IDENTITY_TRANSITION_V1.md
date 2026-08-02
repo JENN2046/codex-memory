@@ -23,8 +23,11 @@ authority-proof replay store; a live adapter must persist it across coordinator
 or process restarts. The included in-memory adapter is synthetic but retains
 consumption across coordinator recreation when the same store is reused.
 The coordinator separately requires an atomic transition-record store that
-reserves each `transition_ref` with its request digest and retains the terminal
-protocol. Active reservations use a bounded admission set; finalization moves
+reserves each `transition_ref` with its request digest and canonical acceptance
+envelope in one write, then retains the terminal protocol. A crash cannot leave
+a durable reservation whose Observer stream lacks the request needed for a
+canonical missing-terminal close. Active reservations use a bounded admission
+set; finalization moves
 the complete protocol into a separate durable archive whose replay marker is
 still consulted on every reservation. Archived terminals do not count against
 the active-reservation limit. Observer-acknowledged coordinator loss likewise
