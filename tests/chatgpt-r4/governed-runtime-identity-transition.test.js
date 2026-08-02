@@ -713,7 +713,17 @@ test('6b. unavailable candidate revalidation preserves exact terminal provenance
       const verification = manifestVerifier(input);
       delete verification.protocol_versions;
       return verification;
-    }
+    },
+    input => ({ ...manifestVerifier(input), source_head: 'bad' }),
+    input => ({ ...manifestVerifier(input), manifest_digest: 'sha256:bad' }),
+    input => ({
+      ...manifestVerifier(input),
+      candidate_tree_digest: 'sha256:bad'
+    }),
+    input => ({
+      ...manifestVerifier(input),
+      protocol_versions: { governed_read_attempt: -1 }
+    })
   ]) {
     const state = initialState();
     let calls = 0;

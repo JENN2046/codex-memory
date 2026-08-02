@@ -21,7 +21,8 @@ const {
   validateRuntimeIdentityTransitionPreview,
   validateRuntimeIdentityTransitionReceipt,
   validateRuntimeIdentityTransitionRequest,
-  validateRuntimeIdentityTransitionTerminal
+  validateRuntimeIdentityTransitionTerminal,
+  validateToRuntime
 } = require('../../packages/chatgpt-r4-contracts');
 
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
@@ -1373,6 +1374,19 @@ function commitCandidateRevalidationFailure(verification, request) {
       typeof verification.manifest_digest !== 'string' ||
       typeof verification.candidate_tree_digest !== 'string' ||
       !isPlainObject(verification.protocol_versions)) {
+    return 'candidate_revalidation_unavailable';
+  }
+  try {
+    validateToRuntime({
+      source_head: verification.source_head,
+      manifest_schema: verification.manifest_schema,
+      manifest_digest: verification.manifest_digest,
+      profile_schema: request.to_runtime.profile_schema,
+      endpoint_identity: request.to_runtime.endpoint_identity,
+      protocol_versions: verification.protocol_versions,
+      candidate_tree_digest: verification.candidate_tree_digest
+    });
+  } catch {
     return 'candidate_revalidation_unavailable';
   }
   if (verification.verified !== true || verification.complete !== true ||
