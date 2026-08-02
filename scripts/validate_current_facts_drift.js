@@ -814,7 +814,7 @@ function containsStaleAssertion(text, assertion) {
     const suffixStart = match.index + match[0].length;
     const suffix = text.slice(suffixStart);
     if (firstUnquotedClauseTerminator(text, suffixStart) === "?") continue;
-    if (/\b(?:do not|don't|never|must not|should not|cannot|can't)\b[^.!?;]*$/i.test(prefix)) {
+    if (/\b(?:do not|don't|never|must not|should not|cannot|can't)\s+(?:claim|state|assert|say|report)\s+(?:that\s+)?(?:the\s+)?$/i.test(prefix)) {
       continue;
     }
     if (/\b(?:whether|if)\s+(?:the\s+)?$/i.test(prefix)) continue;

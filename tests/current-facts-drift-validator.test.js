@@ -1181,6 +1181,7 @@ test("current facts validator permits instructions to re-query the current task 
       "",
       "Do not infer the current task branch; query it fresh before reporting Git state.",
       "Do not claim the current task branch is authoritative; query Git fresh.",
+      "Never assert that the current task branch records the active state.",
       "The current task branch is not recorded by this document.",
       "The phrase `current task branch records the active state` is a stale assertion.",
       "The phrase 'current task branch records the active state' is stale.",
@@ -1225,6 +1226,20 @@ test("current facts validator does not let unrelated question marks hide branch 
   for (const staleText of [
     "The current task branch records the text \"why? \" as metadata.",
     "The current task branch records the active state\nDoes anything else?"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
+test("current facts validator does not let unrelated negation hide branch assertions", () => {
+  for (const staleText of [
+    "Do not query Git because the current task branch records the active state.",
+    "Never doubt the current task branch records the active state."
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
