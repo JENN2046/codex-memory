@@ -814,6 +814,11 @@ function isInsideMarkdownFence(text, index) {
   return fence !== null;
 }
 
+function isInsideMarkdownBlockquote(text, index) {
+  const lineStart = text.lastIndexOf("\n", index - 1) + 1;
+  return /^ {0,3}(?:>\s?)+/.test(text.slice(lineStart, index));
+}
+
 function firstUnquotedClauseTerminator(text, startIndex) {
   const lineEndCandidate = text.indexOf("\n", startIndex);
   const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
@@ -823,6 +828,11 @@ function firstUnquotedClauseTerminator(text, startIndex) {
     }
   }
   return null;
+}
+
+function isDirectBranchQuestion(prefix, text, suffixStart) {
+  if (firstUnquotedClauseTerminator(text, suffixStart) !== "?") return false;
+  return /^\s*(?:(?:what|which|where|when|why|how)\s+)?(?:do|does|did|is|are|was|were|has|have|had|will|would|can|could|may|might|must|need|shall|should)\s+(?:the\s+)?$/i.test(prefix);
 }
 
 function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound = null) {
@@ -892,7 +902,9 @@ function containsAffirmativeAuthorityContinuation(text, suffix, suffixStart) {
 
 function containsStaleAssertion(text, assertion) {
   for (const match of text.matchAll(assertion.pattern)) {
-    if (isInsideMarkdownFence(text, match.index) || isInsideQuotedSegment(text, match.index)) {
+    if (isInsideMarkdownFence(text, match.index) ||
+        isInsideMarkdownBlockquote(text, match.index) ||
+        isInsideQuotedSegment(text, match.index)) {
       continue;
     }
     const clauseStart = Math.max(
@@ -905,7 +917,7 @@ function containsStaleAssertion(text, assertion) {
     const prefix = text.slice(clauseStart, match.index);
     const suffixStart = match.index + match[0].length;
     const suffix = text.slice(suffixStart);
-    if (firstUnquotedClauseTerminator(text, suffixStart) === "?") continue;
+    if (isDirectBranchQuestion(prefix, text, suffixStart)) continue;
     if (NEGATED_REPORTING_PREFIX_RE.test(prefix)) {
       continue;
     }

@@ -1193,6 +1193,8 @@ test("current facts validator permits instructions to re-query the current task 
       "Determine if the current task branch now records state before reporting.",
       "Does the current task branch record the active state?",
       "What does the current task branch currently record?",
+      "> The current task branch records the active state.",
+      "  >> The current task branch stores the current facts.",
       ""
     ].join("\n"),
     "utf8"
@@ -1213,6 +1215,8 @@ test("current facts validator rejects qualified branch-relative assertions", () 
       "The current task branch records the active state. Does anything else?",
       "The current task branch records the active state; why would it change?",
       "The current task branch records the text \"why?\" as metadata.",
+      "The current task branch records the active state—why query Git?",
+      "The current task branch records the active state, doesn't it?",
       ""
     ].join("\n"),
     "utf8"
