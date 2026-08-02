@@ -154,7 +154,7 @@ const STALE_ACTIVE_ASSERTIONS = Object.freeze([
   Object.freeze({
     phrase: "current task branch",
     pattern: new RegExp(
-      String.raw`\bcurrent task branch\s+(?:(?:currently|now)\s+)?(?:(?:${BRANCH_AUTHORITY_AUXILIARY_SOURCE})\s+(?:(?:actually|currently|directly|now|still)\s+){0,2})?(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\b`,
+      String.raw`\bcurrent task branch\s+(?:(?:currently|now)\s+)?(?:(?:${BRANCH_AUTHORITY_AUXILIARY_SOURCE})\s+(?:(?:(?:actually|currently|directly|now|still)|not\s+only)\s+)*)?(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\b`,
       "gi"
     )
   })
