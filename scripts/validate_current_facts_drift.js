@@ -825,20 +825,54 @@ function firstUnquotedClauseTerminator(text, startIndex) {
   return null;
 }
 
+function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound = null) {
+  const leadingCoordination = /^\s*(?:and|but|yet)\b/i.test(prefix);
+  const withoutTransition = prefix.replace(
+    /^\s*(?:but|yet|although|however|and)\b\s*,?\s*/i,
+    ""
+  );
+  const coordination = withoutTransition.match(/\b(?:and|but|yet)\b([^.!?;]*)$/i);
+  const subjectWindow = coordination ? coordination[1] : withoutTransition;
+  const modifiers = String.raw`(?:(?:actually|currently|directly|ever|explicitly|falsely|incorrectly|now|still|wrongly)\s+){0,2}`;
+  const auxiliary = String.raw`(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|need|shall|should)(?:\s+(?:not|no\s+longer))?|(?:don't|doesn't|didn't|hasn't|haven't|hadn't|isn't|aren't|wasn't|weren't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't)|never|cannot|no\s+longer|ought(?:\s+not|n't)\s+to)`;
+  const functionWordsOnly = new RegExp(`^\\s*${modifiers}(?:${auxiliary}\\s+${modifiers})?$`, "i");
+  const branchSubject = new RegExp(
+    `(?:\\b(?:it|(?:the\\s+)?current\\s+task\\s+branch|this\\s+branch|that\\s+branch)\\b)\\s+${modifiers}(?:${auxiliary}\\s+${modifiers})?$`,
+    "i"
+  );
+  if (branchSubject.test(subjectWindow)) return true;
+  if (functionWordsOnly.test(subjectWindow)) {
+    return (coordination || leadingCoordination) && previousSubjectIsBranchBound !== null
+      ? previousSubjectIsBranchBound
+      : true;
+  }
+  return false;
+}
+
 function containsAffirmativeAuthorityContinuation(text, suffix, suffixStart) {
   const lineEnd = suffix.indexOf("\n");
   const lineSuffix = lineEnd === -1 ? suffix : suffix.slice(0, lineEnd);
-  for (const transition of lineSuffix.matchAll(/\b(?:but|yet|although|however|and)\b[^.!?;]*/gi)) {
+  const transition = lineSuffix.match(/\b(?:but|yet|although|however|and)\b[^.!?;]*/i);
+  if (transition) {
     const predicatePattern = new RegExp(`\\b(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\\b`, "gi");
+    let previousPredicateEnd = 0;
+    let previousSubjectIsBranchBound = null;
     for (const predicate of transition[0].matchAll(predicatePattern)) {
       const predicateIndex = transition.index + predicate.index;
       if (isInsideQuotedSegment(text, suffixStart + predicateIndex)) continue;
       const prefix = transition[0].slice(0, predicate.index);
+      const subjectPrefix = transition[0].slice(previousPredicateEnd, predicate.index);
       const predicateSuffix = transition[0].slice(predicate.index + predicate[0].length);
+      const subjectIsBranchBound = continuationSubjectIsBranchBound(
+        subjectPrefix,
+        previousSubjectIsBranchBound
+      );
+      previousPredicateEnd = predicate.index + predicate[0].length;
+      previousSubjectIsBranchBound = subjectIsBranchBound;
       const negatedPrefix = NEGATED_AUTHORITY_PREFIX_RE.test(prefix);
       const queriedPrefix = /\b(?:whether|if)\b[^.!?;]*$/i.test(prefix);
       const negatedSuffix = /^\s+(?:not(?!\s+only\b)|never|no longer|no|neither)\b/i.test(predicateSuffix);
-      if (!negatedPrefix && !queriedPrefix && !negatedSuffix) return true;
+      if (subjectIsBranchBound && !negatedPrefix && !queriedPrefix && !negatedSuffix) return true;
     }
   }
   return false;

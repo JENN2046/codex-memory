@@ -1288,12 +1288,7 @@ test("current facts validator permits directly negated branch predicates", () =>
 });
 
 test("current facts validator permits unknown branch-state guidance", () => {
-  const root = workspace();
-  const currentStatePath = path.join(root, "CURRENT_STATE.md");
-  fs.appendFileSync(
-    currentStatePath,
-    [
-      "",
+  for (const guidance of [
       "The current task branch is unknown until queried fresh.",
       "The current task branch remains unverified until Git is queried.",
       "The current task branch is still unavailable to this document.",
@@ -1308,13 +1303,17 @@ test("current facts validator permits unknown branch-state guidance", () => {
       "The current task branch is unresolved yet oughtn't to determine active identity.",
       "The current task branch is unknown but no longer provides canonical status.",
       "The current task branch is unresolved yet will no longer determine active identity.",
-      "The current task branch is unresolved; query whether it provides status.",
-      ""
-    ].join("\n"),
-    "utf8"
-  );
-  const result = validateCurrentFactsDrift(root);
-  assert.equal(result.ok, true, result.failures.join("\n"));
+      "The current task branch is unknown, but CURRENT_STATE.md provides canonical status.",
+      "The current task branch is unresolved, yet STATUS.md will determine its own summary.",
+      "The current task branch is unknown, but CURRENT_STATE.md provides and determines canonical status.",
+      "The current task branch is unresolved; query whether it provides status."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${guidance}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${guidance}\n${result.failures.join("\n")}`);
+  }
 });
 
 test("current facts validator rejects authority assertions after unknown-state transitions", () => {
@@ -1325,7 +1324,9 @@ test("current facts validator rejects authority assertions after unknown-state t
     "The current task branch is unknown but does not doubt it provides canonical status.",
     "The current task branch is unknown but never doubts it provides canonical status.",
     "The current task branch is unknown but no longer doubts it provides canonical status.",
-    "The current task branch is unknown but does not provide and determines active identity."
+    "The current task branch is unknown but does not provide and determines active identity.",
+    "The current task branch is unknown but it provides the canonical status.",
+    "The current task branch is unresolved yet the current task branch determines active identity."
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
