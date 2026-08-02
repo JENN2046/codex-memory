@@ -767,8 +767,12 @@ function isInsideQuotedSegment(text, index) {
   const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
   const before = text.slice(lineStart, index);
   const after = text.slice(index, lineEnd);
-  return ["\"", "`"].some(delimiter =>
+  const insideSymmetricQuote = ["\"", "'", "`"].some(delimiter =>
     before.split(delimiter).length % 2 === 0 && after.includes(delimiter)
+  );
+  if (insideSymmetricQuote) return true;
+  return [["“", "”"], ["‘", "’"]].some(([open, close]) =>
+    before.lastIndexOf(open) > before.lastIndexOf(close) && after.includes(close)
   );
 }
 
@@ -786,6 +790,7 @@ function containsStaleAssertion(text, assertion) {
     if (/\b(?:do not|don't|never|must not|should not|cannot|can't)\b[^.!?;]*$/i.test(prefix)) {
       continue;
     }
+    if (/\b(?:whether|if)\s+(?:the\s+)?$/i.test(prefix)) continue;
     if (/^(?:is|was|remains?)$/i.test(match[1])) {
       const suffix = text.slice(match.index + match[0].length);
       if (/^\s+(?:not|never|no longer)\b/i.test(suffix)) continue;

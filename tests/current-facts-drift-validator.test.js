@@ -1183,6 +1183,11 @@ test("current facts validator permits instructions to re-query the current task 
       "Do not claim the current task branch is authoritative; query Git fresh.",
       "The current task branch is not recorded by this document.",
       "The phrase `current task branch records the active state` is a stale assertion.",
+      "The phrase 'current task branch records the active state' is stale.",
+      "The phrase “current task branch records the active state” is stale.",
+      "The phrase ‘current task branch records the active state’ is stale.",
+      "Check whether the current task branch is recorded before reporting.",
+      "Determine if the current task branch now records state before reporting.",
       ""
     ].join("\n"),
     "utf8"
