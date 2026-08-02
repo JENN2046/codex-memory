@@ -18,6 +18,7 @@ const {
   validateRuntimeIdentityTransitionTerminal
 } = require('../../packages/chatgpt-r4-contracts');
 const {
+  DEFAULT_ACTIVE_TRANSITION_LIMIT,
   stableControllerBinding,
   validateControllerBinding,
   validateGovernedRuntimeIdentityState
@@ -35,7 +36,7 @@ function exactKeys(value, expected) {
 }
 
 function createGovernedRuntimeIdentityTransitionObserver({
-  maxRetainedTransitions = 256,
+  maxRetainedTransitions = DEFAULT_ACTIVE_TRANSITION_LIMIT,
   initialTerminalReplayMarkers = [],
   initialAuthoritativeState = null
 } = {}) {
@@ -547,6 +548,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
   }
 
   function observe(event) {
+    if (!isPlainObject(event)) return false;
     let eventDigest;
     try {
       eventDigest = digestObject(event);

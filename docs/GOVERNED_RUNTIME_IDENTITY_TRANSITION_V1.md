@@ -106,6 +106,10 @@ can serve as `last_transition`. Stable binding authority IDs use the same
 canonical `grauth_...` format as requests. A stable controller binding without
 that matching `last_transition` is invalid; only the initial legacy-coupled
 state may omit it.
+The state-store adapter also reconstructs each CAS candidate from its exact
+current state and the candidate's retained canonical protocol. Matching a
+numeric version alone cannot commit a candidate derived from a competing
+branch.
 The transition-record store is a secondary durable replay index: coordinator
 construction and every new preview/commit boundary verify or reconstruct that
 index from the atomically committed protocol. No later transition is admitted
@@ -116,6 +120,10 @@ digest. Loss reporting is scoped to that exact owner, so one failed coordinator
 cannot terminalize a live peer's prepared transition in a shared record store;
 restart supervision must reuse the failed coordinator's governed owner digest
 to audit its reservations.
+The record store and Observer share a default active-transition limit of 256,
+so offline admission cannot enqueue an acceptance that the default Observer is
+structurally unable to retain. Explicit non-default adapters must preserve the
+same capacity invariant.
 Before loss reporting emits any missing-terminal event, it first reconciles the
 authoritative state's `last_transition`. A CAS that succeeded before readback
 failure is therefore recovered and finalized as success; an unavailable or
@@ -301,6 +309,8 @@ The Observer acknowledges an exact canonical event replay idempotently without
 incrementing counters or replaying state changes. A changed envelope for the
 same transition remains a protocol violation. This closes the crash window
 where the sink accepted an event but durable outbox acknowledgement failed.
+Null, array, and other non-object event inputs are rejected before replay-marker
+lookup and cannot raise an uncaught transport exception.
 The shared record store likewise treats a repeated acknowledgement as success
 only when that exact digest is already present with its full delivered
 envelope. This serializes cross-coordinator dispatch races without accepting a

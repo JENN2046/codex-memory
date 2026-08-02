@@ -491,6 +491,22 @@ test('persisted transition binds the current stop receipt and legacy evidence', 
   );
 });
 
+test('state CAS derives its candidate from the exact current authority state', () => {
+  const stateA = initialState();
+  const storeA = createGovernedRuntimeIdentityStateStore(stateA);
+  const stateB = initialState({ acceptedRuntime: legacyRuntime('d') });
+  const branchB = prepareAndCommit({
+    state: stateB,
+    request: { target: toRuntime('e') }
+  });
+
+  assert.throws(
+    () => storeA.compareAndSwap(0, branchB.store.snapshot()),
+    { code: 'transition_store_cas_candidate_invalid' }
+  );
+  assert.deepEqual(storeA.snapshot(), stateA);
+});
+
 test('1. receipts from different transition requests cannot be spliced', () => {
   const state = initialState();
   const a = requestFor(state, { suffix: 'A' });
@@ -907,6 +923,25 @@ test('10c1. archived terminals preserve replay markers without consuming admissi
     owner_digest: COORDINATOR_OWNER
   }), false);
   assert.equal(recordStore.get(firstRequest.transition_ref).status, 'terminal');
+});
+
+test('10c2. default record admission matches Observer active capacity', () => {
+  const recordStore = createTransitionRecordStore();
+  for (let index = 0; index < 256; index += 1) {
+    assert.equal(recordStore.reserve({
+      transition_ref: `grit_${String(index).padStart(32, '0')}`,
+      request_digest: digestObject(`capacity-request-${index}`),
+      owner_digest: COORDINATOR_OWNER
+    }), true);
+  }
+  assert.throws(
+    () => recordStore.reserve({
+      transition_ref: `grit_${'Z'.repeat(32)}`,
+      request_digest: digestObject('capacity-request-overflow'),
+      owner_digest: COORDINATOR_OWNER
+    }),
+    { code: 'transition_record_store_capacity_exceeded' }
+  );
 });
 
 test('10d. coordinator recovers a reserved ref index from atomic state protocol', () => {
@@ -2301,6 +2336,13 @@ test('17a0. Observer binds acceptance routing ref to the request ref', () => {
     observer.snapshot().last_violation_code,
     'transition_observer_accept_ref_mismatch'
   );
+});
+
+test('17a01. Observer rejects null before replay-marker lookup', () => {
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  assert.equal(observer.observe(null), false);
+  assert.equal(observer.observe([]), false);
+  assert.equal(observer.snapshot().protocol_violations, 0);
 });
 
 test('17a. Observer rejects a self-consistent commit not derived from its request', () => {

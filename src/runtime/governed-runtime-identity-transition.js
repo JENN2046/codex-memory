@@ -28,6 +28,7 @@ const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
 const EVENT_NAME_PATTERN = /^[a-z][a-z0-9_]{0,79}$/u;
 const TRANSITION_REF_PATTERN = /^grit_[A-Za-z0-9_-]{24,96}$/u;
 const AUTHORITY_PROOF_REPLAY_LIMIT = 4096;
+const DEFAULT_ACTIVE_TRANSITION_LIMIT = 256;
 const STORE_SCHEMA_VERSION = 1;
 const LEGACY_CONTROLLER_BINDING_MODEL = 'legacy_source_coupled';
 const STABLE_CONTROLLER_BINDING_MODEL = 'stable_controller_authority.v1';
@@ -265,6 +266,18 @@ function createGovernedRuntimeIdentityStateStore(initialState) {
       reject('transition_store_cas_candidate_invalid');
     }
     if (state.store_version !== expectedVersion) return false;
+    let expectedCandidate;
+    try {
+      expectedCandidate = successfulTransitionState(
+        state,
+        candidateState.last_transition.protocol
+      );
+    } catch {
+      reject('transition_store_cas_candidate_invalid');
+    }
+    if (canonicalJson(candidateState) !== canonicalJson(expectedCandidate)) {
+      reject('transition_store_cas_candidate_invalid');
+    }
     state = structuredClone(candidateState);
     return true;
   }
@@ -340,7 +353,7 @@ function createAuthorityProofReplayStore(initialEntries = []) {
 }
 
 function createTransitionRecordStore(initialRecords = [], {
-  maxActiveReservations = AUTHORITY_PROOF_REPLAY_LIMIT
+  maxActiveReservations = DEFAULT_ACTIVE_TRANSITION_LIMIT
 } = {}) {
   if (!Array.isArray(initialRecords) ||
       !Number.isInteger(maxActiveReservations) ||
@@ -2260,6 +2273,7 @@ function createGovernedRuntimeIdentityTransitionCoordinator({
 }
 
 module.exports = {
+  DEFAULT_ACTIVE_TRANSITION_LIMIT,
   LEGACY_CONTROLLER_BINDING_MODEL,
   STABLE_CONTROLLER_BINDING_MODEL,
   STORE_SCHEMA_VERSION,
