@@ -3638,6 +3638,68 @@ test('18a. coordinator loss reports durable reservations after recreation', () =
   }), true);
 });
 
+test('18a00. lost records retain their acknowledged missing-event evidence', () => {
+  const state = initialState();
+  const request = requestFor(state);
+  const recordStore = createTransitionRecordStore();
+  assert.equal(recordStore.reserve({
+    transition_ref: request.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(request),
+    owner_digest: COORDINATOR_OWNER,
+    acceptance_event: acceptanceEvent(request)
+  }), true);
+  let pending = recordStore.pendingObserverEvents()[0];
+  assert.equal(recordStore.ackObserverEvent({
+    transition_ref: request.transition_ref,
+    event_digest: pending.event_digest
+  }), true);
+  const missingEnvelope = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_terminal_missing',
+    transition_ref: request.transition_ref
+  };
+  assert.equal(recordStore.enqueueObserverEvent({
+    transition_ref: request.transition_ref,
+    envelope: missingEnvelope
+  }), true);
+  pending = recordStore.pendingObserverEvents()[0];
+  assert.equal(recordStore.ackObserverEvent({
+    transition_ref: request.transition_ref,
+    event_digest: pending.event_digest
+  }), true);
+  const legalLost = structuredClone(recordStore.snapshot()[0]);
+  assert.equal(legalLost.status, 'lost');
+  assert.equal(legalLost.observer_outbox.length, 0);
+  assert.equal(
+    legalLost.observer_delivered_events.at(-1).envelope.event,
+    'transition_terminal_missing'
+  );
+  assert.doesNotThrow(() => createTransitionRecordStore([legalLost]));
+
+  const missingEvidenceRemoved = structuredClone(legalLost);
+  missingEvidenceRemoved.observer_delivered_events.pop();
+  assert.throws(
+    () => createTransitionRecordStore([missingEvidenceRemoved]),
+    { code: 'transition_record_store_invalid' }
+  );
+
+  const committed = prepareAndCommit();
+  const successfulRecord = structuredClone(
+    committed.recordStore.get(committed.request.transition_ref)
+  );
+  successfulRecord.status = 'lost';
+  successfulRecord.protocol = null;
+  successfulRecord.observer_delivered_events = [
+    ...successfulRecord.observer_delivered_events,
+    ...successfulRecord.observer_outbox
+  ].sort((left, right) => left.sequence - right.sequence);
+  successfulRecord.observer_outbox = [];
+  assert.throws(
+    () => createTransitionRecordStore([successfulRecord]),
+    { code: 'transition_record_store_invalid' }
+  );
+});
+
 test('18a0. reservation atomically persists its acceptance before a crash', () => {
   const state = initialState();
   const durableRecords = createTransitionRecordStore();

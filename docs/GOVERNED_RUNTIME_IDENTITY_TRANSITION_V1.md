@@ -265,7 +265,11 @@ delivered prefix ahead of that suffix: an existing Observer consumes exact
 replays idempotently, while a fresh Observer rebuilds the active transition in
 canonical order. Active reservations also restore their delivered prefix when
 the outbox is empty, ensuring a later coordinator-loss report has an active
-Observer record to close. Archived protocol lookup validates and
+Observer record to close. A persisted `lost` record is valid only when its
+outbox is empty and its delivered stream ends in exactly one canonical
+`transition_terminal_missing`; it cannot substitute a successful atomic or
+committed-terminal stream while leaving `protocol` null. Archived protocol
+lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
 Concurrent recovery uses reserve-or-reread semantics: a loser validates the
 matching reservation established by the winner. If the winner finalizes after

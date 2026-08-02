@@ -430,6 +430,7 @@ function createTransitionRecordStore(initialRecords = [], {
     let atomicPreviousStateDigest = null;
     let atomicTerminal = null;
     let terminalSeen = false;
+    let terminalMissing = false;
     let terminal = null;
     for (const entry of entries) {
       const envelope = entry.envelope;
@@ -565,6 +566,7 @@ function createTransitionRecordStore(initialRecords = [], {
           reject('transition_record_store_invalid');
         }
         terminalSeen = true;
+        terminalMissing = true;
       } else {
         reject('transition_record_store_invalid');
       }
@@ -577,6 +579,7 @@ function createTransitionRecordStore(initialRecords = [], {
       atomic_protocol: atomicProtocol,
       atomic_store_version: atomicStoreVersion,
       atomic_previous_state_digest: atomicPreviousStateDigest,
+      terminal_missing: terminalMissing,
       terminal
     };
   }
@@ -632,7 +635,17 @@ function createTransitionRecordStore(initialRecords = [], {
     }
     if (record.status === 'reserved' || record.status === 'lost') {
       if (record.protocol !== null) reject('transition_record_store_invalid');
-      if (record.status === 'lost' && record.observer_outbox.length !== 0) {
+      if (record.status === 'lost') {
+        if (record.observer_outbox.length !== 0 ||
+            !observerStream.terminal_missing ||
+            observerStream.atomic_protocol !== null ||
+            observerStream.terminal !== null) {
+          reject('transition_record_store_invalid');
+        }
+      } else if (observerStream.terminal_missing &&
+          !record.observer_outbox.some(entry =>
+            entry.envelope.event === 'transition_terminal_missing'
+          )) {
         reject('transition_record_store_invalid');
       }
     } else {
@@ -640,6 +653,7 @@ function createTransitionRecordStore(initialRecords = [], {
       if (record.protocol.request.transition_ref !== record.transition_ref ||
           runtimeIdentityTransitionRequestDigest(record.protocol.request) !==
             record.request_digest ||
+          observerStream.terminal_missing ||
           (record.protocol.terminal.outcome === 'success' &&
             (record.previous_state_digest === null ||
               observerStream.entry_count === 0 ||
