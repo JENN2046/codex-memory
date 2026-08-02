@@ -116,6 +116,18 @@ const GOVERNED_RUNTIME_IDENTITY_TRANSITION_FAILURE_REGISTRY =
     protocol_binding_invalid: failure(
       'binding', 'CANDIDATE_MANIFEST_VERIFIED', 'manifest_verifier'
     ),
+    candidate_manifest_changed_after_preview: failure(
+      'candidate', 'TRANSITION_COMMITTED', 'manifest_verifier'
+    ),
+    candidate_scope_changed_after_preview: failure(
+      'candidate', 'TRANSITION_COMMITTED', 'manifest_verifier'
+    ),
+    candidate_protocol_binding_changed_after_preview: failure(
+      'binding', 'TRANSITION_COMMITTED', 'manifest_verifier'
+    ),
+    candidate_revalidation_unavailable: failure(
+      'candidate', 'TRANSITION_COMMITTED', 'manifest_verifier'
+    ),
     transition_expired: failure(
       'lifecycle', 'TERMINAL_FAILURE', 'transition_coordinator'
     ),
@@ -500,13 +512,16 @@ function createRuntimeIdentityTransitionReceipt({
   const expectedStage = nextTransitionStage(receipts);
   if (expectedStage === null) reject('transition_receipt_after_finalization');
   const selectedStage = stage || expectedStage;
+  const failureEntry = outcome === 'failed'
+    ? transitionFailureRegistryEntry(reasonCode)
+    : null;
   const base = {
     schema_version: GOVERNED_RUNTIME_IDENTITY_TRANSITION_SCHEMA_VERSION,
     protocol: GOVERNED_RUNTIME_IDENTITY_TRANSITION_PROTOCOL,
     transition_ref: request.transition_ref,
     sequence: receipts.length,
     stage: selectedStage,
-    origin:
+    origin: failureEntry?.origin ||
       GOVERNED_RUNTIME_IDENTITY_TRANSITION_ORIGIN_BY_STAGE[selectedStage],
     outcome,
     previous_digest: receipts.length === 0
@@ -564,8 +579,10 @@ function validateRuntimeIdentityTransitionReceipt(
       ? 'transition_receipt_stage_regression'
       : 'transition_receipt_stage_gap');
   }
-  if (receipt.origin !==
-      GOVERNED_RUNTIME_IDENTITY_TRANSITION_ORIGIN_BY_STAGE[receipt.stage]) {
+  const expectedOrigin = receipt.outcome === 'failed'
+    ? transitionFailureRegistryEntry(receipt.reason_code).origin
+    : GOVERNED_RUNTIME_IDENTITY_TRANSITION_ORIGIN_BY_STAGE[receipt.stage];
+  if (receipt.origin !== expectedOrigin) {
     reject('transition_receipt_origin_invalid');
   }
   const previousDigest = receipts.length === 0
