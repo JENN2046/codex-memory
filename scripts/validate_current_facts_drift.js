@@ -767,10 +767,20 @@ function isInsideQuotedSegment(text, index) {
   const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
   const before = text.slice(lineStart, index);
   const after = text.slice(index, lineEnd);
-  const insideSymmetricQuote = ["\"", "'", "`"].some(delimiter =>
+  const insideSymmetricQuote = ["\"", "`"].some(delimiter =>
     before.split(delimiter).length % 2 === 0 && after.includes(delimiter)
   );
   if (insideSymmetricQuote) return true;
+  const isWordCharacter = value => typeof value === "string" && /[\p{L}\p{N}_]/u.test(value);
+  const singleQuoteDelimiters = value => [...value].reduce((count, character, characterIndex) => {
+    if (character !== "'") return count;
+    const previous = value[characterIndex - 1];
+    const next = value[characterIndex + 1];
+    return isWordCharacter(previous) && isWordCharacter(next) ? count : count + 1;
+  }, 0);
+  if (singleQuoteDelimiters(before) % 2 === 1 && singleQuoteDelimiters(after) > 0) {
+    return true;
+  }
   return [["“", "”"], ["‘", "’"]].some(([open, close]) =>
     before.lastIndexOf(open) > before.lastIndexOf(close) && after.includes(close)
   );

@@ -1184,6 +1184,7 @@ test("current facts validator permits instructions to re-query the current task 
       "The current task branch is not recorded by this document.",
       "The phrase `current task branch records the active state` is a stale assertion.",
       "The phrase 'current task branch records the active state' is stale.",
+      "Jenn's note quotes 'current task branch records the active state' as stale.",
       "The phrase “current task branch records the active state” is stale.",
       "The phrase ‘current task branch records the active state’ is stale.",
       "Check whether the current task branch is recorded before reporting.",
@@ -1201,7 +1202,12 @@ test("current facts validator rejects qualified branch-relative assertions", () 
   const currentStatePath = path.join(root, "CURRENT_STATE.md");
   fs.appendFileSync(
     currentStatePath,
-    "\nThe current task branch currently records the active state.\n",
+    [
+      "",
+      "The current task branch currently records the active state.",
+      "Jenn's current task branch records state in the owner's note.",
+      ""
+    ].join("\n"),
     "utf8"
   );
   const result = validateCurrentFactsDrift(root);
