@@ -1006,17 +1006,35 @@ function durableSuccessorChainMatches(startState, targetState, records) {
       return false;
     }
     const successorsByPreviousDigest = new Map();
+    function addSuccessor(previousStateDigest, protocol) {
+      const candidates = successorsByPreviousDigest.get(
+        previousStateDigest
+      ) || [];
+      if (!candidates.some(candidate =>
+        canonicalJson(candidate.protocol) === canonicalJson(protocol)
+      )) {
+        candidates.push({ protocol });
+      }
+      successorsByPreviousDigest.set(previousStateDigest, candidates);
+    }
     for (const record of records) {
       if (record.status !== 'terminal' ||
           record.protocol?.terminal.outcome !== 'success' ||
           !DIGEST_PATTERN.test(record.previous_state_digest || '')) {
         continue;
       }
-      const candidates = successorsByPreviousDigest.get(
-        record.previous_state_digest
-      ) || [];
-      candidates.push(record);
-      successorsByPreviousDigest.set(record.previous_state_digest, candidates);
+      addSuccessor(record.previous_state_digest, record.protocol);
+    }
+    // The atomic target is authoritative and retains its complete canonical
+    // last-transition protocol. Use that final edge when its secondary record
+    // is still reserved after a crash between CAS and archive finalization.
+    // An already archived identical edge is deduplicated; a conflicting edge
+    // from the same predecessor remains an ambiguous fork and fails closed.
+    if (targetState.last_transition !== null) {
+      addSuccessor(
+        targetState.last_transition.previous_state_digest,
+        targetState.last_transition.protocol
+      );
     }
     let cursor = structuredClone(startState);
     while (cursor.store_version < targetState.store_version) {

@@ -178,9 +178,12 @@ active set into a bounded reconciliation history, so completed transitions do
 not permanently consume admission capacity while cumulative governance
 counters remain intact.
 Compact terminal replay markers remain after full reconciliation records rotate
-out, and can be snapshotted into a rebuilt Observer. A live Observer adapter
-must persist or safely compact these markers so a rotated `transition_ref`
-cannot be admitted again.
+out, and can be snapshotted into a rebuilt Observer. Each marker binds its
+`transition_ref` to the exact digests of events the Observer acknowledged, so
+a rebuilt Observer can idempotently confirm a redelivered failed terminal
+prefix without accepting a changed envelope. A live Observer adapter must
+persist or safely compact these markers so a rotated `transition_ref` cannot
+be admitted again.
 Observer reconstruction also takes the last complete governed atomic state,
 revalidates it, and restores its version, canonical state digest, accepted
 runtime, stable controller binding, legacy marker, and terminal replay marker
@@ -216,6 +219,11 @@ transition's own runtime, binding, and state digest.
 It also applies when CAS committed but threw instead of acknowledging: a
 successor committed before the exception readback is verified through the
 durable chain and cannot turn the earlier success into a conflicting failure.
+If that successor itself crashed after CAS but before secondary-record
+finalization, the validated target authoritative state's complete
+`last_transition.protocol` supplies only the final chain edge; archived
+predecessor edges must still form a unique path, and conflicting edges fail
+closed.
 If crash recovery finalizes a success that had not yet reached observers, the
 coordinator replays the missing post-preview receipts, atomic commit, and
 terminal event from the authoritative state before releasing the local record.

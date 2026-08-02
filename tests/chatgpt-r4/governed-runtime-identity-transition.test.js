@@ -1174,6 +1174,76 @@ test('13a1. lost CAS acknowledgement tolerates a legal successor', () => {
   assert.equal(current.accepted_runtime.source_head, toRuntime('c').source_head);
 });
 
+test('13a2. authoritative target closes an unfinalized successor chain', () => {
+  const state = initialState();
+  const durableRecords = createTransitionRecordStore();
+  let failSuccessFinalizationRef = null;
+  const recordStore = {
+    ...durableRecords,
+    finalize(input) {
+      if (input.transition_ref === failSuccessFinalizationRef &&
+          input.protocol.terminal.outcome === 'success') {
+        throw new Error('synthetic-successor-finalization-failure');
+      }
+      return durableRecords.finalize(input);
+    }
+  };
+  const observer = { observe() { return true; } };
+  let current = structuredClone(state);
+  let commitUnfinalizedSuccessorBeforeReadback = false;
+  let successorRef = null;
+  const store = {
+    snapshot() {
+      if (commitUnfinalizedSuccessorBeforeReadback) {
+        commitUnfinalizedSuccessorBeforeReadback = false;
+        const successorState = structuredClone(current);
+        const successor = harness({
+          state: successorState,
+          store,
+          recordStore,
+          observer
+        });
+        const successorRequest = requestFor(successorState, {
+          suffix: 'W',
+          target: toRuntime('c'),
+          proofDigest: digestObject('unfinalized-successor-proof'),
+          legacy: null
+        });
+        successorRef = successorRequest.transition_ref;
+        const successorPreview = successor.coordinator.preview(
+          successorRequest
+        );
+        assert.equal(successorPreview.status, 'prepared');
+        failSuccessFinalizationRef = successorRef;
+        assert.throws(
+          () => successor.coordinator.commit(successorPreview.preview),
+          { code: 'transition_record_store_recovery_failed' }
+        );
+        failSuccessFinalizationRef = null;
+      }
+      return structuredClone(current);
+    },
+    compareAndSwap(expectedVersion, candidate) {
+      if (expectedVersion !== current.store_version) return false;
+      current = structuredClone(candidate);
+      if (expectedVersion === 0) {
+        commitUnfinalizedSuccessorBeforeReadback = true;
+        throw new Error('synthetic-ack-loss-before-unfinalized-successor');
+      }
+      return true;
+    }
+  };
+  const first = harness({ state, store, recordStore, observer });
+  const request = requestFor(state);
+  const prepared = first.coordinator.preview(request);
+  const committed = first.coordinator.commit(prepared.preview);
+
+  assert.equal(committed.status, 'terminal_success');
+  assert.equal(current.store_version, 2);
+  assert.equal(current.accepted_runtime.source_head, toRuntime('c').source_head);
+  assert.equal(durableRecords.get(successorRef).status, 'reserved');
+});
+
 test('13b. a transient snapshot fault after successful CAS recovers success', () => {
   const state = initialState();
   let current = structuredClone(state);
@@ -1595,6 +1665,58 @@ test('13d3a. Observer redelivery is idempotent after durable ack failure', () =>
     terminals_fabricated: 0
   });
   assert.equal(recordStore.get(request.transition_ref).status, 'lost');
+});
+
+test('13d3a1. rebuilt Observer acknowledges an exact failed-terminal replay', () => {
+  const state = initialState({
+    lifecycle: {
+      lifecycle_state: 'running',
+      held_stopped: false,
+      safe_stop_receipt_digest: SAFE_STOP_DIGEST,
+      running_component_count: 1
+    }
+  });
+  const recordStore = createTransitionRecordStore();
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  let failTerminalAck = true;
+  const unreliableRecords = {
+    ...recordStore,
+    ackObserverEvent(input) {
+      const pending = recordStore.pendingObserverEvents()[0];
+      if (failTerminalAck &&
+          pending?.envelope.event === 'transition_terminal_committed') {
+        failTerminalAck = false;
+        throw new Error('synthetic-failed-terminal-ack-failure');
+      }
+      return recordStore.ackObserverEvent(input);
+    }
+  };
+  const first = harness({
+    state,
+    recordStore: unreliableRecords,
+    observer
+  });
+  assert.throws(
+    () => first.coordinator.preview(requestFor(state)),
+    /synthetic-failed-terminal-ack-failure/u
+  );
+  assert.equal(recordStore.pendingObserverEvents().length, 1);
+  assert.equal(observer.snapshot().terminal_failures, 1);
+
+  const rebuiltRecords = createTransitionRecordStore(recordStore.snapshot());
+  const rebuiltObserver = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state,
+    initialTerminalReplayMarkers: observer.replayMarkers()
+  });
+  harness({
+    state,
+    recordStore: rebuiltRecords,
+    observer: rebuiltObserver
+  });
+  assert.equal(rebuiltRecords.pendingObserverEvents().length, 0);
+  assert.equal(rebuiltObserver.snapshot().protocol_violations, 0);
 });
 
 test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
@@ -2306,6 +2428,14 @@ test('17e. Observer rotates terminal history without exhausting active capacity'
     event: 'transition_accepted',
     transition_ref: earliestRequest.transition_ref,
     request: earliestRequest
+  }), true);
+  const conflictingReplay = structuredClone(earliestRequest);
+  conflictingReplay.request.nonce = `nonce_${'Z'.repeat(24)}`;
+  assert.equal(rebuilt.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    transition_ref: conflictingReplay.transition_ref,
+    request: conflictingReplay
   }), false);
 });
 

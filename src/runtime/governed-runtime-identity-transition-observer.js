@@ -48,14 +48,42 @@ function createGovernedRuntimeIdentityTransitionObserver({
   const terminalHistory = new Map();
   const provisionalHistoricalTerminals = new Map();
   const terminalReplayMarkers = new Set();
-  const acknowledgedEventDigests = new Set();
-  for (const transitionRef of initialTerminalReplayMarkers) {
-    if (!GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN.test(
-      transitionRef || ''
-    ) || terminalReplayMarkers.has(transitionRef)) {
+  const acknowledgedEventDigestsByTransition = new Map();
+  const initialReplayDigests = new Set();
+
+  function acknowledgeEventDigest(transitionRef, eventDigest) {
+    const transitionDigests =
+      acknowledgedEventDigestsByTransition.get(transitionRef) || new Set();
+    transitionDigests.add(eventDigest);
+    acknowledgedEventDigestsByTransition.set(
+      transitionRef,
+      transitionDigests
+    );
+  }
+
+  for (const marker of initialTerminalReplayMarkers) {
+    if (!exactKeys(marker, [
+      'transition_ref', 'acknowledged_event_digests'
+    ]) ||
+        !GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN.test(
+          marker.transition_ref || ''
+        ) ||
+        !Array.isArray(marker.acknowledged_event_digests) ||
+        marker.acknowledged_event_digests.length === 0 ||
+        new Set(marker.acknowledged_event_digests).size !==
+          marker.acknowledged_event_digests.length ||
+        marker.acknowledged_event_digests.some(
+          digest => !DIGEST_PATTERN.test(digest || '') ||
+            initialReplayDigests.has(digest)
+        ) ||
+        terminalReplayMarkers.has(marker.transition_ref)) {
       reject('transition_observer_replay_markers_invalid');
     }
-    terminalReplayMarkers.add(transitionRef);
+    terminalReplayMarkers.add(marker.transition_ref);
+    for (const eventDigest of marker.acknowledged_event_digests) {
+      initialReplayDigests.add(eventDigest);
+      acknowledgeEventDigest(marker.transition_ref, eventDigest);
+    }
   }
   let lastAuthoritativeCommit = null;
   let initialAuthoritativeAnchor = null;
@@ -155,7 +183,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         }
       ];
       for (const event of canonicalEvents) {
-        acknowledgedEventDigests.add(digestObject(event));
+        acknowledgeEventDigest(lastTransitionRef, digestObject(event));
       }
     }
   }
@@ -525,9 +553,14 @@ function createGovernedRuntimeIdentityTransitionObserver({
     } catch {
       return false;
     }
-    if (acknowledgedEventDigests.has(eventDigest)) return true;
+    if (acknowledgedEventDigestsByTransition.get(event.transition_ref)
+      ?.has(eventDigest)) {
+      return true;
+    }
     const accepted = observeOnce(event);
-    if (accepted === true) acknowledgedEventDigests.add(eventDigest);
+    if (accepted === true) {
+      acknowledgeEventDigest(event.transition_ref, eventDigest);
+    }
     return accepted;
   }
 
@@ -578,7 +611,14 @@ function createGovernedRuntimeIdentityTransitionObserver({
   }
 
   function replayMarkers() {
-    return Object.freeze([...terminalReplayMarkers]);
+    return Object.freeze([...terminalReplayMarkers].map(transitionRef =>
+      Object.freeze({
+        transition_ref: transitionRef,
+        acknowledged_event_digests: Object.freeze([
+          ...(acknowledgedEventDigestsByTransition.get(transitionRef) || [])
+        ])
+      })
+    ));
   }
 
   return Object.freeze({ observe, reconcile, replayMarkers, snapshot });
