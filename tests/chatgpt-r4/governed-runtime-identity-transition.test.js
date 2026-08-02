@@ -2697,6 +2697,41 @@ test('13d3c1. active delivery prefixes recover even with an empty outbox', () =>
   assert.equal(freshObserver.snapshot().terminals_missing, 1);
 });
 
+test('13d3c2. completed terminals retain acknowledged delivery state', () => {
+  const result = prepareAndCommit();
+  const before = result.recordStore.snapshot();
+  const terminal = before[0];
+  assert.equal(terminal.status, 'terminal');
+  assert.equal(terminal.observer_outbox.length, 0);
+  assert.equal(terminal.observer_acknowledged_events.length > 0, true);
+
+  createGovernedRuntimeIdentityTransitionCoordinator({
+    store: result.store,
+    authorityProofReplayStore: createAuthorityProofReplayStore(),
+    transitionRecordStore: result.recordStore,
+    coordinatorOwnerDigest: COORDINATOR_OWNER,
+    authorityVerifier,
+    candidateManifestVerifier: manifestVerifier,
+    clock: () => NOW
+  });
+  assert.deepEqual(result.recordStore.snapshot(), before);
+
+  let redeliveries = 0;
+  harness({
+    state: result.store.snapshot(),
+    store: result.store,
+    recordStore: result.recordStore,
+    observer: {
+      observe() {
+        redeliveries += 1;
+        return true;
+      }
+    }
+  });
+  assert.equal(redeliveries, 0);
+  assert.deepEqual(result.recordStore.snapshot(), before);
+});
+
 test('13d3d. a coordinator without a sink persists the complete event stream', () => {
   const state = initialState();
   const store = createGovernedRuntimeIdentityStateStore(state);

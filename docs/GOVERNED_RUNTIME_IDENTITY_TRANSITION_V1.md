@@ -286,7 +286,9 @@ consumes exact replays idempotently, while a fresh Observer rebuilds the active
 transition in canonical order. Active reservations also restore their
 acknowledged prefix when
 the outbox is empty, ensuring a later coordinator-loss report has an active
-Observer record to close. A persisted `lost` record is valid only when its
+Observer record to close. A completed terminal with no pending suffix retains
+its acknowledged disposition across coordinator reconstruction and is not
+redelivered. A persisted `lost` record is valid only when its
 outbox is empty and its acknowledged stream ends in exactly one canonical
 `transition_terminal_missing`; it cannot substitute a successful atomic or
 committed-terminal stream while leaving `protocol` null. A `reserved` record

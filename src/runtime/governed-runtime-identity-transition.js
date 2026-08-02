@@ -1090,7 +1090,9 @@ function createTransitionRecordStore(initialRecords = [], {
       ...terminalArchive.values()
     ]) {
       if (record.status === 'lost' ||
-          record.observer_acknowledged_events.length === 0) {
+          record.observer_acknowledged_events.length === 0 ||
+          (record.status === 'terminal' &&
+            record.observer_outbox.length === 0)) {
         continue;
       }
       restored += record.observer_acknowledged_events.length;
