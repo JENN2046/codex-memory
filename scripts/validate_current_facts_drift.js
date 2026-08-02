@@ -772,12 +772,15 @@ function isInsideQuotedSegment(text, index) {
   );
   if (insideSymmetricQuote) return true;
   const isWordCharacter = value => typeof value === "string" && /[\p{L}\p{N}_]/u.test(value);
-  const singleQuoteDelimiters = value => [...value].reduce((count, character, characterIndex) => {
-    if (character !== "'") return count;
-    const previous = value[characterIndex - 1];
-    const next = value[characterIndex + 1];
-    return isWordCharacter(previous) && isWordCharacter(next) ? count : count + 1;
-  }, 0);
+  const singleQuoteDelimiters = value => {
+    const characters = [...value];
+    return characters.reduce((count, character, characterIndex) => {
+      if (character !== "'") return count;
+      const previous = characters[characterIndex - 1];
+      const next = characters[characterIndex + 1];
+      return isWordCharacter(previous) && isWordCharacter(next) ? count : count + 1;
+    }, 0);
+  };
   if (singleQuoteDelimiters(before) % 2 === 1 && singleQuoteDelimiters(after) > 0) {
     return true;
   }

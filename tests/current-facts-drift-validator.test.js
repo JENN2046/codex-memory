@@ -1185,6 +1185,7 @@ test("current facts validator permits instructions to re-query the current task 
       "The phrase `current task branch records the active state` is a stale assertion.",
       "The phrase 'current task branch records the active state' is stale.",
       "Jenn's note quotes 'current task branch records the active state' as stale.",
+      "😀 Jenn's note quotes 'current task branch records the active state' as stale.",
       "The phrase “current task branch records the active state” is stale.",
       "The phrase ‘current task branch records the active state’ is stale.",
       "Check whether the current task branch is recorded before reporting.",
