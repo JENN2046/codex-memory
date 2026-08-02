@@ -223,6 +223,7 @@ function replayObserverPrelude(observer, result) {
   observer.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
+    transition_ref: result.request.transition_ref,
     request: result.request
   });
   for (const receipt of result.committed.protocol.receipts) {
@@ -1713,8 +1714,8 @@ test('13d3f. current state anchors an offline historical commit backlog', () => 
     clock: () => NOW
   });
   let current = state;
-  for (const [index, suffix] of ['L', 'M', 'N'].entries()) {
-    const target = toRuntime(['b', 'c', 'd'][index]);
+  for (const [index, suffix] of ['L', 'M', 'N', 'O'].entries()) {
+    const target = toRuntime(['b', 'c', 'd', 'e'][index]);
     const request = requestFor(current, {
       suffix,
       target,
@@ -1729,11 +1730,12 @@ test('13d3f. current state anchors an offline historical commit backlog', () => 
     assert.equal(coordinator.commit(prepared.preview).status, 'terminal_success');
     current = store.snapshot();
   }
-  assert.equal(current.store_version, 3);
+  assert.equal(current.store_version, 4);
   assert.equal(recordStore.pendingObserverEvents().length > 0, true);
 
   const provisionalObserver = createGovernedRuntimeIdentityTransitionObserver({
-    initialAuthoritativeState: current
+    initialAuthoritativeState: current,
+    maxRetainedTransitions: 2
   });
   const firstHistoricalRecord = recordStore.snapshot()
     .find(record => record.protocol?.request.from_runtime.identity_digest ===
@@ -1743,6 +1745,11 @@ test('13d3f. current state anchors an offline historical commit backlog', () => 
   }
   assert.equal(provisionalObserver.snapshot().atomic_commits_verified, 0);
   assert.equal(provisionalObserver.snapshot().terminal_successes, 0);
+  assert.equal(provisionalObserver.snapshot().active_transitions, 0);
+  assert.equal(
+    provisionalObserver.snapshot().provisional_historical_transitions,
+    1
+  );
   assert.throws(
     () => provisionalObserver.reconcile(
       firstHistoricalRecord.transition_ref
@@ -1751,14 +1758,16 @@ test('13d3f. current state anchors an offline historical commit backlog', () => 
   );
 
   const observer = createGovernedRuntimeIdentityTransitionObserver({
-    initialAuthoritativeState: current
+    initialAuthoritativeState: current,
+    maxRetainedTransitions: 2
   });
   harness({ state: current, store, recordStore, observer });
   const snapshot = observer.snapshot();
   assert.equal(recordStore.pendingObserverEvents().length, 0);
-  assert.equal(snapshot.atomic_commits_verified, 2);
-  assert.equal(snapshot.terminal_successes, 2);
-  assert.equal(snapshot.last_authoritative_store_version, 3);
+  assert.equal(snapshot.atomic_commits_verified, 3);
+  assert.equal(snapshot.terminal_successes, 3);
+  assert.equal(snapshot.last_authoritative_store_version, 4);
+  assert.equal(snapshot.provisional_historical_transitions, 0);
   assert.equal(snapshot.protocol_violations, 0);
 });
 
@@ -1926,12 +1935,31 @@ test('17. Observer independently reconstructs the exact terminal', () => {
   );
 });
 
+test('17a0. Observer binds acceptance routing ref to the request ref', () => {
+  const state = initialState();
+  const request = requestFor(state);
+  const observer = createGovernedRuntimeIdentityTransitionObserver();
+  assert.equal(observer.observe({
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    transition_ref: `grit_${'Z'.repeat(32)}`,
+    request
+  }), false);
+  assert.equal(observer.snapshot().active_transitions, 0);
+  assert.equal(observer.snapshot().protocol_violations, 1);
+  assert.equal(
+    observer.snapshot().last_violation_code,
+    'transition_observer_accept_ref_mismatch'
+  );
+});
+
 test('17a. Observer rejects a self-consistent commit not derived from its request', () => {
   const result = prepareAndCommit();
   const observer = createGovernedRuntimeIdentityTransitionObserver();
   observer.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
+    transition_ref: result.request.transition_ref,
     request: result.request
   });
   for (const receipt of result.committed.protocol.receipts) {
@@ -1981,6 +2009,7 @@ test('17b. Observer binds the final terminal to the verified atomic commit', () 
   observer.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
+    transition_ref: result.request.transition_ref,
     request: result.request
   });
   for (const receipt of result.committed.protocol.receipts) {
@@ -2027,6 +2056,7 @@ test('17c. Observer rejects a non-canonical atomic state digest', () => {
   observer.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
+    transition_ref: result.request.transition_ref,
     request: result.request
   });
   for (const receipt of result.committed.protocol.receipts) {
@@ -2058,6 +2088,7 @@ test('17d. Observer recomputes a shaped atomic state digest', () => {
   observer.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
+    transition_ref: result.request.transition_ref,
     request: result.request
   });
   for (const receipt of result.committed.protocol.receipts) {
@@ -2106,6 +2137,7 @@ test('17e. Observer rotates terminal history without exhausting active capacity'
     assert.equal(observer.observe({
       component: 'governed_runtime_identity_transition_coordinator',
       event: 'transition_accepted',
+      transition_ref: request.transition_ref,
       request
     }), true);
     assert.equal(observer.observe({
@@ -2126,6 +2158,7 @@ test('17e. Observer rotates terminal history without exhausting active capacity'
   assert.equal(observer.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
+    transition_ref: earliestRequest.transition_ref,
     request: earliestRequest
   }), true);
   assert.equal(observer.snapshot().transitions_accepted, 5);
@@ -2139,6 +2172,7 @@ test('17e. Observer rotates terminal history without exhausting active capacity'
   assert.equal(rebuilt.observe({
     component: 'governed_runtime_identity_transition_coordinator',
     event: 'transition_accepted',
+    transition_ref: earliestRequest.transition_ref,
     request: earliestRequest
   }), false);
 });

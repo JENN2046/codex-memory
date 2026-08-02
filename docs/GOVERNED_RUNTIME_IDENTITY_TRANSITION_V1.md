@@ -287,7 +287,12 @@ initial authoritative state, they are accepted only as a provisional strictly
 monotonic prefix. No atomic or terminal success is counted as verified until
 that prefix reaches the exact predecessor digest and `from_runtime` bound by
 the initial state's `last_transition`; the current state itself remains the
-live successor anchor.
+live successor anchor. Provisional terminals move out of the bounded active
+admission set, so a history longer than the live retention window cannot block
+the commit that closes the prefix. Acceptance also requires its envelope
+`transition_ref` to equal the canonical request reference. The Observer applies
+the same closed event registry and exact envelope shapes to direct delivery as
+the durable record store applies during enqueue and reconstruction.
 
 The unique failure registry includes:
 
