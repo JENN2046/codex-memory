@@ -635,7 +635,11 @@ function createTransitionRecordStore(initialRecords = [], {
           runtimeIdentityTransitionRequestDigest(record.protocol.request) !==
             record.request_digest ||
           (record.protocol.terminal.outcome === 'success' &&
-            record.previous_state_digest === null)) {
+            (record.previous_state_digest === null ||
+              observerStream.entry_count === 0 ||
+              observerStream.preview === null ||
+              observerStream.atomic_protocol === null ||
+              observerStream.terminal === null))) {
         reject('transition_record_store_invalid');
       }
       // A non-empty durable event stream and its archived protocol are one

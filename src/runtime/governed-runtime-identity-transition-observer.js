@@ -89,7 +89,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
   let lastAuthoritativeCommit = null;
   let initialAuthoritativeAnchor = null;
   let historicalReplayCommit = null;
-  const historicalReplayRefs = [];
+  let pendingHistoricalAtomicCount = 0;
+  let pendingHistoricalTerminalCount = 0;
   if (initialAuthoritativeState !== null) {
     validateGovernedRuntimeIdentityState(initialAuthoritativeState);
     lastAuthoritativeCommit = {
@@ -438,20 +439,27 @@ function createGovernedRuntimeIdentityTransitionObserver({
         };
         if (historicalReplay) {
           historicalReplayCommit = verifiedCommit;
-          historicalReplayRefs.push(event.transition_ref);
+          pendingHistoricalAtomicCount += 1;
           if (closesHistoricalPrefix) {
-            for (const transitionRef of historicalReplayRefs) {
-              const historicalRecord = transitions.get(transitionRef) ||
-                provisionalHistoricalTerminals.get(transitionRef);
-              if (!historicalRecord || historicalRecord.atomic_verified) {
-                continue;
-              }
-              historicalRecord.atomic_verified = true;
-              counters.atomic_commits_verified += 1;
-              if (historicalRecord.terminal) {
-                retainVerifiedTerminal(transitionRef, historicalRecord);
+            counters.atomic_commits_verified += pendingHistoricalAtomicCount;
+            counters.terminal_successes += pendingHistoricalTerminalCount;
+            for (const records of [
+              [...transitions.entries()],
+              [...provisionalHistoricalTerminals.entries()]
+            ]) {
+              for (const [transitionRef, historicalRecord] of records) {
+                if (!historicalRecord.historical_replay ||
+                    historicalRecord.atomic_verified) {
+                  continue;
+                }
+                historicalRecord.atomic_verified = true;
+                if (historicalRecord.terminal) {
+                  retainTerminal(transitionRef, historicalRecord);
+                }
               }
             }
+            pendingHistoricalAtomicCount = 0;
+            pendingHistoricalTerminalCount = 0;
           }
         } else {
           lastAuthoritativeCommit = verifiedCommit;
@@ -498,7 +506,15 @@ function createGovernedRuntimeIdentityTransitionObserver({
         record.terminal = structuredClone(event.terminal);
         if (record.historical_replay && !record.atomic_verified) {
           transitions.delete(event.transition_ref);
+          terminalReplayMarkers.add(event.transition_ref);
           provisionalHistoricalTerminals.set(event.transition_ref, record);
+          pendingHistoricalTerminalCount += 1;
+          while (provisionalHistoricalTerminals.size >
+              maxRetainedTransitions) {
+            provisionalHistoricalTerminals.delete(
+              provisionalHistoricalTerminals.keys().next().value
+            );
+          }
           return true;
         }
         retainVerifiedTerminal(event.transition_ref, record);

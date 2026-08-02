@@ -275,6 +275,11 @@ and any atomic event must carry the exact archived protocol, persisted
 previous-state digest, and preview-derived store version. A recovery adapter
 therefore cannot splice a successful Observer stream onto a conflicting
 failure archive, or detach a commit from its persisted predecessor anchor.
+Every successful terminal archive must retain the complete canonical event
+chain: acceptance, all receipts, preview, atomic commit, and terminal. A
+protocol-only success is rejected because a fresh Observer could not
+independently reconstruct it. Failure and loss replay markers may remain
+compact when no successful atomic state was committed.
 Persisted envelopes use a closed event registry with exact payload shapes.
 Unknown event names, missing required payloads, invalid receipt chains, and
 malformed atomic projections are rejected during store reconstruction and
@@ -332,8 +337,12 @@ monotonic prefix. No atomic or terminal success is counted as verified until
 that prefix reaches the exact predecessor digest and `from_runtime` bound by
 the initial state's `last_transition`; the current state itself remains the
 live successor anchor. Provisional terminals move out of the bounded active
-admission set, so a history longer than the live retention window cannot block
-the commit that closes the prefix. Acceptance also requires its envelope
+admission set. Their full reconciliation records are bounded by the Observer
+retention limit; older records compact into exact acknowledged-event replay
+markers and cumulative pending counts. Closing the prefix verifies those
+counts against the authoritative chain without retaining an unbounded Map, so
+a history longer than the live retention window cannot block the commit that
+closes the prefix. Acceptance also requires its envelope
 `transition_ref` to equal the canonical request reference. The Observer applies
 the same closed event registry and exact envelope shapes to direct delivery as
 the durable record store applies during enqueue and reconstruction.

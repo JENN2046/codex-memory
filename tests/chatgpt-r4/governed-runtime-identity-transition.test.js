@@ -1004,6 +1004,11 @@ test('10d1. concurrent recovery accepts the matching reservation winner', () => 
 test('10d1a. recovery rereads a terminal after commit-context race loss', () => {
   const first = prepareAndCommit();
   const state = first.store.snapshot();
+  const firstRecord = first.recordStore.get(first.request.transition_ref);
+  const canonicalEvents = [
+    ...firstRecord.observer_delivered_events,
+    ...firstRecord.observer_outbox
+  ].map(entry => entry.envelope);
   const durableRecords = createTransitionRecordStore();
   let raceContextWrite = true;
   const racingRecords = {
@@ -1015,7 +1020,8 @@ test('10d1a. recovery rereads a terminal after commit-context race loss', () => 
       durableRecords.finalize({
         transition_ref: first.request.transition_ref,
         request_digest: runtimeIdentityTransitionRequestDigest(first.request),
-        protocol: first.committed.protocol
+        protocol: first.committed.protocol,
+        observer_events: canonicalEvents
       });
       throw new Error('synthetic-context-write-race-loss');
     }
@@ -1955,6 +1961,20 @@ test('13d3b2. archived commit anchors match the atomic Observer event', () => {
   );
 });
 
+test('13d3b3. successful archives require a complete Observer event chain', () => {
+  const result = prepareAndCommit();
+  const record = structuredClone(
+    result.recordStore.get(result.request.transition_ref)
+  );
+  record.observer_delivered_events = [];
+  record.observer_outbox = [];
+
+  assert.throws(
+    () => createTransitionRecordStore([record]),
+    { code: 'transition_record_store_invalid' }
+  );
+});
+
 test('13d3c. a fresh Observer receives the delivered prefix before pending events', () => {
   const state = initialState();
   const recordStore = createTransitionRecordStore();
@@ -2153,6 +2173,60 @@ test('13d3f. current state anchors an offline historical commit backlog', () => 
   assert.equal(snapshot.terminal_successes, 3);
   assert.equal(snapshot.last_authoritative_store_version, 4);
   assert.equal(snapshot.provisional_historical_transitions, 0);
+  assert.equal(snapshot.protocol_violations, 0);
+});
+
+test('13d3f1. an unclosed historical prefix retains only bounded records', () => {
+  const state = initialState();
+  const store = createGovernedRuntimeIdentityStateStore(state);
+  const recordStore = createTransitionRecordStore();
+  const coordinator = createGovernedRuntimeIdentityTransitionCoordinator({
+    store,
+    authorityProofReplayStore: createAuthorityProofReplayStore(),
+    transitionRecordStore: recordStore,
+    coordinatorOwnerDigest: COORDINATOR_OWNER,
+    authorityVerifier,
+    candidateManifestVerifier: manifestVerifier,
+    clock: () => NOW
+  });
+  let current = state;
+  for (const [index, suffix] of ['P', 'Q', 'R', 'S', 'T'].entries()) {
+    const target = toRuntime(['b', 'c', 'd', 'e', 'f'][index]);
+    const request = requestFor(current, {
+      suffix,
+      target,
+      fromRuntime: current.accepted_runtime,
+      proofDigest: digestObject(`bounded-history-proof-${suffix}`),
+      legacy: index === 0
+        ? legacyEvidence(current, target)
+        : null
+    });
+    const prepared = coordinator.preview(request);
+    assert.equal(prepared.status, 'prepared');
+    assert.equal(coordinator.commit(prepared.preview).status, 'terminal_success');
+    current = store.snapshot();
+  }
+
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: current,
+    maxRetainedTransitions: 2
+  });
+  const historicalRecords = recordStore.snapshot().filter(record =>
+    record.protocol?.request.transition_ref !==
+      current.last_transition.protocol.request.transition_ref
+  );
+  for (const record of historicalRecords.slice(0, 3)) {
+    for (const entry of record.observer_outbox) {
+      assert.equal(observer.observe(entry.envelope), true);
+    }
+  }
+  const snapshot = observer.snapshot();
+  assert.equal(snapshot.atomic_commits_verified, 0);
+  assert.equal(snapshot.terminal_successes, 0);
+  assert.equal(snapshot.active_transitions, 0);
+  assert.equal(snapshot.provisional_historical_transitions, 2);
+  assert.equal(snapshot.terminal_replay_markers, 4);
+  assert.equal(observer.replayMarkers().length, 4);
   assert.equal(snapshot.protocol_violations, 0);
 });
 
