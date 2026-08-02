@@ -256,11 +256,9 @@ async function buildShadowCompareReport(config, options) {
       : baselineVectorComparable
         ? baselineFingerprint === currentFingerprint ? 'comparable' : 'approximate'
         : 'lexical-only';
-  const comparableComparisons = comparisons.filter(item =>
-    item.metrics.currentCount > 0 &&
-    item.metrics.baselineCount > 0 &&
-    item.metrics.jaccard !== null
-  );
+  const comparableComparisons = hasBaseline
+    ? comparisons.filter(item => item.metrics.jaccard !== null)
+    : [];
 
   return {
     mode: 'shadow-compare',

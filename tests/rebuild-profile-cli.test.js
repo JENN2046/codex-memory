@@ -389,13 +389,14 @@ test('profile-gate CLI should evaluate a fixed migration suite', async () => {
       name: 'test-suite',
       limit: 3,
       thresholds: {
-        minAverageJaccard: 1,
-        minAverageOverlap: 1,
+        minAverageJaccard: 0.5,
+        minAverageOverlap: 0.5,
         allowNoBaseline: false
       },
       queries: [
         { id: 'alpha', query: 'alpha migration' },
-        { id: 'empty', query: 'unmatched zephyr' }
+        { id: 'empty', query: 'absent quasar' },
+        { id: 'one-sided', query: 'orphan zephyr' }
       ]
     }), 'utf8');
 
@@ -425,7 +426,7 @@ test('profile-gate CLI should evaluate a fixed migration suite', async () => {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `);
       insert.run('current-alpha', 'alpha-memory', 'process', 'Alpha current', 'current.md', 0,
-        'alpha migration current profile chunk', '[]', currentFingerprint, JSON.stringify(['alpha']), now, now);
+        'alpha migration current profile chunk with orphan zephyr', '[]', currentFingerprint, JSON.stringify(['alpha']), now, now);
       insert.run('baseline-alpha', 'alpha-memory', 'process', 'Alpha baseline', 'baseline.md', 0,
         'alpha migration baseline profile chunk', '[]', baselineFingerprint, JSON.stringify(['alpha']), now, now);
     } finally {
@@ -452,12 +453,15 @@ test('profile-gate CLI should evaluate a fixed migration suite', async () => {
     assert.equal(payload.destructive, false);
     assert.equal(payload.status, 'warn');
     assert.equal(payload.suite.name, 'test-suite');
-    assert.equal(payload.summary.queryCount, 2);
-    assert.equal(payload.summary.averageJaccard, 1);
-    assert.equal(payload.summary.averageOverlap, 1);
+    assert.equal(payload.summary.queryCount, 3);
+    assert.equal(payload.summary.averageJaccard, 0.5);
+    assert.equal(payload.summary.averageOverlap, 0.5);
     assert.equal(payload.comparisons[1].metrics.currentCount, 0);
     assert.equal(payload.comparisons[1].metrics.baselineCount, 0);
     assert.equal(payload.comparisons[1].metrics.jaccard, null);
+    assert.equal(payload.comparisons[2].metrics.currentCount, 1);
+    assert.equal(payload.comparisons[2].metrics.baselineCount, 0);
+    assert.equal(payload.comparisons[2].metrics.jaccard, 0);
     assert.equal(payload.checks.some(check => check.code === 'lexical-only'), true);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
@@ -571,7 +575,7 @@ test('profile-gate CLI should fail require-pass when thresholds are missed', asy
         allowNoBaseline: false
       },
       queries: [
-        { id: 'gamma', query: 'gamma only' }
+        { id: 'empty', query: 'absent quasar' }
       ]
     }), 'utf8');
 

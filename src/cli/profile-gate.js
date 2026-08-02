@@ -112,10 +112,10 @@ async function loadSuite(suitePath) {
   };
 }
 
-function getAverageOverlap(comparisons) {
-  const comparableComparisons = comparisons.filter(item =>
-    item.metrics.currentCount > 0 && item.metrics.baselineCount > 0
-  );
+function getAverageOverlap(compare) {
+  const comparableComparisons = compare.status === 'no-baseline'
+    ? []
+    : compare.comparisons.filter(item => item.metrics.jaccard !== null);
   if (comparableComparisons.length === 0) return null;
   const total = comparableComparisons.reduce((sum, item) => sum + item.metrics.overlapCount, 0);
   return Number((total / comparableComparisons.length).toFixed(6));
@@ -130,7 +130,7 @@ function evaluateGate(compare, suite, options) {
   };
   const checks = [];
   const averageJaccard = compare.summary.averageJaccard;
-  const averageOverlap = getAverageOverlap(compare.comparisons);
+  const averageOverlap = getAverageOverlap(compare);
 
   if (suite.queries.length === 0) {
     checks.push({
