@@ -1253,9 +1253,11 @@ test("current facts validator does not let unrelated negation hide branch assert
 test("current facts validator permits bounded negated reporting contexts", () => {
   for (const guidanceText of [
     "This document does not claim that the current task branch records the active state.",
-    "Do not explicitly claim that the current task branch records the active state.",
-    "Never falsely assert that the current task branch records the active state.",
-    "Do not claim the following: the current task branch records the active state."
+      "Do not explicitly claim that the current task branch records the active state.",
+      "Never falsely assert that the current task branch records the active state.",
+      "Do not claim the following: the current task branch records the active state.",
+      "This document ought not to claim that the current task branch records active state.",
+      "This document oughtn't to report that the current task branch records active state."
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
@@ -1301,6 +1303,8 @@ test("current facts validator permits unknown branch-state guidance", () => {
       "The current task branch is unknown but shall not provide canonical status.",
       "The current task branch is unresolved yet shan't determine active identity.",
       "The current task branch is unknown but need not provide status.",
+      "The current task branch is unknown but ought not to provide canonical status.",
+      "The current task branch is unresolved yet oughtn't to determine active identity.",
       "The current task branch is unresolved; query whether it provides status.",
       ""
     ].join("\n"),
