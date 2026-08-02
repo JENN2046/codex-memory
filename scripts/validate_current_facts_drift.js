@@ -159,6 +159,7 @@ const STALE_ACTIVE_ASSERTIONS = Object.freeze([
   })
 ]);
 const NEGATED_REPORTING_PREFIX_RE = /\b(?:(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|should)\s+not)|(?:don't|doesn't|didn't|hasn't|haven't|hadn't|isn't|aren't|wasn't|weren't|won't|wouldn't|can't|couldn't|mightn't|mustn't|shouldn't)|never|cannot)\s+(?:(?:explicitly|falsely|incorrectly|wrongly|ever)\s+){0,2}(?:claims?|claimed|claiming|states?|stated|stating|asserts?|asserted|asserting|says?|said|saying|reports?|reported|reporting)\s*(?::\s*(?:the\s+)?|\s+(?:(?:that\s+)?(?:the\s+)?|the\s+following\s*:\s*(?:the\s+)?))$/i;
+const NEGATED_AUTHORITY_PREFIX_RE = /\b(?:(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|should)\s+not)|(?:don't|doesn't|didn't|hasn't|haven't|hadn't|isn't|aren't|wasn't|weren't|won't|wouldn't|can't|couldn't|mightn't|mustn't|shouldn't)|never|cannot)\s+(?:(?:actually|currently|directly|ever|explicitly|falsely|incorrectly|wrongly)\s+){0,2}$/i;
 const POINTER_SELF_AUTHORITY_RE =
   /\b(?:this (?:file|document|surface|pointer) (?:is|serves as) (?:the )?(?:sole |only )?current(?: work)? authority|current authority\s*:\s*(?:this (?:file|document|surface|pointer)|self))\b/i;
 const SIZE_BUDGETS = Object.freeze({
@@ -834,7 +835,7 @@ function containsAffirmativeAuthorityContinuation(text, suffix, suffixStart) {
       if (isInsideQuotedSegment(text, suffixStart + predicateIndex)) continue;
       const prefix = transition[0].slice(0, predicate.index);
       const predicateSuffix = transition[0].slice(predicate.index + predicate[0].length);
-      const negatedPrefix = /\b(?:(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|should)\s+not)|never|cannot|can't)(?:\s+[a-z-]+){0,2}\s*$/i.test(prefix);
+      const negatedPrefix = NEGATED_AUTHORITY_PREFIX_RE.test(prefix);
       const queriedPrefix = /\b(?:whether|if)\b[^.!?;]*$/i.test(prefix);
       const negatedSuffix = /^\s+(?:not(?!\s+only\b)|never|no longer|no|neither)\b/i.test(predicateSuffix);
       if (!negatedPrefix && !queriedPrefix && !negatedSuffix) return true;

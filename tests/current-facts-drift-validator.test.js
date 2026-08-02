@@ -1296,6 +1296,8 @@ test("current facts validator permits unknown branch-state guidance", () => {
       "The current task branch is still unavailable to this document.",
       "The current task branch is yet to be determined.",
       "The current task branch is unknown but does not provide canonical status.",
+      "The current task branch is unknown but doesn't provide canonical status.",
+      "The current task branch is unresolved yet won't determine active identity.",
       "The current task branch is unresolved; query whether it provides status.",
       ""
     ].join("\n"),
@@ -1309,7 +1311,10 @@ test("current facts validator rejects authority assertions after unknown-state t
   for (const staleText of [
     "The current task branch is unknown but provides the canonical status.",
     "The current task branch is unresolved, yet serves as the current authority.",
-    "The current task branch is still unavailable although it determines the active identity."
+    "The current task branch is still unavailable although it determines the active identity.",
+    "The current task branch is unknown but does not doubt it provides canonical status.",
+    "The current task branch is unknown but never doubts it provides canonical status.",
+    "The current task branch is unknown but does not provide and determines active identity."
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
