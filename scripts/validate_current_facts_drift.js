@@ -851,7 +851,7 @@ function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound =
     }
     if (coordination) {
       const leadingClause = withoutParenthetical.slice(0, coordination.index);
-      const explicitForeignSubject = /^\s*(?:`?[\p{L}\p{N}_./-]+\.(?:md|json|ya?ml|txt)`?\b|(?:the|a|an|this|that)\s+(?!(?:current\s+task\s+)?branch\b))/iu;
+      const explicitForeignSubject = /^\s*(?:`?[\p{L}\p{N}_/-]+\.[\p{L}\p{N}_.-]+`?\b|(?!(?:It|The)\b)[\p{Lu}][\p{L}\p{N}_-]*\b|(?:[Tt]he|[Aa]n?|[Tt]his|[Tt]hat)\s+(?!(?:current\s+task\s+)?branch\b))/u;
       return !explicitForeignSubject.test(leadingClause);
     }
     return true;
