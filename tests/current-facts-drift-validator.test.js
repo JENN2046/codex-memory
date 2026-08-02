@@ -1387,6 +1387,42 @@ test("current facts validator rejects equivalent affirmative branch-authority pr
   }
 });
 
+test("current facts validator rejects passive branch-authority assertions", () => {
+  for (const staleText of [
+    "The active state is recorded by the current task branch.",
+    "Canonical status is provided by the current task branch.",
+    "The current facts have been stored by the current task branch.",
+    "Active identity will still directly be determined by the current task branch.",
+    "Current authority is not only established by the current task branch.",
+    "The active state is recorded by the current task branch, isn't it?"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
+test("current facts validator permits questions and negated passive branch guidance", () => {
+  for (const guidanceText of [
+    "Is the active state recorded by the current task branch?",
+    "Could canonical status be provided by the current task branch?",
+    "The active state is not recorded by the current task branch.",
+    "Canonical status isn't provided by the current task branch.",
+    "This document does not claim that the active state is recorded by the current task branch.",
+    "> The active state is recorded by the current task branch.",
+    "The phrase `active state is recorded by the current task branch` is stale."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${guidanceText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${guidanceText}\n${result.failures.join("\n")}`);
+  }
+});
+
 test("current facts validator rejects non-negative not-only branch predicates", () => {
   const root = workspace();
   const currentStatePath = path.join(root, "CURRENT_STATE.md");
