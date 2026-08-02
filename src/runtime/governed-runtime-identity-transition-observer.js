@@ -48,6 +48,9 @@ function createGovernedRuntimeIdentityTransitionObserver({
     terminalReplayMarkers.add(transitionRef);
   }
   let lastAuthoritativeCommit = null;
+  let initialAuthoritativeAnchor = null;
+  let historicalReplayCommit = null;
+  const historicalReplayRefs = [];
   if (initialAuthoritativeState !== null) {
     validateGovernedRuntimeIdentityState(initialAuthoritativeState);
     lastAuthoritativeCommit = {
@@ -63,6 +66,16 @@ function createGovernedRuntimeIdentityTransitionObserver({
       ),
       store_version: initialAuthoritativeState.store_version,
       state_digest: digestObject(initialAuthoritativeState)
+    };
+    initialAuthoritativeAnchor = {
+      ...structuredClone(lastAuthoritativeCommit),
+      previous_state_digest:
+        initialAuthoritativeState.last_transition?.previous_state_digest ??
+          null,
+      from_runtime: structuredClone(
+        initialAuthoritativeState.last_transition?.protocol?.request
+          ?.from_runtime ?? null
+      )
     };
     const lastTransitionRef =
       initialAuthoritativeState.last_transition?.protocol?.request
@@ -166,6 +179,18 @@ function createGovernedRuntimeIdentityTransitionObserver({
     }
   }
 
+  function retainVerifiedTerminal(transitionRef, record) {
+    if (record.terminal.outcome === 'success') {
+      counters.terminal_successes += 1;
+    } else {
+      counters.terminal_failures += 1;
+    }
+    if (record.terminal.fatal_inconsistency) {
+      counters.fatal_inconsistencies += 1;
+    }
+    retainTerminal(transitionRef, record);
+  }
+
   function observeOnce(event) {
     if (!event || typeof event !== 'object' || Array.isArray(event) ||
         event.component !==
@@ -187,6 +212,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
           receipts: [],
           terminal: null,
           atomic_commit: null,
+          atomic_verified: false,
+          historical_replay: false,
           missing: false
         });
         counters.transitions_accepted += 1;
@@ -227,6 +254,14 @@ function createGovernedRuntimeIdentityTransitionObserver({
           record.request,
           derivedRuntime
         );
+        const historicalReplay = initialAuthoritativeAnchor !== null &&
+          event.store_version < initialAuthoritativeAnchor.store_version;
+        const chainAnchor = historicalReplay
+          ? historicalReplayCommit
+          : lastAuthoritativeCommit;
+        const closesHistoricalPrefix = historicalReplay &&
+          event.store_version ===
+            initialAuthoritativeAnchor.store_version - 1;
         if (event.protocol.terminal.outcome !== 'success' ||
             canonicalJson(event.protocol.request) !==
               canonicalJson(record.request) ||
@@ -244,23 +279,43 @@ function createGovernedRuntimeIdentityTransitionObserver({
               event.accepted_runtime.identity_digest ||
             !Number.isSafeInteger(event.store_version) ||
             event.store_version < 1 ||
-            (lastAuthoritativeCommit !== null &&
+            (chainAnchor !== null &&
               (event.store_version !==
-                lastAuthoritativeCommit.store_version + 1 ||
+                chainAnchor.store_version + 1 ||
                 event.previous_state_digest !==
-                  lastAuthoritativeCommit.state_digest ||
+                  chainAnchor.state_digest ||
                 canonicalJson(record.request.from_runtime) !== canonicalJson(
-                  lastAuthoritativeCommit.accepted_runtime
+                  chainAnchor.accepted_runtime
                 ) ||
                 canonicalJson(event.state_projection.lifecycle) !==
-                  canonicalJson(lastAuthoritativeCommit.lifecycle) ||
-                (lastAuthoritativeCommit.controller_binding.model ===
+                  canonicalJson(chainAnchor.lifecycle) ||
+                (chainAnchor.controller_binding.model ===
                   'stable_controller_authority.v1' &&
                   (record.request.authority.authority_id !==
-                    lastAuthoritativeCommit.controller_binding.authority_id ||
+                    chainAnchor.controller_binding.authority_id ||
                     record.request.authority.authority_lineage_digest !==
-                      lastAuthoritativeCommit.controller_binding
+                      chainAnchor.controller_binding
                         .authority_lineage_digest)))) ||
+            (historicalReplay &&
+              (canonicalJson(event.state_projection.lifecycle) !==
+                canonicalJson(initialAuthoritativeAnchor.lifecycle) ||
+                canonicalJson(event.state_projection.legacy_migration) !==
+                  canonicalJson(
+                    initialAuthoritativeAnchor.legacy_migration
+                  ) ||
+                (initialAuthoritativeAnchor.controller_binding.model ===
+                  'stable_controller_authority.v1' &&
+                  (event.controller_binding.authority_id !==
+                    initialAuthoritativeAnchor.controller_binding.authority_id ||
+                    event.controller_binding.authority_lineage_digest !==
+                      initialAuthoritativeAnchor.controller_binding
+                        .authority_lineage_digest)) ||
+                (closesHistoricalPrefix &&
+                  (event.state_digest !==
+                    initialAuthoritativeAnchor.previous_state_digest ||
+                    canonicalJson(event.accepted_runtime) !== canonicalJson(
+                      initialAuthoritativeAnchor.from_runtime
+                    ))))) ||
             event.state_projection.store_version !== event.store_version ||
             canonicalJson(event.state_projection.accepted_runtime) !==
               canonicalJson(event.accepted_runtime) ||
@@ -281,10 +336,10 @@ function createGovernedRuntimeIdentityTransitionObserver({
                   digestObject(
                     record.request.legacy_transition_evidence
                   ))) ||
-            (lastAuthoritativeCommit !== null &&
+            (chainAnchor !== null &&
               record.request.legacy_transition_evidence === null &&
               canonicalJson(event.state_projection.legacy_migration) !==
-                canonicalJson(lastAuthoritativeCommit.legacy_migration)) ||
+                canonicalJson(chainAnchor.legacy_migration)) ||
             !DIGEST_PATTERN.test(event.state_digest || '') ||
             digestObject(event.state_projection) !== event.state_digest) {
           return violation('transition_observer_atomic_commit_invalid');
@@ -297,7 +352,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
           store_version: event.store_version,
           state_digest: event.state_digest
         };
-        lastAuthoritativeCommit = {
+        record.historical_replay = historicalReplay;
+        const verifiedCommit = {
           accepted_runtime: structuredClone(event.accepted_runtime),
           controller_binding: structuredClone(event.controller_binding),
           lifecycle: structuredClone(event.state_projection.lifecycle),
@@ -307,7 +363,27 @@ function createGovernedRuntimeIdentityTransitionObserver({
           store_version: event.store_version,
           state_digest: event.state_digest
         };
-        counters.atomic_commits_verified += 1;
+        if (historicalReplay) {
+          historicalReplayCommit = verifiedCommit;
+          historicalReplayRefs.push(event.transition_ref);
+          if (closesHistoricalPrefix) {
+            for (const transitionRef of historicalReplayRefs) {
+              const historicalRecord = transitions.get(transitionRef);
+              if (!historicalRecord || historicalRecord.atomic_verified) {
+                continue;
+              }
+              historicalRecord.atomic_verified = true;
+              counters.atomic_commits_verified += 1;
+              if (historicalRecord.terminal) {
+                retainVerifiedTerminal(transitionRef, historicalRecord);
+              }
+            }
+          }
+        } else {
+          lastAuthoritativeCommit = verifiedCommit;
+          record.atomic_verified = true;
+          counters.atomic_commits_verified += 1;
+        }
         return true;
       }
       if (event.event === 'transition_terminal_committed') {
@@ -341,15 +417,10 @@ function createGovernedRuntimeIdentityTransitionObserver({
           return violation('transition_observer_terminal_reconciliation_invalid');
         }
         record.terminal = structuredClone(event.terminal);
-        if (event.terminal.outcome === 'success') {
-          counters.terminal_successes += 1;
-        } else {
-          counters.terminal_failures += 1;
+        if (record.historical_replay && !record.atomic_verified) {
+          return true;
         }
-        if (event.terminal.fatal_inconsistency) {
-          counters.fatal_inconsistencies += 1;
-        }
-        retainTerminal(event.transition_ref, record);
+        retainVerifiedTerminal(event.transition_ref, record);
         return true;
       }
       if (event.event === 'transition_terminal_missing') {
@@ -399,7 +470,8 @@ function createGovernedRuntimeIdentityTransitionObserver({
   function reconcile(transitionRef) {
     const record = transitions.get(transitionRef) ||
       terminalHistory.get(transitionRef);
-    if (!record || record.missing || !record.terminal) {
+    if (!record || record.missing || !record.terminal ||
+        (record.historical_replay && !record.atomic_verified)) {
       reject('transition_terminal_missing');
     }
     const protocol = createGovernedRuntimeIdentityTransitionProtocol({

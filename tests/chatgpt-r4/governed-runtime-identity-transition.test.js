@@ -1700,6 +1700,68 @@ test('13d3e. current authoritative state acknowledges its pending commit events'
   assert.equal(observer.snapshot().protocol_violations, 0);
 });
 
+test('13d3f. current state anchors an offline historical commit backlog', () => {
+  const state = initialState();
+  const store = createGovernedRuntimeIdentityStateStore(state);
+  const recordStore = createTransitionRecordStore();
+  const coordinator = createGovernedRuntimeIdentityTransitionCoordinator({
+    store,
+    authorityProofReplayStore: createAuthorityProofReplayStore(),
+    transitionRecordStore: recordStore,
+    authorityVerifier,
+    candidateManifestVerifier: manifestVerifier,
+    clock: () => NOW
+  });
+  let current = state;
+  for (const [index, suffix] of ['L', 'M', 'N'].entries()) {
+    const target = toRuntime(['b', 'c', 'd'][index]);
+    const request = requestFor(current, {
+      suffix,
+      target,
+      fromRuntime: current.accepted_runtime,
+      proofDigest: digestObject(`offline-backlog-proof-${suffix}`),
+      legacy: index === 0
+        ? legacyEvidence(current, target)
+        : null
+    });
+    const prepared = coordinator.preview(request);
+    assert.equal(prepared.status, 'prepared');
+    assert.equal(coordinator.commit(prepared.preview).status, 'terminal_success');
+    current = store.snapshot();
+  }
+  assert.equal(current.store_version, 3);
+  assert.equal(recordStore.pendingObserverEvents().length > 0, true);
+
+  const provisionalObserver = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: current
+  });
+  const firstHistoricalRecord = recordStore.snapshot()
+    .find(record => record.protocol?.request.from_runtime.identity_digest ===
+      state.accepted_runtime.identity_digest);
+  for (const entry of firstHistoricalRecord.observer_outbox) {
+    assert.equal(provisionalObserver.observe(entry.envelope), true);
+  }
+  assert.equal(provisionalObserver.snapshot().atomic_commits_verified, 0);
+  assert.equal(provisionalObserver.snapshot().terminal_successes, 0);
+  assert.throws(
+    () => provisionalObserver.reconcile(
+      firstHistoricalRecord.transition_ref
+    ),
+    { code: 'transition_terminal_missing' }
+  );
+
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: current
+  });
+  harness({ state: current, store, recordStore, observer });
+  const snapshot = observer.snapshot();
+  assert.equal(recordStore.pendingObserverEvents().length, 0);
+  assert.equal(snapshot.atomic_commits_verified, 2);
+  assert.equal(snapshot.terminal_successes, 2);
+  assert.equal(snapshot.last_authoritative_store_version, 3);
+  assert.equal(snapshot.protocol_violations, 0);
+});
+
 test('13d4. initial state read fault terminalizes the durable reservation', () => {
   const state = initialState();
   const innerStore = createGovernedRuntimeIdentityStateStore(state);

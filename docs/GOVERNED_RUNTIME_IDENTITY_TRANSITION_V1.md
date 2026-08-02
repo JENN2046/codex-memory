@@ -282,6 +282,12 @@ remain subject to ordinary validation and rejection.
 For every atomic event, the top-level `previous_state_digest` must also equal
 `state_projection.last_transition.previous_state_digest`; the Observer never
 anchors a projection to a different predecessor than the event it verified.
+If an offline outbox contains successful commits older than the Observer's
+initial authoritative state, they are accepted only as a provisional strictly
+monotonic prefix. No atomic or terminal success is counted as verified until
+that prefix reaches the exact predecessor digest and `from_runtime` bound by
+the initial state's `last_transition`; the current state itself remains the
+live successor anchor.
 
 The unique failure registry includes:
 
