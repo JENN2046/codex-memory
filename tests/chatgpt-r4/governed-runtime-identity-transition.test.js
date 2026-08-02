@@ -1681,6 +1681,43 @@ test('13d3b. delivered-event ledgers require canonical full envelopes', () => {
   );
 });
 
+test('13d3b1. archived protocols cannot be spliced from Observer event streams', () => {
+  const result = prepareAndCommit();
+  const record = structuredClone(
+    result.recordStore.get(result.request.transition_ref)
+  );
+  const failureTerminal = createRuntimeIdentityTransitionTerminal({
+    request: result.request,
+    receipts: [],
+    outcome: 'failure',
+    reasonCode: 'transition_replayed',
+    runtimeStopped: true
+  });
+  record.protocol = createGovernedRuntimeIdentityTransitionProtocol({
+    request: result.request,
+    receipts: [],
+    terminal: failureTerminal
+  });
+
+  assert.throws(
+    () => createTransitionRecordStore([record]),
+    { code: 'transition_record_store_invalid' }
+  );
+});
+
+test('13d3b2. archived commit anchors match the atomic Observer event', () => {
+  const result = prepareAndCommit();
+  const record = structuredClone(
+    result.recordStore.get(result.request.transition_ref)
+  );
+  record.previous_state_digest = digestObject('spliced-previous-state');
+
+  assert.throws(
+    () => createTransitionRecordStore([record]),
+    { code: 'transition_record_store_invalid' }
+  );
+});
+
 test('13d3c. a fresh Observer receives the delivered prefix before pending events', () => {
   const state = initialState();
   const recordStore = createTransitionRecordStore();

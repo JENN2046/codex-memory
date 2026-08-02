@@ -239,6 +239,13 @@ an existing canonical terminal before appending recovery events, so identical
 recovery cannot duplicate a terminal event stream.
 Observer delivery sequences are globally unique across every persisted record;
 per-record validity cannot introduce ambiguous equal-position FIFO entries.
+For each archived terminal, the record store also treats its event stream and
+protocol as one governance artifact. The observed request and receipt prefix
+must match the archive; any delivered terminal must match its exact terminal,
+and any atomic event must carry the exact archived protocol, persisted
+previous-state digest, and preview-derived store version. A recovery adapter
+therefore cannot splice a successful Observer stream onto a conflicting
+failure archive, or detach a commit from its persisted predecessor anchor.
 Persisted envelopes use a closed event registry with exact payload shapes.
 Unknown event names, missing required payloads, invalid receipt chains, and
 malformed atomic projections are rejected during store reconstruction and

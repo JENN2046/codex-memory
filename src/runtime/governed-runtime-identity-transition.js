@@ -409,9 +409,14 @@ function createTransitionRecordStore(initialRecords = [], {
     let request = null;
     const receipts = [];
     let previewSeen = false;
+    let preview = null;
     let atomicSeen = false;
+    let atomicProtocol = null;
+    let atomicStoreVersion = null;
+    let atomicPreviousStateDigest = null;
     let atomicTerminal = null;
     let terminalSeen = false;
+    let terminal = null;
     for (const entry of entries) {
       const envelope = entry.envelope;
       if (envelope.event === 'transition_accepted') {
@@ -454,6 +459,7 @@ function createTransitionRecordStore(initialRecords = [], {
           reject('transition_record_store_invalid');
         }
         previewSeen = true;
+        preview = envelope.preview;
       } else if (envelope.event === 'transition_atomic_commit') {
         if (!exactKeys(envelope, [
           'component',
@@ -516,6 +522,9 @@ function createTransitionRecordStore(initialRecords = [], {
           reject('transition_record_store_invalid');
         }
         atomicSeen = true;
+        atomicProtocol = envelope.protocol;
+        atomicStoreVersion = envelope.store_version;
+        atomicPreviousStateDigest = envelope.previous_state_digest;
         atomicTerminal = envelope.protocol.terminal;
       } else if (envelope.event === 'transition_terminal_committed') {
         if (!exactKeys(envelope, [
@@ -534,6 +543,7 @@ function createTransitionRecordStore(initialRecords = [], {
           reject('transition_record_store_invalid');
         }
         terminalSeen = true;
+        terminal = envelope.terminal;
       } else if (envelope.event === 'transition_terminal_missing') {
         if (!exactKeys(envelope, [
           'component', 'event', 'transition_ref'
@@ -545,6 +555,16 @@ function createTransitionRecordStore(initialRecords = [], {
         reject('transition_record_store_invalid');
       }
     }
+    return {
+      entry_count: entries.length,
+      request,
+      receipts,
+      preview,
+      atomic_protocol: atomicProtocol,
+      atomic_store_version: atomicStoreVersion,
+      atomic_previous_state_digest: atomicPreviousStateDigest,
+      terminal
+    };
   }
 
   function validateRecord(record) {
@@ -583,7 +603,7 @@ function createTransitionRecordStore(initialRecords = [], {
         )) {
       reject('transition_record_store_invalid');
     }
-    validateObserverEventStream(record);
+    const observerStream = validateObserverEventStream(record);
     assertDigest(record.request_digest, 'transition_record_store_invalid');
     if ((record.previous_state_digest !== null &&
           !DIGEST_PATTERN.test(record.previous_state_digest))) {
@@ -602,6 +622,41 @@ function createTransitionRecordStore(initialRecords = [], {
           (record.protocol.terminal.outcome === 'success' &&
             record.previous_state_digest === null)) {
         reject('transition_record_store_invalid');
+      }
+      // A non-empty durable event stream and its archived protocol are one
+      // governance record, not independently valid artifacts. Binding the
+      // reconstructed protocol and commit anchor here prevents a success
+      // Observer stream from being spliced onto a failure archive (or the
+      // inverse) by a recovery/custom persistence adapter.
+      if (observerStream.entry_count > 0) {
+        const archivedReceiptPrefix = record.protocol.receipts.slice(
+          0,
+          observerStream.receipts.length
+        );
+        if (observerStream.request === null ||
+            canonicalJson(observerStream.request) !==
+              canonicalJson(record.protocol.request) ||
+            canonicalJson(observerStream.receipts) !==
+              canonicalJson(archivedReceiptPrefix)) {
+          reject('transition_record_store_invalid');
+        }
+        if ((observerStream.terminal !== null &&
+              (observerStream.receipts.length !==
+                record.protocol.receipts.length ||
+                canonicalJson(observerStream.terminal) !==
+                  canonicalJson(record.protocol.terminal))) ||
+            (observerStream.atomic_protocol !== null &&
+              canonicalJson(observerStream.atomic_protocol) !==
+                canonicalJson(record.protocol)) ||
+            (observerStream.atomic_previous_state_digest !== null &&
+              observerStream.atomic_previous_state_digest !==
+                record.previous_state_digest) ||
+            (observerStream.preview !== null &&
+              observerStream.atomic_protocol !== null &&
+              observerStream.preview.expected_store_version + 1 !==
+                observerStream.atomic_store_version)) {
+          reject('transition_record_store_invalid');
+        }
       }
     }
     return record;
