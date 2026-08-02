@@ -1265,6 +1265,64 @@ test("current facts validator permits bounded negated reporting contexts", () =>
   }
 });
 
+test("current facts validator permits directly negated branch predicates", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    [
+      "",
+      "The current task branch records no active state.",
+      "The current task branch contains no current facts.",
+      "The current task branch holds neither authority nor status.",
+      "The current task branch now points to no canonical state.",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects non-negative not-only branch predicates", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    "\nThe current task branch records not only the active state but its authority.\n",
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+});
+
+test("current facts validator permits stale assertion examples in Markdown fences", () => {
+  for (const fencedExample of [
+    "```text\nThe current task branch records the active state.\n```",
+    "~~~\nThe current task branch contains current facts.\n~~~"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${fencedExample}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${fencedExample}\n${result.failures.join("\n")}`);
+  }
+});
+
+test("current facts validator rejects assertions after an invalid backtick fence", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    "\n```bad`info\nThe current task branch records the active state.\n```\n",
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+});
+
 test("current facts validator fails closed when baseline objects are unreadable", () => {
   const root = workspace();
   const gitRunner = (_root, args) => {

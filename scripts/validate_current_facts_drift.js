@@ -790,6 +790,25 @@ function isInsideQuotedSegment(text, index) {
   );
 }
 
+function isInsideMarkdownFence(text, index) {
+  const lineStart = text.lastIndexOf("\n", index - 1) + 1;
+  const precedingLines = text.slice(0, lineStart).split("\n");
+  let fence = null;
+  for (const line of precedingLines) {
+    if (!fence) {
+      const opening = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+      if (opening && !(opening[1][0] === "`" && opening[2].includes("`"))) {
+        fence = { character: opening[1][0], length: opening[1].length };
+      }
+      continue;
+    }
+    const marker = fence.character.repeat(fence.length);
+    const closing = new RegExp(`^ {0,3}${marker}${fence.character}*\\s*$`);
+    if (closing.test(line)) fence = null;
+  }
+  return fence !== null;
+}
+
 function firstUnquotedClauseTerminator(text, startIndex) {
   const lineEndCandidate = text.indexOf("\n", startIndex);
   const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
@@ -803,7 +822,9 @@ function firstUnquotedClauseTerminator(text, startIndex) {
 
 function containsStaleAssertion(text, assertion) {
   for (const match of text.matchAll(assertion.pattern)) {
-    if (isInsideQuotedSegment(text, match.index)) continue;
+    if (isInsideMarkdownFence(text, match.index) || isInsideQuotedSegment(text, match.index)) {
+      continue;
+    }
     const clauseStart = Math.max(
       text.lastIndexOf("\n", match.index - 1),
       text.lastIndexOf(".", match.index - 1),
@@ -819,9 +840,7 @@ function containsStaleAssertion(text, assertion) {
       continue;
     }
     if (/\b(?:whether|if)\s+(?:the\s+)?$/i.test(prefix)) continue;
-    if (/^(?:is|was|remains?)$/i.test(match[1])) {
-      if (/^\s+(?:not|never|no longer)\b/i.test(suffix)) continue;
-    }
+    if (/^\s+(?:not(?!\s+only\b)|never|no longer|no|neither)\b/i.test(suffix)) continue;
     return true;
   }
   return false;
