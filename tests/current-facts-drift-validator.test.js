@@ -1298,6 +1298,9 @@ test("current facts validator permits unknown branch-state guidance", () => {
       "The current task branch is unknown but does not provide canonical status.",
       "The current task branch is unknown but doesn't provide canonical status.",
       "The current task branch is unresolved yet won't determine active identity.",
+      "The current task branch is unknown but shall not provide canonical status.",
+      "The current task branch is unresolved yet shan't determine active identity.",
+      "The current task branch is unknown but need not provide status.",
       "The current task branch is unresolved; query whether it provides status.",
       ""
     ].join("\n"),
