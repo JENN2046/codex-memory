@@ -832,7 +832,7 @@ function firstUnquotedClauseTerminator(text, startIndex) {
 
 function isDirectBranchQuestion(prefix, text, suffixStart) {
   if (firstUnquotedClauseTerminator(text, suffixStart) !== "?") return false;
-  return /^\s*(?:(?:what|which|where|when|why|how)\s+)?(?:do|does|did|is|are|was|were|has|have|had|will|would|can|could|may|might|must|need|shall|should)\s+(?:the\s+)?$/i.test(prefix);
+  return /^\s*(?:(?:what|which|where|when|why|how)\s+)?(?:(?:do|does|did|is|are|was|were|has|have|had|will|would|can|could|may|might|must|need|shall|should|ought)|(?:don't|doesn't|didn't|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't|oughtn't)|cannot)\s+(?:the\s+)?$/i.test(prefix);
 }
 
 function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound = null) {

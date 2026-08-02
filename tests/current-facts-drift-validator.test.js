@@ -1193,6 +1193,10 @@ test("current facts validator permits instructions to re-query the current task 
       "Determine if the current task branch now records state before reporting.",
       "Does the current task branch record the active state?",
       "What does the current task branch currently record?",
+      "Doesn't the current task branch provide canonical status?",
+      "Can't the current task branch provide canonical status?",
+      "Shouldn't the current task branch determine active identity?",
+      "Oughtn't the current task branch provide canonical status?",
       "> The current task branch records the active state.",
       "  >> The current task branch stores the current facts.",
       ""
