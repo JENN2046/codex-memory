@@ -256,7 +256,10 @@ envelopes and sequence numbers across coordinator reconstruction; delivery ack
 removes only the exact head event. The acknowledged-event ledger retains each
 complete canonical envelope with its verified digest; bare or mismatched digest
 claims are rejected, and recovery compares full envelopes before suppressing
-redelivery. Delivered entries retain their original sequence. If any later
+redelivery. Multi-event finalization stages and validates the complete cloned
+outbox and every required sequence before replacing the shared record, so a
+later invalid envelope or exhausted sequence cannot leave a partially appended
+recovery stream. Delivered entries retain their original sequence. If any later
 event is still pending during reconstruction, the store restores the complete
 delivered prefix ahead of that suffix: an existing Observer consumes exact
 replays idempotently, while a fresh Observer rebuilds the active transition in
@@ -299,7 +302,9 @@ current authoritative-state anchor. When that integrity-preserving ledger is
 full, the Observer applies backpressure before acknowledging another terminal
 or missing-terminal event; it does not evict the record while retaining an
 unbounded hidden event chain, and it does not downgrade to a forgeable bare
-digest marker.
+digest marker. Export orders successful replay markers by their verified atomic
+`store_version`, independent of terminal arrival order, so reconstruction
+replays the authoritative commit chain monotonically.
 Persisted envelopes use a closed event registry with exact payload shapes.
 Unknown event names, missing required payloads, invalid receipt chains, and
 malformed atomic projections are rejected during store reconstruction and

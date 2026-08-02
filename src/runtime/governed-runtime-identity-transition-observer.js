@@ -658,14 +658,35 @@ function createGovernedRuntimeIdentityTransitionObserver({
   }
 
   function replayMarkers() {
-    return Object.freeze([...terminalReplayMarkers].map(transitionRef =>
-      Object.freeze({
-        transition_ref: transitionRef,
-        acknowledged_events: Object.freeze([
-          ...(acknowledgedEventsByTransition.get(transitionRef)?.values() || [])
-        ].map(event => Object.freeze(structuredClone(event))))
-      })
-    ));
+    const markers = [...terminalReplayMarkers].map((transitionRef, index) => {
+      const acknowledgedEvents = [
+        ...(acknowledgedEventsByTransition.get(transitionRef)?.values() || [])
+      ];
+      const atomicStoreVersion = acknowledgedEvents.find(event =>
+        event.event === 'transition_atomic_commit'
+      )?.store_version ?? null;
+      return {
+        index,
+        atomicStoreVersion,
+        marker: Object.freeze({
+          transition_ref: transitionRef,
+          acknowledged_events: Object.freeze(acknowledgedEvents.map(event =>
+            Object.freeze(structuredClone(event))
+          ))
+        })
+      };
+    });
+    markers.sort((left, right) => {
+      const leftAtomic = left.atomicStoreVersion !== null;
+      const rightAtomic = right.atomicStoreVersion !== null;
+      if (leftAtomic && rightAtomic) {
+        return left.atomicStoreVersion - right.atomicStoreVersion ||
+          left.index - right.index;
+      }
+      if (leftAtomic !== rightAtomic) return leftAtomic ? -1 : 1;
+      return left.index - right.index;
+    });
+    return Object.freeze(markers.map(entry => entry.marker));
   }
 
   restoreTerminalReplayMarkers(initialTerminalReplayMarkers);

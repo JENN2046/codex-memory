@@ -1107,6 +1107,62 @@ test('10d2. terminal recovery finalization is event-idempotent', () => {
   );
 });
 
+test('10d2a. finalization validates its complete Observer event batch atomically', () => {
+  const result = prepareAndCommit();
+  const persisted = result.recordStore.get(result.request.transition_ref);
+  const entries = [
+    ...persisted.observer_delivered_events,
+    ...persisted.observer_outbox
+  ].sort((left, right) => left.sequence - right.sequence);
+  const observerEvents = entries.slice(1).map(entry => entry.envelope);
+  const recoveryRecord = {
+    ...structuredClone(persisted),
+    status: 'reserved',
+    protocol: null,
+    observer_outbox: [{
+      ...structuredClone(entries[0]),
+      sequence: Number.MAX_SAFE_INTEGER - 2
+    }],
+    observer_delivered_events: []
+  };
+  const exhausted = createTransitionRecordStore([recoveryRecord]);
+  const exhaustedBefore = exhausted.snapshot();
+  assert.throws(
+    () => exhausted.finalize({
+      transition_ref: result.request.transition_ref,
+      request_digest: runtimeIdentityTransitionRequestDigest(result.request),
+      protocol: result.committed.protocol,
+      observer_events: observerEvents
+    }),
+    { code: 'transition_record_store_invalid' }
+  );
+  assert.deepEqual(exhausted.snapshot(), exhaustedBefore);
+
+  recoveryRecord.observer_outbox[0].sequence = 0;
+  const invalidBatchStore = createTransitionRecordStore([recoveryRecord]);
+  const invalidBefore = invalidBatchStore.snapshot();
+  const invalidEvents = structuredClone(observerEvents);
+  invalidEvents[1].component = 'tampered_transition_coordinator';
+  assert.throws(
+    () => invalidBatchStore.finalize({
+      transition_ref: result.request.transition_ref,
+      request_digest: runtimeIdentityTransitionRequestDigest(result.request),
+      protocol: result.committed.protocol,
+      observer_events: invalidEvents
+    }),
+    { code: 'transition_record_store_context_mismatch' }
+  );
+  assert.deepEqual(invalidBatchStore.snapshot(), invalidBefore);
+  assert.equal(invalidBatchStore.enqueueObserverEvent({
+    transition_ref: result.request.transition_ref,
+    envelope: observerEvents[0]
+  }), true);
+  assert.equal(
+    invalidBatchStore.pendingObserverEvents().at(-1).sequence,
+    1
+  );
+});
+
 test('10e. a failed terminal-index write is recovered before the next transition', () => {
   const state = initialState();
   const durableRecords = createTransitionRecordStore();
@@ -1956,6 +2012,70 @@ test('13d3a2. Observer recovery validates complete acknowledged envelopes', () =
       initialTerminalReplayMarkers: tampered
     }),
     { code: 'transition_observer_replay_markers_invalid' }
+  );
+});
+
+test('13d3a3. replay markers preserve atomic commit order', () => {
+  const state = initialState();
+  const store = createGovernedRuntimeIdentityStateStore(state);
+  const recordStore = createTransitionRecordStore();
+  const coordinator = createGovernedRuntimeIdentityTransitionCoordinator({
+    store,
+    authorityProofReplayStore: createAuthorityProofReplayStore(),
+    transitionRecordStore: recordStore,
+    coordinatorOwnerDigest: COORDINATOR_OWNER,
+    authorityVerifier,
+    candidateManifestVerifier: manifestVerifier,
+    clock: () => NOW
+  });
+  let current = state;
+  for (const [index, suffix] of ['U', 'V', 'W'].entries()) {
+    const target = toRuntime(['b', 'c', 'd'][index]);
+    const request = requestFor(current, {
+      suffix,
+      target,
+      fromRuntime: current.accepted_runtime,
+      proofDigest: digestObject(`replay-order-proof-${suffix}`),
+      legacy: index === 0 ? legacyEvidence(current, target) : null
+    });
+    const prepared = coordinator.preview(request);
+    assert.equal(prepared.status, 'prepared');
+    assert.equal(coordinator.commit(prepared.preview).status, 'terminal_success');
+    current = store.snapshot();
+  }
+  const streams = recordStore.snapshot().map(record => [
+    ...record.observer_delivered_events,
+    ...record.observer_outbox
+  ].sort((left, right) => left.sequence - right.sequence)
+    .map(entry => entry.envelope))
+    .sort((left, right) => {
+      const version = events => events.find(event =>
+        event.event === 'transition_atomic_commit'
+      ).store_version;
+      return version(left) - version(right);
+    });
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    maxRetainedTransitions: 3
+  });
+  for (const stream of streams) {
+    for (const event of stream.slice(0, -1)) {
+      assert.equal(observer.observe(event), true);
+    }
+  }
+  for (const stream of [...streams].reverse()) {
+    assert.equal(observer.observe(stream.at(-1)), true);
+  }
+  const markers = observer.replayMarkers();
+  assert.deepEqual(markers.map(marker =>
+    marker.acknowledged_events.find(event =>
+      event.event === 'transition_atomic_commit'
+    ).store_version
+  ), [1, 2, 3]);
+  assert.doesNotThrow(() =>
+    createGovernedRuntimeIdentityTransitionObserver({
+      maxRetainedTransitions: 3,
+      initialTerminalReplayMarkers: markers
+    })
   );
 });
 

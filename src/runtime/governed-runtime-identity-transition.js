@@ -736,6 +736,25 @@ function createTransitionRecordStore(initialRecords = [], {
     reject('transition_record_store_invalid');
   }
 
+  function createObserverOutboxEntry(ref, envelope, sequence) {
+    if (!isPlainObject(envelope) ||
+        envelope.component !==
+          'governed_runtime_identity_transition_coordinator' ||
+        !EVENT_NAME_PATTERN.test(envelope.event || '') ||
+        envelope.transition_ref !== ref) {
+      reject('transition_record_store_context_mismatch');
+    }
+    if (!isAllocatableObserverSequence(sequence)) {
+      reject('transition_record_store_invalid');
+    }
+    const stored = structuredClone(envelope);
+    return {
+      sequence,
+      event_digest: digestObject(stored),
+      envelope: stored
+    };
+  }
+
   function reserve({
     transition_ref: ref,
     request_digest: requestDigest,
@@ -799,8 +818,16 @@ function createTransitionRecordStore(initialRecords = [], {
     if (current.status === 'terminal') {
       return canonicalJson(current.protocol) === canonicalJson(protocol);
     }
+    const candidate = structuredClone(current);
+    let candidateNextObserverSequence = nextObserverSequence;
     for (const envelope of observerEvents) {
-      enqueueObserverEvent({ transition_ref: ref, envelope });
+      const entry = createObserverOutboxEntry(
+        ref,
+        envelope,
+        candidateNextObserverSequence
+      );
+      candidate.observer_outbox.push(entry);
+      candidateNextObserverSequence = entry.sequence + 1;
     }
     const terminal = {
       transition_ref: ref,
@@ -808,15 +835,16 @@ function createTransitionRecordStore(initialRecords = [], {
       owner_digest: current.owner_digest,
       status: 'terminal',
       protocol: structuredClone(protocol),
-      observer_outbox: structuredClone(current.observer_outbox),
+      observer_outbox: structuredClone(candidate.observer_outbox),
       observer_delivered_events: structuredClone(
-        current.observer_delivered_events
+        candidate.observer_delivered_events
       ),
       previous_state_digest: current.previous_state_digest
     };
     validateRecord(terminal);
     activeRecords.delete(ref);
     terminalArchive.set(ref, terminal);
+    nextObserverSequence = candidateNextObserverSequence;
     return true;
   }
 
@@ -837,22 +865,14 @@ function createTransitionRecordStore(initialRecords = [], {
 
   function enqueueObserverEvent({ transition_ref: ref, envelope } = {}) {
     const current = activeRecords.get(ref) || terminalArchive.get(ref);
-    if (!current || !isPlainObject(envelope) ||
-        envelope.component !==
-          'governed_runtime_identity_transition_coordinator' ||
-        !EVENT_NAME_PATTERN.test(envelope.event || '') ||
-        envelope.transition_ref !== ref) {
+    if (!current) {
       reject('transition_record_store_context_mismatch');
     }
-    if (!isAllocatableObserverSequence(nextObserverSequence)) {
-      reject('transition_record_store_invalid');
-    }
-    const stored = structuredClone(envelope);
-    const nextEntry = {
-      sequence: nextObserverSequence,
-      event_digest: digestObject(stored),
-      envelope: stored
-    };
+    const nextEntry = createObserverOutboxEntry(
+      ref,
+      envelope,
+      nextObserverSequence
+    );
     const candidate = structuredClone(current);
     candidate.observer_outbox.push(structuredClone(nextEntry));
     validateRecord(candidate);
