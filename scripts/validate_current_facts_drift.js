@@ -146,8 +146,13 @@ const HISTORY_RECOVERY_PATHS = Object.freeze([
 const STALE_ACTIVE_PHRASES = Object.freeze([
   "CI must rerun",
   "merge remains separate",
-  "next exact-head CI pending",
-  "current task branch"
+  "next exact-head CI pending"
+]);
+const STALE_ACTIVE_ASSERTIONS = Object.freeze([
+  Object.freeze({
+    phrase: "current task branch",
+    pattern: /\bcurrent task branch\s+(?:is|was|records?|contains?|holds?|owns?|tracks?|represents?|identifies?|points?\s+to)\b/i
+  })
 ]);
 const POINTER_SELF_AUTHORITY_RE =
   /\b(?:this (?:file|document|surface|pointer) (?:is|serves as) (?:the )?(?:sole |only )?current(?: work)? authority|current authority\s*:\s*(?:this (?:file|document|surface|pointer)|self))\b/i;
@@ -762,6 +767,11 @@ function validateStalePhrases(root, failures) {
     for (const phrase of STALE_ACTIVE_PHRASES) {
       if (text.toLowerCase().includes(phrase.toLowerCase())) {
         failures.push(`${relativePath} contains stale active phrase: ${phrase}`);
+      }
+    }
+    for (const assertion of STALE_ACTIVE_ASSERTIONS) {
+      if (assertion.pattern.test(text)) {
+        failures.push(`${relativePath} contains stale active phrase: ${assertion.phrase}`);
       }
     }
   }

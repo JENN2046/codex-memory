@@ -1172,6 +1172,18 @@ test("current facts validator rejects branch-relative current task language", ()
   assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
 });
 
+test("current facts validator permits instructions to re-query the current task branch", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    "\nDo not infer the current task branch; query it fresh before reporting Git state.\n",
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
 test("current facts validator fails closed when baseline objects are unreadable", () => {
   const root = workspace();
   const gitRunner = (_root, args) => {
