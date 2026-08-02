@@ -146,7 +146,8 @@ const HISTORY_RECOVERY_PATHS = Object.freeze([
 const STALE_ACTIVE_PHRASES = Object.freeze([
   "CI must rerun",
   "merge remains separate",
-  "next exact-head CI pending"
+  "next exact-head CI pending",
+  "current task branch"
 ]);
 const POINTER_SELF_AUTHORITY_RE =
   /\b(?:this (?:file|document|surface|pointer) (?:is|serves as) (?:the )?(?:sole |only )?current(?: work)? authority|current authority\s*:\s*(?:this (?:file|document|surface|pointer)|self))\b/i;

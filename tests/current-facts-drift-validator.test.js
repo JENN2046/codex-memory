@@ -1160,6 +1160,18 @@ test("current facts validator rejects stale pending PR or CI language", () => {
   assert.match(result.failures.join("\n"), /contains stale active phrase/);
 });
 
+test("current facts validator rejects branch-relative current task language", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    "STATUS.md",
+    "# Status\n\n> Non-authoritative pointer to CURRENT_STATE.md.\n\nCurrent task branch records the active state.\n"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+});
+
 test("current facts validator fails closed when baseline objects are unreadable", () => {
   const root = workspace();
   const gitRunner = (_root, args) => {

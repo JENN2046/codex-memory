@@ -51,8 +51,28 @@ function makeFixture({ quotedRoot = false, mapping = syntheticMapping() } = {}) 
   const mappingSource = path.join(sourceDirectory, 'mapping.json');
   fs.writeFileSync(mappingSource, JSON.stringify(mapping), { mode: 0o600 });
   fs.chmodSync(mappingSource, 0o600);
+  const fsImpl = new Proxy(fs, {
+    get(target, property, receiver) {
+      if (property === 'lstatSync') {
+        return (targetPath, ...args) => {
+          const resolvedTarget = path.resolve(String(targetPath));
+          const relativeTarget = path.relative(base, resolvedTarget);
+          const insideFixture = relativeTarget === '' ||
+            (!relativeTarget.startsWith(`..${path.sep}`) && relativeTarget !== '..' && !path.isAbsolute(relativeTarget));
+          if (path.basename(resolvedTarget) === '.git' && !insideFixture) {
+            const error = new Error('fixture-scoped repository boundary');
+            error.code = 'ENOENT';
+            throw error;
+          }
+          return target.lstatSync(targetPath, ...args);
+        };
+      }
+      return Reflect.get(target, property, receiver);
+    }
+  });
   return {
     base,
+    fsImpl,
     mappingSource,
     packageName: 'readonly-context-v2',
     privateRoot
@@ -93,7 +113,7 @@ test('plan fails closed before mapping read when no-replace primitive is unavail
   const fixture = makeFixture();
   try {
     let mappingOpened = false;
-    const missingPrimitiveFs = new Proxy(fs, {
+    const missingPrimitiveFs = new Proxy(fixture.fsImpl, {
       get(target, property, receiver) {
         if (property === 'openSync') {
           return (targetPath, ...args) => {
@@ -136,7 +156,7 @@ test('plan fails closed when the no-replace syscall probe reports unavailable', 
   try {
     let mappingOpened = false;
     let observedArguments = null;
-    const trackingFs = new Proxy(fs, {
+    const trackingFs = new Proxy(fixture.fsImpl, {
       get(target, property, receiver) {
         if (property === 'openSync') {
           return (targetPath, ...args) => {
@@ -331,7 +351,7 @@ test('package verification fails closed when a file entry changes after descript
     fs.copyFileSync(mappingPath, replacementPath);
     fs.chmodSync(replacementPath, 0o600);
     let swapped = false;
-    const swappingFs = new Proxy(fs, {
+    const swappingFs = new Proxy(fixture.fsImpl, {
       get(target, property, receiver) {
         if (property === 'readSync') {
           return (...args) => {
@@ -400,7 +420,7 @@ test('apply reports and cleans a staging directory that cannot be descriptor-ope
   const fixture = makeFixture();
   try {
     const stagingSuffix = `/.${fixture.packageName}.staging`;
-    const failingFs = new Proxy(fs, {
+    const failingFs = new Proxy(fixture.fsImpl, {
       get(target, property, receiver) {
         if (property === 'openSync') {
           return (targetPath, ...args) => {
@@ -443,7 +463,7 @@ test('apply fails closed and cleans staging when private-root permissions drift'
   const fixture = makeFixture();
   try {
     let changed = false;
-    const driftingFs = new Proxy(fs, {
+    const driftingFs = new Proxy(fixture.fsImpl, {
       get(target, property, receiver) {
         if (property === 'writeSync') {
           return (...args) => {
@@ -625,7 +645,7 @@ test('apply retains state for reconciliation when the staging path is replaced',
     const displacedPath = `${stagingPath}-displaced`;
     let targetInspections = 0;
     let swapped = false;
-    const swappingFs = new Proxy(fs, {
+    const swappingFs = new Proxy(fixture.fsImpl, {
       get(target, property, receiver) {
         if (property === 'lstatSync') {
           return (targetPath, ...args) => {
@@ -638,7 +658,7 @@ test('apply retains state for reconciliation when the staging path is replaced',
                 swapped = true;
               }
             }
-            return fs.lstatSync(targetPath, ...args);
+            return target.lstatSync(targetPath, ...args);
           };
         }
         return Reflect.get(target, property, receiver);

@@ -113,9 +113,12 @@ async function loadSuite(suitePath) {
 }
 
 function getAverageOverlap(comparisons) {
-  if (comparisons.length === 0) return null;
-  const total = comparisons.reduce((sum, item) => sum + item.metrics.overlapCount, 0);
-  return Number((total / comparisons.length).toFixed(6));
+  const comparableComparisons = comparisons.filter(item =>
+    item.metrics.currentCount > 0 && item.metrics.baselineCount > 0
+  );
+  if (comparableComparisons.length === 0) return null;
+  const total = comparableComparisons.reduce((sum, item) => sum + item.metrics.overlapCount, 0);
+  return Number((total / comparableComparisons.length).toFixed(6));
 }
 
 function evaluateGate(compare, suite, options) {

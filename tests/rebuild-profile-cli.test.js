@@ -267,10 +267,22 @@ test('shadow-compare CLI should report no-baseline without another profile', asy
   const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'codex-memory-shadow-compare-'));
   const dataDir = path.join(tempBasePath, 'data');
   const dbPath = path.join(dataDir, 'codex-memory.sqlite');
+  const suitePath = path.join(tempBasePath, 'suite.json');
   const currentFingerprint = 'bge-m3-local__1024__single-profile-test';
 
   try {
     await fs.mkdir(dataDir, { recursive: true });
+    await fs.writeFile(suitePath, JSON.stringify({
+      name: 'no-baseline-suite',
+      thresholds: {
+        minAverageJaccard: 1,
+        minAverageOverlap: 1,
+        allowNoBaseline: true
+      },
+      queries: [
+        { id: 'alpha', query: 'alpha migration' }
+      ]
+    }), 'utf8');
     const db = new DatabaseSync(dbPath);
     try {
       db.exec(`
@@ -321,6 +333,43 @@ test('shadow-compare CLI should report no-baseline without another profile', asy
     assert.equal(payload.baselineProfile.fingerprint, null);
     assert.equal(payload.summary.currentChunkCount, 1);
     assert.equal(payload.summary.baselineChunkCount, 0);
+    assert.equal(payload.summary.averageJaccard, null);
+
+    const gateResult = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/profile-gate.js',
+      args: ['--suite', suitePath, '--json'],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'single-profile-test'
+      }
+    });
+    assert.equal(gateResult.code, 0);
+    const gatePayload = JSON.parse(gateResult.stdout);
+    assert.equal(gatePayload.summary.averageJaccard, null);
+    assert.equal(gatePayload.summary.averageOverlap, null);
+    assert.equal(gatePayload.summary.comparableStatus, 'no-baseline');
+
+    const textResult = await runCli({
+      cwd: process.cwd(),
+      script: 'src/cli/profile-gate.js',
+      args: ['--suite', suitePath],
+      env: {
+        CODEX_MEMORY_BASE_PATH: tempBasePath,
+        CODEX_MEMORY_DATA_DIR: dataDir,
+        CODEX_MEMORY_LOCAL_EMBEDDING_URL: 'http://127.0.0.1:18081/',
+        CODEX_MEMORY_LOCAL_EMBEDDING_MODEL: 'bge-m3-local',
+        CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
+        CODEX_MEMORY_EMBEDDING_PROFILE_VERSION: 'single-profile-test'
+      }
+    });
+    assert.equal(textResult.code, 0);
+    assert.match(textResult.stdout, /average jaccard: n\/a/);
+    assert.match(textResult.stdout, /average overlap: n\/a/);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
   }
@@ -345,7 +394,8 @@ test('profile-gate CLI should evaluate a fixed migration suite', async () => {
         allowNoBaseline: false
       },
       queries: [
-        { id: 'alpha', query: 'alpha migration' }
+        { id: 'alpha', query: 'alpha migration' },
+        { id: 'empty', query: 'unmatched zephyr' }
       ]
     }), 'utf8');
 
@@ -402,9 +452,12 @@ test('profile-gate CLI should evaluate a fixed migration suite', async () => {
     assert.equal(payload.destructive, false);
     assert.equal(payload.status, 'warn');
     assert.equal(payload.suite.name, 'test-suite');
-    assert.equal(payload.summary.queryCount, 1);
+    assert.equal(payload.summary.queryCount, 2);
     assert.equal(payload.summary.averageJaccard, 1);
     assert.equal(payload.summary.averageOverlap, 1);
+    assert.equal(payload.comparisons[1].metrics.currentCount, 0);
+    assert.equal(payload.comparisons[1].metrics.baselineCount, 0);
+    assert.equal(payload.comparisons[1].metrics.jaccard, null);
     assert.equal(payload.checks.some(check => check.code === 'lexical-only'), true);
   } finally {
     await fs.rm(tempBasePath, { recursive: true, force: true });
@@ -537,7 +590,7 @@ test('profile-gate CLI should fail require-pass when thresholds are missed', asy
       insert.run('current-alpha', 'alpha-memory', 'process', 'Alpha current', 'current.md', 0,
         'alpha migration current profile chunk', '[]', currentFingerprint, JSON.stringify(['alpha']), now, now);
       insert.run('baseline-gamma', 'gamma-memory', 'process', 'Gamma baseline', 'baseline.md', 0,
-        'gamma baseline profile chunk', '[]', baselineFingerprint, JSON.stringify(['gamma']), now, now);
+        'alpha migration baseline profile chunk with a different identity', '[]', baselineFingerprint, JSON.stringify(['gamma']), now, now);
     } finally {
       db.close();
     }
