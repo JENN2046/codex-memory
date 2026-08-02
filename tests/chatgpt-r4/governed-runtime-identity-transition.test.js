@@ -2269,6 +2269,84 @@ test('13d3b3. successful archives require a complete Observer event chain', () =
   );
 });
 
+test('13d3b4. reserved records reject atomic and committed-terminal events', () => {
+  const state = initialState();
+  const request = requestFor(state);
+  const acceptance = acceptanceEvent(request);
+  const terminal = createRuntimeIdentityTransitionTerminal({
+    request,
+    receipts: [],
+    outcome: 'failure',
+    reasonCode: 'transition_replayed',
+    runtimeStopped: true
+  });
+  const terminalEnvelope = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_terminal_committed',
+    transition_ref: request.transition_ref,
+    terminal
+  };
+  const reservedWithTerminal = {
+    transition_ref: request.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(request),
+    owner_digest: COORDINATOR_OWNER,
+    status: 'reserved',
+    protocol: null,
+    observer_outbox: [],
+    observer_delivered_events: [acceptance, terminalEnvelope]
+      .map((envelope, sequence) => ({
+        sequence,
+        event_digest: digestObject(envelope),
+        envelope
+      })),
+    previous_state_digest: null
+  };
+  assert.throws(
+    () => createTransitionRecordStore([reservedWithTerminal]),
+    { code: 'transition_record_store_invalid' }
+  );
+
+  const liveStore = createTransitionRecordStore();
+  assert.equal(liveStore.reserve({
+    transition_ref: request.transition_ref,
+    request_digest: runtimeIdentityTransitionRequestDigest(request),
+    owner_digest: COORDINATOR_OWNER,
+    acceptance_event: acceptance
+  }), true);
+  const liveBefore = liveStore.snapshot();
+  assert.throws(
+    () => liveStore.enqueueObserverEvent({
+      transition_ref: request.transition_ref,
+      envelope: terminalEnvelope
+    }),
+    { code: 'transition_record_store_invalid' }
+  );
+  assert.deepEqual(liveStore.snapshot(), liveBefore);
+
+  const committed = prepareAndCommit();
+  const successfulRecord = structuredClone(
+    committed.recordStore.get(committed.request.transition_ref)
+  );
+  successfulRecord.status = 'reserved';
+  successfulRecord.protocol = null;
+  successfulRecord.observer_delivered_events = [
+    ...successfulRecord.observer_delivered_events,
+    ...successfulRecord.observer_outbox
+  ].sort((left, right) => left.sequence - right.sequence)
+    .filter(entry =>
+      entry.envelope.event !== 'transition_terminal_committed'
+    );
+  successfulRecord.observer_outbox = [];
+  assert.equal(
+    successfulRecord.observer_delivered_events.at(-1).envelope.event,
+    'transition_atomic_commit'
+  );
+  assert.throws(
+    () => createTransitionRecordStore([successfulRecord]),
+    { code: 'transition_record_store_invalid' }
+  );
+});
+
 test('13d3c. a fresh Observer receives the delivered prefix before pending events', () => {
   const state = initialState();
   const recordStore = createTransitionRecordStore();

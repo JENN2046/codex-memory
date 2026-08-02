@@ -268,7 +268,10 @@ the outbox is empty, ensuring a later coordinator-loss report has an active
 Observer record to close. A persisted `lost` record is valid only when its
 outbox is empty and its delivered stream ends in exactly one canonical
 `transition_terminal_missing`; it cannot substitute a successful atomic or
-committed-terminal stream while leaving `protocol` null. Archived protocol
+committed-terminal stream while leaving `protocol` null. A `reserved` record
+may retain only a non-terminal prefix or a pending `transition_terminal_missing`;
+atomic commits and committed terminals become durable only through the same
+`finalize()` operation that changes its status to `terminal`. Archived protocol
 lookup validates and
 returns the durable terminal before consulting identity state as a fallback.
 Concurrent recovery uses reserve-or-reread semantics: a loser validates the

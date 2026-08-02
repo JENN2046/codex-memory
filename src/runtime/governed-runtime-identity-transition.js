@@ -642,10 +642,12 @@ function createTransitionRecordStore(initialRecords = [], {
             observerStream.terminal !== null) {
           reject('transition_record_store_invalid');
         }
-      } else if (observerStream.terminal_missing &&
-          !record.observer_outbox.some(entry =>
-            entry.envelope.event === 'transition_terminal_missing'
-          )) {
+      } else if (observerStream.atomic_protocol !== null ||
+          observerStream.terminal !== null ||
+          (observerStream.terminal_missing &&
+            !record.observer_outbox.some(entry =>
+              entry.envelope.event === 'transition_terminal_missing'
+            ))) {
         reject('transition_record_store_invalid');
       }
     } else {
