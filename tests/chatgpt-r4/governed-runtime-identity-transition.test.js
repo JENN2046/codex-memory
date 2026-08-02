@@ -2548,7 +2548,7 @@ test('13d3f. current state anchors an offline historical commit backlog', () => 
   assert.equal(snapshot.protocol_violations, 0);
 });
 
-test('13d3f1. an unclosed historical prefix retains only bounded records', () => {
+test('13d3f1. history beyond retention closes without FIFO backpressure', () => {
   const state = initialState();
   const store = createGovernedRuntimeIdentityStateStore(state);
   const recordStore = createTransitionRecordStore();
@@ -2583,35 +2583,26 @@ test('13d3f1. an unclosed historical prefix retains only bounded records', () =>
     initialAuthoritativeState: current,
     maxRetainedTransitions: 2
   });
-  const historicalRecords = recordStore.snapshot().filter(record =>
-    record.protocol?.request.transition_ref !==
-      current.last_transition.protocol.request.transition_ref
-  );
-  let terminalBackpressure = 0;
-  for (const record of historicalRecords.slice(0, 3)) {
-    for (const entry of record.observer_outbox) {
-      const accepted = observer.observe(entry.envelope);
-      if (entry.envelope.event === 'transition_terminal_committed' &&
-          accepted === false) {
-        terminalBackpressure += 1;
-      } else {
-        assert.equal(accepted, true);
-      }
-    }
-  }
+  harness({ state: current, store, recordStore, observer });
   const snapshot = observer.snapshot();
-  assert.equal(snapshot.atomic_commits_verified, 0);
-  assert.equal(snapshot.terminal_successes, 0);
-  assert.equal(snapshot.active_transitions, 1);
-  assert.equal(snapshot.provisional_historical_transitions, 2);
-  assert.equal(snapshot.terminal_replay_markers, 3);
-  assert.equal(observer.replayMarkers().length, 3);
-  assert.equal(terminalBackpressure, 1);
-  assert.equal(snapshot.protocol_violations, 1);
-  assert.equal(
-    snapshot.last_violation_code,
-    'transition_observer_capacity_exceeded'
-  );
+  assert.equal(recordStore.pendingObserverEvents().length, 0);
+  assert.equal(snapshot.atomic_commits_verified, 4);
+  assert.equal(snapshot.terminal_successes, 4);
+  assert.equal(snapshot.active_transitions, 0);
+  assert.equal(snapshot.provisional_historical_transitions, 0);
+  assert.equal(snapshot.retained_terminals, 2);
+  assert.equal(snapshot.terminal_replay_markers, 4);
+  const replayMarkers = observer.replayMarkers();
+  assert.equal(replayMarkers.length, 4);
+  assert.equal(snapshot.protocol_violations, 0);
+  assert.equal(snapshot.last_authoritative_store_version, 5);
+  const rebuilt = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: current,
+    initialTerminalReplayMarkers: replayMarkers,
+    maxRetainedTransitions: 2
+  });
+  assert.equal(rebuilt.snapshot().protocol_violations, 0);
+  assert.equal(rebuilt.snapshot().provisional_historical_transitions, 0);
 });
 
 test('13d4. initial state read fault terminalizes the durable reservation', () => {

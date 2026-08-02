@@ -304,12 +304,15 @@ envelopes, not bare digests. Every restored envelope is replayed through the
 same acceptance, receipt, preview, atomic-commit, and terminal validation, and
 the restored list must exactly match the complete terminal chain before
 idempotent suppression is enabled. The complete-envelope replay ledger retains
-at most `maxRetainedTransitions` terminal transitions in addition to the
-current authoritative-state anchor. When that integrity-preserving ledger is
-full, the Observer applies backpressure before acknowledging another terminal
-or missing-terminal event; it does not evict the record while retaining an
-unbounded hidden event chain, and it does not downgrade to a forgeable bare
-digest marker. Export orders successful replay markers by their verified atomic
+at most `maxRetainedTransitions` terminal transitions, one historical
+checkpoint, and the current authoritative-state anchor. Before that
+integrity-preserving ledger applies backpressure, a monotonic historical prefix
+advances the checkpoint and discards its older full envelope, reserving the
+configured window for the events needed to reach the authoritative predecessor.
+Ordinary terminal traffic still fails closed when neither retained capacity nor
+a historical checkpoint can be advanced. The Observer does not retain an
+unbounded hidden event chain or downgrade to a forgeable bare digest marker.
+Export orders successful replay markers by their verified atomic
 `store_version`, independent of terminal arrival order, so reconstruction
 replays the authoritative commit chain monotonically.
 Persisted envelopes use a closed event registry with exact payload shapes.
@@ -370,14 +373,14 @@ that prefix reaches the exact predecessor digest and `from_runtime` bound by
 the initial state's `last_transition`; the current state itself remains the
 live successor anchor. Provisional terminals move out of the bounded active
 admission set. Their full reconciliation records are bounded by the Observer
-retention limit; older records compact into exact acknowledged-event replay
-markers and cumulative pending counts. Closing the prefix verifies those
-counts against the authoritative chain without retaining an unbounded Map, so
-a history longer than the live retention window cannot block the commit that
-closes the prefix. Acceptance also requires its envelope
-`transition_ref` to equal the canonical request reference. The Observer applies
-the same closed event registry and exact envelope shapes to direct delivery as
-the durable record store applies during enqueue and reconstruction.
+retention limit; older records advance a single full-envelope historical
+checkpoint while cumulative pending counts remain in-process. The checkpoint
+and retained suffix preserve the exact state-digest chain needed to reach the
+authoritative predecessor, so a history longer than the live retention window
+cannot block the commit that closes the prefix. Acceptance also requires its
+envelope `transition_ref` to equal the canonical request reference. The Observer
+applies the same closed event registry and exact envelope shapes to direct
+delivery as the durable record store applies during enqueue and reconstruction.
 Every successful atomic observation requires exactly one prior canonical
 preview, and its `expected_store_version + 1` must equal the atomic
 `store_version`; a syntactically valid preview for another CAS context cannot
