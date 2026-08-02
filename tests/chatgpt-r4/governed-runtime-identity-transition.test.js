@@ -386,6 +386,26 @@ test('a stable controller binding requires its canonical last transition', () =>
   );
 });
 
+test('a persisted last transition requires a positive store version', () => {
+  const result = prepareAndCommit();
+  const state = structuredClone(result.store.snapshot());
+  state.store_version = 0;
+  assert.throws(
+    () => validateGovernedRuntimeIdentityState(state),
+    { code: 'transition_store_last_transition_invalid' }
+  );
+  assert.throws(
+    () => createGovernedRuntimeIdentityStateStore(state),
+    { code: 'transition_store_last_transition_invalid' }
+  );
+  assert.throws(
+    () => createGovernedRuntimeIdentityTransitionObserver({
+      initialAuthoritativeState: state
+    }),
+    { code: 'transition_store_last_transition_invalid' }
+  );
+});
+
 test('a persisted success terminal requires its previous-state digest', () => {
   const result = prepareAndCommit();
   const record = structuredClone(result.recordStore.snapshot()[0]);
@@ -1861,6 +1881,82 @@ test('13d3a1. rebuilt Observer acknowledges an exact failed-terminal replay', ()
   });
   assert.equal(rebuiltRecords.pendingObserverEvents().length, 0);
   assert.equal(rebuiltObserver.snapshot().protocol_violations, 0);
+});
+
+test('13d3a2. Observer recovery validates complete acknowledged envelopes', () => {
+  const state = initialState();
+  const request = requestFor(state);
+  const acceptance = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_accepted',
+    transition_ref: request.transition_ref,
+    request
+  };
+  const terminal = createRuntimeIdentityTransitionTerminal({
+    request,
+    receipts: [],
+    outcome: 'failure',
+    reasonCode: 'transition_replayed',
+    runtimeStopped: true
+  });
+  const terminalEvent = {
+    component: 'governed_runtime_identity_transition_coordinator',
+    event: 'transition_terminal_committed',
+    transition_ref: request.transition_ref,
+    terminal
+  };
+  const observer = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state
+  });
+  assert.equal(observer.observe(acceptance), true);
+  assert.equal(observer.observe(terminalEvent), true);
+  const markers = observer.replayMarkers();
+  assert.deepEqual(
+    Object.keys(markers[0]).sort(),
+    ['acknowledged_events', 'transition_ref']
+  );
+  assert.deepEqual(markers[0].acknowledged_events, [acceptance, terminalEvent]);
+
+  const rebuilt = createGovernedRuntimeIdentityTransitionObserver({
+    initialAuthoritativeState: state,
+    initialTerminalReplayMarkers: markers
+  });
+  assert.equal(rebuilt.observe(terminalEvent), true);
+  assert.equal(rebuilt.snapshot().terminal_failures, 1);
+  assert.equal(rebuilt.snapshot().protocol_violations, 0);
+
+  const bareDigests = [{
+    transition_ref: request.transition_ref,
+    acknowledged_event_digests:
+      markers[0].acknowledged_events.map(digestObject)
+  }];
+  assert.throws(
+    () => createGovernedRuntimeIdentityTransitionObserver({
+      initialAuthoritativeState: state,
+      initialTerminalReplayMarkers: bareDigests
+    }),
+    { code: 'transition_observer_replay_markers_invalid' }
+  );
+  assert.throws(
+    () => createGovernedRuntimeIdentityTransitionObserver({
+      initialAuthoritativeState: state,
+      initialTerminalReplayMarkers: [{
+        transition_ref: request.transition_ref,
+        acknowledged_events: [terminalEvent]
+      }]
+    }),
+    { code: 'transition_observer_replay_markers_invalid' }
+  );
+  const tampered = structuredClone(markers);
+  tampered[0].acknowledged_events[0].request.request.nonce =
+    `nonce_${'Z'.repeat(24)}`;
+  assert.throws(
+    () => createGovernedRuntimeIdentityTransitionObserver({
+      initialAuthoritativeState: state,
+      initialTerminalReplayMarkers: tampered
+    }),
+    { code: 'transition_observer_replay_markers_invalid' }
+  );
 });
 
 test('13d3b. delivered-event ledgers require canonical full envelopes', () => {

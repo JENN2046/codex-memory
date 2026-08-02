@@ -49,42 +49,18 @@ function createGovernedRuntimeIdentityTransitionObserver({
   const terminalHistory = new Map();
   const provisionalHistoricalTerminals = new Map();
   const terminalReplayMarkers = new Set();
-  const acknowledgedEventDigestsByTransition = new Map();
-  const initialReplayDigests = new Set();
+  const acknowledgedEventsByTransition = new Map();
 
-  function acknowledgeEventDigest(transitionRef, eventDigest) {
-    const transitionDigests =
-      acknowledgedEventDigestsByTransition.get(transitionRef) || new Set();
-    transitionDigests.add(eventDigest);
-    acknowledgedEventDigestsByTransition.set(
+  function acknowledgeEvent(event) {
+    const transitionRef = event?.transition_ref;
+    const eventDigest = digestObject(event);
+    const transitionEvents =
+      acknowledgedEventsByTransition.get(transitionRef) || new Map();
+    transitionEvents.set(eventDigest, structuredClone(event));
+    acknowledgedEventsByTransition.set(
       transitionRef,
-      transitionDigests
+      transitionEvents
     );
-  }
-
-  for (const marker of initialTerminalReplayMarkers) {
-    if (!exactKeys(marker, [
-      'transition_ref', 'acknowledged_event_digests'
-    ]) ||
-        !GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN.test(
-          marker.transition_ref || ''
-        ) ||
-        !Array.isArray(marker.acknowledged_event_digests) ||
-        marker.acknowledged_event_digests.length === 0 ||
-        new Set(marker.acknowledged_event_digests).size !==
-          marker.acknowledged_event_digests.length ||
-        marker.acknowledged_event_digests.some(
-          digest => !DIGEST_PATTERN.test(digest || '') ||
-            initialReplayDigests.has(digest)
-        ) ||
-        terminalReplayMarkers.has(marker.transition_ref)) {
-      reject('transition_observer_replay_markers_invalid');
-    }
-    terminalReplayMarkers.add(marker.transition_ref);
-    for (const eventDigest of marker.acknowledged_event_digests) {
-      initialReplayDigests.add(eventDigest);
-      acknowledgeEventDigest(marker.transition_ref, eventDigest);
-    }
   }
   let lastAuthoritativeCommit = null;
   let initialAuthoritativeAnchor = null;
@@ -185,7 +161,7 @@ function createGovernedRuntimeIdentityTransitionObserver({
         }
       ];
       for (const event of canonicalEvents) {
-        acknowledgeEventDigest(lastTransitionRef, digestObject(event));
+        acknowledgeEvent(event);
       }
     }
   }
@@ -571,15 +547,58 @@ function createGovernedRuntimeIdentityTransitionObserver({
     } catch {
       return false;
     }
-    if (acknowledgedEventDigestsByTransition.get(event.transition_ref)
+    if (acknowledgedEventsByTransition.get(event.transition_ref)
       ?.has(eventDigest)) {
       return true;
     }
     const accepted = observeOnce(event);
     if (accepted === true) {
-      acknowledgeEventDigest(event.transition_ref, eventDigest);
+      acknowledgeEvent(event);
     }
     return accepted;
+  }
+
+  function restoreTerminalReplayMarkers(markers) {
+    const restoredRefs = new Set();
+    const restoredDigests = new Set();
+    for (const marker of markers) {
+      if (!exactKeys(marker, ['transition_ref', 'acknowledged_events']) ||
+          !GOVERNED_RUNTIME_IDENTITY_TRANSITION_REF_PATTERN.test(
+            marker.transition_ref || ''
+          ) ||
+          !Array.isArray(marker.acknowledged_events) ||
+          marker.acknowledged_events.length === 0 ||
+          restoredRefs.has(marker.transition_ref)) {
+        reject('transition_observer_replay_markers_invalid');
+      }
+      restoredRefs.add(marker.transition_ref);
+      for (const event of marker.acknowledged_events) {
+        let eventDigest;
+        try {
+          eventDigest = digestObject(event);
+        } catch {
+          reject('transition_observer_replay_markers_invalid');
+        }
+        if (!isPlainObject(event) ||
+            event.transition_ref !== marker.transition_ref ||
+            restoredDigests.has(eventDigest) || observe(event) !== true) {
+          reject('transition_observer_replay_markers_invalid');
+        }
+        restoredDigests.add(eventDigest);
+      }
+      const acknowledged = [
+        ...(acknowledgedEventsByTransition.get(marker.transition_ref)
+          ?.values() || [])
+      ];
+      if (!terminalReplayMarkers.has(marker.transition_ref) ||
+          canonicalJson(acknowledged) !==
+            canonicalJson(marker.acknowledged_events)) {
+        reject('transition_observer_replay_markers_invalid');
+      }
+    }
+    if (transitions.size !== 0 || provisionalHistoricalTerminals.size !== 0) {
+      reject('transition_observer_replay_markers_invalid');
+    }
   }
 
   function reconcile(transitionRef) {
@@ -632,12 +651,14 @@ function createGovernedRuntimeIdentityTransitionObserver({
     return Object.freeze([...terminalReplayMarkers].map(transitionRef =>
       Object.freeze({
         transition_ref: transitionRef,
-        acknowledged_event_digests: Object.freeze([
-          ...(acknowledgedEventDigestsByTransition.get(transitionRef) || [])
-        ])
+        acknowledged_events: Object.freeze([
+          ...(acknowledgedEventsByTransition.get(transitionRef)?.values() || [])
+        ].map(event => Object.freeze(structuredClone(event))))
       })
     ));
   }
+
+  restoreTerminalReplayMarkers(initialTerminalReplayMarkers);
 
   return Object.freeze({ observe, reconcile, replayMarkers, snapshot });
 }

@@ -179,7 +179,8 @@ function validateGovernedRuntimeIdentityState(value) {
     reject('transition_store_migration_invalid');
   }
   if (value.last_transition !== null) {
-    if (!exactKeys(value.last_transition, LAST_TRANSITION_KEYS)) {
+    if (value.store_version < 1 ||
+        !exactKeys(value.last_transition, LAST_TRANSITION_KEYS)) {
       reject('transition_store_last_transition_invalid');
     }
     for (const key of [

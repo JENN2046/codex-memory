@@ -108,7 +108,9 @@ neither a failure protocol nor a self-consistent protocol from another branch
 can serve as `last_transition`. Stable binding authority IDs use the same
 canonical `grauth_...` format as requests. A stable controller binding without
 that matching `last_transition` is invalid; only the initial legacy-coupled
-state may omit it.
+state may omit it. Any state that retains `last_transition` must have
+`store_version >= 1`; version zero is reserved for a state that no successful
+CAS transition has produced.
 The state-store adapter also reconstructs each CAS candidate from its exact
 current state and the candidate's retained canonical protocol. Matching a
 numeric version alone cannot commit a candidate derived from a competing
@@ -282,7 +284,12 @@ Every successful terminal archive must retain the complete canonical event
 chain: acceptance, all receipts, preview, atomic commit, and terminal. A
 protocol-only success is rejected because a fresh Observer could not
 independently reconstruct it. Failure and loss replay markers may remain
-compact when no successful atomic state was committed.
+compact when no successful atomic state was committed. Independent Observer
+reconstruction nevertheless restores the ordered complete acknowledged event
+envelopes, not bare digests. Every restored envelope is replayed through the
+same acceptance, receipt, preview, atomic-commit, and terminal validation, and
+the restored list must exactly match the complete terminal chain before
+idempotent suppression is enabled.
 Persisted envelopes use a closed event registry with exact payload shapes.
 Unknown event names, missing required payloads, invalid receipt chains, and
 malformed atomic projections are rejected during store reconstruction and
