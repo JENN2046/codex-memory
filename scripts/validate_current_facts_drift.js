@@ -151,7 +151,7 @@ const STALE_ACTIVE_PHRASES = Object.freeze([
 const STALE_ACTIVE_ASSERTIONS = Object.freeze([
   Object.freeze({
     phrase: "current task branch",
-    pattern: /\bcurrent task branch\s+(?:(?:currently|now)\s+)?(is|was|remains?|records?|contains?|holds?|owns?|tracks?|represents?|identifies?|points?\s+to)\b/gi
+    pattern: /\bcurrent task branch\s+(?:(?:currently|now)\s+)?(is|was|remains?|has|records?|contains?|holds?|owns?|tracks?|stores?|persists?|keeps?|represents?|identifies?|points?\s+to|serves?\s+as|acts?\s+as|functions?\s+as|provides?|supplies?|defines?|declares?|establishes?|determines?|governs?|controls?|authorizes?)\b/gi
   })
 ]);
 const NEGATED_REPORTING_PREFIX_RE = /\b(?:(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|should)\s+not)|(?:don't|doesn't|didn't|hasn't|haven't|hadn't|isn't|aren't|wasn't|weren't|won't|wouldn't|can't|couldn't|mightn't|mustn't|shouldn't)|never|cannot)\s+(?:(?:explicitly|falsely|incorrectly|wrongly|ever)\s+){0,2}(?:claims?|claimed|claiming|states?|stated|stating|asserts?|asserted|asserting|says?|said|saying|reports?|reported|reporting)\s*(?::\s*(?:the\s+)?|\s+(?:(?:that\s+)?(?:the\s+)?|the\s+following\s*:\s*(?:the\s+)?))$/i;
@@ -840,6 +840,10 @@ function containsStaleAssertion(text, assertion) {
       continue;
     }
     if (/\b(?:whether|if)\s+(?:the\s+)?$/i.test(prefix)) continue;
+    if (/^(?:is|was|remains?)$/i.test(match[1]) &&
+        /^\s+(?:(?:currently|still)\s+)?(?:unknown|unavailable|unverified|undetermined|unresolved|unspecified|not known|yet to be (?:determined|queried|verified))\b/i.test(suffix)) {
+      continue;
+    }
     if (/^\s+(?:not(?!\s+only\b)|never|no longer|no|neither)\b/i.test(suffix)) continue;
     return true;
   }

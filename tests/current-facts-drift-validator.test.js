@@ -1284,6 +1284,42 @@ test("current facts validator permits directly negated branch predicates", () =>
   assert.equal(result.ok, true, result.failures.join("\n"));
 });
 
+test("current facts validator permits unknown branch-state guidance", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    [
+      "",
+      "The current task branch is unknown until queried fresh.",
+      "The current task branch remains unverified until Git is queried.",
+      "The current task branch is still unavailable to this document.",
+      "The current task branch is yet to be determined.",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects equivalent affirmative branch-authority predicates", () => {
+  for (const staleText of [
+    "The current task branch has the active state.",
+    "The current task branch stores the current facts.",
+    "The current task branch serves as the current authority.",
+    "The current task branch provides the canonical status.",
+    "The current task branch determines the active identity."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
 test("current facts validator rejects non-negative not-only branch predicates", () => {
   const root = workspace();
   const currentStatePath = path.join(root, "CURRENT_STATE.md");
