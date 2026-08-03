@@ -86,7 +86,7 @@ function writeProfile(target, value, formatting = 2) {
   fs.chmodSync(target, 0o600);
 }
 
-function recordingFs(calls) {
+function recordingFs(calls, faults = {}) {
   const descriptors = new Map();
   const adapter = Object.create(fs);
   adapter.openSync = (file, ...args) => {
@@ -100,8 +100,18 @@ function recordingFs(calls) {
     return fs.writeFileSync(file, ...args);
   };
   adapter.fsyncSync = descriptor => {
-    calls.push(['fsync', descriptors.get(descriptor)]);
+    const file = descriptors.get(descriptor);
+    calls.push(['fsync', file]);
+    if (typeof faults.fsync === 'function' && faults.fsync(file)) {
+      throw new Error('synthetic file fsync failure');
+    }
     return fs.fsyncSync(descriptor);
+  };
+  adapter.fchmodSync = (descriptor, ...args) => {
+    const file = descriptors.get(descriptor);
+    calls.push(['fchmod', file]);
+    if (faults.fchmod) throw new Error('synthetic fchmod failure');
+    return fs.fchmodSync(descriptor, ...args);
   };
   adapter.closeSync = descriptor => {
     calls.push(['close', descriptors.get(descriptor)]);
@@ -305,6 +315,83 @@ test('file fsync happens before rename and parent directory fsync happens after 
       ? 'rename'
       : call[1] === directory ? 'directory_fsync' : 'file_fsync');
   assert.deepEqual(sequence, ['file_fsync', 'rename', 'directory_fsync']);
+});
+
+test('temp mode is set before final file fsync and target remains owner-only', t => {
+  const { directory, target } = fixture(t);
+  const calls = [];
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(profile()),
+    nextProfile: profile({ adoptedRepositoryHead: GIT('9') }),
+    fsModule: recordingFs(calls)
+  });
+  assert.equal(result.classification, 'COMMITTED');
+  const sequence = calls
+    .filter(call => ['write', 'fchmod', 'fsync', 'close', 'rename'].includes(call[0]))
+    .map(call => {
+      if (call[0] === 'fsync') {
+        return call[1] === directory ? 'directory_fsync' : 'file_fsync';
+      }
+      if (call[0] === 'close') {
+        return call[1] === directory ? 'directory_close' : 'file_close';
+      }
+      return call[0];
+    });
+  assert.deepEqual(sequence, [
+    'write',
+    'fchmod',
+    'file_fsync',
+    'file_close',
+    'rename',
+    'directory_fsync',
+    'directory_close'
+  ]);
+  assert.equal(fs.statSync(target).mode & 0o077, 0);
+});
+
+test('fchmod failure before rename preserves the target and cleans the temp', t => {
+  const { directory, target } = fixture(t);
+  const before = fs.readFileSync(target);
+  const beforeFingerprint = canonicalProfileFingerprint(profile());
+  const beforeEntries = fs.readdirSync(directory).sort();
+  const calls = [];
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: beforeFingerprint,
+    nextProfile: profile({ adoptedRepositoryHead: GIT('9') }),
+    fsModule: recordingFs(calls, { fchmod: true })
+  });
+  assert.equal(result.classification, 'NOT_COMMITTED');
+  assert.equal(result.mutated, false);
+  assert.equal(result.renameAttempted, false);
+  assert.equal(calls.some(call => call[0] === 'fchmod'), true);
+  assert.equal(calls.some(call => call[0] === 'rename'), false);
+  assert.deepEqual(fs.readdirSync(directory).sort(), beforeEntries);
+  assert.deepEqual(fs.readFileSync(target), before);
+  assert.equal(canonicalProfileFingerprint(JSON.parse(fs.readFileSync(target))), beforeFingerprint);
+});
+
+test('file fsync failure after fchmod before rename preserves the target', t => {
+  const { directory, target } = fixture(t);
+  const before = fs.readFileSync(target);
+  const beforeFingerprint = canonicalProfileFingerprint(profile());
+  const calls = [];
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: beforeFingerprint,
+    nextProfile: profile({ adoptedRepositoryHead: GIT('9') }),
+    fsModule: recordingFs(calls, {
+      fsync: file => file !== directory
+    })
+  });
+  assert.equal(result.classification, 'NOT_COMMITTED');
+  assert.equal(result.mutated, false);
+  assert.equal(result.renameAttempted, false);
+  assert.equal(calls.some(call => call[0] === 'fchmod'), true);
+  assert.equal(calls.some(call => call[0] === 'rename'), false);
+  assert.deepEqual(fs.readFileSync(target), before);
+  assert.equal(canonicalProfileFingerprint(JSON.parse(fs.readFileSync(target))), beforeFingerprint);
 });
 
 test('parent-directory fsync failure never returns ordinary committed', t => {

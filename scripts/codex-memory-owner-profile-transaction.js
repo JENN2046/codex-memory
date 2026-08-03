@@ -480,11 +480,11 @@ function commitOwnerProfileTransaction({
     );
     tempCreated = true;
     fsModule.writeFileSync(temporaryDescriptor, body);
+    fsModule.fchmodSync(temporaryDescriptor, OWNER_FILE_MODE);
     fsModule.fsyncSync(temporaryDescriptor);
     invokeFault(faultInjector, 'after_temp_fsync');
     fsModule.closeSync(temporaryDescriptor);
     temporaryDescriptor = undefined;
-    fsModule.chmodSync(temporary, OWNER_FILE_MODE);
     invokeFault(faultInjector, 'before_rename');
     renameAttempted = true;
     fsModule.renameSync(temporary, file);
