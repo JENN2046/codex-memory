@@ -864,7 +864,11 @@ function markdownListContentIndent(line) {
 
 function isMarkdownNonParagraphBlock(line) {
   const value = String(line || "");
-  return /^ {0,3}(?:#{1,6}(?:\s|$)|>|`{3,}|~{3,}|<(?:!--|\/?[A-Za-z]))/.test(value) ||
+  const blockquote = value.match(/^ {0,3}>\s?(.*)$/);
+  if (blockquote) {
+    return blockquote[1] === "" || isMarkdownNonParagraphBlock(blockquote[1]);
+  }
+  return /^ {0,3}(?:#{1,6}(?:\s|$)|`{3,}|~{3,}|<(?:!--|\/?[A-Za-z]))/.test(value) ||
     /^ {0,3}(?:(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,})$/.test(value);
 }
 
@@ -878,6 +882,12 @@ function isInsideMarkdownIndentedCode(text, index) {
 
   const precedingText = lineStart === 0 ? "" : text.slice(0, lineStart - 1);
   const precedingLines = precedingText ? precedingText.split("\n") : [];
+  const precedingLineStarts = [];
+  let precedingOffset = 0;
+  for (const line of precedingLines) {
+    precedingLineStarts.push(precedingOffset);
+    precedingOffset += line.length + 1;
+  }
   let sawBlankBoundary = lineStart === 0;
   let boundaryLine = null;
   let listContentIndent = null;
@@ -888,7 +898,10 @@ function isInsideMarkdownIndentedCode(text, index) {
       continue;
     }
     const listBoundary = markdownListContentIndent(line);
-    if (listBoundary && listBoundary.leadingIndent < currentIndent) {
+    const lineProbeIndex = precedingLineStarts[lineIndex] + Math.max(0, line.length - 1);
+    const listBoundaryIsCode = listBoundary &&
+      isInsideMarkdownIndentedCode(text, lineProbeIndex);
+    if (listBoundary && !listBoundaryIsCode && listBoundary.leadingIndent < currentIndent) {
       listContentIndent = listBoundary.contentIndent;
       break;
     }
