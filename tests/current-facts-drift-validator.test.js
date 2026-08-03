@@ -1461,6 +1461,19 @@ test("current facts validator permits stale assertion examples in Markdown fence
   }
 });
 
+test("current facts validator permits stale assertion examples in Markdown HTML comments", () => {
+  for (const commentedExample of [
+    "<!-- The current task branch records the active state. -->",
+    "<!--\nThe active state is recorded by the current task branch.\n-->"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${commentedExample}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${commentedExample}\n${result.failures.join("\n")}`);
+  }
+});
+
 test("current facts validator permits stale assertion examples in Markdown indented code", () => {
   for (const indentedExample of [
     "Example:\n\n    The current task branch records the active state.",
@@ -1486,8 +1499,12 @@ test("current facts validator does not treat paragraph or list indentation as co
   for (const staleText of [
     "Fresh Git state is required.\n    The current task branch records the active state.",
     "> Fresh Git state is required.\n    The current task branch records the active state.",
+    "Fresh Git state is required.\n*\n      The current task branch records the active state.",
+    "Fresh Git state is required.\n2.\n       The active state is recorded by the current task branch.",
     "-\n    The current task branch records the active state.",
     "1.\n      The active state is recorded by the current task branch.",
+    "- Context:\n\n    guidance\n      The current task branch records the active state.",
+    "100. Context:\n\n     guidance\n         The active state is recorded by the current task branch.",
     "- Recorded status must not be trusted.\n\n    The current task branch provides canonical status.",
     "100. Example:\n\n        The current task branch records the active state.",
     "12345. Example:\n\n        The active state is recorded by the current task branch."

@@ -834,6 +834,15 @@ function isInsideMarkdownBlockquote(text, index) {
   return /^ {0,3}(?:>\s?)+/.test(text.slice(lineStart, index));
 }
 
+function isInsideMarkdownHtmlComment(text, index) {
+  const opening = text.lastIndexOf("<!--", index);
+  if (opening === -1) return false;
+  const closingBefore = text.lastIndexOf("-->", index);
+  if (closingBefore > opening) return false;
+  const closingAfter = text.indexOf("-->", opening + 4);
+  return closingAfter !== -1 && index < closingAfter + 3;
+}
+
 function markdownIndentWidth(line) {
   let width = 0;
   for (const character of String(line || "")) {
@@ -903,6 +912,7 @@ function isInsideMarkdownIndentedCode(text, index) {
   let boundaryLine = null;
   let listContentIndent = null;
   let emptyListBoundary = false;
+  const interveningIndentedWidths = [];
   for (let lineIndex = precedingLines.length - 1; lineIndex >= 0; lineIndex -= 1) {
     const line = precedingLines[lineIndex];
     if (/^\s*$/.test(line)) {
@@ -915,15 +925,29 @@ function isInsideMarkdownIndentedCode(text, index) {
       isInsideMarkdownIndentedCode(text, lineProbeIndex);
     if (listBoundary && !listBoundaryIsCode && listBoundary.leadingIndent < currentIndent) {
       listContentIndent = listBoundary.contentIndent;
-      emptyListBoundary = listBoundary.empty;
+      const previousLine = precedingLines[lineIndex - 1];
+      const emptyMarkerStartsBlock = !listBoundary.empty ||
+        lineIndex === 0 ||
+        /^\s*$/.test(previousLine) ||
+        isMarkdownNonParagraphBlock(previousLine) ||
+        markdownListContentIndent(previousLine) !== null;
+      emptyListBoundary = listBoundary.empty && emptyMarkerStartsBlock;
       break;
     }
-    if (markdownIndentWidth(line) >= 4) continue;
+    const lineIndent = markdownIndentWidth(line);
+    if (lineIndent >= 4) {
+      interveningIndentedWidths.push(lineIndent);
+      continue;
+    }
     boundaryLine = line;
     break;
   }
   if (listContentIndent !== null) {
-    return (sawBlankBoundary || emptyListBoundary) && currentIndent >= listContentIndent + 4;
+    const codeIndent = listContentIndent + 4;
+    const paragraphContinues = interveningIndentedWidths.some(width => width < codeIndent);
+    return !paragraphContinues &&
+      (sawBlankBoundary || emptyListBoundary) &&
+      currentIndent >= codeIndent;
   }
   if (boundaryLine === null) return true;
   return sawBlankBoundary || isMarkdownNonParagraphBlock(boundaryLine);
@@ -1015,6 +1039,7 @@ function containsStaleAssertion(text, assertion) {
   for (const match of text.matchAll(assertion.pattern)) {
     if (isInsideMarkdownFence(text, match.index) ||
         isInsideMarkdownBlockquote(text, match.index) ||
+        isInsideMarkdownHtmlComment(text, match.index) ||
         isInsideMarkdownIndentedCode(text, match.index) ||
         isInsideQuotedSegment(text, match.index)) {
       continue;
