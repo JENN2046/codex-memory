@@ -112,10 +112,13 @@ async function loadSuite(suitePath) {
   };
 }
 
-function getAverageOverlap(comparisons) {
-  if (comparisons.length === 0) return null;
-  const total = comparisons.reduce((sum, item) => sum + item.metrics.overlapCount, 0);
-  return Number((total / comparisons.length).toFixed(6));
+function getAverageOverlap(compare) {
+  const comparableComparisons = compare.status === 'no-baseline'
+    ? []
+    : compare.comparisons.filter(item => item.metrics.jaccard !== null);
+  if (comparableComparisons.length === 0) return null;
+  const total = comparableComparisons.reduce((sum, item) => sum + item.metrics.overlapCount, 0);
+  return Number((total / comparableComparisons.length).toFixed(6));
 }
 
 function evaluateGate(compare, suite, options) {
@@ -127,7 +130,7 @@ function evaluateGate(compare, suite, options) {
   };
   const checks = [];
   const averageJaccard = compare.summary.averageJaccard;
-  const averageOverlap = getAverageOverlap(compare.comparisons);
+  const averageOverlap = getAverageOverlap(compare);
 
   if (suite.queries.length === 0) {
     checks.push({
@@ -158,6 +161,24 @@ function evaluateGate(compare, suite, options) {
       level: 'warn',
       code: 'approximate-vector-compare',
       message: 'Baseline profile differs from current profile; vector scores are directional.'
+    });
+  }
+
+  if (!['no-baseline', 'no-queries'].includes(compare.status) &&
+      averageJaccard === null && thresholds.minAverageJaccard > 0) {
+    checks.push({
+      level: 'fail',
+      code: 'average-jaccard-unavailable',
+      message: 'Average Jaccard is unavailable because no query has non-empty current and baseline results.'
+    });
+  }
+
+  if (!['no-baseline', 'no-queries'].includes(compare.status) &&
+      averageOverlap === null && thresholds.minAverageOverlap > 0) {
+    checks.push({
+      level: 'fail',
+      code: 'average-overlap-unavailable',
+      message: 'Average overlap is unavailable because no query has non-empty current and baseline results.'
     });
   }
 

@@ -1160,6 +1160,416 @@ test("current facts validator rejects stale pending PR or CI language", () => {
   assert.match(result.failures.join("\n"), /contains stale active phrase/);
 });
 
+test("current facts validator rejects branch-relative current task language", () => {
+  const root = workspace();
+  writeFile(
+    root,
+    "STATUS.md",
+    "# Status\n\n> Non-authoritative pointer to CURRENT_STATE.md.\n\nCurrent task branch records the active state.\n"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+});
+
+test("current facts validator permits instructions to re-query the current task branch", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    [
+      "",
+      "Do not infer the current task branch; query it fresh before reporting Git state.",
+      "Do not claim the current task branch is authoritative; query Git fresh.",
+      "Never assert that the current task branch records the active state.",
+      "The current task branch is not recorded by this document.",
+      "The phrase `current task branch records the active state` is a stale assertion.",
+      "The phrase 'current task branch records the active state' is stale.",
+      "Jenn's note quotes 'current task branch records the active state' as stale.",
+      "😀 Jenn's note quotes 'current task branch records the active state' as stale.",
+      "The phrase “current task branch records the active state” is stale.",
+      "The phrase ‘current task branch records the active state’ is stale.",
+      "Check whether the current task branch is recorded before reporting.",
+      "Determine if the current task branch now records state before reporting.",
+      "Does the current task branch record the active state?",
+      "What does the current task branch currently record?",
+      "Doesn't the current task branch provide canonical status?",
+      "Can't the current task branch provide canonical status?",
+      "Shouldn't the current task branch determine active identity?",
+      "Oughtn't the current task branch provide canonical status?",
+      "> The current task branch records the active state.",
+      "  >> The current task branch stores the current facts.",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator rejects qualified branch-relative assertions", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    [
+      "",
+      "The current task branch currently records the active state.",
+      "Jenn's current task branch records state in the owner's note.",
+      "The current task branch records the active state. Does anything else?",
+      "The current task branch records the active state; why would it change?",
+      "The current task branch records the text \"why?\" as metadata.",
+      "The current task branch does record the active state.",
+      "The current task branch will provide canonical status.",
+      "The current task branch can determine active identity.",
+      "The current task branch will still directly provide canonical status.",
+      "The current task branch will still directly actually provide canonical status.",
+      "The current task branch will not only provide canonical status.",
+      "The current task branch does not only record active state.",
+      "The current task branch records the active state—why query Git?",
+      "The current task branch records the active state, doesn't it?",
+      "What the current task branch records is the active state, isn't it?",
+      "What the current task branch provides is canonical status, correct?",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+});
+
+test("current facts validator does not let unrelated question marks hide branch assertions", () => {
+  for (const staleText of [
+    "The current task branch records the text \"why? \" as metadata.",
+    "The current task branch records the active state\nDoes anything else?"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
+test("current facts validator does not let unrelated negation hide branch assertions", () => {
+  for (const staleText of [
+    "Do not query Git because the current task branch records the active state.",
+    "Never doubt the current task branch records the active state."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
+test("current facts validator permits bounded negated reporting contexts", () => {
+  for (const guidanceText of [
+    "This document does not claim that the current task branch records the active state.",
+      "Do not explicitly claim that the current task branch records the active state.",
+      "Never falsely assert that the current task branch records the active state.",
+      "Do not claim the following: the current task branch records the active state.",
+      "This document ought not to claim that the current task branch records active state.",
+      "This document oughtn't to report that the current task branch records active state.",
+      "This document will no longer claim that the current task branch records active state."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${guidanceText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${guidanceText}\n${result.failures.join("\n")}`);
+  }
+});
+
+test("current facts validator permits directly negated branch predicates", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    [
+      "",
+      "The current task branch records no active state.",
+      "The current task branch contains no current facts.",
+      "The current task branch holds neither authority nor status.",
+      "The current task branch now points to no canonical state.",
+      "The current task branch does not record active state.",
+      "The current task branch will not provide canonical status.",
+      "The current task branch can't determine active identity.",
+      ""
+    ].join("\n"),
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, true, result.failures.join("\n"));
+});
+
+test("current facts validator permits unknown branch-state guidance", () => {
+  for (const guidance of [
+      "The current task branch is unknown until queried fresh.",
+      "The current task branch remains unverified until Git is queried.",
+      "The current task branch is still unavailable to this document.",
+      "The current task branch is yet to be determined.",
+      "The current task branch is unknown but does not provide canonical status.",
+      "The current task branch is unknown but doesn't provide canonical status.",
+      "The current task branch is unresolved yet won't determine active identity.",
+      "The current task branch is unknown but shall not provide canonical status.",
+      "The current task branch is unresolved yet shan't determine active identity.",
+      "The current task branch is unknown but need not provide status.",
+      "The current task branch is unknown but ought not to provide canonical status.",
+      "The current task branch is unresolved yet oughtn't to determine active identity.",
+      "The current task branch is unknown but no longer provides canonical status.",
+      "The current task branch is unresolved yet will no longer determine active identity.",
+      "The current task branch is unknown, but CURRENT_STATE.md provides canonical status.",
+      "The current task branch is unresolved, yet STATUS.md will determine its own summary.",
+      "The current task branch is unknown, but CURRENT_STATE.md provides and determines canonical status.",
+      "The current task branch is unknown, but CURRENT_STATE.md reads metadata and provides canonical status.",
+      "The current task branch is unknown, but CURRENT_STATE.md quotes \"provides\" and determines canonical status.",
+      "The current task branch is unknown, but Git reads metadata and provides canonical status.",
+      "The current task branch is unknown, but config.toml reads metadata and provides canonical status.",
+      "The current task branch is unknown, but module.v2 quotes \"provides\" and determines canonical status.",
+      "The current task branch is unknown, but branch.md reads metadata and provides canonical status.",
+      "The current task branch is unknown, but Branch.md reads metadata and provides canonical status.",
+      "The current task branch is unknown, but branch-status.md reads metadata and determines status.",
+      "The current task branch is unknown, but It.md reads metadata and provides canonical status.",
+      "The current task branch is unresolved; query whether it provides status."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${guidance}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${guidance}\n${result.failures.join("\n")}`);
+  }
+});
+
+test("current facts validator rejects authority assertions after unknown-state transitions", () => {
+  for (const staleText of [
+    "The current task branch is unknown but provides the canonical status.",
+    "The current task branch is unresolved, yet serves as the current authority.",
+    "The current task branch is still unavailable although it determines the active identity.",
+    "The current task branch is unknown but does not doubt it provides canonical status.",
+    "The current task branch is unknown but never doubts it provides canonical status.",
+    "The current task branch is unknown but no longer doubts it provides canonical status.",
+    "The current task branch is unknown but does not provide and determines active identity.",
+    "The current task branch is unknown but it provides the canonical status.",
+    "The current task branch is unresolved yet the current task branch determines active identity.",
+    "The current task branch is unknown but, according to CURRENT_STATE.md, provides canonical status.",
+    "The current task branch is unknown but reads metadata and provides canonical status.",
+    "The current task branch is unknown but Current task branch reads metadata and provides canonical status.",
+    "The current task branch is unknown but This branch reads metadata and determines active identity.",
+    "The current task branch is unknown but That branch quotes \"provides\" and controls canonical status.",
+    "The current task branch is unknown but A branch reads metadata and provides canonical status."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
+test("current facts validator rejects equivalent affirmative branch-authority predicates", () => {
+  for (const staleText of [
+    "The current task branch has the active state.",
+    "The current task branch stores the current facts.",
+    "The current task branch serves as the current authority.",
+    "The current task branch provides the canonical status.",
+    "The current task branch determines the active identity."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
+test("current facts validator rejects passive branch-authority assertions", () => {
+  for (const staleText of [
+    "The active state is recorded by the current task branch.",
+    "Canonical status is provided by the current task branch.",
+    "The current facts have been stored by the current task branch.",
+    "Active identity will still directly be determined by the current task branch.",
+    "Current authority is not only established by the current task branch.",
+    "The active state is being recorded by the current task branch.",
+    "The active state should have been recorded by the current task branch.",
+    "Canonical status has actually been directly provided by the current task branch.",
+    "Current facts may still be being stored by the current task branch.",
+    "The active state is recorded by the current task branch, isn't it?"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
+test("current facts validator permits questions and negated passive branch guidance", () => {
+  for (const guidanceText of [
+    "Is the active state recorded by the current task branch?",
+    "Could canonical status be provided by the current task branch?",
+    "What active state is recorded by the current task branch?",
+    "Which canonical status is provided by the current task branch?",
+    "What active state is being recorded by the current task branch?",
+    "Should the active state have been recorded by the current task branch?",
+    "The active state is not recorded by the current task branch.",
+    "Canonical status isn't provided by the current task branch.",
+    "The active state is not being recorded by the current task branch.",
+    "The active state should not have been recorded by the current task branch.",
+    "This document does not claim that the active state is recorded by the current task branch.",
+    "> The active state is recorded by the current task branch.",
+    "The phrase `active state is recorded by the current task branch` is stale."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${guidanceText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${guidanceText}\n${result.failures.join("\n")}`);
+  }
+});
+
+test("current facts validator rejects non-negative not-only branch predicates", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    "\nThe current task branch records not only the active state but its authority.\n",
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+});
+
+test("current facts validator permits stale assertion examples in Markdown fences", () => {
+  for (const fencedExample of [
+    "```text\nThe current task branch records the active state.\n```",
+    "~~~\nThe current task branch contains current facts.\n~~~"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${fencedExample}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${fencedExample}\n${result.failures.join("\n")}`);
+  }
+});
+
+test("current facts validator permits stale assertion examples in Markdown HTML comments", () => {
+  for (const commentedExample of [
+    "<!-- The current task branch records the active state. -->",
+    "<!--\nThe active state is recorded by the current task branch.\n-->",
+    "Unmatched ` token.\n<!-- The current task branch records the active state. -->"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${commentedExample}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${commentedExample}\n${result.failures.join("\n")}`);
+  }
+});
+
+test("current facts validator permits stale assertion examples in Markdown code spans", () => {
+  for (const codeSpanExample of [
+    "``The current task branch records the active state.``",
+    "``example\nThe current task branch records the active state.\n``"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${codeSpanExample}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${codeSpanExample}\n${result.failures.join("\n")}`);
+  }
+});
+
+test("current facts validator rejects assertions outside or after Markdown code spans", () => {
+  for (const staleText of [
+    "``example`` The current task branch records the active state.",
+    "``example``\nThe current task branch records the active state."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
+test("current facts validator permits stale assertion examples in Markdown indented code", () => {
+  for (const indentedExample of [
+    "Example:\n\n    The current task branch records the active state.",
+    "Example:\n\n\tThe active state is recorded by the current task branch.",
+    "## Example\n    The current task branch provides canonical status.\n    The active state is recorded by the current task branch.",
+    "> # Example\n    The current task branch records the active state.",
+    "    - literal list syntax\n        The current task branch records the active state.",
+    "    100. literal list syntax\n        The active state is recorded by the current task branch.",
+    "-\n      The current task branch records the active state.",
+    "1.\n       The active state is recorded by the current task branch.",
+    "- Example:\n\n      The current task branch records the active state.",
+    "1. Example:\n\n       The active state is recorded by the current task branch."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${indentedExample}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${indentedExample}\n${result.failures.join("\n")}`);
+  }
+});
+
+test("current facts validator does not treat paragraph or list indentation as code", () => {
+  for (const staleText of [
+    "Fresh Git state is required.\n    The current task branch records the active state.",
+    "> Fresh Git state is required.\n    The current task branch records the active state.",
+    "Fresh Git state is required.\n*\n      The current task branch records the active state.",
+    "Fresh Git state is required.\n2.\n       The active state is recorded by the current task branch.",
+    "Fresh Git state is required.\n2. still paragraph text\n3.\n       The current task branch records the active state.",
+    "Fresh Git state is required.\n    - shaped continuation\n3.\n       The current task branch records the active state.",
+    "Fresh Git state is required.\n\t- shaped continuation\n3.\n       The current task branch records the active state.",
+    "Fresh Git state is required.\n    1. shaped continuation\n3.\n       The current task branch records the active state.",
+    "The literal token `<!--` is documentation.\nThe current task branch records the active state.\n-->",
+    "The literal token ``<!--`` is documentation.\nThe current task branch records the active state.\n-->",
+    "Unmatched ` token.\nThe literal token ``<!--`` is documentation.\nThe current task branch records the active state.\n-->",
+    "The literal token ````<!--```` is documentation.\nThe current task branch records the active state.\n-->",
+    "`literal\n<!--\n`\nThe current task branch records the active state.\n-->",
+    "The literal token \\<!-- is documentation.\nThe current task branch records the active state.\n-->",
+    "~~~text\n<!--\n~~~\nThe current task branch records the active state.\n-->",
+    "-\n    The current task branch records the active state.",
+    "1.\n      The active state is recorded by the current task branch.",
+    "- Context:\n\n    guidance\n      The current task branch records the active state.",
+    "100. Context:\n\n     guidance\n         The active state is recorded by the current task branch.",
+    "- Recorded status must not be trusted.\n\n    The current task branch provides canonical status.",
+    "100. Example:\n\n        The current task branch records the active state.",
+    "12345. Example:\n\n        The active state is recorded by the current task branch."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+  }
+});
+
+test("current facts validator rejects assertions after an invalid backtick fence", () => {
+  const root = workspace();
+  const currentStatePath = path.join(root, "CURRENT_STATE.md");
+  fs.appendFileSync(
+    currentStatePath,
+    "\n```bad`info\nThe current task branch records the active state.\n```\n",
+    "utf8"
+  );
+  const result = validateCurrentFactsDrift(root);
+  assert.equal(result.ok, false);
+  assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
+});
+
 test("current facts validator fails closed when baseline objects are unreadable", () => {
   const root = workspace();
   const gitRunner = (_root, args) => {

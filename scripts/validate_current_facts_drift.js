@@ -148,6 +148,33 @@ const STALE_ACTIVE_PHRASES = Object.freeze([
   "merge remains separate",
   "next exact-head CI pending"
 ]);
+const BRANCH_AUTHORITY_PREDICATE_SOURCE = String.raw`is|was|remains?|has|records?|contains?|holds?|owns?|tracks?|stores?|persists?|keeps?|represents?|identifies?|points?\s+to|serves?\s+as|acts?\s+as|functions?\s+as|provides?|supplies?|defines?|declares?|establishes?|determines?|governs?|controls?|authorizes?`;
+const BRANCH_AUTHORITY_AUXILIARY_SOURCE = String.raw`do|does|did|has|have|had|will|would|can|could|may|might|must|need|shall|should|ought\s+to`;
+const BRANCH_AUTHORITY_MODIFIER_SOURCE = String.raw`(?:actually|currently|directly|now|still)|not\s+only`;
+const BRANCH_AUTHORITY_MODIFIERS_SOURCE = String.raw`(?:\s+(?:${BRANCH_AUTHORITY_MODIFIER_SOURCE}))*`;
+const BRANCH_AUTHORITY_OBJECT_SOURCE = String.raw`active\s+state|canonical\s+status|current\s+facts?|active\s+identity|current\s+authority`;
+const BRANCH_AUTHORITY_PASSIVE_MODAL_SOURCE = String.raw`will|would|can|could|may|might|must|need|shall|should|ought\s+to`;
+const BRANCH_AUTHORITY_PASSIVE_AUXILIARY_SOURCE = String.raw`(?:be|is|are|was|were|remains?)${BRANCH_AUTHORITY_MODIFIERS_SOURCE}(?:\s+being${BRANCH_AUTHORITY_MODIFIERS_SOURCE})?|(?:has|have|had)${BRANCH_AUTHORITY_MODIFIERS_SOURCE}\s+been${BRANCH_AUTHORITY_MODIFIERS_SOURCE}(?:\s+being${BRANCH_AUTHORITY_MODIFIERS_SOURCE})?|(?:${BRANCH_AUTHORITY_PASSIVE_MODAL_SOURCE})${BRANCH_AUTHORITY_MODIFIERS_SOURCE}\s+(?:be${BRANCH_AUTHORITY_MODIFIERS_SOURCE}(?:\s+being${BRANCH_AUTHORITY_MODIFIERS_SOURCE})?|have${BRANCH_AUTHORITY_MODIFIERS_SOURCE}\s+been${BRANCH_AUTHORITY_MODIFIERS_SOURCE}(?:\s+being${BRANCH_AUTHORITY_MODIFIERS_SOURCE})?)`;
+const BRANCH_AUTHORITY_PASSIVE_PREDICATE_SOURCE = String.raw`recorded|contained|held|owned|tracked|stored|persisted|kept|represented|identified|provided|supplied|defined|declared|established|determined|governed|controlled|authorized`;
+const STALE_ACTIVE_ASSERTIONS = Object.freeze([
+  Object.freeze({
+    phrase: "current task branch",
+    pattern: new RegExp(
+      String.raw`\bcurrent task branch\s+(?:(?:currently|now)\s+)?(?:(?:${BRANCH_AUTHORITY_AUXILIARY_SOURCE})\s+(?:(?:(?:actually|currently|directly|now|still)|not\s+only)\s+)*)?(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\b`,
+      "gi"
+    )
+  }),
+  Object.freeze({
+    phrase: "current task branch",
+    allowWhSubjectQuestion: true,
+    pattern: new RegExp(
+      String.raw`\b(?:the\s+)?(?:${BRANCH_AUTHORITY_OBJECT_SOURCE})\s+(?:${BRANCH_AUTHORITY_PASSIVE_AUXILIARY_SOURCE})\s+(${BRANCH_AUTHORITY_PASSIVE_PREDICATE_SOURCE})\s+by\s+(?:the\s+)?current task branch\b`,
+      "gi"
+    )
+  })
+]);
+const NEGATED_REPORTING_PREFIX_RE = /\b(?:(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|need|shall|should)\s+(?:not|no\s+longer))|(?:don't|doesn't|didn't|hasn't|haven't|hadn't|isn't|aren't|wasn't|weren't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't)|never|cannot|no\s+longer|ought(?:\s+not|n't)\s+to)\s+(?:(?:explicitly|falsely|incorrectly|wrongly|ever)\s+){0,2}(?:claims?|claimed|claiming|states?|stated|stating|asserts?|asserted|asserting|says?|said|saying|reports?|reported|reporting)\s*(?::\s*(?:the\s+)?|\s+(?:(?:that\s+)?(?:the\s+)?|the\s+following\s*:\s*(?:the\s+)?))$/i;
+const NEGATED_AUTHORITY_PREFIX_RE = /\b(?:(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|need|shall|should)\s+(?:not|no\s+longer))|(?:don't|doesn't|didn't|hasn't|haven't|hadn't|isn't|aren't|wasn't|weren't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't)|never|cannot|no\s+longer|ought(?:\s+not|n't)\s+to)\s+(?:(?:actually|currently|directly|ever|explicitly|falsely|incorrectly|wrongly)\s+){0,2}$/i;
 const POINTER_SELF_AUTHORITY_RE =
   /\b(?:this (?:file|document|surface|pointer) (?:is|serves as) (?:the )?(?:sole |only )?current(?: work)? authority|current authority\s*:\s*(?:this (?:file|document|surface|pointer)|self))\b/i;
 const SIZE_BUDGETS = Object.freeze({
@@ -755,12 +782,384 @@ function validateSizeBudgets(root, failures) {
   }
 }
 
+function isInsideQuotedSegment(text, index) {
+  const lineStart = text.lastIndexOf("\n", index - 1) + 1;
+  const lineEndCandidate = text.indexOf("\n", index);
+  const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+  const before = text.slice(lineStart, index);
+  const after = text.slice(index, lineEnd);
+  const insideSymmetricQuote = ["\"", "`"].some(delimiter =>
+    before.split(delimiter).length % 2 === 0 && after.includes(delimiter)
+  );
+  if (insideSymmetricQuote) return true;
+  const isWordCharacter = value => typeof value === "string" && /[\p{L}\p{N}_]/u.test(value);
+  const singleQuoteDelimiters = value => {
+    const characters = [...value];
+    return characters.reduce((count, character, characterIndex) => {
+      if (character !== "'") return count;
+      const previous = characters[characterIndex - 1];
+      const next = characters[characterIndex + 1];
+      return isWordCharacter(previous) && isWordCharacter(next) ? count : count + 1;
+    }, 0);
+  };
+  if (singleQuoteDelimiters(before) % 2 === 1 && singleQuoteDelimiters(after) > 0) {
+    return true;
+  }
+  return [["“", "”"], ["‘", "’"]].some(([open, close]) =>
+    before.lastIndexOf(open) > before.lastIndexOf(close) && after.includes(close)
+  );
+}
+
+function isInsideMarkdownFence(text, index) {
+  const lineStart = text.lastIndexOf("\n", index - 1) + 1;
+  const precedingLines = text.slice(0, lineStart).split("\n");
+  let fence = null;
+  for (const line of precedingLines) {
+    if (!fence) {
+      const opening = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+      if (opening && !(opening[1][0] === "`" && opening[2].includes("`"))) {
+        fence = { character: opening[1][0], length: opening[1].length };
+      }
+      continue;
+    }
+    const marker = fence.character.repeat(fence.length);
+    const closing = new RegExp(`^ {0,3}${marker}${fence.character}*\\s*$`);
+    if (closing.test(line)) fence = null;
+  }
+  return fence !== null;
+}
+
+function isInsideMarkdownBlockquote(text, index) {
+  const lineStart = text.lastIndexOf("\n", index - 1) + 1;
+  return /^ {0,3}(?:>\s?)+/.test(text.slice(lineStart, index));
+}
+
+function isInsideMarkdownCodeSpan(text, index) {
+  const runs = [];
+  for (let cursor = 0; cursor < text.length;) {
+    if (text[cursor] !== "`") {
+      cursor += 1;
+      continue;
+    }
+    let runEnd = cursor + 1;
+    while (text[runEnd] === "`") runEnd += 1;
+    const lineStart = text.lastIndexOf("\n", cursor - 1) + 1;
+    const lineEndCandidate = text.indexOf("\n", cursor);
+    const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+    const line = text.slice(lineStart, lineEnd);
+    const openingFence = /^ {0,3}`{3,}[^`]*$/.test(line);
+    if (isBackslashEscaped(text, cursor) ||
+        openingFence ||
+        isInsideMarkdownFence(text, cursor)) {
+      cursor = runEnd;
+      continue;
+    }
+    runs.push({ start: cursor, end: runEnd, length: runEnd - cursor });
+    cursor = runEnd;
+  }
+  for (let runIndex = 0; runIndex < runs.length;) {
+    const opening = runs[runIndex];
+    let closingIndex = runIndex + 1;
+    while (closingIndex < runs.length &&
+           runs[closingIndex].length !== opening.length) {
+      closingIndex += 1;
+    }
+    if (closingIndex === runs.length) {
+      runIndex += 1;
+      continue;
+    }
+    const closing = runs[closingIndex];
+    if (opening.end <= index && index < closing.start) return true;
+    if (index < opening.start) return false;
+    runIndex = closingIndex + 1;
+  }
+  return false;
+}
+
+function isBackslashEscaped(text, index) {
+  let backslashes = 0;
+  for (let cursor = index - 1; cursor >= 0 && text[cursor] === "\\"; cursor -= 1) {
+    backslashes += 1;
+  }
+  return backslashes % 2 === 1;
+}
+
+function isInsideMarkdownHtmlComment(text, index) {
+  const closingBefore = text.lastIndexOf("-->", index);
+  let opening = text.lastIndexOf("<!--", index);
+  while (opening > closingBefore) {
+    const openerIsCodeOrContainer = isInsideMarkdownFence(text, opening) ||
+      isInsideMarkdownBlockquote(text, opening) ||
+      isInsideMarkdownIndentedCode(text, opening) ||
+      isInsideMarkdownCodeSpan(text, opening) ||
+      isBackslashEscaped(text, opening) ||
+      isInsideQuotedSegment(text, opening);
+    if (!openerIsCodeOrContainer) {
+      const closingAfter = text.indexOf("-->", opening + 4);
+      if (closingAfter !== -1 && index < closingAfter + 3) return true;
+    }
+    opening = text.lastIndexOf("<!--", opening - 1);
+  }
+  return false;
+}
+
+function markdownIndentWidth(line) {
+  let width = 0;
+  for (const character of String(line || "")) {
+    if (character === " ") {
+      width += 1;
+    } else if (character === "\t") {
+      width += 4 - (width % 4);
+    } else {
+      break;
+    }
+  }
+  return width;
+}
+
+function markdownListContentIndent(line) {
+  const value = String(line || "");
+  const match = value.match(/^([ \t]*)([-+*]|\d{1,9}[.)])([ \t]+)\S/);
+  const emptyMatch = match ? null : value.match(/^([ \t]*)([-+*]|\d{1,9}[.)])[ \t]*$/);
+  if (emptyMatch) {
+    const leadingIndent = markdownIndentWidth(emptyMatch[1]);
+    return {
+      leadingIndent,
+      contentIndent: leadingIndent + emptyMatch[2].length + 1,
+      empty: true,
+      interruptsParagraph: false
+    };
+  }
+  if (!match) return null;
+  const leadingIndent = markdownIndentWidth(match[1]);
+  const markerWidth = match[2].length;
+  const gapEndColumn = markdownIndentWidth(`${match[1]}${" ".repeat(markerWidth)}${match[3]}`);
+  const gapWidth = gapEndColumn - leadingIndent - markerWidth;
+  const markerGap = gapWidth >= 1 && gapWidth <= 4 ? gapWidth : 1;
+  return {
+    leadingIndent,
+    contentIndent: leadingIndent + markerWidth + markerGap,
+    empty: false,
+    interruptsParagraph: /^[-+*]$/.test(match[2]) ||
+      Number.parseInt(match[2], 10) === 1
+  };
+}
+
+function markdownListMarkerStartsBlock(lines, lineIndex, boundary) {
+  if (lineIndex === 0) return true;
+  const previousLine = lines[lineIndex - 1];
+  if (/^\s*$/.test(previousLine) || isMarkdownNonParagraphBlock(previousLine)) {
+    return true;
+  }
+  const previousBoundary = markdownListContentIndent(previousLine);
+  if (previousBoundary &&
+      markdownListMarkerStartsBlock(lines, lineIndex - 1, previousBoundary)) {
+    return true;
+  }
+  return boundary.leadingIndent <= 3 && boundary.interruptsParagraph;
+}
+
+function isMarkdownNonParagraphBlock(line) {
+  const value = String(line || "");
+  const blockquote = value.match(/^ {0,3}>\s?(.*)$/);
+  if (blockquote) {
+    return blockquote[1] === "" || isMarkdownNonParagraphBlock(blockquote[1]);
+  }
+  return /^ {0,3}(?:#{1,6}(?:\s|$)|`{3,}|~{3,}|<(?:!--|\/?[A-Za-z]))/.test(value) ||
+    /^ {0,3}(?:(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,})$/.test(value);
+}
+
+function isInsideMarkdownIndentedCode(text, index) {
+  const lineStart = text.lastIndexOf("\n", index - 1) + 1;
+  const lineEndCandidate = text.indexOf("\n", index);
+  const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+  const currentLine = text.slice(lineStart, lineEnd);
+  const currentIndent = markdownIndentWidth(currentLine);
+  if (currentIndent < 4) return false;
+
+  const precedingText = lineStart === 0 ? "" : text.slice(0, lineStart - 1);
+  const precedingLines = precedingText ? precedingText.split("\n") : [];
+  const precedingLineStarts = [];
+  let precedingOffset = 0;
+  for (const line of precedingLines) {
+    precedingLineStarts.push(precedingOffset);
+    precedingOffset += line.length + 1;
+  }
+  let sawBlankBoundary = lineStart === 0;
+  let boundaryLine = null;
+  let listContentIndent = null;
+  let emptyListBoundary = false;
+  const interveningIndentedWidths = [];
+  for (let lineIndex = precedingLines.length - 1; lineIndex >= 0; lineIndex -= 1) {
+    const line = precedingLines[lineIndex];
+    if (/^\s*$/.test(line)) {
+      sawBlankBoundary = true;
+      continue;
+    }
+    const listBoundary = markdownListContentIndent(line);
+    const lineProbeIndex = precedingLineStarts[lineIndex] + Math.max(0, line.length - 1);
+    const listBoundaryIsCode = listBoundary &&
+      isInsideMarkdownIndentedCode(text, lineProbeIndex);
+    if (listBoundary && !listBoundaryIsCode && listBoundary.leadingIndent < currentIndent) {
+      listContentIndent = listBoundary.contentIndent;
+      const emptyMarkerStartsBlock = !listBoundary.empty ||
+        markdownListMarkerStartsBlock(precedingLines, lineIndex, listBoundary);
+      emptyListBoundary = listBoundary.empty && emptyMarkerStartsBlock;
+      break;
+    }
+    const lineIndent = markdownIndentWidth(line);
+    if (lineIndent >= 4) {
+      interveningIndentedWidths.push(lineIndent);
+      continue;
+    }
+    boundaryLine = line;
+    break;
+  }
+  if (listContentIndent !== null) {
+    const codeIndent = listContentIndent + 4;
+    const paragraphContinues = interveningIndentedWidths.some(width => width < codeIndent);
+    return !paragraphContinues &&
+      (sawBlankBoundary || emptyListBoundary) &&
+      currentIndent >= codeIndent;
+  }
+  if (boundaryLine === null) return true;
+  return sawBlankBoundary || isMarkdownNonParagraphBlock(boundaryLine);
+}
+
+function firstUnquotedClauseTerminator(text, startIndex) {
+  const lineEndCandidate = text.indexOf("\n", startIndex);
+  const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+  for (let index = startIndex; index < lineEnd; index += 1) {
+    if (".!?;".includes(text[index]) && !isInsideQuotedSegment(text, index)) {
+      return text[index];
+    }
+  }
+  return null;
+}
+
+function isDirectBranchQuestion(prefix, text, suffixStart, allowWhSubjectQuestion = false) {
+  if (firstUnquotedClauseTerminator(text, suffixStart) !== "?") return false;
+  return /^\s*(?:(?:what|which|where|when|why|how)\s+)?(?:(?:do|does|did|is|are|was|were|has|have|had|will|would|can|could|may|might|must|need|shall|should|ought)|(?:don't|doesn't|didn't|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't|oughtn't)|cannot)\s+(?:the\s+)?$/i.test(prefix) ||
+    (allowWhSubjectQuestion && /^\s*(?:what|which)\s+(?:the\s+)?$/i.test(prefix));
+}
+
+function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound = null) {
+  const leadingCoordination = /^\s*(?:and|but|yet)\b/i.test(prefix);
+  const withoutTransition = prefix.replace(
+    /^\s*(?:but|yet|although|however|and)\b\s*,?\s*/i,
+    ""
+  );
+  const withoutParenthetical = withoutTransition.replace(
+    /^\s*(?:(?:according\s+to|per|as\s+(?:documented|noted|reported)\s+by)\b[^,\n]{1,80},\s*)+/i,
+    ""
+  );
+  const coordination = withoutParenthetical.match(/\b(?:and|but|yet)\b([^.!?;]*)$/i);
+  const subjectWindow = coordination ? coordination[1] : withoutParenthetical;
+  const modifiers = String.raw`(?:(?:actually|currently|directly|ever|explicitly|falsely|incorrectly|now|still|wrongly)\s+){0,2}`;
+  const auxiliary = String.raw`(?:(?:do|does|did|has|have|had|is|are|was|were|will|would|can|could|may|might|must|need|shall|should)(?:\s+(?:not|no\s+longer))?|(?:don't|doesn't|didn't|hasn't|haven't|hadn't|isn't|aren't|wasn't|weren't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't)|never|cannot|no\s+longer|ought(?:\s+not|n't)\s+to)`;
+  const functionWordsOnly = new RegExp(`^\\s*${modifiers}(?:${auxiliary}\\s+${modifiers})?$`, "i");
+  const branchSubject = new RegExp(
+    `(?:\\b(?:it|(?:the\\s+)?current\\s+task\\s+branch|this\\s+branch|that\\s+branch)\\b)\\s+${modifiers}(?:${auxiliary}\\s+${modifiers})?$`,
+    "i"
+  );
+  if (branchSubject.test(subjectWindow)) return true;
+  if (functionWordsOnly.test(subjectWindow)) {
+    if ((coordination || leadingCoordination) && previousSubjectIsBranchBound !== null) {
+      return previousSubjectIsBranchBound;
+    }
+    if (coordination) {
+      const leadingClause = withoutParenthetical.slice(0, coordination.index);
+      const explicitForeignSubject = /^\s*(?:`?[\p{L}\p{N}_/-]+\.[\p{L}\p{N}_.-]+`?\b|(?!(?:[Ii]t|(?:(?:[Tt]he|[Aa]n?|[Tt]his|[Tt]hat)\s+)?(?:[Cc]urrent\s+[Tt]ask\s+)?[Bb]ranch)(?=\s|$))(?:[\p{Lu}][\p{L}\p{N}_-]*\b|(?:[Tt]he|[Aa]n?|[Tt]his|[Tt]hat)\s+))/u;
+      return !explicitForeignSubject.test(leadingClause);
+    }
+    return true;
+  }
+  return false;
+}
+
+function containsAffirmativeAuthorityContinuation(text, suffix, suffixStart) {
+  const lineEnd = suffix.indexOf("\n");
+  const lineSuffix = lineEnd === -1 ? suffix : suffix.slice(0, lineEnd);
+  const transition = lineSuffix.match(
+    /\b(?:but|yet|although|however|and)\b(?:[^.!?;]|\.(?=[\p{L}\p{N}_]))*/iu
+  );
+  if (transition) {
+    const predicatePattern = new RegExp(`\\b(${BRANCH_AUTHORITY_PREDICATE_SOURCE})\\b`, "gi");
+    let previousPredicateEnd = 0;
+    let previousSubjectIsBranchBound = null;
+    for (const predicate of transition[0].matchAll(predicatePattern)) {
+      const predicateIndex = transition.index + predicate.index;
+      if (isInsideQuotedSegment(text, suffixStart + predicateIndex)) continue;
+      const prefix = transition[0].slice(0, predicate.index);
+      const subjectPrefix = transition[0].slice(previousPredicateEnd, predicate.index);
+      const predicateSuffix = transition[0].slice(predicate.index + predicate[0].length);
+      const subjectIsBranchBound = continuationSubjectIsBranchBound(
+        subjectPrefix,
+        previousSubjectIsBranchBound
+      );
+      previousPredicateEnd = predicate.index + predicate[0].length;
+      previousSubjectIsBranchBound = subjectIsBranchBound;
+      const negatedPrefix = NEGATED_AUTHORITY_PREFIX_RE.test(prefix);
+      const queriedPrefix = /\b(?:whether|if)\b[^.!?;]*$/i.test(prefix);
+      const negatedSuffix = /^\s+(?:not(?!\s+only\b)|never|no longer|no|neither)\b/i.test(predicateSuffix);
+      if (subjectIsBranchBound && !negatedPrefix && !queriedPrefix && !negatedSuffix) return true;
+    }
+  }
+  return false;
+}
+
+function containsStaleAssertion(text, assertion) {
+  for (const match of text.matchAll(assertion.pattern)) {
+    if (isInsideMarkdownFence(text, match.index) ||
+        isInsideMarkdownBlockquote(text, match.index) ||
+        isInsideMarkdownHtmlComment(text, match.index) ||
+        isInsideMarkdownIndentedCode(text, match.index) ||
+        isInsideMarkdownCodeSpan(text, match.index) ||
+        isInsideQuotedSegment(text, match.index)) {
+      continue;
+    }
+    const clauseStart = Math.max(
+      text.lastIndexOf("\n", match.index - 1),
+      text.lastIndexOf(".", match.index - 1),
+      text.lastIndexOf(";", match.index - 1),
+      text.lastIndexOf("!", match.index - 1),
+      text.lastIndexOf("?", match.index - 1)
+    ) + 1;
+    const prefix = text.slice(clauseStart, match.index);
+    const suffixStart = match.index + match[0].length;
+    const suffix = text.slice(suffixStart);
+    if (isDirectBranchQuestion(
+      prefix,
+      text,
+      suffixStart,
+      assertion.allowWhSubjectQuestion === true
+    )) continue;
+    if (NEGATED_REPORTING_PREFIX_RE.test(prefix)) {
+      continue;
+    }
+    if (/\b(?:whether|if)\s+(?:the\s+)?$/i.test(prefix)) continue;
+    if (/^(?:is|was|remains?)$/i.test(match[1]) &&
+        /^\s+(?:(?:currently|still)\s+)?(?:unknown|unavailable|unverified|undetermined|unresolved|unspecified|not known|yet to be (?:determined|queried|verified))\b/i.test(suffix) &&
+        !containsAffirmativeAuthorityContinuation(text, suffix, suffixStart)) {
+      continue;
+    }
+    if (/^\s+(?:not(?!\s+only\b)|never|no longer|no|neither)\b/i.test(suffix)) continue;
+    return true;
+  }
+  return false;
+}
+
 function validateStalePhrases(root, failures) {
   for (const relativePath of ACTIVE_SURFACE_FILES) {
     const text = readText(root, relativePath, failures);
     for (const phrase of STALE_ACTIVE_PHRASES) {
       if (text.toLowerCase().includes(phrase.toLowerCase())) {
         failures.push(`${relativePath} contains stale active phrase: ${phrase}`);
+      }
+    }
+    for (const assertion of STALE_ACTIVE_ASSERTIONS) {
+      if (containsStaleAssertion(text, assertion)) {
+        failures.push(`${relativePath} contains stale active phrase: ${assertion.phrase}`);
       }
     }
   }

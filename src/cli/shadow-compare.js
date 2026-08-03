@@ -205,7 +205,7 @@ function compareRankedResults(current = [], baseline = []) {
     currentCount: current.length,
     baselineCount: baseline.length,
     overlapCount: overlap.length,
-    jaccard: union.size > 0 ? Number((overlap.length / union.size).toFixed(6)) : 1,
+    jaccard: union.size > 0 ? Number((overlap.length / union.size).toFixed(6)) : null,
     rankDeltas: overlap.map(key => ({
       key,
       currentRank: currentRankByKey.get(key),
@@ -256,6 +256,9 @@ async function buildShadowCompareReport(config, options) {
       : baselineVectorComparable
         ? baselineFingerprint === currentFingerprint ? 'comparable' : 'approximate'
         : 'lexical-only';
+  const comparableComparisons = hasBaseline
+    ? comparisons.filter(item => item.metrics.jaccard !== null)
+    : [];
 
   return {
     mode: 'shadow-compare',
@@ -278,8 +281,8 @@ async function buildShadowCompareReport(config, options) {
       queryCount: queries.length,
       currentChunkCount: currentChunks.length,
       baselineChunkCount: baselineChunks.length,
-      averageJaccard: comparisons.length > 0
-        ? Number((comparisons.reduce((sum, item) => sum + item.metrics.jaccard, 0) / comparisons.length).toFixed(6))
+      averageJaccard: comparableComparisons.length > 0
+        ? Number((comparableComparisons.reduce((sum, item) => sum + item.metrics.jaccard, 0) / comparableComparisons.length).toFixed(6))
         : null
     },
     profileBreakdown: getProfileBreakdown(artifacts.sqlite),
@@ -304,7 +307,7 @@ function renderText(report) {
 
   for (const comparison of report.comparisons) {
     lines.push(`query: ${comparison.query}`);
-    lines.push(`  overlap: ${comparison.metrics.overlapCount}, jaccard: ${comparison.metrics.jaccard}`);
+    lines.push(`  overlap: ${comparison.metrics.overlapCount}, jaccard: ${comparison.metrics.jaccard ?? 'n/a'}`);
     lines.push(`  current top: ${comparison.current[0]?.title || 'none'}`);
     lines.push(`  baseline top: ${comparison.baseline[0]?.title || 'none'}`);
   }
