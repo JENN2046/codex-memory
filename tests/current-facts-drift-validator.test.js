@@ -1469,6 +1469,8 @@ test("current facts validator permits stale assertion examples in Markdown inden
     "> # Example\n    The current task branch records the active state.",
     "    - literal list syntax\n        The current task branch records the active state.",
     "    100. literal list syntax\n        The active state is recorded by the current task branch.",
+    "-\n      The current task branch records the active state.",
+    "1.\n       The active state is recorded by the current task branch.",
     "- Example:\n\n      The current task branch records the active state.",
     "1. Example:\n\n       The active state is recorded by the current task branch."
   ]) {
@@ -1484,6 +1486,8 @@ test("current facts validator does not treat paragraph or list indentation as co
   for (const staleText of [
     "Fresh Git state is required.\n    The current task branch records the active state.",
     "> Fresh Git state is required.\n    The current task branch records the active state.",
+    "-\n    The current task branch records the active state.",
+    "1.\n      The active state is recorded by the current task branch.",
     "- Recorded status must not be trusted.\n\n    The current task branch provides canonical status.",
     "100. Example:\n\n        The current task branch records the active state.",
     "12345. Example:\n\n        The active state is recorded by the current task branch."

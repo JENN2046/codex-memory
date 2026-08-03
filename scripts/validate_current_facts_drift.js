@@ -849,7 +849,17 @@ function markdownIndentWidth(line) {
 }
 
 function markdownListContentIndent(line) {
-  const match = String(line || "").match(/^([ \t]*)([-+*]|\d{1,9}[.)])([ \t]+)\S/);
+  const value = String(line || "");
+  const match = value.match(/^([ \t]*)([-+*]|\d{1,9}[.)])([ \t]+)\S/);
+  const emptyMatch = match ? null : value.match(/^([ \t]*)([-+*]|\d{1,9}[.)])[ \t]*$/);
+  if (emptyMatch) {
+    const leadingIndent = markdownIndentWidth(emptyMatch[1]);
+    return {
+      leadingIndent,
+      contentIndent: leadingIndent + emptyMatch[2].length + 1,
+      empty: true
+    };
+  }
   if (!match) return null;
   const leadingIndent = markdownIndentWidth(match[1]);
   const markerWidth = match[2].length;
@@ -858,7 +868,8 @@ function markdownListContentIndent(line) {
   const markerGap = gapWidth >= 1 && gapWidth <= 4 ? gapWidth : 1;
   return {
     leadingIndent,
-    contentIndent: leadingIndent + markerWidth + markerGap
+    contentIndent: leadingIndent + markerWidth + markerGap,
+    empty: false
   };
 }
 
@@ -891,6 +902,7 @@ function isInsideMarkdownIndentedCode(text, index) {
   let sawBlankBoundary = lineStart === 0;
   let boundaryLine = null;
   let listContentIndent = null;
+  let emptyListBoundary = false;
   for (let lineIndex = precedingLines.length - 1; lineIndex >= 0; lineIndex -= 1) {
     const line = precedingLines[lineIndex];
     if (/^\s*$/.test(line)) {
@@ -903,6 +915,7 @@ function isInsideMarkdownIndentedCode(text, index) {
       isInsideMarkdownIndentedCode(text, lineProbeIndex);
     if (listBoundary && !listBoundaryIsCode && listBoundary.leadingIndent < currentIndent) {
       listContentIndent = listBoundary.contentIndent;
+      emptyListBoundary = listBoundary.empty;
       break;
     }
     if (markdownIndentWidth(line) >= 4) continue;
@@ -910,7 +923,7 @@ function isInsideMarkdownIndentedCode(text, index) {
     break;
   }
   if (listContentIndent !== null) {
-    return sawBlankBoundary && currentIndent >= listContentIndent + 4;
+    return (sawBlankBoundary || emptyListBoundary) && currentIndent >= listContentIndent + 4;
   }
   if (boundaryLine === null) return true;
   return sawBlankBoundary || isMarkdownNonParagraphBlock(boundaryLine);
