@@ -892,35 +892,55 @@ function markdownInlineBlockBoundary(line, lineStart, lineEnd, textLength, state
       state.htmlBlockEnd = null;
       state.htmlBlockQuoteDepth = null;
     }
+    state.paragraphActive = false;
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
   if (/^\s*$/.test(content)) {
     if (!blockquote) state.blockquoteDepth = null;
     state.listStack = [];
+    state.paragraphActive = false;
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
-  const listItem = content.match(/^( {0,3})([-+*]|\d{1,9}[.)])([ \t]+)(?=\S)/);
-  if (listItem) {
-    const indent = listItem[1].length;
-    const kind = /^[-+*]$/.test(listItem[2]) ? "bullet" : "ordered";
-    const existing = [...state.listStack].reverse().find(item => item.indent === indent);
-    const interrupts = kind === "bullet" ||
-      Number.parseInt(listItem[2], 10) === 1 ||
-      (existing && existing.kind === kind);
-    if (interrupts) {
-      state.listStack = state.listStack.filter(item => item.indent < indent);
-      state.listStack.push({ indent, kind });
-      return { nextStart: contentStart + listItem[0].length };
-    }
-  }
-  const emptyListItem = content.match(/^( {0,3})([-+*]|\d{1,9}[.)])[ \t]*$/);
-  if (emptyListItem) {
-    const indent = emptyListItem[1].length;
-    const kind = /^[-+*]$/.test(emptyListItem[2]) ? "bullet" : "ordered";
-    const existing = [...state.listStack].reverse().find(item => item.indent === indent);
-    if (existing && existing.kind === kind) {
-      state.listStack = state.listStack.filter(item => item.indent <= indent);
-      return { nextStart: Math.min(lineEnd + 1, textLength) };
+  const listBoundary = markdownListContentIndent(content);
+  if (listBoundary) {
+    const markerMatch = content.match(/^[ \t]*([-+*]|\d{1,9}[.)])/);
+    const marker = markerMatch[1];
+    const nonemptyPrefix = listBoundary.empty
+      ? null
+      : content.match(/^[ \t]*(?:[-+*]|\d{1,9}[.)])[ \t]+(?=\S)/)[0];
+    const markerIndent = listBoundary.leadingIndent;
+    const kind = /^[-+*]$/.test(marker) ? "bullet" : "ordered";
+    const existing = [...state.listStack]
+      .reverse()
+      .find(item => item.markerIndent === markerIndent);
+    const parent = [...state.listStack]
+      .reverse()
+      .find(item => item.contentIndent <= markerIndent);
+    const validPosition = markerIndent <= 3 || Boolean(parent);
+    const interrupts = !listBoundary.empty && validPosition && (
+      !state.paragraphActive ||
+      kind === "bullet" ||
+      Number.parseInt(marker, 10) === 1 ||
+      (existing && existing.kind === kind)
+    );
+    const emptySuccessor = listBoundary.empty &&
+      existing &&
+      existing.kind === kind;
+    if (interrupts || emptySuccessor) {
+      state.listStack = state.listStack.filter(item => item.markerIndent < markerIndent);
+      if (!listBoundary.empty) {
+        state.listStack.push({
+          markerIndent,
+          contentIndent: listBoundary.contentIndent,
+          kind
+        });
+      }
+      state.paragraphActive = !listBoundary.empty;
+      return {
+        nextStart: listBoundary.empty
+          ? Math.min(lineEnd + 1, textLength)
+          : contentStart + nonemptyPrefix.length
+      };
     }
   }
   const htmlBlockEnd = markdownHtmlBlockStart(content, {
@@ -931,6 +951,7 @@ function markdownInlineBlockBoundary(line, lineStart, lineEnd, textLength, state
     state.listStack = [];
     state.htmlBlockEnd = htmlBlockEnd.test(content) ? null : htmlBlockEnd;
     state.htmlBlockQuoteDepth = state.htmlBlockEnd ? quoteDepth : null;
+    state.paragraphActive = false;
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
   const interruptsParagraph = /^ {0,3}(?:#{1,6}(?:\s|$)|`{3,}|~{3,})/.test(content) ||
@@ -938,8 +959,10 @@ function markdownInlineBlockBoundary(line, lineStart, lineEnd, textLength, state
   if (interruptsParagraph) {
     if (!blockquote) state.blockquoteDepth = null;
     state.listStack = [];
+    state.paragraphActive = false;
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
+  state.paragraphActive = true;
   return quoteChanged ? { nextStart: contentStart } : null;
 }
 
@@ -949,7 +972,8 @@ function markdownInlineBlockBounds(text, index, { includeHtmlComments = true } =
     listStack: [],
     htmlBlockEnd: null,
     htmlBlockQuoteDepth: null,
-    includeHtmlComments
+    includeHtmlComments,
+    paragraphActive: false
   };
   let start = 0;
   let lineStart = 0;
