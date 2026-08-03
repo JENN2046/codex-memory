@@ -219,6 +219,55 @@ function cleanupTemporary(fsModule, temporary) {
   } catch {}
 }
 
+function confirmCurrentProfileDurability({
+  profilePath,
+  fsModule,
+  faultInjector
+}) {
+  const file = normalizedAbsolutePath(
+    profilePath,
+    'owner_profile_profile_path_invalid'
+  );
+  const directory = path.dirname(file);
+  let profileDescriptor;
+  let directoryDescriptor;
+  try {
+    profileDescriptor = fsModule.openSync(file, fs.constants.O_RDONLY);
+    fsModule.fsyncSync(profileDescriptor);
+    fsModule.closeSync(profileDescriptor);
+    profileDescriptor = undefined;
+    if (typeof fs.constants.O_DIRECTORY !== 'number') {
+      throw codedError('owner_profile_directory_fsync_unsupported');
+    }
+    directoryDescriptor = fsModule.openSync(
+      directory,
+      fs.constants.O_RDONLY | fs.constants.O_DIRECTORY
+    );
+    invokeFault(faultInjector, 'parent_directory_fsync');
+    fsModule.fsyncSync(directoryDescriptor);
+    fsModule.closeSync(directoryDescriptor);
+    directoryDescriptor = undefined;
+    return {
+      confirmed: true,
+      errorCode: null
+    };
+  } catch (error) {
+    return {
+      confirmed: false,
+      errorCode: error?.code === 'owner_profile_directory_fsync_unsupported'
+        ? error.code
+        : error?.code === 'owner_profile_fault_parent_directory_fsync'
+          ? 'owner_profile_parent_directory_fsync_failed'
+          : profileDescriptor !== undefined
+            ? 'owner_profile_profile_fsync_failed'
+            : 'owner_profile_parent_directory_fsync_failed'
+    };
+  } finally {
+    closeQuietly(fsModule, profileDescriptor);
+    closeQuietly(fsModule, directoryDescriptor);
+  }
+}
+
 function readBackAfterCommit({
   profilePath,
   fsModule,
@@ -281,12 +330,12 @@ function readBackAfterCommit({
     });
   }
   return result({
-    classification: 'STALE_CURRENT',
-    errorCode: errorCode || 'owner_profile_stale_conflict',
+    classification: 'COMMIT_RESULT_UNKNOWN',
+    errorCode: errorCode || 'owner_profile_post_commit_state_conflict',
     oldFingerprint,
     nextFingerprint,
     readBackFingerprint: current.fingerprint,
-    mutated: false,
+    mutated: null,
     durabilityConfirmed: false,
     committedProfileMatchesNext: false
   });
@@ -336,14 +385,21 @@ function commitOwnerProfileTransaction({
     });
   }
   if (current.fingerprint === nextFingerprint) {
+    const durability = confirmCurrentProfileDurability({
+      profilePath: file,
+      fsModule,
+      faultInjector
+    });
     return result({
-      classification: 'ALREADY_COMMITTED',
-      errorCode: null,
+      classification: durability.confirmed
+        ? 'ALREADY_COMMITTED'
+        : 'ALREADY_COMMITTED_WITH_UNCERTAIN_DURABILITY',
+      errorCode: durability.errorCode,
       oldFingerprint: expectedCurrentFingerprint,
       nextFingerprint,
       readBackFingerprint: current.fingerprint,
       mutated: false,
-      durabilityConfirmed: true,
+      durabilityConfirmed: durability.confirmed,
       committedProfileMatchesNext: true
     });
   }

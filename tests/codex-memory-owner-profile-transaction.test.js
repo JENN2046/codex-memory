@@ -290,6 +290,80 @@ test('parent-directory fsync failure never returns ordinary committed', t => {
   assert.equal(result.committedProfileMatchesNext, true);
 });
 
+test('exact-new retry confirms profile and parent durability without rewrite', t => {
+  const nextProfile = profile({ adoptedRepositoryHead: GIT('9') });
+  const { directory, target } = fixture(t, nextProfile);
+  const before = fs.readFileSync(target);
+  const calls = [];
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(profile()),
+    nextProfile,
+    fsModule: recordingFs(calls)
+  });
+  assert.equal(result.classification, 'ALREADY_COMMITTED');
+  assert.equal(result.mutated, false);
+  assert.equal(result.durabilityConfirmed, true);
+  assert.deepEqual(fs.readFileSync(target), before);
+  assert.equal(calls.some(call => call[0] === 'rename'), false);
+  assert.equal(calls.some(call => call[0] === 'open' &&
+    call[1] !== directory && /\.tmp$/u.test(path.basename(call[1]))), false);
+  assert.deepEqual(
+    calls
+      .filter(call => call[0] === 'fsync')
+      .map(call => call[1] === directory ? 'directory' : 'profile'),
+    ['profile', 'directory']
+  );
+});
+
+test('exact-new directory fsync failure returns uncertain durability without rewrite', t => {
+  const nextProfile = profile({ adoptedRepositoryHead: GIT('9') });
+  const { target } = fixture(t, nextProfile);
+  const before = fs.readFileSync(target);
+  const calls = [];
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(profile()),
+    nextProfile,
+    fsModule: recordingFs(calls),
+    faultInjector: point => point === 'parent_directory_fsync'
+  });
+  assert.equal(result.classification, 'ALREADY_COMMITTED_WITH_UNCERTAIN_DURABILITY');
+  assert.equal(result.errorCode, 'owner_profile_parent_directory_fsync_failed');
+  assert.equal(result.mutated, false);
+  assert.equal(result.committedProfileMatchesNext, true);
+  assert.equal(result.durabilityConfirmed, false);
+  assert.deepEqual(fs.readFileSync(target), before);
+  assert.equal(calls.some(call => call[0] === 'rename'), false);
+});
+
+test('exact retry after prior parent fsync failure reconfirms durability', t => {
+  const oldProfile = profile();
+  const nextProfile = profile({ adoptedRepositoryHead: GIT('9') });
+  const { target } = fixture(t);
+  const first = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(oldProfile),
+    nextProfile,
+    faultInjector: point => point === 'parent_directory_fsync'
+  });
+  assert.equal(first.classification, 'COMMITTED_WITH_UNCERTAIN_DURABILITY');
+  assert.equal(first.durabilityConfirmed, false);
+  const beforeRetry = fs.readFileSync(target);
+  const calls = [];
+  const second = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(oldProfile),
+    nextProfile,
+    fsModule: recordingFs(calls)
+  });
+  assert.equal(second.classification, 'ALREADY_COMMITTED');
+  assert.equal(second.durabilityConfirmed, true);
+  assert.equal(second.mutated, false);
+  assert.deepEqual(fs.readFileSync(target), beforeRetry);
+  assert.equal(calls.some(call => call[0] === 'rename'), false);
+});
+
 test('rename-before failures preserve the expected old target', t => {
   const { target } = fixture(t);
   const before = fs.readFileSync(target);
@@ -324,7 +398,7 @@ test('after-rename exact new state converges through exact retry', t => {
   assert.equal(second.mutated, false);
 });
 
-test('read-back valid neither-old-nor-new fails closed as stale conflict', t => {
+test('post-rename valid neither-old-nor-new fails closed as unknown conflict', t => {
   const { target } = fixture(t);
   const unexpected = profile({ adoptedRepositoryHead: GIT('c') });
   const result = commitOwnerProfileTransaction({
@@ -335,9 +409,36 @@ test('read-back valid neither-old-nor-new fails closed as stale conflict', t => 
       if (point === 'after_rename') writeProfile(target, unexpected, 0);
     }
   });
-  assert.equal(result.classification, 'STALE_CURRENT');
-  assert.equal(result.mutated, false);
+  assert.equal(result.classification, 'COMMIT_RESULT_UNKNOWN');
+  assert.equal(result.errorCode, 'owner_profile_post_commit_state_conflict');
+  assert.equal(result.mutated, null);
+  assert.equal(result.durabilityConfirmed, false);
   assert.equal(result.readBackFingerprint, canonicalProfileFingerprint(unexpected));
+});
+
+test('exact retry against a persisted post-rename third state remains fail closed', t => {
+  const { target } = fixture(t);
+  const unexpected = profile({ adoptedRepositoryHead: GIT('c') });
+  const nextProfile = profile({ adoptedRepositoryHead: GIT('9') });
+  const first = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(profile()),
+    nextProfile,
+    faultInjector: point => {
+      if (point === 'after_rename') writeProfile(target, unexpected, 0);
+    }
+  });
+  assert.equal(first.classification, 'COMMIT_RESULT_UNKNOWN');
+  assert.equal(first.mutated, null);
+  const beforeRetry = fs.readFileSync(target);
+  const retry = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(profile()),
+    nextProfile
+  });
+  assert.equal(retry.classification, 'STALE_CURRENT');
+  assert.equal(retry.mutated, false);
+  assert.deepEqual(fs.readFileSync(target), beforeRetry);
 });
 
 test('read-back invalid after rename returns commit result unknown', t => {
