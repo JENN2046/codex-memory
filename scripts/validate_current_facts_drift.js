@@ -853,13 +853,22 @@ function isInsideEffectiveMarkdownHtmlComment(text, index) {
   return false;
 }
 
-function isMarkdownInlineBlockBoundaryLine(line) {
+function markdownInlineBlockBoundary(line, lineStart, lineEnd, textLength) {
   const value = String(line || "");
-  return /^\s*$/.test(value) ||
-    /^ {0,3}>/.test(value) ||
-    markdownIndentWidth(value) >= 4 ||
-    isMarkdownNonParagraphBlock(value) ||
-    /^ {0,3}(?:=+|-+)\s*$/.test(value);
+  if (/^\s*$/.test(value)) {
+    return { nextStart: Math.min(lineEnd + 1, textLength) };
+  }
+  const blockquote = value.match(/^ {0,3}(?:>\s?)+/);
+  if (blockquote) return { nextStart: lineStart + blockquote[0].length };
+  const listItem = value.match(/^ {0,3}([-+*]|\d{1,9}[.)])([ \t]+)(?=\S)/);
+  if (listItem && (/^[-+*]$/.test(listItem[1]) || Number.parseInt(listItem[1], 10) === 1)) {
+    return { nextStart: lineStart + listItem[0].length };
+  }
+  const interruptsParagraph = /^ {0,3}(?:#{1,6}(?:\s|$)|`{3,}|~{3,}|<!--)/.test(value) ||
+    /^ {0,3}(?:(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,}|=+|-+)\s*$/.test(value);
+  return interruptsParagraph
+    ? { nextStart: Math.min(lineEnd + 1, textLength) }
+    : null;
 }
 
 function markdownInlineBlockBounds(text, index) {
@@ -869,9 +878,13 @@ function markdownInlineBlockBounds(text, index) {
     const lineEndCandidate = text.indexOf("\n", lineStart);
     const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
     if (lineEnd >= index) break;
-    if (isMarkdownInlineBlockBoundaryLine(text.slice(lineStart, lineEnd))) {
-      start = Math.min(lineEnd + 1, text.length);
-    }
+    const boundary = markdownInlineBlockBoundary(
+      text.slice(lineStart, lineEnd),
+      lineStart,
+      lineEnd,
+      text.length
+    );
+    if (boundary) start = boundary.nextStart;
     lineStart = lineEnd + 1;
   }
   const currentLineEndCandidate = text.indexOf("\n", index);
@@ -882,7 +895,12 @@ function markdownInlineBlockBounds(text, index) {
   while (followingLineStart < text.length) {
     const lineEndCandidate = text.indexOf("\n", followingLineStart);
     const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
-    if (isMarkdownInlineBlockBoundaryLine(text.slice(followingLineStart, lineEnd))) {
+    if (markdownInlineBlockBoundary(
+      text.slice(followingLineStart, lineEnd),
+      followingLineStart,
+      lineEnd,
+      text.length
+    )) {
       end = followingLineStart;
       break;
     }
@@ -897,7 +915,6 @@ function isMarkdownCodeSpanContainer(text, index, { includeHtmlComment = true } 
   const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
   const line = text.slice(lineStart, lineEnd);
   return isInsideMarkdownFence(text, index) ||
-    isInsideMarkdownBlockquote(text, index) ||
     isInsideMarkdownIndentedCode(text, index) ||
     (includeHtmlComment && isInsideEffectiveMarkdownHtmlComment(text, index)) ||
     (isMarkdownNonParagraphBlock(line) && !/^ {0,3}`/.test(line));
