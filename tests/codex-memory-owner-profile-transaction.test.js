@@ -680,16 +680,47 @@ test('schema v4/v5 current profiles fail closed for transaction only', t => {
   assert.equal(result.mutated, false);
 });
 
-test('fault points are internal and lifecycle callers remain unwired', () => {
+test('fault points are internal and only the dormant adapter can reach P1', () => {
   const source = fs.readFileSync(
     path.join(__dirname, '..', 'scripts', 'codex-memory-stack.js'),
+    'utf8'
+  );
+  const adapter = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'scripts',
+      'codex-memory-stopped-profile-transition.js'
+    ),
     'utf8'
   );
   const primitive = fs.readFileSync(
     path.join(__dirname, '..', 'scripts', 'codex-memory-owner-profile-transaction.js'),
     'utf8'
   );
-  assert.equal(source.includes('codex-memory-owner-profile-transaction'), false);
+  assert.equal(
+    source.includes("require('./codex-memory-owner-profile-transaction')"),
+    true
+  );
+  assert.equal(source.includes('coordinateStoppedOwnerProfileTransitionCore'), true);
+  const lifecycleSlices = [
+    ['async function startStackWithProfile(', 'async function stopStack('],
+    ['async function stopStack(', 'async function adoptRunningStack('],
+    ['async function adoptRunningStack(', 'function assertSourceManifestRebindStopped('],
+    ['async function rebindSourceManifestStack(', 'function readPrivateText(']
+  ].map(([start, end]) => source.slice(
+    source.indexOf(start),
+    source.indexOf(end)
+  ));
+  for (const slice of lifecycleSlices) {
+    assert.equal(slice.includes('commitOwnerProfileTransaction'), false);
+    assert.equal(slice.includes('coordinateStoppedOwnerProfileTransition('), false);
+  }
+  assert.equal(adapter.includes('commitOwnerProfileTransaction'), true);
+  assert.equal(adapter.includes('acquireOwnerLock'), false);
+  assert.equal(adapter.includes('transitionRecordStore'), false);
+  assert.equal(adapter.includes('Observer'), false);
+  assert.equal(adapter.includes('journal'), false);
   assert.equal(primitive.includes('transitionRecordStore'), false);
   assert.equal(primitive.includes('Observer'), false);
   assert.equal(primitive.includes('journal'), false);

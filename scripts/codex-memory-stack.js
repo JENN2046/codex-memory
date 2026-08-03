@@ -25,6 +25,9 @@ const {
 const {
   GOVERNED_READ_ATTEMPT_PROTOCOL
 } = require('../packages/chatgpt-r4-contracts/governed-read-attempt');
+const {
+  coordinateStoppedOwnerProfileTransition: coordinateStoppedOwnerProfileTransitionCore
+} = require('./codex-memory-stopped-profile-transition');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
@@ -4546,6 +4549,51 @@ function assertSourceManifestRebindStopped(
   return true;
 }
 
+function inspectStoppedStateForOwnerProfileTransition(
+  profile,
+  { environment = process.env } = {}
+) {
+  let processIdentities;
+  try {
+    processIdentities = Object.fromEntries(
+      Object.keys(COMPONENTS).map(name => [
+        name,
+        inspectProcessIdentity(name, { environment })
+      ])
+    );
+  } catch {
+    throw codedError('stopped_profile_transition_runtime_not_stopped');
+  }
+
+  if (Object.keys(COMPONENTS).some(name => {
+    const pidFile = componentPaths(name, environment).pid;
+    return fs.existsSync(pidFile) && processIdentities[name]?.pid === null;
+  })) {
+    throw codedError('stopped_profile_transition_runtime_not_stopped');
+  }
+
+  let edge;
+  try {
+    edge = inspectEdgeContainer(profile.edgeContainer);
+  } catch {
+    throw codedError('stopped_profile_transition_edge_not_stopped');
+  }
+
+  try {
+    assertSourceManifestRebindStopped(profile, processIdentities, edge);
+  } catch {
+    if (Object.values(processIdentities).some(state => state?.running !== false)) {
+      throw codedError('stopped_profile_transition_runtime_not_stopped');
+    }
+    if (edge?.running !== false ||
+        !profileEdgeLifecycleIdentityMatches(profile, edge)) {
+      throw codedError('stopped_profile_transition_edge_not_stopped');
+    }
+    throw codedError('stopped_profile_transition_runtime_not_stopped');
+  }
+  return Object.freeze({ verified: true });
+}
+
 async function coordinateSourceManifestRebind({
   candidateProfile,
   persistCandidate,
@@ -5408,6 +5456,32 @@ if (require.main === module) {
   });
 }
 
+function coordinateStoppedOwnerProfileTransition(options = {}) {
+  return coordinateStoppedOwnerProfileTransitionCore({
+    candidateBinding: options.candidateBinding,
+    environment: options.environment || process.env,
+    profileSchemaVersion: PROFILE_SCHEMA_VERSION,
+    manifestSchemaVersion: MANIFEST_SCHEMA_VERSION,
+    acquireLifecycleProfile,
+    inspectSourceCompatibility,
+    inspectStoppedState: inspectStoppedStateForOwnerProfileTransition,
+    validateProfile,
+    canonicalProfileFingerprint: (...args) => {
+      const {
+        canonicalProfileFingerprint
+      } = require('./codex-memory-owner-profile-transaction');
+      return canonicalProfileFingerprint(...args);
+    },
+    commitOwnerProfileTransaction: (...args) => {
+      const {
+        commitOwnerProfileTransaction
+      } = require('./codex-memory-owner-profile-transaction');
+      return commitOwnerProfileTransaction(...args);
+    },
+    profilePath
+  });
+}
+
 module.exports = {
   CANONICAL_CODEX_MCP_TOOL_NAMES,
   CANONICAL_CODEX_MCP_ENDPOINT,
@@ -5442,6 +5516,7 @@ module.exports = {
   connectOwnedLoopbackTcpListener,
   connectedUnixPeerOwnedByPid,
   coordinateSourceManifestRebind,
+  coordinateStoppedOwnerProfileTransition,
   controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,
