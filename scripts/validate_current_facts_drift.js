@@ -835,12 +835,20 @@ function isInsideMarkdownBlockquote(text, index) {
 }
 
 function isInsideMarkdownHtmlComment(text, index) {
-  const opening = text.lastIndexOf("<!--", index);
-  if (opening === -1) return false;
   const closingBefore = text.lastIndexOf("-->", index);
-  if (closingBefore > opening) return false;
-  const closingAfter = text.indexOf("-->", opening + 4);
-  return closingAfter !== -1 && index < closingAfter + 3;
+  let opening = text.lastIndexOf("<!--", index);
+  while (opening > closingBefore) {
+    const openerIsCodeOrContainer = isInsideMarkdownFence(text, opening) ||
+      isInsideMarkdownBlockquote(text, opening) ||
+      isInsideMarkdownIndentedCode(text, opening) ||
+      isInsideQuotedSegment(text, opening);
+    if (!openerIsCodeOrContainer) {
+      const closingAfter = text.indexOf("-->", opening + 4);
+      if (closingAfter !== -1 && index < closingAfter + 3) return true;
+    }
+    opening = text.lastIndexOf("<!--", opening - 1);
+  }
+  return false;
 }
 
 function markdownIndentWidth(line) {
@@ -866,7 +874,8 @@ function markdownListContentIndent(line) {
     return {
       leadingIndent,
       contentIndent: leadingIndent + emptyMatch[2].length + 1,
-      empty: true
+      empty: true,
+      interruptsParagraph: false
     };
   }
   if (!match) return null;
@@ -878,8 +887,24 @@ function markdownListContentIndent(line) {
   return {
     leadingIndent,
     contentIndent: leadingIndent + markerWidth + markerGap,
-    empty: false
+    empty: false,
+    interruptsParagraph: /^[-+*]$/.test(match[2]) ||
+      Number.parseInt(match[2], 10) === 1
   };
+}
+
+function markdownListMarkerStartsBlock(lines, lineIndex, boundary) {
+  if (lineIndex === 0) return true;
+  const previousLine = lines[lineIndex - 1];
+  if (/^\s*$/.test(previousLine) || isMarkdownNonParagraphBlock(previousLine)) {
+    return true;
+  }
+  const previousBoundary = markdownListContentIndent(previousLine);
+  if (previousBoundary &&
+      markdownListMarkerStartsBlock(lines, lineIndex - 1, previousBoundary)) {
+    return true;
+  }
+  return boundary.interruptsParagraph;
 }
 
 function isMarkdownNonParagraphBlock(line) {
@@ -925,12 +950,8 @@ function isInsideMarkdownIndentedCode(text, index) {
       isInsideMarkdownIndentedCode(text, lineProbeIndex);
     if (listBoundary && !listBoundaryIsCode && listBoundary.leadingIndent < currentIndent) {
       listContentIndent = listBoundary.contentIndent;
-      const previousLine = precedingLines[lineIndex - 1];
       const emptyMarkerStartsBlock = !listBoundary.empty ||
-        lineIndex === 0 ||
-        /^\s*$/.test(previousLine) ||
-        isMarkdownNonParagraphBlock(previousLine) ||
-        markdownListContentIndent(previousLine) !== null;
+        markdownListMarkerStartsBlock(precedingLines, lineIndex, listBoundary);
       emptyListBoundary = listBoundary.empty && emptyMarkerStartsBlock;
       break;
     }
