@@ -848,6 +848,26 @@ function markdownIndentWidth(line) {
   return width;
 }
 
+function markdownListContentIndent(line) {
+  const match = String(line || "").match(/^([ \t]*)([-+*]|\d{1,9}[.)])([ \t]+)\S/);
+  if (!match) return null;
+  const leadingIndent = markdownIndentWidth(match[1]);
+  const markerWidth = match[2].length;
+  const gapEndColumn = markdownIndentWidth(`${match[1]}${" ".repeat(markerWidth)}${match[3]}`);
+  const gapWidth = gapEndColumn - leadingIndent - markerWidth;
+  const markerGap = gapWidth >= 1 && gapWidth <= 4 ? gapWidth : 1;
+  return {
+    leadingIndent,
+    contentIndent: leadingIndent + markerWidth + markerGap
+  };
+}
+
+function isMarkdownNonParagraphBlock(line) {
+  const value = String(line || "");
+  return /^ {0,3}(?:#{1,6}(?:\s|$)|>|`{3,}|~{3,}|<(?:!--|\/?[A-Za-z]))/.test(value) ||
+    /^ {0,3}(?:(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,})$/.test(value);
+}
+
 function isInsideMarkdownIndentedCode(text, index) {
   const lineStart = text.lastIndexOf("\n", index - 1) + 1;
   const lineEndCandidate = text.indexOf("\n", index);
@@ -860,21 +880,27 @@ function isInsideMarkdownIndentedCode(text, index) {
   const precedingLines = precedingText ? precedingText.split("\n") : [];
   let sawBlankBoundary = lineStart === 0;
   let boundaryLine = null;
+  let listContentIndent = null;
   for (let lineIndex = precedingLines.length - 1; lineIndex >= 0; lineIndex -= 1) {
     const line = precedingLines[lineIndex];
     if (/^\s*$/.test(line)) {
       sawBlankBoundary = true;
       continue;
     }
+    const listBoundary = markdownListContentIndent(line);
+    if (listBoundary && listBoundary.leadingIndent < currentIndent) {
+      listContentIndent = listBoundary.contentIndent;
+      break;
+    }
     if (markdownIndentWidth(line) >= 4) continue;
     boundaryLine = line;
     break;
   }
-  if (!sawBlankBoundary) return false;
-  if (boundaryLine && /^ {0,3}(?:[-+*]|\d+[.)])\s+/.test(boundaryLine) && currentIndent < 8) {
-    return false;
+  if (listContentIndent !== null) {
+    return sawBlankBoundary && currentIndent >= listContentIndent + 4;
   }
-  return true;
+  if (boundaryLine === null) return true;
+  return sawBlankBoundary || isMarkdownNonParagraphBlock(boundaryLine);
 }
 
 function firstUnquotedClauseTerminator(text, startIndex) {
