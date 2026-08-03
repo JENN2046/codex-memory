@@ -1394,6 +1394,10 @@ test("current facts validator rejects passive branch-authority assertions", () =
     "The current facts have been stored by the current task branch.",
     "Active identity will still directly be determined by the current task branch.",
     "Current authority is not only established by the current task branch.",
+    "The active state is being recorded by the current task branch.",
+    "The active state should have been recorded by the current task branch.",
+    "Canonical status has actually been directly provided by the current task branch.",
+    "Current facts may still be being stored by the current task branch.",
     "The active state is recorded by the current task branch, isn't it?"
   ]) {
     const root = workspace();
@@ -1409,8 +1413,14 @@ test("current facts validator permits questions and negated passive branch guida
   for (const guidanceText of [
     "Is the active state recorded by the current task branch?",
     "Could canonical status be provided by the current task branch?",
+    "What active state is recorded by the current task branch?",
+    "Which canonical status is provided by the current task branch?",
+    "What active state is being recorded by the current task branch?",
+    "Should the active state have been recorded by the current task branch?",
     "The active state is not recorded by the current task branch.",
     "Canonical status isn't provided by the current task branch.",
+    "The active state is not being recorded by the current task branch.",
+    "The active state should not have been recorded by the current task branch.",
     "This document does not claim that the active state is recorded by the current task branch.",
     "> The active state is recorded by the current task branch.",
     "The phrase `active state is recorded by the current task branch` is stale."

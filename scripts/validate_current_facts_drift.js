@@ -151,8 +151,10 @@ const STALE_ACTIVE_PHRASES = Object.freeze([
 const BRANCH_AUTHORITY_PREDICATE_SOURCE = String.raw`is|was|remains?|has|records?|contains?|holds?|owns?|tracks?|stores?|persists?|keeps?|represents?|identifies?|points?\s+to|serves?\s+as|acts?\s+as|functions?\s+as|provides?|supplies?|defines?|declares?|establishes?|determines?|governs?|controls?|authorizes?`;
 const BRANCH_AUTHORITY_AUXILIARY_SOURCE = String.raw`do|does|did|has|have|had|will|would|can|could|may|might|must|need|shall|should|ought\s+to`;
 const BRANCH_AUTHORITY_MODIFIER_SOURCE = String.raw`(?:actually|currently|directly|now|still)|not\s+only`;
+const BRANCH_AUTHORITY_MODIFIERS_SOURCE = String.raw`(?:\s+(?:${BRANCH_AUTHORITY_MODIFIER_SOURCE}))*`;
 const BRANCH_AUTHORITY_OBJECT_SOURCE = String.raw`active\s+state|canonical\s+status|current\s+facts?|active\s+identity|current\s+authority`;
-const BRANCH_AUTHORITY_PASSIVE_AUXILIARY_SOURCE = String.raw`be|is|are|was|were|remains?|(?:has|have|had)\s+(?:(?:${BRANCH_AUTHORITY_MODIFIER_SOURCE})\s+)*been|(?:will|would|can|could|may|might|must|need|shall|should|ought\s+to)\s+(?:(?:${BRANCH_AUTHORITY_MODIFIER_SOURCE})\s+)*be`;
+const BRANCH_AUTHORITY_PASSIVE_MODAL_SOURCE = String.raw`will|would|can|could|may|might|must|need|shall|should|ought\s+to`;
+const BRANCH_AUTHORITY_PASSIVE_AUXILIARY_SOURCE = String.raw`(?:be|is|are|was|were|remains?)${BRANCH_AUTHORITY_MODIFIERS_SOURCE}(?:\s+being${BRANCH_AUTHORITY_MODIFIERS_SOURCE})?|(?:has|have|had)${BRANCH_AUTHORITY_MODIFIERS_SOURCE}\s+been${BRANCH_AUTHORITY_MODIFIERS_SOURCE}(?:\s+being${BRANCH_AUTHORITY_MODIFIERS_SOURCE})?|(?:${BRANCH_AUTHORITY_PASSIVE_MODAL_SOURCE})${BRANCH_AUTHORITY_MODIFIERS_SOURCE}\s+(?:be${BRANCH_AUTHORITY_MODIFIERS_SOURCE}(?:\s+being${BRANCH_AUTHORITY_MODIFIERS_SOURCE})?|have${BRANCH_AUTHORITY_MODIFIERS_SOURCE}\s+been${BRANCH_AUTHORITY_MODIFIERS_SOURCE}(?:\s+being${BRANCH_AUTHORITY_MODIFIERS_SOURCE})?)`;
 const BRANCH_AUTHORITY_PASSIVE_PREDICATE_SOURCE = String.raw`recorded|contained|held|owned|tracked|stored|persisted|kept|represented|identified|provided|supplied|defined|declared|established|determined|governed|controlled|authorized`;
 const STALE_ACTIVE_ASSERTIONS = Object.freeze([
   Object.freeze({
@@ -165,7 +167,7 @@ const STALE_ACTIVE_ASSERTIONS = Object.freeze([
   Object.freeze({
     phrase: "current task branch",
     pattern: new RegExp(
-      String.raw`\b(?:the\s+)?(?:${BRANCH_AUTHORITY_OBJECT_SOURCE})\s+(?:${BRANCH_AUTHORITY_PASSIVE_AUXILIARY_SOURCE})\s+(?:(?:${BRANCH_AUTHORITY_MODIFIER_SOURCE})\s+)*(${BRANCH_AUTHORITY_PASSIVE_PREDICATE_SOURCE})\s+by\s+(?:the\s+)?current task branch\b`,
+      String.raw`\b(?:the\s+)?(?:${BRANCH_AUTHORITY_OBJECT_SOURCE})\s+(?:${BRANCH_AUTHORITY_PASSIVE_AUXILIARY_SOURCE})\s+(${BRANCH_AUTHORITY_PASSIVE_PREDICATE_SOURCE})\s+by\s+(?:the\s+)?current task branch\b`,
       "gi"
     )
   })
@@ -844,7 +846,8 @@ function firstUnquotedClauseTerminator(text, startIndex) {
 
 function isDirectBranchQuestion(prefix, text, suffixStart) {
   if (firstUnquotedClauseTerminator(text, suffixStart) !== "?") return false;
-  return /^\s*(?:(?:what|which|where|when|why|how)\s+)?(?:(?:do|does|did|is|are|was|were|has|have|had|will|would|can|could|may|might|must|need|shall|should|ought)|(?:don't|doesn't|didn't|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't|oughtn't)|cannot)\s+(?:the\s+)?$/i.test(prefix);
+  return /^\s*(?:(?:what|which|where|when|why|how)\s+)?(?:(?:do|does|did|is|are|was|were|has|have|had|will|would|can|could|may|might|must|need|shall|should|ought)|(?:don't|doesn't|didn't|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't|oughtn't)|cannot)\s+(?:the\s+)?$/i.test(prefix) ||
+    /^\s*(?:what|which)\s+(?:the\s+)?$/i.test(prefix);
 }
 
 function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound = null) {
