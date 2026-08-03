@@ -834,24 +834,61 @@ function isInsideMarkdownBlockquote(text, index) {
   return /^ {0,3}(?:>\s?)+/.test(text.slice(lineStart, index));
 }
 
-function isInsideLexicalHtmlComment(text, index) {
-  const opening = text.lastIndexOf("<!--", index);
-  if (opening === -1 || text.lastIndexOf("-->", index) > opening) return false;
-  const closing = text.indexOf("-->", opening + 4);
-  return closing !== -1 && index < closing + 3;
+function isInsideEffectiveMarkdownHtmlComment(text, index) {
+  const closingBefore = text.lastIndexOf("-->", index);
+  let opening = text.lastIndexOf("<!--", index);
+  while (opening > closingBefore) {
+    const openerIsCodeOrContainer = isInsideMarkdownFence(text, opening) ||
+      isInsideMarkdownBlockquote(text, opening) ||
+      isInsideMarkdownIndentedCode(text, opening) ||
+      isInsideMarkdownCodeSpan(text, opening, { includeHtmlComment: false }) ||
+      isBackslashEscaped(text, opening) ||
+      isInsideQuotedSegment(text, opening);
+    if (!openerIsCodeOrContainer) {
+      const closingAfter = text.indexOf("-->", opening + 4);
+      if (closingAfter !== -1 && index < closingAfter + 3) return true;
+    }
+    opening = text.lastIndexOf("<!--", opening - 1);
+  }
+  return false;
+}
+
+function isMarkdownInlineBlockBoundaryLine(line) {
+  const value = String(line || "");
+  return /^\s*$/.test(value) ||
+    /^ {0,3}>/.test(value) ||
+    markdownIndentWidth(value) >= 4 ||
+    isMarkdownNonParagraphBlock(value) ||
+    /^ {0,3}(?:=+|-+)\s*$/.test(value);
 }
 
 function markdownInlineBlockBounds(text, index) {
-  const blankLine = /\n[ \t]*\n/g;
   let start = 0;
-  for (const match of text.slice(0, index).matchAll(blankLine)) {
-    start = match.index + match[0].length;
+  let lineStart = 0;
+  while (lineStart < index) {
+    const lineEndCandidate = text.indexOf("\n", lineStart);
+    const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+    if (lineEnd >= index) break;
+    if (isMarkdownInlineBlockBoundaryLine(text.slice(lineStart, lineEnd))) {
+      start = Math.min(lineEnd + 1, text.length);
+    }
+    lineStart = lineEnd + 1;
   }
-  const following = /\n[ \t]*\n/.exec(text.slice(index));
-  return {
-    start,
-    end: following ? index + following.index : text.length
-  };
+  const currentLineEndCandidate = text.indexOf("\n", index);
+  let followingLineStart = currentLineEndCandidate === -1
+    ? text.length
+    : currentLineEndCandidate + 1;
+  let end = text.length;
+  while (followingLineStart < text.length) {
+    const lineEndCandidate = text.indexOf("\n", followingLineStart);
+    const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+    if (isMarkdownInlineBlockBoundaryLine(text.slice(followingLineStart, lineEnd))) {
+      end = followingLineStart;
+      break;
+    }
+    followingLineStart = lineEnd + 1;
+  }
+  return { start, end };
 }
 
 function isMarkdownCodeSpanContainer(text, index, { includeHtmlComment = true } = {}) {
@@ -862,11 +899,11 @@ function isMarkdownCodeSpanContainer(text, index, { includeHtmlComment = true } 
   return isInsideMarkdownFence(text, index) ||
     isInsideMarkdownBlockquote(text, index) ||
     isInsideMarkdownIndentedCode(text, index) ||
-    (includeHtmlComment && isInsideLexicalHtmlComment(text, index)) ||
+    (includeHtmlComment && isInsideEffectiveMarkdownHtmlComment(text, index)) ||
     (isMarkdownNonParagraphBlock(line) && !/^ {0,3}`/.test(line));
 }
 
-function isInsideMarkdownCodeSpan(text, index) {
+function isInsideMarkdownCodeSpan(text, index, { includeHtmlComment = true } = {}) {
   const bounds = markdownInlineBlockBounds(text, index);
   for (let cursor = bounds.start; cursor < index;) {
     const runStart = text.indexOf("`", cursor);
@@ -882,7 +919,8 @@ function isInsideMarkdownCodeSpan(text, index) {
     const fenceLikeBlockStart = /^ {0,3}$/.test(linePrefix) &&
       runLength >= 3 &&
       (runLength === 3 || !lineSuffix.includes("`"));
-    if (fenceLikeBlockStart || isMarkdownCodeSpanContainer(text, runStart)) {
+    if (fenceLikeBlockStart ||
+        isMarkdownCodeSpanContainer(text, runStart, { includeHtmlComment })) {
       cursor = runEnd;
       continue;
     }
@@ -927,22 +965,7 @@ function isBackslashEscaped(text, index) {
 }
 
 function isInsideMarkdownHtmlComment(text, index) {
-  const closingBefore = text.lastIndexOf("-->", index);
-  let opening = text.lastIndexOf("<!--", index);
-  while (opening > closingBefore) {
-    const openerIsCodeOrContainer = isInsideMarkdownFence(text, opening) ||
-      isInsideMarkdownBlockquote(text, opening) ||
-      isInsideMarkdownIndentedCode(text, opening) ||
-      isInsideMarkdownCodeSpan(text, opening) ||
-      isBackslashEscaped(text, opening) ||
-      isInsideQuotedSegment(text, opening);
-    if (!openerIsCodeOrContainer) {
-      const closingAfter = text.indexOf("-->", opening + 4);
-      if (closingAfter !== -1 && index < closingAfter + 3) return true;
-    }
-    opening = text.lastIndexOf("<!--", opening - 1);
-  }
-  return false;
+  return isInsideEffectiveMarkdownHtmlComment(text, index);
 }
 
 function markdownIndentWidth(line) {

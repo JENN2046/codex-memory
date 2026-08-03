@@ -1480,7 +1480,9 @@ test("current facts validator permits stale assertion examples in Markdown code 
     "``The current task branch records the active state.``",
     "````The active state is recorded by the current task branch.````",
     "`example\nThe current task branch records the active state.\n`",
-    "Unmatched ` token.\n``The active state is recorded by the current task branch.``"
+    "Unmatched ` token.\n``The active state is recorded by the current task branch.``",
+    "\\<!-- ``The current task branch records the active state.`` -->",
+    "`<!--` ``The current task branch records the active state.`` -->"
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
@@ -1534,6 +1536,12 @@ test("current facts validator does not treat paragraph or list indentation as co
     "<!-- ` -->\nThe current task branch records the active state.\n<!-- ` -->",
     "> `\n\nThe current task branch records the active state.\n\n> `",
     "    `\n\nThe current task branch records the active state.\n\n    `",
+    "Unmatched `\n# Heading\nThe current task branch records the active state. `",
+    "Unmatched `\nHeading\n===\nThe current task branch records the active state. `",
+    "Unmatched `\n***\nThe current task branch records the active state. `",
+    "Unmatched `\n~~~\ncode\n~~~\nThe current task branch records the active state. `",
+    "Unmatched `\n<!-- boundary -->\nThe current task branch records the active state. `",
+    "Unmatched `\n> boundary\nThe current task branch records the active state. `",
     "-\n    The current task branch records the active state.",
     "1.\n      The active state is recorded by the current task branch.",
     "- Context:\n\n    guidance\n      The current task branch records the active state.",
