@@ -869,54 +869,67 @@ function markdownHtmlBlockStart(line) {
 
 function markdownInlineBlockBoundary(line, lineStart, lineEnd, textLength, state) {
   const value = String(line || "");
+  const blockquote = value.match(/^ {0,3}((?:>\s?)+)/);
+  let content = value;
+  let contentStart = lineStart;
+  let quoteChanged = false;
+  if (blockquote) {
+    const depth = [...blockquote[1]].filter(character => character === ">").length;
+    quoteChanged = state.blockquoteDepth !== depth;
+    state.blockquoteDepth = depth;
+    if (quoteChanged) state.listKind = null;
+    content = value.slice(blockquote[0].length);
+    contentStart += blockquote[0].length;
+  }
   if (state.htmlBlockEnd) {
-    const closes = state.htmlBlockEnd.test(value);
+    const closes = state.htmlBlockEnd.test(content);
     if (closes) state.htmlBlockEnd = null;
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
-  if (/^\s*$/.test(value)) {
-    state.blockquoteDepth = null;
-    state.listActive = false;
+  if (/^\s*$/.test(content)) {
+    if (!blockquote) state.blockquoteDepth = null;
+    state.listKind = null;
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
-  const blockquote = value.match(/^ {0,3}((?:>\s?)+)/);
-  if (blockquote) {
-    const depth = [...blockquote[1]].filter(character => character === ">").length;
-    if (state.blockquoteDepth === depth) return null;
-    state.blockquoteDepth = depth;
-    state.listActive = false;
-    return { nextStart: lineStart + blockquote[0].length };
+  const listItem = content.match(/^ {0,3}([-+*]|\d{1,9}[.)])([ \t]+)(?=\S)/);
+  if (listItem) {
+    const kind = /^[-+*]$/.test(listItem[1]) ? "bullet" : "ordered";
+    const interrupts = kind === "bullet" ||
+      Number.parseInt(listItem[1], 10) === 1 ||
+      state.listKind === kind;
+    if (interrupts) {
+      state.listKind = kind;
+      return { nextStart: contentStart + listItem[0].length };
+    }
   }
-  const listItem = value.match(/^ {0,3}([-+*]|\d{1,9}[.)])([ \t]+)(?=\S)/);
-  if (listItem && (state.listActive ||
-      /^[-+*]$/.test(listItem[1]) ||
-      Number.parseInt(listItem[1], 10) === 1)) {
-    state.listActive = true;
-    return { nextStart: lineStart + listItem[0].length };
+  const emptyListItem = content.match(/^ {0,3}([-+*]|\d{1,9}[.)])[ \t]*$/);
+  if (emptyListItem) {
+    const kind = /^[-+*]$/.test(emptyListItem[1]) ? "bullet" : "ordered";
+    if (state.listKind === kind) {
+      return { nextStart: Math.min(lineEnd + 1, textLength) };
+    }
   }
-  const emptyListItem = value.match(/^ {0,3}([-+*]|\d{1,9}[.)])[ \t]*$/);
-  if (emptyListItem && state.listActive) {
-    return { nextStart: Math.min(lineEnd + 1, textLength) };
-  }
-  const htmlBlockEnd = markdownHtmlBlockStart(value);
+  const htmlBlockEnd = markdownHtmlBlockStart(content);
   if (htmlBlockEnd) {
-    state.blockquoteDepth = null;
-    state.listActive = false;
-    state.htmlBlockEnd = htmlBlockEnd.test(value) ? null : htmlBlockEnd;
+    if (!blockquote) state.blockquoteDepth = null;
+    state.listKind = null;
+    state.htmlBlockEnd = htmlBlockEnd.test(content) ? null : htmlBlockEnd;
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
-  const interruptsParagraph = /^ {0,3}(?:#{1,6}(?:\s|$)|`{3,}|~{3,}|<!--)/.test(value) ||
-    /^ {0,3}(?:(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,}|=+|-+)\s*$/.test(value);
-  if (!interruptsParagraph) return null;
-  state.blockquoteDepth = null;
-  state.listActive = false;
-  return { nextStart: Math.min(lineEnd + 1, textLength) };
+  const interruptsParagraph = /^ {0,3}(?:#{1,6}(?:\s|$)|`{3,}|~{3,}|<!--)/.test(content) ||
+    /^ {0,3}(?:(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,}|=+|-+)\s*$/.test(content);
+  if (interruptsParagraph) {
+    if (!blockquote) state.blockquoteDepth = null;
+    state.listKind = null;
+    return { nextStart: Math.min(lineEnd + 1, textLength) };
+  }
+  return quoteChanged ? { nextStart: contentStart } : null;
 }
 
 function markdownInlineBlockBounds(text, index) {
   const state = {
     blockquoteDepth: null,
-    listActive: false,
+    listKind: null,
     htmlBlockEnd: null
   };
   let start = 0;
