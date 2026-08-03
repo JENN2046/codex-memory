@@ -835,43 +835,51 @@ function isInsideMarkdownBlockquote(text, index) {
 }
 
 function isInsideMarkdownCodeSpan(text, index) {
-  const runs = [];
-  for (let cursor = 0; cursor < text.length;) {
-    if (text[cursor] !== "`") {
-      cursor += 1;
-      continue;
-    }
-    let runEnd = cursor + 1;
+  for (let cursor = 0; cursor < index;) {
+    const runStart = text.indexOf("`", cursor);
+    if (runStart === -1 || runStart >= index) return false;
+    let runEnd = runStart + 1;
     while (text[runEnd] === "`") runEnd += 1;
-    const lineStart = text.lastIndexOf("\n", cursor - 1) + 1;
-    const lineEndCandidate = text.indexOf("\n", cursor);
+    const lineStart = text.lastIndexOf("\n", runStart - 1) + 1;
+    const lineEndCandidate = text.indexOf("\n", runStart);
     const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
-    const line = text.slice(lineStart, lineEnd);
-    const openingFence = /^ {0,3}`{3,}[^`]*$/.test(line);
-    if (isBackslashEscaped(text, cursor) ||
-        openingFence ||
-        isInsideMarkdownFence(text, cursor)) {
+    const linePrefix = text.slice(lineStart, runStart);
+    const lineSuffix = text.slice(runEnd, lineEnd);
+    const runLength = runEnd - runStart;
+    const fenceLikeBlockStart = /^ {0,3}$/.test(linePrefix) &&
+      runLength >= 3 &&
+      (runLength === 3 || !lineSuffix.includes("`"));
+    if (fenceLikeBlockStart || isInsideMarkdownFence(text, runStart)) {
       cursor = runEnd;
       continue;
     }
-    runs.push({ start: cursor, end: runEnd, length: runEnd - cursor });
-    cursor = runEnd;
-  }
-  for (let runIndex = 0; runIndex < runs.length;) {
-    const opening = runs[runIndex];
-    let closingIndex = runIndex + 1;
-    while (closingIndex < runs.length &&
-           runs[closingIndex].length !== opening.length) {
-      closingIndex += 1;
-    }
-    if (closingIndex === runs.length) {
-      runIndex += 1;
+    const escapedPrefix = isBackslashEscaped(text, runStart) ? 1 : 0;
+    const openingStart = runStart + escapedPrefix;
+    const openingLength = runEnd - openingStart;
+    if (openingLength === 0) {
+      cursor = runEnd;
       continue;
     }
-    const closing = runs[closingIndex];
-    if (opening.end <= index && index < closing.start) return true;
-    if (index < opening.start) return false;
-    runIndex = closingIndex + 1;
+    let closingStart = runEnd;
+    let closingEnd = null;
+    while (closingStart < text.length) {
+      closingStart = text.indexOf("`", closingStart);
+      if (closingStart === -1) break;
+      let candidateEnd = closingStart + 1;
+      while (text[candidateEnd] === "`") candidateEnd += 1;
+      if (candidateEnd - closingStart === openingLength) {
+        closingEnd = candidateEnd;
+        break;
+      }
+      closingStart = candidateEnd;
+    }
+    if (closingEnd === null) {
+      cursor = runEnd;
+      continue;
+    }
+    if (openingStart + openingLength <= index && index < closingStart) return true;
+    if (index < openingStart) return false;
+    cursor = closingEnd;
   }
   return false;
 }
@@ -1114,6 +1122,7 @@ function containsStaleAssertion(text, assertion) {
         isInsideMarkdownBlockquote(text, match.index) ||
         isInsideMarkdownHtmlComment(text, match.index) ||
         isInsideMarkdownIndentedCode(text, match.index) ||
+        isInsideMarkdownCodeSpan(text, match.index) ||
         isInsideQuotedSegment(text, match.index)) {
       continue;
     }

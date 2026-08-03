@@ -1475,6 +1475,21 @@ test("current facts validator permits stale assertion examples in Markdown HTML 
   }
 });
 
+test("current facts validator permits stale assertion examples in Markdown code spans", () => {
+  for (const codeSpanExample of [
+    "``The current task branch records the active state.``",
+    "````The active state is recorded by the current task branch.````",
+    "`example\nThe current task branch records the active state.\n`",
+    "Unmatched ` token.\n``The active state is recorded by the current task branch.``"
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${codeSpanExample}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, true, `${codeSpanExample}\n${result.failures.join("\n")}`);
+  }
+});
+
 test("current facts validator permits stale assertion examples in Markdown indented code", () => {
   for (const indentedExample of [
     "Example:\n\n    The current task branch records the active state.",
@@ -1511,6 +1526,8 @@ test("current facts validator does not treat paragraph or list indentation as co
     "Unmatched ` token.\nThe literal token ``<!--`` is documentation.\nThe current task branch records the active state.\n-->",
     "The literal token ````<!--```` is documentation.\nThe current task branch records the active state.\n-->",
     "`literal\n<!--\n`\nThe current task branch records the active state.\n-->",
+    "Token \\``<!--`.\nThe current task branch records the active state.\n-->",
+    "``<!--\\``\nThe current task branch records the active state.\n-->",
     "The literal token \\<!-- is documentation.\nThe current task branch records the active state.\n-->",
     "~~~text\n<!--\n~~~\nThe current task branch records the active state.\n-->",
     "-\n    The current task branch records the active state.",
