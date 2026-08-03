@@ -1497,7 +1497,10 @@ test("current facts validator permits stale assertion examples in Markdown code 
     "- `example\n3) text\nThe current task branch records the active state.\n`",
     "> <script>\n`example\nThe current task branch records the active state.\n`",
     ">> <script>\n``example\nThe current task branch records the active state.\n``",
-    "> <div>\n`example\nThe current task branch records the active state.\n`"
+    "> <div>\n`example\nThe current task branch records the active state.\n`",
+    "- `example\n      - literal marker\n  The current task branch records the active state.\n  `",
+    "1. `example\n       - literal marker\n   The current task branch records the active state.\n   `",
+    "1. `example\n       1. literal marker\n   The current task branch records the active state.\n   `"
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");

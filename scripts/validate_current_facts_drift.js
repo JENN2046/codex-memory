@@ -915,7 +915,8 @@ function markdownInlineBlockBoundary(line, lineStart, lineEnd, textLength, state
       .find(item => item.markerIndent === markerIndent);
     const parent = [...state.listStack]
       .reverse()
-      .find(item => item.contentIndent <= markerIndent);
+      .find(item => item.contentIndent <= markerIndent &&
+        markerIndent <= item.contentIndent + 3);
     const validPosition = markerIndent <= 3 || Boolean(parent);
     const interrupts = !listBoundary.empty && validPosition && (
       !state.paragraphActive ||
