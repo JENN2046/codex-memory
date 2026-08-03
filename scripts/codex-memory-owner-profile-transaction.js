@@ -115,6 +115,13 @@ function fingerprintForValidatedProfile(profile) {
   return `sha256:${crypto.createHash('sha256').update(canonicalBytes).digest('hex')}`;
 }
 
+function canonicalProfileBytes(profile) {
+  return Buffer.from(
+    `${JSON.stringify(canonicalize(profile))}\n`,
+    'utf8'
+  );
+}
+
 function canonicalProfileFingerprint(profile) {
   return fingerprintForValidatedProfile(validatedProfile(profile));
 }
@@ -165,7 +172,9 @@ function result({
   mutated,
   durabilityConfirmed,
   committedProfileMatchesNext,
-  validationFailed = false
+  validationFailed = false,
+  tempCreated = false,
+  renameAttempted = false
 }) {
   return Object.freeze({
     classification,
@@ -176,7 +185,9 @@ function result({
     mutated,
     durabilityConfirmed,
     committedProfileMatchesNext,
-    validationFailed
+    validationFailed,
+    tempCreated,
+    renameAttempted
   });
 }
 
@@ -276,7 +287,9 @@ function readBackAfterCommit({
   oldFingerprint,
   durabilityConfirmed,
   errorCode,
-  mutated
+  mutated,
+  tempCreated = false,
+  renameAttempted = false
 }) {
   const current = readValidatedProfile(profilePath, fsModule);
   if (!current.valid) {
@@ -288,7 +301,9 @@ function readBackAfterCommit({
       readBackFingerprint: null,
       mutated: null,
       durabilityConfirmed: false,
-      committedProfileMatchesNext: false
+      committedProfileMatchesNext: false,
+      tempCreated,
+      renameAttempted
     });
   }
   if (!current.supported) {
@@ -300,7 +315,9 @@ function readBackAfterCommit({
       readBackFingerprint: current.fingerprint,
       mutated: null,
       durabilityConfirmed: false,
-      committedProfileMatchesNext: false
+      committedProfileMatchesNext: false,
+      tempCreated,
+      renameAttempted
     });
   }
   if (current.fingerprint === nextFingerprint) {
@@ -314,7 +331,9 @@ function readBackAfterCommit({
       readBackFingerprint: current.fingerprint,
       mutated: mutated === null ? null : mutated,
       durabilityConfirmed,
-      committedProfileMatchesNext: true
+      committedProfileMatchesNext: true,
+      tempCreated,
+      renameAttempted
     });
   }
   if (current.fingerprint === expectedFingerprint) {
@@ -326,7 +345,9 @@ function readBackAfterCommit({
       readBackFingerprint: current.fingerprint,
       mutated: false,
       durabilityConfirmed: false,
-      committedProfileMatchesNext: false
+      committedProfileMatchesNext: false,
+      tempCreated,
+      renameAttempted
     });
   }
   return result({
@@ -337,10 +358,18 @@ function readBackAfterCommit({
     readBackFingerprint: current.fingerprint,
     mutated: null,
     durabilityConfirmed: false,
-    committedProfileMatchesNext: false
+    committedProfileMatchesNext: false,
+    tempCreated,
+    renameAttempted
   });
 }
 
+/*
+ * Caller precondition: the caller must hold the canonical exclusive lifecycle
+ * lock for the complete read / compare / commit / readback interval. This
+ * primitive intentionally does not create a second serialization authority;
+ * P2 owns the lock and stopped-state gate before production wiring.
+ */
 function commitOwnerProfileTransaction({
   profilePath,
   expectedCurrentFingerprint,
@@ -357,6 +386,21 @@ function commitOwnerProfileTransaction({
   }
   const validatedNext = validateTransactionProfile(nextProfile);
   const nextFingerprint = fingerprintForValidatedProfile(validatedNext);
+  const nextBody = canonicalProfileBytes(validatedNext);
+  if (nextBody.length < 1 || nextBody.length > MAX_PROFILE_BYTES) {
+    return result({
+      classification: 'INPUT_REJECTED',
+      errorCode: 'owner_profile_next_too_large',
+      oldFingerprint: expectedCurrentFingerprint,
+      nextFingerprint,
+      readBackFingerprint: null,
+      mutated: false,
+      durabilityConfirmed: false,
+      committedProfileMatchesNext: false,
+      tempCreated: false,
+      renameAttempted: false
+    });
+  }
   const current = readValidatedProfile(file, fsModule);
   if (!current.valid) {
     return result({
@@ -417,13 +461,11 @@ function commitOwnerProfileTransaction({
   }
 
   const directory = path.dirname(file);
-  const body = Buffer.from(
-    `${JSON.stringify(canonicalize(validatedNext))}\n`,
-    'utf8'
-  );
+  const body = nextBody;
   const temporary = temporaryPath(directory);
   let temporaryDescriptor;
   let directoryDescriptor;
+  let tempCreated = false;
   let renameAttempted = false;
   let renamed = false;
   let directoryDurabilityConfirmed = false;
@@ -436,6 +478,7 @@ function commitOwnerProfileTransaction({
       fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_WRONLY,
       OWNER_FILE_MODE
     );
+    tempCreated = true;
     fsModule.writeFileSync(temporaryDescriptor, body);
     fsModule.fsyncSync(temporaryDescriptor);
     invokeFault(faultInjector, 'after_temp_fsync');
@@ -467,7 +510,9 @@ function commitOwnerProfileTransaction({
       nextFingerprint,
       oldFingerprint: expectedCurrentFingerprint,
       durabilityConfirmed: true,
-      mutated: true
+      mutated: true,
+      tempCreated: true,
+      renameAttempted: true
     });
   } catch (error) {
     readbackFaulted = error?.code === 'owner_profile_fault_readback';
@@ -485,7 +530,9 @@ function commitOwnerProfileTransaction({
         readBackFingerprint: expectedCurrentFingerprint,
         mutated: false,
         durabilityConfirmed: false,
-        committedProfileMatchesNext: false
+        committedProfileMatchesNext: false,
+        tempCreated,
+        renameAttempted
       });
     }
     if (readbackFaulted) {
@@ -497,7 +544,9 @@ function commitOwnerProfileTransaction({
         readBackFingerprint: null,
         mutated: null,
         durabilityConfirmed: false,
-        committedProfileMatchesNext: false
+        committedProfileMatchesNext: false,
+        tempCreated,
+        renameAttempted
       });
     }
     return readBackAfterCommit({
@@ -514,7 +563,9 @@ function commitOwnerProfileTransaction({
           : error?.code === 'owner_profile_fault_parent_directory_fsync'
             ? 'owner_profile_parent_directory_fsync_failed'
             : 'owner_profile_commit_result_unknown',
-      mutated: renamed ? true : null
+      mutated: renamed ? true : null,
+      tempCreated,
+      renameAttempted
     });
   } finally {
     closeQuietly(fsModule, temporaryDescriptor);
@@ -525,6 +576,7 @@ function commitOwnerProfileTransaction({
 
 module.exports = {
   CURRENT_STATE,
+  MAX_PROFILE_BYTES,
   canonicalProfileFingerprint,
   commitOwnerProfileTransaction
 };

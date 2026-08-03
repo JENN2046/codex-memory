@@ -13,6 +13,7 @@ const {
   validateProfile
 } = require('../scripts/codex-memory-stack');
 const {
+  MAX_PROFILE_BYTES,
   canonicalProfileFingerprint,
   commitOwnerProfileTransaction
 } = require('../scripts/codex-memory-owner-profile-transaction');
@@ -121,6 +122,35 @@ function reverseKeys(value) {
   return Object.fromEntries(
     Object.keys(value).reverse().map(key => [key, value[key]])
   );
+}
+
+function canonicalProfileBytesForTest(value) {
+  const canonical = Object.fromEntries(
+    Object.keys(value).sort().map(key => [key, value[key]])
+  );
+  return Buffer.from(`${JSON.stringify(canonical)}\n`, 'utf8');
+}
+
+function profileWithExactCanonicalBytes(targetBytes) {
+  let low = 0;
+  let high = targetBytes;
+  let best = null;
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const candidate = profile({
+      runtimeRepository: `/synthetic/é${'x'.repeat(middle)}`
+    });
+    const bytes = canonicalProfileBytesForTest(candidate);
+    if (bytes.length <= targetBytes) {
+      best = candidate;
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
+  }
+  assert.ok(best);
+  assert.equal(canonicalProfileBytesForTest(best).length, targetBytes);
+  return best;
 }
 
 test('canonical fingerprint ignores JSON whitespace and object insertion order', t => {
@@ -288,6 +318,72 @@ test('parent-directory fsync failure never returns ordinary committed', t => {
   assert.equal(result.classification, 'COMMITTED_WITH_UNCERTAIN_DURABILITY');
   assert.equal(result.durabilityConfirmed, false);
   assert.equal(result.committedProfileMatchesNext, true);
+});
+
+test('exact profile byte boundary is accepted using UTF-8 byte length', t => {
+  const { target } = fixture(t);
+  const nextProfile = profileWithExactCanonicalBytes(MAX_PROFILE_BYTES);
+  assert.match(nextProfile.runtimeRepository, /é/u);
+  assert.ok(
+    Buffer.byteLength(nextProfile.runtimeRepository, 'utf8') >
+      nextProfile.runtimeRepository.length
+  );
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(profile()),
+    nextProfile
+  });
+  assert.equal(result.classification, 'COMMITTED');
+  assert.equal(result.tempCreated, true);
+  assert.equal(result.renameAttempted, true);
+  assert.equal(fs.statSync(target).size, MAX_PROFILE_BYTES);
+  assert.deepEqual(JSON.parse(fs.readFileSync(target, 'utf8')), nextProfile);
+});
+
+test('oversized valid candidate is rejected before temp creation or rename', t => {
+  const { directory, target } = fixture(t);
+  const oversized = profileWithExactCanonicalBytes(MAX_PROFILE_BYTES + 1);
+  const beforeBytes = fs.readFileSync(target);
+  const beforeStat = fs.statSync(target);
+  const beforeFingerprint = canonicalProfileFingerprint(profile());
+  const beforeEntries = fs.readdirSync(directory).sort();
+  const calls = [];
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: beforeFingerprint,
+    nextProfile: oversized,
+    fsModule: recordingFs(calls)
+  });
+  assert.equal(result.classification, 'INPUT_REJECTED');
+  assert.equal(result.errorCode, 'owner_profile_next_too_large');
+  assert.equal(result.mutated, false);
+  assert.equal(result.tempCreated, false);
+  assert.equal(result.renameAttempted, false);
+  assert.equal(calls.some(call => call[0] === 'rename'), false);
+  assert.equal(calls.some(call => call[0] === 'open' &&
+    /\.tmp$/u.test(path.basename(call[1]))), false);
+  assert.deepEqual(fs.readdirSync(directory).sort(), beforeEntries);
+  assert.deepEqual(fs.readFileSync(target), beforeBytes);
+  assert.equal(fs.statSync(target).mtimeNs, beforeStat.mtimeNs);
+  assert.equal(canonicalProfileFingerprint(JSON.parse(fs.readFileSync(target))), beforeFingerprint);
+});
+
+test('oversized candidate is rejected before exact-new fast-path evaluation', t => {
+  const exactNew = profile({ adoptedRepositoryHead: GIT('9') });
+  const { target } = fixture(t, exactNew);
+  const oversized = profileWithExactCanonicalBytes(MAX_PROFILE_BYTES + 1);
+  const before = fs.readFileSync(target);
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(profile()),
+    nextProfile: oversized
+  });
+  assert.equal(result.classification, 'INPUT_REJECTED');
+  assert.equal(result.errorCode, 'owner_profile_next_too_large');
+  assert.equal(result.mutated, false);
+  assert.equal(result.tempCreated, false);
+  assert.equal(result.renameAttempted, false);
+  assert.deepEqual(fs.readFileSync(target), before);
 });
 
 test('exact-new retry confirms profile and parent durability without rewrite', t => {
@@ -563,6 +659,20 @@ test('invalid next profile is rejected before any target mutation', t => {
     { code: 'owner_profile_next_invalid' }
   );
   assert.deepEqual(fs.readFileSync(target), before);
+});
+
+test('current profile size limit remains fail-closed', t => {
+  const { target } = fixture(t);
+  fs.writeFileSync(target, `${JSON.stringify(profile())}${' '.repeat(MAX_PROFILE_BYTES)}\n`);
+  fs.chmodSync(target, 0o600);
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(profile()),
+    nextProfile: profile({ adoptedRepositoryHead: GIT('9') })
+  });
+  assert.equal(result.classification, 'INVALID_CURRENT');
+  assert.equal(result.errorCode, 'owner_profile_current_invalid');
+  assert.equal(result.mutated, false);
 });
 
 test('missing target is invalid and does not create a profile', t => {
