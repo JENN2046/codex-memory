@@ -1464,7 +1464,8 @@ test("current facts validator permits stale assertion examples in Markdown fence
 test("current facts validator permits stale assertion examples in Markdown HTML comments", () => {
   for (const commentedExample of [
     "<!-- The current task branch records the active state. -->",
-    "<!--\nThe active state is recorded by the current task branch.\n-->"
+    "<!--\nThe active state is recorded by the current task branch.\n-->",
+    "Unmatched ` token.\n<!-- The current task branch records the active state. -->"
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
@@ -1502,7 +1503,15 @@ test("current facts validator does not treat paragraph or list indentation as co
     "Fresh Git state is required.\n*\n      The current task branch records the active state.",
     "Fresh Git state is required.\n2.\n       The active state is recorded by the current task branch.",
     "Fresh Git state is required.\n2. still paragraph text\n3.\n       The current task branch records the active state.",
+    "Fresh Git state is required.\n    - shaped continuation\n3.\n       The current task branch records the active state.",
+    "Fresh Git state is required.\n\t- shaped continuation\n3.\n       The current task branch records the active state.",
+    "Fresh Git state is required.\n    1. shaped continuation\n3.\n       The current task branch records the active state.",
     "The literal token `<!--` is documentation.\nThe current task branch records the active state.\n-->",
+    "The literal token ``<!--`` is documentation.\nThe current task branch records the active state.\n-->",
+    "Unmatched ` token.\nThe literal token ``<!--`` is documentation.\nThe current task branch records the active state.\n-->",
+    "The literal token ````<!--```` is documentation.\nThe current task branch records the active state.\n-->",
+    "`literal\n<!--\n`\nThe current task branch records the active state.\n-->",
+    "The literal token \\<!-- is documentation.\nThe current task branch records the active state.\n-->",
     "~~~text\n<!--\n~~~\nThe current task branch records the active state.\n-->",
     "-\n    The current task branch records the active state.",
     "1.\n      The active state is recorded by the current task branch.",

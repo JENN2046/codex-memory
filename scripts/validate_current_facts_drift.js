@@ -834,6 +834,56 @@ function isInsideMarkdownBlockquote(text, index) {
   return /^ {0,3}(?:>\s?)+/.test(text.slice(lineStart, index));
 }
 
+function isInsideMarkdownCodeSpan(text, index) {
+  const runs = [];
+  for (let cursor = 0; cursor < text.length;) {
+    if (text[cursor] !== "`") {
+      cursor += 1;
+      continue;
+    }
+    let runEnd = cursor + 1;
+    while (text[runEnd] === "`") runEnd += 1;
+    const lineStart = text.lastIndexOf("\n", cursor - 1) + 1;
+    const lineEndCandidate = text.indexOf("\n", cursor);
+    const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+    const line = text.slice(lineStart, lineEnd);
+    const openingFence = /^ {0,3}`{3,}[^`]*$/.test(line);
+    if (isBackslashEscaped(text, cursor) ||
+        openingFence ||
+        isInsideMarkdownFence(text, cursor)) {
+      cursor = runEnd;
+      continue;
+    }
+    runs.push({ start: cursor, end: runEnd, length: runEnd - cursor });
+    cursor = runEnd;
+  }
+  for (let runIndex = 0; runIndex < runs.length;) {
+    const opening = runs[runIndex];
+    let closingIndex = runIndex + 1;
+    while (closingIndex < runs.length &&
+           runs[closingIndex].length !== opening.length) {
+      closingIndex += 1;
+    }
+    if (closingIndex === runs.length) {
+      runIndex += 1;
+      continue;
+    }
+    const closing = runs[closingIndex];
+    if (opening.end <= index && index < closing.start) return true;
+    if (index < opening.start) return false;
+    runIndex = closingIndex + 1;
+  }
+  return false;
+}
+
+function isBackslashEscaped(text, index) {
+  let backslashes = 0;
+  for (let cursor = index - 1; cursor >= 0 && text[cursor] === "\\"; cursor -= 1) {
+    backslashes += 1;
+  }
+  return backslashes % 2 === 1;
+}
+
 function isInsideMarkdownHtmlComment(text, index) {
   const closingBefore = text.lastIndexOf("-->", index);
   let opening = text.lastIndexOf("<!--", index);
@@ -841,6 +891,8 @@ function isInsideMarkdownHtmlComment(text, index) {
     const openerIsCodeOrContainer = isInsideMarkdownFence(text, opening) ||
       isInsideMarkdownBlockquote(text, opening) ||
       isInsideMarkdownIndentedCode(text, opening) ||
+      isInsideMarkdownCodeSpan(text, opening) ||
+      isBackslashEscaped(text, opening) ||
       isInsideQuotedSegment(text, opening);
     if (!openerIsCodeOrContainer) {
       const closingAfter = text.indexOf("-->", opening + 4);
@@ -904,7 +956,7 @@ function markdownListMarkerStartsBlock(lines, lineIndex, boundary) {
       markdownListMarkerStartsBlock(lines, lineIndex - 1, previousBoundary)) {
     return true;
   }
-  return boundary.interruptsParagraph;
+  return boundary.leadingIndent <= 3 && boundary.interruptsParagraph;
 }
 
 function isMarkdownNonParagraphBlock(line) {
