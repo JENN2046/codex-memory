@@ -1565,6 +1565,8 @@ test("current facts validator does not treat paragraph or list indentation as co
     "Unmatched `\n<![CDATA[x]]>\nThe current task branch records the active state. `",
     "Unmatched `\n- item\nThe current task branch records the active state. `",
     "Unmatched `\n1. item\nThe current task branch records the active state. `",
+    "Unmatched `\n- The current task branch records the active state. `",
+    "Unmatched `\n1. The current task branch records the active state. `",
     "- item `\n+\nThe current task branch records the active state. `",
     "* item `\n*\nThe current task branch records the active state. `",
     "1. item `\n2)\nThe current task branch records the active state. `",
