@@ -28,7 +28,12 @@ const {
 
 function gateResult(
   toolName = 'search_memory',
-  { visibility = 'shared', scopeFilteringProven = true } = {}
+  {
+    visibility = 'shared',
+    scopeFilteringProven = true,
+    clientId = 'Codex',
+    completeFixedScope = false
+  } = {}
 ) {
   const result = validateGovernedMcpVcpNativeBridgeGate({
     product_goal: {
@@ -40,10 +45,12 @@ function gateResult(
       local_memory_role: [...REQUIRED_LOCAL_MEMORY_ROLE]
     },
     bridge_request: {
-      client_id: 'Codex',
+      client_id: clientId,
       scope: {
         project_id: 'codex-memory',
         workspace_id: 'workspace-alpha',
+        ...(completeFixedScope ? { scope_id: 'chatgpt-web-fixed-scope' } : {}),
+        client_id: clientId,
         visibility
       },
       runtime_target: {
@@ -82,9 +89,11 @@ function gateResult(
     trusted_execution_context: {
       accepted: true,
       executionContext: {
-        agentAlias: 'Codex',
+        agentAlias: clientId,
+        clientId,
         projectId: 'codex-memory',
         workspaceId: 'workspace-alpha',
+        ...(completeFixedScope ? { scopeId: 'chatgpt-web-fixed-scope' } : {}),
         visibility
       }
     },
@@ -105,6 +114,10 @@ function gateResult(
 }
 
 function nativeInvocationReceiptForPayload(payload, overrides = {}) {
+  const {
+    nativeRuntimeReceipt: nativeRuntimeReceiptOverrides = {},
+    ...receiptOverrides
+  } = overrides;
   return {
     targetReferenceName: payload.targetReferenceName,
     targetKind: 'mcp_server',
@@ -168,9 +181,10 @@ function nativeInvocationReceiptForPayload(payload, overrides = {}) {
       rawMemoryContentDisclosed: false,
       runtimeLocatorDisclosed: false,
       tokenMaterialDisclosed: false,
-      readinessClaimed: false
+      readinessClaimed: false,
+      ...nativeRuntimeReceiptOverrides
     },
-    ...overrides
+    ...receiptOverrides
   };
 }
 
@@ -693,6 +707,102 @@ test('delegates governed read to native MCP caller and returns only low-disclosu
       toolName
     );
   }
+});
+
+test('chatgpt_web read delegation binds fixed scope and mapping digest without write authority', async () => {
+  let calls = 0;
+  const gate = gateResult('search_memory', {
+    visibility: 'project',
+    clientId: 'chatgpt_web',
+    completeFixedScope: true
+  });
+  assert.equal(gate.accepted, true, gate.blockers.join(', '));
+  assert.equal(gate.normalizedBridgeRequest.write_eligible, false);
+
+  const result = await executeGovernedMcpVcpNativeReadDelegation({
+    toolName: 'search_memory',
+    args: { query: 'synthetic read-only channel query', limit: 1 },
+    gateResult: gate,
+    callMcpTool: receiptAwareCallMcpTool(async payload => {
+      calls += 1;
+      assert.equal(payload.arguments.scope.client_id, 'chatgpt_web');
+      assert.equal(payload.arguments.scope.visibility, 'project');
+      assert.equal(payload.arguments.scope.scope_id, 'chatgpt-web-fixed-scope');
+      assert.equal(payload.arguments.governed_bridge.client_id, 'chatgpt_web');
+      assert.equal(payload.arguments.governed_bridge.read_allowed, true);
+      assert.equal(payload.arguments.governed_bridge.write_allowed, false);
+      assert.equal(payload.governanceMeta.scopeEnforcement.mode, 'diary_allowlist_v1');
+      assert.equal(
+        payload.governanceMeta.scopeEnforcement.expectedMappingReference,
+        'jenn-vcp-diary-scope-v1'
+      );
+      assert.match(
+        payload.governanceMeta.scopeEnforcement.expectedMappingDigest,
+        /^sha256:[a-f0-9]{64}$/
+      );
+      return { results: [] };
+    })
+  });
+
+  assert.equal(calls, 1);
+  assert.equal(result.accepted, true);
+  assert.equal(result.delegatedResult.receipt.clientIdentityBound, true);
+  assert.equal(result.delegatedResult.receipt.readAllowed, true);
+  assert.equal(result.delegatedResult.receipt.writeAllowed, false);
+  assert.equal(
+    result.delegatedResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.mappingReferenceBound,
+    true
+  );
+  assert.equal(
+    result.delegatedResult.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.mappingDigestBound,
+    true
+  );
+  assert.equal(result.delegatedResult.access.localMemoryFallbackUsed, false);
+});
+
+test('chatgpt_web fails closed on expected or actual mapping digest drift', async () => {
+  let preflightCalls = 0;
+  const invalidExpected = gateResult('search_memory', {
+    visibility: 'project', clientId: 'chatgpt_web', completeFixedScope: true
+  });
+  invalidExpected.normalizedBridgeRequest.expected_mapping_digest = 'sha256:invalid';
+  const preflight = await executeGovernedMcpVcpNativeReadDelegation({
+    toolName: 'search_memory',
+    args: { query: 'synthetic digest drift' },
+    gateResult: invalidExpected,
+    callMcpTool: receiptAwareCallMcpTool(async () => {
+      preflightCalls += 1;
+      return { results: [] };
+    })
+  });
+  assert.equal(preflight.accepted, false);
+  assert.ok(preflight.invalidFields.includes(
+    'gateResult.normalizedBridgeRequest.expected_mapping_digest'
+  ));
+  assert.equal(preflightCalls, 0);
+
+  let runtimeCalls = 0;
+  const actualMismatch = await executeGovernedMcpVcpNativeReadDelegation({
+    toolName: 'search_memory',
+    args: { query: 'synthetic actual digest drift' },
+    gateResult: gateResult('search_memory', {
+      visibility: 'project', clientId: 'chatgpt_web', completeFixedScope: true
+    }),
+    callMcpTool: receiptAwareCallMcpTool(async () => {
+      runtimeCalls += 1;
+      return { results: [] };
+    }, { nativeRuntimeReceipt: { mappingDigestBound: false } })
+  });
+  assert.equal(runtimeCalls, 1);
+  assert.equal(actualMismatch.accepted, false);
+  assert.equal(
+    actualMismatch.reasonCode,
+    'native_read_delegation_native_invocation_receipt_unbound'
+  );
+  assert.equal(
+    actualMismatch.receipt.nativeInvocationReceipt.nativeRuntimeReceipt.mappingDigestBound,
+    false
+  );
 });
 
 test('read delegation requires native caller receipt capability before native call', async () => {

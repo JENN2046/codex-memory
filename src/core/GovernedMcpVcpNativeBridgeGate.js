@@ -17,8 +17,10 @@ const {
 } = require('./GovernedMcpVcpNativeRuntimeTargetConfig');
 const { TOOL_DEFINITIONS } = require('./constants');
 const {
+  GOVERNED_NATIVE_READ_CLIENTS,
   GOVERNED_NATIVE_VISIBILITIES,
-  canonicalGovernedNativeClient
+  canonicalGovernedNativeReadClient,
+  canonicalGovernedNativeWriteClient
 } = require('./MemoryAccessContract');
 
 const CONTRACT_NAME = 'GovernedMcpVcpNativeBridgeGate';
@@ -69,6 +71,9 @@ const WRITE_TOOL_EXACT_APPROVAL_ACTIONS = Object.freeze({
   tombstone_memory: 'live_bridge_tombstone_memory_proof',
   supersede_memory: 'live_bridge_supersede_memory_proof'
 });
+
+const CHATGPT_WEB_READ_ONLY_CLIENT = 'chatgpt_web';
+const CHATGPT_WEB_ALLOWED_VISIBILITIES = Object.freeze(['project', 'workspace']);
 
 const ZERO_SIDE_EFFECT_COUNTERS = Object.freeze([
   'vcpToolBoxCalls',
@@ -370,7 +375,7 @@ function normalizeTrustedExecutionContext(trustedContextResult, clientId) {
   const referenceValues = [agentAlias, trustedClientId, projectId, workspaceId, scopeId].filter(Boolean);
   const referencesSafe = referenceValues.every(isSafeReferenceName);
   const visibilityAccepted = !visibility || ALLOWED_VISIBILITIES.includes(visibility);
-  const agentAliasMatches = canonicalGovernedNativeClient(agentAlias) === clientId;
+  const agentAliasMatches = canonicalGovernedNativeReadClient(agentAlias) === clientId;
 
   return {
     supplied: true,
@@ -890,10 +895,10 @@ function validateGovernedMcpVcpNativeBridgeGate(input = {}) {
   }
 
   const effectiveRequest = isPlainObject(request) ? request : {};
-  const clientId = canonicalGovernedNativeClient(
+  const clientId = canonicalGovernedNativeReadClient(
     firstString(getAlias(effectiveRequest, 'client_id', 'clientId'))
   );
-  if (!clientId || !REQUIRED_CLIENTS.includes(clientId)) {
+  if (!clientId) {
     blockers.push('client_id_must_be_governed_native_client');
   }
 
@@ -916,6 +921,24 @@ function validateGovernedMcpVcpNativeBridgeGate(input = {}) {
     if (scope.hasIdentifier && !scope.identifiersSafe) blockers.push('scope_identifier_must_be_safe_reference');
     if (!scope.visibility) blockers.push('visibility_must_be_governed_visibility');
     if (!scope.clientMatches) blockers.push('scope_client_id_must_match_client_id');
+  }
+  if (clientId === CHATGPT_WEB_READ_ONLY_CLIENT) {
+    if (!trustedExecutionContext.supplied || !trustedExecutionContext.accepted) {
+      blockers.push('chatgpt_web_requires_accepted_server_trusted_execution_context');
+    }
+    if (!trustedExecutionContext.agentAliasMatches || !trustedScopeMatches) {
+      blockers.push('chatgpt_web_trusted_execution_context_must_match_fixed_scope');
+    }
+    if (!CHATGPT_WEB_ALLOWED_VISIBILITIES.includes(scope.visibility)) {
+      blockers.push('chatgpt_web_visibility_must_be_project_or_workspace');
+    }
+    if (
+      !scope.normalized?.project_id ||
+      !scope.normalized?.workspace_id ||
+      !scope.normalized?.scope_id
+    ) {
+      blockers.push('chatgpt_web_requires_complete_server_fixed_scope');
+    }
   }
 
   const runtimeTarget = normalizeRuntimeTarget(getAlias(effectiveRequest, 'runtime_target', 'runtimeTarget'));
@@ -944,6 +967,9 @@ function validateGovernedMcpVcpNativeBridgeGate(input = {}) {
   if (!authority.accepted) {
     blockers.push('read_write_authority_must_match_invocation_profile');
     if (authority.unboundedWrite) blockers.push('unbounded_write_not_allowed');
+  }
+  if (authority.writeAllowed && !canonicalGovernedNativeWriteClient(clientId)) {
+    blockers.push('client_id_not_eligible_for_governed_native_write');
   }
   if (authority.forbiddenFields.length > 0) {
     blockers.push('read_write_authority_must_not_include_locator_or_secret_material');
@@ -1048,7 +1074,13 @@ function validateGovernedMcpVcpNativeBridgeGate(input = {}) {
     blockers,
     normalizedProductGoal: productGoalResult.normalizedProductGoal,
     normalizedBridgeRequest: {
-      client_id: REQUIRED_CLIENTS.includes(clientId) ? clientId : null,
+      client_id: GOVERNED_NATIVE_READ_CLIENTS.includes(clientId) ? clientId : null,
+      principal_capability: clientId === CHATGPT_WEB_READ_ONLY_CLIENT
+        ? 'governed_read_only_channel'
+        : canonicalGovernedNativeWriteClient(clientId)
+          ? 'governed_read_write_client'
+          : null,
+      write_eligible: canonicalGovernedNativeWriteClient(clientId) !== null,
       trusted_execution_context_supplied: trustedExecutionContext.supplied,
       trusted_execution_context_accepted: trustedExecutionContext.accepted,
       trusted_execution_context_scope_matched: trustedScopeMatches,

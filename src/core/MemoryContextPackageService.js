@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const { assembleChatGptWebContext } = require('./ChatGptWebContextAssembler');
 
 const { redactSensitiveFragments } = require('./SensitiveFragmentRedaction');
 const { compactText, uniqueTokens } = require('../recall/text');
@@ -671,11 +672,75 @@ class MemoryContextPackageService {
   constructor({
     searchMemory,
     overviewService,
-    auditMemoryReadonlyService
+    auditMemoryReadonlyService,
+    governedReadFacade = null
   }) {
     this.searchMemory = searchMemory;
     this.overviewService = overviewService;
     this.auditMemoryReadonlyService = auditMemoryReadonlyService;
+    this.governedReadFacade = governedReadFacade;
+  }
+
+  async prepareChatGptWeb(input = {}, requestContext = {}) {
+    if (!this.governedReadFacade) throw new Error('VCP_COMPOSITE_READ_NOT_READY');
+    const task = isPlainObject(input.task) ? input.task : {};
+    const options = isPlainObject(input.options) ? input.options : {};
+    const query = buildQuery(task);
+    const maxItems = clampInteger(options.max_items, DEFAULT_MAX_ITEMS, 1, 6);
+    const contextText = safeString(task.user_request || task.title || '', 2000);
+    const composite = await this.governedReadFacade.read({
+      recallInput: {
+        query,
+        target: 'both',
+        limit: maxItems,
+        include_content: false,
+        ...(contextText ? { context_text: contextText } : {})
+      },
+      overviewInput: { auditWindow: 50 },
+      auditInput: { audit_family: 'all', window: 20, include_raw: false },
+      requestContext: { ...requestContext, noTokenReadOnly: true, memoryContextPackageReadOnly: true }
+    });
+    const sourceTruth = composite.sourceTruthReceipt;
+    const provenance = sourceTruth?.provenance || {
+      memoryIntelligenceSource: 'none', governanceSource: 'codex_memory',
+      packagingSource: 'codex_memory', transportSource: 'secure_mcp_tunnel',
+      fallbackStatus: 'blocked', resultCanBeMistakenForVcpNative: false
+    };
+    const results = composite.status === 'success'
+      ? normalizeSearchResults(composite.recall).slice(0, maxItems) : [];
+    const buckets = { mustKnow: [], decisions: [], blockers: [], risks: [], forbiddenAssumptions: [] };
+    for (const [index, item] of results.entries()) {
+      const projected = projectContextItem(item, index);
+      const classification = classifyResult(item);
+      const candidate = {
+        statement: projected.statement,
+        statementType: classification === 'recent_decisions' ? 'decision_candidate'
+          : ['blockers', 'risks', 'forbidden_assumptions'].includes(classification)
+            ? 'risk_candidate' : 'fact_candidate',
+        relevance: projected.relevance,
+        freshness: projected.freshness,
+        reasonCodes: projected.reason_codes.map(code =>
+          String(code).toUpperCase().replace(/[^A-Z0-9_]/g, '_')),
+        sourceKinds: projected.source_kinds.map(kind =>
+          String(kind).toLowerCase().replace(/[^a-z0-9_-]/g, '_'))
+      };
+      const target = { recent_decisions: 'decisions', blockers: 'blockers', risks: 'risks',
+        forbidden_assumptions: 'forbiddenAssumptions' }[classification] || 'mustKnow';
+      buckets[target].push(candidate);
+    }
+    return assembleChatGptWebContext({
+      ...buckets,
+      status: composite.status === 'success' ? results.length > 0 ? 'success' : 'empty' : 'unavailable',
+      provenance,
+      sourceTruth,
+      auditReceipt: {
+        aggregateReceiptDigest: composite.aggregateReceiptDigest || null,
+        durableMemoryMutationCount: 0,
+        operationalAuditWriteCount: 0,
+        providerApiCalls: 0,
+        externalNetworkCalls: 0
+      }
+    });
   }
 
   async prepare(input = {}, requestContext = {}) {
