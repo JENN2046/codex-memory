@@ -166,6 +166,7 @@ const STALE_ACTIVE_ASSERTIONS = Object.freeze([
   }),
   Object.freeze({
     phrase: "current task branch",
+    allowWhSubjectQuestion: true,
     pattern: new RegExp(
       String.raw`\b(?:the\s+)?(?:${BRANCH_AUTHORITY_OBJECT_SOURCE})\s+(?:${BRANCH_AUTHORITY_PASSIVE_AUXILIARY_SOURCE})\s+(${BRANCH_AUTHORITY_PASSIVE_PREDICATE_SOURCE})\s+by\s+(?:the\s+)?current task branch\b`,
       "gi"
@@ -844,10 +845,10 @@ function firstUnquotedClauseTerminator(text, startIndex) {
   return null;
 }
 
-function isDirectBranchQuestion(prefix, text, suffixStart) {
+function isDirectBranchQuestion(prefix, text, suffixStart, allowWhSubjectQuestion = false) {
   if (firstUnquotedClauseTerminator(text, suffixStart) !== "?") return false;
   return /^\s*(?:(?:what|which|where|when|why|how)\s+)?(?:(?:do|does|did|is|are|was|were|has|have|had|will|would|can|could|may|might|must|need|shall|should|ought)|(?:don't|doesn't|didn't|isn't|aren't|wasn't|weren't|hasn't|haven't|hadn't|won't|wouldn't|can't|couldn't|mightn't|mustn't|needn't|shan't|shouldn't|oughtn't)|cannot)\s+(?:the\s+)?$/i.test(prefix) ||
-    /^\s*(?:what|which)\s+(?:the\s+)?$/i.test(prefix);
+    (allowWhSubjectQuestion && /^\s*(?:what|which)\s+(?:the\s+)?$/i.test(prefix));
 }
 
 function continuationSubjectIsBranchBound(prefix, previousSubjectIsBranchBound = null) {
@@ -932,7 +933,12 @@ function containsStaleAssertion(text, assertion) {
     const prefix = text.slice(clauseStart, match.index);
     const suffixStart = match.index + match[0].length;
     const suffix = text.slice(suffixStart);
-    if (isDirectBranchQuestion(prefix, text, suffixStart)) continue;
+    if (isDirectBranchQuestion(
+      prefix,
+      text,
+      suffixStart,
+      assertion.allowWhSubjectQuestion === true
+    )) continue;
     if (NEGATED_REPORTING_PREFIX_RE.test(prefix)) {
       continue;
     }

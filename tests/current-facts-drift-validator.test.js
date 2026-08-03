@@ -1228,6 +1228,8 @@ test("current facts validator rejects qualified branch-relative assertions", () 
       "The current task branch does not only record active state.",
       "The current task branch records the active state—why query Git?",
       "The current task branch records the active state, doesn't it?",
+      "What the current task branch records is the active state, isn't it?",
+      "What the current task branch provides is canonical status, correct?",
       ""
     ].join("\n"),
     "utf8"
