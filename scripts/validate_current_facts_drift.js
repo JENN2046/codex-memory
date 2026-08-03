@@ -853,25 +853,72 @@ function isInsideEffectiveMarkdownHtmlComment(text, index) {
   return false;
 }
 
-function markdownInlineBlockBoundary(line, lineStart, lineEnd, textLength) {
+function markdownHtmlBlockStart(line) {
   const value = String(line || "");
-  if (/^\s*$/.test(value)) {
-    return { nextStart: Math.min(lineEnd + 1, textLength) };
-  }
-  const blockquote = value.match(/^ {0,3}(?:>\s?)+/);
-  if (blockquote) return { nextStart: lineStart + blockquote[0].length };
-  const listItem = value.match(/^ {0,3}([-+*]|\d{1,9}[.)])([ \t]+)(?=\S)/);
-  if (listItem && (/^[-+*]$/.test(listItem[1]) || Number.parseInt(listItem[1], 10) === 1)) {
-    return { nextStart: lineStart + listItem[0].length };
-  }
-  const interruptsParagraph = /^ {0,3}(?:#{1,6}(?:\s|$)|`{3,}|~{3,}|<!--)/.test(value) ||
-    /^ {0,3}(?:(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,}|=+|-+)\s*$/.test(value);
-  return interruptsParagraph
-    ? { nextStart: Math.min(lineEnd + 1, textLength) }
+  const rawTag = value.match(/^ {0,3}<(script|pre|style|textarea)(?:\s|>|$)/i);
+  if (rawTag) return new RegExp(`</${rawTag[1]}\\s*>`, "i");
+  if (/^ {0,3}<!--/.test(value)) return /-->/;
+  if (/^ {0,3}<\?/.test(value)) return /\?>/;
+  if (/^ {0,3}<![A-Z]/.test(value)) return />/;
+  if (/^ {0,3}<!\[CDATA\[/.test(value)) return /\]\]>/;
+  const blockTag = String.raw`address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|search|section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul`;
+  return new RegExp(`^ {0,3}</?(?:${blockTag})(?:\\s|/?>|$)`, "i").test(value)
+    ? /^\s*$/
     : null;
 }
 
+function markdownInlineBlockBoundary(line, lineStart, lineEnd, textLength, state) {
+  const value = String(line || "");
+  if (state.htmlBlockEnd) {
+    const closes = state.htmlBlockEnd.test(value);
+    if (closes) state.htmlBlockEnd = null;
+    return { nextStart: Math.min(lineEnd + 1, textLength) };
+  }
+  if (/^\s*$/.test(value)) {
+    state.blockquoteDepth = null;
+    state.listActive = false;
+    return { nextStart: Math.min(lineEnd + 1, textLength) };
+  }
+  const blockquote = value.match(/^ {0,3}((?:>\s?)+)/);
+  if (blockquote) {
+    const depth = [...blockquote[1]].filter(character => character === ">").length;
+    if (state.blockquoteDepth === depth) return null;
+    state.blockquoteDepth = depth;
+    state.listActive = false;
+    return { nextStart: lineStart + blockquote[0].length };
+  }
+  const listItem = value.match(/^ {0,3}([-+*]|\d{1,9}[.)])([ \t]+)(?=\S)/);
+  if (listItem && (state.listActive ||
+      /^[-+*]$/.test(listItem[1]) ||
+      Number.parseInt(listItem[1], 10) === 1)) {
+    state.listActive = true;
+    return { nextStart: lineStart + listItem[0].length };
+  }
+  const emptyListItem = value.match(/^ {0,3}([-+*]|\d{1,9}[.)])[ \t]*$/);
+  if (emptyListItem && state.listActive) {
+    return { nextStart: Math.min(lineEnd + 1, textLength) };
+  }
+  const htmlBlockEnd = markdownHtmlBlockStart(value);
+  if (htmlBlockEnd) {
+    state.blockquoteDepth = null;
+    state.listActive = false;
+    state.htmlBlockEnd = htmlBlockEnd.test(value) ? null : htmlBlockEnd;
+    return { nextStart: Math.min(lineEnd + 1, textLength) };
+  }
+  const interruptsParagraph = /^ {0,3}(?:#{1,6}(?:\s|$)|`{3,}|~{3,}|<!--)/.test(value) ||
+    /^ {0,3}(?:(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,}|=+|-+)\s*$/.test(value);
+  if (!interruptsParagraph) return null;
+  state.blockquoteDepth = null;
+  state.listActive = false;
+  return { nextStart: Math.min(lineEnd + 1, textLength) };
+}
+
 function markdownInlineBlockBounds(text, index) {
+  const state = {
+    blockquoteDepth: null,
+    listActive: false,
+    htmlBlockEnd: null
+  };
   let start = 0;
   let lineStart = 0;
   while (lineStart < index) {
@@ -882,7 +929,8 @@ function markdownInlineBlockBounds(text, index) {
       text.slice(lineStart, lineEnd),
       lineStart,
       lineEnd,
-      text.length
+      text.length,
+      state
     );
     if (boundary) start = boundary.nextStart;
     lineStart = lineEnd + 1;
@@ -892,6 +940,7 @@ function markdownInlineBlockBounds(text, index) {
     ? text.length
     : currentLineEndCandidate + 1;
   let end = text.length;
+  const forwardState = { ...state };
   while (followingLineStart < text.length) {
     const lineEndCandidate = text.indexOf("\n", followingLineStart);
     const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
@@ -899,7 +948,8 @@ function markdownInlineBlockBounds(text, index) {
       text.slice(followingLineStart, lineEnd),
       followingLineStart,
       lineEnd,
-      text.length
+      text.length,
+      forwardState
     )) {
       end = followingLineStart;
       break;
