@@ -853,11 +853,11 @@ function isInsideEffectiveMarkdownHtmlComment(text, index) {
   return false;
 }
 
-function markdownHtmlBlockStart(line) {
+function markdownHtmlBlockStart(line, { includeComments = true } = {}) {
   const value = String(line || "");
   const rawTag = value.match(/^ {0,3}<(script|pre|style|textarea)(?:\s|>|$)/i);
   if (rawTag) return new RegExp(`</${rawTag[1]}\\s*>`, "i");
-  if (/^ {0,3}<!--/.test(value)) return /-->/;
+  if (includeComments && /^ {0,3}<!--/.test(value)) return /-->/;
   if (/^ {0,3}<\?/.test(value)) return /\?>/;
   if (/^ {0,3}<![A-Z]/.test(value)) return />/;
   if (/^ {0,3}<!\[CDATA\[/.test(value)) return /\]\]>/;
@@ -873,65 +873,83 @@ function markdownInlineBlockBoundary(line, lineStart, lineEnd, textLength, state
   let content = value;
   let contentStart = lineStart;
   let quoteChanged = false;
+  let quoteDepth = null;
   if (blockquote) {
-    const depth = [...blockquote[1]].filter(character => character === ">").length;
-    quoteChanged = state.blockquoteDepth !== depth;
-    state.blockquoteDepth = depth;
-    if (quoteChanged) state.listKind = null;
+    quoteDepth = [...blockquote[1]].filter(character => character === ">").length;
+    quoteChanged = state.blockquoteDepth !== quoteDepth;
+    state.blockquoteDepth = quoteDepth;
+    if (quoteChanged) state.listStack = [];
     content = value.slice(blockquote[0].length);
     contentStart += blockquote[0].length;
   }
-  if (state.includeHtmlBlocks && state.htmlBlockEnd) {
+  if (state.htmlBlockEnd && state.htmlBlockQuoteDepth !== quoteDepth) {
+    state.htmlBlockEnd = null;
+    state.htmlBlockQuoteDepth = null;
+  }
+  if (state.htmlBlockEnd) {
     const closes = state.htmlBlockEnd.test(content);
-    if (closes) state.htmlBlockEnd = null;
+    if (closes) {
+      state.htmlBlockEnd = null;
+      state.htmlBlockQuoteDepth = null;
+    }
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
   if (/^\s*$/.test(content)) {
     if (!blockquote) state.blockquoteDepth = null;
-    state.listKind = null;
+    state.listStack = [];
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
-  const listItem = content.match(/^ {0,3}([-+*]|\d{1,9}[.)])([ \t]+)(?=\S)/);
+  const listItem = content.match(/^( {0,3})([-+*]|\d{1,9}[.)])([ \t]+)(?=\S)/);
   if (listItem) {
-    const kind = /^[-+*]$/.test(listItem[1]) ? "bullet" : "ordered";
+    const indent = listItem[1].length;
+    const kind = /^[-+*]$/.test(listItem[2]) ? "bullet" : "ordered";
+    const existing = [...state.listStack].reverse().find(item => item.indent === indent);
     const interrupts = kind === "bullet" ||
-      Number.parseInt(listItem[1], 10) === 1 ||
-      state.listKind === kind;
+      Number.parseInt(listItem[2], 10) === 1 ||
+      (existing && existing.kind === kind);
     if (interrupts) {
-      state.listKind = kind;
+      state.listStack = state.listStack.filter(item => item.indent < indent);
+      state.listStack.push({ indent, kind });
       return { nextStart: contentStart + listItem[0].length };
     }
   }
-  const emptyListItem = content.match(/^ {0,3}([-+*]|\d{1,9}[.)])[ \t]*$/);
+  const emptyListItem = content.match(/^( {0,3})([-+*]|\d{1,9}[.)])[ \t]*$/);
   if (emptyListItem) {
-    const kind = /^[-+*]$/.test(emptyListItem[1]) ? "bullet" : "ordered";
-    if (state.listKind === kind) {
+    const indent = emptyListItem[1].length;
+    const kind = /^[-+*]$/.test(emptyListItem[2]) ? "bullet" : "ordered";
+    const existing = [...state.listStack].reverse().find(item => item.indent === indent);
+    if (existing && existing.kind === kind) {
+      state.listStack = state.listStack.filter(item => item.indent <= indent);
       return { nextStart: Math.min(lineEnd + 1, textLength) };
     }
   }
-  const htmlBlockEnd = state.includeHtmlBlocks ? markdownHtmlBlockStart(content) : null;
+  const htmlBlockEnd = markdownHtmlBlockStart(content, {
+    includeComments: state.includeHtmlComments
+  });
   if (htmlBlockEnd) {
     if (!blockquote) state.blockquoteDepth = null;
-    state.listKind = null;
+    state.listStack = [];
     state.htmlBlockEnd = htmlBlockEnd.test(content) ? null : htmlBlockEnd;
+    state.htmlBlockQuoteDepth = state.htmlBlockEnd ? quoteDepth : null;
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
   const interruptsParagraph = /^ {0,3}(?:#{1,6}(?:\s|$)|`{3,}|~{3,})/.test(content) ||
     /^ {0,3}(?:(?:\*\s*){3,}|(?:-\s*){3,}|(?:_\s*){3,}|=+|-+)\s*$/.test(content);
   if (interruptsParagraph) {
     if (!blockquote) state.blockquoteDepth = null;
-    state.listKind = null;
+    state.listStack = [];
     return { nextStart: Math.min(lineEnd + 1, textLength) };
   }
   return quoteChanged ? { nextStart: contentStart } : null;
 }
 
-function markdownInlineBlockBounds(text, index, { includeHtmlBlocks = true } = {}) {
+function markdownInlineBlockBounds(text, index, { includeHtmlComments = true } = {}) {
   const state = {
     blockquoteDepth: null,
-    listKind: null,
+    listStack: [],
     htmlBlockEnd: null,
-    includeHtmlBlocks
+    htmlBlockQuoteDepth: null,
+    includeHtmlComments
   };
   let start = 0;
   let lineStart = 0;
@@ -998,7 +1016,7 @@ function isMarkdownCodeSpanContainer(text, index, { includeHtmlComment = true } 
 
 function isInsideMarkdownCodeSpan(text, index, { includeHtmlComment = true } = {}) {
   const bounds = markdownInlineBlockBounds(text, index, {
-    includeHtmlBlocks: includeHtmlComment
+    includeHtmlComments: includeHtmlComment
   });
   for (let cursor = bounds.start; cursor < index;) {
     const runStart = text.indexOf("`", cursor);

@@ -1465,7 +1465,9 @@ test("current facts validator permits stale assertion examples in Markdown HTML 
   for (const commentedExample of [
     "<!-- The current task branch records the active state. -->",
     "<!--\nThe active state is recorded by the current task branch.\n-->",
-    "Unmatched ` token.\n<!-- The current task branch records the active state. -->"
+    "Unmatched ` token.\n<!-- The current task branch records the active state. -->",
+    "Unmatched `\n<script></script>\n<!-- The current task branch records the active state. -->\nLater `",
+    "Unmatched `\n<?done?>\n<!-- The current task branch records the active state. -->\nLater `"
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
@@ -1492,7 +1494,10 @@ test("current facts validator permits stale assertion examples in Markdown code 
     "`example\n<x-widget>inline</x-widget>\nThe current task branch records the active state.\n`",
     "`example\n2. item\nThe current task branch records the active state.\n`",
     "- `example\n2. text\nThe current task branch records the active state.\n`",
-    "- `example\n3) text\nThe current task branch records the active state.\n`"
+    "- `example\n3) text\nThe current task branch records the active state.\n`",
+    "> <script>\n`example\nThe current task branch records the active state.\n`",
+    ">> <script>\n``example\nThe current task branch records the active state.\n``",
+    "> <div>\n`example\nThe current task branch records the active state.\n`"
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
@@ -1571,6 +1576,8 @@ test("current facts validator does not treat paragraph or list indentation as co
     "* item `\n*\nThe current task branch records the active state. `",
     "1. item `\n2)\nThe current task branch records the active state. `",
     "1. item `\n2.\nThe current task branch records the active state. `",
+    "1. outer\n   - nested `\n2. next\nThe current task branch records the active state. `",
+    "1. outer\n   - nested `\n2.\nThe current task branch records the active state. `",
     "-\n    The current task branch records the active state.",
     "1.\n      The active state is recorded by the current task branch.",
     "- Context:\n\n    guidance\n      The current task branch records the active state.",
