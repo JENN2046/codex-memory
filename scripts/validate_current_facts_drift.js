@@ -834,6 +834,49 @@ function isInsideMarkdownBlockquote(text, index) {
   return /^ {0,3}(?:>\s?)+/.test(text.slice(lineStart, index));
 }
 
+function markdownIndentWidth(line) {
+  let width = 0;
+  for (const character of String(line || "")) {
+    if (character === " ") {
+      width += 1;
+    } else if (character === "\t") {
+      width += 4 - (width % 4);
+    } else {
+      break;
+    }
+  }
+  return width;
+}
+
+function isInsideMarkdownIndentedCode(text, index) {
+  const lineStart = text.lastIndexOf("\n", index - 1) + 1;
+  const lineEndCandidate = text.indexOf("\n", index);
+  const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
+  const currentLine = text.slice(lineStart, lineEnd);
+  const currentIndent = markdownIndentWidth(currentLine);
+  if (currentIndent < 4) return false;
+
+  const precedingText = lineStart === 0 ? "" : text.slice(0, lineStart - 1);
+  const precedingLines = precedingText ? precedingText.split("\n") : [];
+  let sawBlankBoundary = lineStart === 0;
+  let boundaryLine = null;
+  for (let lineIndex = precedingLines.length - 1; lineIndex >= 0; lineIndex -= 1) {
+    const line = precedingLines[lineIndex];
+    if (/^\s*$/.test(line)) {
+      sawBlankBoundary = true;
+      continue;
+    }
+    if (markdownIndentWidth(line) >= 4) continue;
+    boundaryLine = line;
+    break;
+  }
+  if (!sawBlankBoundary) return false;
+  if (boundaryLine && /^ {0,3}(?:[-+*]|\d+[.)])\s+/.test(boundaryLine) && currentIndent < 8) {
+    return false;
+  }
+  return true;
+}
+
 function firstUnquotedClauseTerminator(text, startIndex) {
   const lineEndCandidate = text.indexOf("\n", startIndex);
   const lineEnd = lineEndCandidate === -1 ? text.length : lineEndCandidate;
@@ -920,6 +963,7 @@ function containsStaleAssertion(text, assertion) {
   for (const match of text.matchAll(assertion.pattern)) {
     if (isInsideMarkdownFence(text, match.index) ||
         isInsideMarkdownBlockquote(text, match.index) ||
+        isInsideMarkdownIndentedCode(text, match.index) ||
         isInsideQuotedSegment(text, match.index)) {
       continue;
     }
