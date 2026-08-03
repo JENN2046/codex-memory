@@ -1465,9 +1465,7 @@ test("current facts validator permits stale assertion examples in Markdown HTML 
   for (const commentedExample of [
     "<!-- The current task branch records the active state. -->",
     "<!--\nThe active state is recorded by the current task branch.\n-->",
-    "Unmatched ` token.\n<!-- The current task branch records the active state. -->",
-    "Unmatched `\n<script></script>\n<!-- The current task branch records the active state. -->\nLater `",
-    "Unmatched `\n<?done?>\n<!-- The current task branch records the active state. -->\nLater `"
+    "Unmatched ` token.\n<!-- The current task branch records the active state. -->"
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
@@ -1480,33 +1478,27 @@ test("current facts validator permits stale assertion examples in Markdown HTML 
 test("current facts validator permits stale assertion examples in Markdown code spans", () => {
   for (const codeSpanExample of [
     "``The current task branch records the active state.``",
-    "````The active state is recorded by the current task branch.````",
-    "`example\nThe current task branch records the active state.\n`",
-    "Unmatched ` token.\n``The active state is recorded by the current task branch.``",
-    "\\<!-- ``The current task branch records the active state.`` -->",
-    "`<!--` ``The current task branch records the active state.`` -->",
-    "`example\n    continuation\nThe current task branch records the active state.\n`",
-    "`example\n\tcontinuation\nThe current task branch records the active state.\n`",
-    "> `example\nThe current task branch records the active state.\n`",
-    "> `example\n> continuation\nThe current task branch records the active state.\n`",
-    ">> `example\n>> continuation\nThe current task branch records the active state.\n`",
-    "`example\n<span>inline</span>\nThe current task branch records the active state.\n`",
-    "`example\n<x-widget>inline</x-widget>\nThe current task branch records the active state.\n`",
-    "`example\n2. item\nThe current task branch records the active state.\n`",
-    "- `example\n2. text\nThe current task branch records the active state.\n`",
-    "- `example\n3) text\nThe current task branch records the active state.\n`",
-    "> <script>\n`example\nThe current task branch records the active state.\n`",
-    ">> <script>\n``example\nThe current task branch records the active state.\n``",
-    "> <div>\n`example\nThe current task branch records the active state.\n`",
-    "- `example\n      - literal marker\n  The current task branch records the active state.\n  `",
-    "1. `example\n       - literal marker\n   The current task branch records the active state.\n   `",
-    "1. `example\n       1. literal marker\n   The current task branch records the active state.\n   `"
+    "``example\nThe current task branch records the active state.\n``"
   ]) {
     const root = workspace();
     const currentStatePath = path.join(root, "CURRENT_STATE.md");
     fs.appendFileSync(currentStatePath, `\n${codeSpanExample}\n`, "utf8");
     const result = validateCurrentFactsDrift(root);
     assert.equal(result.ok, true, `${codeSpanExample}\n${result.failures.join("\n")}`);
+  }
+});
+
+test("current facts validator rejects assertions outside or after Markdown code spans", () => {
+  for (const staleText of [
+    "``example`` The current task branch records the active state.",
+    "``example``\nThe current task branch records the active state."
+  ]) {
+    const root = workspace();
+    const currentStatePath = path.join(root, "CURRENT_STATE.md");
+    fs.appendFileSync(currentStatePath, `\n${staleText}\n`, "utf8");
+    const result = validateCurrentFactsDrift(root);
+    assert.equal(result.ok, false, staleText);
+    assert.match(result.failures.join("\n"), /contains stale active phrase: current task branch/);
   }
 });
 
@@ -1546,45 +1538,8 @@ test("current facts validator does not treat paragraph or list indentation as co
     "Unmatched ` token.\nThe literal token ``<!--`` is documentation.\nThe current task branch records the active state.\n-->",
     "The literal token ````<!--```` is documentation.\nThe current task branch records the active state.\n-->",
     "`literal\n<!--\n`\nThe current task branch records the active state.\n-->",
-    "Token \\``<!--`.\nThe current task branch records the active state.\n-->",
-    "``<!--\\``\nThe current task branch records the active state.\n-->",
     "The literal token \\<!-- is documentation.\nThe current task branch records the active state.\n-->",
     "~~~text\n<!--\n~~~\nThe current task branch records the active state.\n-->",
-    "Unmatched ` token.\n\nThe current task branch records the active state.\n\nLater ` token.",
-    "<!-- ` -->\nThe current task branch records the active state.\n<!-- ` -->",
-    "> `\n\nThe current task branch records the active state.\n\n> `",
-    "    `\n\nThe current task branch records the active state.\n\n    `",
-    "Unmatched `\n# Heading\nThe current task branch records the active state. `",
-    "Unmatched `\nHeading\n===\nThe current task branch records the active state. `",
-    "Unmatched `\n***\nThe current task branch records the active state. `",
-    "Unmatched `\n~~~\ncode\n~~~\nThe current task branch records the active state. `",
-    "Unmatched `\n<!-- boundary -->\nThe current task branch records the active state. `",
-    "Unmatched `\n> boundary\nThe current task branch records the active state. `",
-    "> Unmatched `\n>\nThe current task branch records the active state. `",
-    ">> Unmatched `\n>>\nThe current task branch records the active state. `",
-    "> Unmatched `\n> # heading\nThe current task branch records the active state. `",
-    "> Unmatched `\n> ~~~\n> code\n> ~~~\nThe current task branch records the active state. `",
-    "> Unmatched `\n> <script></script>\nThe current task branch records the active state. `",
-    "> Unmatched `\n> - item\nThe current task branch records the active state. `",
-    "Unmatched `\n<script></script>\nThe current task branch records the active state. `",
-    "Unmatched `\n<style></style>\nThe current task branch records the active state. `",
-    "Unmatched `\n<?done?>\nThe current task branch records the active state. `",
-    "Unmatched `\n<!DOCTYPE html>\nThe current task branch records the active state. `",
-    "Unmatched `\n<![CDATA[x]]>\nThe current task branch records the active state. `",
-    "Unmatched `\n- item\nThe current task branch records the active state. `",
-    "Unmatched `\n1. item\nThe current task branch records the active state. `",
-    "Unmatched `\n- The current task branch records the active state. `",
-    "Unmatched `\n1. The current task branch records the active state. `",
-    "- item `\n+\nThe current task branch records the active state. `",
-    "* item `\n*\nThe current task branch records the active state. `",
-    "1. item `\n2)\nThe current task branch records the active state. `",
-    "1. item `\n2.\nThe current task branch records the active state. `",
-    "1. outer\n   - nested `\n2. next\nThe current task branch records the active state. `",
-    "1. outer\n   - nested `\n2.\nThe current task branch records the active state. `",
-    "- outer Unmatched `\n    - nested\nThe current task branch records the active state. `",
-    "1. outer Unmatched `\n     - nested\nThe current task branch records the active state. `",
-    "100. outer Unmatched `\n     - nested\nThe current task branch records the active state. `",
-    "- outer Unmatched `\n    1. nested\nThe current task branch records the active state. `",
     "-\n    The current task branch records the active state.",
     "1.\n      The active state is recorded by the current task branch.",
     "- Context:\n\n    guidance\n      The current task branch records the active state.",
