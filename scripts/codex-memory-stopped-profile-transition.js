@@ -24,6 +24,19 @@ const P1_CLASSIFICATIONS = new Set([
   'NOT_COMMITTED',
   'COMMIT_RESULT_UNKNOWN'
 ]);
+const ACQUISITION_RELEASE_FAILURE_CODES = new Set([
+  'stack_lifecycle_lock_release_failed',
+  'stack_lifecycle_lock_identity_changed'
+]);
+const LIFECYCLE_ACQUISITION_FAILURE_CODES = new Set([
+  'stack_lifecycle_busy',
+  'stack_lifecycle_lock_failed',
+  'stack_lifecycle_lock_identity_changed',
+  'stack_lifecycle_lock_invalid',
+  'stack_lifecycle_lock_path_invalid',
+  'stack_lifecycle_lock_recovery_failed',
+  'stack_lifecycle_lock_release_failed'
+]);
 
 function codedError(code) {
   const error = new Error(code);
@@ -147,7 +160,7 @@ function normalizeInspectionFailure(error, fallback) {
 }
 
 function normalizeExecutionFailure(error) {
-  if (error?.code?.startsWith?.('stack_lifecycle_')) {
+  if (LIFECYCLE_ACQUISITION_FAILURE_CODES.has(error?.code)) {
     return 'stopped_profile_transition_lock_failed';
   }
   if (error?.code?.startsWith?.('stack_profile_') ||
@@ -167,6 +180,7 @@ function precondition({
   p1Called = false,
   profileTransactionClassification = null,
   profileTransactionErrorCode = null,
+  lifecycleLockErrorCode = null,
   readBackProfileFingerprint = null,
   profileMutated = false,
   durabilityConfirmed = false,
@@ -182,6 +196,7 @@ function precondition({
     p1Called,
     profileTransactionClassification,
     profileTransactionErrorCode,
+    lifecycleLockErrorCode,
     currentProfileFingerprint,
     nextProfileFingerprint,
     readBackProfileFingerprint,
@@ -247,12 +262,14 @@ function finalize(outcome, candidateBinding, lifecycleLockReleased) {
   });
 }
 
-function projectLockReleaseFailure(outcome) {
+function projectLockReleaseFailure(outcome, lifecycleLockErrorCode = null) {
   return {
     ...outcome,
     classification: 'LOCK_RELEASE_FAILED',
     underlyingClassification: outcome.classification,
-    stableReason: 'stopped_profile_transition_lock_release_failed'
+    stableReason: 'stopped_profile_transition_lock_release_failed',
+    lifecycleLockErrorCode:
+      lifecycleLockErrorCode || outcome.lifecycleLockErrorCode || null
   };
 }
 
@@ -555,7 +572,7 @@ function coordinateStoppedOwnerProfileTransition({
     if (!outcome) {
       const acquisitionReleaseFailed =
         lifecycle === null &&
-        error?.code === 'stack_lifecycle_lock_release_failed';
+        ACQUISITION_RELEASE_FAILURE_CODES.has(error?.code);
       if (acquisitionReleaseFailed) lifecycleLockState = 'RELEASE_FAILED';
       const rejected = precondition({
         reason: acquisitionReleaseFailed
@@ -565,10 +582,13 @@ function coordinateStoppedOwnerProfileTransition({
         currentProfileFingerprint,
         nextProfileFingerprint,
         initialStoppedVerified,
-        finalStoppedVerified
+        finalStoppedVerified,
+        lifecycleLockErrorCode: acquisitionReleaseFailed
+          ? error.code
+          : null
       });
       outcome = acquisitionReleaseFailed
-        ? projectLockReleaseFailure(rejected)
+        ? projectLockReleaseFailure(rejected, error.code)
         : rejected;
     }
   } finally {
@@ -576,7 +596,7 @@ function coordinateStoppedOwnerProfileTransition({
       try {
         lifecycle.release();
         lifecycleLockState = 'RELEASED';
-      } catch {
+      } catch (error) {
         lifecycleLockState = 'RELEASE_FAILED';
         const underlying = outcome || precondition({
           reason: 'stopped_profile_transition_profile_transaction_failed',
@@ -586,7 +606,7 @@ function coordinateStoppedOwnerProfileTransition({
           initialStoppedVerified,
           finalStoppedVerified
         });
-        outcome = projectLockReleaseFailure(underlying);
+        outcome = projectLockReleaseFailure(underlying, error?.code);
       }
     }
   }

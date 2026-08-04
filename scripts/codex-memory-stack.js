@@ -1838,6 +1838,140 @@ function controllerCommandMatchesComponent(name, command, options = {}) {
   return componentCommandKind(name, command, options) === 'controller';
 }
 
+function inspectOrphanManagedProcesses(profile, {
+  environment = process.env,
+  fsModule = fs,
+  processIdentities = {},
+  processEntries,
+  enumerateProcesses,
+  controllerPid = process.pid,
+  ownerUid,
+  isRunning = pid => isPidRunning(pid),
+  readIdentity = pid => readProcessIdentity(pid, fsModule),
+  readStartTicks = (pid, options) => readLinuxProcessStartTicks(pid, options)
+} = {}) {
+  const componentNames = Object.keys(COMPONENTS);
+  let expectedOwnerUid = ownerUid;
+  try {
+    if (expectedOwnerUid === undefined) expectedOwnerUid = currentUid();
+  } catch {
+    throw codedError('stack_process_enumeration_unavailable');
+  }
+  if (!Number.isSafeInteger(expectedOwnerUid) || expectedOwnerUid < 0) {
+    throw codedError('stack_process_enumeration_unavailable');
+  }
+
+  let entries;
+  try {
+    entries = typeof enumerateProcesses === 'function'
+      ? enumerateProcesses()
+      : processEntries || fsModule.readdirSync('/proc');
+  } catch {
+    throw codedError('stack_process_enumeration_unavailable');
+  }
+  if (!Array.isArray(entries)) {
+    throw codedError('stack_process_enumeration_unavailable');
+  }
+
+  const knownPids = Object.fromEntries(
+    componentNames.map(name => [
+      name,
+      parsePid(processIdentities?.[name]?.pid)
+    ])
+  );
+  const observations = Object.fromEntries(
+    componentNames.map(name => [
+      name,
+      {
+        orphanDetected: false,
+        matchingPidCount: 0,
+        inspectionComplete: true,
+        reason: null
+      }
+    ])
+  );
+
+  const statProcess = pid => {
+    const file = `/proc/${pid}`;
+    if (typeof fsModule.statSync === 'function') {
+      return fsModule.statSync(file);
+    }
+    return fsModule.lstatSync(file);
+  };
+  const processIsRunning = pid => {
+    try {
+      return isRunning(pid) === true;
+    } catch {
+      throw codedError('stack_process_enumeration_unavailable');
+    }
+  };
+
+  for (const entry of entries) {
+    const pid = parsePid(entry);
+    if (pid === null || pid === controllerPid) continue;
+    if (!processIsRunning(pid)) continue;
+
+    let stat;
+    try {
+      stat = statProcess(pid);
+    } catch {
+      if (!processIsRunning(pid)) continue;
+      throw codedError('stack_process_enumeration_unavailable');
+    }
+    if (!stat || stat.uid !== expectedOwnerUid) continue;
+
+    let identity;
+    try {
+      identity = readIdentity(pid);
+    } catch {
+      identity = null;
+    }
+    if (!identity) {
+      if (!processIsRunning(pid)) continue;
+      throw codedError('stack_process_identity_unavailable');
+    }
+
+    const matches = componentNames.filter(name =>
+      commandMatchesComponent(
+        name,
+        identity.command,
+        {
+          executable: identity.executable,
+          cwd: identity.cwd,
+          profile,
+          environment,
+          fsModule
+        }
+      )
+    );
+    if (matches.length === 0) continue;
+
+    let startTicks;
+    try {
+      startTicks = readStartTicks(pid, { fsModule });
+    } catch {
+      throw codedError('stack_process_start_identity_unavailable');
+    }
+    if (!/^[1-9][0-9]{0,39}$/u.test(String(startTicks || ''))) {
+      throw codedError('stack_process_start_identity_unavailable');
+    }
+
+    for (const name of matches) {
+      observations[name].matchingPidCount += 1;
+      if (knownPids[name] !== pid) {
+        observations[name].orphanDetected = true;
+      }
+    }
+  }
+
+  return Object.freeze(Object.fromEntries(
+    componentNames.map(name => [
+      name,
+      Object.freeze(observations[name])
+    ])
+  ));
+}
+
 function inspectProcessIdentity(name, {
   environment = process.env,
   fsModule = fs
@@ -4551,14 +4685,19 @@ function assertSourceManifestRebindStopped(
 
 function inspectStoppedStateForOwnerProfileTransition(
   profile,
-  { environment = process.env } = {}
+  {
+    environment = process.env,
+    fsModule = fs,
+    inspectProcess = inspectProcessIdentity,
+    inspectOrphans = inspectOrphanManagedProcesses
+  } = {}
 ) {
   let processIdentities;
   try {
     processIdentities = Object.fromEntries(
       Object.keys(COMPONENTS).map(name => [
         name,
-        inspectProcessIdentity(name, { environment })
+        inspectProcess(name, { environment, fsModule })
       ])
     );
   } catch {
@@ -4567,8 +4706,29 @@ function inspectStoppedStateForOwnerProfileTransition(
 
   if (Object.keys(COMPONENTS).some(name => {
     const pidFile = componentPaths(name, environment).pid;
-    return fs.existsSync(pidFile) && processIdentities[name]?.pid === null;
+    return fsModule.existsSync(pidFile) &&
+      processIdentities[name]?.pid === null;
   })) {
+    throw codedError('stopped_profile_transition_runtime_not_stopped');
+  }
+
+  let orphanInspection;
+  try {
+    orphanInspection = inspectOrphans(profile, {
+      environment,
+      fsModule,
+      processIdentities
+    });
+  } catch {
+    throw codedError('stopped_profile_transition_runtime_not_stopped');
+  }
+  if (!orphanInspection ||
+      Object.keys(COMPONENTS).some(name => {
+        const observation = orphanInspection[name];
+        return observation?.inspectionComplete !== true ||
+          observation.orphanDetected === true ||
+          observation.matchingPidCount > 1;
+      })) {
     throw codedError('stopped_profile_transition_runtime_not_stopped');
   }
 
@@ -5524,6 +5684,7 @@ module.exports = {
   extractEnvFileArgument,
   finalizeManagedSpawn,
   inspectEdgeContainer,
+  inspectOrphanManagedProcesses,
   inspectProviderContainer,
   inspectSourceCompatibility,
   inspectVcpRuntimeIdentity,

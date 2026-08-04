@@ -7,6 +7,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
+  inspectOrphanManagedProcesses,
   PROFILE_SCHEMA_VERSION,
   validateProfile
 } = require('../scripts/codex-memory-stack');
@@ -280,6 +281,196 @@ test('final stopped failure rejects immediately before P1', () => {
   assert.equal(h.sourceCalls.length, 2);
   assert.equal(h.p1Calls.length, 0);
   assert.equal(h.calls.at(-1), 'release');
+});
+
+test('orphan runtime discovered by the final stopped gate blocks P1', () => {
+  const h = harness({
+    stopResults: [
+      { verified: true },
+      {
+        verified: false,
+        reason: 'stopped_profile_transition_runtime_not_stopped'
+      }
+    ]
+  });
+  const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
+
+  assert.equal(result.classification, 'PRECONDITION_REJECTED');
+  assert.equal(
+    result.stableReason,
+    'stopped_profile_transition_runtime_not_stopped'
+  );
+  assert.equal(result.initialStoppedVerified, true);
+  assert.equal(result.finalStoppedVerified, false);
+  assert.equal(result.p1Called, false);
+  assert.equal(h.stoppedCalls.length, 2);
+  assert.equal(h.p1Calls.length, 0);
+});
+
+test('orphan process discovery uses exact same-owner component identity', () => {
+  const currentUid = process.getuid();
+  const processIdentities = Object.fromEntries(
+    ['shim', 'http', 'governance', 'relay'].map(name => [
+      name,
+      { pid: null }
+    ])
+  );
+  const exactIdentity = name => ({
+    command: [
+      process.execPath,
+      '/synthetic/runtime-repository/scripts/codex-memory-stack.js',
+      {
+        shim: '_run-shim',
+        http: '_run-http',
+        governance: '_run-governance',
+        relay: '_run-relay'
+      }[name],
+      `--stack-environment=/synthetic/owner-root/${
+        name === 'relay' ? 'relay' : 'governance'
+      }/runtime.env`
+    ],
+    executable: process.execPath,
+    cwd: '/synthetic/runtime-repository'
+  });
+  const fsModule = {
+    statSync(file) {
+      assert.match(file, /^\/proc\/[0-9]+$/u);
+      return { uid: currentUid };
+    },
+    realpathSync(file) {
+      assert.equal(file, process.execPath);
+      return process.execPath;
+    }
+  };
+  const inspect = (processEntries, readIdentity, overrides = {}) =>
+    inspectOrphanManagedProcesses(profile(), {
+      fsModule,
+      processIdentities,
+      processEntries,
+      controllerPid: 999_999,
+      isRunning: () => true,
+      readIdentity,
+      readStartTicks: () => '42',
+      ownerUid: currentUid,
+      ...overrides
+    });
+
+  const orphan = inspect(['4321'], () => exactIdentity('http'));
+  assert.equal(orphan.http.orphanDetected, true);
+  assert.equal(orphan.http.matchingPidCount, 1);
+
+  const unrelated = inspect(['4321'], () => ({
+    command: [process.execPath, '/synthetic/unrelated-node.js'],
+    executable: process.execPath,
+    cwd: '/synthetic/runtime-repository'
+  }));
+  assert.equal(unrelated.http.orphanDetected, false);
+  assert.equal(unrelated.http.matchingPidCount, 0);
+
+  const otherComponent = inspect(['4321'], () => exactIdentity('relay'));
+  assert.equal(otherComponent.relay.orphanDetected, true);
+  assert.equal(otherComponent.http.orphanDetected, false);
+
+  const controllerExcluded = inspect(
+    [process.pid],
+    () => exactIdentity('http'),
+    { controllerPid: process.pid }
+  );
+  assert.equal(controllerExcluded.http.matchingPidCount, 0);
+
+  const multiple = inspect(
+    ['4321', '4322'],
+    () => exactIdentity('http')
+  );
+  assert.equal(multiple.http.matchingPidCount, 2);
+  assert.equal(multiple.http.orphanDetected, true);
+});
+
+test('orphan process discovery fails closed when inspection is unavailable', () => {
+  const currentUid = process.getuid();
+  const processIdentities = Object.fromEntries(
+    ['shim', 'http', 'governance', 'relay'].map(name => [
+      name,
+      { pid: null }
+    ])
+  );
+  const identity = {
+    command: [
+      process.execPath,
+      '/synthetic/runtime-repository/scripts/codex-memory-stack.js',
+      '_run-http',
+      '--stack-environment=/synthetic/owner-root/governance/runtime.env'
+    ],
+    executable: process.execPath,
+    cwd: '/synthetic/runtime-repository'
+  };
+  const fsModule = {
+    statSync() {
+      return { uid: currentUid };
+    },
+    realpathSync(file) {
+      assert.equal(file, process.execPath);
+      return process.execPath;
+    }
+  };
+  const base = {
+    fsModule,
+    processIdentities,
+    controllerPid: 999_999,
+    isRunning: () => true,
+    readIdentity: () => identity,
+    ownerUid: currentUid
+  };
+
+  const clean = inspectOrphanManagedProcesses(profile(), {
+    ...base,
+    processEntries: [],
+    readStartTicks: () => '42'
+  });
+  assert.equal(clean.http.orphanDetected, false);
+  assert.equal(clean.http.matchingPidCount, 0);
+
+  const foreign = inspectOrphanManagedProcesses(profile(), {
+    ...base,
+    processEntries: ['4321'],
+    fsModule: {
+      ...fsModule,
+      statSync() {
+        return { uid: currentUid + 1 };
+      }
+    },
+    readStartTicks: () => '42'
+  });
+  assert.equal(foreign.http.matchingPidCount, 0);
+
+  assert.throws(
+    () => inspectOrphanManagedProcesses(profile(), {
+      ...base,
+      processEntries: ['4321'],
+      readIdentity: () => null,
+      readStartTicks: () => '42'
+    }),
+    { code: 'stack_process_identity_unavailable' }
+  );
+  assert.throws(
+    () => inspectOrphanManagedProcesses(profile(), {
+      ...base,
+      processEntries: ['4321'],
+      readStartTicks: () => {
+        throw new Error('start identity unavailable');
+      }
+    }),
+    { code: 'stack_process_start_identity_unavailable' }
+  );
+  assert.throws(
+    () => inspectOrphanManagedProcesses(profile(), {
+      ...base,
+      enumerateProcesses() {
+        throw new Error('enumeration unavailable');
+      }
+    }),
+    { code: 'stack_process_enumeration_unavailable' }
+  );
 });
 
 test('runtime, Edge, and identity stopped failures remain distinct and do not stop anything', () => {
@@ -668,21 +859,73 @@ test('acquisition cleanup release failure is distinct and keeps lock unreleased'
   assert.equal(h.calls.includes('release'), false);
 });
 
-test('ordinary acquisition failure is not projected as release failure', () => {
-  const h = harness({ acquireError: 'stack_lifecycle_busy' });
+test('acquisition cleanup identity change is also an unreleased-lock failure', () => {
+  const h = harness({
+    acquireError: 'stack_lifecycle_lock_identity_changed'
+  });
 
   const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
 
-  assert.equal(result.classification, 'PRECONDITION_REJECTED');
+  assert.equal(result.classification, 'LOCK_RELEASE_FAILED');
   assert.equal(result.underlyingClassification, 'PRECONDITION_REJECTED');
   assert.equal(result.stableReason,
-    'stopped_profile_transition_lock_failed');
+    'stopped_profile_transition_lock_release_failed');
+  assert.equal(
+    result.lifecycleLockErrorCode,
+    'stack_lifecycle_lock_identity_changed'
+  );
+  assert.equal(result.profileTransactionClassification, null);
   assert.equal(result.profileMutated, false);
+  assert.equal(result.runtimeMutated, false);
   assert.equal(result.p1Called, false);
-  assert.equal(result.lifecycleLockReleased, true);
+  assert.equal(result.lifecycleLockReleased, false);
   assert.deepEqual(h.calls, ['lock']);
   assert.equal(h.p1Calls.length, 0);
   assert.equal(h.calls.includes('release'), false);
+});
+
+test('post-acquisition identity change wraps the underlying P1 result', () => {
+  const h = harness({
+    release: () => {
+      const error = new Error('synthetic lock identity change');
+      error.code = 'stack_lifecycle_lock_identity_changed';
+      throw error;
+    }
+  });
+
+  const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
+
+  assert.equal(result.classification, 'LOCK_RELEASE_FAILED');
+  assert.equal(result.underlyingClassification, 'COMMITTED');
+  assert.equal(result.profileTransactionClassification, 'COMMITTED');
+  assert.equal(result.profileMutated, true);
+  assert.equal(result.durabilityConfirmed, true);
+  assert.equal(result.lifecycleLockErrorCode,
+    'stack_lifecycle_lock_identity_changed');
+  assert.equal(result.lifecycleLockReleased, false);
+  assert.equal(h.p1Calls.length, 1);
+});
+
+test('ordinary acquisition failures are not projected as release failures', () => {
+  for (const acquireError of [
+    'stack_lifecycle_busy',
+    'stack_lifecycle_lock_invalid',
+    'stack_lifecycle_lock_path_invalid'
+  ]) {
+    const h = harness({ acquireError });
+    const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
+
+    assert.equal(result.classification, 'PRECONDITION_REJECTED');
+    assert.equal(result.underlyingClassification, 'PRECONDITION_REJECTED');
+    assert.equal(result.stableReason,
+      'stopped_profile_transition_lock_failed');
+    assert.equal(result.profileMutated, false);
+    assert.equal(result.p1Called, false);
+    assert.equal(result.lifecycleLockReleased, true);
+    assert.deepEqual(h.calls, ['lock']);
+    assert.equal(h.p1Calls.length, 0);
+    assert.equal(h.calls.includes('release'), false);
+  }
 });
 
 test('real P1 transaction commits a complete temporary schema-v6 profile fixture', t => {
