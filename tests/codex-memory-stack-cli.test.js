@@ -48,8 +48,10 @@ const {
   extractEnvFileArgument,
   finalizeManagedSpawn,
   inspectEdgeContainer,
+  inspectOrphanManagedProcesses,
   inspectProviderContainer,
   inspectSourceCompatibility,
+  inspectStoppedStateForOwnerProfileTransition,
   inspectVcpRuntimeIdentity,
   isPidRunning,
   legacyVcpRuntimeBootstrapMatches,
@@ -227,6 +229,79 @@ function legacyProfile(overrides = {}) {
     ...legacy,
     schemaVersion: 4,
     ...overrides
+  };
+}
+
+function lockFaultFilesystem({
+  write = false,
+  fsync = false,
+  fstat = false,
+  chmod = false,
+  close = false,
+  unlink = false
+} = {}) {
+  let closeCalls = 0;
+  let unlinkCalls = 0;
+  const calls = { close: 0, unlink: 0 };
+  return {
+    calls,
+    fsModule: new Proxy(fs, {
+      get(target, property) {
+        if (property === 'writeFileSync' && write) {
+          return () => {
+            const error = new Error('synthetic write failure');
+            error.code = 'stack_synthetic_write_failed';
+            throw error;
+          };
+        }
+        if (property === 'fsyncSync' && fsync) {
+          return () => {
+            const error = new Error('synthetic fsync failure');
+            error.code = 'stack_synthetic_fsync_failed';
+            throw error;
+          };
+        }
+        if (property === 'fstatSync' && fstat) {
+          return () => {
+            const error = new Error('synthetic fstat failure');
+            error.code = 'stack_synthetic_fstat_failed';
+            throw error;
+          };
+        }
+        if (property === 'chmodSync' && chmod) {
+          return () => {
+            const error = new Error('synthetic mode failure');
+            error.code = 'stack_synthetic_mode_failed';
+            throw error;
+          };
+        }
+        if (property === 'closeSync') {
+          return descriptor => {
+            calls.close += 1;
+            closeCalls += 1;
+            if (close && closeCalls === 1) {
+              const error = new Error('synthetic close failure');
+              error.code = 'stack_synthetic_close_failed';
+              throw error;
+            }
+            return target.closeSync(descriptor);
+          };
+        }
+        if (property === 'unlinkSync' && unlink) {
+          return file => {
+            calls.unlink += 1;
+            unlinkCalls += 1;
+            if (unlinkCalls === 1) {
+              const error = new Error('synthetic unlink failure');
+              error.code = 'stack_synthetic_unlink_failed';
+              throw error;
+            }
+            return target.unlinkSync(file);
+          };
+        }
+        return target[property];
+      }
+    })
   };
 }
 
@@ -957,6 +1032,296 @@ test('lifecycle lock recovers a live PID only when its start identity changed', 
   );
 });
 
+test('lock acquisition distinguishes pre-creation failures from stale identity races', t => {
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'codex-memory-stack-lock-race-')
+  );
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'lifecycle.lock');
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const openFailureFs = new Proxy(fs, {
+    get(target, property) {
+      if (property === 'openSync') {
+        return () => {
+          const error = new Error('synthetic open failure');
+          error.code = 'EACCES';
+          throw error;
+        };
+      }
+      return target[property];
+    }
+  });
+  assert.throws(
+    () => acquireOwnerLock(file, { fsModule: openFailureFs }),
+    { code: 'stack_lifecycle_lock_failed' }
+  );
+  assert.equal(fs.existsSync(file), false);
+
+  fs.writeFileSync(file, `${JSON.stringify({
+    schemaVersion: 1,
+    pid: 999999999,
+    startTicks: '42'
+  })}\n`, { mode: 0o600 });
+  let lstatCalls = 0;
+  const raceFs = new Proxy(fs, {
+    get(target, property) {
+      if (property === 'lstatSync') {
+        return value => {
+          const stat = target.lstatSync(value);
+          lstatCalls += 1;
+          if (lstatCalls === 2) return { ...stat, ino: stat.ino + 1 };
+          return stat;
+        };
+      }
+      return target[property];
+    }
+  });
+  assert.throws(
+    () => acquireOwnerLock(file, {
+      fsModule: raceFs,
+      kill() {
+        const error = new Error('dead');
+        error.code = 'ESRCH';
+        throw error;
+      }
+    }),
+    { code: 'stack_lifecycle_lock_identity_changed' }
+  );
+  assert.equal(fs.existsSync(file), true);
+});
+
+test('owner-lock initialization failures expose cleanup provenance', t => {
+  const faults = [
+    { write: true },
+    { fsync: true },
+    { fstat: true },
+    { chmod: true },
+    { close: true }
+  ];
+  for (const fault of faults) {
+    const root = fs.mkdtempSync(
+      path.join(os.tmpdir(), 'codex-memory-stack-lock-init-')
+    );
+    fs.chmodSync(root, 0o700);
+    const file = path.join(root, 'lifecycle.lock');
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    const { fsModule } = lockFaultFilesystem(fault);
+    assert.throws(
+      () => acquireOwnerLock(file, {
+        fsModule,
+        readStartTicks: () => '42'
+      }),
+      error => {
+        if (fault.fstat) {
+          assert.equal(error.code,
+            'stack_lifecycle_acquisition_cleanup_failed');
+          assert.equal(error.primaryErrorCode,
+            'stack_synthetic_fstat_failed');
+          assert.equal(error.cleanupErrorCode,
+            'stack_lifecycle_lock_identity_unavailable');
+          assert.equal(error.lifecycleLockReleased, false);
+          assert.equal(error.residualLockPossible, true);
+          return true;
+        }
+        assert.equal(error.code, fault.close
+          ? 'stack_synthetic_close_failed'
+          : fault.write
+            ? 'stack_synthetic_write_failed'
+            : fault.fsync
+              ? 'stack_synthetic_fsync_failed'
+              : fault.fstat
+                ? 'stack_synthetic_fstat_failed'
+                : 'stack_synthetic_mode_failed');
+        assert.equal(error.cleanupPhase, 'owner_lock_initialization');
+        assert.equal(error.lifecycleLockAcquired, true);
+        assert.equal(error.lifecycleLockReleaseAttempted, true);
+        assert.equal(error.lifecycleLockReleased, true);
+        assert.equal(error.residualLockPossible, false);
+        assert.equal(error.primaryErrorCode, error.code);
+        assert.equal(error.cleanupErrorCode, null);
+        return true;
+      }
+    );
+    assert.equal(fs.existsSync(file), fault.fstat === true);
+  }
+});
+
+test('owner-lock initialization cleanup failure is visible and fail closed', t => {
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'codex-memory-stack-lock-init-')
+  );
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'lifecycle.lock');
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const { fsModule } = lockFaultFilesystem({
+    fsync: true,
+    unlink: true
+  });
+  assert.throws(
+    () => acquireOwnerLock(file, {
+      fsModule,
+      readStartTicks: () => '42'
+    }),
+    error => {
+      assert.equal(error.code, 'stack_lifecycle_acquisition_cleanup_failed');
+      assert.equal(error.cleanupPhase, 'owner_lock_initialization');
+      assert.equal(error.lifecycleLockAcquired, true);
+      assert.equal(error.lifecycleLockReleaseAttempted, true);
+      assert.equal(error.lifecycleLockReleased, false);
+      assert.equal(error.residualLockPossible, true);
+      assert.equal(error.primaryErrorCode,
+        'stack_synthetic_fsync_failed');
+      assert.equal(error.cleanupErrorCode,
+        'stack_lifecycle_lock_unlink_failed');
+      return true;
+    }
+  );
+  assert.equal(fs.existsSync(file), true);
+});
+
+test('owner-lock initialization refuses to unlink a replacement inode', t => {
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'codex-memory-stack-lock-init-')
+  );
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'lifecycle.lock');
+  const replacement = `${file}.replacement`;
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  let fstatCalls = 0;
+  let unlinkCalls = 0;
+  const fsModule = new Proxy(fs, {
+    get(target, property) {
+      if (property === 'fstatSync') {
+        return descriptor => {
+          const stat = target.fstatSync(descriptor);
+          fstatCalls += 1;
+          if (fstatCalls === 1) {
+            target.renameSync(file, replacement);
+            target.writeFileSync(file, 'replacement\n', { mode: 0o600 });
+          }
+          return stat;
+        };
+      }
+      if (property === 'chmodSync') {
+        return () => {
+          const error = new Error('synthetic mode failure');
+          error.code = 'stack_synthetic_mode_failed';
+          throw error;
+        };
+      }
+      if (property === 'unlinkSync') {
+        return value => {
+          unlinkCalls += 1;
+          return target.unlinkSync(value);
+        };
+      }
+      return target[property];
+    }
+  });
+  assert.throws(
+    () => acquireOwnerLock(file, {
+      fsModule,
+      readStartTicks: () => '42'
+    }),
+    error => {
+      assert.equal(error.code, 'stack_lifecycle_acquisition_cleanup_failed');
+      assert.equal(error.primaryErrorCode, 'stack_synthetic_mode_failed');
+      assert.equal(error.cleanupErrorCode,
+        'stack_lifecycle_lock_identity_changed');
+      assert.equal(error.lifecycleLockReleased, false);
+      assert.equal(error.residualLockPossible, true);
+      return true;
+    }
+  );
+  assert.equal(unlinkCalls, 0);
+  assert.equal(fs.readFileSync(file, 'utf8'), 'replacement\n');
+});
+
+test('owner-lock initialization validation failure also reports cleanup outcome', t => {
+  const root = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'codex-memory-stack-lock-init-')
+  );
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'lifecycle.lock');
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  assert.throws(
+    () => acquireOwnerLock(file, {
+      readStartTicks: () => {
+        const error = new Error('synthetic start identity failure');
+        error.code = 'stack_process_start_identity_unavailable';
+        throw error;
+      }
+    }),
+    error => {
+      assert.equal(error.code, 'stack_process_start_identity_unavailable');
+      assert.equal(error.cleanupPhase, 'owner_lock_initialization');
+      assert.equal(error.lifecycleLockAcquired, true);
+      assert.equal(error.lifecycleLockReleaseAttempted, true);
+      assert.equal(error.lifecycleLockReleased, true);
+      assert.equal(error.residualLockPossible, false);
+      return true;
+    }
+  );
+  assert.equal(fs.existsSync(file), false);
+});
+
+test('profile acquisition cleanup success and failure retain provenance', () => {
+  const environment = { XDG_RUNTIME_DIR: '/synthetic/runtime' };
+  const profileError = new Error('synthetic profile failure');
+  profileError.code = 'stack_profile_invalid';
+  assert.throws(
+    () => acquireLifecycleProfile({
+      environment,
+      ensureRuntime() {},
+      acquireLock() {
+        return { release: () => true };
+      },
+      read() {
+        throw profileError;
+      }
+    }),
+    error => {
+      assert.equal(error.code, 'stack_profile_invalid');
+      assert.equal(error.cleanupPhase, 'lifecycle_profile_acquisition');
+      assert.equal(error.lifecycleLockAcquired, true);
+      assert.equal(error.lifecycleLockReleaseAttempted, true);
+      assert.equal(error.lifecycleLockReleased, true);
+      assert.equal(error.residualLockPossible, false);
+      return true;
+    }
+  );
+  const releaseError = new Error('synthetic release failure');
+  releaseError.code = 'stack_lifecycle_lock_identity_changed';
+  assert.throws(
+    () => acquireLifecycleProfile({
+      environment,
+      ensureRuntime() {},
+      acquireLock() {
+        return {
+          release() {
+            throw releaseError;
+          }
+        };
+      },
+      read() {
+        throw profileError;
+      }
+    }),
+    error => {
+      assert.equal(error.code, 'stack_lifecycle_acquisition_cleanup_failed');
+      assert.equal(error.cleanupPhase, 'lifecycle_profile_acquisition');
+      assert.equal(error.lifecycleLockAcquired, true);
+      assert.equal(error.lifecycleLockReleaseAttempted, true);
+      assert.equal(error.lifecycleLockReleased, false);
+      assert.equal(error.residualLockPossible, true);
+      assert.equal(error.primaryErrorCode, 'stack_profile_invalid');
+      assert.equal(error.cleanupErrorCode,
+        'stack_lifecycle_lock_identity_changed');
+      return true;
+    }
+  );
+});
+
 test('lifecycle profile snapshot is read only after the lock is acquired', () => {
   const events = [];
   const environment = { XDG_RUNTIME_DIR: '/synthetic/runtime' };
@@ -1289,6 +1654,188 @@ test('managed command matching binds exact executable, script, mode, and environ
     '_run-relay',
     `--stack-environment=${relayEnvironment}`
   ], options), true);
+});
+
+test('orphan process scan filters unrelated same-owner processes before exact matching', () => {
+  const names = ['shim', 'http', 'governance', 'relay'];
+  const identities = Object.fromEntries(names.map(name => [name, {
+    pid: null,
+    running: false,
+    identity: null
+  }]));
+  const executable = fs.realpathSync(process.execPath);
+  const componentModes = {
+    shim: '_run-shim',
+    http: '_run-http',
+    governance: '_run-governance',
+    relay: '_run-relay'
+  };
+  const exactCommand = name => [
+    executable,
+    '/repo/scripts/codex-memory-stack.js',
+    componentModes[name],
+    `--stack-environment=/synthetic/owner-only/${
+      name === 'relay' ? 'relay' : 'governance'
+    }/runtime.env`
+  ];
+  const observation = (pid, overrides = {}) => ({
+    pid,
+    running: true,
+    ownerMatches: true,
+    executable,
+    executableReadable: true,
+    cwd: '/repo',
+    cwdReadable: true,
+    argv: exactCommand('http'),
+    argvReadable: true,
+    disappeared: false,
+    observationUnavailable: false,
+    ...overrides
+  });
+  const scan = (pids, readObservation, processState = identities) =>
+    inspectOrphanManagedProcesses(profile(), processState, {
+      environment: { XDG_RUNTIME_DIR: '/runtime' },
+      listPids: () => pids,
+      readObservation,
+      readStartIdentity: () => '44'
+    });
+
+  assert.throws(
+    () => scan([123], () => observation(123)),
+    { code: 'stack_managed_orphan_process' }
+  );
+  const known = {
+    ...identities,
+    http: { pid: 123, running: false, identity: null }
+  };
+  const knownResult = scan([123], () => observation(123), known);
+  assert.equal(knownResult.components.http.orphanDetected, false);
+  assert.equal(knownResult.components.http.matchingPidCount, 1);
+
+  const unrelated = scan([124], () => observation(124, {
+    cwd: '/other-project',
+    argv: [executable]
+  }));
+  assert.equal(unrelated.components.http.matchingPidCount, 0);
+  assert.doesNotThrow(() => scan([125], () => observation(125, {
+    executable: '/usr/bin/python',
+    executableReadable: true,
+    argv: null,
+    argvReadable: false
+  })));
+  assert.throws(
+    () => scan([126], () => observation(126, {
+      argv: [executable]
+    })),
+    { code: 'stack_process_identity_unavailable' }
+  );
+  assert.doesNotThrow(() => scan([127], () => observation(127, {
+    ownerMatches: false
+  })));
+  assert.doesNotThrow(() => scan([128], () => observation(128, {
+    disappeared: true,
+    running: false
+  })));
+  assert.throws(
+    () => scan([129, 130], pid => observation(pid)),
+    { code: 'stack_managed_orphan_process' }
+  );
+  assert.throws(
+    () => inspectOrphanManagedProcesses(profile(), identities, {
+      listPids: () => [131],
+      readObservation: () => observation(131),
+      readStartIdentity: () => {
+        throw new Error('unavailable');
+      }
+    }),
+    { code: 'stack_process_start_identity_unavailable' }
+  );
+  assert.throws(
+    () => inspectOrphanManagedProcesses(profile(), identities, {
+      listPids: () => {
+        throw new Error('enumeration unavailable');
+      }
+    }),
+    { code: 'stack_process_enumeration_unavailable' }
+  );
+});
+
+test('stopped inspector repeats the same orphan gate and rejects a final orphan race', () => {
+  const names = ['shim', 'http', 'governance', 'relay'];
+  const identities = Object.fromEntries(names.map(name => [name, {
+    pid: null,
+    running: false,
+    identity: null
+  }]));
+  const executable = fs.realpathSync(process.execPath);
+  let scans = 0;
+  const edge = {
+    configurationSecure: true,
+    id: profile().edgeContainerId,
+    revision: profile().runtimeBaseline,
+    running: false
+  };
+  const readObservation = pid => ({
+    pid,
+    running: true,
+    ownerMatches: true,
+    executable,
+    executableReadable: true,
+    cwd: '/repo',
+    cwdReadable: true,
+    argv: [
+      executable,
+      '/repo/scripts/codex-memory-stack.js',
+      '_run-http',
+      '--stack-environment=/synthetic/owner-only/governance/runtime.env'
+    ],
+    argvReadable: true,
+    disappeared: false,
+    observationUnavailable: false
+  });
+  const inspect = () => inspectStoppedStateForOwnerProfileTransition(
+    profile(),
+    {
+      environment: { XDG_RUNTIME_DIR: '/runtime' },
+      inspectProcess: () => ({ running: false, identity: null }),
+      inspectEdge: () => edge,
+      readPidFileState: () => ({ present: false, valid: true, pid: null }),
+      listPids: () => scans++ === 0 ? [] : [200],
+      readObservation,
+      readStartIdentity: () => '44'
+    }
+  );
+  assert.doesNotThrow(inspect);
+  assert.throws(inspect, { code: 'stack_managed_orphan_process' });
+  assert.equal(scans, 2);
+  assert.throws(
+    () => inspectStoppedStateForOwnerProfileTransition(
+      profile(),
+      {
+        environment: { XDG_RUNTIME_DIR: '/runtime' },
+        inspectProcess: () => ({ pid: 200, running: false, identity: null }),
+        inspectEdge: () => edge,
+        readPidFileState: () => ({ present: true, valid: true, pid: 200 }),
+        listPids: () => [200],
+        readObservation,
+        readStartIdentity: () => '44'
+      }
+    ),
+    { code: 'stack_process_running' }
+  );
+  assert.throws(
+    () => inspectStoppedStateForOwnerProfileTransition(
+      profile(),
+      {
+        environment: { XDG_RUNTIME_DIR: '/runtime' },
+        inspectProcess: () => ({ running: false, identity: null }),
+        inspectEdge: () => edge,
+        readPidFileState: () => ({ present: true, valid: false, pid: null }),
+        listPids: () => []
+      }
+    ),
+    { code: 'stack_process_pid_file_invalid' }
+  );
 });
 
 test('runtime repository adoption derivation rejects every legacy HTTP entrypoint', () => {

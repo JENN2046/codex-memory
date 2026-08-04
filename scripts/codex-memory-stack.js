@@ -18,6 +18,9 @@ const {
   inspectControllerSourceManifest
 } = require('./codex-memory-controller-source-manifest');
 const {
+  coordinateStoppedOwnerProfileTransition: coordinateStoppedOwnerProfileTransitionCore
+} = require('./codex-memory-stopped-profile-transition');
+const {
   CHATGPT_EDGE_DATA_SCHEMA_VERSION,
   EDGE_REQUEST_SCHEMA_VERSION,
   EDGE_RESPONSE_SCHEMA_VERSION
@@ -216,6 +219,47 @@ const VCP_RUNTIME_SOURCE_PATHS = Object.freeze([
 function codedError(code) {
   const safe = SAFE_CODE.test(code || '') ? code : 'codex_memory_stack_failed';
   return Object.assign(new Error(safe), { code: safe });
+}
+
+function attachLifecycleLockProvenance(error, {
+  cleanupPhase,
+  lifecycleLockAcquired,
+  lifecycleLockReleaseAttempted,
+  lifecycleLockReleased,
+  residualLockPossible,
+  primaryErrorCode = null,
+  cleanupErrorCode = null
+} = {}) {
+  const target = error instanceof Error ? error : codedError(safeCode(error));
+  Object.assign(target, {
+    cleanupPhase: cleanupPhase || null,
+    lifecycleLockAcquired: lifecycleLockAcquired === true,
+    lifecycleLockReleaseAttempted: lifecycleLockReleaseAttempted === true,
+    lifecycleLockReleased: lifecycleLockReleased === true,
+    residualLockPossible: residualLockPossible === true,
+    primaryErrorCode: primaryErrorCode || null,
+    cleanupErrorCode: cleanupErrorCode || null
+  });
+  return target;
+}
+
+function lifecycleAcquisitionCleanupError({
+  cleanupPhase,
+  primaryErrorCode,
+  cleanupErrorCode
+}) {
+  return attachLifecycleLockProvenance(
+    codedError('stack_lifecycle_acquisition_cleanup_failed'),
+    {
+      cleanupPhase,
+      lifecycleLockAcquired: true,
+      lifecycleLockReleaseAttempted: true,
+      lifecycleLockReleased: false,
+      residualLockPossible: true,
+      primaryErrorCode,
+      cleanupErrorCode
+    }
+  );
 }
 
 function safeCode(error, fallback = 'codex_memory_stack_failed') {
@@ -1558,16 +1602,75 @@ function acquireOwnerLock(file, {
     fsModule.closeSync(descriptor);
     descriptor = undefined;
     fsModule.chmodSync(file, 0o600);
-  } catch {
+  } catch (initializationError) {
+    const primaryErrorCode = safeCode(
+      initializationError,
+      'stack_lifecycle_lock_failed'
+    );
+    let cleanupErrorCode = null;
+    let cleanupIdentity = identity;
+    if (!cleanupIdentity && descriptor !== undefined) {
+      try {
+        cleanupIdentity = fsModule.fstatSync(descriptor);
+      } catch {
+        cleanupErrorCode = 'stack_lifecycle_lock_identity_unavailable';
+      }
+    }
+    let descriptorClosed = descriptor === undefined;
     if (descriptor !== undefined) {
       try {
         fsModule.closeSync(descriptor);
-      } catch {}
+        descriptorClosed = true;
+      } catch {
+        cleanupErrorCode ||= 'stack_lifecycle_lock_close_failed';
+      }
     }
-    try {
-      fsModule.unlinkSync(file);
-    } catch {}
-    throw codedError('stack_lifecycle_lock_failed');
+    if (!descriptorClosed) {
+      cleanupErrorCode ||= 'stack_lifecycle_lock_close_failed';
+    } else if (!cleanupIdentity) {
+      cleanupErrorCode ||= 'stack_lifecycle_lock_identity_unavailable';
+    } else {
+      let current;
+      try {
+        current = fsModule.lstatSync(file);
+      } catch {
+        cleanupErrorCode ||= 'stack_lifecycle_lock_identity_changed';
+      }
+      if (current && (
+        !current.isFile() || current.isSymbolicLink() ||
+        current.uid !== currentUid() ||
+        current.dev !== cleanupIdentity.dev ||
+        current.ino !== cleanupIdentity.ino
+      )) {
+        cleanupErrorCode ||= 'stack_lifecycle_lock_identity_changed';
+      }
+      if (!cleanupErrorCode && current) {
+        try {
+          fsModule.unlinkSync(file);
+        } catch {
+          cleanupErrorCode = 'stack_lifecycle_lock_unlink_failed';
+        }
+      }
+    }
+    if (cleanupErrorCode) {
+      throw lifecycleAcquisitionCleanupError({
+        cleanupPhase: 'owner_lock_initialization',
+        primaryErrorCode,
+        cleanupErrorCode
+      });
+    }
+    throw attachLifecycleLockProvenance(
+      codedError(primaryErrorCode),
+      {
+        cleanupPhase: 'owner_lock_initialization',
+        lifecycleLockAcquired: true,
+        lifecycleLockReleaseAttempted: true,
+        lifecycleLockReleased: true,
+        residualLockPossible: false,
+        primaryErrorCode,
+        cleanupErrorCode: null
+      }
+    );
   }
   let released = false;
   return Object.freeze({
@@ -1577,17 +1680,47 @@ function acquireOwnerLock(file, {
       try {
         current = fsModule.lstatSync(file);
       } catch {
-        throw codedError('stack_lifecycle_lock_identity_changed');
+        throw attachLifecycleLockProvenance(
+          codedError('stack_lifecycle_lock_identity_changed'),
+          {
+            cleanupPhase: 'final_release',
+            lifecycleLockAcquired: true,
+            lifecycleLockReleaseAttempted: true,
+            lifecycleLockReleased: false,
+            residualLockPossible: true,
+            cleanupErrorCode: 'stack_lifecycle_lock_identity_changed'
+          }
+        );
       }
       if (!current.isFile() || current.isSymbolicLink() ||
           current.uid !== currentUid() ||
           current.dev !== identity.dev || current.ino !== identity.ino) {
-        throw codedError('stack_lifecycle_lock_identity_changed');
+        throw attachLifecycleLockProvenance(
+          codedError('stack_lifecycle_lock_identity_changed'),
+          {
+            cleanupPhase: 'final_release',
+            lifecycleLockAcquired: true,
+            lifecycleLockReleaseAttempted: true,
+            lifecycleLockReleased: false,
+            residualLockPossible: true,
+            cleanupErrorCode: 'stack_lifecycle_lock_identity_changed'
+          }
+        );
       }
       try {
         fsModule.unlinkSync(file);
       } catch {
-        throw codedError('stack_lifecycle_lock_release_failed');
+        throw attachLifecycleLockProvenance(
+          codedError('stack_lifecycle_lock_release_failed'),
+          {
+            cleanupPhase: 'final_release',
+            lifecycleLockAcquired: true,
+            lifecycleLockReleaseAttempted: true,
+            lifecycleLockReleased: false,
+            residualLockPossible: true,
+            cleanupErrorCode: 'stack_lifecycle_lock_release_failed'
+          }
+        );
       }
       released = true;
       return true;
@@ -1610,8 +1743,33 @@ function acquireLifecycleProfile({
       release: () => lifecycleLock.release()
     });
   } catch (error) {
-    lifecycleLock.release();
-    throw error;
+    try {
+      lifecycleLock.release();
+    } catch (releaseError) {
+      throw lifecycleAcquisitionCleanupError({
+        cleanupPhase: 'lifecycle_profile_acquisition',
+        primaryErrorCode: safeCode(
+          error,
+          'stack_lifecycle_profile_acquisition_failed'
+        ),
+        cleanupErrorCode: safeCode(
+          releaseError,
+          'stack_lifecycle_lock_release_failed'
+        )
+      });
+    }
+    throw attachLifecycleLockProvenance(error, {
+      cleanupPhase: 'lifecycle_profile_acquisition',
+      lifecycleLockAcquired: true,
+      lifecycleLockReleaseAttempted: true,
+      lifecycleLockReleased: true,
+      residualLockPossible: false,
+      primaryErrorCode: safeCode(
+        error,
+        'stack_lifecycle_profile_acquisition_failed'
+      ),
+      cleanupErrorCode: null
+    });
   }
 }
 
@@ -1634,6 +1792,35 @@ function readPidFile(file, fsModule = fs) {
   } catch {
     return null;
   }
+}
+
+function inspectPidFile(file, fsModule = fs) {
+  let stat;
+  try {
+    stat = fsModule.lstatSync(file);
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      return Object.freeze({ present: false, valid: true, pid: null });
+    }
+    return Object.freeze({ present: true, valid: false, pid: null });
+  }
+  if (!stat.isFile() || stat.isSymbolicLink() ||
+      stat.uid !== currentUid() || (stat.mode & 0o077) !== 0 ||
+      stat.size < 1 || stat.size > 32) {
+    return Object.freeze({ present: true, valid: false, pid: null });
+  }
+  let value;
+  try {
+    value = fsModule.readFileSync(file, 'utf8');
+  } catch {
+    return Object.freeze({ present: true, valid: false, pid: null });
+  }
+  const pid = parsePid(value);
+  return Object.freeze({
+    present: true,
+    valid: pid !== null,
+    pid
+  });
 }
 
 function isPidRunning(pid, kill = process.kill) {
@@ -1671,6 +1858,293 @@ function readProcessIdentity(pid, fsModule = fs) {
   } catch {
     return null;
   }
+}
+
+function enumerateProcessIds({ fsModule = fs } = {}) {
+  let entries;
+  try {
+    entries = fsModule.readdirSync('/proc');
+  } catch {
+    throw codedError('stack_process_enumeration_unavailable');
+  }
+  if (!Array.isArray(entries)) {
+    throw codedError('stack_process_enumeration_unavailable');
+  }
+  return entries
+    .map(entry => parsePid(typeof entry === 'string' ? entry : entry?.name))
+    .filter(pid => pid !== null);
+}
+
+function readProcessObservation(pid, {
+  fsModule = fs,
+  isRunning = value => isPidRunning(value),
+  owner = currentUid()
+} = {}) {
+  const normalizedPid = parsePid(pid);
+  if (normalizedPid === null) {
+    throw codedError('stack_process_identity_invalid');
+  }
+  let initiallyRunning;
+  try {
+    initiallyRunning = isRunning(normalizedPid) === true;
+  } catch {
+    return Object.freeze({
+      pid: normalizedPid,
+      running: true,
+      ownerMatches: null,
+      executable: null,
+      executableReadable: false,
+      cwd: null,
+      cwdReadable: false,
+      argv: null,
+      argvReadable: false,
+      disappeared: false,
+      observationUnavailable: true
+    });
+  }
+  if (!initiallyRunning) {
+    return Object.freeze({
+      pid: normalizedPid,
+      running: false,
+      ownerMatches: null,
+      executable: null,
+      executableReadable: false,
+      cwd: null,
+      cwdReadable: false,
+      argv: null,
+      argvReadable: false,
+      disappeared: true,
+      observationUnavailable: false
+    });
+  }
+  let ownerMatches;
+  try {
+    ownerMatches = fsModule.statSync(`/proc/${normalizedPid}`).uid === owner;
+  } catch {
+    try {
+      if (!isRunning(normalizedPid)) {
+        return Object.freeze({
+          pid: normalizedPid,
+          running: false,
+          ownerMatches: null,
+          executable: null,
+          executableReadable: false,
+          cwd: null,
+          cwdReadable: false,
+          argv: null,
+          argvReadable: false,
+          disappeared: true,
+          observationUnavailable: false
+        });
+      }
+    } catch {}
+    return Object.freeze({
+      pid: normalizedPid,
+      running: true,
+      ownerMatches: null,
+      executable: null,
+      executableReadable: false,
+      cwd: null,
+      cwdReadable: false,
+      argv: null,
+      argvReadable: false,
+      disappeared: false,
+      observationUnavailable: true
+    });
+  }
+  if (!ownerMatches) {
+    return Object.freeze({
+      pid: normalizedPid,
+      running: true,
+      ownerMatches: false,
+      executable: null,
+      executableReadable: false,
+      cwd: null,
+      cwdReadable: false,
+      argv: null,
+      argvReadable: false,
+      disappeared: false,
+      observationUnavailable: false
+    });
+  }
+  let executable = null;
+  let executableReadable = false;
+  let cwd = null;
+  let cwdReadable = false;
+  let argv = null;
+  let argvReadable = false;
+  try {
+    executable = fsModule.realpathSync(`/proc/${normalizedPid}/exe`);
+    executableReadable = path.isAbsolute(executable);
+  } catch {}
+  try {
+    cwd = fsModule.realpathSync(`/proc/${normalizedPid}/cwd`);
+    cwdReadable = path.isAbsolute(cwd);
+  } catch {}
+  try {
+    const value = fsModule.readFileSync(`/proc/${normalizedPid}/cmdline`);
+    argv = value.toString('utf8').split('\0').filter(Boolean);
+    argvReadable = true;
+  } catch {}
+  let stillRunning;
+  try {
+    stillRunning = isRunning(normalizedPid) === true;
+  } catch {
+    stillRunning = null;
+  }
+  if (stillRunning === false) {
+    return Object.freeze({
+      pid: normalizedPid,
+      running: false,
+      ownerMatches: true,
+      executable,
+      executableReadable,
+      cwd,
+      cwdReadable,
+      argv,
+      argvReadable,
+      disappeared: true,
+      observationUnavailable: false
+    });
+  }
+  if (stillRunning === null) {
+    return Object.freeze({
+      pid: normalizedPid,
+      running: true,
+      ownerMatches: true,
+      executable,
+      executableReadable,
+      cwd,
+      cwdReadable,
+      argv,
+      argvReadable,
+      disappeared: false,
+      observationUnavailable: true
+    });
+  }
+  return Object.freeze({
+    pid: normalizedPid,
+    running: true,
+    ownerMatches: true,
+    executable,
+    executableReadable,
+    cwd,
+    cwdReadable,
+    argv,
+    argvReadable,
+    disappeared: false,
+    observationUnavailable: false
+  });
+}
+
+function inspectOrphanManagedProcesses(profile, processIdentities, {
+  environment = process.env,
+  fsModule = fs,
+  listPids = () => enumerateProcessIds({ fsModule }),
+  readObservation = pid => readProcessObservation(pid, { fsModule }),
+  readStartIdentity = (pid, options) =>
+    readLinuxProcessStartTicks(pid, options),
+  controllerPid = process.pid
+} = {}) {
+  if (!profile || !processIdentities) {
+    throw codedError('stack_process_inspection_invalid');
+  }
+  let pids;
+  try {
+    pids = listPids();
+  } catch {
+    throw codedError('stack_process_enumeration_unavailable');
+  }
+  if (!Array.isArray(pids)) {
+    throw codedError('stack_process_enumeration_unavailable');
+  }
+  const matching = new Map(
+    Object.keys(COMPONENTS).map(name => [name, []])
+  );
+  const nodeExecutable = (() => {
+    try {
+      return fsModule.realpathSync(process.execPath);
+    } catch {
+      return null;
+    }
+  })();
+  for (const candidate of pids) {
+    const pid = parsePid(candidate);
+    if (pid === null || pid === controllerPid) continue;
+    const observation = readObservation(pid);
+    if (!observation || observation.disappeared ||
+        observation.running !== true) continue;
+    if (observation.ownerMatches === false) continue;
+    if (observation.ownerMatches !== true ||
+        observation.observationUnavailable === true) {
+      throw codedError('stack_process_identity_unavailable');
+    }
+    if (nodeExecutable === null && observation.executableReadable === true) {
+      throw codedError('stack_process_identity_unavailable');
+    }
+    const executableIsNode = observation.executableReadable === true &&
+      observation.executable === nodeExecutable;
+    const cwdIsRuntime = observation.cwdReadable === true &&
+      observation.cwd === profile.runtimeRepository;
+    if (observation.executableReadable === true && !executableIsNode) {
+      continue;
+    }
+    if (observation.cwdReadable === true && !cwdIsRuntime) continue;
+
+    const completeIdentity = observation.executableReadable === true &&
+      observation.cwdReadable === true &&
+      observation.argvReadable === true &&
+      Array.isArray(observation.argv) &&
+      observation.argv.every(value => typeof value === 'string');
+    if (!completeIdentity) {
+      throw codedError('stack_process_identity_unavailable');
+    }
+    if (executableIsNode && cwdIsRuntime && observation.argv.length < 2) {
+      throw codedError('stack_process_identity_unavailable');
+    }
+    const componentMatches = Object.keys(COMPONENTS).filter(name =>
+      commandMatchesComponent(name, observation.argv, {
+        executable: observation.executable,
+        cwd: observation.cwd,
+        profile,
+        environment,
+        fsModule
+      })
+    );
+    if (componentMatches.length === 0) continue;
+    let startIdentity;
+    try {
+      startIdentity = readStartIdentity(pid, { fsModule });
+    } catch {
+      throw codedError('stack_process_start_identity_unavailable');
+    }
+    if (!/^[1-9][0-9]{0,39}$/u.test(startIdentity || '')) {
+      throw codedError('stack_process_start_identity_invalid');
+    }
+    for (const name of componentMatches) {
+      matching.get(name).push(pid);
+    }
+  }
+  const components = Object.fromEntries(
+    [...matching.entries()].map(([name, pidsForComponent]) => {
+      const knownPid = parsePid(processIdentities[name]?.pid);
+      return [name, Object.freeze({
+        orphanDetected: pidsForComponent.some(pid => pid !== knownPid),
+        matchingPidCount: pidsForComponent.length,
+        knownPidPresent: knownPid !== null &&
+          pidsForComponent.includes(knownPid)
+      })];
+    })
+  );
+  if (Object.values(components).some(state =>
+    state.matchingPidCount > 1 || state.orphanDetected
+  )) {
+    throw codedError('stack_managed_orphan_process');
+  }
+  return Object.freeze({
+    inspectionComplete: true,
+    components: Object.freeze(components)
+  });
 }
 
 function processEnvironmentExactlyMatches(pid, expected, {
@@ -4546,6 +5020,81 @@ function assertSourceManifestRebindStopped(
   return true;
 }
 
+function inspectStoppedStateForOwnerProfileTransition(profile, {
+  environment = process.env,
+  fsModule = fs,
+  inspectProcess = name =>
+    inspectProcessIdentity(name, { environment, fsModule }),
+  inspectEdge = name => inspectEdgeContainer(name),
+  inspectOrphans = (value, identities, options) =>
+    inspectOrphanManagedProcesses(value, identities, options),
+  readPidFileState = name =>
+    inspectPidFile(componentPaths(name, environment).pid, fsModule),
+  listPids,
+  readObservation,
+  readStartIdentity
+} = {}) {
+  const componentNames = Object.keys(COMPONENTS);
+  const processIdentities = Object.fromEntries(
+    componentNames.map(name => [name, inspectProcess(name)])
+  );
+  for (const name of componentNames) {
+    const pidFile = readPidFileState(name);
+    if (!pidFile || pidFile.valid !== true) {
+      throw codedError('stack_process_pid_file_invalid');
+    }
+  }
+  const orphanOptions = {
+    environment,
+    fsModule,
+    ...(listPids ? { listPids } : {}),
+    ...(readObservation ? { readObservation } : {}),
+    ...(readStartIdentity ? { readStartIdentity } : {})
+  };
+  const orphanInspection = inspectOrphans(
+    profile,
+    processIdentities,
+    orphanOptions
+  );
+  if (Object.values(orphanInspection?.components || {}).some(state =>
+    state?.matchingPidCount > 0
+  )) {
+    throw codedError('stack_process_running');
+  }
+  const edge = inspectEdge(profile.edgeContainer);
+  assertSourceManifestRebindStopped(profile, processIdentities, edge);
+  return Object.freeze({
+    processIdentities,
+    edge,
+    orphanInspection
+  });
+}
+
+function coordinateStoppedOwnerProfileTransition({
+  candidateBinding,
+  environment = process.env
+} = {}) {
+  const {
+    commitOwnerProfileTransaction
+  } = require('./codex-memory-owner-profile-transaction');
+  return coordinateStoppedOwnerProfileTransitionCore({
+    candidateBinding,
+    profilePath: profilePath(environment),
+    manifestSchemaVersion: MANIFEST_SCHEMA_VERSION,
+    acquireLifecycleProfile: () => acquireLifecycleProfile({ environment }),
+    inspectSourceCompatibility: profile => inspectSourceCompatibility(profile, {
+      repoRoot: profile.runtimeRepository
+    }),
+    inspectStoppedState: profile =>
+      inspectStoppedStateForOwnerProfileTransition(profile, { environment }),
+    validateProfile,
+    canonicalProfileFingerprint: require(
+      './codex-memory-owner-profile-transaction'
+    ).canonicalProfileFingerprint,
+    commitOwnerProfileTransaction
+  });
+}
+
 async function coordinateSourceManifestRebind({
   candidateProfile,
   persistCandidate,
@@ -5442,15 +5991,20 @@ module.exports = {
   connectOwnedLoopbackTcpListener,
   connectedUnixPeerOwnedByPid,
   coordinateSourceManifestRebind,
+  coordinateStoppedOwnerProfileTransition,
   controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
   discoverPrivateRoot,
+  enumerateProcessIds,
   exactKeys,
   extractEnvFileArgument,
   finalizeManagedSpawn,
   inspectEdgeContainer,
+  inspectOrphanManagedProcesses,
+  inspectPidFile,
   inspectProviderContainer,
   inspectSourceCompatibility,
+  inspectStoppedStateForOwnerProfileTransition,
   inspectVcpRuntimeIdentity,
   isPidRunning,
   legacyVcpRuntimeBootstrapMatches,
@@ -5487,6 +6041,7 @@ module.exports = {
   rebindSourceManifestStack,
   readLinuxProcessStartTicks,
   readPidFile,
+  readProcessObservation,
   readVcpProviderEnvironmentSnapshot,
   safeCode,
   sourceManifestRebindEligible,

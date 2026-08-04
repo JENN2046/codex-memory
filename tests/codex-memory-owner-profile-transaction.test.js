@@ -680,16 +680,44 @@ test('schema v4/v5 current profiles fail closed for transaction only', t => {
   assert.equal(result.mutated, false);
 });
 
-test('fault points are internal and lifecycle callers remain unwired', () => {
+test('fault points are internal and the P2 adapter remains dormant', () => {
   const source = fs.readFileSync(
     path.join(__dirname, '..', 'scripts', 'codex-memory-stack.js'),
+    'utf8'
+  );
+  const adapter = fs.readFileSync(
+    path.join(
+      __dirname,
+      '..',
+      'scripts',
+      'codex-memory-stopped-profile-transition.js'
+    ),
     'utf8'
   );
   const primitive = fs.readFileSync(
     path.join(__dirname, '..', 'scripts', 'codex-memory-owner-profile-transaction.js'),
     'utf8'
   );
-  assert.equal(source.includes('codex-memory-owner-profile-transaction'), false);
+  assert.equal(source.includes('codex-memory-owner-profile-transaction'), true);
+  assert.equal(source.includes('coordinateStoppedOwnerProfileTransition('), true);
+  const adapterStart = source.indexOf(
+    'function coordinateStoppedOwnerProfileTransition('
+  );
+  for (const command of ['startStackWithProfile(', 'stopStack(',
+    'rebindSourceManifestStack(', 'adoptRunningStack(']) {
+    const start = source.indexOf(`async function ${command}`);
+    if (start < 0) continue;
+    const next = source.indexOf('\nasync function ', start + 1);
+    const end = next < 0
+      ? adapterStart
+      : Math.min(next, adapterStart);
+    const slice = source.slice(start, end);
+    assert.equal(slice.includes('coordinateStoppedOwnerProfileTransition('), false);
+  }
+  assert.equal(adapter.includes('coordinateSourceManifestRebind'), false);
+  assert.equal(adapter.includes('startStackWithProfile'), false);
+  assert.equal(adapter.includes('journal'), false);
+  assert.equal(adapter.includes('Observer'), false);
   assert.equal(primitive.includes('transitionRecordStore'), false);
   assert.equal(primitive.includes('Observer'), false);
   assert.equal(primitive.includes('journal'), false);
