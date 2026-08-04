@@ -2147,6 +2147,26 @@ function inspectOrphanManagedProcesses(profile, processIdentities, {
         commandObservation.argv.length < 2) {
       throw codedError('stack_process_identity_unavailable');
     }
+    const identityComplete = observation.executableReadable === true &&
+      observation.cwdReadable === true;
+    if (!identityComplete) {
+      const plausibleManagedCommand = Object.keys(COMPONENTS).some(name =>
+        commandPlausiblyMatchesManagedComponent(
+          name,
+          commandObservation.argv,
+          {
+            profile,
+            environment,
+            fsModule,
+            nodeExecutable
+          }
+        )
+      );
+      if (plausibleManagedCommand) {
+        throw codedError('stack_process_identity_unavailable');
+      }
+      continue;
+    }
     const componentMatches = Object.keys(COMPONENTS).filter(name =>
       commandMatchesComponent(name, commandObservation.argv, {
         executable: observation.executable,
@@ -2352,6 +2372,35 @@ function commandMatchesComponent(name, command, options = {}) {
 
 function controllerCommandMatchesComponent(name, command, options = {}) {
   return componentCommandKind(name, command, options) === 'controller';
+}
+
+function commandPlausiblyMatchesManagedComponent(name, command, {
+  profile,
+  environment = process.env,
+  fsModule = fs,
+  nodeExecutable
+} = {}) {
+  if (typeof nodeExecutable !== 'string' || !profile ||
+      !Array.isArray(command) ||
+      !command.every(value => typeof value === 'string')) {
+    return false;
+  }
+  let commandExecutable = null;
+  try {
+    commandExecutable = fsModule.realpathSync(
+      resolveCommandPath(command[0], profile.runtimeRepository)
+    );
+  } catch {}
+  if (commandExecutable !== null && commandExecutable !== nodeExecutable) {
+    return false;
+  }
+  return componentCommandKind(name, command, {
+    executable: nodeExecutable,
+    cwd: profile.runtimeRepository,
+    profile,
+    environment,
+    fsModule
+  }) !== null;
 }
 
 function inspectProcessIdentity(name, {

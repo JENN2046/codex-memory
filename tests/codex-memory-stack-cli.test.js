@@ -1871,6 +1871,93 @@ test('orphan scan stages minimal observation before cmdline and start identity r
   assert.equal(events.includes('start:143'), false);
 });
 
+test('incomplete plausible process identity fails closed without start identity reads', () => {
+  const identities = {
+    shim: { pid: null, running: false, identity: null },
+    http: { pid: null, running: false, identity: null },
+    governance: { pid: null, running: false, identity: null },
+    relay: { pid: null, running: false, identity: null }
+  };
+  const executable = fs.realpathSync(process.execPath);
+  const exact = [
+    executable,
+    '/repo/scripts/codex-memory-stack.js',
+    '_run-http',
+    '--stack-environment=/synthetic/owner-only/governance/runtime.env'
+  ];
+  const events = [];
+  const commandObservation = argv => ({
+    running: true,
+    argv,
+    argvReadable: true,
+    disappeared: false,
+    observationUnavailable: false
+  });
+  const scan = (minimal, command) => inspectOrphanManagedProcesses(
+    profile(),
+    identities,
+    {
+      environment: { XDG_RUNTIME_DIR: '/runtime' },
+      listPids: () => [150],
+      readObservation: () => {
+        events.push('observation');
+        return minimal;
+      },
+      readCommandLine: () => {
+        events.push('cmdline');
+        return commandObservation(command);
+      },
+      readStartIdentity: () => {
+        events.push('start');
+        return '44';
+      }
+    }
+  );
+  const base = {
+    pid: 150,
+    running: true,
+    ownerMatches: true,
+    disappeared: false,
+    observationUnavailable: false
+  };
+
+  assert.throws(
+    () => scan({
+      ...base,
+      executable: null,
+      executableReadable: false,
+      cwd: '/repo',
+      cwdReadable: true
+    }, exact),
+    { code: 'stack_process_identity_unavailable' }
+  );
+  assert.deepEqual(events, ['observation', 'cmdline']);
+  events.length = 0;
+
+  assert.doesNotThrow(() => scan({
+    ...base,
+    executable: null,
+    executableReadable: false,
+    cwd: '/repo',
+    cwdReadable: true
+  }, [executable, '/repo/other-node-program.js']));
+  assert.deepEqual(events, ['observation', 'cmdline']);
+  events.length = 0;
+
+  assert.throws(
+    () => scan({
+      ...base,
+      executable,
+      executableReadable: true,
+      cwd: null,
+      cwdReadable: false
+    }, exact),
+    { code: 'stack_process_identity_unavailable' }
+  );
+  assert.deepEqual(events, ['observation', 'cmdline']);
+  assert.equal(events.includes('start'), false);
+});
+
 test('stopped inspector repeats the same orphan gate and rejects a final orphan race', () => {
   const names = ['shim', 'http', 'governance', 'relay'];
   const identities = Object.fromEntries(names.map(name => [name, {
