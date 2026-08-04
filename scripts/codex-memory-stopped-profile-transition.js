@@ -24,10 +24,8 @@ const P1_CLASSIFICATIONS = new Set([
   'NOT_COMMITTED',
   'COMMIT_RESULT_UNKNOWN'
 ]);
-const ACQUISITION_RELEASE_FAILURE_CODES = new Set([
-  'stack_lifecycle_lock_release_failed',
-  'stack_lifecycle_lock_identity_changed'
-]);
+const ACQUISITION_CLEANUP_RELEASE_FAILURE_CODE =
+  'stack_lifecycle_profile_cleanup_release_failed';
 const LIFECYCLE_ACQUISITION_FAILURE_CODES = new Set([
   'stack_lifecycle_busy',
   'stack_lifecycle_lock_failed',
@@ -35,7 +33,8 @@ const LIFECYCLE_ACQUISITION_FAILURE_CODES = new Set([
   'stack_lifecycle_lock_invalid',
   'stack_lifecycle_lock_path_invalid',
   'stack_lifecycle_lock_recovery_failed',
-  'stack_lifecycle_lock_release_failed'
+  'stack_lifecycle_lock_release_failed',
+  ACQUISITION_CLEANUP_RELEASE_FAILURE_CODE
 ]);
 
 function codedError(code) {
@@ -254,10 +253,18 @@ function projectP1Result(result, {
   };
 }
 
-function finalize(outcome, candidateBinding, lifecycleLockReleased) {
+function finalize(
+  outcome,
+  candidateBinding,
+  lifecycleLockReleased,
+  lifecycleLockAcquired = false,
+  lifecycleLockReleaseAttempted = false
+) {
   return Object.freeze({
     ...outcome,
     candidateBinding,
+    lifecycleLockAcquired,
+    lifecycleLockReleaseAttempted,
     lifecycleLockReleased
   });
 }
@@ -332,6 +339,8 @@ function coordinateStoppedOwnerProfileTransition({
 
   let lifecycle = null;
   let lifecycleLockState = 'NOT_ACQUIRED';
+  let lifecycleLockAcquired = false;
+  let lifecycleLockReleaseAttempted = false;
   let outcome = null;
   let currentProfileFingerprint = null;
   let nextProfileFingerprint = null;
@@ -343,6 +352,7 @@ function coordinateStoppedOwnerProfileTransition({
   try {
     lifecycle = acquireLifecycleProfile({ environment });
     lifecycleLockState = 'HELD';
+    lifecycleLockAcquired = true;
     if (!lifecycle ||
         typeof lifecycle.release !== 'function' ||
         !lifecycle.profile ||
@@ -570,12 +580,24 @@ function coordinateStoppedOwnerProfileTransition({
     }
   } catch (error) {
     if (!outcome) {
-      const acquisitionReleaseFailed =
+      const acquisitionCleanupReleaseFailed =
         lifecycle === null &&
-        ACQUISITION_RELEASE_FAILURE_CODES.has(error?.code);
-      if (acquisitionReleaseFailed) lifecycleLockState = 'RELEASE_FAILED';
+        error?.code === ACQUISITION_CLEANUP_RELEASE_FAILURE_CODE &&
+        error.lifecycleLockAcquired === true &&
+        error.lifecycleLockReleaseAttempted === true &&
+        error.lifecycleLockReleased === false;
+      const acquisitionFailure =
+        LIFECYCLE_ACQUISITION_FAILURE_CODES.has(error?.code);
+      if (acquisitionCleanupReleaseFailed) {
+        lifecycleLockState = 'RELEASE_FAILED';
+        lifecycleLockAcquired = true;
+        lifecycleLockReleaseAttempted = true;
+      }
+      const lifecycleLockErrorCode = acquisitionCleanupReleaseFailed
+        ? error.lifecycleLockReleaseErrorCode || null
+        : acquisitionFailure ? error.code : null;
       const rejected = precondition({
-        reason: acquisitionReleaseFailed
+        reason: acquisitionCleanupReleaseFailed
           ? 'stopped_profile_transition_lock_release_failed'
           : normalizeExecutionFailure(error),
         candidateBinding: binding,
@@ -583,16 +605,18 @@ function coordinateStoppedOwnerProfileTransition({
         nextProfileFingerprint,
         initialStoppedVerified,
         finalStoppedVerified,
-        lifecycleLockErrorCode: acquisitionReleaseFailed
-          ? error.code
-          : null
+        lifecycleLockErrorCode
       });
-      outcome = acquisitionReleaseFailed
-        ? projectLockReleaseFailure(rejected, error.code)
+      outcome = acquisitionCleanupReleaseFailed
+        ? projectLockReleaseFailure(
+          rejected,
+          error.lifecycleLockReleaseErrorCode
+        )
         : rejected;
     }
   } finally {
     if (lifecycle && typeof lifecycle.release === 'function') {
+      lifecycleLockReleaseAttempted = true;
       try {
         lifecycle.release();
         lifecycleLockState = 'RELEASED';
@@ -620,7 +644,8 @@ function coordinateStoppedOwnerProfileTransition({
     nextProfileFingerprint,
     initialStoppedVerified,
     finalStoppedVerified
-  }), binding, lifecycleLockReleased);
+  }), binding, lifecycleLockReleased, lifecycleLockAcquired,
+  lifecycleLockReleaseAttempted);
 }
 
 module.exports = {

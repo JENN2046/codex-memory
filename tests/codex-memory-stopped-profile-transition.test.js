@@ -7,6 +7,7 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
+  acquireLifecycleProfile,
   inspectOrphanManagedProcesses,
   PROFILE_SCHEMA_VERSION,
   validateProfile
@@ -118,6 +119,17 @@ function defaultTransaction(overrides = {}) {
   };
 }
 
+function acquisitionCleanupReleaseError(releaseErrorCode) {
+  const error = new Error('synthetic acquisition cleanup release failure');
+  error.code = 'stack_lifecycle_profile_cleanup_release_failed';
+  error.lifecycleLockAcquired = true;
+  error.lifecycleLockReleaseAttempted = true;
+  error.lifecycleLockReleased = false;
+  error.lifecycleLockReleaseErrorCode = releaseErrorCode;
+  error.acquisitionErrorCode = 'stack_profile_invalid';
+  return error;
+}
+
 function harness({
   current = profile(),
   binding = candidateBinding(),
@@ -160,8 +172,18 @@ function harness({
     acquireLifecycleProfile: () => {
       calls.push('lock');
       if (acquireError) {
-        const error = new Error(acquireError);
-        error.code = acquireError;
+        const error = acquireError instanceof Error
+          ? acquireError
+          : new Error(
+            typeof acquireError === 'string'
+              ? acquireError
+              : acquireError.code
+          );
+        if (typeof acquireError === 'string') {
+          error.code = acquireError;
+        } else if (!(acquireError instanceof Error)) {
+          Object.assign(error, acquireError);
+        }
         throw error;
       }
       calls.push('profile-read');
@@ -222,6 +244,8 @@ test('holds the canonical lock through both gates and one P1 commit', () => {
   assert.equal(result.runtimeMutated, false);
   assert.equal(result.underlyingClassification, 'COMMITTED');
   assert.equal(result.lifecycleLockReleased, true);
+  assert.equal(result.lifecycleLockAcquired, true);
+  assert.equal(result.lifecycleLockReleaseAttempted, true);
   assert.equal(h.p1Calls.length, 1);
   assert.ok(h.calls.indexOf('lock') < h.calls.indexOf('profile-read'));
   assert.ok(h.calls.indexOf('profile-read') < h.calls.indexOf('stopped-1'));
@@ -835,12 +859,16 @@ test('lock release failure wraps precondition rejection without inventing a P1 r
   assert.equal(releaseCount, 1);
   assert.equal(h.calls.includes('rollback'), false);
   assert.equal(result.runtimeMutated, false);
+  assert.equal(result.lifecycleLockAcquired, true);
+  assert.equal(result.lifecycleLockReleaseAttempted, true);
   assert.equal(result.lifecycleLockReleased, false);
 });
 
 test('acquisition cleanup release failure is distinct and keeps lock unreleased', () => {
   const h = harness({
-    acquireError: 'stack_lifecycle_lock_release_failed'
+    acquireError: acquisitionCleanupReleaseError(
+      'stack_lifecycle_lock_release_failed'
+    )
   });
 
   const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
@@ -849,6 +877,10 @@ test('acquisition cleanup release failure is distinct and keeps lock unreleased'
   assert.equal(result.underlyingClassification, 'PRECONDITION_REJECTED');
   assert.equal(result.stableReason,
     'stopped_profile_transition_lock_release_failed');
+  assert.equal(result.lifecycleLockErrorCode,
+    'stack_lifecycle_lock_release_failed');
+  assert.equal(result.lifecycleLockAcquired, true);
+  assert.equal(result.lifecycleLockReleaseAttempted, true);
   assert.equal(result.profileTransactionClassification, null);
   assert.equal(result.profileMutated, false);
   assert.equal(result.runtimeMutated, false);
@@ -859,29 +891,56 @@ test('acquisition cleanup release failure is distinct and keeps lock unreleased'
   assert.equal(h.calls.includes('release'), false);
 });
 
-test('acquisition cleanup identity change is also an unreleased-lock failure', () => {
+test('stale-lock identity change without cleanup provenance is ordinary acquisition failure', () => {
   const h = harness({
     acquireError: 'stack_lifecycle_lock_identity_changed'
   });
 
   const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
 
-  assert.equal(result.classification, 'LOCK_RELEASE_FAILED');
+  assert.equal(result.classification, 'PRECONDITION_REJECTED');
   assert.equal(result.underlyingClassification, 'PRECONDITION_REJECTED');
   assert.equal(result.stableReason,
-    'stopped_profile_transition_lock_release_failed');
+    'stopped_profile_transition_lock_failed');
   assert.equal(
     result.lifecycleLockErrorCode,
     'stack_lifecycle_lock_identity_changed'
   );
+  assert.equal(result.lifecycleLockAcquired, false);
+  assert.equal(result.lifecycleLockReleaseAttempted, false);
   assert.equal(result.profileTransactionClassification, null);
   assert.equal(result.profileMutated, false);
   assert.equal(result.runtimeMutated, false);
   assert.equal(result.p1Called, false);
-  assert.equal(result.lifecycleLockReleased, false);
+  assert.equal(result.lifecycleLockReleased, true);
   assert.deepEqual(h.calls, ['lock']);
   assert.equal(h.p1Calls.length, 0);
   assert.equal(h.calls.includes('release'), false);
+});
+
+test('structured cleanup identity change is an unreleased-lock failure', () => {
+  const h = harness({
+    acquireError: acquisitionCleanupReleaseError(
+      'stack_lifecycle_lock_identity_changed'
+    )
+  });
+
+  const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
+
+  assert.equal(result.classification, 'LOCK_RELEASE_FAILED');
+  assert.equal(result.underlyingClassification, 'PRECONDITION_REJECTED');
+  assert.equal(result.stableReason,
+    'stopped_profile_transition_lock_release_failed');
+  assert.equal(result.lifecycleLockErrorCode,
+    'stack_lifecycle_lock_identity_changed');
+  assert.equal(result.lifecycleLockAcquired, true);
+  assert.equal(result.lifecycleLockReleaseAttempted, true);
+  assert.equal(result.lifecycleLockReleased, false);
+  assert.equal(result.profileTransactionClassification, null);
+  assert.equal(result.profileMutated, false);
+  assert.equal(result.p1Called, false);
+  assert.deepEqual(h.calls, ['lock']);
+  assert.equal(h.p1Calls.length, 0);
 });
 
 test('post-acquisition identity change wraps the underlying P1 result', () => {
@@ -902,6 +961,8 @@ test('post-acquisition identity change wraps the underlying P1 result', () => {
   assert.equal(result.durabilityConfirmed, true);
   assert.equal(result.lifecycleLockErrorCode,
     'stack_lifecycle_lock_identity_changed');
+  assert.equal(result.lifecycleLockAcquired, true);
+  assert.equal(result.lifecycleLockReleaseAttempted, true);
   assert.equal(result.lifecycleLockReleased, false);
   assert.equal(h.p1Calls.length, 1);
 });
@@ -926,6 +987,107 @@ test('ordinary acquisition failures are not projected as release failures', () =
     assert.equal(h.p1Calls.length, 0);
     assert.equal(h.calls.includes('release'), false);
   }
+});
+
+test('lock acquisition identity race has no cleanup provenance', () => {
+  const original = new Error('synthetic stale-lock identity race');
+  original.code = 'stack_lifecycle_lock_identity_changed';
+  let thrown;
+
+  try {
+    acquireLifecycleProfile({
+      environment: { XDG_RUNTIME_DIR: '/synthetic/runtime' },
+      ensureRuntime() {},
+      acquireLock() {
+        throw original;
+      },
+      read() {
+        throw new Error('read must not run');
+      }
+    });
+  } catch (error) {
+    thrown = error;
+  }
+
+  assert.equal(thrown, original);
+  assert.equal(thrown.code, 'stack_lifecycle_lock_identity_changed');
+  assert.equal(thrown.lifecycleLockAcquired, undefined);
+  assert.equal(thrown.lifecycleLockReleaseAttempted, undefined);
+  assert.equal(thrown.lifecycleLockReleased, undefined);
+});
+
+test('acquisition cleanup release errors carry explicit lock provenance', () => {
+  for (const releaseErrorCode of [
+    'stack_lifecycle_lock_identity_changed',
+    'stack_lifecycle_lock_release_failed'
+  ]) {
+    const acquisitionError = new Error('synthetic profile acquisition error');
+    acquisitionError.code = 'stack_profile_invalid';
+    let releaseCount = 0;
+    let thrown;
+
+    try {
+      acquireLifecycleProfile({
+        environment: { XDG_RUNTIME_DIR: '/synthetic/runtime' },
+        ensureRuntime() {},
+        acquireLock() {
+          return {
+            release() {
+              releaseCount += 1;
+              const releaseError = new Error('synthetic release error');
+              releaseError.code = releaseErrorCode;
+              throw releaseError;
+            }
+          };
+        },
+        read() {
+          throw acquisitionError;
+        }
+      });
+    } catch (error) {
+      thrown = error;
+    }
+
+    assert.equal(thrown.code,
+      'stack_lifecycle_profile_cleanup_release_failed');
+    assert.equal(thrown.lifecycleLockAcquired, true);
+    assert.equal(thrown.lifecycleLockReleaseAttempted, true);
+    assert.equal(thrown.lifecycleLockReleased, false);
+    assert.equal(thrown.lifecycleLockReleaseErrorCode, releaseErrorCode);
+    assert.equal(thrown.acquisitionErrorCode, 'stack_profile_invalid');
+    assert.equal(releaseCount, 1);
+  }
+});
+
+test('successful acquisition cleanup preserves the original error', () => {
+  const original = new Error('synthetic profile acquisition error');
+  original.code = 'stack_profile_invalid';
+  let releaseCount = 0;
+  let thrown;
+
+  try {
+    acquireLifecycleProfile({
+      environment: { XDG_RUNTIME_DIR: '/synthetic/runtime' },
+      ensureRuntime() {},
+      acquireLock() {
+        return {
+          release() {
+            releaseCount += 1;
+            return true;
+          }
+        };
+      },
+      read() {
+        throw original;
+      }
+    });
+  } catch (error) {
+    thrown = error;
+  }
+
+  assert.equal(thrown, original);
+  assert.equal(thrown.code, 'stack_profile_invalid');
+  assert.equal(releaseCount, 1);
 });
 
 test('real P1 transaction commits a complete temporary schema-v6 profile fixture', t => {

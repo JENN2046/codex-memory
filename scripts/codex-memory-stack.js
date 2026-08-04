@@ -1613,7 +1613,23 @@ function acquireLifecycleProfile({
       release: () => lifecycleLock.release()
     });
   } catch (error) {
-    lifecycleLock.release();
+    try {
+      lifecycleLock.release();
+    } catch (releaseError) {
+      const cleanupError = codedError(
+        'stack_lifecycle_profile_cleanup_release_failed'
+      );
+      cleanupError.lifecycleLockAcquired = true;
+      cleanupError.lifecycleLockReleaseAttempted = true;
+      cleanupError.lifecycleLockReleased = false;
+      cleanupError.lifecycleLockReleaseErrorCode =
+        typeof releaseError?.code === 'string'
+          ? releaseError.code
+          : null;
+      cleanupError.acquisitionErrorCode =
+        typeof error?.code === 'string' ? error.code : null;
+      throw cleanupError;
+    }
     throw error;
   }
 }
