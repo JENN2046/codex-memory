@@ -127,12 +127,16 @@ function harness({
   sourceResults,
   transaction = defaultTransaction(),
   validate = validateProfile,
-  profilePath = '/synthetic/full-stack-control.json'
+  profilePath = '/synthetic/full-stack-control.json',
+  release
 } = {}) {
   const calls = [];
   const sourceCalls = [];
   const stoppedCalls = [];
   const p1Calls = [];
+  const releaseHandler = release || (() => {
+    calls.push('release');
+  });
   let sourceIndex = 0;
   let stoppedIndex = 0;
 
@@ -156,9 +160,7 @@ function harness({
       calls.push('profile-read');
       return {
         profile: current,
-        release: () => {
-          calls.push('release');
-        }
+        release: releaseHandler
       };
     },
     inspectSourceCompatibility: profileValue => {
@@ -211,6 +213,7 @@ test('holds the canonical lock through both gates and one P1 commit', () => {
   assert.equal(result.p1Called, true);
   assert.equal(result.profileMutated, true);
   assert.equal(result.runtimeMutated, false);
+  assert.equal(result.underlyingClassification, 'COMMITTED');
   assert.equal(result.lifecycleLockReleased, true);
   assert.equal(h.p1Calls.length, 1);
   assert.ok(h.calls.indexOf('lock') < h.calls.indexOf('profile-read'));
@@ -492,6 +495,107 @@ test('P1 exception is fail-closed and releases the canonical lock', () => {
   assert.equal(result.profileMutated, false);
   assert.equal(result.lifecycleLockReleased, true);
   assert.equal(h.calls.at(-1), 'release');
+});
+
+test('lock release failure wraps P1 results without changing operation truth', () => {
+  const cases = [
+    {
+      classification: 'COMMITTED',
+      errorCode: null,
+      mutated: true,
+      durabilityConfirmed: true,
+      committedProfileMatchesNext: true
+    },
+    {
+      classification: 'ALREADY_COMMITTED',
+      errorCode: 'owner_profile_already_committed',
+      mutated: false,
+      durabilityConfirmed: true,
+      committedProfileMatchesNext: true
+    },
+    {
+      classification: 'COMMIT_RESULT_UNKNOWN',
+      errorCode: 'owner_profile_post_commit_state_conflict',
+      mutated: null,
+      durabilityConfirmed: false,
+      committedProfileMatchesNext: false
+    }
+  ];
+  const nextFingerprint = SHA('n');
+  const readBackFingerprint = SHA('r');
+
+  for (const expected of cases) {
+    let releaseCount = 0;
+    const h = harness({
+      transaction: defaultTransaction({
+        ...expected,
+        nextFingerprint,
+        readBackFingerprint
+      }),
+      release: () => {
+        releaseCount += 1;
+        throw new Error('synthetic lifecycle lock release failure');
+      }
+    });
+    const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
+
+    assert.equal(result.classification, 'LOCK_RELEASE_FAILED');
+    assert.equal(result.stableReason,
+      'stopped_profile_transition_lock_release_failed');
+    assert.equal(result.underlyingClassification, expected.classification);
+    assert.equal(
+      result.profileTransactionClassification,
+      expected.classification
+    );
+    assert.equal(result.profileTransactionErrorCode, expected.errorCode);
+    assert.equal(
+      result.currentProfileFingerprint,
+      canonicalProfileFingerprint(h.current)
+    );
+    assert.equal(result.nextProfileFingerprint, nextFingerprint);
+    assert.equal(result.readBackProfileFingerprint, readBackFingerprint);
+    assert.equal(result.profileMutated, expected.mutated);
+    assert.equal(result.durabilityConfirmed, expected.durabilityConfirmed);
+    assert.equal(
+      result.committedProfileMatchesNext,
+      expected.committedProfileMatchesNext
+    );
+    assert.equal(result.lifecycleLockReleased, false);
+    assert.equal(result.p1Called, true);
+    assert.equal(h.p1Calls.length, 1);
+    assert.equal(releaseCount, 1);
+    assert.equal(h.calls.includes('rollback'), false);
+    assert.equal(result.runtimeMutated, false);
+  }
+});
+
+test('lock release failure wraps precondition rejection without inventing a P1 result', () => {
+  let releaseCount = 0;
+  const h = harness({
+    stopResults: [{
+      verified: false,
+      reason: 'stopped_profile_transition_runtime_not_stopped'
+    }],
+    release: () => {
+      releaseCount += 1;
+      throw new Error('synthetic lifecycle lock release failure');
+    }
+  });
+  const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
+
+  assert.equal(result.classification, 'LOCK_RELEASE_FAILED');
+  assert.equal(result.stableReason,
+    'stopped_profile_transition_lock_release_failed');
+  assert.equal(result.underlyingClassification, 'PRECONDITION_REJECTED');
+  assert.equal(result.profileTransactionClassification, null);
+  assert.equal(result.profileTransactionErrorCode, null);
+  assert.equal(result.profileMutated, false);
+  assert.equal(result.p1Called, false);
+  assert.equal(h.p1Calls.length, 0);
+  assert.equal(releaseCount, 1);
+  assert.equal(h.calls.includes('rollback'), false);
+  assert.equal(result.runtimeMutated, false);
+  assert.equal(result.lifecycleLockReleased, false);
 });
 
 test('real P1 transaction commits a complete temporary schema-v6 profile fixture', t => {

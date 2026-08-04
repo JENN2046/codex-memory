@@ -173,6 +173,7 @@ function precondition({
 }) {
   return {
     classification: 'PRECONDITION_REJECTED',
+    underlyingClassification: 'PRECONDITION_REJECTED',
     stableReason: reason,
     candidateBinding,
     initialStoppedVerified,
@@ -211,6 +212,7 @@ function projectP1Result(result, {
   }
   return {
     classification,
+    underlyingClassification: classification,
     stableReason:
       classification === 'COMMITTED' ||
       classification === 'ALREADY_COMMITTED'
@@ -557,29 +559,20 @@ function coordinateStoppedOwnerProfileTransition({
         lifecycleLockReleased = true;
       } catch {
         lifecycleLockReleased = false;
-        outcome = precondition({
-          reason: 'stopped_profile_transition_lock_release_failed',
+        const underlying = outcome || precondition({
+          reason: 'stopped_profile_transition_profile_transaction_failed',
           candidateBinding: binding,
           currentProfileFingerprint,
           nextProfileFingerprint,
           initialStoppedVerified,
-          finalStoppedVerified,
-          p1Called: outcome?.p1Called === true,
-          profileTransactionClassification:
-            outcome?.profileTransactionClassification || null,
-          profileTransactionErrorCode:
-            outcome?.profileTransactionErrorCode || null,
-          readBackProfileFingerprint:
-            outcome?.readBackProfileFingerprint || null,
-          profileMutated:
-            outcome?.profileMutated === true ||
-            outcome?.profileMutated === false
-              ? outcome.profileMutated
-              : false,
-          durabilityConfirmed: outcome?.durabilityConfirmed === true,
-          committedProfileMatchesNext:
-            outcome?.committedProfileMatchesNext === true
+          finalStoppedVerified
         });
+        outcome = {
+          ...underlying,
+          classification: 'LOCK_RELEASE_FAILED',
+          underlyingClassification: underlying.classification,
+          stableReason: 'stopped_profile_transition_lock_release_failed'
+        };
       }
     }
   }
