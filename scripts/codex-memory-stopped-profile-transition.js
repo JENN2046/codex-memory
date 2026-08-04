@@ -15,6 +15,7 @@ const IDENTITY_FIELDS = Object.freeze([
 ]);
 const P1_CLASSIFICATIONS = new Set([
   'COMMITTED',
+  'COMMITTED_WITH_UNCERTAIN_DURABILITY',
   'ALREADY_COMMITTED',
   'ALREADY_COMMITTED_WITH_UNCERTAIN_DURABILITY',
   'STALE_CURRENT',
@@ -146,7 +147,7 @@ function normalizeInspectionFailure(error, fallback) {
 }
 
 function normalizeExecutionFailure(error) {
-  if (error?.code?.startsWith?.('stack_lifecycle_lock')) {
+  if (error?.code?.startsWith?.('stack_lifecycle_')) {
     return 'stopped_profile_transition_lock_failed';
   }
   if (error?.code?.startsWith?.('stack_profile_') ||
@@ -246,6 +247,15 @@ function finalize(outcome, candidateBinding, lifecycleLockReleased) {
   });
 }
 
+function projectLockReleaseFailure(outcome) {
+  return {
+    ...outcome,
+    classification: 'LOCK_RELEASE_FAILED',
+    underlyingClassification: outcome.classification,
+    stableReason: 'stopped_profile_transition_lock_release_failed'
+  };
+}
+
 /*
  * This is an internal orchestration seam. All supplied dependencies are
  * caller-owned so tests can use synthetic lock, stopped-state, source, and
@@ -304,7 +314,7 @@ function coordinateStoppedOwnerProfileTransition({
   }
 
   let lifecycle = null;
-  let lifecycleLockReleased = true;
+  let lifecycleLockState = 'NOT_ACQUIRED';
   let outcome = null;
   let currentProfileFingerprint = null;
   let nextProfileFingerprint = null;
@@ -315,7 +325,7 @@ function coordinateStoppedOwnerProfileTransition({
 
   try {
     lifecycle = acquireLifecycleProfile({ environment });
-    lifecycleLockReleased = false;
+    lifecycleLockState = 'HELD';
     if (!lifecycle ||
         typeof lifecycle.release !== 'function' ||
         !lifecycle.profile ||
@@ -543,22 +553,31 @@ function coordinateStoppedOwnerProfileTransition({
     }
   } catch (error) {
     if (!outcome) {
-      outcome = precondition({
-        reason: normalizeExecutionFailure(error),
+      const acquisitionReleaseFailed =
+        lifecycle === null &&
+        error?.code === 'stack_lifecycle_lock_release_failed';
+      if (acquisitionReleaseFailed) lifecycleLockState = 'RELEASE_FAILED';
+      const rejected = precondition({
+        reason: acquisitionReleaseFailed
+          ? 'stopped_profile_transition_lock_release_failed'
+          : normalizeExecutionFailure(error),
         candidateBinding: binding,
         currentProfileFingerprint,
         nextProfileFingerprint,
         initialStoppedVerified,
         finalStoppedVerified
       });
+      outcome = acquisitionReleaseFailed
+        ? projectLockReleaseFailure(rejected)
+        : rejected;
     }
   } finally {
     if (lifecycle && typeof lifecycle.release === 'function') {
       try {
         lifecycle.release();
-        lifecycleLockReleased = true;
+        lifecycleLockState = 'RELEASED';
       } catch {
-        lifecycleLockReleased = false;
+        lifecycleLockState = 'RELEASE_FAILED';
         const underlying = outcome || precondition({
           reason: 'stopped_profile_transition_profile_transaction_failed',
           candidateBinding: binding,
@@ -567,16 +586,13 @@ function coordinateStoppedOwnerProfileTransition({
           initialStoppedVerified,
           finalStoppedVerified
         });
-        outcome = {
-          ...underlying,
-          classification: 'LOCK_RELEASE_FAILED',
-          underlyingClassification: underlying.classification,
-          stableReason: 'stopped_profile_transition_lock_release_failed'
-        };
+        outcome = projectLockReleaseFailure(underlying);
       }
     }
   }
 
+  const lifecycleLockReleased = lifecycleLockState === 'NOT_ACQUIRED' ||
+    lifecycleLockState === 'RELEASED';
   return finalize(outcome || precondition({
     reason: 'stopped_profile_transition_profile_transaction_failed',
     candidateBinding: binding,

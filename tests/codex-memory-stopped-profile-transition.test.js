@@ -128,7 +128,8 @@ function harness({
   transaction = defaultTransaction(),
   validate = validateProfile,
   profilePath = '/synthetic/full-stack-control.json',
-  release
+  release,
+  acquireError
 } = {}) {
   const calls = [];
   const sourceCalls = [];
@@ -157,6 +158,11 @@ function harness({
     profileSchemaVersion: PROFILE_SCHEMA_VERSION,
     acquireLifecycleProfile: () => {
       calls.push('lock');
+      if (acquireError) {
+        const error = new Error(acquireError);
+        error.code = acquireError;
+        throw error;
+      }
       calls.push('profile-read');
       return {
         profile: current,
@@ -448,6 +454,7 @@ test('next-profile validation failure is distinct and does not call P1', () => {
 test('all P1 result classifications are preserved without retry or alternate authority', () => {
   const results = [
     ['COMMITTED', true],
+    ['COMMITTED_WITH_UNCERTAIN_DURABILITY', true],
     ['ALREADY_COMMITTED', false],
     ['ALREADY_COMMITTED_WITH_UNCERTAIN_DURABILITY', false],
     ['STALE_CURRENT', false],
@@ -504,6 +511,13 @@ test('lock release failure wraps P1 results without changing operation truth', (
       errorCode: null,
       mutated: true,
       durabilityConfirmed: true,
+      committedProfileMatchesNext: true
+    },
+    {
+      classification: 'COMMITTED_WITH_UNCERTAIN_DURABILITY',
+      errorCode: 'owner_profile_parent_directory_fsync_failed',
+      mutated: true,
+      durabilityConfirmed: false,
       committedProfileMatchesNext: true
     },
     {
@@ -569,6 +583,41 @@ test('lock release failure wraps P1 results without changing operation truth', (
   }
 });
 
+test('committed uncertain durability is projected without losing P1 facts', () => {
+  const nextFingerprint = SHA('n');
+  const readBackFingerprint = SHA('r');
+  const errorCode = 'owner_profile_parent_directory_fsync_failed';
+  const h = harness({
+    transaction: defaultTransaction({
+      classification: 'COMMITTED_WITH_UNCERTAIN_DURABILITY',
+      errorCode,
+      nextFingerprint,
+      readBackFingerprint,
+      mutated: true,
+      durabilityConfirmed: false,
+      committedProfileMatchesNext: true
+    })
+  });
+
+  const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
+
+  assert.equal(result.classification,
+    'COMMITTED_WITH_UNCERTAIN_DURABILITY');
+  assert.equal(result.underlyingClassification,
+    'COMMITTED_WITH_UNCERTAIN_DURABILITY');
+  assert.equal(result.profileTransactionClassification,
+    'COMMITTED_WITH_UNCERTAIN_DURABILITY');
+  assert.equal(result.profileTransactionErrorCode, errorCode);
+  assert.equal(result.profileMutated, true);
+  assert.equal(result.durabilityConfirmed, false);
+  assert.equal(result.committedProfileMatchesNext, true);
+  assert.equal(result.nextProfileFingerprint, nextFingerprint);
+  assert.equal(result.readBackProfileFingerprint, readBackFingerprint);
+  assert.equal(result.p1Called, true);
+  assert.equal(h.p1Calls.length, 1);
+  assert.equal(result.lifecycleLockReleased, true);
+});
+
 test('lock release failure wraps precondition rejection without inventing a P1 result', () => {
   let releaseCount = 0;
   const h = harness({
@@ -596,6 +645,44 @@ test('lock release failure wraps precondition rejection without inventing a P1 r
   assert.equal(h.calls.includes('rollback'), false);
   assert.equal(result.runtimeMutated, false);
   assert.equal(result.lifecycleLockReleased, false);
+});
+
+test('acquisition cleanup release failure is distinct and keeps lock unreleased', () => {
+  const h = harness({
+    acquireError: 'stack_lifecycle_lock_release_failed'
+  });
+
+  const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
+
+  assert.equal(result.classification, 'LOCK_RELEASE_FAILED');
+  assert.equal(result.underlyingClassification, 'PRECONDITION_REJECTED');
+  assert.equal(result.stableReason,
+    'stopped_profile_transition_lock_release_failed');
+  assert.equal(result.profileTransactionClassification, null);
+  assert.equal(result.profileMutated, false);
+  assert.equal(result.runtimeMutated, false);
+  assert.equal(result.p1Called, false);
+  assert.equal(result.lifecycleLockReleased, false);
+  assert.deepEqual(h.calls, ['lock']);
+  assert.equal(h.p1Calls.length, 0);
+  assert.equal(h.calls.includes('release'), false);
+});
+
+test('ordinary acquisition failure is not projected as release failure', () => {
+  const h = harness({ acquireError: 'stack_lifecycle_busy' });
+
+  const result = coordinateStoppedOwnerProfileTransition(h.dependencies);
+
+  assert.equal(result.classification, 'PRECONDITION_REJECTED');
+  assert.equal(result.underlyingClassification, 'PRECONDITION_REJECTED');
+  assert.equal(result.stableReason,
+    'stopped_profile_transition_lock_failed');
+  assert.equal(result.profileMutated, false);
+  assert.equal(result.p1Called, false);
+  assert.equal(result.lifecycleLockReleased, true);
+  assert.deepEqual(h.calls, ['lock']);
+  assert.equal(h.p1Calls.length, 0);
+  assert.equal(h.calls.includes('release'), false);
 });
 
 test('real P1 transaction commits a complete temporary schema-v6 profile fixture', t => {
