@@ -18,6 +18,7 @@ const {
   projectAcquisitionFailure,
   projectReleaseFailure
 } = require('../scripts/codex-memory-stopped-profile-transition');
+const observer = require('../scripts/codex-memory-process-observer');
 const {
   COMMAND_SHAPES,
   DECISIONS,
@@ -25,9 +26,8 @@ const {
   OWNER_STATES,
   classifyManagedCommandShape,
   classifyManagedProcessEvidence,
-  createCanonicalNodeSnapshot,
   scanManagedProcesses
-} = require('../scripts/codex-memory-process-observer');
+} = observer;
 
 const GIT = suffix => suffix.repeat(40);
 const SHA = suffix => `sha256:${suffix.repeat(64)}`;
@@ -275,6 +275,7 @@ function observerDecision(overrides = {}) {
 }
 
 function scanObserverOne({
+  runtimeRepository = OBSERVER_RUNTIME,
   executable = OBSERVER_NODE,
   cwd = OBSERVER_RUNTIME,
   owner = OWNER_STATES.SAME_OWNER,
@@ -285,7 +286,8 @@ function scanObserverOne({
   liveness = [true, true, true],
   commandReadable = true,
   controllerPid = 999,
-  startIdentity = '88'
+  startIdentity = '88',
+  canonicalResolver = null
 } = {}) {
   const calls = [];
   let livenessIndex = 0;
@@ -297,10 +299,10 @@ function scanObserverOne({
     resolveCanonicalNode(value) {
       calls.push(`canonical:${value}`);
       if (canonicalNode === null) throw new Error('node unavailable');
-      return canonicalNode;
+      return canonicalResolver ? canonicalResolver(value) : canonicalNode;
     },
     execPath: OBSERVER_NODE,
-    runtimeRepository: OBSERVER_RUNTIME,
+    runtimeRepository,
     controllerPid,
     readLiveness() {
       calls.push('liveness');
@@ -337,6 +339,37 @@ function scanObserverOne({
   });
   return { calls, result };
 }
+
+function assertSanitizedScanResult(result, canonicalStatus) {
+  assert.deepEqual(result.canonicalNode, { status: canonicalStatus });
+  for (const forbidden of [
+    'evidence',
+    'command',
+    'argv',
+    'executable',
+    'cwd',
+    'startIdentity'
+  ]) {
+    assert.equal(Object.hasOwn(result, forbidden), false, forbidden);
+  }
+  for (const match of result.componentMatches) {
+    assert.deepEqual(Object.keys(match).sort(), ['component', 'pid']);
+  }
+}
+
+test('observer exports only the sanitized process-observation contract', () => {
+  assert.deepEqual(Object.keys(observer).sort(), [
+    'COMMAND_SHAPES',
+    'DECISIONS',
+    'EVIDENCE_STATUS',
+    'OWNER_STATES',
+    'classifyManagedCommandShape',
+    'classifyManagedProcessEvidence',
+    'scanManagedProcesses'
+  ].sort());
+  assert.equal(Object.hasOwn(observer, 'collectProcessEvidence'), false);
+  assert.equal(Object.hasOwn(observer, 'createCanonicalNodeSnapshot'), false);
+});
 
 test('tri-state command shape and evidence classifiers never conflate unknown with nonmatch', () => {
   const matchComponents = argv =>
@@ -388,6 +421,8 @@ test('tri-state scanner minimizes reads and only reads start identity after exac
 
   const exact = scanObserverOne();
   assert.equal(exact.result.decision, DECISIONS.EXACT);
+  assertSanitizedScanResult(exact.result, EVIDENCE_STATUS.RESOLVED);
+  assert.equal(Object.hasOwn(exact.result.canonicalNode, 'path'), false);
   assert.equal(Object.hasOwn(exact.result, 'argv'), false);
   assert.deepEqual(exact.calls, [
     'canonical:/synthetic/node',
@@ -405,6 +440,7 @@ test('tri-state scanner minimizes reads and only reads start identity after exac
   ]);
   const nonmatch = scanObserverOne({ exactComponent: null });
   assert.equal(nonmatch.result.decision, DECISIONS.IGNORE);
+  assertSanitizedScanResult(nonmatch.result, EVIDENCE_STATUS.RESOLVED);
   assert.equal(nonmatch.calls.includes('start'), false);
 });
 
@@ -414,6 +450,7 @@ test('canonical Node unavailable and incomplete identity remain fail-closed when
     commandShape: COMMAND_SHAPES.MANAGED_SHAPE
   });
   assert.equal(nodeUnavailable.result.decision, DECISIONS.FAIL_CLOSED);
+  assertSanitizedScanResult(nodeUnavailable.result, EVIDENCE_STATUS.UNAVAILABLE);
   assert.equal(nodeUnavailable.calls.includes('start'), false);
 
   const cwdUnavailable = scanObserverOne({
@@ -421,31 +458,31 @@ test('canonical Node unavailable and incomplete identity remain fail-closed when
     commandShape: COMMAND_SHAPES.MANAGED_SHAPE
   });
   assert.equal(cwdUnavailable.result.decision, DECISIONS.FAIL_CLOSED);
+  assertSanitizedScanResult(cwdUnavailable.result, EVIDENCE_STATUS.RESOLVED);
   assert.equal(cwdUnavailable.calls.includes('start'), false);
 
   const argvUnavailable = scanObserverOne({ commandReadable: false });
   assert.equal(argvUnavailable.result.decision, DECISIONS.FAIL_CLOSED);
+  assertSanitizedScanResult(argvUnavailable.result, EVIDENCE_STATUS.RESOLVED);
   assert.equal(argvUnavailable.calls.includes('start'), false);
 
   const invalidStart = scanObserverOne({ startIdentity: 'not-a-start-tick' });
   assert.equal(invalidStart.result.decision, DECISIONS.FAIL_CLOSED);
+  assertSanitizedScanResult(invalidStart.result, EVIDENCE_STATUS.RESOLVED);
   assert.equal(invalidStart.calls.at(-1), 'start');
 });
 
 test('canonical Node is snapshotted once and disappearance is ignored', () => {
   let resolverCalls = 0;
-  const snapshot = createCanonicalNodeSnapshot({
-    execPath: OBSERVER_NODE,
-    realpathSync() {
+  const snapshot = scanObserverOne({
+    canonicalResolver() {
       resolverCalls += 1;
       return resolverCalls === 1 ? OBSERVER_NODE : '/synthetic/changed-node';
     }
   });
-  assert.deepEqual(snapshot, {
-    status: EVIDENCE_STATUS.RESOLVED,
-    path: OBSERVER_NODE
-  });
+  assertSanitizedScanResult(snapshot.result, EVIDENCE_STATUS.RESOLVED);
   assert.equal(resolverCalls, 1);
+  assert.equal(Object.hasOwn(snapshot.result.canonicalNode, 'path'), false);
 
   const disappeared = scanObserverOne({
     owner: OWNER_STATES.UNKNOWN,
@@ -463,6 +500,42 @@ test('canonical Node is snapshotted once and disappearance is ignored', () => {
     execPath: OBSERVER_NODE
   });
   assert.equal(unavailableEnumeration.decision, DECISIONS.FAIL_CLOSED);
+  assertSanitizedScanResult(unavailableEnumeration, EVIDENCE_STATUS.RESOLVED);
+  assert.equal(Object.hasOwn(unavailableEnumeration.canonicalNode, 'path'), false);
+});
+
+test('all scan paths exclude raw process evidence and recognizable markers', () => {
+  const markerScan = scanObserverOne({
+    runtimeRepository: '/synthetic/RAW_CWD_SECRET_MARKER',
+    executable: '/synthetic/RAW_EXECUTABLE_SECRET_MARKER',
+    canonicalNode: '/synthetic/RAW_EXECUTABLE_SECRET_MARKER',
+    cwd: '/synthetic/RAW_CWD_SECRET_MARKER',
+    command: ['RAW_ARGV_SECRET_MARKER'],
+    startIdentity: 'RAW_START_SECRET_MARKER'
+  });
+  const serialized = JSON.stringify(markerScan.result);
+  for (const marker of [
+    'RAW_ARGV_SECRET_MARKER',
+    'RAW_EXECUTABLE_SECRET_MARKER',
+    'RAW_CWD_SECRET_MARKER',
+    'RAW_START_SECRET_MARKER'
+  ]) {
+    assert.equal(serialized.includes(marker), false, marker);
+  }
+  assert.equal(markerScan.result.decision, DECISIONS.FAIL_CLOSED);
+
+  const unavailableEnumeration = scanManagedProcesses({
+    runtimeRepository: OBSERVER_RUNTIME,
+    enumerateProcessIds() {
+      throw new Error('enumeration unavailable');
+    },
+    resolveCanonicalNode: () => '/synthetic/RAW_EXECUTABLE_SECRET_MARKER',
+    execPath: '/synthetic/RAW_EXECUTABLE_SECRET_MARKER'
+  });
+  const unavailableSerialized = JSON.stringify(unavailableEnumeration);
+  assert.equal(unavailableSerialized.includes('RAW_EXECUTABLE_SECRET_MARKER'), false);
+  assert.equal(Object.hasOwn(unavailableEnumeration, 'evidence'), false);
+  assert.equal(Object.hasOwn(unavailableEnumeration, 'argv'), false);
 });
 
 test('coordinator locks before profile read and releases after one P1 readback', () => {

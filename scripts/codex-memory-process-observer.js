@@ -525,6 +525,33 @@ function collectProcessEvidence(pid, {
   });
 }
 
+function sanitizeCanonicalNodeStatus(canonicalNode) {
+  return Object.freeze({
+    status: canonicalNode?.status === EVIDENCE_STATUS.RESOLVED
+      ? EVIDENCE_STATUS.RESOLVED
+      : EVIDENCE_STATUS.UNAVAILABLE
+  });
+}
+
+function finalizeScanResult({
+  decision,
+  reason,
+  componentMatches = [],
+  canonicalNode
+} = {}) {
+  return Object.freeze({
+    decision,
+    reason,
+    componentMatches: Object.freeze(componentMatches.map(match =>
+      Object.freeze({
+        pid: match.pid,
+        component: match.component
+      })
+    )),
+    canonicalNode: sanitizeCanonicalNodeStatus(canonicalNode)
+  });
+}
+
 function scanManagedProcesses({
   enumerateProcessIds,
   resolveCanonicalNode = fs.realpathSync,
@@ -548,18 +575,18 @@ function scanManagedProcesses({
   try {
     pids = enumerateProcessIds();
   } catch {
-    return Object.freeze({
+    return finalizeScanResult({
       decision: DECISIONS.FAIL_CLOSED,
       reason: 'PROCESS_ENUMERATION_UNAVAILABLE',
-      componentMatches: Object.freeze([]),
+      componentMatches: [],
       canonicalNode
     });
   }
   if (!Array.isArray(pids)) {
-    return Object.freeze({
+    return finalizeScanResult({
       decision: DECISIONS.FAIL_CLOSED,
       reason: 'PROCESS_ENUMERATION_UNAVAILABLE',
-      componentMatches: Object.freeze([]),
+      componentMatches: [],
       canonicalNode
     });
   }
@@ -579,10 +606,10 @@ function scanManagedProcesses({
       exactComponentMatcher
     });
     if (observation.result.decision === DECISIONS.FAIL_CLOSED) {
-      return Object.freeze({
+      return finalizeScanResult({
         decision: DECISIONS.FAIL_CLOSED,
         reason: observation.result.reason,
-        componentMatches: Object.freeze([]),
+        componentMatches: [],
         canonicalNode
       });
     }
@@ -593,10 +620,10 @@ function scanManagedProcesses({
       }));
     }
   }
-  return Object.freeze({
+  return finalizeScanResult({
     decision: matches.length > 0 ? DECISIONS.EXACT : DECISIONS.IGNORE,
     reason: matches.length > 0 ? 'EXACT_COMPONENT_IDENTITY' : 'NO_MANAGED_MATCH',
-    componentMatches: Object.freeze(matches),
+    componentMatches: matches,
     canonicalNode
   });
 }
@@ -608,7 +635,5 @@ module.exports = {
   OWNER_STATES,
   classifyManagedCommandShape,
   classifyManagedProcessEvidence,
-  collectProcessEvidence,
-  createCanonicalNodeSnapshot,
   scanManagedProcesses
 };
