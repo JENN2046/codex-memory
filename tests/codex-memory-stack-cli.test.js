@@ -1686,17 +1686,27 @@ test('orphan process scan filters unrelated same-owner processes before exact ma
     executableReadable: true,
     cwd: '/repo',
     cwdReadable: true,
-    argv: exactCommand('http'),
-    argvReadable: true,
     disappeared: false,
     observationUnavailable: false,
     ...overrides
   });
-  const scan = (pids, readObservation, processState = identities) =>
+  const scan = (
+    pids,
+    readObservation,
+    processState = identities,
+    commandLines = new Map()
+  ) =>
     inspectOrphanManagedProcesses(profile(), processState, {
       environment: { XDG_RUNTIME_DIR: '/runtime' },
       listPids: () => pids,
       readObservation,
+      readCommandLine: pid => commandLines.get(pid) || {
+        running: true,
+        argv: exactCommand('http'),
+        argvReadable: true,
+        disappeared: false,
+        observationUnavailable: false
+      },
       readStartIdentity: () => '44'
     });
 
@@ -1713,22 +1723,31 @@ test('orphan process scan filters unrelated same-owner processes before exact ma
   assert.equal(knownResult.components.http.matchingPidCount, 1);
 
   const unrelated = scan([124], () => observation(124, {
-    cwd: '/other-project',
-    argv: [executable]
+    cwd: '/other-project'
   }));
   assert.equal(unrelated.components.http.matchingPidCount, 0);
   assert.doesNotThrow(() => scan([125], () => observation(125, {
     executable: '/usr/bin/python',
-    executableReadable: true,
-    argv: null,
-    argvReadable: false
+    executableReadable: true
   })));
   assert.throws(
-    () => scan([126], () => observation(126, {
-      argv: [executable]
-    })),
+    () => scan([126], () => observation(126), identities, new Map([[126, {
+      running: true,
+      argv: [executable],
+      argvReadable: true,
+      disappeared: false,
+      observationUnavailable: false
+    }]])),
     { code: 'stack_process_identity_unavailable' }
   );
+  assert.doesNotThrow(() => scan([132], () => observation(132), identities,
+    new Map([[132, {
+      running: true,
+      argv: [executable, '/repo/other-node-program.js'],
+      argvReadable: true,
+      disappeared: false,
+      observationUnavailable: false
+    }]])));
   assert.doesNotThrow(() => scan([127], () => observation(127, {
     ownerMatches: false
   })));
@@ -1744,6 +1763,13 @@ test('orphan process scan filters unrelated same-owner processes before exact ma
     () => inspectOrphanManagedProcesses(profile(), identities, {
       listPids: () => [131],
       readObservation: () => observation(131),
+      readCommandLine: () => ({
+        running: true,
+        argv: exactCommand('http'),
+        argvReadable: true,
+        disappeared: false,
+        observationUnavailable: false
+      }),
       readStartIdentity: () => {
         throw new Error('unavailable');
       }
@@ -1758,6 +1784,91 @@ test('orphan process scan filters unrelated same-owner processes before exact ma
     }),
     { code: 'stack_process_enumeration_unavailable' }
   );
+});
+
+test('orphan scan stages minimal observation before cmdline and start identity reads', () => {
+  const names = ['shim', 'http', 'governance', 'relay'];
+  const identities = Object.fromEntries(names.map(name => [name, {
+    pid: null,
+    running: false,
+    identity: null
+  }]));
+  const executable = fs.realpathSync(process.execPath);
+  const events = [];
+  const exact = [
+    executable,
+    '/repo/scripts/codex-memory-stack.js',
+    '_run-http',
+    '--stack-environment=/synthetic/owner-only/governance/runtime.env'
+  ];
+  const observation = (pid, overrides = {}) => ({
+    pid,
+    running: true,
+    ownerMatches: true,
+    executable,
+    executableReadable: true,
+    cwd: '/repo',
+    cwdReadable: true,
+    disappeared: false,
+    observationUnavailable: false,
+    ...overrides
+  });
+  const commandObservation = argv => ({
+    running: true,
+    argv,
+    argvReadable: true,
+    disappeared: false,
+    observationUnavailable: false
+  });
+  const scan = (pid, minimal, command, processState = identities) =>
+    inspectOrphanManagedProcesses(
+      profile(),
+      processState,
+      {
+        environment: { XDG_RUNTIME_DIR: '/runtime' },
+        listPids: () => [pid],
+        readObservation: value => {
+          events.push(`observation:${value}`);
+          return minimal;
+        },
+        readCommandLine: value => {
+          events.push(`cmdline:${value}`);
+          return command;
+        },
+        readStartIdentity: value => {
+          events.push(`start:${value}`);
+          return '44';
+        }
+      }
+    );
+
+  scan(140, observation(140, { executable: '/usr/bin/python' }), null);
+  assert.deepEqual(events, ['observation:140']);
+  events.length = 0;
+
+  scan(141, observation(141, { cwd: '/other-project' }), null);
+  assert.deepEqual(events, ['observation:141']);
+  events.length = 0;
+
+  scan(142, observation(142), commandObservation(exact), {
+    ...identities,
+    http: { pid: 142, running: false, identity: null }
+  });
+  assert.deepEqual(events, ['observation:142', 'cmdline:142', 'start:142']);
+  events.length = 0;
+
+  assert.throws(
+    () => scan(143, observation(143), {
+      running: true,
+      argv: null,
+      argvReadable: false,
+      disappeared: false,
+      observationUnavailable: false
+    }),
+    { code: 'stack_process_identity_unavailable' }
+  );
+  assert.deepEqual(events, ['observation:143', 'cmdline:143']);
+  assert.equal(events.includes('start:143'), false);
 });
 
 test('stopped inspector repeats the same orphan gate and rejects a final orphan race', () => {
@@ -1783,6 +1894,11 @@ test('stopped inspector repeats the same orphan gate and rejects a final orphan 
     executableReadable: true,
     cwd: '/repo',
     cwdReadable: true,
+    disappeared: false,
+    observationUnavailable: false
+  });
+  const readCommandLine = () => ({
+    running: true,
     argv: [
       executable,
       '/repo/scripts/codex-memory-stack.js',
@@ -1802,6 +1918,7 @@ test('stopped inspector repeats the same orphan gate and rejects a final orphan 
       readPidFileState: () => ({ present: false, valid: true, pid: null }),
       listPids: () => scans++ === 0 ? [] : [200],
       readObservation,
+      readCommandLine,
       readStartIdentity: () => '44'
     }
   );
@@ -1818,6 +1935,7 @@ test('stopped inspector repeats the same orphan gate and rejects a final orphan 
         readPidFileState: () => ({ present: true, valid: true, pid: 200 }),
         listPids: () => [200],
         readObservation,
+        readCommandLine,
         readStartIdentity: () => '44'
       }
     ),

@@ -1896,8 +1896,6 @@ function readProcessObservation(pid, {
       executableReadable: false,
       cwd: null,
       cwdReadable: false,
-      argv: null,
-      argvReadable: false,
       disappeared: false,
       observationUnavailable: true
     });
@@ -1911,8 +1909,6 @@ function readProcessObservation(pid, {
       executableReadable: false,
       cwd: null,
       cwdReadable: false,
-      argv: null,
-      argvReadable: false,
       disappeared: true,
       observationUnavailable: false
     });
@@ -1931,8 +1927,6 @@ function readProcessObservation(pid, {
           executableReadable: false,
           cwd: null,
           cwdReadable: false,
-          argv: null,
-          argvReadable: false,
           disappeared: true,
           observationUnavailable: false
         });
@@ -1946,8 +1940,6 @@ function readProcessObservation(pid, {
       executableReadable: false,
       cwd: null,
       cwdReadable: false,
-      argv: null,
-      argvReadable: false,
       disappeared: false,
       observationUnavailable: true
     });
@@ -1961,8 +1953,6 @@ function readProcessObservation(pid, {
       executableReadable: false,
       cwd: null,
       cwdReadable: false,
-      argv: null,
-      argvReadable: false,
       disappeared: false,
       observationUnavailable: false
     });
@@ -1971,8 +1961,6 @@ function readProcessObservation(pid, {
   let executableReadable = false;
   let cwd = null;
   let cwdReadable = false;
-  let argv = null;
-  let argvReadable = false;
   try {
     executable = fsModule.realpathSync(`/proc/${normalizedPid}/exe`);
     executableReadable = path.isAbsolute(executable);
@@ -1980,11 +1968,6 @@ function readProcessObservation(pid, {
   try {
     cwd = fsModule.realpathSync(`/proc/${normalizedPid}/cwd`);
     cwdReadable = path.isAbsolute(cwd);
-  } catch {}
-  try {
-    const value = fsModule.readFileSync(`/proc/${normalizedPid}/cmdline`);
-    argv = value.toString('utf8').split('\0').filter(Boolean);
-    argvReadable = true;
   } catch {}
   let stillRunning;
   try {
@@ -2001,8 +1984,6 @@ function readProcessObservation(pid, {
       executableReadable,
       cwd,
       cwdReadable,
-      argv,
-      argvReadable,
       disappeared: true,
       observationUnavailable: false
     });
@@ -2016,8 +1997,6 @@ function readProcessObservation(pid, {
       executableReadable,
       cwd,
       cwdReadable,
-      argv,
-      argvReadable,
       disappeared: false,
       observationUnavailable: true
     });
@@ -2030,10 +2009,68 @@ function readProcessObservation(pid, {
     executableReadable,
     cwd,
     cwdReadable,
+    disappeared: false,
+    observationUnavailable: false
+  });
+}
+
+function readProcessCommandLine(pid, {
+  fsModule = fs,
+  isRunning = value => isPidRunning(value)
+} = {}) {
+  const normalizedPid = parsePid(pid);
+  if (normalizedPid === null) {
+    throw codedError('stack_process_identity_invalid');
+  }
+  let initiallyRunning;
+  try {
+    initiallyRunning = isRunning(normalizedPid) === true;
+  } catch {
+    return Object.freeze({
+      running: true,
+      argv: null,
+      argvReadable: false,
+      disappeared: false,
+      observationUnavailable: true
+    });
+  }
+  if (!initiallyRunning) {
+    return Object.freeze({
+      running: false,
+      argv: null,
+      argvReadable: false,
+      disappeared: true,
+      observationUnavailable: false
+    });
+  }
+  let argv = null;
+  let argvReadable = false;
+  try {
+    const value = fsModule.readFileSync(`/proc/${normalizedPid}/cmdline`);
+    argv = value.toString('utf8').split('\0').filter(Boolean);
+    argvReadable = true;
+  } catch {}
+  let stillRunning;
+  try {
+    stillRunning = isRunning(normalizedPid) === true;
+  } catch {
+    stillRunning = null;
+  }
+  if (stillRunning === false) {
+    return Object.freeze({
+      running: false,
+      argv,
+      argvReadable,
+      disappeared: true,
+      observationUnavailable: false
+    });
+  }
+  return Object.freeze({
+    running: true,
     argv,
     argvReadable,
     disappeared: false,
-    observationUnavailable: false
+    observationUnavailable: stillRunning === null
   });
 }
 
@@ -2042,6 +2079,7 @@ function inspectOrphanManagedProcesses(profile, processIdentities, {
   fsModule = fs,
   listPids = () => enumerateProcessIds({ fsModule }),
   readObservation = pid => readProcessObservation(pid, { fsModule }),
+  readCommandLine = pid => readProcessCommandLine(pid, { fsModule }),
   readStartIdentity = (pid, options) =>
     readLinuxProcessStartTicks(pid, options),
   controllerPid = process.pid
@@ -2091,19 +2129,26 @@ function inspectOrphanManagedProcesses(profile, processIdentities, {
     }
     if (observation.cwdReadable === true && !cwdIsRuntime) continue;
 
-    const completeIdentity = observation.executableReadable === true &&
-      observation.cwdReadable === true &&
-      observation.argvReadable === true &&
-      Array.isArray(observation.argv) &&
-      observation.argv.every(value => typeof value === 'string');
-    if (!completeIdentity) {
+    let commandObservation;
+    try {
+      commandObservation = readCommandLine(pid, { fsModule });
+    } catch {
       throw codedError('stack_process_identity_unavailable');
     }
-    if (executableIsNode && cwdIsRuntime && observation.argv.length < 2) {
+    if (!commandObservation || commandObservation.disappeared ||
+        commandObservation.running === false) continue;
+    if (commandObservation.observationUnavailable === true ||
+        commandObservation.argvReadable !== true ||
+        !Array.isArray(commandObservation.argv) ||
+        commandObservation.argv.some(value => typeof value !== 'string')) {
+      throw codedError('stack_process_identity_unavailable');
+    }
+    if (executableIsNode && cwdIsRuntime &&
+        commandObservation.argv.length < 2) {
       throw codedError('stack_process_identity_unavailable');
     }
     const componentMatches = Object.keys(COMPONENTS).filter(name =>
-      commandMatchesComponent(name, observation.argv, {
+      commandMatchesComponent(name, commandObservation.argv, {
         executable: observation.executable,
         cwd: observation.cwd,
         profile,
@@ -5032,6 +5077,7 @@ function inspectStoppedStateForOwnerProfileTransition(profile, {
     inspectPidFile(componentPaths(name, environment).pid, fsModule),
   listPids,
   readObservation,
+  readCommandLine,
   readStartIdentity
 } = {}) {
   const componentNames = Object.keys(COMPONENTS);
@@ -5049,6 +5095,7 @@ function inspectStoppedStateForOwnerProfileTransition(profile, {
     fsModule,
     ...(listPids ? { listPids } : {}),
     ...(readObservation ? { readObservation } : {}),
+    ...(readCommandLine ? { readCommandLine } : {}),
     ...(readStartIdentity ? { readStartIdentity } : {})
   };
   const orphanInspection = inspectOrphans(

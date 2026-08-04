@@ -319,6 +319,15 @@ function projectReleaseFailure(previous, releaseError, context) {
   });
 }
 
+function synchronizeLifecycleLockContext(context, result) {
+  if (!context || !result) return;
+  context.lifecycleLockAcquired = result.lifecycleLockAcquired;
+  context.lifecycleLockReleaseAttempted =
+    result.lifecycleLockReleaseAttempted;
+  context.lifecycleLockReleased = result.lifecycleLockReleased;
+  context.lifecycleLockErrorCode = result.lifecycleLockErrorCode;
+}
+
 function requireStopped(inspection) {
   if (inspection === false || inspection?.verified === false ||
       inspection?.stopped === false || inspection?.accepted === false) {
@@ -501,11 +510,7 @@ function coordinateStoppedOwnerProfileTransition({
       currentProfileFingerprint: currentFingerprint,
       nextProfileFingerprint: nextFingerprint
     });
-    context.lifecycleLockAcquired = result.lifecycleLockAcquired;
-    context.lifecycleLockReleaseAttempted =
-      result.lifecycleLockReleaseAttempted;
-    context.lifecycleLockReleased = result.lifecycleLockReleased;
-    context.lifecycleLockErrorCode = result.lifecycleLockErrorCode;
+    synchronizeLifecycleLockContext(context, result);
   } finally {
     if (lifecycle) {
       context.lifecycleLockReleaseAttempted = true;
@@ -519,6 +524,7 @@ function coordinateStoppedOwnerProfileTransition({
           currentProfileFingerprint: currentFingerprint,
           nextProfileFingerprint: nextFingerprint
         });
+        synchronizeLifecycleLockContext(context, result);
       }
     }
   }

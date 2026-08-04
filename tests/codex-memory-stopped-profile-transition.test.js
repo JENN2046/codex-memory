@@ -354,8 +354,34 @@ test('release failure wraps P1 unknown without changing mutation truth', () => {
     'owner_profile_post_commit_state_conflict');
   assert.equal(result.profileMutated, null);
   assert.equal(result.readBackProfileFingerprint, 'sha256:third');
+  assert.equal(result.lifecycleLockErrorCode,
+    'stack_lifecycle_lock_identity_changed');
   assert.equal(result.lifecycleLockReleased, false);
   assert.equal(commitResults.length, 1);
+});
+
+test('final release error remains authoritative after a precondition failure', () => {
+  const preconditionError = new Error('synthetic stopped-state failure');
+  preconditionError.code = 'stack_lifecycle_busy';
+  const releaseError = new Error('synthetic final release failure');
+  releaseError.code = 'stack_lifecycle_lock_identity_changed';
+  const { result, releaseCount, commitResults } = run({
+    releaseError,
+    stoppedFactory: () => {
+      throw preconditionError;
+    }
+  });
+  assert.equal(result.classification, 'LOCK_RELEASE_FAILED');
+  assert.equal(result.underlyingClassification, 'PRECONDITION_REJECTED');
+  assert.equal(result.preconditionErrorCode, 'stack_lifecycle_busy');
+  assert.equal(result.lifecycleLockErrorCode,
+    'stack_lifecycle_lock_identity_changed');
+  assert.equal(result.lifecycleLockAcquired, true);
+  assert.equal(result.lifecycleLockReleaseAttempted, true);
+  assert.equal(result.lifecycleLockReleased, false);
+  assert.equal(result.p1Called, false);
+  assert.equal(releaseCount, 1);
+  assert.equal(commitResults.length, 0);
 });
 
 test('structured acquisition cleanup failure is distinct from raw stale-lock failure', () => {
