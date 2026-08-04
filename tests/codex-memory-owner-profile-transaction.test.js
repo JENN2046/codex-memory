@@ -680,7 +680,7 @@ test('schema v4/v5 current profiles fail closed for transaction only', t => {
   assert.equal(result.mutated, false);
 });
 
-test('fault points are internal and lifecycle callers remain unwired', () => {
+test('fault points remain internal and the dormant adapter stays off the CLI path', () => {
   const source = fs.readFileSync(
     path.join(__dirname, '..', 'scripts', 'codex-memory-stack.js'),
     'utf8'
@@ -689,7 +689,12 @@ test('fault points are internal and lifecycle callers remain unwired', () => {
     path.join(__dirname, '..', 'scripts', 'codex-memory-owner-profile-transaction.js'),
     'utf8'
   );
-  assert.equal(source.includes('codex-memory-owner-profile-transaction'), false);
+  const mainStart = source.indexOf('async function main(');
+  const mainEnd = source.indexOf('\nif (require.main === module)', mainStart);
+  assert.notEqual(mainStart, -1);
+  assert.notEqual(mainEnd, -1);
+  const mainSource = source.slice(mainStart, mainEnd);
+  assert.equal(mainSource.includes('coordinateStoppedOwnerProfileTransition'), false);
   assert.equal(primitive.includes('transitionRecordStore'), false);
   assert.equal(primitive.includes('Observer'), false);
   assert.equal(primitive.includes('journal'), false);
