@@ -344,8 +344,12 @@ contract evidence. Changing a security root body or any transitive local or
 external security dependency changes the contract digest and requires explicit
 reacceptance. Missing, unreadable, untracked, symlinked, path-escaping, or
 worktree-divergent evidence fails closed; a security-relevant dynamic local
-dependency that cannot be resolved statically also fails closed. An unrelated
-VCP implementation file remains outside this evidence closure, so a clean
+dependency that cannot be resolved statically also fails closed. Dependency
+analysis accepts only unshadowed direct loaders with literal specifiers and
+static ESM declarations. Loader aliases, computed specifiers, `createRequire`,
+and unsupported execution indirection make the entire contract evidence
+unavailable; no partial evidence digest or migration package is produced. An
+unrelated VCP implementation file remains outside this evidence closure, so a clean
 routine update to such a file changes only the observed build identity. The
 top-level package manifest is Git-validated and contributes repository identity
 and build observation, but unrelated version or script metadata is not treated

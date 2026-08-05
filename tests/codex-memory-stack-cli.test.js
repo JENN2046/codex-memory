@@ -302,6 +302,15 @@ function vcpContractFixture(t, {
   return root;
 }
 
+function vcpKnowledgeBaseSource(prelude, initializeBody = 'return true;') {
+  return `${prelude}\n` +
+    'class KnowledgeBaseManager {\n' +
+    `  async initialize() { ${initializeBody} }\n` +
+    '  async shutdown() {}\n' +
+    '}\n' +
+    'module.exports = new KnowledgeBaseManager();\n';
+}
+
 function legacyProfile(overrides = {}) {
   const {
     controllerSourceCommit: _controllerSourceCommit,
@@ -2939,7 +2948,7 @@ test('VCP contract evidence fails closed on path, Git, and dependency ambiguity'
   assert.equal(inspectVcpRuntimeContractEvidence(dynamicRoot).complete, false);
   assert.equal(
     inspectVcpRuntimeContractEvidence(dynamicRoot).stableErrorCode,
-    'stack_vcp_runtime_contract_dynamic_dependency_unresolved'
+    'stack_vcp_runtime_contract_dependency_indirection_unsupported'
   );
 
   const traversalRoot = vcpContractFixture(t, {
@@ -2950,6 +2959,141 @@ test('VCP contract evidence fails closed on path, Git, and dependency ambiguity'
       'module.exports = new KnowledgeBaseManager();\n'
   });
   assert.equal(inspectVcpRuntimeContractEvidence(traversalRoot).complete, false);
+});
+
+test('VCP contract evidence fails closed on loader and execution indirection', t => {
+  const unsupportedLoaders = [
+    "const load = require; load('./security-helper');",
+    "let load = require; load('./security-helper');",
+    "let load; load = require; load('./security-helper');",
+    'const load = module.require;',
+    'const load = module.require.bind(module);',
+    'const holder = { load: require };',
+    'consume(require);',
+    'function expose() { return require; }',
+    "const { createRequire } = require('node:module');",
+    "const Module = require('node:module'); Module.createRequire(__filename);"
+  ];
+  for (const [index, prelude] of unsupportedLoaders.entries()) {
+    const root = vcpContractFixture(t, {
+      knowledgeBaseSource: vcpKnowledgeBaseSource(prelude)
+    });
+    const evidence = inspectVcpRuntimeContractEvidence(root);
+    assert.equal(evidence.complete, false, `loader fixture ${index}`);
+    assert.equal(evidence.evidenceDigest, null, `loader fixture ${index}`);
+    assert.equal(evidence.projection, null, `loader fixture ${index}`);
+    assert.equal(
+      evidence.stableErrorCode,
+      'stack_vcp_runtime_contract_dependency_indirection_unsupported',
+      `loader fixture ${index}`
+    );
+  }
+
+  const executionIndirections = [
+    "eval(\"require('./security-helper')\");",
+    'const execute = eval;',
+    'globalThis.eval("void 0");',
+    "new Function(\"return require('./security-helper')\");",
+    'const Constructor = Function;',
+    'global.Function("return 1");',
+    "vm.runInThisContext(\"require('./security-helper')\");",
+    'const execute = vm;',
+    "process.mainModule.require('./security-helper');",
+    'const legacyLoader = process.mainModule;',
+    'const root = global;',
+    "global.require('./security-helper');"
+  ];
+  for (const [index, prelude] of executionIndirections.entries()) {
+    const root = vcpContractFixture(t, {
+      knowledgeBaseSource: vcpKnowledgeBaseSource(prelude)
+    });
+    const evidence = inspectVcpRuntimeContractEvidence(root);
+    assert.equal(evidence.complete, false, `execution fixture ${index}`);
+    assert.equal(evidence.evidenceDigest, null, `execution fixture ${index}`);
+    assert.equal(evidence.projection, null, `execution fixture ${index}`);
+    assert.equal(
+      evidence.stableErrorCode,
+      'stack_vcp_runtime_contract_execution_indirection_unsupported',
+      `execution fixture ${index}`
+    );
+  }
+});
+
+test('VCP contract evidence rejects computed specifiers and shadowed loaders', t => {
+  const computedSpecifiers = [
+    "const name = 'security-helper'; require('./' + name);",
+    "const target = './security-helper'; require(target);",
+    "const name = 'security-helper'; require(`./${name}`);",
+    "const target = './security-helper'; import(target);",
+    "module['require']('./security-helper');",
+    "require?.('./security-helper');"
+  ];
+  for (const [index, prelude] of computedSpecifiers.entries()) {
+    const root = vcpContractFixture(t, {
+      knowledgeBaseSource: vcpKnowledgeBaseSource(prelude)
+    });
+    const evidence = inspectVcpRuntimeContractEvidence(root);
+    assert.equal(evidence.complete, false, `specifier fixture ${index}`);
+    assert.equal(evidence.evidenceDigest, null, `specifier fixture ${index}`);
+    assert.equal(evidence.projection, null, `specifier fixture ${index}`);
+    assert.equal(
+      evidence.stableErrorCode,
+      'stack_vcp_runtime_contract_dependency_indirection_unsupported',
+      `specifier fixture ${index}`
+    );
+  }
+
+  const shadowedRoot = vcpContractFixture(t, {
+    knowledgeBaseSource: vcpKnowledgeBaseSource(
+      "function load(require) { return require('./not-a-real-load'); }"
+    )
+  });
+  const shadowed = inspectVcpRuntimeContractEvidence(shadowedRoot);
+  assert.equal(shadowed.complete, false);
+  assert.equal(
+    shadowed.stableErrorCode,
+    'stack_vcp_runtime_contract_dependency_analysis_ambiguous'
+  );
+});
+
+test('VCP dependency analysis ignores comments and preserves static literals', t => {
+  const commentsRoot = vcpContractFixture(t, {
+    knowledgeBaseSource: vcpKnowledgeBaseSource(
+      '// const load = require;\n' +
+      'const text = "require(\\\'./fake\\\')";',
+      'return text.length > 0;'
+    )
+  });
+  assert.equal(inspectVcpRuntimeContractEvidence(commentsRoot).complete, true);
+
+  const directRoot = vcpContractFixture(t, {
+    knowledgeBaseSource: vcpKnowledgeBaseSource(
+      "const helper = module.require('./security-helper');",
+      'return helper.initialize();'
+    )
+  });
+  const before = inspectVcpRuntimeContractEvidence(directRoot);
+  assert.equal(before.complete, true);
+  fs.writeFileSync(
+    path.join(directRoot, 'security-helper.js'),
+    "const leaf = require('./security-leaf');\n" +
+      'module.exports = { initialize: () => leaf.value + 1, ' +
+      'shutdown: () => true };\n'
+  );
+  commitVcpContractFixture(directRoot, 'change direct static dependency');
+  const after = inspectVcpRuntimeContractEvidence(directRoot);
+  assert.equal(after.complete, true);
+  assert.notEqual(after.evidenceDigest, before.evidenceDigest);
+
+  const literalImportRoot = vcpContractFixture(t, {
+    knowledgeBaseSource: vcpKnowledgeBaseSource(
+      "import('./security-helper');"
+    )
+  });
+  assert.equal(
+    inspectVcpRuntimeContractEvidence(literalImportRoot).complete,
+    true
+  );
 });
 
 test('VCP contract evidence binds relevant external dependency identity', t => {
@@ -3061,6 +3205,14 @@ test('legacy schema-v6 migration package binds fingerprint and exact stale-safe 
   const result = commitOwnerProfileTransaction(migration.transaction);
   assert.equal(result.classification, 'STALE_CURRENT');
   assert.deepEqual(JSON.parse(fs.readFileSync(profilePath, 'utf8')), stale);
+  assert.throws(
+    () => vcpRuntimeContractMigrationCandidate(
+      legacy,
+      { ...identity, contractComplete: false, contractEvidenceDigest: null },
+      { expectedCurrentFingerprint, profilePath }
+    ),
+    { code: 'stack_vcp_runtime_migration_candidate_invalid' }
+  );
 });
 
 test('VCP provider binding pins model and dimension without pinning the API key', () => {
