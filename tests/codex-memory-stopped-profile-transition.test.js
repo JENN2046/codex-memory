@@ -148,6 +148,67 @@ test('observer exposes only tri-state enums, pure classifiers, and sanitized sca
   }).decision, observer.DECISIONS.FAIL_CLOSED);
 });
 
+test('complete identity requires positive command exclusion before ignore', () => {
+  const complete = {
+    liveness: observer.LIVENESS_STATES.RUNNING,
+    disappeared: false,
+    owner: { status: observer.OWNER_STATES.SAME_OWNER },
+    canonicalNode: { status: observer.EVIDENCE_STATUS.RESOLVED, path: NODE },
+    executable: { status: observer.EVIDENCE_STATUS.READABLE, path: NODE },
+    cwd: { status: observer.EVIDENCE_STATUS.READABLE, path: RUNTIME },
+    command: {
+      status: observer.EVIDENCE_STATUS.READABLE,
+      argv: ['node', 'managed']
+    },
+    startIdentity: { status: observer.EVIDENCE_STATUS.NOT_READ, value: null }
+  };
+  const classify = (commandShape, exactComponent = null, evidence = complete) =>
+    observer.classifyManagedProcessEvidence(evidence, {
+      runtimeRepository: RUNTIME,
+      commandShape,
+      exactComponent
+    });
+
+  assert.deepEqual(classify(observer.COMMAND_SHAPES.MANAGED_SHAPE), {
+    decision: observer.DECISIONS.FAIL_CLOSED,
+    reason: 'MANAGED_SHAPE_EXACT_MATCH_MISSING',
+    component: null
+  });
+  assert.deepEqual(classify(observer.COMMAND_SHAPES.AMBIGUOUS), {
+    decision: observer.DECISIONS.FAIL_CLOSED,
+    reason: 'COMMAND_SHAPE_AMBIGUOUS',
+    component: null
+  });
+  assert.deepEqual(classify(
+    observer.COMMAND_SHAPES.DEFINITIVELY_UNRELATED
+  ), {
+    decision: observer.DECISIONS.IGNORE,
+    reason: 'COMPLETE_IDENTITY_NONMATCH',
+    component: null
+  });
+  assert.deepEqual(classify(observer.COMMAND_SHAPES.MANAGED_SHAPE, 'http', {
+    ...complete,
+    startIdentity: { status: observer.EVIDENCE_STATUS.VALID, value: '77' }
+  }), {
+    decision: observer.DECISIONS.EXACT,
+    reason: 'EXACT_COMPONENT_IDENTITY',
+    component: 'http'
+  });
+  assert.deepEqual(classify(observer.COMMAND_SHAPES.MANAGED_SHAPE, 'http'), {
+    decision: observer.DECISIONS.FAIL_CLOSED,
+    reason: 'START_IDENTITY_UNAVAILABLE',
+    component: null
+  });
+});
+
+test('scanner fails closed when managed shape has no exact component', () => {
+  const scan = scanOne({ component: null });
+  assert.equal(scan.result.decision, observer.DECISIONS.FAIL_CLOSED);
+  assert.equal(scan.result.reason, 'MANAGED_SHAPE_EXACT_MATCH_MISSING');
+  assert.deepEqual(scan.result.componentMatches, []);
+  assert.equal(scan.calls.filter(call => call === 'start').length, 0);
+});
+
 test('liveness normalization preserves unknown and native error semantics', () => {
   const injected = [
     [true, 'KNOWN_PID_RUNNING'],
@@ -664,6 +725,8 @@ test('stack aggregation rejects known, unknown, orphan, and enumeration failures
       'stack_process_identity_unavailable', []],
     ['PROCESS_ENUMERATION_UNAVAILABLE', observer.DECISIONS.FAIL_CLOSED,
       'stack_process_enumeration_unavailable', []],
+    ['MANAGED_SHAPE_EXACT_MATCH_MISSING', observer.DECISIONS.FAIL_CLOSED,
+      'stack_process_identity_unavailable', []],
     ['MANAGED_PROCESS_MATCH', observer.DECISIONS.EXACT,
       'stack_managed_orphan_process', [{ pid: 777, component: 'http' }]]
   ];

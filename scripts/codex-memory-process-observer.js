@@ -153,16 +153,26 @@ function classifyManagedProcessEvidence(evidence, {
     evidence.cwd?.status === EVIDENCE_STATUS.READABLE &&
     evidence.cwd.path === runtimeRepository;
   if (identityComplete) {
-    if (typeof exactComponent !== 'string' || exactComponent.length === 0) {
+    const hasExactComponent =
+      typeof exactComponent === 'string' && exactComponent.length > 0;
+    if (hasExactComponent) {
+      if (evidence.startIdentity?.status !== EVIDENCE_STATUS.VALID) {
+        return decision(DECISIONS.FAIL_CLOSED, 'START_IDENTITY_UNAVAILABLE');
+      }
+      return decision(
+        DECISIONS.EXACT,
+        'EXACT_COMPONENT_IDENTITY',
+        exactComponent
+      );
+    }
+    if (commandShape === COMMAND_SHAPES.DEFINITIVELY_UNRELATED) {
       return decision(DECISIONS.IGNORE, 'COMPLETE_IDENTITY_NONMATCH');
     }
-    if (evidence.startIdentity?.status !== EVIDENCE_STATUS.VALID) {
-      return decision(DECISIONS.FAIL_CLOSED, 'START_IDENTITY_UNAVAILABLE');
-    }
     return decision(
-      DECISIONS.EXACT,
-      'EXACT_COMPONENT_IDENTITY',
-      exactComponent
+      DECISIONS.FAIL_CLOSED,
+      commandShape === COMMAND_SHAPES.MANAGED_SHAPE
+        ? 'MANAGED_SHAPE_EXACT_MATCH_MISSING'
+        : 'COMMAND_SHAPE_AMBIGUOUS'
     );
   }
   if (commandShape === COMMAND_SHAPES.DEFINITIVELY_UNRELATED) {
