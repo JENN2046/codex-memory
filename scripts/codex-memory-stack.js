@@ -9,6 +9,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { builtinModules } = require('node:module');
 const { parseEnv } = require('node:util');
+const acorn = require('acorn');
 const {
   execFile,
   execFileSync,
@@ -2372,34 +2373,341 @@ function vcpExternalPackageName(specifier) {
     : parts[0];
 }
 
+const VCP_DEPENDENCY_ANALYSIS_STATUS = Object.freeze({
+  AMBIGUOUS: 'AMBIGUOUS',
+  COMPLETE: 'COMPLETE',
+  PARSE_FAILED: 'PARSE_FAILED',
+  UNSUPPORTED_INDIRECTION: 'UNSUPPORTED_INDIRECTION'
+});
+
 function parseVcpStaticDependencies(source) {
-  const specifiers = new Set();
-  let dynamicDependency = false;
-  const callPatterns = [
-    /\brequire\s*\(([^)]*)\)/gu,
-    /\bimport\s*\(([^)]*)\)/gu
-  ];
-  for (const pattern of callPatterns) {
-    for (const match of source.matchAll(pattern)) {
-      const argument = match[1].trim();
-      const literal = argument.match(/^(['"])([^'"]+)\1$/u);
-      if (!literal) {
-        dynamicDependency = true;
-      } else {
-        specifiers.add(literal[2]);
-      }
+  const rejected = (status, stableErrorCode) => Object.freeze({
+    specifiers: Object.freeze([]),
+    stableErrorCode,
+    status
+  });
+  if (typeof source !== 'string') {
+    return rejected(
+      VCP_DEPENDENCY_ANALYSIS_STATUS.PARSE_FAILED,
+      'stack_vcp_runtime_contract_dependency_parse_failed'
+    );
+  }
+  let program;
+  try {
+    program = acorn.parse(source, {
+      allowHashBang: true,
+      ecmaVersion: 'latest',
+      sourceType: 'script'
+    });
+  } catch {
+    try {
+      program = acorn.parse(source, {
+        allowHashBang: true,
+        ecmaVersion: 'latest',
+        sourceType: 'module'
+      });
+    } catch {
+      return rejected(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.PARSE_FAILED,
+        'stack_vcp_runtime_contract_dependency_parse_failed'
+      );
     }
   }
-  const staticPatterns = [
-    /\bimport\s+(?:[^'";]+?\s+from\s+)?['"]([^'"]+)['"]/gu,
-    /\bexport\s+[^'";]+?\s+from\s+['"]([^'"]+)['"]/gu
-  ];
-  for (const pattern of staticPatterns) {
-    for (const match of source.matchAll(pattern)) specifiers.add(match[1]);
+
+  const children = node => Object.entries(node).flatMap(([key, value]) => {
+    if (key === 'start' || key === 'end' || key === 'loc' || key === 'range') {
+      return [];
+    }
+    if (Array.isArray(value)) {
+      return value.filter(candidate => candidate?.type);
+    }
+    return value?.type ? [value] : [];
+  });
+  const walk = (node, visit, parent = null) => {
+    visit(node, parent);
+    for (const child of children(node)) walk(child, visit, node);
+  };
+  const boundNames = new Set();
+  const collectPatternNames = pattern => {
+    if (!pattern) return;
+    if (pattern.type === 'Identifier') {
+      boundNames.add(pattern.name);
+      return;
+    }
+    if (pattern.type === 'RestElement') {
+      collectPatternNames(pattern.argument);
+      return;
+    }
+    if (pattern.type === 'AssignmentPattern') {
+      collectPatternNames(pattern.left);
+      return;
+    }
+    if (pattern.type === 'ArrayPattern') {
+      for (const element of pattern.elements) collectPatternNames(element);
+      return;
+    }
+    if (pattern.type === 'ObjectPattern') {
+      for (const property of pattern.properties) {
+        collectPatternNames(
+          property.type === 'RestElement' ? property.argument : property.value
+        );
+      }
+    }
+  };
+  walk(program, node => {
+    if (node.type === 'VariableDeclarator') collectPatternNames(node.id);
+    if (node.type === 'FunctionDeclaration' ||
+        node.type === 'FunctionExpression' ||
+        node.type === 'ArrowFunctionExpression') {
+      collectPatternNames(node.id);
+      for (const parameter of node.params) collectPatternNames(parameter);
+    }
+    if (node.type === 'ClassDeclaration' || node.type === 'ClassExpression') {
+      collectPatternNames(node.id);
+    }
+    if (node.type === 'ImportSpecifier' ||
+        node.type === 'ImportDefaultSpecifier' ||
+        node.type === 'ImportNamespaceSpecifier') {
+      collectPatternNames(node.local);
+    }
+    if (node.type === 'CatchClause') collectPatternNames(node.param);
+  });
+  if (boundNames.has('require') || boundNames.has('module')) {
+    return rejected(
+      VCP_DEPENDENCY_ANALYSIS_STATUS.AMBIGUOUS,
+      'stack_vcp_runtime_contract_dependency_analysis_ambiguous'
+    );
   }
+
+  const specifiers = new Set();
+  let failure = null;
+  const fail = (status, stableErrorCode) => {
+    if (!failure) failure = { stableErrorCode, status };
+  };
+  const literalSpecifier = node =>
+    node?.type === 'Literal' &&
+    typeof node.value === 'string' &&
+    node.value.length > 0
+      ? node.value
+      : null;
+  const propertyName = node => {
+    if (!node || node.type !== 'MemberExpression') return null;
+    if (!node.computed && node.property.type === 'Identifier') {
+      return node.property.name;
+    }
+    return node.computed && node.property.type === 'Literal' &&
+      typeof node.property.value === 'string'
+      ? node.property.value
+      : null;
+  };
+  const isIdentifier = (node, name) =>
+    node?.type === 'Identifier' && node.name === name;
+  const isModuleRequire = node =>
+    node?.type === 'MemberExpression' &&
+    !node.computed &&
+    node.optional !== true &&
+    isIdentifier(node.object, 'module') &&
+    propertyName(node) === 'require';
+  const isDirectLoaderCall = node =>
+    node?.type === 'CallExpression' &&
+    node.optional !== true &&
+    (isIdentifier(node.callee, 'require') || isModuleRequire(node.callee));
+  const isPropertyPosition = (node, parent) =>
+    (parent?.type === 'MemberExpression' && parent.property === node &&
+     !parent.computed) ||
+    (parent?.type === 'Property' && parent.key === node && !parent.computed &&
+     parent.shorthand !== true);
+
+  walk(program, (node, parent) => {
+    if (failure) return;
+    if (node.type === 'ImportDeclaration' ||
+        node.type === 'ExportNamedDeclaration' ||
+        node.type === 'ExportAllDeclaration') {
+      if (node.source) {
+        const specifier = literalSpecifier(node.source);
+        if (!specifier) {
+          fail(
+            VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+            'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+          );
+        } else {
+          specifiers.add(specifier);
+        }
+      }
+      return;
+    }
+    if (node.type === 'ImportExpression') {
+      const specifier = literalSpecifier(node.source);
+      if (!specifier) {
+        fail(
+          VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+          'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+        );
+      } else {
+        specifiers.add(specifier);
+      }
+      return;
+    }
+    if (isDirectLoaderCall(node)) {
+      const specifier = node.arguments.length === 1
+        ? literalSpecifier(node.arguments[0])
+        : null;
+      if (!specifier) {
+        fail(
+          VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+          'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+        );
+      } else {
+        specifiers.add(specifier);
+      }
+      return;
+    }
+    if (node.type === 'NewExpression' && isIdentifier(node.callee, 'Function')) {
+      fail(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+        'stack_vcp_runtime_contract_execution_indirection_unsupported'
+      );
+      return;
+    }
+    if (node.type === 'CallExpression' && isIdentifier(node.callee, 'eval')) {
+      fail(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+        'stack_vcp_runtime_contract_execution_indirection_unsupported'
+      );
+      return;
+    }
+    if (node.type === 'MemberExpression') {
+      const name = propertyName(node);
+      if (name === 'createRequire') {
+        fail(
+          VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+          'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+        );
+        return;
+      }
+      if (name?.startsWith('runIn') && isIdentifier(node.object, 'vm')) {
+        fail(
+          VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+          'stack_vcp_runtime_contract_execution_indirection_unsupported'
+        );
+        return;
+      }
+      if (['eval', 'Function'].includes(name) &&
+          (isIdentifier(node.object, 'global') ||
+           isIdentifier(node.object, 'globalThis'))) {
+        fail(
+          VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+          'stack_vcp_runtime_contract_execution_indirection_unsupported'
+        );
+        return;
+      }
+      if (name === 'mainModule' && isIdentifier(node.object, 'process')) {
+        fail(
+          VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+          'stack_vcp_runtime_contract_execution_indirection_unsupported'
+        );
+        return;
+      }
+      if (name === 'require' &&
+          (isIdentifier(node.object, 'global') ||
+           isIdentifier(node.object, 'globalThis') ||
+           node.object?.type === 'MemberExpression' &&
+           isIdentifier(node.object.object, 'process') &&
+           propertyName(node.object) === 'mainModule')) {
+        fail(
+          VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+          'stack_vcp_runtime_contract_execution_indirection_unsupported'
+        );
+        return;
+      }
+      if (isModuleRequire(node) &&
+          !isDirectLoaderCall(parent)) {
+        fail(
+          VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+          'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+        );
+      }
+      return;
+    }
+    if (node.type === 'Property' && parent?.type === 'ObjectPattern' &&
+        propertyName({
+          computed: node.computed,
+          object: null,
+          property: node.key,
+          type: 'MemberExpression'
+        }) === 'createRequire') {
+      fail(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+        'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+      );
+      return;
+    }
+    if (node.type === 'Identifier' && node.name === 'createRequire') {
+      if (isPropertyPosition(node, parent)) return;
+      fail(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+        'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+      );
+      return;
+    }
+    if (node.type === 'Identifier' && node.name === 'eval' &&
+        !isPropertyPosition(node, parent)) {
+      fail(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+        'stack_vcp_runtime_contract_execution_indirection_unsupported'
+      );
+      return;
+    }
+    if (node.type === 'Identifier' && node.name === 'Function' &&
+        !isPropertyPosition(node, parent)) {
+      fail(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+        'stack_vcp_runtime_contract_execution_indirection_unsupported'
+      );
+      return;
+    }
+    if (node.type === 'Identifier' && ['global', 'globalThis'].includes(node.name) &&
+        !(parent?.type === 'MemberExpression' && parent.object === node)) {
+      fail(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+        'stack_vcp_runtime_contract_execution_indirection_unsupported'
+      );
+      return;
+    }
+    if (node.type === 'Identifier' && node.name === 'vm' &&
+        !(parent?.type === 'MemberExpression' && parent.object === node)) {
+      fail(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+        'stack_vcp_runtime_contract_execution_indirection_unsupported'
+      );
+      return;
+    }
+    if (node.type === 'Identifier' && node.name === 'require' &&
+        !isDirectLoaderCall(parent) &&
+        !isPropertyPosition(node, parent)) {
+      fail(
+        VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+        'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+      );
+      return;
+    }
+    if (node.type === 'Identifier' && node.name === 'module') {
+      const canonicalMember = parent?.type === 'MemberExpression' &&
+        parent.object === node && !parent.computed &&
+        ['exports', 'require'].includes(propertyName(parent));
+      if (!canonicalMember && !isPropertyPosition(node, parent)) {
+        fail(
+          VCP_DEPENDENCY_ANALYSIS_STATUS.UNSUPPORTED_INDIRECTION,
+          'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+        );
+      }
+    }
+  });
+  if (failure) return rejected(failure.status, failure.stableErrorCode);
   return Object.freeze({
-    dynamicDependency,
-    specifiers: Object.freeze([...specifiers].sort())
+    specifiers: Object.freeze([...specifiers].sort()),
+    stableErrorCode: null,
+    status: VCP_DEPENDENCY_ANALYSIS_STATUS.COMPLETE
   });
 }
 
@@ -2597,10 +2905,8 @@ function inspectVcpRuntimeContractEvidence(repoRoot, {
       files.set(relativePath, evidence);
       if (!evidence.source || opaqueRootFor(relativePath)) continue;
       const parsed = parseVcpStaticDependencies(evidence.source);
-      if (parsed.dynamicDependency) {
-        return rejected(
-          'stack_vcp_runtime_contract_dynamic_dependency_unresolved'
-        );
+      if (parsed.status !== VCP_DEPENDENCY_ANALYSIS_STATUS.COMPLETE) {
+        return rejected(parsed.stableErrorCode);
       }
       for (const specifier of parsed.specifiers) {
         if (specifier.startsWith('.')) {
