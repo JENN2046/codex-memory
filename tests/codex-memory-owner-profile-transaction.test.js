@@ -680,7 +680,7 @@ test('schema v4/v5 current profiles fail closed for transaction only', t => {
   assert.equal(result.mutated, false);
 });
 
-test('fault points are internal and lifecycle callers remain unwired', () => {
+test('fault points are internal and P1 remains wired only to the dormant adapter', () => {
   const source = fs.readFileSync(
     path.join(__dirname, '..', 'scripts', 'codex-memory-stack.js'),
     'utf8'
@@ -689,7 +689,22 @@ test('fault points are internal and lifecycle callers remain unwired', () => {
     path.join(__dirname, '..', 'scripts', 'codex-memory-owner-profile-transaction.js'),
     'utf8'
   );
-  assert.equal(source.includes('codex-memory-owner-profile-transaction'), false);
+  assert.equal(
+    source.match(/codex-memory-owner-profile-transaction/gu)?.length,
+    1
+  );
+  const dormant = source.indexOf(
+    'function coordinateStoppedOwnerProfileTransition('
+  );
+  const dispatch = source.indexOf('async function main(');
+  assert.ok(dormant >= 0);
+  assert.ok(source.indexOf('codex-memory-owner-profile-transaction') > dormant);
+  assert.equal(
+    source.slice(dispatch, source.indexOf('module.exports =')).includes(
+      'coordinateStoppedOwnerProfileTransition('
+    ),
+    false
+  );
   assert.equal(primitive.includes('transitionRecordStore'), false);
   assert.equal(primitive.includes('Observer'), false);
   assert.equal(primitive.includes('journal'), false);
