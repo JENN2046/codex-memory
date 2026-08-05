@@ -15,6 +15,9 @@ const {
 const {
   createProductionGovernedReadShimRuntime
 } = require('../runtime/vcp-native/production-governed-read-shim');
+const {
+  VCP_RUNTIME_NATIVE_CAPABILITIES
+} = require('../core/VcpRuntimeContract');
 
 const GOVERNED_READ_ATTEMPT_DEFAULT_PORT = 7616;
 const DIGEST_PATTERN = /^sha256:[a-f0-9]{64}$/u;
@@ -266,9 +269,7 @@ async function main(
     endpoint: `http://${options.host}:${port}/mcp/vcp-native`,
     targetReferenceName: 'operator-vcp-toolbox-service-ref',
     nativeTools: [
-      'knowledge_base.search',
-      'memory_overview',
-      'audit_memory',
+      ...VCP_RUNTIME_NATIVE_CAPABILITIES,
       ...(options.enableWrite ? ['knowledge_base.record'] : [])
     ],
     endpointDisclosed: true,

@@ -21,6 +21,9 @@ const {
   PROFILE_SCHEMA_VERSION,
   V5_PROFILE_KEYS,
   VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
+  VCP_RUNTIME_CLASSIFICATIONS,
+  VCP_RUNTIME_CONTRACT_PROJECTION,
+  VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
   VCP_RUNTIME_SOURCE_PATHS,
   acquireLifecycleProfile,
   acquireOwnerLock,
@@ -51,6 +54,7 @@ const {
   inspectProviderContainer,
   inspectSourceCompatibility,
   inspectVcpRuntimeIdentity,
+  inspectVcpRuntimeContractEvidence,
   isPidRunning,
   legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
@@ -90,6 +94,8 @@ const {
   validateRetainedBindingPayload,
   validateProfile,
   vcpProviderConfigDigest,
+  vcpRuntimeContractDigest,
+  vcpRuntimeContractMigrationCandidate,
   vcpRuntimeRepository,
   writeGovernancePrivateIdentityReceipt,
   writeProviderConfigIdentityReceipt,
@@ -99,6 +105,9 @@ const {
 const {
   getPublicToolDefinitions
 } = require('../src/adapters/codex-mcp/server');
+const {
+  GOVERNED_READ_ATTEMPT_PROTOCOL
+} = require('../packages/chatgpt-r4-contracts/governed-read-attempt');
 
 const BASELINE = '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118';
 const CONTROLLER_SOURCE_COMMIT =
@@ -114,6 +123,7 @@ const PROVIDER_CONTAINER_ID = 'cd'.repeat(32);
 const PROVIDER_IMAGE_ID = `sha256:${'ef'.repeat(32)}`;
 const PROVIDER_REVISION = '1234567890abcdef1234567890abcdef12345678';
 const VCP_SCOPE_DIGEST = `sha256:${'12'.repeat(32)}`;
+const VCP_CONTRACT_DIGEST = vcpRuntimeContractDigest();
 const VCP_PROVIDER_ENVIRONMENT = Object.freeze({
   apiKey: 'synthetic-provider-key',
   model: 'synthetic-embedding-model',
@@ -191,6 +201,8 @@ function profile(overrides = {}) {
     edgeContainerId: EDGE_CONTAINER_ID,
     vcpProviderConfigDigest: VCP_PROVIDER_CONFIG_DIGEST,
     vcpRuntimeBaseline: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
+    vcpRuntimeContractDigest: VCP_CONTRACT_DIGEST,
+    vcpRuntimeIdentitySchemaVersion: VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
     vcpRuntimeRepository: '/vcp',
     vcpRuntimeScopeDigest: VCP_SCOPE_DIGEST,
     ...overrides
@@ -202,6 +214,8 @@ function v5Profile(overrides = {}) {
     adoptedRepositoryHead: _adoptedRepositoryHead,
     controllerSourceManifestDigest: _controllerSourceManifestDigest,
     controllerSourceManifestVersion: _controllerSourceManifestVersion,
+    vcpRuntimeContractDigest: _vcpRuntimeContractDigest,
+    vcpRuntimeIdentitySchemaVersion: _vcpRuntimeIdentitySchemaVersion,
     ...v5
   } = profile();
   return {
@@ -210,6 +224,15 @@ function v5Profile(overrides = {}) {
     controllerSourceCommit: V5_CONTROLLER_SOURCE_COMMIT,
     ...overrides
   };
+}
+
+function legacyV6Profile(overrides = {}) {
+  const {
+    vcpRuntimeContractDigest: _vcpRuntimeContractDigest,
+    vcpRuntimeIdentitySchemaVersion: _vcpRuntimeIdentitySchemaVersion,
+    ...legacyV6
+  } = profile();
+  return { ...legacyV6, ...overrides };
 }
 
 function legacyProfile(overrides = {}) {
@@ -266,6 +289,9 @@ function acceptedStack(overrides = {}) {
     vcpProviderConfigMatch: true,
     vcpProviderCredentialFresh: true,
     vcpRuntime: {
+      admissionAllowed: true,
+      contractComplete: true,
+      contractDigest: VCP_CONTRACT_DIGEST,
       recognized: true,
       revision: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
       repository: '/vcp',
@@ -2539,9 +2565,10 @@ test('legacy source compatibility remains historical and manifest failures rejec
   assert.equal(unsafe.controllerSourceMatch, false);
 });
 
-test('VCP runtime identity is pinned to the profile-selected commit and clean source scope', () => {
+test('VCP runtime contract admits clean build drift and blocks contract or worktree drift', () => {
   const repoRoot = '/owner/VCPToolBox';
   const revision = VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE];
+  const nextRevision = 'b'.repeat(40);
   const fsModule = {
     realpathSync(value) {
       return value;
@@ -2554,28 +2581,47 @@ test('VCP runtime identity is pinned to the profile-selected commit and clean so
       };
     }
   };
-  const inspect = scopedStatus => inspectVcpRuntimeIdentity(profile(), {
+  const inspect = ({
+    boundProfile = profile({ vcpRuntimeRepository: repoRoot }),
+    contractComplete = true,
+    head = revision,
+    status = ''
+  } = {}) => inspectVcpRuntimeIdentity(boundProfile, {
     repoRoot,
     expectedRepository: repoRoot,
     canonicalRepository: repoRoot,
     fsModule,
+    inspectContractEvidence: () => ({
+      complete: contractComplete,
+      stableErrorCode: contractComplete
+        ? null
+        : 'stack_vcp_runtime_contract_input_unavailable'
+    }),
+    observedAt: '2026-08-05T00:00:00.000Z',
     exec(_command, args) {
       if (args[0] === 'rev-parse' && args[1] === '--show-toplevel') {
         return `${repoRoot}\n`;
       }
       if (args[0] === 'rev-parse' && args[1] === 'HEAD^{commit}') {
-        return `${revision}\n`;
+        return `${head}\n`;
       }
       if (args[0] === 'rev-parse' &&
           args[1] === 'refs/remotes/origin/main^{commit}') {
-        return `${revision}\n`;
+        return `${head}\n`;
       }
       if (args[0] === 'status') {
-        assert.deepEqual(
-          args.slice(-VCP_RUNTIME_SOURCE_PATHS.length),
-          [...VCP_RUNTIME_SOURCE_PATHS]
-        );
-        return scopedStatus;
+        assert.deepEqual(args, [
+          'status',
+          '--porcelain=v1',
+          '--untracked-files=all'
+        ]);
+        return status;
+      }
+      if (args[0] === 'rev-parse' && args[1] === 'HEAD^{tree}') {
+        return `${head}\n`;
+      }
+      if (args[0] === 'rev-parse' && args[1] === 'HEAD:package.json') {
+        return `${'c'.repeat(40)}\n`;
       }
       if (args[0] === 'rev-parse' && args[1].startsWith('HEAD:')) {
         return `${'a'.repeat(40)}\n`;
@@ -2583,34 +2629,171 @@ test('VCP runtime identity is pinned to the profile-selected commit and clean so
       throw new Error('unexpected git call');
     }
   });
-  const accepted = inspect('');
+  const accepted = inspect();
   const boundProfile = profile({
     vcpRuntimeBaseline: revision,
     vcpRuntimeRepository: repoRoot,
     vcpRuntimeScopeDigest: accepted.scopeDigest
   });
   assert.equal(
-    profileVcpRuntimeIdentityMatches(boundProfile, accepted),
+    profileVcpRuntimeIdentityMatches(
+      boundProfile,
+      inspect({ boundProfile })
+    ),
     true
   );
-  assert.equal(accepted.scopeComplete, true);
+  assert.equal(
+    inspect({ boundProfile }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MATCH
+  );
   assert.equal(
     profileVcpRuntimeIdentityMatches(
       boundProfile,
-      inspect(' M KnowledgeBaseManager.js\n')
+      inspect({ boundProfile, head: nextRevision })
+    ),
+    true
+  );
+  assert.equal(
+    inspect({ boundProfile, head: nextRevision }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MATCH_BUILD_CHANGED
+  );
+  assert.equal(
+    profileVcpRuntimeIdentityMatches(
+      { ...boundProfile, vcpRuntimeContractDigest: `sha256:${'0'.repeat(64)}` },
+      { ...inspect({ boundProfile }), admissionAllowed: true }
     ),
     false
   );
   assert.equal(
-    profileVcpRuntimeIdentityMatches(
-      {
-        ...boundProfile,
-        vcpRuntimeBaseline: '0'.repeat(40)
-      },
-      accepted
-    ),
+    inspect({ boundProfile, status: ' M KnowledgeBaseManager.js\n' })
+      .classification,
+    VCP_RUNTIME_CLASSIFICATIONS.BUILD_UNTRUSTED
+  );
+  assert.equal(
+    inspect({ boundProfile, contractComplete: false }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_UNAVAILABLE
+  );
+  assert.equal(
+    inspect({
+      boundProfile: profile({
+        vcpRuntimeContractDigest: `sha256:${'0'.repeat(64)}`,
+        vcpRuntimeRepository: repoRoot
+      })
+    }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MISMATCH
+  );
+  const legacyBound = legacyV6Profile({
+    vcpRuntimeBaseline: revision,
+    vcpRuntimeRepository: repoRoot,
+    vcpRuntimeScopeDigest: accepted.scopeDigest
+  });
+  assert.equal(
+    inspect({ boundProfile: legacyBound }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.LEGACY_IDENTITY_MATCH
+  );
+  assert.equal(
+    inspect({ boundProfile: legacyBound, head: nextRevision }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.LEGACY_REACCEPTANCE_REQUIRED
+  );
+});
+
+test('VCP runtime contract hard-gates capability and policy changes', () => {
+  assert.equal(
+    VCP_RUNTIME_CONTRACT_PROJECTION.nativeShimProtocol,
+    GOVERNED_READ_ATTEMPT_PROTOCOL
+  );
+  const base = {
+    capabilitySurface: [
+      'audit_memory',
+      'knowledge_base.search',
+      'memory_overview'
+    ],
+    componentBindingContract: {
+      embeddingModule: 'EmbeddingUtils.js#getEmbeddingsBatch',
+      knowledgeBaseModule: 'KnowledgeBaseManager.js#initialize,shutdown'
+    },
+    globalSearchPolicy: 'disabled',
+    manifestSchemaVersion: 1,
+    memoryReadPolicy: 'project_scoped_allowlisted_diaries',
+    memoryWritePolicy: 'disabled',
+    nativeShimProtocol: 'governed_read_attempt.v1',
+    providerPolicy: 'governed_embedding_child_only',
+    repositoryBinding: 'canonical_vcp_runtime_repository',
+    schemaVersion: 1
+  };
+  const changes = [
+    { memoryWritePolicy: 'enabled' },
+    { globalSearchPolicy: 'enabled' },
+    { providerPolicy: 'direct_execution' },
+    { capabilitySurface: [...base.capabilitySurface, 'record_memory'] },
+    { nativeShimProtocol: 'governed_read_attempt.v2' },
+    { repositoryBinding: 'substituted_runtime_repository' }
+  ];
+  for (const change of changes) {
+    assert.notEqual(
+      vcpRuntimeContractDigest({ ...base, ...change }),
+      VCP_CONTRACT_DIGEST
+    );
+  }
+  assert.throws(
+    () => vcpRuntimeContractDigest({ ...base, unknownPolicy: false }),
+    { code: 'stack_vcp_runtime_contract_invalid' }
+  );
+});
+
+test('VCP runtime contract evidence requires regular canonical interface files', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-vcp-contract-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(
+    path.join(root, 'package.json'),
+    JSON.stringify({ name: 'vcptoolbox', version: '1.0.0' })
+  );
+  fs.writeFileSync(
+    path.join(root, 'EmbeddingUtils.js'),
+    'async function getEmbeddingsBatch() {}\n' +
+      'function cosineSimilarity() {}\n' +
+      'module.exports = { getEmbeddingsBatch, cosineSimilarity };\n'
+  );
+  fs.writeFileSync(
+    path.join(root, 'KnowledgeBaseManager.js'),
+    'class KnowledgeBaseManager { async initialize() {} ' +
+      'async shutdown() {} }\n' +
+      'module.exports = new KnowledgeBaseManager();\n'
+  );
+  assert.equal(
+    inspectVcpRuntimeContractEvidence(root).complete,
+    true
+  );
+  fs.rmSync(path.join(root, 'EmbeddingUtils.js'));
+  assert.equal(
+    inspectVcpRuntimeContractEvidence(root).complete,
     false
   );
+});
+
+test('legacy schema-v6 build drift requires explicit contract migration', () => {
+  const legacy = legacyV6Profile();
+  const identity = {
+    contractComplete: true,
+    contractDigest: VCP_CONTRACT_DIGEST,
+    currentMain: true,
+    repository: legacy.vcpRuntimeRepository,
+    repositoryMatch: true,
+    revision: 'd'.repeat(40),
+    scopeClean: true,
+    scopeComplete: true,
+    scopeDigest: `sha256:${'e'.repeat(64)}`
+  };
+  const candidate = vcpRuntimeContractMigrationCandidate(legacy, identity);
+  assert.equal(candidate.schemaVersion, PROFILE_SCHEMA_VERSION);
+  assert.equal(
+    candidate.vcpRuntimeIdentitySchemaVersion,
+    VCP_RUNTIME_IDENTITY_SCHEMA_VERSION
+  );
+  assert.equal(candidate.vcpRuntimeContractDigest, VCP_CONTRACT_DIGEST);
+  assert.equal(candidate.vcpRuntimeBaseline, identity.revision);
+  assert.equal(candidate.vcpRuntimeScopeDigest, identity.scopeDigest);
+  assert.equal(Object.hasOwn(legacy, 'vcpRuntimeContractDigest'), false);
 });
 
 test('VCP provider binding pins model and dimension without pinning the API key', () => {
@@ -2941,6 +3124,9 @@ test('Relay secret-file rotation invalidates the running process without secret 
 
 test('legacy profiles bootstrap only reviewed identities into a v6 manifest binding', () => {
   const identity = {
+    admissionAllowed: true,
+    contractComplete: true,
+    contractDigest: VCP_CONTRACT_DIGEST,
     recognized: true,
     revision: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
     repository: vcpRuntimeRepository(),
@@ -2992,6 +3178,11 @@ test('legacy profiles bootstrap only reviewed identities into a v6 manifest bind
     RELAY_ENVIRONMENT_CONFIG_DIGEST
   );
   assert.equal(upgraded.vcpRuntimeBaseline, identity.revision);
+  assert.equal(upgraded.vcpRuntimeContractDigest, VCP_CONTRACT_DIGEST);
+  assert.equal(
+    upgraded.vcpRuntimeIdentitySchemaVersion,
+    VCP_RUNTIME_IDENTITY_SCHEMA_VERSION
+  );
   assert.equal(upgraded.vcpRuntimeRepository, identity.repository);
   assert.equal(upgraded.vcpRuntimeScopeDigest, identity.scopeDigest);
   assert.equal(profileVcpRuntimeIdentityMatches(upgraded, identity), true);
