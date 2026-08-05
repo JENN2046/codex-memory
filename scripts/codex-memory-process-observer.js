@@ -165,24 +165,14 @@ function classifyManagedProcessEvidence(evidence, {
         exactComponent
       );
     }
-    if (commandShape === COMMAND_SHAPES.DEFINITIVELY_UNRELATED) {
-      return decision(DECISIONS.IGNORE, 'COMPLETE_IDENTITY_NONMATCH');
-    }
     return decision(
       DECISIONS.FAIL_CLOSED,
-      commandShape === COMMAND_SHAPES.MANAGED_SHAPE
-        ? 'MANAGED_SHAPE_EXACT_MATCH_MISSING'
-        : 'COMMAND_SHAPE_AMBIGUOUS'
+      'EXACT_COMPONENT_MATCH_MISSING'
     );
-  }
-  if (commandShape === COMMAND_SHAPES.DEFINITIVELY_UNRELATED) {
-    return decision(DECISIONS.IGNORE, 'COMMAND_SHAPE_NONMATCH');
   }
   return decision(
     DECISIONS.FAIL_CLOSED,
-    commandShape === COMMAND_SHAPES.MANAGED_SHAPE
-      ? 'MANAGED_SHAPE_IDENTITY_INCOMPLETE'
-      : 'COMMAND_SHAPE_AMBIGUOUS'
+    'PROCESS_IDENTITY_INCOMPLETE'
   );
 }
 
@@ -422,7 +412,7 @@ function collectProcessEvidence(pid, {
     evidence.cwd.status === EVIDENCE_STATUS.READABLE &&
     evidence.cwd.path === runtimeRepository;
   let exactComponent = null;
-  if (identityComplete && commandShape !== COMMAND_SHAPES.DEFINITIVELY_UNRELATED) {
+  if (identityComplete) {
     try {
       exactComponent = exactComponentMatcher(
         evidence.command.argv,

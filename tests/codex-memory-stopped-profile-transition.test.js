@@ -148,7 +148,7 @@ test('observer exposes only tri-state enums, pure classifiers, and sanitized sca
   }).decision, observer.DECISIONS.FAIL_CLOSED);
 });
 
-test('complete identity requires positive command exclusion before ignore', () => {
+test('command shape cannot authorize ignore without exact process identity', () => {
   const complete = {
     liveness: observer.LIVENESS_STATES.RUNNING,
     disappeared: false,
@@ -171,19 +171,19 @@ test('complete identity requires positive command exclusion before ignore', () =
 
   assert.deepEqual(classify(observer.COMMAND_SHAPES.MANAGED_SHAPE), {
     decision: observer.DECISIONS.FAIL_CLOSED,
-    reason: 'MANAGED_SHAPE_EXACT_MATCH_MISSING',
+    reason: 'EXACT_COMPONENT_MATCH_MISSING',
     component: null
   });
   assert.deepEqual(classify(observer.COMMAND_SHAPES.AMBIGUOUS), {
     decision: observer.DECISIONS.FAIL_CLOSED,
-    reason: 'COMMAND_SHAPE_AMBIGUOUS',
+    reason: 'EXACT_COMPONENT_MATCH_MISSING',
     component: null
   });
   assert.deepEqual(classify(
     observer.COMMAND_SHAPES.DEFINITIVELY_UNRELATED
   ), {
-    decision: observer.DECISIONS.IGNORE,
-    reason: 'COMPLETE_IDENTITY_NONMATCH',
+    decision: observer.DECISIONS.FAIL_CLOSED,
+    reason: 'EXACT_COMPONENT_MATCH_MISSING',
     component: null
   });
   assert.deepEqual(classify(observer.COMMAND_SHAPES.MANAGED_SHAPE, 'http', {
@@ -199,14 +199,59 @@ test('complete identity requires positive command exclusion before ignore', () =
     reason: 'START_IDENTITY_UNAVAILABLE',
     component: null
   });
+  assert.deepEqual(classify(
+    observer.COMMAND_SHAPES.DEFINITIVELY_UNRELATED,
+    null,
+    {
+      ...complete,
+      canonicalNode: {
+        status: observer.EVIDENCE_STATUS.UNAVAILABLE,
+        path: null
+      },
+      executable: {
+        status: observer.EVIDENCE_STATUS.UNREADABLE,
+        path: null
+      }
+    }
+  ), {
+    decision: observer.DECISIONS.FAIL_CLOSED,
+    reason: 'PROCESS_IDENTITY_INCOMPLETE',
+    component: null
+  });
 });
 
-test('scanner fails closed when managed shape has no exact component', () => {
-  const scan = scanOne({ component: null });
+test('scanner exact matcher outranks command-shape diagnostics', () => {
+  const relativeExpandedShim = [
+    'node',
+    'src/cli/vcp-toolbox-native-mcp-shim.js',
+    '--host',
+    '127.0.0.1',
+    '--port',
+    '7615',
+    '--selected-diary-hydration'
+  ];
+  const scan = scanOne({
+    command: relativeExpandedShim,
+    shape: observer.COMMAND_SHAPES.DEFINITIVELY_UNRELATED,
+    component: null
+  });
   assert.equal(scan.result.decision, observer.DECISIONS.FAIL_CLOSED);
-  assert.equal(scan.result.reason, 'MANAGED_SHAPE_EXACT_MATCH_MISSING');
+  assert.equal(scan.result.reason, 'EXACT_COMPONENT_MATCH_MISSING');
   assert.deepEqual(scan.result.componentMatches, []);
+  assert.equal(scan.calls.filter(call => call === 'exact').length, 1);
   assert.equal(scan.calls.filter(call => call === 'start').length, 0);
+
+  const exact = scanOne({
+    command: relativeExpandedShim,
+    shape: observer.COMMAND_SHAPES.DEFINITIVELY_UNRELATED,
+    component: 'shim'
+  });
+  assert.equal(exact.result.decision, observer.DECISIONS.EXACT);
+  assert.deepEqual(exact.result.componentMatches, [
+    { pid: 123, component: 'shim' }
+  ]);
+  assert.equal(exact.calls.filter(call => call === 'exact').length, 1);
+  assert.equal(exact.calls.filter(call => call === 'start').length, 1);
 });
 
 test('liveness normalization preserves unknown and native error semantics', () => {
@@ -725,7 +770,9 @@ test('stack aggregation rejects known, unknown, orphan, and enumeration failures
       'stack_process_identity_unavailable', []],
     ['PROCESS_ENUMERATION_UNAVAILABLE', observer.DECISIONS.FAIL_CLOSED,
       'stack_process_enumeration_unavailable', []],
-    ['MANAGED_SHAPE_EXACT_MATCH_MISSING', observer.DECISIONS.FAIL_CLOSED,
+    ['EXACT_COMPONENT_MATCH_MISSING', observer.DECISIONS.FAIL_CLOSED,
+      'stack_process_identity_unavailable', []],
+    ['PROCESS_IDENTITY_INCOMPLETE', observer.DECISIONS.FAIL_CLOSED,
       'stack_process_identity_unavailable', []],
     ['MANAGED_PROCESS_MATCH', observer.DECISIONS.EXACT,
       'stack_managed_orphan_process', [{ pid: 777, component: 'http' }]]
