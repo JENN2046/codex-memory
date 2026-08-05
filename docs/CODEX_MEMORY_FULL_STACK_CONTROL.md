@@ -321,6 +321,59 @@ If runtime-critical source, the accepted baseline, owner profile, or Edge
 container changes, startup fails closed. Reprovision and complete a fresh
 exact-baseline acceptance instead of using `--force`.
 
+## VCP Runtime Contract and Build Identity
+
+Schema-v6 supports two explicit VCP identity modes. Profiles without
+`vcpRuntimeIdentitySchemaVersion` retain the legacy exact-build contract:
+their accepted VCP commit and scoped content digest must match exactly. A
+legacy mismatch never auto-migrates or auto-accepts the observed checkout.
+
+Profiles with `vcpRuntimeIdentitySchemaVersion: 1` additionally bind
+`vcpRuntimeContractDigest`. The digest combines the codex-memory static policy
+projection with Git-authenticated evidence from the configured canonical VCP
+checkout. The static policy covers the repository binding, governed-read
+protocol, public native capability allowlist, project-scoped read policy,
+disabled durable-write and global-search policies, and the governed Provider
+boundary. The VCP evidence binds the content and Git blob identity of the
+security roots, their statically resolvable local dependency closure, required
+interface shapes, and the exact lockfile identities of external packages used
+by that closure.
+
+Required export names are necessary compatibility checks, not sufficient
+contract evidence. Changing a security root body or any transitive local or
+external security dependency changes the contract digest and requires explicit
+reacceptance. Missing, unreadable, untracked, symlinked, path-escaping, or
+worktree-divergent evidence fails closed; a security-relevant dynamic local
+dependency that cannot be resolved statically also fails closed. Dependency
+analysis accepts only unshadowed direct loaders with literal specifiers and
+static ESM declarations. Loader aliases, computed specifiers, `createRequire`,
+and unsupported execution indirection make the entire contract evidence
+unavailable; no partial evidence digest or migration package is produced. An
+unrelated VCP implementation file remains outside this evidence closure, so a clean
+routine update to such a file changes only the observed build identity. The
+top-level package manifest is Git-validated and contributes repository identity
+and build observation, but unrelated version or script metadata is not treated
+as a memory-security contract change; external packages actually used by the
+security closure remain bound through their exact lockfile entries.
+
+The observed build identity is separate audit evidence: repository head,
+complete tree digest, package-manifest digest, scoped content digest, clean
+state, and observation time. A clean `main == origin/main` build may change
+without changing the accepted contract and without rewriting the owner
+profile. Any tracked or untracked worktree change remains a hard failure.
+
+Migration from legacy schema-v6 is explicit. The controller can construct and
+validate an in-memory migration package containing the observed contract and
+build evidence, the exact current canonical profile fingerprint, the validated
+next profile, and the matching inputs for the existing atomic owner-profile
+transaction. A stale package therefore cannot overwrite a changed profile.
+Package construction is deterministic and side-effect free; persistence still
+requires a separately authorized transition and never retries automatically.
+
+This source candidate does not migrate the real owner profile, accept the
+current VCP contract, deploy the identity model, start the runtime, or establish
+that B2 has passed.
+
 ## Selected-Diary Production Hydration
 
 The schema-v6 managed shim is launched with the canonical VCPToolBox
