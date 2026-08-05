@@ -55,7 +55,9 @@ function profile(overrides = {}) {
 
 function contractProfile(overrides = {}) {
   return profile({
-    vcpRuntimeContractDigest: vcpRuntimeContractDigest(),
+    vcpRuntimeContractDigest: vcpRuntimeContractDigest({
+      vcpContractEvidenceDigest: SHA('8')
+    }),
     vcpRuntimeIdentitySchemaVersion: VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
     ...overrides
   });
