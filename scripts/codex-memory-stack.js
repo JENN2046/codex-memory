@@ -25,6 +25,13 @@ const {
 const {
   GOVERNED_READ_ATTEMPT_PROTOCOL
 } = require('../packages/chatgpt-r4-contracts/governed-read-attempt');
+const {
+  COMMAND_SHAPES,
+  DECISIONS,
+  EVIDENCE_STATUS,
+  classifyManagedCommandShape: classifyProcessCommandShape,
+  scanManagedProcesses
+} = require('./codex-memory-process-observer');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
@@ -1472,6 +1479,45 @@ function validateLifecycleLockRecord(value) {
   });
 }
 
+function attachLifecycleLockProvenance(error, {
+  cleanupPhase = null,
+  lifecycleLockAcquired = false,
+  lifecycleLockReleaseAttempted = false,
+  lifecycleLockReleased = true,
+  residualLockPossible = false,
+  primaryErrorCode = null,
+  cleanupErrorCode = null
+} = {}) {
+  return Object.assign(error, {
+    cleanupPhase,
+    lifecycleLockAcquired,
+    lifecycleLockReleaseAttempted,
+    lifecycleLockReleased,
+    residualLockPossible,
+    primaryErrorCode,
+    cleanupErrorCode
+  });
+}
+
+function lifecycleAcquisitionCleanupError({
+  cleanupPhase,
+  primaryErrorCode,
+  cleanupErrorCode
+}) {
+  return attachLifecycleLockProvenance(
+    codedError('stack_lifecycle_acquisition_cleanup_failed'),
+    {
+      cleanupPhase,
+      lifecycleLockAcquired: true,
+      lifecycleLockReleaseAttempted: true,
+      lifecycleLockReleased: false,
+      residualLockPossible: true,
+      primaryErrorCode,
+      cleanupErrorCode
+    }
+  );
+}
+
 function acquireOwnerLock(file, {
   fsModule = fs,
   kill = process.kill,
@@ -1558,16 +1604,72 @@ function acquireOwnerLock(file, {
     fsModule.closeSync(descriptor);
     descriptor = undefined;
     fsModule.chmodSync(file, 0o600);
-  } catch {
+  } catch (initializationError) {
+    const primaryErrorCode = safeCode(
+      initializationError,
+      'stack_lifecycle_lock_failed'
+    );
+    let cleanupErrorCode = null;
+    let cleanupIdentity = identity;
+    if (!cleanupIdentity && descriptor !== undefined) {
+      try {
+        cleanupIdentity = fsModule.fstatSync(descriptor);
+      } catch {
+        cleanupErrorCode = 'stack_lifecycle_lock_identity_unavailable';
+      }
+    }
+    let descriptorClosed = descriptor === undefined;
     if (descriptor !== undefined) {
       try {
         fsModule.closeSync(descriptor);
-      } catch {}
+        descriptorClosed = true;
+      } catch {
+        cleanupErrorCode ||= 'stack_lifecycle_lock_close_failed';
+      }
     }
-    try {
-      fsModule.unlinkSync(file);
-    } catch {}
-    throw codedError('stack_lifecycle_lock_failed');
+    if (!descriptorClosed) {
+      cleanupErrorCode ||= 'stack_lifecycle_lock_close_failed';
+    } else if (!cleanupIdentity) {
+      cleanupErrorCode ||= 'stack_lifecycle_lock_identity_unavailable';
+    } else {
+      let current;
+      try {
+        current = fsModule.lstatSync(file);
+      } catch {
+        cleanupErrorCode ||= 'stack_lifecycle_lock_identity_changed';
+      }
+      if (current && (
+        !current.isFile() || current.isSymbolicLink() ||
+        current.uid !== currentUid() ||
+        current.dev !== cleanupIdentity.dev ||
+        current.ino !== cleanupIdentity.ino
+      )) {
+        cleanupErrorCode ||= 'stack_lifecycle_lock_identity_changed';
+      }
+      if (!cleanupErrorCode && current) {
+        try {
+          fsModule.unlinkSync(file);
+        } catch {
+          cleanupErrorCode = 'stack_lifecycle_lock_unlink_failed';
+        }
+      }
+    }
+    if (cleanupErrorCode) {
+      throw lifecycleAcquisitionCleanupError({
+        cleanupPhase: 'owner_lock_initialization',
+        primaryErrorCode,
+        cleanupErrorCode
+      });
+    }
+    throw attachLifecycleLockProvenance(codedError(primaryErrorCode), {
+      cleanupPhase: 'owner_lock_initialization',
+      lifecycleLockAcquired: true,
+      lifecycleLockReleaseAttempted: true,
+      lifecycleLockReleased: true,
+      residualLockPossible: false,
+      primaryErrorCode,
+      cleanupErrorCode: null
+    });
   }
   let released = false;
   return Object.freeze({
@@ -1610,8 +1712,33 @@ function acquireLifecycleProfile({
       release: () => lifecycleLock.release()
     });
   } catch (error) {
-    lifecycleLock.release();
-    throw error;
+    try {
+      lifecycleLock.release();
+    } catch (releaseError) {
+      throw lifecycleAcquisitionCleanupError({
+        cleanupPhase: 'lifecycle_profile_acquisition',
+        primaryErrorCode: safeCode(
+          error,
+          'stack_lifecycle_profile_acquisition_failed'
+        ),
+        cleanupErrorCode: safeCode(
+          releaseError,
+          'stack_lifecycle_lock_release_failed'
+        )
+      });
+    }
+    throw attachLifecycleLockProvenance(error, {
+      cleanupPhase: 'lifecycle_profile_acquisition',
+      lifecycleLockAcquired: true,
+      lifecycleLockReleaseAttempted: true,
+      lifecycleLockReleased: true,
+      residualLockPossible: false,
+      primaryErrorCode: safeCode(
+        error,
+        'stack_lifecycle_profile_acquisition_failed'
+      ),
+      cleanupErrorCode: null
+    });
   }
 }
 
@@ -1634,6 +1761,35 @@ function readPidFile(file, fsModule = fs) {
   } catch {
     return null;
   }
+}
+
+function inspectPidFile(file, fsModule = fs) {
+  let stat;
+  try {
+    stat = fsModule.lstatSync(file);
+  } catch (error) {
+    if (error?.code === 'ENOENT') {
+      return Object.freeze({ present: false, valid: true, pid: null });
+    }
+    return Object.freeze({ present: true, valid: false, pid: null });
+  }
+  if (!stat.isFile() || stat.isSymbolicLink() ||
+      stat.uid !== currentUid() || (stat.mode & 0o077) !== 0 ||
+      stat.size < 1 || stat.size > 32) {
+    return Object.freeze({ present: true, valid: false, pid: null });
+  }
+  let value;
+  try {
+    value = fsModule.readFileSync(file, 'utf8');
+  } catch {
+    return Object.freeze({ present: true, valid: false, pid: null });
+  }
+  const pid = parsePid(value);
+  return Object.freeze({
+    present: true,
+    valid: pid !== null,
+    pid
+  });
 }
 
 function isPidRunning(pid, kill = process.kill) {
@@ -1724,11 +1880,13 @@ function processEnvironmentExactlyMatches(pid, expected, {
 }
 
 function nodeProcessIdentityMatches(identity, {
-  fsModule = fs
+  fsModule = fs,
+  canonicalNodePath = null
 } = {}) {
   if (!identity) return false;
   try {
-    return identity.executable === fsModule.realpathSync(process.execPath);
+    const expected = canonicalNodePath || fsModule.realpathSync(process.execPath);
+    return identity.executable === expected;
   } catch {
     return false;
   }
@@ -1754,18 +1912,16 @@ function resolveCommandPath(value, cwd) {
   return path.resolve(cwd, value);
 }
 
-function componentCommandKind(name, command, {
+function componentCommandShapeKind(name, command, {
   executable,
   cwd,
   profile,
-  environment = process.env,
-  fsModule = fs
+  environment = process.env
 } = {}) {
   const component = COMPONENTS[name];
   if (!component || !profile || !Array.isArray(command) ||
       !command.every(value => typeof value === 'string') ||
-      cwd !== profile.runtimeRepository ||
-      !nodeProcessIdentityMatches({ executable, cwd, command }, { fsModule })) {
+      typeof command[0] !== 'string' || command[0].length === 0) {
     return null;
   }
   let environmentFile;
@@ -1774,6 +1930,9 @@ function componentCommandKind(name, command, {
   } catch {
     return null;
   }
+  const shapeCwd = typeof cwd === 'string' && path.isAbsolute(cwd)
+    ? cwd
+    : profile.runtimeRepository;
   const controllerCommand = [
     command[0],
     path.join(profile.runtimeRepository, 'scripts', 'codex-memory-stack.js'),
@@ -1806,7 +1965,7 @@ function componentCommandKind(name, command, {
     return command.length === legacy.length &&
       command.every((value, index) =>
         index === 1
-          ? resolveCommandPath(value, cwd) === legacy[index]
+          ? resolveCommandPath(value, shapeCwd) === legacy[index]
           : value === legacy[index]
       )
       ? 'legacy'
@@ -1814,7 +1973,7 @@ function componentCommandKind(name, command, {
   }
   if (name === 'http') {
     return command.length === 2 &&
-      resolveCommandPath(command[1], cwd) ===
+      resolveCommandPath(command[1], shapeCwd) ===
         path.join(profile.runtimeRepository, 'src', 'http-index.js')
       ? 'legacy'
       : null;
@@ -1822,9 +1981,32 @@ function componentCommandKind(name, command, {
   const legacyRunner = path.join(runtimeRoot, `${name}-runner.js`);
   return command.length === 3 &&
     command[1] === `--env-file=${environmentFile}` &&
-    resolveCommandPath(command[2], cwd) === legacyRunner
+    resolveCommandPath(command[2], shapeCwd) === legacyRunner
     ? 'legacy'
     : null;
+}
+
+function componentCommandKind(name, command, {
+  executable,
+  cwd,
+  profile,
+  environment = process.env,
+  fsModule = fs,
+  canonicalNodePath = null
+} = {}) {
+  if (cwd !== profile?.runtimeRepository ||
+      !nodeProcessIdentityMatches(
+        { executable, cwd, command },
+        { fsModule, canonicalNodePath }
+      )) {
+    return null;
+  }
+  return componentCommandShapeKind(name, command, {
+    executable,
+    cwd,
+    profile,
+    environment
+  });
 }
 
 function commandMatchesComponent(name, command, options = {}) {
@@ -1833,6 +2015,51 @@ function commandMatchesComponent(name, command, options = {}) {
 
 function controllerCommandMatchesComponent(name, command, options = {}) {
   return componentCommandKind(name, command, options) === 'controller';
+}
+
+function classifyManagedCommandShape(command, {
+  profile,
+  environment = process.env
+} = {}) {
+  if (!profile || typeof profile.runtimeRepository !== 'string') {
+    return COMMAND_SHAPES.AMBIGUOUS;
+  }
+  const script = path.join(
+    profile.runtimeRepository,
+    'scripts',
+    'codex-memory-stack.js'
+  );
+  const modes = new Set(Object.values(COMPONENTS).map(component =>
+    component.mode
+  ));
+  const legacyHints = [
+    path.join(profile.runtimeRepository, 'src', 'http-index.js'),
+    path.join(
+      profile.runtimeRepository,
+      'src',
+      'cli',
+      'vcp-toolbox-native-mcp-shim.js'
+    )
+  ];
+  return classifyProcessCommandShape(command, {
+    matchComponents(argv) {
+      return Object.keys(COMPONENTS).filter(name =>
+        componentCommandShapeKind(name, argv, {
+          profile,
+          environment
+        }) !== null
+      );
+    },
+    hasManagedShapeHint(argv) {
+      return argv.some(value =>
+        modes.has(value) ||
+        value === script ||
+        value.startsWith('--stack-environment=') ||
+        legacyHints.includes(value) ||
+        value.startsWith('--env-file=')
+      );
+    }
+  });
 }
 
 function inspectProcessIdentity(name, {
@@ -4546,6 +4773,153 @@ function assertSourceManifestRebindStopped(
   return true;
 }
 
+function inspectStoppedStateForOwnerProfileTransition(profile, {
+  environment = process.env,
+  fsModule = fs,
+  inspectEdge = name => inspectEdgeContainer(name),
+  readPidFileState = name =>
+    inspectPidFile(componentPaths(name, environment).pid, fsModule),
+  scanProcesses = scanManagedProcesses,
+  controllerPid = process.pid
+} = {}) {
+  const componentNames = Object.keys(COMPONENTS);
+  if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+      typeof profile.runtimeRepository !== 'string') {
+    throw codedError('stopped_profile_transition_schema_unsupported');
+  }
+  const pidFiles = Object.fromEntries(componentNames.map(name => {
+    let state;
+    try {
+      state = readPidFileState(name);
+    } catch {
+      throw codedError('stack_process_pid_file_invalid');
+    }
+    if (!state || state.valid !== true) {
+      throw codedError('stack_process_pid_file_invalid');
+    }
+    return [name, state];
+  }));
+  const knownPidsByComponent = Object.fromEntries(componentNames.map(name => [
+    name,
+    pidFiles[name].pid
+  ]));
+  let scan;
+  try {
+    scan = scanProcesses({
+      runtimeRepository: profile.runtimeRepository,
+      controllerPid,
+      knownPidsByComponent,
+      classifyCommandShape: command =>
+        classifyManagedCommandShape(command, { profile, environment }),
+      exactComponentMatcher: (command, { canonicalNode, evidence }) => {
+        if (canonicalNode?.status !== EVIDENCE_STATUS.RESOLVED ||
+            evidence?.executable?.status !== EVIDENCE_STATUS.READABLE ||
+            evidence?.cwd?.status !== EVIDENCE_STATUS.READABLE) {
+          return null;
+        }
+        const matches = componentNames.filter(name =>
+          commandMatchesComponent(name, command, {
+            executable: evidence.executable.path,
+            cwd: evidence.cwd.path,
+            profile,
+            environment,
+            fsModule,
+            canonicalNodePath: canonicalNode.path
+          })
+        );
+        if (matches.length > 1) {
+          throw codedError('stack_process_identity_ambiguous');
+        }
+        return matches[0] || null;
+      }
+    });
+  } catch {
+    throw codedError('stack_process_identity_unavailable');
+  }
+  if (!scan || typeof scan !== 'object' ||
+      !Object.values(DECISIONS).includes(scan.decision) ||
+      !Array.isArray(scan.componentMatches)) {
+    throw codedError('stack_process_identity_unavailable');
+  }
+  if (scan.decision === DECISIONS.FAIL_CLOSED) {
+    if (scan.reason === 'PROCESS_ENUMERATION_UNAVAILABLE') {
+      throw codedError('stack_process_enumeration_unavailable');
+    }
+    if (scan.reason === 'START_IDENTITY_UNAVAILABLE') {
+      throw codedError('stack_process_start_identity_unavailable');
+    }
+    if (scan.reason === 'KNOWN_PID_RUNNING') {
+      throw codedError('stack_process_running');
+    }
+    throw codedError('stack_process_identity_unavailable');
+  }
+  const byComponent = Object.fromEntries(componentNames.map(name => [
+    name,
+    scan.componentMatches.filter(match => match.component === name)
+  ]));
+  const orphanInspection = Object.fromEntries(componentNames.map(name => {
+    const matches = byComponent[name];
+    const knownPid = pidFiles[name].pid;
+    return [name, Object.freeze({
+      orphanDetected: matches.some(match => match.pid !== knownPid),
+      matchingPidCount: matches.length,
+      knownPidPresent: knownPid !== null &&
+        matches.some(match => match.pid === knownPid)
+    })];
+  }));
+  if (scan.decision === DECISIONS.EXACT) {
+    if (Object.values(orphanInspection).some(state =>
+      state.matchingPidCount > 1 || state.orphanDetected
+    )) {
+      throw codedError('stack_managed_orphan_process');
+    }
+    throw codedError('stack_process_running');
+  }
+  const processIdentities = Object.freeze(Object.fromEntries(
+    componentNames.map(name => [name, Object.freeze({
+      pid: pidFiles[name].pid,
+      running: false
+    })])
+  ));
+  const edge = inspectEdge(profile.edgeContainer);
+  assertSourceManifestRebindStopped(profile, processIdentities, edge);
+  return Object.freeze({
+    processIdentities,
+    edge,
+    orphanInspection: Object.freeze(orphanInspection),
+    processDecision: scan.decision,
+    canonicalNodeStatus: scan.canonicalNodeStatus,
+    inspectionComplete: true
+  });
+}
+
+function coordinateStoppedOwnerProfileTransition({
+  candidateBinding,
+  environment = process.env
+} = {}) {
+  const {
+    canonicalProfileFingerprint,
+    commitOwnerProfileTransaction
+  } = require('./codex-memory-owner-profile-transaction');
+  const {
+    coordinateStoppedOwnerProfileTransition: coordinate
+  } = require('./codex-memory-stopped-profile-transition');
+  return coordinate({
+    candidateBinding,
+    profilePath: profilePath(environment),
+    manifestSchemaVersion: MANIFEST_SCHEMA_VERSION,
+    acquireLifecycleProfile: () => acquireLifecycleProfile({ environment }),
+    inspectSourceCompatibility: profile => inspectSourceCompatibility(profile, {
+      repoRoot: profile.runtimeRepository
+    }),
+    inspectStoppedState: profile =>
+      inspectStoppedStateForOwnerProfileTransition(profile, { environment }),
+    validateProfile,
+    canonicalProfileFingerprint,
+    commitOwnerProfileTransaction
+  });
+}
+
 async function coordinateSourceManifestRebind({
   candidateProfile,
   persistCandidate,
@@ -5436,11 +5810,13 @@ module.exports = {
   childBaseEnvironment,
   childHttpEndpoint,
   childProfileSchemaVersion,
+  classifyManagedCommandShape,
   commandMatchesComponent,
   computeRuntimeAccepted,
   computeStackAccepted,
   connectOwnedLoopbackTcpListener,
   connectedUnixPeerOwnedByPid,
+  coordinateStoppedOwnerProfileTransition,
   coordinateSourceManifestRebind,
   controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
@@ -5449,6 +5825,8 @@ module.exports = {
   extractEnvFileArgument,
   finalizeManagedSpawn,
   inspectEdgeContainer,
+  inspectPidFile,
+  inspectStoppedStateForOwnerProfileTransition,
   inspectProviderContainer,
   inspectSourceCompatibility,
   inspectVcpRuntimeIdentity,
