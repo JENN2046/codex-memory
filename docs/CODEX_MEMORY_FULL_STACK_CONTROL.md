@@ -321,6 +321,32 @@ If runtime-critical source, the accepted baseline, owner profile, or Edge
 container changes, startup fails closed. Reprovision and complete a fresh
 exact-baseline acceptance instead of using `--force`.
 
+## VCP Runtime Contract and Build Identity
+
+Schema-v6 supports two explicit VCP identity modes. Profiles without
+`vcpRuntimeIdentitySchemaVersion` retain the legacy exact-build contract:
+their accepted VCP commit and scoped content digest must match exactly. A
+legacy mismatch never auto-migrates or auto-accepts the observed checkout.
+
+Profiles with `vcpRuntimeIdentitySchemaVersion: 1` additionally bind
+`vcpRuntimeContractDigest`. This digest covers the canonical repository
+binding, governed-read protocol, required VCP module interfaces, public native
+capability allowlist, project-scoped read policy, disabled durable-write and
+global-search policies, and the governed Provider boundary. Missing interface
+evidence, an unknown identity schema, a substituted or symlinked repository,
+or a changed contract fails closed.
+
+The observed build identity is separate audit evidence: repository head,
+complete tree digest, package-manifest digest, scoped content digest, clean
+state, and observation time. A clean `main == origin/main` build may change
+without changing the accepted contract and without rewriting the owner
+profile. Any tracked or untracked worktree change remains a hard failure.
+
+Migration from legacy schema-v6 is explicit. The controller can construct and
+validate an in-memory candidate containing the observed contract digest and
+build baseline, but only the existing atomic owner-profile transaction may
+persist that candidate under a separately authorized transition.
+
 ## Selected-Diary Production Hydration
 
 The schema-v6 managed shim is launched with the canonical VCPToolBox

@@ -32,6 +32,10 @@ const {
   classifyManagedCommandShape: classifyProcessCommandShape,
   scanManagedProcesses
 } = require('./codex-memory-process-observer');
+const {
+  VCP_RUNTIME_CONTRACT_PROJECTION,
+  VCP_RUNTIME_IDENTITY_SCHEMA_VERSION
+} = require('../src/core/VcpRuntimeContract');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
@@ -90,6 +94,7 @@ const CONTROLLER_CHANGE_PATHS = new Set([
   'scripts/codex-memory-stack.js',
   'src/adapters/codex-mcp/http.js',
   'src/cli/vcp-toolbox-native-mcp-shim.js',
+  'src/core/VcpRuntimeContract.js',
   'tests/mcp-http.test.js',
   'tests/codex-memory-stack-cli.test.js',
   'tests/chatgpt-r4/local-integration.test.js',
@@ -152,7 +157,7 @@ const V5_PROFILE_KEYS = Object.freeze([
   'vcpRuntimeRepository',
   'vcpRuntimeScopeDigest'
 ]);
-const PROFILE_KEYS = Object.freeze([
+const LEGACY_V6_PROFILE_KEYS = Object.freeze([
   ...LEGACY_PROFILE_KEYS,
   'adoptedRepositoryHead',
   'controllerSourceManifestDigest',
@@ -163,6 +168,11 @@ const PROFILE_KEYS = Object.freeze([
   'vcpRuntimeBaseline',
   'vcpRuntimeRepository',
   'vcpRuntimeScopeDigest'
+]);
+const PROFILE_KEYS = Object.freeze([
+  ...LEGACY_V6_PROFILE_KEYS,
+  'vcpRuntimeContractDigest',
+  'vcpRuntimeIdentitySchemaVersion'
 ]);
 const PRIVATE_FILE_MAX_BYTES = 262_144;
 const SAFE_GIT_OBJECT = /^[a-f0-9]{40}$/u;
@@ -219,6 +229,20 @@ const VCP_RUNTIME_SOURCE_PATHS = Object.freeze([
   'rag_params.json',
   'rust-vexus-lite'
 ]);
+const VCP_RUNTIME_BUILD_SCHEMA_VERSION = 1;
+const VCP_RUNTIME_CLASSIFICATIONS = Object.freeze({
+  CONTRACT_MATCH: 'VCP_RUNTIME_CONTRACT_MATCH',
+  CONTRACT_MATCH_BUILD_CHANGED:
+    'VCP_RUNTIME_CONTRACT_MATCH_BUILD_CHANGED',
+  CONTRACT_MISMATCH: 'VCP_RUNTIME_CONTRACT_MISMATCH',
+  CONTRACT_UNAVAILABLE: 'VCP_RUNTIME_CONTRACT_UNAVAILABLE',
+  BUILD_UNTRUSTED: 'VCP_RUNTIME_BUILD_UNTRUSTED',
+  LEGACY_IDENTITY_MATCH: 'VCP_RUNTIME_LEGACY_IDENTITY_MATCH',
+  LEGACY_REACCEPTANCE_REQUIRED:
+    'VCP_RUNTIME_LEGACY_REACCEPTANCE_REQUIRED',
+  IDENTITY_SCHEMA_UNSUPPORTED:
+    'VCP_RUNTIME_IDENTITY_SCHEMA_UNSUPPORTED'
+});
 
 function codedError(code) {
   const safe = SAFE_CODE.test(code || '') ? code : 'codex_memory_stack_failed';
@@ -265,6 +289,82 @@ function exactKeys(value, expected) {
   const wanted = [...expected].sort();
   return actual.length === wanted.length &&
     actual.every((key, index) => key === wanted[index]);
+}
+
+function canonicalObject(value) {
+  if (Array.isArray(value)) return value.map(canonicalObject);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.keys(value).sort().map(key => [key, canonicalObject(value[key])])
+  );
+}
+
+function sha256Projection(value) {
+  return `sha256:${crypto.createHash('sha256').update(
+    JSON.stringify(canonicalObject(value)),
+    'utf8'
+  ).digest('hex')}`;
+}
+
+function vcpRuntimeContractDigest(
+  projection = VCP_RUNTIME_CONTRACT_PROJECTION
+) {
+  if (!exactKeys(projection, [
+    'capabilitySurface',
+    'componentBindingContract',
+    'globalSearchPolicy',
+    'manifestSchemaVersion',
+    'memoryReadPolicy',
+    'memoryWritePolicy',
+    'nativeShimProtocol',
+    'providerPolicy',
+    'repositoryBinding',
+    'schemaVersion'
+  ]) ||
+      projection.schemaVersion !== VCP_RUNTIME_IDENTITY_SCHEMA_VERSION ||
+      projection.manifestSchemaVersion !== 1 ||
+      ![
+        projection.memoryReadPolicy,
+        projection.memoryWritePolicy,
+        projection.globalSearchPolicy,
+        projection.providerPolicy,
+        projection.repositoryBinding,
+        projection.nativeShimProtocol
+      ].every(value => typeof value === 'string' && value.length > 0) ||
+      !exactKeys(projection.componentBindingContract, [
+        'embeddingModule',
+        'knowledgeBaseModule'
+      ]) ||
+      !Object.values(projection.componentBindingContract).every(
+        value => typeof value === 'string' && value.length > 0
+      ) ||
+      !Array.isArray(projection.capabilitySurface) ||
+      projection.capabilitySurface.length < 1 ||
+      !projection.capabilitySurface.every(
+        (value, index, values) =>
+          typeof value === 'string' && value.length > 0 &&
+          (index === 0 || values[index - 1] < value)
+      )) {
+    throw codedError('stack_vcp_runtime_contract_invalid');
+  }
+  return sha256Projection(projection);
+}
+
+function profileVcpRuntimeIdentityMode(profile) {
+  if (!profileHasRuntimeBinding(profile)) return 'none';
+  const hasSchema = Object.hasOwn(
+    profile,
+    'vcpRuntimeIdentitySchemaVersion'
+  );
+  const hasDigest = Object.hasOwn(profile, 'vcpRuntimeContractDigest');
+  if (!hasSchema && !hasDigest) return 'legacy';
+  if (hasSchema && hasDigest &&
+      profile.vcpRuntimeIdentitySchemaVersion ===
+        VCP_RUNTIME_IDENTITY_SCHEMA_VERSION &&
+      SAFE_SHA256_DIGEST.test(profile.vcpRuntimeContractDigest || '')) {
+    return 'contract_v1';
+  }
+  return 'unsupported';
 }
 
 function profileHasRuntimeBinding(profile) {
@@ -1264,11 +1364,16 @@ function profileRetainedBindingMatches(profile, {
 }
 
 function validateProfile(value) {
+  const v6IdentityMode = value?.schemaVersion === PROFILE_SCHEMA_VERSION
+    ? profileVcpRuntimeIdentityMode(value)
+    : null;
   const keys = value?.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION
     ? LEGACY_PROFILE_KEYS
     : value?.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION
       ? V5_PROFILE_KEYS
-      : PROFILE_KEYS;
+      : v6IdentityMode === 'legacy'
+        ? LEGACY_V6_PROFILE_KEYS
+        : PROFILE_KEYS;
   if (!exactKeys(value, keys) ||
       ![
         LEGACY_PROFILE_SCHEMA_VERSION,
@@ -1312,6 +1417,7 @@ function validateProfile(value) {
   }
   if (value.schemaVersion === PROFILE_SCHEMA_VERSION &&
       (
+        !['legacy', 'contract_v1'].includes(v6IdentityMode) ||
         !SAFE_GIT_OBJECT.test(value.adoptedRepositoryHead || '') ||
         value.controllerSourceManifestVersion !== MANIFEST_SCHEMA_VERSION ||
         !SAFE_SHA256_DIGEST.test(
@@ -2216,13 +2322,71 @@ function vcpRuntimeRepository() {
   return path.resolve(REPO_ROOT, '..', '..', 'runtime', 'VCPToolBox');
 }
 
+function inspectVcpRuntimeContractEvidence(repoRoot, {
+  fsModule = fs
+} = {}) {
+  const rejected = stableErrorCode => Object.freeze({
+    complete: false,
+    stableErrorCode
+  });
+  const readSource = name => {
+    const candidate = path.join(repoRoot, name);
+    const stat = fsModule.lstatSync(candidate);
+    if (!stat.isFile() || stat.isSymbolicLink?.()) {
+      throw codedError('stack_vcp_runtime_contract_input_invalid');
+    }
+    const real = fsModule.realpathSync(candidate);
+    if (real !== candidate || path.dirname(real) !== repoRoot) {
+      throw codedError('stack_vcp_runtime_contract_input_invalid');
+    }
+    return fsModule.readFileSync(candidate, 'utf8');
+  };
+  try {
+    const packageManifest = JSON.parse(readSource('package.json'));
+    const embeddingSource = readSource('EmbeddingUtils.js');
+    const knowledgeBaseSource = readSource('KnowledgeBaseManager.js');
+    if (!packageManifest ||
+        typeof packageManifest !== 'object' ||
+        Array.isArray(packageManifest) ||
+        packageManifest.name !== 'vcptoolbox' ||
+        typeof packageManifest.version !== 'string' ||
+        !/^[0-9]+\.[0-9]+\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$/u.test(
+          packageManifest.version
+        ) ||
+        !/async function getEmbeddingsBatch\s*\(/u.test(
+          embeddingSource
+        ) ||
+        !/module\.exports\s*=\s*\{\s*getEmbeddingsBatch\s*,\s*cosineSimilarity\s*\}/u.test(
+          embeddingSource
+        ) ||
+        !/async initialize\s*\(/u.test(knowledgeBaseSource) ||
+        !/async shutdown\s*\(/u.test(knowledgeBaseSource) ||
+        !/module\.exports\s*=\s*new KnowledgeBaseManager\s*\(\s*\)/u.test(
+          knowledgeBaseSource
+        )) {
+      return rejected('stack_vcp_runtime_contract_input_invalid');
+    }
+    return Object.freeze({
+      complete: true,
+      stableErrorCode: null
+    });
+  } catch {
+    return rejected('stack_vcp_runtime_contract_input_unavailable');
+  }
+}
+
 function inspectVcpRuntimeIdentity(profile, {
   repoRoot = vcpRuntimeRepository(),
   expectedRepository = null,
   canonicalRepository = vcpRuntimeRepository(),
   exec = execFileSync,
-  fsModule = fs
+  fsModule = fs,
+  inspectContractEvidence = inspectVcpRuntimeContractEvidence,
+  observedAt = new Date().toISOString()
 } = {}) {
+  const identityMode = profile?.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION
+    ? 'bootstrap_legacy'
+    : profileVcpRuntimeIdentityMode(profile);
   const expectedRevision = profileHasRuntimeBinding(profile)
     ? profile.vcpRuntimeBaseline
     : VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[profile?.runtimeBaseline] || null;
@@ -2233,6 +2397,16 @@ function inspectVcpRuntimeIdentity(profile, {
         : canonicalRepository
     );
   const rejected = overrides => Object.freeze({
+    admissionAllowed: false,
+    buildChanged: null,
+    buildDigest: null,
+    buildIdentity: null,
+    classification: VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_UNAVAILABLE,
+    contractComplete: false,
+    contractDigest: null,
+    contractMatch: false,
+    identityMode,
+    manifestDigest: null,
     recognized: false,
     revision: null,
     repository: null,
@@ -2241,13 +2415,20 @@ function inspectVcpRuntimeIdentity(profile, {
     scopeClean: false,
     scopeComplete: false,
     scopeDigest: null,
+    stableErrorCode: 'stack_vcp_runtime_identity_unavailable',
     ...overrides
   });
-  if (!SAFE_GIT_OBJECT.test(expectedRevision || '') ||
+  if ((['bootstrap_legacy', 'legacy'].includes(identityMode) &&
+       !SAFE_GIT_OBJECT.test(expectedRevision || '')) ||
+      identityMode === 'unsupported' ||
       typeof boundRepository !== 'string' ||
       !path.isAbsolute(boundRepository) ||
       path.resolve(boundRepository) !== boundRepository) {
-    return rejected();
+    return rejected({
+      classification: identityMode === 'unsupported'
+        ? VCP_RUNTIME_CLASSIFICATIONS.IDENTITY_SCHEMA_UNSUPPORTED
+        : VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_UNAVAILABLE
+    });
   }
   let inspectedRepository;
   try {
@@ -2271,13 +2452,16 @@ function inspectVcpRuntimeIdentity(profile, {
       ['rev-parse', 'refs/remotes/origin/main^{commit}'],
       options
     );
-    const scopedStatus = gitText([
+    const worktreeStatus = gitText([
       'status',
       '--porcelain=v1',
-      '--untracked-files=all',
-      '--',
-      ...VCP_RUNTIME_SOURCE_PATHS
+      '--untracked-files=all'
     ], options);
+    const treeObject = gitText(['rev-parse', 'HEAD^{tree}'], options);
+    const packageObject = gitText(
+      ['rev-parse', 'HEAD:package.json'],
+      options
+    );
     const scopeObjects = [];
     const scopeComplete = VCP_RUNTIME_SOURCE_PATHS.every(candidate => {
       try {
@@ -2300,25 +2484,98 @@ function inspectVcpRuntimeIdentity(profile, {
         'utf8'
       ).digest('hex')}`
       : null;
+    const buildDigest = SAFE_GIT_OBJECT.test(treeObject)
+      ? sha256Projection({ repositoryTree: treeObject, schemaVersion: 1 })
+      : null;
+    const manifestDigest = SAFE_GIT_OBJECT.test(packageObject)
+      ? sha256Projection({ packageManifestObject: packageObject })
+      : null;
     const repositoryMatch = repository === inspectedRepository &&
       inspectedRepository === path.resolve(boundRepository) &&
       path.resolve(boundRepository) === path.resolve(canonicalRepository);
     const currentMain = head === originMain;
-    const scopeClean = scopedStatus === '';
-    const recognized = repositoryMatch &&
-      currentMain &&
-      scopeClean &&
-      scopeComplete &&
-      head === expectedRevision;
+    const scopeClean = worktreeStatus === '';
+    const contractEvidence = inspectContractEvidence(
+      inspectedRepository,
+      { fsModule }
+    );
+    const contractComplete = contractEvidence?.complete === true &&
+      SAFE_SHA256_DIGEST.test(buildDigest || '') &&
+      SAFE_SHA256_DIGEST.test(manifestDigest || '') &&
+      scopeComplete;
+    const contractDigest = contractComplete
+      ? vcpRuntimeContractDigest()
+      : null;
+    const contractMatch = identityMode === 'contract_v1' &&
+      contractDigest === profile.vcpRuntimeContractDigest;
+    const buildChanged = SAFE_GIT_OBJECT.test(head) &&
+      SAFE_SHA256_DIGEST.test(scopeDigest || '')
+      ? head !== profile?.vcpRuntimeBaseline ||
+        scopeDigest !== profile?.vcpRuntimeScopeDigest
+      : null;
+    let classification;
+    let admissionAllowed = false;
+    let stableErrorCode = null;
+    if (!repositoryMatch || !contractComplete) {
+      classification = VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_UNAVAILABLE;
+      stableErrorCode = contractEvidence?.stableErrorCode ||
+        'stack_vcp_runtime_contract_unavailable';
+    } else if (!currentMain || !scopeClean) {
+      classification = VCP_RUNTIME_CLASSIFICATIONS.BUILD_UNTRUSTED;
+      stableErrorCode = 'stack_vcp_runtime_build_untrusted';
+    } else if (['bootstrap_legacy', 'legacy'].includes(identityMode)) {
+      admissionAllowed = head === expectedRevision &&
+        (identityMode === 'bootstrap_legacy' ||
+          scopeDigest === profile.vcpRuntimeScopeDigest);
+      classification = admissionAllowed
+        ? VCP_RUNTIME_CLASSIFICATIONS.LEGACY_IDENTITY_MATCH
+        : VCP_RUNTIME_CLASSIFICATIONS.LEGACY_REACCEPTANCE_REQUIRED;
+      stableErrorCode = admissionAllowed
+        ? null
+        : 'stack_vcp_runtime_legacy_reacceptance_required';
+    } else if (identityMode === 'contract_v1' && contractMatch) {
+      admissionAllowed = true;
+      classification = buildChanged
+        ? VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MATCH_BUILD_CHANGED
+        : VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MATCH;
+    } else if (identityMode === 'contract_v1') {
+      classification = VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MISMATCH;
+      stableErrorCode = 'stack_vcp_runtime_contract_mismatch';
+    } else {
+      classification = VCP_RUNTIME_CLASSIFICATIONS.IDENTITY_SCHEMA_UNSUPPORTED;
+      stableErrorCode = 'stack_vcp_runtime_identity_schema_unsupported';
+    }
+    const buildIdentity = contractComplete
+      ? Object.freeze({
+        buildDigest,
+        contractDigest,
+        manifestDigest,
+        observedAt,
+        repositoryHead: head,
+        schemaVersion: VCP_RUNTIME_BUILD_SCHEMA_VERSION,
+        worktreeClean: scopeClean
+      })
+      : null;
     return Object.freeze({
-      recognized,
+      admissionAllowed,
+      buildChanged,
+      buildDigest,
+      buildIdentity,
+      classification,
+      contractComplete,
+      contractDigest,
+      contractMatch,
+      identityMode,
+      manifestDigest,
+      recognized: admissionAllowed,
       revision: SAFE_GIT_OBJECT.test(head) ? head : null,
       repository,
       currentMain,
       repositoryMatch,
       scopeClean,
       scopeComplete,
-      scopeDigest
+      scopeDigest,
+      stableErrorCode
     });
   } catch {
     return rejected();
@@ -2326,19 +2583,49 @@ function inspectVcpRuntimeIdentity(profile, {
 }
 
 function profileVcpRuntimeIdentityMatches(profile, identity) {
+  const identityMode = profileVcpRuntimeIdentityMode(profile);
+  const acceptedIdentityMatches = identityMode === 'legacy'
+    ? identity?.revision === profile?.vcpRuntimeBaseline &&
+      identity?.scopeDigest === profile?.vcpRuntimeScopeDigest
+    : identityMode === 'contract_v1'
+      ? identity?.contractComplete === true &&
+        identity?.contractDigest === profile?.vcpRuntimeContractDigest
+      : false;
   return Boolean(
     profileHasRuntimeBinding(profile) &&
     SAFE_GIT_OBJECT.test(profile?.vcpRuntimeBaseline || '') &&
     SAFE_SHA256_DIGEST.test(profile?.vcpRuntimeScopeDigest || '') &&
-    identity?.recognized === true &&
-    identity?.revision === profile.vcpRuntimeBaseline &&
+    acceptedIdentityMatches &&
+    identity?.admissionAllowed === true &&
     identity?.repository === profile.vcpRuntimeRepository &&
-    identity?.scopeDigest === profile.vcpRuntimeScopeDigest &&
     identity?.currentMain === true &&
     identity?.repositoryMatch === true &&
     identity?.scopeClean === true &&
     identity?.scopeComplete === true
   );
+}
+
+function vcpRuntimeContractMigrationCandidate(profile, identity) {
+  if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+      profileVcpRuntimeIdentityMode(profile) !== 'legacy' ||
+      identity?.contractComplete !== true ||
+      identity?.repository !== profile.vcpRuntimeRepository ||
+      identity?.repositoryMatch !== true ||
+      identity?.currentMain !== true ||
+      identity?.scopeClean !== true ||
+      identity?.scopeComplete !== true ||
+      !SAFE_GIT_OBJECT.test(identity?.revision || '') ||
+      !SAFE_SHA256_DIGEST.test(identity?.scopeDigest || '') ||
+      !SAFE_SHA256_DIGEST.test(identity?.contractDigest || '')) {
+    throw codedError('stack_vcp_runtime_migration_candidate_invalid');
+  }
+  return validateProfile({
+    ...profile,
+    vcpRuntimeBaseline: identity.revision,
+    vcpRuntimeContractDigest: identity.contractDigest,
+    vcpRuntimeIdentitySchemaVersion: VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
+    vcpRuntimeScopeDigest: identity.scopeDigest
+  });
 }
 
 function legacyVcpRuntimeBootstrapMatches(profile, identity) {
@@ -2374,7 +2661,9 @@ function profileWithControllerManifestBinding(
       source?.upgradeEligible !== true ||
       source?.manifestVersion !== MANIFEST_SCHEMA_VERSION ||
       !SAFE_SHA256_DIGEST.test(source?.manifestDigest || '') ||
-      !SAFE_GIT_OBJECT.test(source?.head || '')) {
+      !SAFE_GIT_OBJECT.test(source?.head || '') ||
+      identity?.contractComplete !== true ||
+      !SAFE_SHA256_DIGEST.test(identity?.contractDigest || '')) {
     throw codedError('stack_vcp_runtime_identity_mismatch');
   }
   const {
@@ -2394,6 +2683,8 @@ function profileWithControllerManifestBinding(
     vcpProviderConfigDigest:
       vcpProviderConfigDigest(providerEnvironment),
     vcpRuntimeBaseline: identity.revision,
+    vcpRuntimeContractDigest: identity.contractDigest,
+    vcpRuntimeIdentitySchemaVersion: VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
     vcpRuntimeRepository: identity.repository,
     vcpRuntimeScopeDigest: identity.scopeDigest
   });
@@ -3353,6 +3644,12 @@ function buildControllerChildEnvironment(environmentFile, {
       profile.vcpRuntimeRepository;
     childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST =
       profile.vcpRuntimeScopeDigest;
+    if (profileVcpRuntimeIdentityMode(profile) === 'contract_v1') {
+      childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_CONTRACT_DIGEST =
+        profile.vcpRuntimeContractDigest;
+      childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_IDENTITY_SCHEMA_VERSION =
+        String(profile.vcpRuntimeIdentitySchemaVersion);
+    }
   } else if (profile.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION) {
     childEnvironment.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT =
       profile.controllerSourceCommit;
@@ -3381,6 +3678,27 @@ function buildControllerChildEnvironment(environmentFile, {
       String(pid);
   }
   return Object.freeze(childEnvironment);
+}
+
+function childVcpRuntimeProfileFields(environment = process.env) {
+  const fields = {
+    vcpProviderConfigDigest:
+      environment.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST,
+    vcpRuntimeBaseline:
+      environment.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE,
+    vcpRuntimeRepository:
+      environment.CODEX_MEMORY_STACK_VCP_RUNTIME_REPOSITORY,
+    vcpRuntimeScopeDigest:
+      environment.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST
+  };
+  const schema = environment
+    .CODEX_MEMORY_STACK_VCP_RUNTIME_IDENTITY_SCHEMA_VERSION;
+  const digest = environment.CODEX_MEMORY_STACK_VCP_RUNTIME_CONTRACT_DIGEST;
+  if (schema !== undefined || digest !== undefined) {
+    fields.vcpRuntimeContractDigest = digest;
+    fields.vcpRuntimeIdentitySchemaVersion = Number(schema);
+  }
+  return fields;
 }
 
 function runChildProbe(mode, environmentFile, {
@@ -3870,6 +4188,9 @@ async function inspectStack({
     }),
     vcpRuntime: Object.freeze({
       identityMatch: profileVcpRuntimeIdentityMatches(profile, vcpRuntime),
+      classification: vcpRuntime.classification,
+      contractMatch: vcpRuntime.contractMatch,
+      buildChanged: vcpRuntime.buildChanged,
       providerConfigIdentityMatch: vcpProviderConfigMatch,
       providerCredentialFresh: vcpProviderCredentialFresh,
       currentMain: vcpRuntime.currentMain,
@@ -4697,6 +5018,8 @@ async function adoptRunningStack({
       vcpProviderConfigDigest:
         vcpProviderConfigDigest(vcpProviderEnvironment),
       vcpRuntimeBaseline: vcpRuntime.revision,
+      vcpRuntimeContractDigest: vcpRuntime.contractDigest,
+      vcpRuntimeIdentitySchemaVersion: VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
       vcpRuntimeRepository: vcpRuntime.repository,
       vcpRuntimeScopeDigest: vcpRuntime.scopeDigest
     });
@@ -5147,7 +5470,11 @@ function buildHttpChildEnvironment(environment, {
     CODEX_MEMORY_ACTIVE_MEMORY_ROOT: '',
     CODEX_MEMORY_VCHAT_DATA_ROOT: '',
     CODEX_MEMORY_SECURITY_PROFILE: 'hardened',
-    CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'false',
+    CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER:
+      VCP_RUNTIME_CONTRACT_PROJECTION.providerPolicy ===
+        'governed_embedding_child_only'
+        ? 'false'
+        : 'true',
     CODEX_MEMORY_ENABLE_SOFT_READ_POLICY: 'true',
     CODEX_MEMORY_ENABLE_LIFECYCLE_READ_POLICY: 'true',
     CODEX_MEMORY_ENABLE_WRITE_PREFLIGHT: 'true',
@@ -5160,14 +5487,24 @@ function buildHttpChildEnvironment(environment, {
     CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE: 'read_only',
     CODEX_MEMORY_MCP_PUBLIC_TOOLS: '',
     CODEX_MEMORY_EXPOSE_CONTROLLED_MUTATION_TOOLS: 'false',
-    CODEX_MEMORY_EXPOSE_WRITE_TOOLS: 'false',
+    CODEX_MEMORY_EXPOSE_WRITE_TOOLS:
+      VCP_RUNTIME_CONTRACT_PROJECTION.memoryWritePolicy === 'disabled'
+        ? 'false'
+        : 'true',
     CODEX_MEMORY_VCP_NATIVE_RUNTIME_PROFILE: 'wsl-newapi-prod',
     CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_ENDPOINT:
       'http://127.0.0.1:7615/mcp/vcp-native',
     CODEX_MEMORY_VCP_NATIVE_HTTP_MCP_TOKEN: token,
     CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE: 'strict',
-    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE: 'primary',
-    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE: 'off',
+    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE:
+      VCP_RUNTIME_CONTRACT_PROJECTION.memoryReadPolicy ===
+        'project_scoped_allowlisted_diaries'
+        ? 'primary'
+        : 'off',
+    CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE:
+      VCP_RUNTIME_CONTRACT_PROJECTION.memoryWritePolicy === 'disabled'
+        ? 'off'
+        : 'primary',
     CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_REFERENCE:
       environment.CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE || '',
     CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_DIGEST:
@@ -5263,14 +5600,7 @@ async function runShimChild() {
     ...childControllerProfileFields(),
     runtimeRepository: REPO_ROOT,
     runtimeBaseline: process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE,
-    vcpProviderConfigDigest:
-      process.env.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST,
-    vcpRuntimeBaseline:
-      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE,
-    vcpRuntimeRepository:
-      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_REPOSITORY,
-    vcpRuntimeScopeDigest:
-      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST
+    ...childVcpRuntimeProfileFields(process.env)
   };
   const source = inspectSourceCompatibility(profile);
   if (!source.compatible) {
@@ -5392,14 +5722,7 @@ function requireShimListenerForGovernanceChild(privateRoot) {
       process.env.CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE,
     runtimeBaseline: process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE,
     runtimeRepository: REPO_ROOT,
-    vcpProviderConfigDigest:
-      process.env.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST,
-    vcpRuntimeBaseline:
-      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE,
-    vcpRuntimeRepository:
-      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_REPOSITORY,
-    vcpRuntimeScopeDigest:
-      process.env.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST
+    ...childVcpRuntimeProfileFields(process.env)
   };
   if (!SAFE_GIT_OBJECT.test(profile.adoptedRepositoryHead || '') ||
       profile.controllerSourceManifestVersion !== MANIFEST_SCHEMA_VERSION ||
@@ -5411,6 +5734,7 @@ function requireShimListenerForGovernanceChild(privateRoot) {
       !SAFE_SHA256_DIGEST.test(profile.vcpProviderConfigDigest || '') ||
       !SAFE_GIT_OBJECT.test(profile.vcpRuntimeBaseline || '') ||
       !SAFE_SHA256_DIGEST.test(profile.vcpRuntimeScopeDigest || '') ||
+      (profileVcpRuntimeIdentityMode(profile) === 'unsupported') ||
       profile.vcpRuntimeRepository !== vcpRuntimeRepository()) {
     throw codedError('stack_shim_listener_identity_mismatch');
   }
@@ -5792,9 +6116,14 @@ module.exports = {
   PROFILE_KEYS,
   PROFILE_SCHEMA_VERSION,
   LEGACY_ROLLBACK_MCP_ENDPOINT,
+  LEGACY_V6_PROFILE_KEYS,
   V5_CONTROLLER_SOURCE_UPGRADE_COMMITS,
   V5_PROFILE_KEYS,
   VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
+  VCP_RUNTIME_BUILD_SCHEMA_VERSION,
+  VCP_RUNTIME_CLASSIFICATIONS,
+  VCP_RUNTIME_CONTRACT_PROJECTION,
+  VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
   VCP_RUNTIME_SOURCE_PATHS,
   acquireLifecycleProfile,
   acquireOwnerLock,
@@ -5830,6 +6159,7 @@ module.exports = {
   inspectProviderContainer,
   inspectSourceCompatibility,
   inspectVcpRuntimeIdentity,
+  inspectVcpRuntimeContractEvidence,
   isPidRunning,
   legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
@@ -5872,6 +6202,8 @@ module.exports = {
   validateRetainedBindingPayload,
   validateProfile,
   vcpProviderConfigDigest,
+  vcpRuntimeContractDigest,
+  vcpRuntimeContractMigrationCandidate,
   vcpRuntimeRepository,
   writeGovernancePrivateIdentityReceipt,
   writeProviderConfigIdentityReceipt,
