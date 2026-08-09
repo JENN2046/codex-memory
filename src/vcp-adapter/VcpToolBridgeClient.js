@@ -11,6 +11,8 @@ const PROTOCOL = Object.freeze({
   connectionAckType: 'connection_ack'
 });
 
+const TERMINAL_REQUEST_STATUSES = new Set(['completed', 'failed', 'timeout']);
+
 class VcpToolBridgeClientError extends Error {
   constructor(message, code) {
     super(message);
@@ -30,6 +32,10 @@ function normalizeTimeout(value, fallback = 30000) {
 
 function normalizeRequestId(value) {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function isTerminalRequestState(state) {
+  return Boolean(state && TERMINAL_REQUEST_STATUSES.has(state.status));
 }
 
 function publicRequestState(state) {
@@ -66,6 +72,7 @@ class VcpToolBridgeClient {
     this.pending = new Map();
     this.requestStates = new Map();
     this.bridgeRequestAliases = new Map();
+    this.socketMessageChains = new WeakMap();
     this.connected = false;
     this.bridgeEnabled = false;
     this.protocolReady = false;
@@ -168,7 +175,8 @@ class VcpToolBridgeClient {
       }
       const socket = new this.WebSocketImpl(this._connectionUrl());
       this.socket = socket;
-      socket.addEventListener('message', event => this._handleMessage(event, socket));
+      this.socketMessageChains.set(socket, Promise.resolve());
+      socket.addEventListener('message', event => this._enqueueMessage(event, socket));
       socket.addEventListener('close', () => this._handleDisconnect('vcp_bridge_disconnected', socket));
       socket.addEventListener('error', event => {
         const error = new VcpToolBridgeClientError(
@@ -267,6 +275,17 @@ class VcpToolBridgeClient {
     return String(data ?? '');
   }
 
+  _enqueueMessage(event, socket) {
+    const previous = this.socketMessageChains.get(socket) || Promise.resolve();
+    const next = previous
+      .then(() => this._handleMessage(event, socket))
+      .catch(error => {
+        if (this.socket !== socket) return;
+        this.lastError = this._safeErrorMessage(error, 'vcp_bridge_message_error');
+      });
+    this.socketMessageChains.set(socket, next);
+  }
+
   async _handleMessage(event, socket = this.socket) {
     if (socket && this.socket !== socket) return;
     let text;
@@ -302,7 +321,7 @@ class VcpToolBridgeClient {
     const state = this.requestStates.get(requestId);
 
     if (PROTOCOL.statusMessageTypes.includes(message.type)) {
-      if (state) {
+      if (state && !isTerminalRequestState(state)) {
         state.status = 'running';
         state.progress = message.data;
       }
@@ -314,7 +333,7 @@ class VcpToolBridgeClient {
       this.bridgeEnabled = true;
       this.protocolReady = true;
       this.toolsDiscovered = plugins.length;
-      if (state) {
+      if (state && !isTerminalRequestState(state)) {
         state.status = 'completed';
         state.result = message.data;
       }
@@ -323,6 +342,7 @@ class VcpToolBridgeClient {
     }
 
     if (message.type !== PROTOCOL.resultMessageType) return;
+    if (isTerminalRequestState(state)) return;
 
     const success = message.data?.status === 'success';
     const bridgeTaskId = normalizeRequestId(message.data?.result?.taskId);

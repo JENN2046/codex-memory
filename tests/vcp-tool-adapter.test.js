@@ -214,6 +214,14 @@ function createDeferred() {
   return { promise, resolve, reject };
 }
 
+function bridgeMessage(type, data) {
+  return JSON.stringify({ type, data });
+}
+
+function nextTurn() {
+  return new Promise(resolve => setImmediate(resolve));
+}
+
 async function captureUnhandledRejections(run) {
   const unhandled = [];
   const listener = reason => unhandled.push(reason);
@@ -489,6 +497,342 @@ test('a delayed tool result from a stale socket cannot revive a disconnected req
   assert.equal(client.connected, true);
   assert.equal(harness.sockets[1].readyState, 1);
   client.disconnect();
+});
+
+test('same-socket progress messages are applied in arrival order despite async decode latency', async () => {
+  const harness = createConnectHarness(socket => socket.acknowledge());
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 100,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  await client.connect();
+  const socket = harness.sockets[0];
+  const execution = client.executeTool({
+    toolName: 'OrderedProgressTool',
+    toolArgs: {},
+    requestId: 'ordered-progress-request'
+  });
+  await nextTurn();
+
+  const slowFirstDecode = createDeferred();
+  let secondDecodeStarted = false;
+  socket.emit('message', {
+    data: { text: () => slowFirstDecode.promise }
+  });
+  socket.emit('message', {
+    data: {
+      text: () => {
+        secondDecodeStarted = true;
+        return Promise.resolve(bridgeMessage('vcp_tool_status', {
+          requestId: 'ordered-progress-request',
+          progress: 20
+        }));
+      }
+    }
+  });
+  await nextTurn();
+  assert.equal(secondDecodeStarted, false);
+
+  slowFirstDecode.resolve(bridgeMessage('vcp_tool_status', {
+    requestId: 'ordered-progress-request',
+    progress: 10
+  }));
+  await nextTurn();
+
+  assert.equal(secondDecodeStarted, true);
+  assert.equal(client.getRequestStatus('ordered-progress-request').progress.progress, 20);
+
+  socket.emit('message', {
+    data: bridgeMessage('vcp_tool_result', {
+      requestId: 'ordered-progress-request',
+      status: 'success',
+      result: { done: true }
+    })
+  });
+  const completed = await execution;
+  assert.equal(completed.status, 'completed');
+  client.disconnect();
+});
+
+test('an earlier completed result remains terminal when a later running status decodes faster', async () => {
+  const harness = createConnectHarness(socket => socket.acknowledge());
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 100,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  await client.connect();
+  const socket = harness.sockets[0];
+  const execution = client.executeTool({
+    toolName: 'TerminalOrderingTool',
+    toolArgs: {},
+    requestId: 'terminal-order-request'
+  });
+  await nextTurn();
+
+  const slowCompletedDecode = createDeferred();
+  let laterStatusDecodeStarted = false;
+  socket.emit('message', {
+    data: { text: () => slowCompletedDecode.promise }
+  });
+  socket.emit('message', {
+    data: {
+      text: () => {
+        laterStatusDecodeStarted = true;
+        return Promise.resolve(bridgeMessage('vcp_tool_status', {
+          requestId: 'terminal-order-request',
+          stage: 'must-not-regress'
+        }));
+      }
+    }
+  });
+  await nextTurn();
+  assert.equal(laterStatusDecodeStarted, false);
+
+  slowCompletedDecode.resolve(bridgeMessage('vcp_tool_result', {
+    requestId: 'terminal-order-request',
+    status: 'success',
+    result: { firstTerminal: 'completed' }
+  }));
+  const completed = await execution;
+  await nextTurn();
+
+  assert.equal(laterStatusDecodeStarted, true);
+  assert.equal(completed.status, 'completed');
+  assert.equal(client.getRequestStatus('terminal-order-request').status, 'completed');
+
+  socket.emit('message', {
+    data: bridgeMessage('vcp_tool_result', {
+      requestId: 'terminal-order-request',
+      status: 'error',
+      error: 'later_terminal_conflict'
+    })
+  });
+  await nextTurn();
+  const firstTerminal = client.getRequestStatus('terminal-order-request');
+  assert.equal(firstTerminal.status, 'completed');
+  assert.deepEqual(firstTerminal.result, { firstTerminal: 'completed' });
+  assert.equal(firstTerminal.error, null);
+  client.disconnect();
+});
+
+test('an earlier running status is applied before a later completed result', async () => {
+  const harness = createConnectHarness(socket => socket.acknowledge());
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 100,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  await client.connect();
+  const socket = harness.sockets[0];
+  const execution = client.executeTool({
+    toolName: 'ProgressThenResultTool',
+    toolArgs: {},
+    requestId: 'progress-then-result-request'
+  });
+  await nextTurn();
+
+  const slowProgressDecode = createDeferred();
+  let resultDecodeStarted = false;
+  socket.emit('message', {
+    data: { text: () => slowProgressDecode.promise }
+  });
+  socket.emit('message', {
+    data: {
+      text: () => {
+        resultDecodeStarted = true;
+        return Promise.resolve(bridgeMessage('vcp_tool_result', {
+          requestId: 'progress-then-result-request',
+          status: 'success',
+          result: { done: true }
+        }));
+      }
+    }
+  });
+  await nextTurn();
+  assert.equal(resultDecodeStarted, false);
+
+  slowProgressDecode.resolve(bridgeMessage('vcp_tool_status', {
+    requestId: 'progress-then-result-request',
+    stage: 'before-completion'
+  }));
+  const completed = await execution;
+
+  assert.equal(resultDecodeStarted, true);
+  assert.equal(completed.status, 'completed');
+  const state = client.getRequestStatus('progress-then-result-request');
+  assert.equal(state.status, 'completed');
+  assert.equal(state.progress.stage, 'before-completion');
+  client.disconnect();
+});
+
+test('failed and timeout request states ignore later nonterminal and terminal messages', async () => {
+  {
+    const harness = createConnectHarness(socket => socket.acknowledge());
+    const client = new VcpToolBridgeClient({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: 'synthetic-key-not-a-real-secret',
+      requestTimeoutMs: 100,
+      WebSocketImpl: harness.WebSocket
+    });
+    await client.connect();
+    const socket = harness.sockets[0];
+    const execution = client.executeTool({
+      toolName: 'FirstFailureWinsTool',
+      toolArgs: {},
+      requestId: 'failed-terminal-request'
+    });
+    await nextTurn();
+    socket.emit('message', {
+      data: bridgeMessage('vcp_tool_result', {
+        requestId: 'failed-terminal-request',
+        status: 'error',
+        error: 'first_failure'
+      })
+    });
+    const failed = await execution;
+    assert.equal(failed.status, 'failed');
+
+    socket.emit('message', {
+      data: bridgeMessage('vcp_tool_status', {
+        requestId: 'failed-terminal-request',
+        stage: 'must-not-run'
+      })
+    });
+    socket.emit('message', {
+      data: bridgeMessage('vcp_tool_result', {
+        requestId: 'failed-terminal-request',
+        status: 'success',
+        result: { mustNotWin: true }
+      })
+    });
+    await nextTurn();
+
+    const state = client.getRequestStatus('failed-terminal-request');
+    assert.equal(state.status, 'failed');
+    assert.equal(state.error, 'first_failure');
+    assert.equal(state.progress, null);
+    assert.equal(state.result, null);
+    client.disconnect();
+  }
+
+  {
+    const harness = createConnectHarness(socket => socket.acknowledge());
+    const client = new VcpToolBridgeClient({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: 'synthetic-key-not-a-real-secret',
+      requestTimeoutMs: 15,
+      WebSocketImpl: harness.WebSocket
+    });
+    await client.connect();
+    const socket = harness.sockets[0];
+    const timedOut = await client.executeTool({
+      toolName: 'TimeoutFirstWinsTool',
+      toolArgs: {},
+      requestId: 'timeout-terminal-request'
+    });
+    assert.equal(timedOut.status, 'timeout');
+
+    socket.emit('message', {
+      data: bridgeMessage('vcp_tool_status', {
+        requestId: 'timeout-terminal-request',
+        stage: 'must-not-run'
+      })
+    });
+    socket.emit('message', {
+      data: bridgeMessage('vcp_tool_result', {
+        requestId: 'timeout-terminal-request',
+        status: 'success',
+        result: { mustNotWin: true }
+      })
+    });
+    await nextTurn();
+
+    const state = client.getRequestStatus('timeout-terminal-request');
+    assert.equal(state.status, 'timeout');
+    assert.equal(state.error, 'vcp_bridge_request_timeout');
+    assert.equal(state.progress, null);
+    assert.equal(state.result, null);
+    client.disconnect();
+  }
+});
+
+test('a slow old-socket decode does not block the replacement socket message chain', async () => {
+  const slowOldAck = createDeferred();
+  const harness = createConnectHarness((socket, state) => {
+    if (state.socketCount === 1) {
+      socket.emit('message', { data: { text: () => slowOldAck.promise } });
+    } else {
+      socket.acknowledge();
+    }
+  });
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 100,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  const firstAttempt = client.connect();
+  await nextTurn();
+  harness.sockets[0].close();
+  await assert.rejects(firstAttempt, error => error.code === 'VCP_BRIDGE_DISCONNECTED');
+
+  await client.connect();
+  assert.equal(client.connected, true);
+  assert.equal(harness.sockets[1].readyState, 1);
+
+  slowOldAck.resolve(bridgeMessage('connection_ack', { serverId: 'stale-synthetic' }));
+  await nextTurn();
+  assert.equal(client.connected, true);
+  assert.equal(client.socket, harness.sockets[1]);
+  client.disconnect();
+});
+
+test('a message decode failure does not poison the socket chain or create an unhandled rejection', async () => {
+  const harness = createConnectHarness(socket => socket.acknowledge());
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 100,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  const unhandled = await captureUnhandledRejections(async () => {
+    await client.connect();
+    const socket = harness.sockets[0];
+    const execution = client.executeTool({
+      toolName: 'DecodeRecoveryTool',
+      toolArgs: {},
+      requestId: 'decode-recovery-request'
+    });
+    await nextTurn();
+
+    socket.emit('message', {
+      data: { text: () => Promise.reject(new Error('synthetic_decode_failure')) }
+    });
+    socket.emit('message', {
+      data: bridgeMessage('vcp_tool_result', {
+        requestId: 'decode-recovery-request',
+        status: 'success',
+        result: { recovered: true }
+      })
+    });
+
+    const completed = await execution;
+    assert.equal(completed.status, 'completed');
+    assert.deepEqual(completed.result, { recovered: true });
+    client.disconnect();
+  });
+
+  assert.deepEqual(unhandled, []);
 });
 
 test('fake bridge connects and exposes arbitrary manifests without a second registry', async () => {
