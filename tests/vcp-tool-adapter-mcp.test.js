@@ -97,16 +97,27 @@ test('MCP execute_vcp_tool validates its generic schema and forwards arbitrary J
     assert.equal(result.response.result.structuredContent.request_id, 'mcp-request-1');
     assert.deepEqual(result.response.result.structuredContent.result.forwarded, args.tool_args);
 
-    const invalid = await server.handleJsonRpc({
-      jsonrpc: '2.0',
-      id: 3,
-      method: 'tools/call',
-      params: {
-        name: 'execute_vcp_tool',
-        arguments: { tool_name: 'AnyNativeVcpPlugin', tool_args: {}, unexpected: true }
-      }
-    });
-    assert.equal(invalid.response.error.code, -32602);
+    for (const [id, injectedField] of [
+      [3, 'vcp_key'],
+      [4, 'bridge_url'],
+      [5, 'authentication_path']
+    ]) {
+      const invalid = await server.handleJsonRpc({
+        jsonrpc: '2.0',
+        id,
+        method: 'tools/call',
+        params: {
+          name: 'execute_vcp_tool',
+          arguments: {
+            tool_name: 'AnyNativeVcpPlugin',
+            tool_args: {},
+            [injectedField]: 'attacker-value'
+          }
+        }
+      });
+      assert.equal(invalid.response.error.code, -32602);
+    }
+    assert.equal(calls.length, 1);
   });
 });
 
@@ -128,4 +139,70 @@ test('MCP routes adapter status, manifest discovery, and request status through 
       'get_vcp_tool_status'
     ]);
   });
+});
+
+test('real MCP adapter wiring defaults denied tools locally and redacts connection errors and logs', async () => {
+  const tempBasePath = await fs.mkdtemp(path.join(os.tmpdir(), 'vcp-adapter-credential-'));
+  const syntheticKey = 'synthetic-server-credential-not-real';
+  const httpLogPath = path.join(tempBasePath, 'logs', 'http.log');
+  let socketConstructions = 0;
+  class ThrowingWebSocket {
+    constructor() {
+      socketConstructions += 1;
+      throw new Error(`Synthetic setup failure ${syntheticKey}`);
+    }
+  }
+  const app = createCodexMemoryApplication({
+    projectBasePath: tempBasePath,
+    dailyNoteRootPath: path.join(tempBasePath, 'dailynote'),
+    logsDir: path.join(tempBasePath, 'logs'),
+    dataDir: path.join(tempBasePath, 'data'),
+    httpLogPath,
+    vcpAdapterEnabled: true,
+    vcpAdapterBridgeUrl: 'ws://127.0.0.1:1',
+    vcpAdapterKey: syntheticKey,
+    vcpAdapterAllowedTools: ['ToolA'],
+    vcpAdapterWebSocketImpl: ThrowingWebSocket
+  });
+  await app.initialize();
+
+  try {
+    const server = new CodexMemoryMcpServer({ app });
+    const status = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 20,
+      method: 'tools/call',
+      params: { name: 'get_vcp_adapter_status', arguments: {} }
+    });
+    assert.equal(JSON.stringify(status).includes(syntheticKey), false);
+
+    const denied = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 21,
+      method: 'tools/call',
+      params: {
+        name: 'execute_vcp_tool',
+        arguments: { tool_name: 'ToolB', tool_args: {} }
+      }
+    });
+    assert.equal(denied.response.error.code, -32001);
+    assert.equal(denied.response.error.data.code, 'VCP_TOOL_NOT_ALLOWED');
+    assert.equal(socketConstructions, 0);
+
+    const connectionFailure = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 22,
+      method: 'tools/call',
+      params: { name: 'list_vcp_tools', arguments: {} }
+    });
+    assert.equal(connectionFailure.response.error.code, -32603);
+    assert.equal(JSON.stringify(connectionFailure).includes(syntheticKey), false);
+    assert.equal(socketConstructions, 1);
+
+    const log = await fs.readFile(httpLogPath, 'utf8');
+    assert.equal(log.includes(syntheticKey), false);
+  } finally {
+    await app.close();
+    await fs.rm(tempBasePath, { recursive: true, force: true });
+  }
 });

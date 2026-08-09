@@ -436,23 +436,33 @@ token material.
 
 ### Universal VCP Tool Adapter
 
-When `VCP_ADAPTER_ENABLED=true`, `VCP_ADAPTER_BRIDGE_URL`, and
-`VCP_ADAPTER_KEY` are configured, the existing MCP server also exposes four
-generic tools:
+When `VCP_ADAPTER_ENABLED=true`, the existing MCP server also exposes four
+generic tools. Bridge connections use the server-side
+`VCP_ADAPTER_BRIDGE_URL` and `VCP_ADAPTER_KEY` configuration:
 
 - `get_vcp_adapter_status`
 - `list_vcp_tools`
 - `execute_vcp_tool`
 - `get_vcp_tool_status`
 
+`VCP_ADAPTER_ALLOWED_TOOLS` is a comma-separated list of exact canonical VCP
+tool names, for example `DailyNoteSearcher,AnotherTool`. Missing, empty, or
+invalid configuration is default-deny: manifests are still discovered from
+VCPToolBridge, but no tools are returned or executable. The allowlist is only
+a server-side policy filter; VCPToolBridge remains the authoritative registry.
+
 `VCP_ADAPTER_REQUEST_TIMEOUT_MS` optionally sets the in-process request
 deadline. The URL contains only the `ws`/`wss` bridge origin; the adapter adds
-the authenticated VCP distributed-server path at connection time and never
-returns the key or connection locator through MCP. Tool manifests are fetched
-from VCPToolBridge and kept only as the current in-memory view. Tool execution
-forwards the supplied native tool name and JSON arguments to VCPToolBridge;
-codex-memory does not maintain a second plugin registry or execute native VCP
-tool logic locally.
+the authenticated VCP distributed-server path at connection time. MCP callers
+cannot supply or override the bridge key, URL, or authentication path, and the
+adapter redacts its configured key from status, manifest, execution, status,
+and error projections. Tool execution accepts a trimmed tool name of at most
+256 characters, an optional request id of at most 128 characters, and a plain
+JSON object payload of at most 64 KiB. Circular/non-JSON values and recursive
+`__proto__`, `prototype`, or `constructor` keys are rejected before the Bridge
+is contacted. These checks are generic transport validation, not per-tool
+semantic policy. codex-memory does not maintain a second plugin registry or
+execute native VCP tool logic locally.
 
 ## Governance Model
 

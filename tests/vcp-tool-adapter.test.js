@@ -3,13 +3,25 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 
+const { createConfig } = require('../src/config/createConfig');
 const { VcpToolAdapter } = require('../src/vcp-adapter/VcpToolAdapter');
 const { VcpToolBridgeClient } = require('../src/vcp-adapter/VcpToolBridgeClient');
 
+const SYNTHETIC_BRIDGE_KEY = 'synthetic-key-not-a-real-secret';
+const DEFAULT_FAKE_ALLOWED_TOOLS = Object.freeze([
+  'ArbitraryWeatherTool',
+  'DailyNoteSearcher',
+  'AsyncTool',
+  'FailingTool',
+  'TimeoutTool',
+  'DisconnectTool',
+  'DifferentTool'
+]);
+
 class FakeVcpToolBridge {
-  constructor() {
+  constructor({ manifests } = {}) {
     this.received = [];
-    this.manifests = [
+    this.manifests = manifests || [
       {
         name: 'ArbitraryWeatherTool',
         displayName: 'Arbitrary Weather',
@@ -144,11 +156,15 @@ class FakeVcpToolBridge {
   }
 }
 
-function createFixture({ timeout = 40 } = {}) {
-  const bridge = new FakeVcpToolBridge();
+function createFixture({
+  timeout = 40,
+  allowedTools = DEFAULT_FAKE_ALLOWED_TOOLS,
+  manifests
+} = {}) {
+  const bridge = new FakeVcpToolBridge({ manifests });
   const client = new VcpToolBridgeClient({
     bridgeUrl: 'ws://127.0.0.1:1',
-    key: 'synthetic-key-not-a-real-secret',
+    key: SYNTHETIC_BRIDGE_KEY,
     requestTimeoutMs: timeout,
     WebSocketImpl: bridge.activate(),
     requestIdFactory: (() => {
@@ -156,7 +172,11 @@ function createFixture({ timeout = 40 } = {}) {
       return () => `adapter-request-${++sequence}`;
     })()
   });
-  return { bridge, client, adapter: new VcpToolAdapter({ client }) };
+  return {
+    bridge,
+    client,
+    adapter: new VcpToolAdapter({ client, allowedTools })
+  };
 }
 
 function createConnectHarness(onConnect = () => {}) {
@@ -946,4 +966,207 @@ test('tool errors, timeouts, and disconnects return correlated terminal states',
     assert.equal(disconnected.error, 'vcp_bridge_disconnected');
     assert.equal(adapter.getStatus().connected, false);
   }
+});
+
+test('VCP adapter allowlist config is exact, deduplicated, and fail-closed', () => {
+  const configured = createConfig({
+    projectBasePath: process.cwd(),
+    vcpAdapterAllowedTools: ' ToolA,ToolB|ToolA，ToolC '
+  });
+  assert.deepEqual(configured.vcpAdapter.allowedTools, ['ToolA', 'ToolB', 'ToolC']);
+
+  const explicitEmpty = createConfig({
+    projectBasePath: process.cwd(),
+    vcpAdapterAllowedTools: []
+  });
+  assert.deepEqual(explicitEmpty.vcpAdapter.allowedTools, []);
+
+  const invalid = createConfig({
+    projectBasePath: process.cwd(),
+    vcpAdapterAllowedTools: ['ToolA', 7]
+  });
+  assert.deepEqual(invalid.vcpAdapter.allowedTools, []);
+});
+
+test('default-deny discovers manifests but exposes and executes no tools', async () => {
+  const { bridge, adapter } = createFixture({ allowedTools: [] });
+  const listed = await adapter.listTools();
+
+  assert.deepEqual(listed, { tools: [] });
+  assert.equal(adapter.getStatus().tools_discovered, 0);
+  assert.equal(bridge.received.length, 1);
+  assert.equal(bridge.received[0].type, 'get_vcp_manifests');
+  await assert.rejects(
+    adapter.executeTool({ tool_name: 'ArbitraryWeatherTool', tool_args: {} }),
+    error => error.code === 'VCP_TOOL_NOT_ALLOWED' && error.jsonRpcCode === -32001
+  );
+  assert.equal(bridge.received.length, 1);
+  adapter.close();
+});
+
+test('allowlist filters discovered manifests and remains data-driven across tools', async () => {
+  const manifests = ['ToolA', 'ToolB', 'ToolC'].map(name => ({
+    name,
+    description: `Synthetic ${name}`
+  }));
+  const first = createFixture({ allowedTools: ['ToolA'], manifests });
+  const listed = await first.adapter.listTools();
+  assert.deepEqual(listed.tools.map(tool => tool.name), ['ToolA']);
+
+  const allowed = await first.adapter.executeTool({
+    tool_name: 'ToolA',
+    tool_args: { nested: { values: [1, true, null] } },
+    request_id: 'allow-tool-a'
+  });
+  assert.equal(allowed.status, 'completed');
+  const bridgeMessagesBeforeDeny = first.bridge.received.length;
+  await assert.rejects(
+    first.adapter.executeTool({
+      tool_name: 'ToolB',
+      tool_args: {},
+      request_id: 'deny-tool-b'
+    }),
+    error => error.code === 'VCP_TOOL_NOT_ALLOWED'
+  );
+  assert.equal(first.bridge.received.length, bridgeMessagesBeforeDeny);
+  first.adapter.close();
+
+  const second = createFixture({ allowedTools: ['ToolB'], manifests });
+  const secondResult = await second.adapter.executeTool({
+    tool_name: 'ToolB',
+    tool_args: { arbitrary: true }
+  });
+  assert.equal(secondResult.result.executedTool, 'ToolB');
+  assert.equal(second.bridge.received[0].data.toolName, 'ToolB');
+  second.adapter.close();
+});
+
+test('generic argument validation rejects unsafe or non-JSON requests before the Bridge', async () => {
+  const circular = {};
+  circular.self = circular;
+  const unsafePrototypeKey = JSON.parse('{"__proto__":{"polluted":true}}');
+  const unsafeNestedConstructor = { nested: JSON.parse('{"constructor":{"value":true}}') };
+  const invalidCases = [
+    { tool_args: null, code: 'VCP_TOOL_ARGS_INVALID' },
+    { tool_args: [], code: 'VCP_TOOL_ARGS_INVALID' },
+    { tool_args: circular, code: 'VCP_TOOL_ARGS_INVALID' },
+    { tool_args: unsafePrototypeKey, code: 'VCP_TOOL_ARGS_UNSAFE' },
+    { tool_args: unsafeNestedConstructor, code: 'VCP_TOOL_ARGS_UNSAFE' },
+    { tool_args: { callback() {} }, code: 'VCP_TOOL_ARGS_INVALID' },
+    { tool_args: { value: Symbol('invalid') }, code: 'VCP_TOOL_ARGS_INVALID' },
+    { tool_args: { value: 1n }, code: 'VCP_TOOL_ARGS_INVALID' },
+    { tool_args: { value: Number.NaN }, code: 'VCP_TOOL_ARGS_INVALID' },
+    { tool_args: { payload: 'x'.repeat(64 * 1024) }, code: 'VCP_TOOL_ARGS_TOO_LARGE' }
+  ];
+
+  for (const [index, invalid] of invalidCases.entries()) {
+    const { bridge, adapter } = createFixture({ allowedTools: ['ToolA'] });
+    await assert.rejects(
+      adapter.executeTool({
+        tool_name: 'ToolA',
+        tool_args: invalid.tool_args,
+        request_id: `invalid-args-${index}`
+      }),
+      error => error.code === invalid.code
+    );
+    assert.equal(bridge.received.length, 0);
+    adapter.close();
+  }
+});
+
+test('tool name and request id bounds are enforced before the Bridge', async () => {
+  const invalidCases = [
+    { tool_name: null, request_id: 'valid-id', code: 'VCP_TOOL_NAME_INVALID' },
+    { tool_name: '   ', request_id: 'valid-id', code: 'VCP_TOOL_NAME_REQUIRED' },
+    { tool_name: 'x'.repeat(257), request_id: 'valid-id', code: 'VCP_TOOL_NAME_INVALID' },
+    { tool_name: 'ToolA', request_id: ' ', code: 'VCP_REQUEST_ID_INVALID' },
+    { tool_name: 'ToolA', request_id: 'x'.repeat(129), code: 'VCP_REQUEST_ID_INVALID' }
+  ];
+
+  for (const invalid of invalidCases) {
+    const { bridge, adapter } = createFixture({ allowedTools: ['ToolA'] });
+    await assert.rejects(
+      adapter.executeTool({
+        tool_name: invalid.tool_name,
+        tool_args: {},
+        request_id: invalid.request_id
+      }),
+      error => error.code === invalid.code
+    );
+    assert.equal(bridge.received.length, 0);
+    adapter.close();
+  }
+
+  const { bridge, adapter } = createFixture({ allowedTools: ['ToolA'] });
+  const valid = await adapter.executeTool({
+    tool_name: '  ToolA  ',
+    tool_args: { options: { limit: 10 } },
+    request_id: '  bounded-id  '
+  });
+  assert.equal(valid.tool_name, 'ToolA');
+  assert.equal(valid.request_id, 'bounded-id');
+  assert.equal(bridge.received[0].data.toolName, 'ToolA');
+  assert.equal(bridge.received[0].data.requestId, 'bounded-id');
+  adapter.close();
+});
+
+test('server-side Bridge credentials and endpoint cannot be overridden or exposed', async () => {
+  const manifests = [{
+    name: 'ToolA',
+    description: `Synthetic manifest ${SYNTHETIC_BRIDGE_KEY}`,
+    metadata: { credentialEcho: SYNTHETIC_BRIDGE_KEY }
+  }];
+  const { bridge, client, adapter } = createFixture({
+    allowedTools: ['ToolA'],
+    manifests
+  });
+  const listed = await adapter.listTools();
+  assert.equal(JSON.stringify(listed).includes(SYNTHETIC_BRIDGE_KEY), false);
+
+  const attackerEndpoint = 'ws://attacker.invalid/override';
+  const result = await adapter.executeTool({
+    tool_name: 'ToolA',
+    tool_args: {
+      vcp_key: 'attacker-value',
+      bridge_url: attackerEndpoint,
+      authentication_path: '/attacker-auth',
+      echo: SYNTHETIC_BRIDGE_KEY
+    },
+    request_id: 'credential-boundary'
+  });
+  assert.equal(bridge.socket.url.includes('127.0.0.1'), true);
+  assert.equal(bridge.socket.url.includes('attacker.invalid'), false);
+  assert.equal(bridge.received[1].data.toolArgs.bridge_url, attackerEndpoint);
+  assert.equal(JSON.stringify(result).includes(SYNTHETIC_BRIDGE_KEY), false);
+
+  client.lastError = `Synthetic connection error ${SYNTHETIC_BRIDGE_KEY}`;
+  assert.equal(JSON.stringify(adapter.getStatus()).includes(SYNTHETIC_BRIDGE_KEY), false);
+  assert.equal(
+    JSON.stringify(adapter.getToolStatus({ request_id: 'credential-boundary' }))
+      .includes(SYNTHETIC_BRIDGE_KEY),
+    false
+  );
+  adapter.close();
+});
+
+test('connection failures redact configured Bridge credentials before reaching callers', async () => {
+  class ThrowingWebSocket {
+    constructor() {
+      throw new Error(`Synthetic setup failure ${SYNTHETIC_BRIDGE_KEY}`);
+    }
+  }
+  const adapter = new VcpToolAdapter({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: SYNTHETIC_BRIDGE_KEY,
+    allowedTools: ['ToolA'],
+    requestTimeoutMs: 20,
+    WebSocketImpl: ThrowingWebSocket
+  });
+
+  await assert.rejects(
+    adapter.listTools(),
+    error => error.code === 'VCP_BRIDGE_CONNECTION_ERROR' &&
+      !error.message.includes(SYNTHETIC_BRIDGE_KEY)
+  );
+  adapter.close();
 });

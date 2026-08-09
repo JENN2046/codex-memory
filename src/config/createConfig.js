@@ -74,6 +74,19 @@ function normalizeStringList(value) {
     .filter(Boolean))];
 }
 
+function normalizeVcpAdapterAllowedTools(value) {
+  if (Array.isArray(value)) {
+    if (!value.every(item => typeof item === 'string')) return [];
+    return [...new Set(value.map(item => item.trim()).filter(Boolean))];
+  }
+
+  if (typeof value !== 'string' || !value.trim()) return [];
+  return [...new Set(value
+    .split(/[,|，]/)
+    .map(item => item.trim())
+    .filter(Boolean))];
+}
+
 function normalizeLightMemoDirectoryMap(value) {
   const source = parseJsonObject(value, {});
   const output = {};
@@ -773,6 +786,12 @@ function createConfig(overrides = {}) {
     ),
     30000
   );
+  const vcpAdapterAllowedToolsSource = overrides.vcpAdapterAllowedTools !== undefined
+    ? overrides.vcpAdapterAllowedTools
+    : overrides.vcpAdapter?.allowedTools !== undefined
+      ? overrides.vcpAdapter.allowedTools
+      : process.env.VCP_ADAPTER_ALLOWED_TOOLS ?? '';
+  const vcpAdapterAllowedTools = normalizeVcpAdapterAllowedTools(vcpAdapterAllowedToolsSource);
   const vcpAdapterEnabled = _resolveBool(
     overrides.vcpAdapterEnabled ?? overrides.vcpAdapter?.enabled,
     'VCP_ADAPTER_ENABLED',
@@ -845,7 +864,8 @@ function createConfig(overrides = {}) {
       enabled: vcpAdapterEnabled,
       bridgeUrl: vcpAdapterBridgeUrl,
       key: vcpAdapterKey,
-      requestTimeoutMs: vcpAdapterRequestTimeoutMs
+      requestTimeoutMs: vcpAdapterRequestTimeoutMs,
+      allowedTools: vcpAdapterAllowedTools
     },
     embedDimensions: inferredEmbedDimensions,
     embeddingFingerprint,
