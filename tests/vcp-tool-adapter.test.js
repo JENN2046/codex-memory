@@ -170,6 +170,7 @@ function createConnectHarness(onConnect = () => {}) {
       harness.sockets.push(this);
       this.readyState = 0;
       this.listeners = new Map();
+      this.sent = [];
       queueMicrotask(() => onConnect(this, harness));
     }
 
@@ -190,6 +191,10 @@ function createConnectHarness(onConnect = () => {}) {
       });
     }
 
+    send(payload) {
+      this.sent.push(JSON.parse(payload));
+    }
+
     close() {
       if (this.readyState >= 2) return;
       this.readyState = 3;
@@ -197,6 +202,16 @@ function createConnectHarness(onConnect = () => {}) {
     }
   };
   return harness;
+}
+
+function createDeferred() {
+  let resolve;
+  let reject;
+  const promise = new Promise((resolvePromise, rejectPromise) => {
+    resolve = resolvePromise;
+    reject = rejectPromise;
+  });
+  return { promise, resolve, reject };
 }
 
 async function captureUnhandledRejections(run) {
@@ -369,6 +384,110 @@ test('a failed connection attempt can be retried successfully', async () => {
   assert.equal(harness.socketCount, 1);
   assert.equal(client.connected, true);
   assert.equal(client.connectPromise, null);
+  client.disconnect();
+});
+
+test('a delayed acknowledgement from a stale socket cannot settle a retry', async () => {
+  const delayedAck = createDeferred();
+  const harness = createConnectHarness((socket, state) => {
+    if (state.socketCount !== 1) return;
+    socket.emit('message', {
+      data: { text: () => delayedAck.promise }
+    });
+  });
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 100,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  const unhandled = await captureUnhandledRejections(async () => {
+    const firstAttempt = client.connect();
+    await new Promise(resolve => setImmediate(resolve));
+    const staleSocket = harness.sockets[0];
+    staleSocket.close();
+    await assert.rejects(
+      firstAttempt,
+      error => error.code === 'VCP_BRIDGE_DISCONNECTED'
+    );
+
+    const secondAttempt = client.connect();
+    const currentSocket = harness.sockets[1];
+    let secondSettled = false;
+    secondAttempt.then(
+      () => { secondSettled = true; },
+      () => { secondSettled = true; }
+    );
+
+    delayedAck.resolve(JSON.stringify({
+      type: 'connection_ack',
+      data: { serverId: 'stale-synthetic' }
+    }));
+    await new Promise(resolve => setImmediate(resolve));
+
+    assert.equal(currentSocket.readyState, 0);
+    assert.equal(secondSettled, false);
+    assert.equal(client.connected, false);
+
+    currentSocket.acknowledge();
+    await secondAttempt;
+    assert.equal(client.connected, true);
+    client.disconnect();
+  });
+
+  assert.deepEqual(unhandled, []);
+  assert.equal(harness.socketCount, 2);
+});
+
+test('a delayed tool result from a stale socket cannot revive a disconnected request', async () => {
+  const harness = createConnectHarness(socket => socket.acknowledge());
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 100,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  await client.connect();
+  const staleSocket = harness.sockets[0];
+  const execution = client.executeTool({
+    toolName: 'ArbitraryTool',
+    toolArgs: { arbitrary: true },
+    requestId: 'stale-result-request'
+  });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(staleSocket.sent.length, 1);
+
+  const delayedResult = createDeferred();
+  staleSocket.emit('message', {
+    data: { text: () => delayedResult.promise }
+  });
+  await new Promise(resolve => setImmediate(resolve));
+  staleSocket.close();
+
+  const disconnected = await execution;
+  assert.equal(disconnected.status, 'failed');
+  assert.equal(disconnected.error, 'vcp_bridge_disconnected');
+
+  await client.connect();
+  assert.equal(client.connected, true);
+  delayedResult.resolve(JSON.stringify({
+    type: 'vcp_tool_result',
+    data: {
+      requestId: 'stale-result-request',
+      status: 'success',
+      result: { stale: true }
+    }
+  }));
+  await new Promise(resolve => setImmediate(resolve));
+
+  const state = client.getRequestStatus('stale-result-request');
+  assert.equal(state.status, 'failed');
+  assert.equal(state.error, 'vcp_bridge_disconnected');
+  assert.equal(state.result, null);
+  assert.equal(client.connected, true);
+  assert.equal(harness.sockets[1].readyState, 1);
   client.disconnect();
 });
 

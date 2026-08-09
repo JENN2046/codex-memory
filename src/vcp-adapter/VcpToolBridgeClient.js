@@ -269,9 +269,19 @@ class VcpToolBridgeClient {
 
   async _handleMessage(event, socket = this.socket) {
     if (socket && this.socket !== socket) return;
+    let text;
+    try {
+      text = await this._messageText(event?.data);
+    } catch {
+      if (socket && this.socket !== socket) return;
+      this.lastError = 'vcp_bridge_invalid_json_message';
+      return;
+    }
+    if (socket && this.socket !== socket) return;
+
     let message;
     try {
-      message = JSON.parse(await this._messageText(event?.data));
+      message = JSON.parse(text);
     } catch {
       this.lastError = 'vcp_bridge_invalid_json_message';
       return;
