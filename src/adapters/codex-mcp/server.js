@@ -24,8 +24,14 @@ const {
 } = require('../../core/GovernedMcpVcpNativeBridgeConfigWarningProjection');
 const {
   ToolArgumentValidationError,
+  validateArgumentsAgainstSchema,
   validateToolArguments
 } = require('../../core/ToolArgumentValidator');
+const {
+  VCP_ADAPTER_TOOL_DEFINITIONS,
+  VCP_ADAPTER_TOOL_NAMES,
+  isVcpAdapterToolName
+} = require('../../vcp-adapter/VcpToolAdapter');
 const { redactSensitiveFragments } = require('../../core/SensitiveFragmentRedaction');
 const { isSafeReferenceName } = require('../../core/VcpToolBoxSafeReference');
 const {
@@ -616,41 +622,46 @@ function normalizePublicToolNameSet(values = []) {
 }
 
 function getPublicToolNameSet(config = {}) {
+  let toolNames;
   if (String(config.securityProfile || '').trim().toLowerCase() === 'hardened') {
-    return new Set(DEFAULT_PUBLIC_MCP_READ_TOOLS);
-  }
-
-  const explicitTools = normalizePublicToolNameSet(config.mcpPublicToolNames);
-  if (explicitTools.size > 0) {
-    return explicitTools;
-  }
-
-  const toolNames = new Set(DEFAULT_PUBLIC_MCP_READ_TOOLS);
-  const surface = String(config.mcpPublicToolSurface || 'read_only').trim().toLowerCase();
-  if (
-    config.exposeControlledMutationMcpTools === true ||
-    surface === 'controlled_mutation' ||
-    surface === 'full'
-  ) {
-    for (const toolName of CONTROLLED_MUTATION_MCP_TOOLS) {
-      toolNames.add(toolName);
+    toolNames = new Set(DEFAULT_PUBLIC_MCP_READ_TOOLS);
+  } else {
+    const explicitTools = normalizePublicToolNameSet(config.mcpPublicToolNames);
+    if (explicitTools.size > 0) {
+      toolNames = explicitTools;
+    } else {
+      toolNames = new Set(DEFAULT_PUBLIC_MCP_READ_TOOLS);
+      const surface = String(config.mcpPublicToolSurface || 'read_only').trim().toLowerCase();
+      if (
+        config.exposeControlledMutationMcpTools === true ||
+        surface === 'controlled_mutation' ||
+        surface === 'full'
+      ) {
+        for (const toolName of CONTROLLED_MUTATION_MCP_TOOLS) {
+          toolNames.add(toolName);
+        }
+      }
+      if (
+        config.exposeWriteMcpTools === true ||
+        surface === 'write' ||
+        surface === 'full'
+      ) {
+        for (const toolName of WRITE_MCP_TOOLS) {
+          toolNames.add(toolName);
+        }
+      }
     }
   }
-  if (
-    config.exposeWriteMcpTools === true ||
-    surface === 'write' ||
-    surface === 'full'
-  ) {
-    for (const toolName of WRITE_MCP_TOOLS) {
-      toolNames.add(toolName);
-    }
+  if (config.vcpAdapter?.enabled === true) {
+    for (const toolName of VCP_ADAPTER_TOOL_NAMES) toolNames.add(toolName);
   }
   return toolNames;
 }
 
 function getPublicToolDefinitions(config = {}) {
   const publicToolNames = getPublicToolNameSet(config);
-  return TOOL_DEFINITIONS.filter(tool => publicToolNames.has(tool.name));
+  return [...TOOL_DEFINITIONS, ...VCP_ADAPTER_TOOL_DEFINITIONS]
+    .filter(tool => publicToolNames.has(tool.name));
 }
 
 function isPublicMcpToolExposed(toolName, config = {}) {
@@ -849,6 +860,19 @@ function buildGovernedMcpServerMetadata(config = {}) {
 }
 
 function buildToolDefinitionForList(toolDefinition, config = {}) {
+  if (isVcpAdapterToolName(toolDefinition.name)) {
+    return {
+      ...toolDefinition,
+      _meta: {
+        ...(isPlainObject(toolDefinition._meta) ? toolDefinition._meta : {}),
+        universalVcpToolAdapter: {
+          authoritativeRegistry: 'VCPToolBridge',
+          executionOwner: 'VCPToolBox PluginManager',
+          credentialsDisclosed: false
+        }
+      }
+    };
+  }
   return {
     ...toolDefinition,
     _meta: {
@@ -1772,7 +1796,13 @@ class CodexMemoryMcpServer {
       }
 
       try {
-        validateToolArguments(params.name, args);
+        if (isVcpAdapterToolName(params.name)) {
+          const toolDefinition = VCP_ADAPTER_TOOL_DEFINITIONS
+            .find(candidate => candidate.name === params.name);
+          validateArgumentsAgainstSchema(toolDefinition.inputSchema, args);
+        } else {
+          validateToolArguments(params.name, args);
+        }
         const governedRequestContext = buildGovernedMcpRequestContextFromParams(params);
         if (governedRequestContext.accepted !== true) {
           return {
