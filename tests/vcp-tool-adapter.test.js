@@ -159,6 +159,219 @@ function createFixture({ timeout = 40 } = {}) {
   return { bridge, client, adapter: new VcpToolAdapter({ client }) };
 }
 
+function createConnectHarness(onConnect = () => {}) {
+  const harness = {
+    socketCount: 0,
+    sockets: []
+  };
+  harness.WebSocket = class {
+    constructor() {
+      harness.socketCount += 1;
+      harness.sockets.push(this);
+      this.readyState = 0;
+      this.listeners = new Map();
+      queueMicrotask(() => onConnect(this, harness));
+    }
+
+    addEventListener(type, handler) {
+      const handlers = this.listeners.get(type) || [];
+      handlers.push(handler);
+      this.listeners.set(type, handlers);
+    }
+
+    emit(type, event = {}) {
+      for (const handler of this.listeners.get(type) || []) handler(event);
+    }
+
+    acknowledge() {
+      this.readyState = 1;
+      this.emit('message', {
+        data: JSON.stringify({ type: 'connection_ack', data: { serverId: 'synthetic' } })
+      });
+    }
+
+    close() {
+      if (this.readyState >= 2) return;
+      this.readyState = 3;
+      this.emit('close', {});
+    }
+  };
+  return harness;
+}
+
+async function captureUnhandledRejections(run) {
+  const unhandled = [];
+  const listener = reason => unhandled.push(reason);
+  process.on('unhandledRejection', listener);
+  try {
+    await run(unhandled);
+    await new Promise(resolve => setImmediate(resolve));
+  } finally {
+    process.off('unhandledRejection', listener);
+  }
+  return unhandled;
+}
+
+test('synchronous configuration failure preserves the original rejection without an unhandled rejection', async () => {
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: '',
+    requestTimeoutMs: 20
+  });
+  const unhandled = await captureUnhandledRejections(async () => {
+    await assert.rejects(
+      client.connect(),
+      error => error.code === 'VCP_BRIDGE_KEY_REQUIRED'
+    );
+  });
+
+  assert.deepEqual(unhandled, []);
+  assert.equal(client.connected, false);
+  assert.equal(client.connectPromise, null);
+  assert.equal(client.socket, null);
+});
+
+test('synchronous WebSocket constructor failure rejects once and clears the connection attempt', async () => {
+  let socketCount = 0;
+  class ThrowingWebSocket {
+    constructor() {
+      socketCount += 1;
+      throw new Error('synthetic_constructor_failure');
+    }
+  }
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 20,
+    WebSocketImpl: ThrowingWebSocket
+  });
+  const unhandled = await captureUnhandledRejections(async () => {
+    await assert.rejects(
+      client.connect(),
+      error => error.code === 'VCP_BRIDGE_CONNECTION_ERROR' &&
+        error.message === 'synthetic_constructor_failure'
+    );
+  });
+
+  assert.equal(socketCount, 1);
+  assert.deepEqual(unhandled, []);
+  assert.equal(client.connectPromise, null);
+  assert.equal(client.socket, null);
+});
+
+test('asynchronous socket error rejects and cleans the active connection attempt', async () => {
+  const harness = createConnectHarness(socket => {
+    socket.emit('error', { error: new Error('synthetic_async_connection_failure') });
+  });
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 20,
+    WebSocketImpl: harness.WebSocket
+  });
+  const unhandled = await captureUnhandledRejections(async () => {
+    await assert.rejects(
+      client.connect(),
+      error => error.code === 'VCP_BRIDGE_CONNECTION_ERROR' &&
+        error.message === 'synthetic_async_connection_failure'
+    );
+  });
+
+  assert.equal(harness.socketCount, 1);
+  assert.deepEqual(unhandled, []);
+  assert.equal(client.connected, false);
+  assert.equal(client.connectPromise, null);
+  assert.equal(client.socket, null);
+});
+
+test('handshake timeout rejects and leaves no stale connection attempt', async () => {
+  const harness = createConnectHarness();
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 10,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  await assert.rejects(
+    client.connect(),
+    error => error.code === 'VCP_BRIDGE_CONNECT_TIMEOUT'
+  );
+  assert.equal(client.connected, false);
+  assert.equal(client.connectPromise, null);
+  assert.equal(client.socket, null);
+  assert.equal(harness.sockets[0].readyState, 3);
+});
+
+test('concurrent connect callers share one successful physical connection attempt', async () => {
+  const harness = createConnectHarness(socket => {
+    setTimeout(() => socket.acknowledge(), 5);
+  });
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 30,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  const first = client.connect();
+  const second = client.connect();
+  assert.equal(first, second);
+  await Promise.all([first, second]);
+  assert.equal(harness.socketCount, 1);
+  assert.equal(client.connected, true);
+  assert.equal(client.connectPromise, null);
+  client.disconnect();
+});
+
+test('concurrent connect callers share one failed physical connection attempt', async () => {
+  const failure = new Error('synthetic_shared_connection_failure');
+  const harness = createConnectHarness(socket => {
+    setTimeout(() => socket.emit('error', { error: failure }), 5);
+  });
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: 'synthetic-key-not-a-real-secret',
+    requestTimeoutMs: 30,
+    WebSocketImpl: harness.WebSocket
+  });
+
+  const unhandled = await captureUnhandledRejections(async () => {
+    const first = client.connect();
+    const second = client.connect();
+    assert.equal(first, second);
+    const outcomes = await Promise.allSettled([first, second]);
+    assert.equal(outcomes[0].status, 'rejected');
+    assert.equal(outcomes[1].status, 'rejected');
+    assert.equal(outcomes[0].reason, outcomes[1].reason);
+    assert.equal(outcomes[0].reason.code, 'VCP_BRIDGE_CONNECTION_ERROR');
+  });
+
+  assert.equal(harness.socketCount, 1);
+  assert.deepEqual(unhandled, []);
+  assert.equal(client.connectPromise, null);
+});
+
+test('a failed connection attempt can be retried successfully', async () => {
+  const client = new VcpToolBridgeClient({ bridgeUrl: '', key: '', requestTimeoutMs: 30 });
+  await assert.rejects(
+    client.connect(),
+    error => error.code === 'VCP_BRIDGE_URL_REQUIRED'
+  );
+  assert.equal(client.connectPromise, null);
+
+  const harness = createConnectHarness(socket => socket.acknowledge());
+  client.bridgeUrl = 'ws://127.0.0.1:1';
+  client.key = 'synthetic-key-not-a-real-secret';
+  client.WebSocketImpl = harness.WebSocket;
+  await client.connect();
+
+  assert.equal(harness.socketCount, 1);
+  assert.equal(client.connected, true);
+  assert.equal(client.connectPromise, null);
+  client.disconnect();
+});
+
 test('fake bridge connects and exposes arbitrary manifests without a second registry', async () => {
   const { bridge, adapter } = createFixture();
   const listed = await adapter.listTools();

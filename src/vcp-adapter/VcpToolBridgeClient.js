@@ -129,7 +129,10 @@ class VcpToolBridgeClient {
   _settleConnect(error = null) {
     const resolve = this.connectResolve;
     const reject = this.connectReject;
-    this._clearConnectWaiter();
+    if (this.connectTimer) clearTimeout(this.connectTimer);
+    this.connectTimer = null;
+    this.connectResolve = null;
+    this.connectReject = null;
     if (error) {
       if (reject) reject(error);
     } else if (resolve) {
@@ -137,30 +140,55 @@ class VcpToolBridgeClient {
     }
   }
 
-  async connect() {
-    if (this.connected && this.socket?.readyState === 1) return;
+  connect() {
+    if (this.connected && this.socket?.readyState === 1) return Promise.resolve();
     if (this.connectPromise) return this.connectPromise;
-    if (typeof this.WebSocketImpl !== 'function') {
-      throw new VcpToolBridgeClientError('WebSocket client is unavailable', 'VCP_WEBSOCKET_UNAVAILABLE');
-    }
 
     this.disconnectRequested = false;
-    this.connectPromise = new Promise((resolve, reject) => {
+    const attempt = new Promise((resolve, reject) => {
       this.connectResolve = resolve;
       this.connectReject = reject;
     });
+    this.connectPromise = attempt;
+    attempt.then(
+      () => {
+        if (this.connectPromise === attempt) this._clearConnectWaiter();
+      },
+      () => {
+        if (this.connectPromise === attempt) this._clearConnectWaiter();
+      }
+    );
 
     try {
-      this.socket = new this.WebSocketImpl(this._connectionUrl());
-      this.socket.addEventListener('message', event => this._handleMessage(event));
-      this.socket.addEventListener('close', () => this._handleDisconnect('vcp_bridge_disconnected'));
-      this.socket.addEventListener('error', event => {
+      if (typeof this.WebSocketImpl !== 'function') {
+        throw new VcpToolBridgeClientError(
+          'WebSocket client is unavailable',
+          'VCP_WEBSOCKET_UNAVAILABLE'
+        );
+      }
+      const socket = new this.WebSocketImpl(this._connectionUrl());
+      this.socket = socket;
+      socket.addEventListener('message', event => this._handleMessage(event, socket));
+      socket.addEventListener('close', () => this._handleDisconnect('vcp_bridge_disconnected', socket));
+      socket.addEventListener('error', event => {
         const error = new VcpToolBridgeClientError(
           this._safeErrorMessage(event?.error, 'vcp_bridge_connection_error'),
           'VCP_BRIDGE_CONNECTION_ERROR'
         );
         this.lastError = error.message;
-        if (this.connectReject) this._settleConnect(error);
+        if (this.connectReject && this.socket === socket) {
+          this.connected = false;
+          this.protocolReady = false;
+          this.socket = null;
+          this._settleConnect(error);
+          if (socket.readyState < 2) {
+            try {
+              socket.close();
+            } catch {
+              // The connection attempt is already rejected and detached.
+            }
+          }
+        }
       });
       this.connectTimer = setTimeout(() => {
         const error = new VcpToolBridgeClientError(
@@ -168,9 +196,12 @@ class VcpToolBridgeClient {
           'VCP_BRIDGE_CONNECT_TIMEOUT'
         );
         this.lastError = error.message;
+        this.connected = false;
+        this.protocolReady = false;
+        if (this.socket === socket) this.socket = null;
         this._settleConnect(error);
         try {
-          this.socket?.close();
+          if (socket.readyState < 2) socket.close();
         } catch {
           // Ignore close failures after a connection timeout.
         }
@@ -183,10 +214,13 @@ class VcpToolBridgeClient {
             'VCP_BRIDGE_CONNECTION_ERROR'
           );
       this.lastError = wrapped.message;
+      this.connected = false;
+      this.protocolReady = false;
+      this.socket = null;
       this._settleConnect(wrapped);
     }
 
-    return this.connectPromise;
+    return attempt;
   }
 
   disconnect() {
@@ -202,7 +236,8 @@ class VcpToolBridgeClient {
     }
   }
 
-  _handleDisconnect(reason) {
+  _handleDisconnect(reason, socket = this.socket) {
+    if (socket && this.socket !== socket) return;
     const wasRequested = this.disconnectRequested;
     this.connected = false;
     this.protocolReady = false;
@@ -232,7 +267,8 @@ class VcpToolBridgeClient {
     return String(data ?? '');
   }
 
-  async _handleMessage(event) {
+  async _handleMessage(event, socket = this.socket) {
+    if (socket && this.socket !== socket) return;
     let message;
     try {
       message = JSON.parse(await this._messageText(event?.data));
