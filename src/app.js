@@ -41,6 +41,7 @@ const { CompatibilitySyntaxAdapter } = require('./adapters/vcp-passive-memory/Co
 const { VcpPassiveMemoryAdapter } = require('./adapters/vcp-passive-memory');
 const { VcpActiveMemoryAdapter } = require('./adapters/vcp-active-memory');
 const { VcpLightMemoryAdapter } = require('./adapters/vcp-light-memory');
+const { VcpToolAdapter, isVcpAdapterToolName } = require('./vcp-adapter/VcpToolAdapter');
 const { TimeExpressionParser } = require('./recall/TimeExpressionParser');
 const { TagMemoEngine } = require('./recall/TagMemoEngine');
 const { ResultDeduplicator } = require('./recall/ResultDeduplicator');
@@ -2377,6 +2378,16 @@ async function applyLifecycleReadPolicy(results, { config, shadowStore } = {}) {
 
 function createCodexMemoryApplication(overrides = {}) {
   const config = createConfig(overrides);
+  const vcpToolAdapter = overrides.vcpToolAdapter || (
+    config.vcpAdapter?.enabled === true
+      ? new VcpToolAdapter({
+          bridgeUrl: config.vcpAdapter.bridgeUrl,
+          key: config.vcpAdapter.key,
+          requestTimeoutMs: config.vcpAdapter.requestTimeoutMs,
+          WebSocketImpl: overrides.vcpAdapterWebSocketImpl
+        })
+      : null
+  );
   const phase8OneShotNativeWriteEnforcementEnabled =
     overrides.phase8OneShotNativeWriteEnforcementEnabled === true;
   const phase8OneShotAuthorizationAssertionVerifier =
@@ -2710,7 +2721,8 @@ function createCodexMemoryApplication(overrides = {}) {
       compatibilitySyntaxAdapter,
       vcpPassiveMemoryAdapter,
       vcpActiveMemoryAdapter,
-      vcpLightMemoryAdapter
+      vcpLightMemoryAdapter,
+      vcpToolAdapter
     },
     recall: {
       timeExpressionParser,
@@ -2746,6 +2758,12 @@ function createCodexMemoryApplication(overrides = {}) {
       }
     },
     async callTool(toolName, args = {}, requestContext = {}) {
+      if (isVcpAdapterToolName(toolName)) {
+        if (!vcpToolAdapter) {
+          throw new Error('Universal VCP Tool Adapter is not configured');
+        }
+        return vcpToolAdapter.callTool(toolName, args);
+      }
       let effectiveRequestContext = requestContext;
       if (toolName === 'record_memory' && phase8OneShotNativeWriteEnforcementEnabled) {
         if (
@@ -3330,6 +3348,7 @@ function createCodexMemoryApplication(overrides = {}) {
     },
     async close() {
       memoryWriteReconcileWorker.stop();
+      vcpToolAdapter?.close();
       await shadowStore.close();
     }
   };

@@ -752,6 +752,32 @@ function createConfig(overrides = {}) {
       ''
     )
   );
+  const vcpAdapterBridgeUrl = String(pickFirstNonEmpty(
+    overrides.vcpAdapterBridgeUrl,
+    overrides.vcpAdapter?.bridgeUrl,
+    process.env.VCP_ADAPTER_BRIDGE_URL,
+    ''
+  )).trim();
+  const vcpAdapterKey = String(pickFirstNonEmpty(
+    overrides.vcpAdapterKey,
+    overrides.vcpAdapter?.key,
+    process.env.VCP_ADAPTER_KEY,
+    ''
+  ));
+  const vcpAdapterRequestTimeoutMs = parsePositiveInteger(
+    pickFirstNonEmpty(
+      overrides.vcpAdapterRequestTimeoutMs,
+      overrides.vcpAdapter?.requestTimeoutMs,
+      process.env.VCP_ADAPTER_REQUEST_TIMEOUT_MS,
+      '30000'
+    ),
+    30000
+  );
+  const vcpAdapterEnabled = _resolveBool(
+    overrides.vcpAdapterEnabled ?? overrides.vcpAdapter?.enabled,
+    'VCP_ADAPTER_ENABLED',
+    false
+  );
   const embeddingProfileDir = path.join(dataDir, 'embedding-profiles', embeddingFingerprint);
   const vectorIndexPath = resolveAbsolutePath(
     basePath,
@@ -815,6 +841,12 @@ function createConfig(overrides = {}) {
     mcpPublicToolNames: isHardened ? [] : requestedMcpPublicToolNames,
     exposeControlledMutationMcpTools: isHardened ? false : exposeControlledMutationMcpTools,
     exposeWriteMcpTools: isHardened ? false : exposeWriteMcpTools,
+    vcpAdapter: {
+      enabled: vcpAdapterEnabled,
+      bridgeUrl: vcpAdapterBridgeUrl,
+      key: vcpAdapterKey,
+      requestTimeoutMs: vcpAdapterRequestTimeoutMs
+    },
     embedDimensions: inferredEmbedDimensions,
     embeddingFingerprint,
     embeddingProfileVersion,

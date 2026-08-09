@@ -434,6 +434,26 @@ secret identity used by the schema-v6 canonical listener. Token equivalence is
 an execution-time precondition and must be proved without printing or copying
 token material.
 
+### Universal VCP Tool Adapter
+
+When `VCP_ADAPTER_ENABLED=true`, `VCP_ADAPTER_BRIDGE_URL`, and
+`VCP_ADAPTER_KEY` are configured, the existing MCP server also exposes four
+generic tools:
+
+- `get_vcp_adapter_status`
+- `list_vcp_tools`
+- `execute_vcp_tool`
+- `get_vcp_tool_status`
+
+`VCP_ADAPTER_REQUEST_TIMEOUT_MS` optionally sets the in-process request
+deadline. The URL contains only the `ws`/`wss` bridge origin; the adapter adds
+the authenticated VCP distributed-server path at connection time and never
+returns the key or connection locator through MCP. Tool manifests are fetched
+from VCPToolBridge and kept only as the current in-memory view. Tool execution
+forwards the supplied native tool name and JSON arguments to VCPToolBridge;
+codex-memory does not maintain a second plugin registry or execute native VCP
+tool logic locally.
+
 ## Governance Model
 
 The bridge governs these dimensions:
