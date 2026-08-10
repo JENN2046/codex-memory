@@ -160,18 +160,20 @@ function createFixture({
   timeout = 40,
   allowedTools = DEFAULT_FAKE_ALLOWED_TOOLS,
   manifests,
-  key = SYNTHETIC_BRIDGE_KEY
+  key = SYNTHETIC_BRIDGE_KEY,
+  requestIdFactory
 } = {}) {
   const bridge = new FakeVcpToolBridge({ manifests });
+  const generatedRequestIdFactory = requestIdFactory || (() => {
+    let sequence = 0;
+    return () => `adapter-request-${++sequence}`;
+  })();
   const client = new VcpToolBridgeClient({
     bridgeUrl: 'ws://127.0.0.1:1',
     key,
     requestTimeoutMs: timeout,
     WebSocketImpl: bridge.activate(),
-    requestIdFactory: (() => {
-      let sequence = 0;
-      return () => `adapter-request-${++sequence}`;
-    })()
+    requestIdFactory: generatedRequestIdFactory
   });
   return {
     bridge,
@@ -1132,7 +1134,7 @@ test('validation error paths escape attacker controls and redact the Bridge cred
   adapter.close();
 });
 
-test('credential redaction preserves fixed projection keys and redacts only nested values', async () => {
+test('boundary-aware credential redaction preserves protocol envelopes and redacts payload values', async () => {
   const fixedKeys = ['status', 'error', 'result', 'request_id', 'tool_name', 'connected'];
 
   for (const secret of fixedKeys) {
@@ -1188,8 +1190,8 @@ test('credential redaction preserves fixed projection keys and redacts only nest
     }
 
     assert.equal(status.last_error, 'last-[REDACTED]');
-    assert.equal(requestStatus.request_id, 'request-[REDACTED]');
-    assert.equal(requestStatus.status, 'state-[REDACTED]');
+    assert.equal(requestStatus.request_id, `request-${secret}`);
+    assert.equal(requestStatus.status, `state-${secret}`);
     assert.deepEqual(requestStatus.progress, [
       '[REDACTED]',
       { nested: 'progress-[REDACTED]' }
@@ -1202,8 +1204,9 @@ test('credential redaction preserves fixed projection keys and redacts only nest
     assert.equal(requestStatus.result.failure.code, 'code-[REDACTED]');
     assert.equal(requestStatus.error.includes(secret), false);
     assert.equal(requestStatus.error.includes('[REDACTED]'), true);
-    assert.equal(executed.tool_name, '[REDACTED]');
-    assert.equal(executed.request_id, 'request-[REDACTED]');
+    assert.equal(executed.tool_name, secret);
+    assert.equal(executed.request_id, `request-${secret}`);
+    assert.equal(executed.status, `state-${secret}`);
     adapter.close();
   }
 
@@ -1228,6 +1231,131 @@ test('credential redaction preserves fixed projection keys and redacts only nest
     assert.deepEqual(adapter.getToolStatus({ request_id: 'request-1' }), unchanged);
     adapter.close();
   }
+});
+
+test('generated and caller-supplied request ids survive credential collisions and remain queryable', async () => {
+  const generatedRequestId = '123e4567-e89b-12d3-a456-426614174000';
+  const generated = createFixture({
+    allowedTools: ['ToolA'],
+    key: '-',
+    requestIdFactory: () => generatedRequestId
+  });
+  const generatedResult = await generated.adapter.executeTool({
+    tool_name: 'ToolA',
+    tool_args: { source: 'generated' }
+  });
+  assert.equal(generatedResult.request_id, generatedRequestId);
+  assert.equal(generatedResult.request_id.includes('[REDACTED]'), false);
+  const generatedStatus = generated.adapter.getToolStatus({
+    request_id: generatedResult.request_id
+  });
+  assert.equal(generatedStatus.request_id, generatedRequestId);
+  assert.equal(generatedStatus.status, 'completed');
+  assert.equal(generatedStatus.error, null);
+  generated.adapter.close();
+
+  for (const requestId of ['status', 'status-123', 'abc-status-def']) {
+    const fixture = createFixture({
+      allowedTools: ['ToolA'],
+      key: 'status'
+    });
+    const executed = await fixture.adapter.executeTool({
+      tool_name: 'ToolA',
+      tool_args: { source: 'caller' },
+      request_id: requestId
+    });
+    assert.equal(executed.request_id, requestId);
+    assert.equal(executed.request_id.includes('[REDACTED]'), false);
+    const status = fixture.adapter.getToolStatus({ request_id: executed.request_id });
+    assert.equal(status.request_id, requestId);
+    assert.equal(status.status, 'completed');
+    assert.equal(status.error, null);
+    fixture.adapter.close();
+  }
+});
+
+test('tool and status identities stay exact while arbitrary manifest and result payloads are redacted', async () => {
+  const secret = 'status';
+  const manifests = [{
+    name: 'status-tool',
+    displayName: 'status tool',
+    description: 'server credential is status',
+    capabilities: {
+      invocationCommands: [{ command: 'status-command', example: { token: 'status' } }]
+    },
+    parameters: { type: 'object', title: 'status schema' },
+    metadata: { request_id: 'credential=status' }
+  }];
+  const fixture = createFixture({
+    allowedTools: ['status-tool'],
+    key: secret,
+    manifests
+  });
+
+  const listed = await fixture.adapter.listTools();
+  assert.equal(listed.tools[0].name, 'status-tool');
+  assert.equal(listed.tools[0].display_name, 'status tool');
+  assert.equal(listed.tools[0].description, 'server credential is [REDACTED]');
+  assert.deepEqual(listed.tools[0].invocation_commands, [
+    { command: 'status-command', example: { token: '[REDACTED]' } }
+  ]);
+  assert.deepEqual(listed.tools[0].parameters, {
+    type: 'object',
+    title: 'status schema'
+  });
+  assert.equal(listed.tools[0].raw_manifest.metadata.request_id, 'credential=[REDACTED]');
+
+  const executed = await fixture.adapter.executeTool({
+    tool_name: 'status-tool',
+    tool_args: {
+      request_id: 'credential=status',
+      nested: { message: 'payload status value' }
+    },
+    request_id: 'status-123'
+  });
+  assert.equal(executed.request_id, 'status-123');
+  assert.equal(executed.tool_name, 'status-tool');
+  assert.equal(executed.status, 'completed');
+  assert.equal(fixture.bridge.received[1].data.toolName, 'status-tool');
+  assert.equal(executed.result.executedTool, '[REDACTED]-tool');
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(executed.result.receivedArgs, 'request_id'),
+    true
+  );
+  assert.equal(executed.result.receivedArgs.request_id, 'credential=[REDACTED]');
+  assert.equal(executed.result.receivedArgs.nested.message, 'payload [REDACTED] value');
+  assert.equal(
+    fixture.adapter.getToolStatus({ request_id: executed.request_id }).request_id,
+    'status-123'
+  );
+  fixture.adapter.close();
+
+  const completed = createFixture({
+    allowedTools: ['ToolA'],
+    key: 'completed'
+  });
+  const completedResult = await completed.adapter.executeTool({
+    tool_name: 'ToolA',
+    tool_args: {},
+    request_id: 'completed-state'
+  });
+  assert.equal(completedResult.status, 'completed');
+  assert.equal(completedResult.status.includes('[REDACTED]'), false);
+  completed.adapter.close();
+
+  const failed = createFixture({
+    allowedTools: ['FailingTool'],
+    key: 'synthetic'
+  });
+  const failedResult = await failed.adapter.executeTool({
+    tool_name: 'FailingTool',
+    tool_args: {},
+    request_id: 'error-payload'
+  });
+  assert.equal(failedResult.request_id, 'error-payload');
+  assert.equal(failedResult.status, 'failed');
+  assert.equal(failedResult.error, '[REDACTED]_tool_failure');
+  failed.adapter.close();
 });
 
 test('tool name and request id bounds are enforced before the Bridge', async () => {

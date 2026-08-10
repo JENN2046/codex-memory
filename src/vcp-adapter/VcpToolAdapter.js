@@ -271,7 +271,7 @@ function validateToolArgs(value, credential) {
   }
 }
 
-function redactSensitiveValues(value, credential, seen = new WeakMap()) {
+function redactPayloadValue(value, credential, seen = new WeakMap()) {
   if (typeof value === 'string') {
     return redactCredentialText(value, credential);
   }
@@ -280,7 +280,7 @@ function redactSensitiveValues(value, credential, seen = new WeakMap()) {
   if (Array.isArray(value)) {
     const output = [];
     seen.set(value, output);
-    for (const item of value) output.push(redactSensitiveValues(item, credential, seen));
+    for (const item of value) output.push(redactPayloadValue(item, credential, seen));
     return output;
   }
   const output = {};
@@ -311,7 +311,7 @@ function redactSensitiveValues(value, credential, seen = new WeakMap()) {
   }
   for (const [key, nestedValue] of Object.entries(value)) {
     Object.defineProperty(output, key, {
-      value: redactSensitiveValues(nestedValue, credential, seen),
+      value: redactPayloadValue(nestedValue, credential, seen),
       enumerable: true,
       configurable: true,
       writable: true
@@ -328,8 +328,39 @@ class VcpToolAdapter {
     this.manifestsLoaded = false;
   }
 
-  _redactOutput(value) {
-    return redactSensitiveValues(value, this.client?.key);
+  _redactPayload(value) {
+    return redactPayloadValue(value, this.client?.key);
+  }
+
+  _projectInvocationCommand(invocation) {
+    if (typeof invocation === 'string') return invocation;
+    const projected = this._redactPayload(invocation);
+    if (isPlainObject(invocation) && Object.prototype.hasOwnProperty.call(invocation, 'command')) {
+      projected.command = invocation.command;
+    }
+    return projected;
+  }
+
+  _projectManifest(tool) {
+    return {
+      name: tool.name,
+      display_name: tool.display_name,
+      description: this._redactPayload(tool.description),
+      invocation_commands: tool.invocation_commands
+        .map(invocation => this._projectInvocationCommand(invocation)),
+      parameters: tool.parameters,
+      raw_manifest: this._redactPayload(tool.raw_manifest)
+    };
+  }
+
+  _projectRequestStatus(state) {
+    return {
+      request_id: state.request_id,
+      status: state.status,
+      progress: this._redactPayload(state.progress ?? null),
+      result: this._redactPayload(state.result ?? null),
+      error: this._redactPayload(state.error ?? null)
+    };
   }
 
   _assertToolAllowed(toolName) {
@@ -343,12 +374,16 @@ class VcpToolAdapter {
 
   getStatus() {
     const clientStatus = this.client.getStatus();
-    return this._redactOutput({
-      ...clientStatus,
+    return {
+      connected: clientStatus.connected,
+      bridge_enabled: clientStatus.bridge_enabled,
+      protocol_ready: clientStatus.protocol_ready,
       tools_discovered: this.manifestsLoaded
         ? this.latestTools.length
-        : clientStatus.tools_discovered
-    });
+        : clientStatus.tools_discovered,
+      pending_requests: clientStatus.pending_requests,
+      last_error: this._redactPayload(clientStatus.last_error ?? null)
+    };
   }
 
   async listTools() {
@@ -356,7 +391,7 @@ class VcpToolAdapter {
     this.latestTools = discovered.plugins
       .map(normalizeManifest)
       .filter(tool => typeof tool.name === 'string' && this.allowedTools.has(tool.name))
-      .map(tool => this._redactOutput(tool));
+      .map(tool => this._projectManifest(tool));
     this.manifestsLoaded = true;
     return { tools: this.latestTools };
   }
@@ -372,18 +407,18 @@ class VcpToolAdapter {
       toolArgs: args.tool_args,
       requestId
     });
-    return this._redactOutput({
+    return {
       request_id: state.request_id,
       tool_name: toolName,
       status: state.status,
-      result: state.result ?? null,
-      error: state.error ?? null
-    });
+      result: this._redactPayload(state.result ?? null),
+      error: this._redactPayload(state.error ?? null)
+    };
   }
 
   getToolStatus(args = {}) {
     const requestId = normalizeValidatedRequestId(args.request_id, { required: true });
-    return this._redactOutput(this.client.getRequestStatus(requestId));
+    return this._projectRequestStatus(this.client.getRequestStatus(requestId));
   }
 
   async callTool(toolName, args = {}) {
