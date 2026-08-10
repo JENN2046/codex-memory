@@ -6,6 +6,13 @@ const {
   isPlainObject,
   normalizeRequestId
 } = require('./VcpToolBridgeClient');
+const {
+  projectAdapterStatus,
+  projectToolExecution,
+  projectToolList,
+  projectToolStatus,
+  redactCredentialText
+} = require('./VcpOutputProjection');
 
 const VCP_ADAPTER_TOOL_NAMES = Object.freeze([
   'get_vcp_adapter_status',
@@ -72,38 +79,6 @@ const VCP_ADAPTER_TOOL_DEFINITIONS = Object.freeze([
   }
 ]);
 
-function normalizeManifest(manifest) {
-  const source = isPlainObject(manifest) ? manifest : {};
-  const capabilities = isPlainObject(source.capabilities) ? source.capabilities : {};
-  const invocationCommands = Array.isArray(capabilities.invocationCommands)
-    ? capabilities.invocationCommands
-    : Array.isArray(source.invocationCommands)
-      ? source.invocationCommands
-      : [];
-  const parameters = isPlainObject(source.parameters)
-    ? source.parameters
-    : isPlainObject(source.inputSchema)
-      ? source.inputSchema
-      : isPlainObject(capabilities.parameters)
-        ? capabilities.parameters
-        : {};
-
-  return {
-    name: typeof source.name === 'string' ? source.name : null,
-    display_name: typeof source.displayName === 'string'
-      ? source.displayName
-      : typeof source.display_name === 'string'
-        ? source.display_name
-        : typeof source.name === 'string'
-          ? source.name
-          : null,
-    description: typeof source.description === 'string' ? source.description : '',
-    invocation_commands: invocationCommands,
-    parameters,
-    raw_manifest: source
-  };
-}
-
 function adapterError(message, code, {
   jsonRpcCode = -32602,
   jsonRpcMessage = 'Invalid params'
@@ -113,24 +88,6 @@ function adapterError(message, code, {
   error.jsonRpcMessage = jsonRpcMessage;
   error.jsonRpcData = { code, status: 'rejected' };
   return error;
-}
-
-function credentialCandidates(credential) {
-  if (typeof credential !== 'string' || !credential) return [];
-  const candidates = [credential];
-  try {
-    candidates.push(encodeURIComponent(credential));
-  } catch {
-    // The literal credential is still safe to redact when URI encoding fails.
-  }
-  return [...new Set(candidates.filter(Boolean))];
-}
-
-function redactCredentialText(value, credential) {
-  return credentialCandidates(credential).reduce(
-    (output, candidate) => output.split(candidate).join('[REDACTED]'),
-    String(value)
-  );
 }
 
 function escapedControlCharacter(character) {
@@ -271,96 +228,12 @@ function validateToolArgs(value, credential) {
   }
 }
 
-function redactPayloadValue(value, credential, seen = new WeakMap()) {
-  if (typeof value === 'string') {
-    return redactCredentialText(value, credential);
-  }
-  if (!value || typeof value !== 'object') return value;
-  if (seen.has(value)) return seen.get(value);
-  if (Array.isArray(value)) {
-    const output = [];
-    seen.set(value, output);
-    for (const item of value) output.push(redactPayloadValue(item, credential, seen));
-    return output;
-  }
-  const output = {};
-  seen.set(value, output);
-  if (value instanceof Error) {
-    Object.defineProperties(output, {
-      name: {
-        value: redactCredentialText(value.name, credential),
-        enumerable: true,
-        configurable: true,
-        writable: true
-      },
-      message: {
-        value: redactCredentialText(value.message, credential),
-        enumerable: true,
-        configurable: true,
-        writable: true
-      },
-      stack: {
-        value: typeof value.stack === 'string'
-          ? redactCredentialText(value.stack, credential)
-          : null,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      }
-    });
-  }
-  for (const [key, nestedValue] of Object.entries(value)) {
-    Object.defineProperty(output, key, {
-      value: redactPayloadValue(nestedValue, credential, seen),
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  }
-  return output;
-}
-
 class VcpToolAdapter {
   constructor(options = {}) {
     this.client = options.client || new VcpToolBridgeClient(options);
     this.allowedTools = normalizeAllowedTools(options.allowedTools);
     this.latestTools = [];
     this.manifestsLoaded = false;
-  }
-
-  _redactPayload(value) {
-    return redactPayloadValue(value, this.client?.key);
-  }
-
-  _projectInvocationCommand(invocation) {
-    if (typeof invocation === 'string') return invocation;
-    const projected = this._redactPayload(invocation);
-    if (isPlainObject(invocation) && Object.prototype.hasOwnProperty.call(invocation, 'command')) {
-      projected.command = invocation.command;
-    }
-    return projected;
-  }
-
-  _projectManifest(tool) {
-    return {
-      name: tool.name,
-      display_name: tool.display_name,
-      description: this._redactPayload(tool.description),
-      invocation_commands: tool.invocation_commands
-        .map(invocation => this._projectInvocationCommand(invocation)),
-      parameters: tool.parameters,
-      raw_manifest: this._redactPayload(tool.raw_manifest)
-    };
-  }
-
-  _projectRequestStatus(state) {
-    return {
-      request_id: state.request_id,
-      status: state.status,
-      progress: this._redactPayload(state.progress ?? null),
-      result: this._redactPayload(state.result ?? null),
-      error: this._redactPayload(state.error ?? null)
-    };
   }
 
   _assertToolAllowed(toolName) {
@@ -374,26 +247,23 @@ class VcpToolAdapter {
 
   getStatus() {
     const clientStatus = this.client.getStatus();
-    return {
-      connected: clientStatus.connected,
-      bridge_enabled: clientStatus.bridge_enabled,
-      protocol_ready: clientStatus.protocol_ready,
-      tools_discovered: this.manifestsLoaded
+    return projectAdapterStatus(clientStatus, {
+      credential: this.client?.key,
+      toolsDiscovered: this.manifestsLoaded
         ? this.latestTools.length
-        : clientStatus.tools_discovered,
-      pending_requests: clientStatus.pending_requests,
-      last_error: this._redactPayload(clientStatus.last_error ?? null)
-    };
+        : clientStatus.tools_discovered
+    });
   }
 
   async listTools() {
     const discovered = await this.client.discoverManifests();
-    this.latestTools = discovered.plugins
-      .map(normalizeManifest)
-      .filter(tool => typeof tool.name === 'string' && this.allowedTools.has(tool.name))
-      .map(tool => this._projectManifest(tool));
+    const projected = projectToolList(discovered.plugins, {
+      credential: this.client?.key,
+      allowedTools: this.allowedTools
+    });
+    this.latestTools = projected.tools;
     this.manifestsLoaded = true;
-    return { tools: this.latestTools };
+    return projected;
   }
 
   async executeTool(args = {}) {
@@ -407,18 +277,14 @@ class VcpToolAdapter {
       toolArgs: args.tool_args,
       requestId
     });
-    return {
-      request_id: state.request_id,
-      tool_name: toolName,
-      status: state.status,
-      result: this._redactPayload(state.result ?? null),
-      error: this._redactPayload(state.error ?? null)
-    };
+    return projectToolExecution(state, toolName, { credential: this.client?.key });
   }
 
   getToolStatus(args = {}) {
     const requestId = normalizeValidatedRequestId(args.request_id, { required: true });
-    return this._projectRequestStatus(this.client.getRequestStatus(requestId));
+    return projectToolStatus(this.client.getRequestStatus(requestId), {
+      credential: this.client?.key
+    });
   }
 
   async callTool(toolName, args = {}) {
@@ -445,6 +311,5 @@ module.exports = {
   VCP_ADAPTER_TOOL_DEFINITIONS,
   VCP_ADAPTER_TOOL_NAMES,
   VcpToolAdapter,
-  isVcpAdapterToolName,
-  normalizeManifest
+  isVcpAdapterToolName
 };

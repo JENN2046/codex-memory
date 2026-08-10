@@ -6,6 +6,10 @@ const assert = require('node:assert/strict');
 const { createConfig } = require('../src/config/createConfig');
 const { VcpToolAdapter } = require('../src/vcp-adapter/VcpToolAdapter');
 const { VcpToolBridgeClient } = require('../src/vcp-adapter/VcpToolBridgeClient');
+const {
+  MAX_OUTPUT_PROJECTION_DEPTH,
+  MAX_OUTPUT_PROJECTION_NODES
+} = require('../src/vcp-adapter/VcpOutputProjection');
 
 const SYNTHETIC_BRIDGE_KEY = 'synthetic-key-not-a-real-secret';
 const DEFAULT_FAKE_ALLOWED_TOOLS = Object.freeze([
@@ -1150,7 +1154,7 @@ test('boundary-aware credential redaction preserves protocol envelopes and redac
           protocol_ready: true,
           tools_discovered: 1,
           pending_requests: 0,
-          last_error: `last-${secret}`
+          last_error: `last-${secret}\r\nstatus-line`
         };
       },
       getRequestStatus() {
@@ -1189,7 +1193,10 @@ test('boundary-aware credential redaction preserves protocol envelopes and redac
       assert.equal(Object.prototype.hasOwnProperty.call(executed, key), true);
     }
 
-    assert.equal(status.last_error, 'last-[REDACTED]');
+    assert.equal(status.last_error.includes(secret), false);
+    assert.equal(status.last_error.includes('\r'), false);
+    assert.equal(status.last_error.includes('\n'), false);
+    assert.equal(status.last_error.includes('\\r\\n'), true);
     assert.equal(requestStatus.request_id, `request-${secret}`);
     assert.equal(requestStatus.status, `state-${secret}`);
     assert.deepEqual(requestStatus.progress, [
@@ -1294,14 +1301,14 @@ test('tool and status identities stay exact while arbitrary manifest and result 
 
   const listed = await fixture.adapter.listTools();
   assert.equal(listed.tools[0].name, 'status-tool');
-  assert.equal(listed.tools[0].display_name, 'status tool');
+  assert.equal(listed.tools[0].display_name, '[REDACTED] tool');
   assert.equal(listed.tools[0].description, 'server credential is [REDACTED]');
   assert.deepEqual(listed.tools[0].invocation_commands, [
-    { command: 'status-command', example: { token: '[REDACTED]' } }
+    { command: '[REDACTED]-command', example: { token: '[REDACTED]' } }
   ]);
   assert.deepEqual(listed.tools[0].parameters, {
     type: 'object',
-    title: 'status schema'
+    title: '[REDACTED] schema'
   });
   assert.equal(listed.tools[0].raw_manifest.metadata.request_id, 'credential=[REDACTED]');
 
@@ -1391,6 +1398,221 @@ test('tool name and request id bounds are enforced before the Bridge', async () 
   assert.equal(valid.request_id, 'bounded-id');
   assert.equal(bridge.received[0].data.toolName, 'ToolA');
   assert.equal(bridge.received[0].data.requestId, 'bounded-id');
+  adapter.close();
+});
+
+test('tool manifests use one bounded safe source for parameters, commands, and raw output', async () => {
+  const credential = 'string';
+  const manifests = [{
+    name: 'SchemaTool',
+    version: 'string',
+    displayName: 'Schema string tool',
+    description: 'uses credential string',
+    parameters: {
+      type: 'object',
+      properties: {
+        string: {
+          type: 'string',
+          description: 'enter credential string',
+          default: 'string',
+          example: 'prefix-string-suffix'
+        }
+      },
+      required: ['string'],
+      enum: ['string']
+    },
+    invocationCommands: ['root-tool --key string'],
+    capabilities: {
+      invocationCommands: [
+        'curl http://127.0.0.1/run?VCP_Key=string',
+        {
+          command: 'tool --key string',
+          description: 'uses string',
+          metadata: { endpoint: 'ws://host/string' }
+        }
+      ]
+    },
+    metadata: {
+      description: 'nested string credential',
+      arbitrary: { request_id: 'credential=string' }
+    }
+  }];
+  const fixture = createFixture({
+    allowedTools: ['SchemaTool'],
+    key: credential,
+    manifests
+  });
+
+  const listed = await fixture.adapter.listTools();
+  assert.equal(listed.tools.length, 1);
+  const tool = listed.tools[0];
+  assert.equal(tool.name, 'SchemaTool');
+  assert.equal(tool.raw_manifest.name, 'SchemaTool');
+  assert.equal(tool.raw_manifest.version, 'string');
+  assert.equal(tool.display_name, 'Schema [REDACTED] tool');
+  assert.equal(tool.description, 'uses credential [REDACTED]');
+  assert.equal(tool.description, tool.raw_manifest.description);
+
+  assert.strictEqual(tool.parameters, tool.raw_manifest.parameters);
+  assert.equal(tool.parameters.type, 'object');
+  assert.equal(Object.prototype.hasOwnProperty.call(tool.parameters.properties, 'string'), true);
+  assert.equal(tool.parameters.properties.string.type, 'string');
+  assert.deepEqual(tool.parameters.required, ['string']);
+  assert.deepEqual(tool.parameters.enum, ['string']);
+  assert.equal(tool.parameters.properties.string.description, 'enter credential [REDACTED]');
+  assert.equal(tool.parameters.properties.string.default, '[REDACTED]');
+  assert.equal(tool.parameters.properties.string.example, 'prefix-[REDACTED]-suffix');
+
+  assert.strictEqual(
+    tool.invocation_commands,
+    tool.raw_manifest.capabilities.invocationCommands
+  );
+  assert.equal(
+    tool.invocation_commands[0],
+    'curl http://127.0.0.1/run?VCP_Key=[REDACTED]'
+  );
+  assert.deepEqual(tool.invocation_commands[1], {
+    command: 'tool --key [REDACTED]',
+    description: 'uses [REDACTED]',
+    metadata: { endpoint: 'ws://host/[REDACTED]' }
+  });
+  assert.deepEqual(tool.raw_manifest.invocationCommands, [
+    'root-tool --key [REDACTED]'
+  ]);
+  assert.equal(tool.raw_manifest.metadata.description, 'nested [REDACTED] credential');
+  assert.equal(
+    tool.raw_manifest.metadata.arbitrary.request_id,
+    'credential=[REDACTED]'
+  );
+  fixture.adapter.close();
+});
+
+test('deep and wide Bridge outputs fail with a stable bounded projection error', async () => {
+  function nestedObject(depth) {
+    let value = 'leaf';
+    for (let index = 0; index < depth; index += 1) value = { nested: value };
+    return value;
+  }
+
+  function nestedArray(depth) {
+    let value = 'leaf';
+    for (let index = 0; index < depth; index += 1) value = [value];
+    return value;
+  }
+
+  for (const overBudgetResult of [
+    nestedObject(MAX_OUTPUT_PROJECTION_DEPTH + 2),
+    nestedArray(MAX_OUTPUT_PROJECTION_DEPTH + 2),
+    Array.from({ length: MAX_OUTPUT_PROJECTION_NODES + 1 }, () => true)
+  ]) {
+    let result = overBudgetResult;
+    const client = {
+      key: 'synthetic-output-secret',
+      async executeTool({ toolName, requestId }) {
+        return {
+          request_id: requestId || 'bounded-output-request',
+          tool_name: toolName,
+          status: 'completed',
+          result,
+          error: null
+        };
+      },
+      disconnect() {}
+    };
+    const adapter = new VcpToolAdapter({ client, allowedTools: ['ToolA'] });
+    await assert.rejects(
+      adapter.executeTool({
+        tool_name: 'ToolA',
+        tool_args: {},
+        request_id: 'bounded-output-request'
+      }),
+      error => {
+        assert.equal(error instanceof RangeError, false);
+        assert.equal(error.code, 'VCP_RESPONSE_TOO_COMPLEX');
+        assert.equal(error.jsonRpcCode, -32603);
+        assert.equal(error.jsonRpcData.code, 'VCP_RESPONSE_TOO_COMPLEX');
+        return true;
+      }
+    );
+
+    result = { process_survived: true };
+    const recovered = await adapter.executeTool({
+      tool_name: 'ToolA',
+      tool_args: {},
+      request_id: 'bounded-output-recovery'
+    });
+    assert.deepEqual(recovered.result, { process_survived: true });
+    adapter.close();
+  }
+
+  const statusAdapter = new VcpToolAdapter({
+    client: {
+      key: 'synthetic-output-secret',
+      getRequestStatus(requestId) {
+        return {
+          request_id: requestId,
+          status: 'completed',
+          progress: null,
+          result: nestedObject(MAX_OUTPUT_PROJECTION_DEPTH + 2),
+          error: null
+        };
+      },
+      disconnect() {}
+    },
+    allowedTools: []
+  });
+  assert.throws(
+    () => statusAdapter.getToolStatus({ request_id: 'deep-status-output' }),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  statusAdapter.close();
+});
+
+test('deep Bridge manifests fail closed without publishing a partial tool list', async () => {
+  let manifests = [{
+    name: 'ToolA',
+    description: 'safe manifest',
+    parameters: (() => {
+      let value = { type: 'string' };
+      for (let index = 0; index < MAX_OUTPUT_PROJECTION_DEPTH + 2; index += 1) {
+        value = {
+          type: 'object',
+          properties: { nested: value }
+        };
+      }
+      return value;
+    })()
+  }];
+  const client = {
+    key: 'synthetic-manifest-secret',
+    async discoverManifests() {
+      return { plugins: manifests };
+    },
+    getStatus() {
+      return {
+        connected: true,
+        bridge_enabled: true,
+        protocol_ready: true,
+        tools_discovered: manifests.length,
+        pending_requests: 0,
+        last_error: null
+      };
+    },
+    disconnect() {}
+  };
+  const adapter = new VcpToolAdapter({ client, allowedTools: ['ToolA'] });
+
+  await assert.rejects(
+    adapter.listTools(),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  assert.equal(adapter.manifestsLoaded, false);
+  assert.deepEqual(adapter.latestTools, []);
+
+  manifests = [{ name: 'ToolA', description: 'safe manifest' }];
+  const recovered = await adapter.listTools();
+  assert.equal(recovered.tools.length, 1);
+  assert.equal(recovered.tools[0].name, 'ToolA');
   adapter.close();
 });
 
