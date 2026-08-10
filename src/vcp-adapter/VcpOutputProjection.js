@@ -17,27 +17,27 @@ const PROJECTION_MODE = Object.freeze({
   PAYLOAD: 'payload',
   SCHEMA: 'schema',
   SCHEMA_MAP: 'schema_map',
-  SCHEMA_SEMANTIC: 'schema_semantic'
+  SCHEMA_CONTRACT_MAP: 'schema_contract_map',
+  SCHEMA_CONTRACT: 'schema_contract'
 });
 
-const SCHEMA_TEXT_FIELDS = new Set([
-  '$comment',
+const SCHEMA_DESCRIPTIVE_FIELDS = new Set([
   'description',
-  'title',
-  'example',
-  'examples',
-  'default'
+  'title'
 ]);
 
 const SCHEMA_MAP_FIELDS = new Set([
-  '$defs',
-  'definitions',
   'dependentSchemas',
-  'patternProperties',
   'properties'
 ]);
 
-const SCHEMA_FIELDS = new Set([
+const SCHEMA_CONTRACT_MAP_FIELDS = new Set([
+  '$defs',
+  'definitions',
+  'patternProperties'
+]);
+
+const SCHEMA_CONTAINER_FIELDS = new Set([
   'additionalProperties',
   'allOf',
   'anyOf',
@@ -55,45 +55,12 @@ const SCHEMA_FIELDS = new Set([
   'unevaluatedProperties'
 ]);
 
-const SCHEMA_STRUCTURAL_FIELDS = new Set([
-  '$anchor',
-  '$dynamicAnchor',
-  '$dynamicRef',
-  '$id',
-  '$ref',
-  '$schema',
-  'contentEncoding',
-  'contentMediaType',
-  'dependentRequired',
-  'deprecated',
-  'discriminator',
-  'exclusiveMaximum',
-  'exclusiveMinimum',
-  'format',
-  'maxContains',
-  'maximum',
-  'maxItems',
-  'maxLength',
-  'maxProperties',
-  'minContains',
-  'minimum',
-  'minItems',
-  'minLength',
-  'minProperties',
-  'multipleOf',
-  'pattern',
-  'readOnly',
-  'required',
-  'type',
-  'uniqueItems',
-  'writeOnly'
-]);
-
-const SCHEMA_SEMANTIC_FIELDS = new Set([
-  'const',
-  'enum',
-  'pattern'
-]);
+function isSchemaContractValueMode(mode) {
+  return mode === PROJECTION_MODE.SCHEMA ||
+    mode === PROJECTION_MODE.SCHEMA_MAP ||
+    mode === PROJECTION_MODE.SCHEMA_CONTRACT_MAP ||
+    mode === PROJECTION_MODE.SCHEMA_CONTRACT;
+}
 
 function projectionError() {
   const error = new VcpToolBridgeClientError(
@@ -199,7 +166,7 @@ class ProjectionContext {
     if (Buffer.byteLength(value, 'utf8') > this.maxStringBytes) {
       throw projectionError();
     }
-    if (mode === PROJECTION_MODE.SCHEMA_SEMANTIC && this.containsCredential(value)) {
+    if (isSchemaContractValueMode(mode) && this.containsCredential(value)) {
       throw unsafeManifestProjectionError();
     }
     const projected = mode === PROJECTION_MODE.PAYLOAD ? this.redact(value) : value;
@@ -209,10 +176,16 @@ class ProjectionContext {
   }
 
   claimKey(key, mode) {
-    if (mode === PROJECTION_MODE.SCHEMA_SEMANTIC && this.containsCredential(key)) {
+    this.claimStringBytes(key);
+    if (
+      (
+        mode === PROJECTION_MODE.SCHEMA_CONTRACT ||
+        mode === PROJECTION_MODE.SCHEMA_CONTRACT_MAP
+      ) &&
+      this.containsCredential(key)
+    ) {
       throw unsafeManifestProjectionError();
     }
-    this.claimStringBytes(key);
   }
 }
 
@@ -259,16 +232,24 @@ function enumerableDataEntries(value) {
 }
 
 function schemaChildMode(key) {
-  if (SCHEMA_TEXT_FIELDS.has(key)) return PROJECTION_MODE.PAYLOAD;
+  if (SCHEMA_DESCRIPTIVE_FIELDS.has(key)) return PROJECTION_MODE.PAYLOAD;
   if (SCHEMA_MAP_FIELDS.has(key)) return PROJECTION_MODE.SCHEMA_MAP;
-  if (SCHEMA_FIELDS.has(key)) return PROJECTION_MODE.SCHEMA;
-  if (SCHEMA_SEMANTIC_FIELDS.has(key)) return PROJECTION_MODE.SCHEMA_SEMANTIC;
-  if (SCHEMA_STRUCTURAL_FIELDS.has(key)) return PROJECTION_MODE.EXACT;
-  return PROJECTION_MODE.PAYLOAD;
+  if (SCHEMA_CONTRACT_MAP_FIELDS.has(key)) return PROJECTION_MODE.SCHEMA_CONTRACT_MAP;
+  if (SCHEMA_CONTAINER_FIELDS.has(key)) return PROJECTION_MODE.SCHEMA;
+
+  // Known contract values and unknown extension values are both opaque. If
+  // they contain the configured credential, rewriting them would falsify the
+  // invocation contract, so their bounded projection must fail closed.
+  return PROJECTION_MODE.SCHEMA_CONTRACT;
 }
 
 function childMode(parentMode, key) {
-  if (parentMode === PROJECTION_MODE.SCHEMA_MAP) return PROJECTION_MODE.SCHEMA;
+  if (
+    parentMode === PROJECTION_MODE.SCHEMA_MAP ||
+    parentMode === PROJECTION_MODE.SCHEMA_CONTRACT_MAP
+  ) {
+    return PROJECTION_MODE.SCHEMA;
+  }
   if (parentMode === PROJECTION_MODE.SCHEMA) return schemaChildMode(key);
   return parentMode;
 }

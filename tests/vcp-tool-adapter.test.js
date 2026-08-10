@@ -1404,40 +1404,60 @@ test('tool name and request id bounds are enforced before the Bridge', async () 
 });
 
 test('tool manifests use one bounded safe source for parameters, commands, and raw output', async () => {
-  const credential = 'string';
+  const credential = 'bridge-secret';
+  const safeUnknownContract = {
+    mode: 'strict',
+    identifier: 'future-value',
+    nested: { route: 'semantic-value' }
+  };
   const manifests = [{
     name: 'SchemaTool',
-    version: 'string',
-    displayName: 'Schema string tool',
-    description: 'uses credential string',
+    version: '1.0.0',
+    displayName: `Schema ${credential} tool`,
+    description: `uses credential ${credential}`,
     parameters: {
+      $id: 'urn:vcp:schema-tool',
       type: 'object',
+      $defs: {
+        futureType: { type: 'string' }
+      },
+      patternProperties: {
+        '^future-[a-z]+$': { type: 'string' }
+      },
       properties: {
-        string: {
+        [credential]: {
+          type: 'string'
+        },
+        mode: {
+          $ref: 'https://schemas.invalid/mode',
           type: 'string',
           const: 'one',
           enum: ['one', 'two'],
-          description: 'enter credential string',
-          default: 'string',
-          example: 'prefix-string-suffix'
+          title: `credential ${credential} mode`,
+          description: `enter credential ${credential}`,
+          default: 'safe-default',
+          example: 'safe-example',
+          examples: ['safe-example', 'future-value'],
+          'x-future-vcp-scalar-2046': 'future-string-value',
+          'x-future-vcp-contract-2046': safeUnknownContract
         }
       },
-      required: ['string']
+      required: ['mode']
     },
-    invocationCommands: ['root-tool --key string'],
+    invocationCommands: [`root-tool --key ${credential}`],
     capabilities: {
       invocationCommands: [
-        'curl http://127.0.0.1/run?VCP_Key=string',
+        `curl http://127.0.0.1/run?VCP_Key=${credential}`,
         {
-          command: 'tool --key string',
-          description: 'uses string',
-          metadata: { endpoint: 'ws://host/string' }
+          command: `tool --key ${credential}`,
+          description: `uses ${credential}`,
+          metadata: { endpoint: `ws://host/${credential}` }
         }
       ]
     },
     metadata: {
-      description: 'nested string credential',
-      arbitrary: { request_id: 'credential=string' }
+      description: `nested ${credential} credential`,
+      arbitrary: { request_id: `credential=${credential}` }
     }
   }];
   const fixture = createFixture({
@@ -1451,21 +1471,42 @@ test('tool manifests use one bounded safe source for parameters, commands, and r
   const tool = listed.tools[0];
   assert.equal(tool.name, 'SchemaTool');
   assert.equal(tool.raw_manifest.name, 'SchemaTool');
-  assert.equal(tool.raw_manifest.version, 'string');
+  assert.equal(tool.raw_manifest.version, '1.0.0');
   assert.equal(tool.display_name, 'Schema [REDACTED] tool');
   assert.equal(tool.description, 'uses credential [REDACTED]');
   assert.equal(tool.description, tool.raw_manifest.description);
 
   assert.strictEqual(tool.parameters, tool.raw_manifest.parameters);
+  assert.equal(tool.parameters.$id, 'urn:vcp:schema-tool');
   assert.equal(tool.parameters.type, 'object');
-  assert.equal(Object.prototype.hasOwnProperty.call(tool.parameters.properties, 'string'), true);
-  assert.equal(tool.parameters.properties.string.type, 'string');
-  assert.deepEqual(tool.parameters.required, ['string']);
-  assert.equal(tool.parameters.properties.string.const, 'one');
-  assert.deepEqual(tool.parameters.properties.string.enum, ['one', 'two']);
-  assert.equal(tool.parameters.properties.string.description, 'enter credential [REDACTED]');
-  assert.equal(tool.parameters.properties.string.default, '[REDACTED]');
-  assert.equal(tool.parameters.properties.string.example, 'prefix-[REDACTED]-suffix');
+  assert.deepEqual(tool.parameters.$defs, {
+    futureType: { type: 'string' }
+  });
+  assert.deepEqual(tool.parameters.patternProperties, {
+    '^future-[a-z]+$': { type: 'string' }
+  });
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(tool.parameters.properties, credential),
+    true
+  );
+  assert.equal(tool.parameters.properties[credential].type, 'string');
+  assert.deepEqual(tool.parameters.required, ['mode']);
+  const mode = tool.parameters.properties.mode;
+  assert.equal(mode.$ref, 'https://schemas.invalid/mode');
+  assert.equal(mode.type, 'string');
+  assert.equal(mode.const, 'one');
+  assert.deepEqual(mode.enum, ['one', 'two']);
+  assert.equal(mode.title, 'credential [REDACTED] mode');
+  assert.equal(mode.description, 'enter credential [REDACTED]');
+  assert.equal(mode.default, 'safe-default');
+  assert.equal(mode.example, 'safe-example');
+  assert.deepEqual(mode.examples, ['safe-example', 'future-value']);
+  assert.equal(mode['x-future-vcp-scalar-2046'], 'future-string-value');
+  assert.deepEqual(mode['x-future-vcp-contract-2046'], safeUnknownContract);
+  assert.equal(
+    JSON.stringify(mode['x-future-vcp-contract-2046']).includes('[REDACTED]'),
+    false
+  );
 
   assert.strictEqual(
     tool.invocation_commands,
@@ -1495,31 +1536,119 @@ test('schema semantic credential collisions fail closed without publishing a fal
   const credential = 'bridge-secret';
   const unsafeSchemas = [
     {
-      type: 'object',
-      properties: { mode: { type: 'string', const: credential } }
-    },
-    {
-      type: 'object',
-      properties: { mode: { type: 'string', enum: ['safe', credential] } }
-    },
-    {
-      type: 'string',
-      enum: ['safe', `prefix-${credential}-suffix`]
-    },
-    {
-      type: 'array',
-      items: {
+      name: 'const',
+      parameters: {
         type: 'object',
-        properties: { kind: { type: 'string', const: credential } }
+        properties: { mode: { type: 'string', const: credential } }
       }
     },
     {
-      type: 'string',
-      pattern: `^prefix-${credential}-suffix$`
+      name: 'enum',
+      parameters: {
+        type: 'object',
+        properties: { mode: { type: 'string', enum: ['safe', credential] } }
+      }
+    },
+    {
+      name: 'enum-substring',
+      parameters: {
+        type: 'string',
+        enum: ['safe', `prefix-${credential}-suffix`]
+      }
+    },
+    {
+      name: 'nested-const',
+      parameters: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: { kind: { type: 'string', const: credential } }
+        }
+      }
+    },
+    {
+      name: 'pattern',
+      parameters: {
+        type: 'string',
+        pattern: `^prefix-${credential}-suffix$`
+      }
+    },
+    {
+      name: 'pattern-properties-key',
+      parameters: {
+        type: 'object',
+        patternProperties: {
+          [`^prefix-${credential}-suffix$`]: { type: 'string' }
+        }
+      }
+    },
+    {
+      name: 'ref',
+      parameters: { $ref: `https://schemas.invalid/tool?key=${credential}` }
+    },
+    {
+      name: 'id',
+      parameters: { $id: `urn:vcp:${credential}:tool`, type: 'string' }
+    },
+    {
+      name: 'schema-identifier',
+      parameters: { $schema: `https://schemas.invalid/${credential}` }
+    },
+    {
+      name: 'known-contract-format',
+      parameters: { type: 'string', format: `format-${credential}` }
+    },
+    {
+      name: 'malformed-root-schema-string',
+      parameters: credential
+    },
+    {
+      name: 'malformed-container-string',
+      parameters: { type: 'array', items: credential }
+    },
+    {
+      name: 'malformed-schema-map-string',
+      parameters: { type: 'object', properties: credential }
+    },
+    {
+      name: 'malformed-property-schema-string',
+      parameters: {
+        type: 'object',
+        properties: { mode: credential }
+      }
+    },
+    {
+      name: 'default',
+      parameters: { type: 'string', default: `prefix-${credential}-suffix` }
+    },
+    {
+      name: 'example',
+      parameters: { type: 'string', example: credential }
+    },
+    {
+      name: 'examples',
+      parameters: { type: 'string', examples: ['safe', credential] }
+    },
+    {
+      name: 'unknown-string',
+      parameters: {
+        type: 'string',
+        'x-future-vcp-scalar-2046': `prefix-${credential}-suffix`
+      }
+    },
+    {
+      name: 'unknown-nested-object',
+      parameters: {
+        type: 'string',
+        'x-future-vcp-contract-2046': {
+          mode: 'strict',
+          nested: { identifier: `prefix-${credential}-suffix` }
+        }
+      }
     }
   ];
 
-  for (const parameters of unsafeSchemas) {
+  for (const { name, parameters } of unsafeSchemas) {
     const fixture = createFixture({
       allowedTools: ['ToolA'],
       key: credential,
@@ -1534,10 +1663,17 @@ test('schema semantic credential collisions fail closed without publishing a fal
         assert.equal(error.jsonRpcData.code, 'VCP_MANIFEST_UNSAFE_TO_PROJECT');
         assert.equal(error.message.includes(credential), false);
         return true;
-      }
+      },
+      name
     );
     assert.equal(fixture.adapter.manifestsLoaded, false);
     assert.deepEqual(fixture.adapter.latestTools, []);
+    assert.equal(
+      JSON.stringify(fixture.adapter.latestTools)
+        .includes(`prefix-[REDACTED]-suffix`),
+      false,
+      name
+    );
     fixture.adapter.close();
   }
 });
@@ -1674,6 +1810,23 @@ test('single-string and aggregate UTF-8 output byte budgets fail with no partial
   );
   assert.equal(manifestAdapter.manifestsLoaded, false);
   assert.deepEqual(manifestAdapter.latestTools, []);
+  const oversizedContractKey =
+    `synthetic-output-secret-${'k'.repeat(1024 * 1024)}`;
+  manifests = [{
+    name: 'ToolA',
+    parameters: {
+      type: 'string',
+      'x-future-vcp-contract-2046': {
+        [oversizedContractKey]: 'safe-value'
+      }
+    }
+  }];
+  await assert.rejects(
+    manifestAdapter.listTools(),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  assert.equal(manifestAdapter.manifestsLoaded, false);
+  assert.deepEqual(manifestAdapter.latestTools, []);
   manifests = [{ name: 'ToolA', description: 'safe manifest' }];
   assert.equal((await manifestAdapter.listTools()).tools.length, 1);
   manifestAdapter.close();
@@ -1761,20 +1914,26 @@ test('deep and wide Bridge outputs fail with a stable bounded projection error',
 });
 
 test('deep Bridge manifests fail closed without publishing a partial tool list', async () => {
-  let manifests = [{
-    name: 'ToolA',
-    description: 'safe manifest',
-    parameters: (() => {
-      let value = { type: 'string' };
-      for (let index = 0; index < MAX_OUTPUT_PROJECTION_DEPTH + 2; index += 1) {
-        value = {
-          type: 'object',
-          properties: { nested: value }
-        };
-      }
-      return value;
-    })()
-  }];
+  function nestedValue(depth, wrap) {
+    let value = { type: 'string' };
+    for (let index = 0; index < depth; index += 1) value = wrap(value);
+    return value;
+  }
+
+  const overBudgetParameters = [
+    nestedValue(
+      MAX_OUTPUT_PROJECTION_DEPTH + 2,
+      value => ({ type: 'object', properties: { nested: value } })
+    ),
+    {
+      type: 'string',
+      'x-future-vcp-contract-2046': nestedValue(
+        MAX_OUTPUT_PROJECTION_DEPTH + 2,
+        value => ({ nested: value })
+      )
+    }
+  ];
+  let manifests = [];
   const client = {
     key: 'synthetic-manifest-secret',
     async discoverManifests() {
@@ -1794,12 +1953,15 @@ test('deep Bridge manifests fail closed without publishing a partial tool list',
   };
   const adapter = new VcpToolAdapter({ client, allowedTools: ['ToolA'] });
 
-  await assert.rejects(
-    adapter.listTools(),
-    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
-  );
-  assert.equal(adapter.manifestsLoaded, false);
-  assert.deepEqual(adapter.latestTools, []);
+  for (const parameters of overBudgetParameters) {
+    manifests = [{ name: 'ToolA', description: 'safe manifest', parameters }];
+    await assert.rejects(
+      adapter.listTools(),
+      error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+    );
+    assert.equal(adapter.manifestsLoaded, false);
+    assert.deepEqual(adapter.latestTools, []);
+  }
 
   manifests = [{ name: 'ToolA', description: 'safe manifest' }];
   const recovered = await adapter.listTools();
