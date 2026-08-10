@@ -17,7 +17,9 @@ const VCP_ADAPTER_TOOL_NAMES = Object.freeze([
 const MAX_TOOL_NAME_LENGTH = 256;
 const MAX_REQUEST_ID_LENGTH = 128;
 const MAX_TOOL_ARGS_BYTES = 64 * 1024;
+const MAX_SAFE_ERROR_FRAGMENT_LENGTH = 512;
 const FORBIDDEN_JSON_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
+const ERROR_CONTROL_CHARACTER_PATTERN = /[\u0000-\u001f\u007f]/gu;
 
 const VCP_ADAPTER_TOOL_DEFINITIONS = Object.freeze([
   {
@@ -113,6 +115,38 @@ function adapterError(message, code, {
   return error;
 }
 
+function credentialCandidates(credential) {
+  if (typeof credential !== 'string' || !credential) return [];
+  const candidates = [credential];
+  try {
+    candidates.push(encodeURIComponent(credential));
+  } catch {
+    // The literal credential is still safe to redact when URI encoding fails.
+  }
+  return [...new Set(candidates.filter(Boolean))];
+}
+
+function redactCredentialText(value, credential) {
+  return credentialCandidates(credential).reduce(
+    (output, candidate) => output.split(candidate).join('[REDACTED]'),
+    String(value)
+  );
+}
+
+function escapedControlCharacter(character) {
+  if (character === '\r') return '\\r';
+  if (character === '\n') return '\\n';
+  if (character === '\t') return '\\t';
+  return `\\u${character.charCodeAt(0).toString(16).padStart(4, '0')}`;
+}
+
+function safeErrorFragment(value, credential) {
+  const sanitized = redactCredentialText(value, credential)
+    .replace(ERROR_CONTROL_CHARACTER_PATTERN, escapedControlCharacter);
+  if (sanitized.length <= MAX_SAFE_ERROR_FRAGMENT_LENGTH) return sanitized;
+  return `${sanitized.slice(0, MAX_SAFE_ERROR_FRAGMENT_LENGTH - 1)}…`;
+}
+
 function normalizeAllowedTools(value) {
   if (!Array.isArray(value)) return new Set();
   if (!value.every(item => typeof item === 'string')) return new Set();
@@ -150,7 +184,7 @@ function normalizeValidatedRequestId(value, { required = false } = {}) {
   return normalized;
 }
 
-function validateJsonValue(value, path, ancestors) {
+function validateJsonValue(value, path, ancestors, credential) {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return;
   if (typeof value === 'number') {
     if (Number.isFinite(value)) return;
@@ -170,7 +204,7 @@ function validateJsonValue(value, path, ancestors) {
         if (!Object.prototype.hasOwnProperty.call(value, index)) {
           throw adapterError(`${path}[${index}] must be a JSON value`, 'VCP_TOOL_ARGS_INVALID');
         }
-        validateJsonValue(value[index], `${path}[${index}]`, ancestors);
+        validateJsonValue(value[index], `${path}[${index}]`, ancestors, credential);
       }
       const extraKeys = Reflect.ownKeys(value).filter(key => {
         if (key === 'length') return false;
@@ -191,14 +225,15 @@ function validateJsonValue(value, path, ancestors) {
       if (typeof key !== 'string') {
         throw adapterError(`${path} must not contain symbol keys`, 'VCP_TOOL_ARGS_INVALID');
       }
+      const safeKey = safeErrorFragment(key, credential);
       if (FORBIDDEN_JSON_KEYS.has(key)) {
-        throw adapterError(`${path}.${key} is not allowed`, 'VCP_TOOL_ARGS_UNSAFE');
+        throw adapterError(`${path}.${safeKey} is not allowed`, 'VCP_TOOL_ARGS_UNSAFE');
       }
       const descriptor = descriptors[key];
       if (!Object.prototype.hasOwnProperty.call(descriptor, 'value')) {
-        throw adapterError(`${path}.${key} must not use accessors`, 'VCP_TOOL_ARGS_INVALID');
+        throw adapterError(`${path}.${safeKey} must not use accessors`, 'VCP_TOOL_ARGS_INVALID');
       }
-      validateJsonValue(descriptor.value, `${path}.${key}`, ancestors);
+      validateJsonValue(descriptor.value, `${path}.${safeKey}`, ancestors, credential);
     }
   } catch (error) {
     if (error instanceof VcpToolBridgeClientError) throw error;
@@ -208,7 +243,7 @@ function validateJsonValue(value, path, ancestors) {
   }
 }
 
-function validateToolArgs(value) {
+function validateToolArgs(value, credential) {
   let prototype = null;
   try {
     prototype = value && typeof value === 'object'
@@ -220,7 +255,7 @@ function validateToolArgs(value) {
   if (!isPlainObject(value) || (prototype !== Object.prototype && prototype !== null)) {
     throw adapterError('tool_args must be a plain JSON object', 'VCP_TOOL_ARGS_INVALID');
   }
-  validateJsonValue(value, 'tool_args', new Set());
+  validateJsonValue(value, 'tool_args', new Set(), credential);
 
   let serialized;
   try {
@@ -236,29 +271,47 @@ function validateToolArgs(value) {
   }
 }
 
-function redactCredential(value, credential, seen = new WeakMap()) {
-  if (!credential) return value;
+function redactSensitiveValues(value, credential, seen = new WeakMap()) {
   if (typeof value === 'string') {
-    const candidates = [...new Set([credential, encodeURIComponent(credential)].filter(Boolean))];
-    return candidates.reduce(
-      (output, candidate) => output.split(candidate).join('[REDACTED]'),
-      value
-    );
+    return redactCredentialText(value, credential);
   }
   if (!value || typeof value !== 'object') return value;
   if (seen.has(value)) return seen.get(value);
   if (Array.isArray(value)) {
     const output = [];
     seen.set(value, output);
-    for (const item of value) output.push(redactCredential(item, credential, seen));
+    for (const item of value) output.push(redactSensitiveValues(item, credential, seen));
     return output;
   }
   const output = {};
   seen.set(value, output);
+  if (value instanceof Error) {
+    Object.defineProperties(output, {
+      name: {
+        value: redactCredentialText(value.name, credential),
+        enumerable: true,
+        configurable: true,
+        writable: true
+      },
+      message: {
+        value: redactCredentialText(value.message, credential),
+        enumerable: true,
+        configurable: true,
+        writable: true
+      },
+      stack: {
+        value: typeof value.stack === 'string'
+          ? redactCredentialText(value.stack, credential)
+          : null,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      }
+    });
+  }
   for (const [key, nestedValue] of Object.entries(value)) {
-    const safeKey = redactCredential(key, credential, seen);
-    Object.defineProperty(output, safeKey, {
-      value: redactCredential(nestedValue, credential, seen),
+    Object.defineProperty(output, key, {
+      value: redactSensitiveValues(nestedValue, credential, seen),
       enumerable: true,
       configurable: true,
       writable: true
@@ -276,7 +329,7 @@ class VcpToolAdapter {
   }
 
   _redactOutput(value) {
-    return redactCredential(value, this.client?.key);
+    return redactSensitiveValues(value, this.client?.key);
   }
 
   _assertToolAllowed(toolName) {
@@ -310,7 +363,7 @@ class VcpToolAdapter {
 
   async executeTool(args = {}) {
     const toolName = normalizeToolName(args.tool_name);
-    validateToolArgs(args.tool_args);
+    validateToolArgs(args.tool_args, this.client?.key);
     const requestId = normalizeValidatedRequestId(args.request_id);
     this._assertToolAllowed(toolName);
 
@@ -319,13 +372,13 @@ class VcpToolAdapter {
       toolArgs: args.tool_args,
       requestId
     });
-    return {
+    return this._redactOutput({
       request_id: state.request_id,
       tool_name: toolName,
       status: state.status,
-      result: this._redactOutput(state.result ?? null),
-      error: this._redactOutput(state.error ?? null)
-    };
+      result: state.result ?? null,
+      error: state.error ?? null
+    });
   }
 
   getToolStatus(args = {}) {
@@ -338,7 +391,10 @@ class VcpToolAdapter {
     if (toolName === 'list_vcp_tools') return this.listTools();
     if (toolName === 'execute_vcp_tool') return this.executeTool(args);
     if (toolName === 'get_vcp_tool_status') return this.getToolStatus(args);
-    throw new VcpToolBridgeClientError(`Unknown VCP adapter tool: ${toolName}`, 'VCP_ADAPTER_TOOL_UNKNOWN');
+    throw new VcpToolBridgeClientError(
+      `Unknown VCP adapter tool: ${safeErrorFragment(toolName, this.client?.key)}`,
+      'VCP_ADAPTER_TOOL_UNKNOWN'
+    );
   }
 
   close() {

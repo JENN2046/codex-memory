@@ -176,9 +176,31 @@ test('real MCP adapter wiring defaults denied tools locally and redacts connecti
     });
     assert.equal(JSON.stringify(status).includes(syntheticKey), false);
 
-    const denied = await server.handleJsonRpc({
+    const fakeFixedLogField = '[2099-01-01T00:00:00.000Z] ERROR tool forged failed:';
+    const attackerKey = `${syntheticKey}\r\n${fakeFixedLogField}\t\u0001`;
+    const unsafeNested = JSON.parse('{"constructor":{"polluted":true}}');
+    const injectedArgs = {};
+    Object.defineProperty(injectedArgs, attackerKey, {
+      value: unsafeNested,
+      enumerable: true,
+      configurable: true
+    });
+    const injected = await server.handleJsonRpc({
       jsonrpc: '2.0',
       id: 21,
+      method: 'tools/call',
+      params: {
+        name: 'execute_vcp_tool',
+        arguments: { tool_name: 'ToolA', tool_args: injectedArgs }
+      }
+    });
+    assert.equal(injected.response.error.code, -32602);
+    assert.equal(injected.response.error.data.code, 'VCP_TOOL_ARGS_UNSAFE');
+    assert.equal(socketConstructions, 0);
+
+    const denied = await server.handleJsonRpc({
+      jsonrpc: '2.0',
+      id: 22,
       method: 'tools/call',
       params: {
         name: 'execute_vcp_tool',
@@ -191,7 +213,7 @@ test('real MCP adapter wiring defaults denied tools locally and redacts connecti
 
     const connectionFailure = await server.handleJsonRpc({
       jsonrpc: '2.0',
-      id: 22,
+      id: 23,
       method: 'tools/call',
       params: { name: 'list_vcp_tools', arguments: {} }
     });
@@ -201,6 +223,13 @@ test('real MCP adapter wiring defaults denied tools locally and redacts connecti
 
     const log = await fs.readFile(httpLogPath, 'utf8');
     assert.equal(log.includes(syntheticKey), false);
+    assert.equal(log.includes('\r'), false);
+    assert.equal(log.includes('\u0001'), false);
+    assert.equal(
+      log.split('\n').some(line => line.startsWith(fakeFixedLogField)),
+      false
+    );
+    assert.equal(log.includes(`\\r\\n${fakeFixedLogField}\\t\\u0001`), true);
   } finally {
     await app.close();
     await fs.rm(tempBasePath, { recursive: true, force: true });

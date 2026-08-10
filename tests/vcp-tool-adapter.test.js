@@ -159,12 +159,13 @@ class FakeVcpToolBridge {
 function createFixture({
   timeout = 40,
   allowedTools = DEFAULT_FAKE_ALLOWED_TOOLS,
-  manifests
+  manifests,
+  key = SYNTHETIC_BRIDGE_KEY
 } = {}) {
   const bridge = new FakeVcpToolBridge({ manifests });
   const client = new VcpToolBridgeClient({
     bridgeUrl: 'ws://127.0.0.1:1',
-    key: SYNTHETIC_BRIDGE_KEY,
+    key,
     requestTimeoutMs: timeout,
     WebSocketImpl: bridge.activate(),
     requestIdFactory: (() => {
@@ -1070,6 +1071,161 @@ test('generic argument validation rejects unsafe or non-JSON requests before the
       error => error.code === invalid.code
     );
     assert.equal(bridge.received.length, 0);
+    adapter.close();
+  }
+});
+
+test('validation error paths escape attacker controls and redact the Bridge credential before logging', async () => {
+  const syntheticCredential = 'synthetic-validation-log-secret';
+  const attackerKey = `${syntheticCredential}-普通字段\r\nFAKE_FIXED_LOG_FIELD\t\u0001`;
+  const toolArgs = Object.create(null);
+  Object.defineProperty(toolArgs, attackerKey, {
+    value: JSON.parse('{"constructor":{"polluted":true}}'),
+    enumerable: true,
+    configurable: true
+  });
+  const { bridge, adapter } = createFixture({
+    allowedTools: ['ToolA'],
+    key: syntheticCredential
+  });
+
+  let observedError;
+  await assert.rejects(
+    adapter.executeTool({
+      tool_name: 'ToolA',
+      tool_args: toolArgs,
+      request_id: 'safe-error-path'
+    }),
+    error => {
+      observedError = error;
+      return error.code === 'VCP_TOOL_ARGS_UNSAFE';
+    }
+  );
+
+  assert.equal(bridge.received.length, 0);
+  assert.equal(observedError.message.includes(syntheticCredential), false);
+  assert.equal(observedError.message.includes('\r'), false);
+  assert.equal(observedError.message.includes('\n'), false);
+  assert.equal(observedError.message.includes('\t'), false);
+  assert.equal(observedError.message.includes('\u0001'), false);
+  assert.match(
+    observedError.message,
+    /tool_args\.\[REDACTED\]-普通字段\\r\\nFAKE_FIXED_LOG_FIELD\\t\\u0001\.constructor is not allowed/u
+  );
+  assert.equal(observedError.stack.includes(syntheticCredential), false);
+  assert.equal(observedError.stack.includes(`\nFAKE_FIXED_LOG_FIELD`), false);
+
+  let unknownToolError;
+  await assert.rejects(
+    adapter.callTool(`${syntheticCredential}\r\nUNKNOWN_FAKE_LOG_FIELD\t`),
+    error => {
+      unknownToolError = error;
+      return error.code === 'VCP_ADAPTER_TOOL_UNKNOWN';
+    }
+  );
+  assert.equal(unknownToolError.message.includes(syntheticCredential), false);
+  assert.equal(unknownToolError.message.includes('\r'), false);
+  assert.equal(unknownToolError.message.includes('\n'), false);
+  assert.equal(unknownToolError.message.includes('\t'), false);
+  assert.match(unknownToolError.message, /\[REDACTED\]\\r\\nUNKNOWN_FAKE_LOG_FIELD\\t/u);
+  assert.equal(bridge.received.length, 0);
+  adapter.close();
+});
+
+test('credential redaction preserves fixed projection keys and redacts only nested values', async () => {
+  const fixedKeys = ['status', 'error', 'result', 'request_id', 'tool_name', 'connected'];
+
+  for (const secret of fixedKeys) {
+    const syntheticError = Object.assign(new Error(`failure-${secret}`), {
+      code: `code-${secret}`
+    });
+    const client = {
+      key: secret,
+      getStatus() {
+        return {
+          connected: true,
+          bridge_enabled: true,
+          protocol_ready: true,
+          tools_discovered: 1,
+          pending_requests: 0,
+          last_error: `last-${secret}`
+        };
+      },
+      getRequestStatus() {
+        return {
+          request_id: `request-${secret}`,
+          status: `state-${secret}`,
+          progress: [secret, { nested: `progress-${secret}` }],
+          result: {
+            tool_name: `result-${secret}`,
+            failure: syntheticError
+          },
+          error: `error-${secret}`
+        };
+      },
+      async executeTool() {
+        return this.getRequestStatus();
+      },
+      disconnect() {}
+    };
+    const adapter = new VcpToolAdapter({ client, allowedTools: [secret] });
+    const status = adapter.getStatus();
+    const requestStatus = adapter.getToolStatus({ request_id: 'lookup-request' });
+    const executed = await adapter.executeTool({
+      tool_name: secret,
+      tool_args: { nested: { allowed: true } },
+      request_id: `execute-${secret}`
+    });
+
+    for (const key of ['connected', 'last_error']) {
+      assert.equal(Object.prototype.hasOwnProperty.call(status, key), true);
+    }
+    for (const key of ['request_id', 'status', 'progress', 'result', 'error']) {
+      assert.equal(Object.prototype.hasOwnProperty.call(requestStatus, key), true);
+    }
+    for (const key of ['request_id', 'tool_name', 'status', 'result', 'error']) {
+      assert.equal(Object.prototype.hasOwnProperty.call(executed, key), true);
+    }
+
+    assert.equal(status.last_error, 'last-[REDACTED]');
+    assert.equal(requestStatus.request_id, 'request-[REDACTED]');
+    assert.equal(requestStatus.status, 'state-[REDACTED]');
+    assert.deepEqual(requestStatus.progress, [
+      '[REDACTED]',
+      { nested: 'progress-[REDACTED]' }
+    ]);
+    assert.equal(requestStatus.result.tool_name.includes(secret), false);
+    assert.equal(requestStatus.result.tool_name.includes('[REDACTED]'), true);
+    assert.equal(requestStatus.result.failure.name, 'Error');
+    assert.equal(requestStatus.result.failure.message, 'failure-[REDACTED]');
+    assert.equal(requestStatus.result.failure.stack.includes(secret), false);
+    assert.equal(requestStatus.result.failure.code, 'code-[REDACTED]');
+    assert.equal(requestStatus.error.includes(secret), false);
+    assert.equal(requestStatus.error.includes('[REDACTED]'), true);
+    assert.equal(executed.tool_name, '[REDACTED]');
+    assert.equal(executed.request_id, 'request-[REDACTED]');
+    adapter.close();
+  }
+
+  const unchanged = {
+    request_id: 'request-1',
+    status: 'completed',
+    progress: [10, { nested: true }],
+    result: { ordinary: 'value' },
+    error: null
+  };
+  for (const key of ['', undefined, null, 'unused-secret']) {
+    const adapter = new VcpToolAdapter({
+      client: {
+        key,
+        getRequestStatus() {
+          return unchanged;
+        },
+        disconnect() {}
+      },
+      allowedTools: []
+    });
+    assert.deepEqual(adapter.getToolStatus({ request_id: 'request-1' }), unchanged);
     adapter.close();
   }
 });
