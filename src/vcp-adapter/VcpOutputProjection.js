@@ -7,6 +7,8 @@ const {
 
 const MAX_OUTPUT_PROJECTION_DEPTH = 64;
 const MAX_OUTPUT_PROJECTION_NODES = 10_000;
+const MAX_OUTPUT_PROJECTION_STRING_BYTES = 256 * 1024;
+const MAX_OUTPUT_PROJECTION_TOTAL_BYTES = 4 * 1024 * 1024;
 const REDACTION_MARKER = '[REDACTED]';
 const CONTROL_CHARACTER_PATTERN = /[\u0000-\u001f\u007f]/gu;
 
@@ -14,7 +16,8 @@ const PROJECTION_MODE = Object.freeze({
   EXACT: 'exact',
   PAYLOAD: 'payload',
   SCHEMA: 'schema',
-  SCHEMA_MAP: 'schema_map'
+  SCHEMA_MAP: 'schema_map',
+  SCHEMA_SEMANTIC: 'schema_semantic'
 });
 
 const SCHEMA_TEXT_FIELDS = new Set([
@@ -59,13 +62,11 @@ const SCHEMA_STRUCTURAL_FIELDS = new Set([
   '$id',
   '$ref',
   '$schema',
-  'const',
   'contentEncoding',
   'contentMediaType',
   'dependentRequired',
   'deprecated',
   'discriminator',
-  'enum',
   'exclusiveMaximum',
   'exclusiveMinimum',
   'format',
@@ -88,6 +89,12 @@ const SCHEMA_STRUCTURAL_FIELDS = new Set([
   'writeOnly'
 ]);
 
+const SCHEMA_SEMANTIC_FIELDS = new Set([
+  'const',
+  'enum',
+  'pattern'
+]);
+
 function projectionError() {
   const error = new VcpToolBridgeClientError(
     'VCP response exceeds safe output projection limits',
@@ -97,6 +104,20 @@ function projectionError() {
   error.jsonRpcMessage = 'Internal error';
   error.jsonRpcData = {
     code: 'VCP_RESPONSE_TOO_COMPLEX',
+    status: 'failed'
+  };
+  return error;
+}
+
+function unsafeManifestProjectionError() {
+  const error = new VcpToolBridgeClientError(
+    'VCP manifest cannot be projected without changing its invocation contract',
+    'VCP_MANIFEST_UNSAFE_TO_PROJECT'
+  );
+  error.jsonRpcCode = -32603;
+  error.jsonRpcMessage = 'Internal error';
+  error.jsonRpcData = {
+    code: 'VCP_MANIFEST_UNSAFE_TO_PROJECT',
     status: 'failed'
   };
   return error;
@@ -131,12 +152,18 @@ class ProjectionContext {
   constructor({
     credential,
     maxDepth = MAX_OUTPUT_PROJECTION_DEPTH,
-    maxNodes = MAX_OUTPUT_PROJECTION_NODES
+    maxNodes = MAX_OUTPUT_PROJECTION_NODES,
+    maxStringBytes = MAX_OUTPUT_PROJECTION_STRING_BYTES,
+    maxTotalBytes = MAX_OUTPUT_PROJECTION_TOTAL_BYTES
   } = {}) {
     this.credential = credential;
+    this.credentials = credentialCandidates(credential);
     this.maxDepth = maxDepth;
     this.maxNodes = maxNodes;
+    this.maxStringBytes = maxStringBytes;
+    this.maxTotalBytes = maxTotalBytes;
     this.nodes = 0;
+    this.totalBytes = 0;
   }
 
   claim(depth) {
@@ -147,7 +174,45 @@ class ProjectionContext {
   }
 
   redact(value) {
-    return redactCredentialText(value, this.credential);
+    return this.credentials.reduce(
+      (output, candidate) => output.split(candidate).join(REDACTION_MARKER),
+      String(value)
+    );
+  }
+
+  containsCredential(value) {
+    return this.credentials.some(candidate => String(value).includes(candidate));
+  }
+
+  claimStringBytes(value) {
+    const bytes = Buffer.byteLength(value, 'utf8');
+    if (
+      bytes > this.maxStringBytes ||
+      bytes > this.maxTotalBytes - this.totalBytes
+    ) {
+      throw projectionError();
+    }
+    this.totalBytes += bytes;
+  }
+
+  projectString(value, mode, transform = output => output) {
+    if (Buffer.byteLength(value, 'utf8') > this.maxStringBytes) {
+      throw projectionError();
+    }
+    if (mode === PROJECTION_MODE.SCHEMA_SEMANTIC && this.containsCredential(value)) {
+      throw unsafeManifestProjectionError();
+    }
+    const projected = mode === PROJECTION_MODE.PAYLOAD ? this.redact(value) : value;
+    const transformed = transform(projected);
+    this.claimStringBytes(transformed);
+    return transformed;
+  }
+
+  claimKey(key, mode) {
+    if (mode === PROJECTION_MODE.SCHEMA_SEMANTIC && this.containsCredential(key)) {
+      throw unsafeManifestProjectionError();
+    }
+    this.claimStringBytes(key);
   }
 }
 
@@ -197,6 +262,7 @@ function schemaChildMode(key) {
   if (SCHEMA_TEXT_FIELDS.has(key)) return PROJECTION_MODE.PAYLOAD;
   if (SCHEMA_MAP_FIELDS.has(key)) return PROJECTION_MODE.SCHEMA_MAP;
   if (SCHEMA_FIELDS.has(key)) return PROJECTION_MODE.SCHEMA;
+  if (SCHEMA_SEMANTIC_FIELDS.has(key)) return PROJECTION_MODE.SCHEMA_SEMANTIC;
   if (SCHEMA_STRUCTURAL_FIELDS.has(key)) return PROJECTION_MODE.EXACT;
   return PROJECTION_MODE.PAYLOAD;
 }
@@ -211,7 +277,7 @@ function createProjectedNode(source, mode, depth, context, seen) {
   context.claim(depth);
   if (typeof source === 'string') {
     return {
-      output: mode === PROJECTION_MODE.PAYLOAD ? context.redact(source) : source,
+      output: context.projectString(source, mode),
       frame: null
     };
   }
@@ -269,6 +335,7 @@ function projectStructuredValue(source, context, mode, rootDepth) {
       throw projectionError();
     }
     for (const [key, value] of entries) {
+      context.claimKey(key, frame.mode);
       const modeForChild = childMode(frame.mode, key);
       const child = createProjectedNode(
         value,
@@ -297,7 +364,11 @@ function projectErrorText(value, context, depth) {
   context.claim(depth);
   if (value === null || value === undefined) return null;
   const text = value instanceof Error ? value.message : String(value);
-  return context.redact(text).replace(CONTROL_CHARACTER_PATTERN, escapedControlCharacter);
+  return context.projectString(
+    text,
+    PROJECTION_MODE.PAYLOAD,
+    output => output.replace(CONTROL_CHARACTER_PATTERN, escapedControlCharacter)
+  );
 }
 
 function projectSchema(value, context, depth) {
@@ -320,6 +391,7 @@ function projectSafeCapabilities(value, context, depth) {
   if (entries.length > context.maxNodes - context.nodes) throw projectionError();
 
   for (const [key, nestedValue] of entries) {
+    context.claimKey(key, PROJECTION_MODE.PAYLOAD);
     let projected;
     if (key === 'invocationCommands' || key === 'invocation_commands') {
       projected = projectInvocationCommands(nestedValue, context, depth + 1);
@@ -341,6 +413,7 @@ function projectSafeToolManifest(value, context, depth) {
   if (entries.length > context.maxNodes - context.nodes) throw projectionError();
 
   for (const [key, nestedValue] of entries) {
+    context.claimKey(key, PROJECTION_MODE.PAYLOAD);
     let projected;
     if (key === 'name' || key === 'version') {
       projected = projectExact(nestedValue, context, depth + 1);
@@ -360,10 +433,24 @@ function projectSafeToolManifest(value, context, depth) {
   return output;
 }
 
-function assertOutputBudget(value, { maxDepth, maxNodes }) {
+function assertOutputBudget(value, {
+  maxDepth,
+  maxNodes,
+  maxStringBytes,
+  maxTotalBytes
+}) {
   let nodes = 0;
+  let totalBytes = 0;
   const active = new WeakSet();
   const stack = [{ value, depth: 0, exit: false }];
+
+  function claimString(valueToClaim) {
+    const bytes = Buffer.byteLength(valueToClaim, 'utf8');
+    if (bytes > maxStringBytes || bytes > maxTotalBytes - totalBytes) {
+      throw projectionError();
+    }
+    totalBytes += bytes;
+  }
 
   while (stack.length > 0) {
     const current = stack.pop();
@@ -373,14 +460,23 @@ function assertOutputBudget(value, { maxDepth, maxNodes }) {
     }
     if (current.depth > maxDepth || nodes >= maxNodes) throw projectionError();
     nodes += 1;
+    if (typeof current.value === 'string') {
+      claimString(current.value);
+      continue;
+    }
     if (!current.value || typeof current.value !== 'object') continue;
     if (active.has(current.value)) throw projectionError();
     active.add(current.value);
     stack.push({ value: current.value, depth: current.depth, exit: true });
 
-    const children = Array.isArray(current.value)
-      ? current.value
-      : enumerableDataEntries(current.value).map(([, child]) => child);
+    let children;
+    if (Array.isArray(current.value)) {
+      children = current.value;
+    } else {
+      const entries = enumerableDataEntries(current.value);
+      for (const [key] of entries) claimString(key);
+      children = entries.map(([, child]) => child);
+    }
     if (children.length > maxNodes - nodes) throw projectionError();
     for (let index = children.length - 1; index >= 0; index -= 1) {
       stack.push({ value: children[index], depth: current.depth + 1, exit: false });
@@ -391,7 +487,9 @@ function assertOutputBudget(value, { maxDepth, maxNodes }) {
 function finalizeProjection(output, context) {
   assertOutputBudget(output, {
     maxDepth: context.maxDepth,
-    maxNodes: context.maxNodes
+    maxNodes: context.maxNodes,
+    maxStringBytes: context.maxStringBytes,
+    maxTotalBytes: context.maxTotalBytes
   });
   return output;
 }
@@ -404,9 +502,17 @@ function projectAdapterStatus(clientStatus = {}, {
   credential,
   toolsDiscovered,
   maxDepth,
-  maxNodes
+  maxNodes,
+  maxStringBytes,
+  maxTotalBytes
 } = {}) {
-  const context = createContext({ credential, maxDepth, maxNodes });
+  const context = createContext({
+    credential,
+    maxDepth,
+    maxNodes,
+    maxStringBytes,
+    maxTotalBytes
+  });
   const output = {
     connected: clientStatus.connected,
     bridge_enabled: clientStatus.bridge_enabled,
@@ -422,9 +528,17 @@ function projectToolList(manifests, {
   credential,
   allowedTools,
   maxDepth,
-  maxNodes
+  maxNodes,
+  maxStringBytes,
+  maxTotalBytes
 } = {}) {
-  const context = createContext({ credential, maxDepth, maxNodes });
+  const context = createContext({
+    credential,
+    maxDepth,
+    maxNodes,
+    maxStringBytes,
+    maxTotalBytes
+  });
   const tools = [];
   for (const manifest of Array.isArray(manifests) ? manifests : []) {
     if (!isPlainObject(manifest) || typeof manifest.name !== 'string') continue;
@@ -478,9 +592,17 @@ function projectToolList(manifests, {
 function projectToolExecution(state = {}, toolName, {
   credential,
   maxDepth,
-  maxNodes
+  maxNodes,
+  maxStringBytes,
+  maxTotalBytes
 } = {}) {
-  const context = createContext({ credential, maxDepth, maxNodes });
+  const context = createContext({
+    credential,
+    maxDepth,
+    maxNodes,
+    maxStringBytes,
+    maxTotalBytes
+  });
   return finalizeProjection({
     request_id: state.request_id,
     tool_name: toolName,
@@ -493,9 +615,17 @@ function projectToolExecution(state = {}, toolName, {
 function projectToolStatus(state = {}, {
   credential,
   maxDepth,
-  maxNodes
+  maxNodes,
+  maxStringBytes,
+  maxTotalBytes
 } = {}) {
-  const context = createContext({ credential, maxDepth, maxNodes });
+  const context = createContext({
+    credential,
+    maxDepth,
+    maxNodes,
+    maxStringBytes,
+    maxTotalBytes
+  });
   return finalizeProjection({
     request_id: state.request_id,
     status: state.status,
@@ -508,6 +638,8 @@ function projectToolStatus(state = {}, {
 module.exports = {
   MAX_OUTPUT_PROJECTION_DEPTH,
   MAX_OUTPUT_PROJECTION_NODES,
+  MAX_OUTPUT_PROJECTION_STRING_BYTES,
+  MAX_OUTPUT_PROJECTION_TOTAL_BYTES,
   projectAdapterStatus,
   projectToolExecution,
   projectToolList,

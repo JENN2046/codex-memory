@@ -8,7 +8,9 @@ const { VcpToolAdapter } = require('../src/vcp-adapter/VcpToolAdapter');
 const { VcpToolBridgeClient } = require('../src/vcp-adapter/VcpToolBridgeClient');
 const {
   MAX_OUTPUT_PROJECTION_DEPTH,
-  MAX_OUTPUT_PROJECTION_NODES
+  MAX_OUTPUT_PROJECTION_NODES,
+  MAX_OUTPUT_PROJECTION_STRING_BYTES,
+  MAX_OUTPUT_PROJECTION_TOTAL_BYTES
 } = require('../src/vcp-adapter/VcpOutputProjection');
 
 const SYNTHETIC_BRIDGE_KEY = 'synthetic-key-not-a-real-secret';
@@ -1413,13 +1415,14 @@ test('tool manifests use one bounded safe source for parameters, commands, and r
       properties: {
         string: {
           type: 'string',
+          const: 'one',
+          enum: ['one', 'two'],
           description: 'enter credential string',
           default: 'string',
           example: 'prefix-string-suffix'
         }
       },
-      required: ['string'],
-      enum: ['string']
+      required: ['string']
     },
     invocationCommands: ['root-tool --key string'],
     capabilities: {
@@ -1458,7 +1461,8 @@ test('tool manifests use one bounded safe source for parameters, commands, and r
   assert.equal(Object.prototype.hasOwnProperty.call(tool.parameters.properties, 'string'), true);
   assert.equal(tool.parameters.properties.string.type, 'string');
   assert.deepEqual(tool.parameters.required, ['string']);
-  assert.deepEqual(tool.parameters.enum, ['string']);
+  assert.equal(tool.parameters.properties.string.const, 'one');
+  assert.deepEqual(tool.parameters.properties.string.enum, ['one', 'two']);
   assert.equal(tool.parameters.properties.string.description, 'enter credential [REDACTED]');
   assert.equal(tool.parameters.properties.string.default, '[REDACTED]');
   assert.equal(tool.parameters.properties.string.example, 'prefix-[REDACTED]-suffix');
@@ -1485,6 +1489,194 @@ test('tool manifests use one bounded safe source for parameters, commands, and r
     'credential=[REDACTED]'
   );
   fixture.adapter.close();
+});
+
+test('schema semantic credential collisions fail closed without publishing a false manifest', async () => {
+  const credential = 'bridge-secret';
+  const unsafeSchemas = [
+    {
+      type: 'object',
+      properties: { mode: { type: 'string', const: credential } }
+    },
+    {
+      type: 'object',
+      properties: { mode: { type: 'string', enum: ['safe', credential] } }
+    },
+    {
+      type: 'string',
+      enum: ['safe', `prefix-${credential}-suffix`]
+    },
+    {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: { kind: { type: 'string', const: credential } }
+      }
+    },
+    {
+      type: 'string',
+      pattern: `^prefix-${credential}-suffix$`
+    }
+  ];
+
+  for (const parameters of unsafeSchemas) {
+    const fixture = createFixture({
+      allowedTools: ['ToolA'],
+      key: credential,
+      manifests: [{ name: 'ToolA', parameters }]
+    });
+
+    await assert.rejects(
+      fixture.adapter.listTools(),
+      error => {
+        assert.equal(error.code, 'VCP_MANIFEST_UNSAFE_TO_PROJECT');
+        assert.equal(error.jsonRpcCode, -32603);
+        assert.equal(error.jsonRpcData.code, 'VCP_MANIFEST_UNSAFE_TO_PROJECT');
+        assert.equal(error.message.includes(credential), false);
+        return true;
+      }
+    );
+    assert.equal(fixture.adapter.manifestsLoaded, false);
+    assert.deepEqual(fixture.adapter.latestTools, []);
+    fixture.adapter.close();
+  }
+});
+
+test('single-string and aggregate UTF-8 output byte budgets fail with no partial result', async () => {
+  const cases = [
+    {
+      name: 'single-1MiB-string',
+      value: { message: 'a'.repeat(1024 * 1024) }
+    },
+    {
+      name: 'utf8-string-bytes',
+      value: {
+        message: '界'.repeat(Math.floor(MAX_OUTPUT_PROJECTION_STRING_BYTES / 2))
+      }
+    },
+    {
+      name: 'aggregate-string-bytes',
+      value: {
+        items: Array.from(
+          { length: Math.floor(MAX_OUTPUT_PROJECTION_TOTAL_BYTES / (64 * 1024)) + 1 },
+          () => 'b'.repeat(64 * 1024)
+        )
+      }
+    }
+  ];
+
+  assert.equal(
+    cases[1].value.message.length < MAX_OUTPUT_PROJECTION_STRING_BYTES,
+    true
+  );
+  assert.equal(
+    Buffer.byteLength(cases[1].value.message, 'utf8') >
+      MAX_OUTPUT_PROJECTION_STRING_BYTES,
+    true
+  );
+  assert.equal(
+    Buffer.byteLength(cases[2].value.items[0], 'utf8') <
+      MAX_OUTPUT_PROJECTION_STRING_BYTES,
+    true
+  );
+  assert.equal(
+    cases[2].value.items.reduce(
+      (total, item) => total + Buffer.byteLength(item, 'utf8'),
+      0
+    ) > MAX_OUTPUT_PROJECTION_TOTAL_BYTES,
+    true
+  );
+
+  for (const outputCase of cases) {
+    let result = outputCase.value;
+    const client = {
+      key: 'synthetic-output-secret',
+      async executeTool({ toolName, requestId }) {
+        return {
+          request_id: requestId,
+          tool_name: toolName,
+          status: 'completed',
+          result,
+          error: null
+        };
+      },
+      disconnect() {}
+    };
+    const adapter = new VcpToolAdapter({ client, allowedTools: ['ToolA'] });
+
+    await assert.rejects(
+      adapter.executeTool({
+        tool_name: 'ToolA',
+        tool_args: {},
+        request_id: outputCase.name
+      }),
+      error => {
+        assert.equal(error instanceof RangeError, false);
+        assert.equal(error.code, 'VCP_RESPONSE_TOO_COMPLEX');
+        assert.equal(error.jsonRpcCode, -32603);
+        assert.equal(error.jsonRpcData.code, 'VCP_RESPONSE_TOO_COMPLEX');
+        return true;
+      }
+    );
+
+    result = { process_survived: true };
+    const recovered = await adapter.executeTool({
+      tool_name: 'ToolA',
+      tool_args: {},
+      request_id: `${outputCase.name}-recovery`
+    });
+    assert.deepEqual(recovered.result, { process_survived: true });
+    adapter.close();
+  }
+
+  let progress = { message: 'p'.repeat(1024 * 1024) };
+  const statusAdapter = new VcpToolAdapter({
+    client: {
+      key: 'synthetic-output-secret',
+      getRequestStatus(requestId) {
+        return {
+          request_id: requestId,
+          status: 'running',
+          progress,
+          result: null,
+          error: null
+        };
+      },
+      disconnect() {}
+    },
+    allowedTools: []
+  });
+  assert.throws(
+    () => statusAdapter.getToolStatus({ request_id: 'oversized-progress' }),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  progress = { stage: 'recovered' };
+  assert.deepEqual(
+    statusAdapter.getToolStatus({ request_id: 'safe-progress' }).progress,
+    { stage: 'recovered' }
+  );
+  statusAdapter.close();
+
+  let manifests = [{ name: 'ToolA', description: 'm'.repeat(1024 * 1024) }];
+  const manifestAdapter = new VcpToolAdapter({
+    client: {
+      key: 'synthetic-output-secret',
+      async discoverManifests() {
+        return { plugins: manifests };
+      },
+      disconnect() {}
+    },
+    allowedTools: ['ToolA']
+  });
+  await assert.rejects(
+    manifestAdapter.listTools(),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  assert.equal(manifestAdapter.manifestsLoaded, false);
+  assert.deepEqual(manifestAdapter.latestTools, []);
+  manifests = [{ name: 'ToolA', description: 'safe manifest' }];
+  assert.equal((await manifestAdapter.listTools()).tools.length, 1);
+  manifestAdapter.close();
 });
 
 test('deep and wide Bridge outputs fail with a stable bounded projection error', async () => {
