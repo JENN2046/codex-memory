@@ -2,15 +2,21 @@
 
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 
 const { createConfig } = require('../src/config/createConfig');
 const { VcpToolAdapter } = require('../src/vcp-adapter/VcpToolAdapter');
-const { VcpToolBridgeClient } = require('../src/vcp-adapter/VcpToolBridgeClient');
+const {
+  MAX_VCP_INBOUND_FRAME_BYTES,
+  VcpToolBridgeClient
+} = require('../src/vcp-adapter/VcpToolBridgeClient');
 const {
   MAX_OUTPUT_PROJECTION_DEPTH,
   MAX_OUTPUT_PROJECTION_NODES,
   MAX_OUTPUT_PROJECTION_STRING_BYTES,
-  MAX_OUTPUT_PROJECTION_TOTAL_BYTES
+  MAX_OUTPUT_PROJECTION_TOTAL_BYTES,
+  projectToolExecution,
+  projectToolList
 } = require('../src/vcp-adapter/VcpOutputProjection');
 
 const SYNTHETIC_BRIDGE_KEY = 'synthetic-key-not-a-real-secret';
@@ -24,10 +30,30 @@ const DEFAULT_FAKE_ALLOWED_TOOLS = Object.freeze([
   'DifferentTool'
 ]);
 
+function asNativePlugins(manifests) {
+  return (Array.isArray(manifests) ? manifests : []).map(manifest => {
+    const nativeManifest = manifest?.nativeManifest || manifest;
+    const invocationCommands = Array.isArray(nativeManifest?.capabilities?.invocationCommands)
+      ? nativeManifest.capabilities.invocationCommands
+      : Array.isArray(nativeManifest?.invocationCommands)
+        ? nativeManifest.invocationCommands
+        : [];
+    return {
+      name: nativeManifest.name,
+      displayName: nativeManifest.displayName || nativeManifest.name,
+      description: nativeManifest.description || '',
+      version: nativeManifest.version || '1.0.0',
+      capabilities: { invocationCommands },
+      nativeManifest
+    };
+  });
+}
+
 class FakeVcpToolBridge {
-  constructor({ manifests, manifestResponseFactory } = {}) {
+  constructor({ manifests, manifestResponseFactory, executionResponseFactory } = {}) {
     this.received = [];
     this.manifestResponseFactory = manifestResponseFactory;
+    this.executionResponseFactory = executionResponseFactory;
     this.manifests = manifests || [
       {
         name: 'ArbitraryWeatherTool',
@@ -102,13 +128,15 @@ class FakeVcpToolBridge {
   handle(socket, message) {
     this.received.push(message);
     if (message.type === 'get_vcp_manifests') {
+      const nativeV1Requested = message.data?.manifestSurface === 'native-v1';
       const response = this.manifestResponseFactory
         ? this.manifestResponseFactory(message)
         : {
             type: 'vcp_manifest_response',
             data: {
               requestId: message.data.requestId,
-              plugins: this.manifests,
+              ...(nativeV1Requested ? { manifestSurface: 'native-v1' } : {}),
+              plugins: nativeV1Requested ? asNativePlugins(this.manifests) : this.manifests,
               vcpVersion: 'fake-1'
             }
           };
@@ -117,6 +145,10 @@ class FakeVcpToolBridge {
     }
 
     if (message.type !== 'execute_vcp_tool') return;
+    if (this.executionResponseFactory) {
+      this.respond(socket, this.executionResponseFactory(message));
+      return;
+    }
     const { requestId, toolName, toolArgs } = message.data;
     if (toolName === 'TimeoutTool') return;
     if (toolName === 'DisconnectTool') {
@@ -171,10 +203,15 @@ function createFixture({
   allowedTools = DEFAULT_FAKE_ALLOWED_TOOLS,
   manifests,
   manifestResponseFactory,
+  executionResponseFactory,
   key = SYNTHETIC_BRIDGE_KEY,
   requestIdFactory
 } = {}) {
-  const bridge = new FakeVcpToolBridge({ manifests, manifestResponseFactory });
+  const bridge = new FakeVcpToolBridge({
+    manifests,
+    manifestResponseFactory,
+    executionResponseFactory
+  });
   const generatedRequestIdFactory = requestIdFactory || (() => {
     let sequence = 0;
     return () => `adapter-request-${++sequence}`;
@@ -190,6 +227,118 @@ function createFixture({
     bridge,
     client,
     adapter: new VcpToolAdapter({ client, allowedTools })
+  };
+}
+
+function createWideJsonObject(keyCount) {
+  const value = {};
+  for (let index = 0; index < keyCount; index += 1) {
+    value[`field_${index}`] = true;
+  }
+  return value;
+}
+
+function captureOwnDescriptorReads(operation) {
+  const originalGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+  let descriptorReads = 0;
+  let caughtError = null;
+  Object.getOwnPropertyDescriptor = (...args) => {
+    descriptorReads += 1;
+    return Reflect.apply(originalGetOwnPropertyDescriptor, Object, args);
+  };
+  try {
+    operation();
+  } catch (error) {
+    caughtError = error;
+  } finally {
+    Object.getOwnPropertyDescriptor = originalGetOwnPropertyDescriptor;
+  }
+  return { caughtError, descriptorReads };
+}
+
+function connectionAckFrameAtUtf8Bytes(targetBytes) {
+  const prefix = '{"type":"connection_ack","data":{"padding":"';
+  const suffix = '"}}';
+  const framingBytes = Buffer.byteLength(prefix + suffix, 'utf8');
+  assert.equal(targetBytes >= framingBytes, true);
+  return `${prefix}${'a'.repeat(targetBytes - framingBytes)}${suffix}`;
+}
+
+function createOffsetView(text, { dataView = false } = {}) {
+  const source = Buffer.from(text, 'utf8');
+  const backing = new ArrayBuffer(source.byteLength + 16);
+  const bytes = new Uint8Array(backing, 8, source.byteLength);
+  bytes.set(source);
+  return dataView
+    ? new DataView(backing, 8, source.byteLength)
+    : bytes;
+}
+
+async function observeInboundFrame(data, { pendingRequest = false } = {}) {
+  const socket = {
+    readyState: 1,
+    closeCalls: [],
+    close(code, reason) {
+      this.closeCalls.push({ code, reason });
+      this.readyState = 3;
+    }
+  };
+  const client = new VcpToolBridgeClient({
+    bridgeUrl: 'ws://127.0.0.1:1',
+    key: SYNTHETIC_BRIDGE_KEY,
+    requestTimeoutMs: 100,
+    WebSocketImpl: class {}
+  });
+  client.socket = socket;
+  client.connected = true;
+
+  let rejectedError = null;
+  if (pendingRequest) {
+    client.requestStates.set('frame-admission-request', {
+      requestId: 'frame-admission-request',
+      kind: 'manifest',
+      manifestSurface: 'native-v1',
+      status: 'running',
+      progress: null,
+      result: null,
+      error: null
+    });
+    const timer = setTimeout(() => {}, 1_000);
+    timer.unref?.();
+    client.pending.set('frame-admission-request', {
+      timer,
+      resolve() {},
+      reject(error) {
+        rejectedError = error;
+      }
+    });
+  }
+
+  const originalParse = JSON.parse;
+  const originalMessageText = client._messageText.bind(client);
+  let jsonParseCalls = 0;
+  let messageTextCalls = 0;
+  JSON.parse = (...args) => {
+    jsonParseCalls += 1;
+    return Reflect.apply(originalParse, JSON, args);
+  };
+  client._messageText = async (...args) => {
+    messageTextCalls += 1;
+    return originalMessageText(...args);
+  };
+  try {
+    await client._handleMessage({ data }, socket);
+  } finally {
+    JSON.parse = originalParse;
+    client._messageText = originalMessageText;
+  }
+
+  return {
+    client,
+    jsonParseCalls,
+    messageTextCalls,
+    rejectedError,
+    socket
   };
 }
 
@@ -869,6 +1018,148 @@ test('a message decode failure does not poison the socket chain or create an unh
   assert.deepEqual(unhandled, []);
 });
 
+test('inbound VCP frames enforce the inclusive 4 MiB boundary before JSON.parse', async () => {
+  for (const admittedBytes of [
+    MAX_VCP_INBOUND_FRAME_BYTES - 1,
+    MAX_VCP_INBOUND_FRAME_BYTES
+  ]) {
+    const frame = connectionAckFrameAtUtf8Bytes(admittedBytes);
+    assert.equal(Buffer.byteLength(frame, 'utf8'), admittedBytes);
+    const observed = await observeInboundFrame(frame);
+    assert.equal(observed.messageTextCalls, 1);
+    assert.equal(observed.jsonParseCalls, 1);
+    assert.equal(observed.client.connected, true);
+    assert.deepEqual(observed.socket.closeCalls, []);
+  }
+
+  const oversizedFrame = connectionAckFrameAtUtf8Bytes(
+    MAX_VCP_INBOUND_FRAME_BYTES + 1
+  );
+  const rejected = await observeInboundFrame(oversizedFrame, {
+    pendingRequest: true
+  });
+  assert.equal(Buffer.byteLength(oversizedFrame, 'utf8'), 4_194_305);
+  assert.equal(rejected.messageTextCalls, 0);
+  assert.equal(rejected.jsonParseCalls, 0);
+  assert.equal(rejected.client.socket, null);
+  assert.equal(rejected.client.connected, false);
+  assert.equal(rejected.client.pending.size, 0);
+  assert.equal(
+    rejected.client.requestStates.get('frame-admission-request').status,
+    'failed'
+  );
+  assert.equal(
+    rejected.client.requestStates.get('frame-admission-request').error,
+    'vcp_response_too_complex'
+  );
+  assert.equal(rejected.rejectedError?.code, 'VCP_RESPONSE_TOO_COMPLEX');
+  assert.equal(rejected.rejectedError?.message, 'vcp_response_too_complex');
+  assert.deepEqual(rejected.socket.closeCalls, [{
+    code: 1009,
+    reason: 'vcp_response_too_complex'
+  }]);
+});
+
+test('frame admission uses the native byte semantics of every supported WebSocket data form', async () => {
+  const smallFrame = JSON.stringify({
+    type: 'connection_ack',
+    data: { serverId: 'frame-form-synthetic' }
+  });
+  const smallBytes = Buffer.from(smallFrame, 'utf8');
+  const smallArrayBuffer = Uint8Array.from(smallBytes).buffer;
+  const admittedForms = [
+    ['string', smallFrame],
+    ['Buffer', smallBytes],
+    ['ArrayBuffer', smallArrayBuffer],
+    ['Uint8Array view with offset', createOffsetView(smallFrame)],
+    ['DataView with offset', createOffsetView(smallFrame, { dataView: true })],
+    ['Blob', new Blob([smallBytes])]
+  ];
+
+  for (const [name, data] of admittedForms) {
+    const observed = await observeInboundFrame(data);
+    assert.equal(observed.messageTextCalls, 1, name);
+    assert.equal(observed.jsonParseCalls, 1, name);
+    assert.equal(observed.client.connected, true, name);
+  }
+
+  let oversizedBlobTextCalls = 0;
+  const oversizedBlob = new Blob([
+    new Uint8Array(MAX_VCP_INBOUND_FRAME_BYTES + 1)
+  ]);
+  oversizedBlob.text = async () => {
+    oversizedBlobTextCalls += 1;
+    return '{}';
+  };
+  const oversizedForms = [
+    ['string', () => connectionAckFrameAtUtf8Bytes(MAX_VCP_INBOUND_FRAME_BYTES + 1)],
+    ['Buffer', () => Buffer.alloc(MAX_VCP_INBOUND_FRAME_BYTES + 1)],
+    ['ArrayBuffer', () => new ArrayBuffer(MAX_VCP_INBOUND_FRAME_BYTES + 1)],
+    ['ArrayBufferView', () => new Uint8Array(
+      new ArrayBuffer(MAX_VCP_INBOUND_FRAME_BYTES + 33),
+      16,
+      MAX_VCP_INBOUND_FRAME_BYTES + 1
+    )],
+    ['Blob', () => oversizedBlob]
+  ];
+
+  for (const [name, createData] of oversizedForms) {
+    const observed = await observeInboundFrame(createData());
+    assert.equal(observed.messageTextCalls, 0, name);
+    assert.equal(observed.jsonParseCalls, 0, name);
+    assert.deepEqual(observed.socket.closeCalls, [{
+      code: 1009,
+      reason: 'vcp_response_too_complex'
+    }], name);
+  }
+  assert.equal(oversizedBlobTextCalls, 0);
+});
+
+test('normalized UTF-8 size is rechecked and multibyte strings cannot bypass frame admission', async () => {
+  const unicodeFrame = JSON.stringify({
+    type: 'connection_ack',
+    data: { padding: '界'.repeat(100) }
+  });
+  assert.equal(Buffer.byteLength(unicodeFrame, 'utf8') > unicodeFrame.length, true);
+  const admittedUnicode = await observeInboundFrame(unicodeFrame);
+  assert.equal(admittedUnicode.jsonParseCalls, 1);
+
+  const prefix = '{"type":"connection_ack","data":{"padding":"';
+  const suffix = '"}}';
+  const unicodeCount = Math.ceil(
+    (MAX_VCP_INBOUND_FRAME_BYTES + 1 - Buffer.byteLength(prefix + suffix, 'utf8')) / 3
+  );
+  const oversizedUnicode = `${prefix}${'界'.repeat(unicodeCount)}${suffix}`;
+  assert.equal(oversizedUnicode.length < MAX_VCP_INBOUND_FRAME_BYTES, true);
+  assert.equal(
+    Buffer.byteLength(oversizedUnicode, 'utf8') > MAX_VCP_INBOUND_FRAME_BYTES,
+    true
+  );
+  const unicodeRejected = await observeInboundFrame(oversizedUnicode);
+  assert.equal(unicodeRejected.messageTextCalls, 0);
+  assert.equal(unicodeRejected.jsonParseCalls, 0);
+
+  const normalizedOversized = connectionAckFrameAtUtf8Bytes(
+    MAX_VCP_INBOUND_FRAME_BYTES + 1
+  );
+  const textLikeRejected = await observeInboundFrame({
+    text: async () => normalizedOversized
+  });
+  assert.equal(textLikeRejected.messageTextCalls, 1);
+  assert.equal(textLikeRejected.jsonParseCalls, 0);
+
+  let mismatchedBlobTextCalls = 0;
+  const mismatchedBlob = new Blob(['{}']);
+  mismatchedBlob.text = async () => {
+    mismatchedBlobTextCalls += 1;
+    return normalizedOversized;
+  };
+  const blobRejected = await observeInboundFrame(mismatchedBlob);
+  assert.equal(blobRejected.messageTextCalls, 1);
+  assert.equal(mismatchedBlobTextCalls, 1);
+  assert.equal(blobRejected.jsonParseCalls, 0);
+});
+
 test('fake bridge connects and exposes arbitrary manifests without a second registry', async () => {
   const { bridge, adapter } = createFixture();
   const listed = await adapter.listTools();
@@ -882,7 +1173,7 @@ test('fake bridge connects and exposes arbitrary manifests without a second regi
   assert.deepEqual(listed.tools[0].invocation_commands, bridge.manifests[0].capabilities.invocationCommands);
   assert.equal(listed.tools[0].raw_manifest.extraField.preserved, true);
   assert.equal(bridge.received[0].type, 'get_vcp_manifests');
-  assert.equal(Object.hasOwn(bridge.received[0].data, 'manifestSurface'), false);
+  assert.equal(bridge.received[0].data.manifestSurface, 'native-v1');
   assert.match(bridge.socket.url, /\/vcp-distributed-server\/VCP_Key=/u);
 
   adapter.close();
@@ -1651,12 +1942,37 @@ test('validation error paths escape attacker controls and redact the Bridge cred
   assert.equal(observedError.message.includes('\n'), false);
   assert.equal(observedError.message.includes('\t'), false);
   assert.equal(observedError.message.includes('\u0001'), false);
-  assert.match(
-    observedError.message,
-    /tool_args\.\[REDACTED\]-普通字段\\r\\nFAKE_FIXED_LOG_FIELD\\t\\u0001\.constructor is not allowed/u
-  );
+  assert.equal(observedError.message, 'tool_args.[property].[property] is not allowed');
+  assert.equal(observedError.message.includes('FAKE_FIXED_LOG_FIELD'), false);
   assert.equal(observedError.stack.includes(syntheticCredential), false);
   assert.equal(observedError.stack.includes(`\nFAKE_FIXED_LOG_FIELD`), false);
+
+  const encodedCredential = [...Buffer.from(syntheticCredential, 'utf8')]
+    .map(byte => `%${byte.toString(16).padStart(2, '0')}`)
+    .join('');
+  const encodedAttackerKey = `${encodedCredential}\r\nENCODED_FAKE_LOG_FIELD\t`;
+  const encodedArgs = Object.create(null);
+  Object.defineProperty(encodedArgs, encodedAttackerKey, {
+    value: JSON.parse('{"prototype":{"polluted":true}}'),
+    enumerable: true,
+    configurable: true
+  });
+  let encodedError;
+  await assert.rejects(
+    adapter.executeTool({
+      tool_name: 'ToolA',
+      tool_args: encodedArgs,
+      request_id: 'safe-encoded-error-path'
+    }),
+    error => {
+      encodedError = error;
+      return error.code === 'VCP_TOOL_ARGS_UNSAFE';
+    }
+  );
+  assert.equal(encodedError.message, 'tool_args.[property].[property] is not allowed');
+  assert.equal(encodedError.message.includes(encodedCredential), false);
+  assert.equal(encodedError.stack.includes(encodedCredential), false);
+  assert.equal(encodedError.stack.includes('ENCODED_FAKE_LOG_FIELD'), false);
 
   let unknownToolError;
   await assert.rejects(
@@ -1670,7 +1986,8 @@ test('validation error paths escape attacker controls and redact the Bridge cred
   assert.equal(unknownToolError.message.includes('\r'), false);
   assert.equal(unknownToolError.message.includes('\n'), false);
   assert.equal(unknownToolError.message.includes('\t'), false);
-  assert.match(unknownToolError.message, /\[REDACTED\]\\r\\nUNKNOWN_FAKE_LOG_FIELD\\t/u);
+  assert.equal(unknownToolError.message, 'Unknown VCP adapter tool');
+  assert.equal(unknownToolError.message.includes('UNKNOWN_FAKE_LOG_FIELD'), false);
   assert.equal(bridge.received.length, 0);
   adapter.close();
 });
@@ -1700,7 +2017,7 @@ test('boundary-aware credential redaction preserves protocol envelopes and redac
           status: `state-${secret}`,
           progress: [secret, { nested: `progress-${secret}` }],
           result: {
-            tool_name: `result-${secret}`,
+            payload_value: `result-${secret}`,
             failure: syntheticError
           },
           error: `error-${secret}`
@@ -1740,8 +2057,8 @@ test('boundary-aware credential redaction preserves protocol envelopes and redac
       '[REDACTED]',
       { nested: 'progress-[REDACTED]' }
     ]);
-    assert.equal(requestStatus.result.tool_name.includes(secret), false);
-    assert.equal(requestStatus.result.tool_name.includes('[REDACTED]'), true);
+    assert.equal(requestStatus.result.payload_value.includes(secret), false);
+    assert.equal(requestStatus.result.payload_value.includes('[REDACTED]'), true);
     assert.equal(requestStatus.result.failure.name, 'Error');
     assert.equal(requestStatus.result.failure.message, 'failure-[REDACTED]');
     assert.equal(requestStatus.result.failure.stack.includes(secret), false);
@@ -1775,6 +2092,118 @@ test('boundary-aware credential redaction preserves protocol envelopes and redac
     assert.deepEqual(adapter.getToolStatus({ request_id: 'request-1' }), unchanged);
     adapter.close();
   }
+});
+
+test('payload and error projections cannot recreate supported credential representations', async () => {
+  const credential = 'x[R';
+  const encodedCredentialWithPrefix = 'x%78%5b%52';
+  const client = {
+    key: credential,
+    getStatus() {
+      return {
+        connected: true,
+        bridge_enabled: true,
+        protocol_ready: true,
+        tools_discovered: 1,
+        pending_requests: 0,
+        last_error: encodedCredentialWithPrefix
+      };
+    },
+    getRequestStatus(requestId) {
+      return {
+        request_id: requestId,
+        status: 'completed',
+        progress: encodedCredentialWithPrefix,
+        result: { message: encodedCredentialWithPrefix },
+        error: encodedCredentialWithPrefix
+      };
+    },
+    async executeTool({ requestId }) {
+      return this.getRequestStatus(requestId);
+    },
+    disconnect() {}
+  };
+  const adapter = new VcpToolAdapter({ client, allowedTools: ['ToolA'] });
+  assert.equal(adapter.getStatus().last_error, '');
+  const status = adapter.getToolStatus({ request_id: 'boundary-status' });
+  assert.equal(status.progress, '');
+  assert.equal(status.result.message, '');
+  assert.equal(status.error, '');
+  const executed = await adapter.executeTool({
+    tool_name: 'ToolA',
+    tool_args: {},
+    request_id: 'boundary-execute'
+  });
+  assert.equal(executed.result.message, '');
+  assert.equal(executed.error, '');
+  assert.equal(JSON.stringify({ status, executed }).includes(credential), false);
+  adapter.close();
+
+  const controlCredentialAdapter = new VcpToolAdapter({
+    client: {
+      key: 'x\\n',
+      getStatus() {
+        return {
+          connected: false,
+          bridge_enabled: false,
+          protocol_ready: false,
+          tools_discovered: 0,
+          pending_requests: 0,
+          last_error: 'x\n'
+        };
+      },
+      disconnect() {}
+    },
+    allowedTools: []
+  });
+  assert.equal(controlCredentialAdapter.getStatus().last_error, '');
+  controlCredentialAdapter.close();
+});
+
+test('payload object keys fail closed on raw and single-percent credential representations', async () => {
+  const credential = 'SECRET';
+  const encodedCredential = '%53%45%43%52%45%54';
+  const client = {
+    key: credential,
+    getRequestStatus(requestId) {
+      return {
+        request_id: requestId,
+        status: 'failed',
+        progress: null,
+        result: { [credential]: 'safe-value' },
+        error: { [encodedCredential]: 'safe-error-value' }
+      };
+    },
+    async executeTool({ requestId }) {
+      return this.getRequestStatus(requestId);
+    },
+    disconnect() {}
+  };
+  const adapter = new VcpToolAdapter({ client, allowedTools: ['ToolA'] });
+
+  await assert.rejects(
+    adapter.executeTool({
+      tool_name: 'ToolA',
+      tool_args: {},
+      request_id: 'payload-key-execute'
+    }),
+    error => {
+      assert.equal(error.code, 'VCP_RESPONSE_UNSAFE_TO_PROJECT');
+      assert.equal(error.message.includes(credential), false);
+      assert.equal(error.message.includes(encodedCredential), false);
+      return true;
+    }
+  );
+  assert.throws(
+    () => adapter.getToolStatus({ request_id: 'payload-key-status' }),
+    error => {
+      assert.equal(error.code, 'VCP_RESPONSE_UNSAFE_TO_PROJECT');
+      assert.equal(error.message.includes(credential), false);
+      assert.equal(error.message.includes(encodedCredential), false);
+      return true;
+    }
+  );
+  adapter.close();
 });
 
 test('generated and caller-supplied request ids survive credential collisions and remain queryable', async () => {
@@ -1821,36 +2250,36 @@ test('generated and caller-supplied request ids survive credential collisions an
 test('tool and status identities stay exact while arbitrary manifest and result payloads are redacted', async () => {
   const secret = 'status';
   const manifests = [{
-    name: 'status-tool',
+    name: 'PayloadTool',
     displayName: 'status tool',
     description: 'server credential is status',
     capabilities: {
-      invocationCommands: [{ command: 'status-command', example: { token: 'status' } }]
+      invocationCommands: [{ command: 'safe-command', example: { token: 'safe' } }]
     },
     parameters: { type: 'object', title: 'status schema' },
-    metadata: { request_id: 'credential=status' }
+    metadata: { request_id: 'safe-contract-value' }
   }];
   const fixture = createFixture({
-    allowedTools: ['status-tool'],
+    allowedTools: ['PayloadTool'],
     key: secret,
     manifests
   });
 
   const listed = await fixture.adapter.listTools();
-  assert.equal(listed.tools[0].name, 'status-tool');
+  assert.equal(listed.tools[0].name, 'PayloadTool');
   assert.equal(listed.tools[0].display_name, '[REDACTED] tool');
   assert.equal(listed.tools[0].description, 'server credential is [REDACTED]');
   assert.deepEqual(listed.tools[0].invocation_commands, [
-    { command: '[REDACTED]-command', example: { token: '[REDACTED]' } }
+    { command: 'safe-command', example: { token: 'safe' } }
   ]);
   assert.deepEqual(listed.tools[0].parameters, {
     type: 'object',
     title: '[REDACTED] schema'
   });
-  assert.equal(listed.tools[0].raw_manifest.metadata.request_id, 'credential=[REDACTED]');
+  assert.equal(listed.tools[0].raw_manifest.metadata.request_id, 'safe-contract-value');
 
   const executed = await fixture.adapter.executeTool({
-    tool_name: 'status-tool',
+    tool_name: 'PayloadTool',
     tool_args: {
       request_id: 'credential=status',
       nested: { message: 'payload status value' }
@@ -1858,10 +2287,10 @@ test('tool and status identities stay exact while arbitrary manifest and result 
     request_id: 'status-123'
   });
   assert.equal(executed.request_id, 'status-123');
-  assert.equal(executed.tool_name, 'status-tool');
+  assert.equal(executed.tool_name, 'PayloadTool');
   assert.equal(executed.status, 'completed');
-  assert.equal(fixture.bridge.received[1].data.toolName, 'status-tool');
-  assert.equal(executed.result.executedTool, '[REDACTED]-tool');
+  assert.equal(fixture.bridge.received[1].data.toolName, 'PayloadTool');
+  assert.equal(executed.result.executedTool, 'PayloadTool');
   assert.equal(
     Object.prototype.hasOwnProperty.call(executed.result.receivedArgs, 'request_id'),
     true
@@ -1960,7 +2389,7 @@ test('tool manifests use one bounded safe source for parameters, commands, and r
         '^future-[a-z]+$': { type: 'string' }
       },
       properties: {
-        [credential]: {
+        credentialField: {
           type: 'string'
         },
         mode: {
@@ -1979,20 +2408,20 @@ test('tool manifests use one bounded safe source for parameters, commands, and r
       },
       required: ['mode']
     },
-    invocationCommands: [`root-tool --key ${credential}`],
+    invocationCommands: ['root-tool --mode safe'],
     capabilities: {
       invocationCommands: [
-        `curl http://127.0.0.1/run?VCP_Key=${credential}`,
+        'curl https://example.invalid/run?mode=safe',
         {
-          command: `tool --key ${credential}`,
-          description: `uses ${credential}`,
-          metadata: { endpoint: `ws://host/${credential}` }
+          command: 'tool --mode safe',
+          description: 'safe command contract',
+          metadata: { endpoint: 'wss://example.invalid/tool' }
         }
       ]
     },
     metadata: {
-      description: `nested ${credential} credential`,
-      arbitrary: { request_id: `credential=${credential}` }
+      description: 'nested opaque contract description',
+      arbitrary: { request_id: 'safe-contract-id' }
     }
   }];
   const fixture = createFixture({
@@ -2021,10 +2450,10 @@ test('tool manifests use one bounded safe source for parameters, commands, and r
     '^future-[a-z]+$': { type: 'string' }
   });
   assert.equal(
-    Object.prototype.hasOwnProperty.call(tool.parameters.properties, credential),
+    Object.prototype.hasOwnProperty.call(tool.parameters.properties, 'credentialField'),
     true
   );
-  assert.equal(tool.parameters.properties[credential].type, 'string');
+  assert.equal(tool.parameters.properties.credentialField.type, 'string');
   assert.deepEqual(tool.parameters.required, ['mode']);
   const mode = tool.parameters.properties.mode;
   assert.equal(mode.$ref, 'https://schemas.invalid/mode');
@@ -2049,22 +2478,735 @@ test('tool manifests use one bounded safe source for parameters, commands, and r
   );
   assert.equal(
     tool.invocation_commands[0],
-    'curl http://127.0.0.1/run?VCP_Key=[REDACTED]'
+    'curl https://example.invalid/run?mode=safe'
   );
   assert.deepEqual(tool.invocation_commands[1], {
-    command: 'tool --key [REDACTED]',
-    description: 'uses [REDACTED]',
-    metadata: { endpoint: 'ws://host/[REDACTED]' }
+    command: 'tool --mode safe',
+    description: 'safe command contract',
+    metadata: { endpoint: 'wss://example.invalid/tool' }
   });
   assert.deepEqual(tool.raw_manifest.invocationCommands, [
-    'root-tool --key [REDACTED]'
+    'root-tool --mode safe'
   ]);
-  assert.equal(tool.raw_manifest.metadata.description, 'nested [REDACTED] credential');
+  assert.equal(
+    tool.raw_manifest.metadata.description,
+    'nested opaque contract description'
+  );
   assert.equal(
     tool.raw_manifest.metadata.arbitrary.request_id,
-    'credential=[REDACTED]'
+    'safe-contract-id'
   );
   fixture.adapter.close();
+});
+
+test('public aliases and safe meta keys derive only from the projected native authority', async () => {
+  const credential = 'wrapper-only-secret';
+  const nativeManifest = JSON.parse(`{
+    "name": "AuthorityTool",
+    "version": "2.0.0",
+    "displayName": "Authority display",
+    "description": "Authority description",
+    "parameters": false,
+    "parameterSchema": {"type":"object","properties":{"query":{"type":"string"}}},
+    "inputSchema": true,
+    "configSchema": {"mode":{"type":"string","description":"safe config mode"}},
+    "capabilities": {
+      "invocationCommands": [{"command":"authority-command"}]
+    },
+    "x-future-extension": {
+      "nested": {
+        "alpha":[1,true,null,"value"],
+        "meta": {
+          "__proto__":{"array":[1,true,null,"nested-proto"]},
+          "constructor":{"object":{"value":"nested-constructor"}},
+          "prototype":[{"toJSON":{"kind":"nested-plain-data"}}]
+        }
+      }
+    },
+    "__proto__": {"nested":[1,true,null,"proto-value"]},
+    "constructor": {"nested":{"x":"constructor-value"}},
+    "prototype": ["prototype-value",7],
+    "toJSON": {"kind":"plain-data"}
+  }`);
+  const fixture = createFixture({
+    allowedTools: ['AuthorityTool'],
+    key: credential,
+    manifestResponseFactory(message) {
+      return {
+        type: 'vcp_manifest_response',
+        data: {
+          requestId: message.data.requestId,
+          manifestSurface: 'native-v1',
+          plugins: [{
+            name: 'AuthorityTool',
+            displayName: `wrapper ${credential}`,
+            description: `wrapper ${credential}`,
+            version: credential,
+            capabilities: {
+              invocationCommands: [{ command: `wrapper-${credential}` }]
+            },
+            nativeManifest
+          }]
+        }
+      };
+    }
+  });
+
+  const listed = await fixture.adapter.listTools();
+  const tool = listed.tools[0];
+  assert.equal(tool.name, 'AuthorityTool');
+  assert.equal(tool.display_name, 'Authority display');
+  assert.equal(tool.description, 'Authority description');
+  assert.equal(tool.parameters, false);
+  assert.deepEqual(tool.raw_manifest.parameterSchema, {
+    type: 'object',
+    properties: { query: { type: 'string' } }
+  });
+  assert.equal(tool.raw_manifest.inputSchema, true);
+  assert.deepEqual(tool.raw_manifest.configSchema, {
+    mode: { type: 'string', description: 'safe config mode' }
+  });
+  assert.strictEqual(tool.invocation_commands, tool.raw_manifest.capabilities.invocationCommands);
+  assert.deepEqual(tool.invocation_commands, [{ command: 'authority-command' }]);
+  assert.deepEqual(tool.raw_manifest['x-future-extension'], {
+    nested: {
+      alpha: [1, true, null, 'value'],
+      meta: JSON.parse(`{
+        "__proto__":{"array":[1,true,null,"nested-proto"]},
+        "constructor":{"object":{"value":"nested-constructor"}},
+        "prototype":[{"toJSON":{"kind":"nested-plain-data"}}]
+      }`)
+    }
+  });
+  for (const [key, expected] of [
+    ['__proto__', { nested: [1, true, null, 'proto-value'] }],
+    ['constructor', { nested: { x: 'constructor-value' } }],
+    ['prototype', ['prototype-value', 7]],
+    ['toJSON', { kind: 'plain-data' }]
+  ]) {
+    assert.equal(Object.prototype.hasOwnProperty.call(tool.raw_manifest, key), true, key);
+    assert.deepEqual(tool.raw_manifest[key], expected, key);
+  }
+  assert.equal(Object.getPrototypeOf(tool.raw_manifest), Object.prototype);
+  const nestedMeta = tool.raw_manifest['x-future-extension'].nested.meta;
+  assert.equal(Object.prototype.hasOwnProperty.call(nestedMeta, '__proto__'), true);
+  assert.deepEqual(nestedMeta.__proto__, {
+    array: [1, true, null, 'nested-proto']
+  });
+  assert.deepEqual(nestedMeta.prototype[0].toJSON, {
+    kind: 'nested-plain-data'
+  });
+  assert.equal(Object.getPrototypeOf(nestedMeta), Object.prototype);
+  assert.equal(Object.getPrototypeOf(nestedMeta.prototype[0]), Object.prototype);
+  assert.equal(Object.prototype.hasOwnProperty.call(Object.prototype, 'nested'), false);
+  assert.equal(JSON.stringify(listed).includes(credential), false);
+  fixture.adapter.close();
+});
+
+test('all parameter-schema aliases preserve fallback order and semantic class rules', async () => {
+  const credential = 'schema-alias-secret';
+  const paths = [
+    ['parameters'],
+    ['parameterSchema'],
+    ['inputSchema'],
+    ['input_schema'],
+    ['capabilities', 'parameters'],
+    ['capabilities', 'parameterSchema'],
+    ['capabilities', 'inputSchema'],
+    ['capabilities', 'input_schema']
+  ];
+  const setPath = (target, path, value) => {
+    let parent = target;
+    for (const segment of path.slice(0, -1)) {
+      parent[segment] ||= {};
+      parent = parent[segment];
+    }
+    parent[path.at(-1)] = value;
+  };
+  const getPath = (target, path) => path.reduce((value, segment) => value[segment], target);
+
+  for (let firstIndex = 0; firstIndex < paths.length; firstIndex += 1) {
+    const manifest = { name: 'AliasTool' };
+    for (let index = firstIndex; index < paths.length; index += 1) {
+      setPath(manifest, paths[index], {
+        type: 'string',
+        title: `${credential} title ${index}`,
+        description: `description ${credential} ${index}`,
+        default: `safe-default-${index}`
+      });
+    }
+    const fixture = createFixture({
+      allowedTools: ['AliasTool'],
+      key: credential,
+      manifests: [manifest]
+    });
+    const tool = (await fixture.adapter.listTools()).tools[0];
+    const projectedSchema = getPath(tool.raw_manifest, paths[firstIndex]);
+    assert.strictEqual(tool.parameters, projectedSchema, paths[firstIndex].join('.'));
+    assert.equal(projectedSchema.title, `[REDACTED] title ${firstIndex}`);
+    assert.equal(projectedSchema.description, `description [REDACTED] ${firstIndex}`);
+    assert.equal(projectedSchema.default, `safe-default-${firstIndex}`);
+    fixture.adapter.close();
+
+    const unsafeManifest = { name: 'AliasTool' };
+    setPath(unsafeManifest, paths[firstIndex], {
+      type: 'string',
+      const: credential
+    });
+    const unsafeFixture = createFixture({
+      allowedTools: ['AliasTool'],
+      key: credential,
+      manifests: [unsafeManifest]
+    });
+    await assert.rejects(
+      unsafeFixture.adapter.listTools(),
+      error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT',
+      paths[firstIndex].join('.')
+    );
+    unsafeFixture.adapter.close();
+  }
+});
+
+test('root and capabilities configSchema maps redact annotations and preserve contracts', async () => {
+  const credential = 'config-schema-secret';
+  for (const location of ['root', 'capabilities']) {
+    const schema = {
+      mode: {
+        type: 'string',
+        title: `${credential} title`,
+        description: `description ${credential}`,
+        default: 'safe-default'
+      }
+    };
+    const manifest = location === 'root'
+      ? { name: 'ConfigTool', configSchema: schema }
+      : { name: 'ConfigTool', capabilities: { configSchema: schema } };
+    const fixture = createFixture({
+      allowedTools: ['ConfigTool'],
+      key: credential,
+      manifests: [manifest]
+    });
+    const projected = (await fixture.adapter.listTools()).tools[0].raw_manifest;
+    const projectedSchema = location === 'root'
+      ? projected.configSchema
+      : projected.capabilities.configSchema;
+    assert.equal(projectedSchema.mode.title, '[REDACTED] title', location);
+    assert.equal(projectedSchema.mode.description, 'description [REDACTED]', location);
+    assert.equal(projectedSchema.mode.default, 'safe-default', location);
+    fixture.adapter.close();
+
+    const unsafeSchema = {
+      mode: { type: 'string', default: credential }
+    };
+    const unsafeManifest = location === 'root'
+      ? { name: 'ConfigTool', configSchema: unsafeSchema }
+      : { name: 'ConfigTool', capabilities: { configSchema: unsafeSchema } };
+    const unsafeFixture = createFixture({
+      allowedTools: ['ConfigTool'],
+      key: credential,
+      manifests: [unsafeManifest]
+    });
+    await assert.rejects(
+      unsafeFixture.adapter.listTools(),
+      error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT',
+      location
+    );
+    unsafeFixture.adapter.close();
+  }
+});
+
+test('all invocation-command aliases preserve fallback order and fail closed on collisions', async () => {
+  const credential = 'invocation-alias-secret';
+  const paths = [
+    ['capabilities', 'invocationCommands'],
+    ['capabilities', 'invocation_commands'],
+    ['invocationCommands'],
+    ['invocation_commands']
+  ];
+  const setPath = (target, path, value) => {
+    let parent = target;
+    for (const segment of path.slice(0, -1)) {
+      parent[segment] ||= {};
+      parent = parent[segment];
+    }
+    parent[path.at(-1)] = value;
+  };
+  const getPath = (target, path) => path.reduce((value, segment) => value[segment], target);
+
+  for (let firstIndex = 0; firstIndex < paths.length; firstIndex += 1) {
+    const manifest = { name: 'InvocationTool' };
+    for (let index = firstIndex; index < paths.length; index += 1) {
+      setPath(manifest, paths[index], [`safe-command-${index}`]);
+    }
+    const fixture = createFixture({
+      allowedTools: ['InvocationTool'],
+      key: credential,
+      manifests: [manifest]
+    });
+    const tool = (await fixture.adapter.listTools()).tools[0];
+    const projectedCommands = getPath(tool.raw_manifest, paths[firstIndex]);
+    assert.strictEqual(tool.invocation_commands, projectedCommands, paths[firstIndex].join('.'));
+    assert.deepEqual(projectedCommands, [`safe-command-${firstIndex}`]);
+    fixture.adapter.close();
+
+    const unsafeManifest = { name: 'InvocationTool' };
+    setPath(unsafeManifest, paths[firstIndex], [`run ${credential}`]);
+    const unsafeFixture = createFixture({
+      allowedTools: ['InvocationTool'],
+      key: credential,
+      manifests: [unsafeManifest]
+    });
+    await assert.rejects(
+      unsafeFixture.adapter.listTools(),
+      error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT',
+      paths[firstIndex].join('.')
+    );
+    unsafeFixture.adapter.close();
+  }
+});
+
+test('single percent decoding protects non-ASCII credentials without changing JSON scalars', async () => {
+  const credential = '密钥';
+  const encodedLower = [...Buffer.from(credential, 'utf8')]
+    .map(byte => `%${byte.toString(16).padStart(2, '0')}`)
+    .join('');
+  const encodedUpper = encodedLower.toUpperCase();
+  const encodedMixed = [...encodedLower].map((character, index) => (
+    /[a-f]/u.test(character) && index % 2 === 0 ? character.toUpperCase() : character
+  )).join('');
+  const manifest = {
+    name: 'UnicodeTool',
+    description: `${encodedUpper}|${encodedLower}|${encodedMixed}`,
+    'x-json-scalars': {
+      number: 123,
+      boolean: true,
+      nothing: null,
+      array: [123, false, null]
+    }
+  };
+  const fixture = createFixture({
+    allowedTools: ['UnicodeTool'],
+    key: credential,
+    manifests: [manifest]
+  });
+  const tool = (await fixture.adapter.listTools()).tools[0];
+  assert.equal(tool.description, '[REDACTED]|[REDACTED]|[REDACTED]');
+  assert.deepEqual(tool.raw_manifest['x-json-scalars'], {
+    number: 123,
+    boolean: true,
+    nothing: null,
+    array: [123, false, null]
+  });
+  fixture.adapter.close();
+
+  const unsafeFixture = createFixture({
+    allowedTools: ['UnicodeTool'],
+    key: credential,
+    manifests: [{
+      name: 'UnicodeTool',
+      'x-future-contract': { encoded: encodedMixed }
+    }]
+  });
+  await assert.rejects(
+    unsafeFixture.adapter.listTools(),
+    error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT'
+  );
+  unsafeFixture.adapter.close();
+
+  const numericCredentialFixture = createFixture({
+    allowedTools: ['ScalarTool'],
+    key: '123',
+    manifests: [{
+      name: 'ScalarTool',
+      'x-json-scalars': { number: 123, boolean: true, nothing: null }
+    }]
+  });
+  assert.deepEqual(
+    (await numericCredentialFixture.adapter.listTools())
+      .tools[0].raw_manifest['x-json-scalars'],
+    { number: 123, boolean: true, nothing: null }
+  );
+  numericCredentialFixture.adapter.close();
+
+  for (const [scalarCredential, scalar] of [
+    ['123', 123],
+    ['true', true],
+    ['false', false],
+    ['null', null]
+  ]) {
+    const scalarFixture = createFixture({
+      allowedTools: ['ScalarTool'],
+      key: scalarCredential,
+      manifests: [{
+        name: 'ScalarTool',
+        'x-json-scalar': scalar
+      }]
+    });
+    assert.equal(
+      (await scalarFixture.adapter.listTools())
+        .tools[0].raw_manifest['x-json-scalar'],
+      scalar,
+      scalarCredential
+    );
+    scalarFixture.adapter.close();
+  }
+});
+
+test('single percent decoding preserves UTF-8 BOM bytes for credential matching', async () => {
+  const credential = '\uFEFFX';
+  const encodedCredential = '%EF%BB%BF%58';
+  const descriptiveFixture = createFixture({
+    allowedTools: ['BomTool'],
+    key: credential,
+    manifests: [{ name: 'BomTool', description: encodedCredential }]
+  });
+  assert.equal(
+    (await descriptiveFixture.adapter.listTools()).tools[0].description,
+    '[REDACTED]'
+  );
+  descriptiveFixture.adapter.close();
+
+  for (const manifest of [
+    { name: 'BomTool', 'x-future-contract': { value: encodedCredential } },
+    { name: 'BomTool', [encodedCredential]: 'safe-value' }
+  ]) {
+    const unsafeFixture = createFixture({
+      allowedTools: ['BomTool'],
+      key: credential,
+      manifests: [manifest]
+    });
+    await assert.rejects(
+      unsafeFixture.adapter.listTools(),
+      error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT'
+    );
+    unsafeFixture.adapter.close();
+  }
+});
+
+test('descriptive fields redact raw and single-percent representations exactly once', async () => {
+  const credential = 'Jazz';
+  const encodedUpper = '%4A%61%7A%7A';
+  const encodedLower = '%4a%61%7a%7a';
+  const encodedMixed = 'J%61z%7A';
+  const encodedAfterInvalidUtf8 = `%FF${encodedUpper}`;
+  const encodedAfterMalformed = `%ZZ${encodedLower}`;
+  const doubleEncoded = '%254A%2561%257A%257A';
+  const manifests = [{
+    name: 'RepresentationTool',
+    displayName: encodedUpper,
+    title: encodedLower,
+    description: `raw ${credential}`,
+    parameters: {
+      type: 'object',
+      properties: {
+        mixed: { type: 'string', description: encodedMixed },
+        invalid: { type: 'string', description: encodedAfterInvalidUtf8 },
+        malformed: { type: 'string', description: encodedAfterMalformed },
+        parsedUnicode: {
+          type: 'string',
+          description: JSON.parse('"\\u004a\\u0061\\u007a\\u007a"')
+        }
+      }
+    },
+    metadata: {
+      caseSensitive: 'jazz',
+      markerData: '[REDACTED]',
+      doubleEncoded,
+      base64Text: 'SmF6eg==',
+      hexadecimalText: '4a617a7a',
+      literalUnicodeEscape: '\\u004a\\u0061\\u007a\\u007a',
+      crossNode: ['Ja', 'zz']
+    }
+  }];
+  const fixture = createFixture({
+    allowedTools: ['RepresentationTool'],
+    key: credential,
+    manifests
+  });
+
+  const firstProjection = await fixture.adapter.listTools();
+  const tool = firstProjection.tools[0];
+  assert.equal(tool.display_name, '[REDACTED]');
+  assert.equal(tool.description, 'raw [REDACTED]');
+  assert.equal(tool.raw_manifest.title, '[REDACTED]');
+  assert.equal(tool.parameters.properties.mixed.description, '[REDACTED]');
+  assert.equal(tool.parameters.properties.invalid.description, '%FF[REDACTED]');
+  assert.equal(tool.parameters.properties.malformed.description, '%ZZ[REDACTED]');
+  assert.equal(tool.parameters.properties.parsedUnicode.description, '[REDACTED]');
+  assert.equal(tool.raw_manifest.metadata.caseSensitive, 'jazz');
+  assert.equal(tool.raw_manifest.metadata.markerData, '[REDACTED]');
+  assert.equal(tool.raw_manifest.metadata.doubleEncoded, doubleEncoded);
+  assert.equal(tool.raw_manifest.metadata.base64Text, 'SmF6eg==');
+  assert.equal(tool.raw_manifest.metadata.hexadecimalText, '4a617a7a');
+  assert.equal(
+    tool.raw_manifest.metadata.literalUnicodeEscape,
+    '\\u004a\\u0061\\u007a\\u007a'
+  );
+  assert.deepEqual(tool.raw_manifest.metadata.crossNode, ['Ja', 'zz']);
+  assert.deepEqual(await fixture.adapter.listTools(), firstProjection);
+  fixture.adapter.close();
+});
+
+test('identity, contract, invocation, and opaque credential collisions fail closed', async () => {
+  const cases = [
+    {
+      name: 'schema-property-name',
+      credential: 'SECRET',
+      manifest: {
+        name: 'ToolA',
+        parameters: {
+          type: 'object',
+          properties: { SECRET: { type: 'string' } }
+        }
+      }
+    },
+    {
+      name: 'manifest-version',
+      credential: 'SECRET',
+      manifest: { name: 'ToolA', manifestVersion: 'SECRET' }
+    },
+    {
+      name: 'config-schema-contract',
+      credential: 'SECRET',
+      manifest: {
+        name: 'ToolA',
+        configSchema: {
+          mode: { type: 'string', default: 'SECRET' }
+        }
+      }
+    },
+    {
+      name: 'manifest-name',
+      credential: 'ToolA',
+      manifest: { name: 'ToolA' }
+    },
+    {
+      name: 'unknown-key-percent-lower',
+      credential: 'Jazz',
+      manifest: { name: 'ToolA', '%4a%61%7a%7a': 'safe' }
+    },
+    {
+      name: 'unknown-nested-percent-mixed',
+      credential: 'Jazz',
+      manifest: {
+        name: 'ToolA',
+        'x-future-contract': { mode: 'J%61z%7A' }
+      }
+    },
+    {
+      name: 'unknown-description-is-not-descriptive',
+      credential: 'SECRET',
+      manifest: {
+        name: 'ToolA',
+        'x-future-contract': { description: 'SECRET' }
+      }
+    },
+    {
+      name: 'invocation-command',
+      credential: 'SECRET',
+      manifest: {
+        name: 'ToolA',
+        capabilities: { invocationCommands: ['run SECRET'] }
+      }
+    }
+  ];
+
+  for (const testCase of cases) {
+    const fixture = createFixture({
+      allowedTools: [testCase.manifest.name],
+      key: testCase.credential,
+      manifests: [testCase.manifest]
+    });
+    await assert.rejects(
+      fixture.adapter.listTools(),
+      error => {
+        assert.equal(error.code, 'VCP_MANIFEST_UNSAFE_TO_PROJECT');
+        assert.equal(error.message.includes(testCase.credential), false);
+        return true;
+      },
+      testCase.name
+    );
+    assert.equal(fixture.adapter.manifestsLoaded, false, testCase.name);
+    assert.deepEqual(fixture.adapter.latestTools, [], testCase.name);
+    fixture.adapter.close();
+  }
+});
+
+test('redaction marker collisions fail the entire manifest projection', async () => {
+  const fixture = createFixture({
+    allowedTools: ['ToolA'],
+    key: 'REDACTED',
+    manifests: [{ name: 'ToolA', description: 'credential REDACTED' }]
+  });
+  await assert.rejects(
+    fixture.adapter.listTools(),
+    error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT'
+  );
+  assert.equal(fixture.adapter.manifestsLoaded, false);
+  assert.deepEqual(fixture.adapter.latestTools, []);
+  fixture.adapter.close();
+});
+
+test('final egress assertion rejects a credential created by redaction boundaries', async () => {
+  const credential = 'x[REDACTED]y';
+  const encodedCredential = [...Buffer.from(credential, 'utf8')]
+    .map(byte => `%${byte.toString(16).padStart(2, '0')}`)
+    .join('');
+  const fixture = createFixture({
+    allowedTools: ['ToolA'],
+    key: credential,
+    manifests: [{
+      name: 'ToolA',
+      description: `x${encodedCredential}y`
+    }]
+  });
+  await assert.rejects(
+    fixture.adapter.listTools(),
+    error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT'
+  );
+  assert.equal(fixture.adapter.manifestsLoaded, false);
+  assert.deepEqual(fixture.adapter.latestTools, []);
+  fixture.adapter.close();
+});
+
+test('high-frequency descriptive matches are streamed and bounded during redaction', async () => {
+  const adjacentFixture = createFixture({
+    allowedTools: ['DenseTool'],
+    key: 'q',
+    manifests: [{
+      name: 'DenseTool',
+      description: 'q'.repeat(MAX_OUTPUT_PROJECTION_STRING_BYTES)
+    }]
+  });
+  assert.equal(
+    (await adjacentFixture.adapter.listTools()).tools[0].description,
+    '[REDACTED]'
+  );
+  adjacentFixture.adapter.close();
+
+  const percentFixture = createFixture({
+    allowedTools: ['DenseTool'],
+    key: 'q',
+    manifests: [{
+      name: 'DenseTool',
+      description: '%71'.repeat(Math.floor(MAX_OUTPUT_PROJECTION_STRING_BYTES / 3))
+    }]
+  });
+  assert.equal(
+    (await percentFixture.adapter.listTools()).tools[0].description,
+    '[REDACTED]'
+  );
+  percentFixture.adapter.close();
+
+  const alternatingFixture = createFixture({
+    allowedTools: ['DenseTool'],
+    key: 'q',
+    manifests: [{
+      name: 'DenseTool',
+      description: 'qx'.repeat(MAX_OUTPUT_PROJECTION_STRING_BYTES / 2)
+    }]
+  });
+  await assert.rejects(
+    alternatingFixture.adapter.listTools(),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  alternatingFixture.adapter.close();
+});
+
+test('one unsafe allowed manifest fails the cohort and clears a previously safe snapshot', async () => {
+  const credential = 'unsafe-contract-secret';
+  const fixture = createFixture({
+    allowedTools: ['SafeTool', 'UnsafeTool'],
+    key: credential,
+    manifests: [{ name: 'SafeTool', description: 'safe manifest' }]
+  });
+  assert.equal((await fixture.adapter.listTools()).tools.length, 1);
+  assert.equal(fixture.adapter.getStatus().protocol_ready, true);
+
+  fixture.bridge.manifests = [
+    { name: 'SafeTool', description: 'safe manifest' },
+    { name: 'UnsafeTool', manifestVersion: credential }
+  ];
+  await assert.rejects(
+    fixture.adapter.listTools(),
+    error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT'
+  );
+  assert.equal(fixture.adapter.manifestsLoaded, false);
+  assert.deepEqual(fixture.adapter.latestTools, []);
+  assert.equal(fixture.adapter.getStatus().protocol_ready, false);
+  assert.equal(fixture.adapter.getStatus().tools_discovered, 0);
+
+  fixture.bridge.manifests = [{ name: 'SafeTool', description: 'safe again' }];
+  assert.equal((await fixture.adapter.listTools()).tools.length, 1);
+  assert.equal(fixture.adapter.getStatus().protocol_ready, true);
+  fixture.adapter.close();
+});
+
+test('unsafe disallowed manifests do not change exact allowlist filtering', async () => {
+  const credential = 'unsafe-disallowed-secret';
+  const fixture = createFixture({
+    allowedTools: ['SafeTool'],
+    key: credential,
+    manifests: [
+      { name: 'SafeTool', description: 'safe manifest' },
+      { name: 'DisallowedTool', manifestVersion: credential }
+    ]
+  });
+  const listed = await fixture.adapter.listTools();
+  assert.deepEqual(listed.tools.map(tool => tool.name), ['SafeTool']);
+  fixture.adapter.close();
+});
+
+test('manifest traversal rejects non-JSON hooks without invoking them', () => {
+  let getterCalls = 0;
+  let toJSONCalls = 0;
+  const accessor = {};
+  Object.defineProperty(accessor, 'value', {
+    enumerable: true,
+    get() {
+      getterCalls += 1;
+      return 'unsafe';
+    }
+  });
+  const withAccessor = { name: 'HookTool', extension: accessor };
+  assert.throws(
+    () => projectToolList(
+      [{ name: 'HookTool', nativeManifest: withAccessor }],
+      { credential: 'credential', allowedTools: new Set(['HookTool']) }
+    ),
+    error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT'
+  );
+  assert.equal(getterCalls, 0);
+
+  const withExecutableToJSON = {
+    name: 'HookTool',
+    toJSON() {
+      toJSONCalls += 1;
+      return { name: 'HookTool' };
+    }
+  };
+  assert.throws(
+    () => projectToolList(
+      [{ name: 'HookTool', nativeManifest: withExecutableToJSON }],
+      { credential: 'credential', allowedTools: new Set(['HookTool']) }
+    ),
+    error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT'
+  );
+  assert.equal(toJSONCalls, 0);
+
+  const sparse = [];
+  sparse.length = 2;
+  sparse[1] = 'value';
+  assert.throws(
+    () => projectToolList(
+      [{
+        name: 'HookTool',
+        nativeManifest: { name: 'HookTool', extension: sparse }
+      }],
+      { credential: 'credential', allowedTools: new Set(['HookTool']) }
+    ),
+    error => error.code === 'VCP_MANIFEST_UNSAFE_TO_PROJECT'
+  );
 });
 
 test('schema semantic credential collisions fail closed without publishing a false manifest', async () => {
@@ -2213,6 +3355,264 @@ test('schema semantic credential collisions fail closed without publishing a fal
   }
 });
 
+test('manifest source and projected-output byte budgets are enforced independently', async () => {
+  const credential = 'source-secret';
+  const sourceHeavyProperties = {};
+  for (let index = 0; index < 4_000; index += 1) {
+    sourceHeavyProperties[`field-${index}`] = {
+      description: credential.repeat(100)
+    };
+  }
+  const sourceHeavyManifest = {
+    name: 'SourceBudgetTool',
+    parameters: {
+      type: 'object',
+      properties: sourceHeavyProperties
+    }
+  };
+  const sourceFixture = createFixture({
+    timeout: 5_000,
+    allowedTools: ['SourceBudgetTool'],
+    key: credential,
+    manifests: [sourceHeavyManifest]
+  });
+  assert.equal(
+    Buffer.byteLength(JSON.stringify(sourceHeavyManifest), 'utf8') >
+      MAX_OUTPUT_PROJECTION_TOTAL_BYTES,
+    true
+  );
+  await assert.rejects(
+    sourceFixture.adapter.listTools(),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  assert.deepEqual(sourceFixture.adapter.latestTools, []);
+  sourceFixture.adapter.close();
+
+  const repeatedContractValues = Array.from(
+    { length: 9 },
+    (_, index) => `${index}${'a'.repeat((240 * 1024) - 1)}`
+  );
+  const outputHeavyManifest = {
+    name: 'OutputBudgetTool',
+    parameters: {
+      type: 'string',
+      examples: repeatedContractValues
+    }
+  };
+  assert.equal(
+    Buffer.byteLength(JSON.stringify(outputHeavyManifest), 'utf8') <
+      MAX_OUTPUT_PROJECTION_TOTAL_BYTES,
+    true
+  );
+  const outputFixture = createFixture({
+    timeout: 5_000,
+    allowedTools: ['OutputBudgetTool'],
+    key: 'different-secret',
+    manifests: [outputHeavyManifest]
+  });
+  await assert.rejects(
+    outputFixture.adapter.listTools(),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  assert.deepEqual(outputFixture.adapter.latestTools, []);
+  outputFixture.adapter.close();
+
+  const wideFixture = createFixture({
+    timeout: 5_000,
+    allowedTools: ['WideTool'],
+    key: 'different-secret',
+    manifests: [{
+      name: 'WideTool',
+      'x-future-wide': Array.from(
+        { length: MAX_OUTPUT_PROJECTION_NODES + 1 },
+        () => true
+      )
+    }]
+  });
+  await assert.rejects(
+    wideFixture.adapter.listTools(),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  assert.deepEqual(wideFixture.adapter.latestTools, []);
+  wideFixture.adapter.close();
+});
+
+test('budgeted projection avoids full-width reflection materializers', () => {
+  const projectorSource = fs.readFileSync(
+    require.resolve('../src/vcp-adapter/VcpOutputProjection'),
+    'utf8'
+  );
+  const forbiddenMaterializers = [
+    /Object\.getOwnPropertyDescriptors\s*\(/u,
+    /Object\.(?:entries|keys|values|getOwnPropertyNames)\s*\(/u,
+    /Reflect\.ownKeys\s*\(/u
+  ];
+
+  for (const pattern of forbiddenMaterializers) {
+    assert.doesNotMatch(projectorSource, pattern);
+  }
+  assert.match(projectorSource, /function\s*\*\s*ownEnumerableKeyIterator/u);
+  assert.match(projectorSource, /Object\.getOwnPropertyDescriptor\s*\(/u);
+});
+
+test('100,000-key admitted manifest and PAYLOAD stop at the node gate before full-width descriptor reads', async () => {
+  const keyCount = 100_000;
+  const wideObject = createWideJsonObject(keyCount);
+  const wideNativeManifest = {
+    name: 'WideObjectTool',
+    'x-future-wide-object': wideObject
+  };
+  assert.equal(
+    Buffer.byteLength(JSON.stringify(wideNativeManifest), 'utf8') <
+      MAX_OUTPUT_PROJECTION_TOTAL_BYTES,
+    true
+  );
+
+  let projectedManifest;
+  const manifestObservation = captureOwnDescriptorReads(() => {
+    projectedManifest = projectToolList(asNativePlugins([wideNativeManifest]), {
+      credential: 'different-secret',
+      allowedTools: new Set(['WideObjectTool'])
+    });
+  });
+  assert.equal(projectedManifest, undefined);
+  assert.equal(manifestObservation.caughtError instanceof RangeError, false);
+  assert.equal(
+    manifestObservation.caughtError?.code,
+    'VCP_RESPONSE_TOO_COMPLEX'
+  );
+  assert.equal(
+    manifestObservation.descriptorReads <= MAX_OUTPUT_PROJECTION_NODES + 64,
+    true,
+    `manifest descriptor reads were ${manifestObservation.descriptorReads}`
+  );
+  assert.equal(manifestObservation.descriptorReads < keyCount, true);
+
+  let projectedExecution;
+  const payloadObservation = captureOwnDescriptorReads(() => {
+    projectedExecution = projectToolExecution({
+      request_id: 'wide-payload-request',
+      status: 'completed',
+      result: wideObject,
+      error: null
+    }, 'WideObjectTool', {
+      credential: 'different-secret'
+    });
+  });
+  assert.equal(projectedExecution, undefined);
+  assert.equal(payloadObservation.caughtError instanceof RangeError, false);
+  assert.equal(
+    payloadObservation.caughtError?.code,
+    'VCP_RESPONSE_TOO_COMPLEX'
+  );
+  assert.equal(
+    payloadObservation.descriptorReads <= MAX_OUTPUT_PROJECTION_NODES + 64,
+    true,
+    `PAYLOAD descriptor reads were ${payloadObservation.descriptorReads}`
+  );
+  assert.equal(payloadObservation.descriptorReads < keyCount, true);
+
+  let manifestFrameBytes = 0;
+  const manifestFixture = createFixture({
+    timeout: 5_000,
+    allowedTools: ['WideObjectTool'],
+    key: 'different-secret',
+    manifestResponseFactory(message) {
+      const response = {
+        type: 'vcp_manifest_response',
+        data: {
+          requestId: message.data.requestId,
+          manifestSurface: 'native-v1',
+          plugins: asNativePlugins([wideNativeManifest]),
+          vcpVersion: 'fake-1'
+        }
+      };
+      manifestFrameBytes = Buffer.byteLength(JSON.stringify(response), 'utf8');
+      return response;
+    }
+  });
+  await assert.rejects(
+    manifestFixture.adapter.listTools(),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  assert.equal(manifestFrameBytes <= MAX_VCP_INBOUND_FRAME_BYTES, true);
+  assert.deepEqual(manifestFixture.adapter.latestTools, []);
+  manifestFixture.adapter.close();
+
+  let payloadFrameBytes = 0;
+  const payloadFixture = createFixture({
+    timeout: 5_000,
+    allowedTools: ['WideObjectTool'],
+    key: 'different-secret',
+    executionResponseFactory(message) {
+      const response = {
+        type: 'vcp_tool_result',
+        data: {
+          requestId: message.data.requestId,
+          status: 'success',
+          result: wideObject
+        }
+      };
+      payloadFrameBytes = Buffer.byteLength(JSON.stringify(response), 'utf8');
+      return response;
+    }
+  });
+  await assert.rejects(
+    payloadFixture.adapter.executeTool({
+      tool_name: 'WideObjectTool',
+      tool_args: {},
+      request_id: 'wide-payload-admission'
+    }),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+  assert.equal(payloadFrameBytes <= MAX_VCP_INBOUND_FRAME_BYTES, true);
+  payloadFixture.adapter.close();
+});
+
+test('a many-key frame above 4 MiB is rejected before parsed traversal', async () => {
+  const oversizedManifest = { name: 'OversizedWireTool' };
+  for (let index = 0; index < 150_000; index += 1) {
+    oversizedManifest[`oversized_contract_field_${index}`] = true;
+  }
+  const frame = JSON.stringify({
+    type: 'vcp_manifest_response',
+    data: {
+      requestId: 'oversized-many-key-frame',
+      manifestSurface: 'native-v1',
+      plugins: asNativePlugins([oversizedManifest])
+    }
+  });
+  assert.equal(Buffer.byteLength(frame, 'utf8') > MAX_VCP_INBOUND_FRAME_BYTES, true);
+
+  const observed = await observeInboundFrame(frame);
+  assert.equal(observed.messageTextCalls, 0);
+  assert.equal(observed.jsonParseCalls, 0);
+  assert.deepEqual(observed.socket.closeCalls, [{
+    code: 1009,
+    reason: 'vcp_response_too_complex'
+  }]);
+});
+
+test('moderately wide plus over-depth manifest fails with the bounded complexity error', () => {
+  let deepValue = 'leaf';
+  for (let index = 0; index < MAX_OUTPUT_PROJECTION_DEPTH + 2; index += 1) {
+    deepValue = { nested: deepValue };
+  }
+  const wideAndDeep = createWideJsonObject(256);
+  wideAndDeep.deep = deepValue;
+
+  assert.throws(
+    () => projectToolList(asNativePlugins([{
+      name: 'WideDeepTool',
+      'x-future-wide-deep': wideAndDeep
+    }]), {
+      credential: 'different-secret',
+      allowedTools: new Set(['WideDeepTool'])
+    }),
+    error => error.code === 'VCP_RESPONSE_TOO_COMPLEX' && !(error instanceof RangeError)
+  );
+});
+
 test('single-string and aggregate UTF-8 output byte budgets fail with no partial result', async () => {
   const cases = [
     {
@@ -2333,7 +3733,7 @@ test('single-string and aggregate UTF-8 output byte budgets fail with no partial
     client: {
       key: 'synthetic-output-secret',
       async discoverManifests() {
-        return { plugins: manifests };
+        return { manifestSurface: 'native-v1', plugins: asNativePlugins(manifests) };
       },
       disconnect() {}
     },
@@ -2472,7 +3872,7 @@ test('deep Bridge manifests fail closed without publishing a partial tool list',
   const client = {
     key: 'synthetic-manifest-secret',
     async discoverManifests() {
-      return { plugins: manifests };
+      return { manifestSurface: 'native-v1', plugins: asNativePlugins(manifests) };
     },
     getStatus() {
       return {
@@ -2508,8 +3908,7 @@ test('deep Bridge manifests fail closed without publishing a partial tool list',
 test('server-side Bridge credentials and endpoint cannot be overridden or exposed', async () => {
   const manifests = [{
     name: 'ToolA',
-    description: `Synthetic manifest ${SYNTHETIC_BRIDGE_KEY}`,
-    metadata: { credentialEcho: SYNTHETIC_BRIDGE_KEY }
+    description: `Synthetic manifest ${SYNTHETIC_BRIDGE_KEY}`
   }];
   const { bridge, client, adapter } = createFixture({
     allowedTools: ['ToolA'],
@@ -2564,4 +3963,74 @@ test('connection failures redact configured Bridge credentials before reaching c
       !error.message.includes(SYNTHETIC_BRIDGE_KEY)
   );
   adapter.close();
+
+  const encodedCredential = [...Buffer.from(SYNTHETIC_BRIDGE_KEY, 'utf8')]
+    .map(byte => `%${byte.toString(16).padStart(2, '0')}`)
+    .join('');
+  class PercentThrowingWebSocket {
+    constructor() {
+      throw new Error(`Synthetic encoded setup failure ${encodedCredential}`);
+    }
+  }
+  for (const operation of ['list', 'execute']) {
+    const encodedAdapter = new VcpToolAdapter({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: SYNTHETIC_BRIDGE_KEY,
+      allowedTools: ['ToolA'],
+      requestTimeoutMs: 20,
+      WebSocketImpl: PercentThrowingWebSocket
+    });
+    await assert.rejects(
+      operation === 'list'
+        ? encodedAdapter.listTools()
+        : encodedAdapter.executeTool({
+            tool_name: 'ToolA',
+            tool_args: {},
+            request_id: 'encoded-connection-error'
+          }),
+      error => {
+        assert.equal(error.code, 'VCP_BRIDGE_CONNECTION_ERROR');
+        assert.equal(error.message.includes(encodedCredential), false);
+        assert.equal(error.stack.includes(encodedCredential), false);
+        assert.equal(error.message.includes(SYNTHETIC_BRIDGE_KEY), false);
+        return true;
+      },
+      operation
+    );
+    encodedAdapter.close();
+  }
+
+  const controlCredential = 'boundary\\nsecret';
+  class ControlThrowingWebSocket {
+    constructor() {
+      throw new Error('boundary\nsecret');
+    }
+  }
+  for (const operation of ['list', 'execute']) {
+    const controlAdapter = new VcpToolAdapter({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: controlCredential,
+      allowedTools: ['ToolA'],
+      requestTimeoutMs: 20,
+      WebSocketImpl: ControlThrowingWebSocket
+    });
+    await assert.rejects(
+      operation === 'list'
+        ? controlAdapter.listTools()
+        : controlAdapter.executeTool({
+            tool_name: 'ToolA',
+            tool_args: {},
+            request_id: 'control-connection-error'
+          }),
+      error => {
+        assert.equal(error.code, 'VCP_BRIDGE_CONNECTION_ERROR');
+        assert.equal(error.message.includes(controlCredential), false);
+        assert.equal(error.stack.includes(controlCredential), false);
+        assert.equal(error.message.includes('boundary\nsecret'), false);
+        return true;
+      },
+      operation
+    );
+    controlAdapter.close();
+  }
 });

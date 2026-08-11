@@ -13,6 +13,8 @@ const PROTOCOL = Object.freeze({
 });
 
 const TERMINAL_REQUEST_STATUSES = new Set(['completed', 'failed', 'timeout']);
+const MAX_VCP_INBOUND_FRAME_BYTES = 4 * 1024 * 1024;
+const OVERSIZED_FRAME_ERROR_MESSAGE = 'vcp_response_too_complex';
 
 class VcpToolBridgeClientError extends Error {
   constructor(message, code) {
@@ -41,6 +43,15 @@ function isTerminalRequestState(state) {
 
 function hasOwn(value, key) {
   return Object.prototype.hasOwnProperty.call(value, key);
+}
+
+function knownInboundFrameByteLength(data) {
+  if (typeof data === 'string') return Buffer.byteLength(data, 'utf8');
+  if (Buffer.isBuffer(data)) return data.byteLength;
+  if (data instanceof ArrayBuffer) return data.byteLength;
+  if (ArrayBuffer.isView(data)) return data.byteLength;
+  if (typeof Blob === 'function' && data instanceof Blob) return data.size;
+  return null;
 }
 
 function isNativeManifestResponseData(data) {
@@ -265,13 +276,17 @@ class VcpToolBridgeClient {
     }
   }
 
-  _handleDisconnect(reason, socket = this.socket) {
+  _handleDisconnect(
+    reason,
+    socket = this.socket,
+    errorCode = 'VCP_BRIDGE_DISCONNECTED'
+  ) {
     if (socket && this.socket !== socket) return;
     const wasRequested = this.disconnectRequested;
     this.connected = false;
     this.protocolReady = false;
     this.socket = null;
-    const error = new VcpToolBridgeClientError(reason, 'VCP_BRIDGE_DISCONNECTED');
+    const error = new VcpToolBridgeClientError(reason, errorCode);
     if (!wasRequested) this.lastError = reason;
     if (this.connectReject) this._settleConnect(error);
 
@@ -285,6 +300,22 @@ class VcpToolBridgeClient {
       pending.reject(error);
     }
     this.pending.clear();
+  }
+
+  _rejectOversizedInboundFrame(socket) {
+    if (socket && this.socket !== socket) return;
+    this._handleDisconnect(
+      OVERSIZED_FRAME_ERROR_MESSAGE,
+      socket,
+      'VCP_RESPONSE_TOO_COMPLEX'
+    );
+    if (socket?.readyState < 2) {
+      try {
+        socket.close(1009, OVERSIZED_FRAME_ERROR_MESSAGE);
+      } catch {
+        // The frame is already rejected and the socket has been detached.
+      }
+    }
   }
 
   async _messageText(data) {
@@ -309,6 +340,16 @@ class VcpToolBridgeClient {
 
   async _handleMessage(event, socket = this.socket) {
     if (socket && this.socket !== socket) return;
+    let preflightBytes;
+    try {
+      preflightBytes = knownInboundFrameByteLength(event?.data);
+    } catch {
+      preflightBytes = null;
+    }
+    if (preflightBytes !== null && preflightBytes > MAX_VCP_INBOUND_FRAME_BYTES) {
+      this._rejectOversizedInboundFrame(socket);
+      return;
+    }
     let text;
     try {
       text = await this._messageText(event?.data);
@@ -318,6 +359,10 @@ class VcpToolBridgeClient {
       return;
     }
     if (socket && this.socket !== socket) return;
+    if (Buffer.byteLength(text, 'utf8') > MAX_VCP_INBOUND_FRAME_BYTES) {
+      this._rejectOversizedInboundFrame(socket);
+      return;
+    }
 
     let message;
     try {
@@ -592,6 +637,7 @@ class VcpToolBridgeClient {
 }
 
 module.exports = {
+  MAX_VCP_INBOUND_FRAME_BYTES,
   PROTOCOL,
   VcpToolBridgeClient,
   VcpToolBridgeClientError,

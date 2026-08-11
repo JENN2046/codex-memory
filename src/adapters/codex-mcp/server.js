@@ -81,8 +81,12 @@ function projectGovernedMcpOutputValue(value) {
   return projected;
 }
 
-function formatToolResult(payload, isError = false) {
-  const projectedPayload = projectGovernedMcpOutputValue(payload);
+function formatToolResult(payload, isError = false, {
+  preserveProjectedPayload = false
+} = {}) {
+  const projectedPayload = preserveProjectedPayload
+    ? payload
+    : projectGovernedMcpOutputValue(payload);
   return {
     content: [
       {
@@ -1827,7 +1831,9 @@ class CodexMemoryMcpServer {
         const payload = await this.app.callTool(params.name, args, effectiveRequestContext.requestContext);
         const isError = payload?.decision === 'rejected';
         return {
-          response: jsonRpcSuccess(id, formatToolResult(payload, isError))
+          response: jsonRpcSuccess(id, formatToolResult(payload, isError, {
+            preserveProjectedPayload: params.name === 'list_vcp_tools'
+          }))
         };
       } catch (error) {
         if (error instanceof ToolArgumentValidationError) {

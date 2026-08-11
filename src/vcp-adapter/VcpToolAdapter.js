@@ -24,7 +24,6 @@ const VCP_ADAPTER_TOOL_NAMES = Object.freeze([
 const MAX_TOOL_NAME_LENGTH = 256;
 const MAX_REQUEST_ID_LENGTH = 128;
 const MAX_TOOL_ARGS_BYTES = 64 * 1024;
-const MAX_SAFE_ERROR_FRAGMENT_LENGTH = 512;
 const FORBIDDEN_JSON_KEYS = new Set(['__proto__', 'prototype', 'constructor']);
 const ERROR_CONTROL_CHARACTER_PATTERN = /[\u0000-\u001f\u007f]/gu;
 
@@ -97,11 +96,15 @@ function escapedControlCharacter(character) {
   return `\\u${character.charCodeAt(0).toString(16).padStart(4, '0')}`;
 }
 
-function safeErrorFragment(value, credential) {
-  const sanitized = redactCredentialText(value, credential)
+function sanitizeAdapterBoundaryError(error, credential) {
+  if (!(error instanceof Error)) return error;
+  const escapedMessage = redactCredentialText(error.message || 'vcp_adapter_error', credential)
     .replace(ERROR_CONTROL_CHARACTER_PATTERN, escapedControlCharacter);
-  if (sanitized.length <= MAX_SAFE_ERROR_FRAGMENT_LENGTH) return sanitized;
-  return `${sanitized.slice(0, MAX_SAFE_ERROR_FRAGMENT_LENGTH - 1)}…`;
+  const projectedMessage = redactCredentialText(escapedMessage, credential);
+  const safeMessage = projectedMessage || redactCredentialText('0', credential) || '0';
+  error.message = safeMessage;
+  error.stack = safeMessage;
+  return error;
 }
 
 function normalizeAllowedTools(value) {
@@ -141,7 +144,7 @@ function normalizeValidatedRequestId(value, { required = false } = {}) {
   return normalized;
 }
 
-function validateJsonValue(value, path, ancestors, credential) {
+function validateJsonValue(value, path, ancestors) {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return;
   if (typeof value === 'number') {
     if (Number.isFinite(value)) return;
@@ -161,7 +164,7 @@ function validateJsonValue(value, path, ancestors, credential) {
         if (!Object.prototype.hasOwnProperty.call(value, index)) {
           throw adapterError(`${path}[${index}] must be a JSON value`, 'VCP_TOOL_ARGS_INVALID');
         }
-        validateJsonValue(value[index], `${path}[${index}]`, ancestors, credential);
+        validateJsonValue(value[index], `${path}[${index}]`, ancestors);
       }
       const extraKeys = Reflect.ownKeys(value).filter(key => {
         if (key === 'length') return false;
@@ -182,15 +185,14 @@ function validateJsonValue(value, path, ancestors, credential) {
       if (typeof key !== 'string') {
         throw adapterError(`${path} must not contain symbol keys`, 'VCP_TOOL_ARGS_INVALID');
       }
-      const safeKey = safeErrorFragment(key, credential);
       if (FORBIDDEN_JSON_KEYS.has(key)) {
-        throw adapterError(`${path}.${safeKey} is not allowed`, 'VCP_TOOL_ARGS_UNSAFE');
+        throw adapterError(`${path}.[property] is not allowed`, 'VCP_TOOL_ARGS_UNSAFE');
       }
       const descriptor = descriptors[key];
       if (!Object.prototype.hasOwnProperty.call(descriptor, 'value')) {
-        throw adapterError(`${path}.${safeKey} must not use accessors`, 'VCP_TOOL_ARGS_INVALID');
+        throw adapterError(`${path}.[property] must not use accessors`, 'VCP_TOOL_ARGS_INVALID');
       }
-      validateJsonValue(descriptor.value, `${path}.${safeKey}`, ancestors, credential);
+      validateJsonValue(descriptor.value, `${path}.[property]`, ancestors);
     }
   } catch (error) {
     if (error instanceof VcpToolBridgeClientError) throw error;
@@ -200,7 +202,7 @@ function validateJsonValue(value, path, ancestors, credential) {
   }
 }
 
-function validateToolArgs(value, credential) {
+function validateToolArgs(value) {
   let prototype = null;
   try {
     prototype = value && typeof value === 'object'
@@ -212,7 +214,7 @@ function validateToolArgs(value, credential) {
   if (!isPlainObject(value) || (prototype !== Object.prototype && prototype !== null)) {
     throw adapterError('tool_args must be a plain JSON object', 'VCP_TOOL_ARGS_INVALID');
   }
-  validateJsonValue(value, 'tool_args', new Set(), credential);
+  validateJsonValue(value, 'tool_args', new Set());
 
   let serialized;
   try {
@@ -234,6 +236,7 @@ class VcpToolAdapter {
     this.allowedTools = normalizeAllowedTools(options.allowedTools);
     this.latestTools = [];
     this.manifestsLoaded = false;
+    this.manifestProjectionFailed = false;
   }
 
   _assertToolAllowed(toolName) {
@@ -247,36 +250,54 @@ class VcpToolAdapter {
 
   getStatus() {
     const clientStatus = this.client.getStatus();
-    return projectAdapterStatus(clientStatus, {
+    const publicClientStatus = this.manifestProjectionFailed
+      ? { ...clientStatus, protocol_ready: false }
+      : clientStatus;
+    return projectAdapterStatus(publicClientStatus, {
       credential: this.client?.key,
-      toolsDiscovered: this.manifestsLoaded
+      toolsDiscovered: this.manifestProjectionFailed
+        ? 0
+        : this.manifestsLoaded
         ? this.latestTools.length
         : clientStatus.tools_discovered
     });
   }
 
   async listTools() {
-    const discovered = await this.client.discoverManifests();
-    const projected = projectToolList(discovered.plugins, {
-      credential: this.client?.key,
-      allowedTools: this.allowedTools
-    });
-    this.latestTools = projected.tools;
-    this.manifestsLoaded = true;
-    return projected;
+    try {
+      const discovered = await this.client.discoverManifests({ manifestSurface: 'native-v1' });
+      const projected = projectToolList(discovered.plugins, {
+        credential: this.client?.key,
+        allowedTools: this.allowedTools
+      });
+      this.latestTools = projected.tools;
+      this.manifestsLoaded = true;
+      this.manifestProjectionFailed = false;
+      return projected;
+    } catch (error) {
+      this.latestTools = [];
+      this.manifestsLoaded = false;
+      this.manifestProjectionFailed = true;
+      throw sanitizeAdapterBoundaryError(error, this.client?.key);
+    }
   }
 
   async executeTool(args = {}) {
     const toolName = normalizeToolName(args.tool_name);
-    validateToolArgs(args.tool_args, this.client?.key);
+    validateToolArgs(args.tool_args);
     const requestId = normalizeValidatedRequestId(args.request_id);
     this._assertToolAllowed(toolName);
 
-    const state = await this.client.executeTool({
-      toolName,
-      toolArgs: args.tool_args,
-      requestId
-    });
+    let state;
+    try {
+      state = await this.client.executeTool({
+        toolName,
+        toolArgs: args.tool_args,
+        requestId
+      });
+    } catch (error) {
+      throw sanitizeAdapterBoundaryError(error, this.client?.key);
+    }
     return projectToolExecution(state, toolName, { credential: this.client?.key });
   }
 
@@ -293,7 +314,7 @@ class VcpToolAdapter {
     if (toolName === 'execute_vcp_tool') return this.executeTool(args);
     if (toolName === 'get_vcp_tool_status') return this.getToolStatus(args);
     throw new VcpToolBridgeClientError(
-      `Unknown VCP adapter tool: ${safeErrorFragment(toolName, this.client?.key)}`,
+      'Unknown VCP adapter tool',
       'VCP_ADAPTER_TOOL_UNKNOWN'
     );
   }
