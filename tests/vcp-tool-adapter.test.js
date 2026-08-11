@@ -25,8 +25,9 @@ const DEFAULT_FAKE_ALLOWED_TOOLS = Object.freeze([
 ]);
 
 class FakeVcpToolBridge {
-  constructor({ manifests } = {}) {
+  constructor({ manifests, manifestResponseFactory } = {}) {
     this.received = [];
+    this.manifestResponseFactory = manifestResponseFactory;
     this.manifests = manifests || [
       {
         name: 'ArbitraryWeatherTool',
@@ -101,14 +102,17 @@ class FakeVcpToolBridge {
   handle(socket, message) {
     this.received.push(message);
     if (message.type === 'get_vcp_manifests') {
-      this.respond(socket, {
-        type: 'vcp_manifest_response',
-        data: {
-          requestId: message.data.requestId,
-          plugins: this.manifests,
-          vcpVersion: 'fake-1'
-        }
-      });
+      const response = this.manifestResponseFactory
+        ? this.manifestResponseFactory(message)
+        : {
+            type: 'vcp_manifest_response',
+            data: {
+              requestId: message.data.requestId,
+              plugins: this.manifests,
+              vcpVersion: 'fake-1'
+            }
+          };
+      this.respond(socket, response);
       return;
     }
 
@@ -166,10 +170,11 @@ function createFixture({
   timeout = 40,
   allowedTools = DEFAULT_FAKE_ALLOWED_TOOLS,
   manifests,
+  manifestResponseFactory,
   key = SYNTHETIC_BRIDGE_KEY,
   requestIdFactory
 } = {}) {
-  const bridge = new FakeVcpToolBridge({ manifests });
+  const bridge = new FakeVcpToolBridge({ manifests, manifestResponseFactory });
   const generatedRequestIdFactory = requestIdFactory || (() => {
     let sequence = 0;
     return () => `adapter-request-${++sequence}`;
@@ -877,9 +882,539 @@ test('fake bridge connects and exposes arbitrary manifests without a second regi
   assert.deepEqual(listed.tools[0].invocation_commands, bridge.manifests[0].capabilities.invocationCommands);
   assert.equal(listed.tools[0].raw_manifest.extraField.preserved, true);
   assert.equal(bridge.received[0].type, 'get_vcp_manifests');
+  assert.equal(Object.hasOwn(bridge.received[0].data, 'manifestSurface'), false);
   assert.match(bridge.socket.url, /\/vcp-distributed-server\/VCP_Key=/u);
 
   adapter.close();
+});
+
+test('native-v1 transport requires the selector and preserves complete JSON manifest semantics', async () => {
+  const nativeManifest = JSON.parse(`{
+    "name": "FutureTool",
+    "parameters": {
+      "type": "object",
+      "properties": { "query": { "type": "string" } }
+    },
+    "parameterSchema": {
+      "type": "object",
+      "properties": {
+        "query": { "type": "string" },
+        "options": {
+          "type": "object",
+          "properties": { "mode": { "enum": ["one", "two"] } }
+        }
+      }
+    },
+    "inputSchema": {
+      "type": "object",
+      "required": ["query"]
+    },
+    "configSchema": { "enabled": { "type": "boolean" } },
+    "configSchemaDescriptions": { "enabled": "Synthetic flag" },
+    "defaults": { "enabled": true },
+    "x-future-extension": {
+      "nested": { "alpha": [1, true, null, "future-value"] }
+    },
+    "__proto__": {
+      "nested": [1, true, null, "proto-value"],
+      "fmsNativePrototypePollution": "data-only"
+    },
+    "constructor": { "nested": { "x": "constructor-value" } },
+    "prototype": ["prototype-value", 7],
+    "toJSON": { "kind": "plain-data" }
+  }`);
+  const futureOnlyNativeManifest = JSON.parse(`{
+    "name": "FutureOnlyTool",
+    "x-future-only": {
+      "opaque": [null, false, 2046, "preserved"]
+    }
+  }`);
+  const { bridge, client } = createFixture({
+    manifestResponseFactory: message => ({
+      type: 'vcp_manifest_response',
+      data: {
+        requestId: message.data.requestId,
+        manifestSurface: 'native-v1',
+        plugins: [
+          {
+            name: 'FutureTool',
+            displayName: 'Future Tool',
+            description: 'Synthetic native-v1 manifest',
+            version: '1.0.0',
+            capabilities: { invocationCommands: [{ command: 'Future' }] },
+            nativeManifest
+          },
+          {
+            name: 'FutureOnlyTool',
+            nativeManifest: futureOnlyNativeManifest
+          }
+        ],
+        vcpVersion: 'fake-native-v1'
+      }
+    })
+  });
+
+  const discovered = await client.discoverManifests({ manifestSurface: 'native-v1' });
+
+  assert.deepEqual(bridge.received[0], {
+    type: 'get_vcp_manifests',
+    data: {
+      manifestSurface: 'native-v1',
+      requestId: 'adapter-request-1'
+    }
+  });
+  assert.equal(discovered.manifestSurface, 'native-v1');
+  assert.equal(discovered.vcpVersion, 'fake-native-v1');
+  assert.deepEqual(discovered.plugins[0].nativeManifest, nativeManifest);
+  assert.deepEqual(discovered.plugins[1], {
+    name: 'FutureOnlyTool',
+    nativeManifest: futureOnlyNativeManifest
+  });
+  for (const key of ['__proto__', 'constructor', 'prototype', 'toJSON']) {
+    assert.equal(Object.hasOwn(discovered.plugins[0].nativeManifest, key), true);
+    assert.deepEqual(discovered.plugins[0].nativeManifest[key], nativeManifest[key]);
+  }
+  assert.equal(Object.getPrototypeOf(discovered.plugins[0].nativeManifest), Object.prototype);
+  assert.equal(Object.prototype.fmsNativePrototypePollution, undefined);
+  assert.equal(Array.prototype.fmsNativePrototypePollution, undefined);
+  client.disconnect();
+});
+
+test('native-v1 transport fails closed on incompatible or incomplete Bridge responses', async t => {
+  const completeNativePlugin = {
+    name: 'SyntheticNativeTool',
+    nativeManifest: {
+      name: 'SyntheticNativeTool',
+      'x-future-extension': { preserved: true }
+    }
+  };
+  const scenarios = [
+    {
+      name: 'old Bridge response has neither marker nor native manifest',
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: { requestId, plugins: [{ name: 'LegacyTool' }] }
+      })
+    },
+    {
+      name: 'marker is missing even when nativeManifest is present',
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: { requestId, plugins: [completeNativePlugin] }
+      })
+    },
+    ...['legacy-v1', 'native-v2'].map(manifestSurface => ({
+      name: `wrong surface ${manifestSurface}`,
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: { requestId, manifestSurface, plugins: [completeNativePlugin] }
+      })
+    })),
+    {
+      name: 'response type is not vcp_manifest_response',
+      response: requestId => ({
+        type: 'vcp_tool_result',
+        data: { requestId, status: 'success', result: { plugins: [completeNativePlugin] } }
+      })
+    },
+    {
+      name: 'native-v1 marker is present but nativeManifest is missing',
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: {
+          requestId,
+          manifestSurface: 'native-v1',
+          plugins: [{ name: 'MissingNativeManifestTool' }]
+        }
+      })
+    },
+    {
+      name: 'declared native-v1 producer errors cannot become successful empty discovery',
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: {
+          requestId,
+          manifestSurface: 'native-v1',
+          status: 'error',
+          error: 'SYNTHETIC_NATIVE_ERROR_SENTINEL',
+          plugins: []
+        }
+      })
+    },
+    {
+      name: 'empty native manifest authority is rejected',
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: {
+          requestId,
+          manifestSurface: 'native-v1',
+          plugins: [{ name: 'EmptyAuthorityTool', nativeManifest: {} }]
+        }
+      })
+    },
+    {
+      name: 'compatibility identity must match native manifest authority',
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: {
+          requestId,
+          manifestSurface: 'native-v1',
+          plugins: [{ name: 'WrapperTool', nativeManifest: { name: 'DifferentTool' } }]
+        }
+      })
+    },
+    {
+      name: 'one incomplete plugin rejects the entire response',
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: {
+          requestId,
+          manifestSurface: 'native-v1',
+          plugins: [completeNativePlugin, { name: 'IncompleteTool' }]
+        }
+      })
+    },
+    {
+      name: 'plugins must be an array',
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: { requestId, manifestSurface: 'native-v1', plugins: null }
+      })
+    },
+    {
+      name: 'nativeManifest must be a JSON object container',
+      response: requestId => ({
+        type: 'vcp_manifest_response',
+        data: {
+          requestId,
+          manifestSurface: 'native-v1',
+          plugins: [{ name: 'InvalidNativeManifestTool', nativeManifest: [] }]
+        }
+      })
+    }
+  ];
+
+  for (const scenario of scenarios) {
+    await t.test(scenario.name, async () => {
+      const { client } = createFixture({
+        manifestResponseFactory: message => scenario.response(message.data.requestId)
+      });
+      await assert.rejects(
+        client.discoverManifests({ manifestSurface: 'native-v1' }),
+        error => error.code === 'VCP_NATIVE_MANIFEST_SURFACE_UNAVAILABLE'
+      );
+      const state = client.getRequestStatus('adapter-request-1');
+      assert.equal(state.status, 'failed');
+      assert.equal(state.error, 'vcp_native_manifest_surface_unavailable');
+      assert.equal(state.result, null);
+      assert.equal(client.getStatus().protocol_ready, false);
+      assert.equal(client.getStatus().tools_discovered, 0);
+      assert.equal(JSON.stringify(client.getStatus()).includes('SYNTHETIC_NATIVE_ERROR_SENTINEL'), false);
+      client.disconnect();
+    });
+  }
+});
+
+test('manifest responses only settle active manifest requests with an exact requestId', async t => {
+  const validNativeData = requestId => ({
+    requestId,
+    manifestSurface: 'native-v1',
+    plugins: [{ name: 'CorrelatedTool', nativeManifest: { name: 'CorrelatedTool' } }]
+  });
+
+  await t.test('an unrelated request id cannot activate discovery', async () => {
+    const harness = createConnectHarness(socket => socket.acknowledge());
+    const client = new VcpToolBridgeClient({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: SYNTHETIC_BRIDGE_KEY,
+      requestTimeoutMs: 100,
+      WebSocketImpl: harness.WebSocket,
+      requestIdFactory: () => 'native-active-request'
+    });
+    await client.connect();
+    const discovery = client.discoverManifests({ manifestSurface: 'native-v1' });
+    await nextTurn();
+    const socket = harness.sockets[0];
+    socket.emit('message', {
+      data: bridgeMessage('vcp_manifest_response', {
+        requestId: 'unrelated-request',
+        plugins: [{ name: 'InjectedLegacyTool' }]
+      })
+    });
+    await nextTurn();
+
+    assert.equal(client.getRequestStatus('native-active-request').status, 'running');
+    assert.equal(client.getStatus().protocol_ready, false);
+    assert.equal(client.getStatus().tools_discovered, 0);
+
+    socket.emit('message', {
+      data: bridgeMessage('vcp_manifest_response', validNativeData('native-active-request'))
+    });
+    const discovered = await discovery;
+    assert.equal(discovered.plugins[0].name, 'CorrelatedTool');
+    client.disconnect();
+  });
+
+  await t.test('job and task aliases cannot substitute for manifest requestId', async () => {
+    const harness = createConnectHarness(socket => socket.acknowledge());
+    const client = new VcpToolBridgeClient({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: SYNTHETIC_BRIDGE_KEY,
+      requestTimeoutMs: 100,
+      WebSocketImpl: harness.WebSocket,
+      requestIdFactory: () => 'native-exact-correlation'
+    });
+    await client.connect();
+    const discovery = client.discoverManifests({ manifestSurface: 'native-v1' });
+    await nextTurn();
+    const socket = harness.sockets[0];
+    socket.emit('message', {
+      data: bridgeMessage('vcp_manifest_response', {
+        ...validNativeData(undefined),
+        requestId: undefined,
+        job_id: 'native-exact-correlation'
+      })
+    });
+    await nextTurn();
+
+    assert.equal(client.getRequestStatus('native-exact-correlation').status, 'running');
+    assert.equal(client.getStatus().protocol_ready, false);
+
+    socket.emit('message', {
+      data: bridgeMessage('vcp_manifest_response', validNativeData('native-exact-correlation'))
+    });
+    await discovery;
+    client.disconnect();
+  });
+
+  await t.test('manifest requestId echo is matched without trimming', async () => {
+    const harness = createConnectHarness(socket => socket.acknowledge());
+    const client = new VcpToolBridgeClient({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: SYNTHETIC_BRIDGE_KEY,
+      requestTimeoutMs: 100,
+      WebSocketImpl: harness.WebSocket,
+      requestIdFactory: () => 'native-exact-whitespace'
+    });
+    await client.connect();
+    const discovery = client.discoverManifests({ manifestSurface: 'native-v1' });
+    await nextTurn();
+    const socket = harness.sockets[0];
+    socket.emit('message', {
+      data: bridgeMessage(
+        'vcp_manifest_response',
+        validNativeData(' native-exact-whitespace ')
+      )
+    });
+    await nextTurn();
+
+    assert.equal(client.getRequestStatus('native-exact-whitespace').status, 'running');
+    assert.equal(client.getStatus().protocol_ready, false);
+
+    socket.emit('message', {
+      data: bridgeMessage('vcp_manifest_response', validNativeData('native-exact-whitespace'))
+    });
+    await discovery;
+    client.disconnect();
+  });
+
+  await t.test('a manifest frame cannot complete an execute request', async () => {
+    const harness = createConnectHarness(socket => socket.acknowledge());
+    const client = new VcpToolBridgeClient({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: SYNTHETIC_BRIDGE_KEY,
+      requestTimeoutMs: 100,
+      WebSocketImpl: harness.WebSocket
+    });
+    await client.connect();
+    const execution = client.executeTool({
+      toolName: 'CorrelationTool',
+      toolArgs: {},
+      requestId: 'execute-correlation-request'
+    });
+    await nextTurn();
+    const socket = harness.sockets[0];
+    socket.emit('message', {
+      data: bridgeMessage(
+        'vcp_manifest_response',
+        validNativeData('execute-correlation-request')
+      )
+    });
+    await nextTurn();
+
+    assert.equal(client.getRequestStatus('execute-correlation-request').status, 'running');
+    assert.equal(client.getStatus().protocol_ready, false);
+    assert.equal(client.getStatus().tools_discovered, 0);
+
+    socket.emit('message', {
+      data: bridgeMessage('vcp_tool_result', {
+        requestId: 'execute-correlation-request',
+        status: 'success',
+        result: { executed: true }
+      })
+    });
+    const completed = await execution;
+    assert.equal(completed.status, 'completed');
+    client.disconnect();
+  });
+});
+
+test('terminal native-v1 requests ignore late manifest frames and failed refreshes clear readiness', async t => {
+  const validResponse = requestId => bridgeMessage('vcp_manifest_response', {
+    requestId,
+    manifestSurface: 'native-v1',
+    plugins: [{ name: 'LateTool', nativeManifest: { name: 'LateTool' } }]
+  });
+
+  await t.test('a late response cannot revive a timed-out manifest request', async () => {
+    const harness = createConnectHarness(socket => socket.acknowledge());
+    const client = new VcpToolBridgeClient({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: SYNTHETIC_BRIDGE_KEY,
+      requestTimeoutMs: 10,
+      WebSocketImpl: harness.WebSocket,
+      requestIdFactory: () => 'native-timeout-request'
+    });
+    await client.connect();
+    await assert.rejects(
+      client.discoverManifests({ manifestSurface: 'native-v1' }),
+      error => error.code === 'VCP_REQUEST_TIMEOUT'
+    );
+    const socket = harness.sockets[0];
+    socket.emit('message', { data: validResponse('native-timeout-request') });
+    await nextTurn();
+
+    assert.equal(client.getRequestStatus('native-timeout-request').status, 'timeout');
+    assert.equal(client.getStatus().protocol_ready, false);
+    assert.equal(client.getStatus().tools_discovered, 0);
+    client.disconnect();
+  });
+
+  await t.test('a late response cannot revive a failed manifest request', async () => {
+    const harness = createConnectHarness(socket => socket.acknowledge());
+    const client = new VcpToolBridgeClient({
+      bridgeUrl: 'ws://127.0.0.1:1',
+      key: SYNTHETIC_BRIDGE_KEY,
+      requestTimeoutMs: 100,
+      WebSocketImpl: harness.WebSocket,
+      requestIdFactory: () => 'native-failed-request'
+    });
+    await client.connect();
+    const discovery = client.discoverManifests({ manifestSurface: 'native-v1' });
+    await nextTurn();
+    const socket = harness.sockets[0];
+    socket.emit('message', {
+      data: bridgeMessage('vcp_manifest_response', {
+        requestId: 'native-failed-request',
+        plugins: [{ name: 'LegacyTool' }]
+      })
+    });
+    await assert.rejects(
+      discovery,
+      error => error.code === 'VCP_NATIVE_MANIFEST_SURFACE_UNAVAILABLE'
+    );
+    socket.emit('message', { data: validResponse('native-failed-request') });
+    await nextTurn();
+
+    assert.equal(client.getRequestStatus('native-failed-request').status, 'failed');
+    assert.equal(client.getStatus().bridge_enabled, false);
+    assert.equal(client.getStatus().protocol_ready, false);
+    assert.equal(client.getStatus().tools_discovered, 0);
+    client.disconnect();
+  });
+
+  await t.test('a failed refresh clears prior native-v1 readiness', async () => {
+    let responseCount = 0;
+    const { client } = createFixture({
+      manifestResponseFactory: message => {
+        responseCount += 1;
+        if (responseCount === 1) {
+          return {
+            type: 'vcp_manifest_response',
+            data: {
+              requestId: message.data.requestId,
+              manifestSurface: 'native-v1',
+              plugins: [
+                { name: 'FirstTool', nativeManifest: { name: 'FirstTool' } },
+                { name: 'SecondTool', nativeManifest: { name: 'SecondTool' } }
+              ]
+            }
+          };
+        }
+        return {
+          type: 'vcp_manifest_response',
+          data: {
+            requestId: message.data.requestId,
+            plugins: [{ name: 'LegacyFallbackTool' }]
+          }
+        };
+      }
+    });
+
+    await client.discoverManifests({ manifestSurface: 'native-v1' });
+    assert.equal(client.getStatus().protocol_ready, true);
+    assert.equal(client.getStatus().tools_discovered, 2);
+
+    await assert.rejects(
+      client.discoverManifests({ manifestSurface: 'native-v1' }),
+      error => error.code === 'VCP_NATIVE_MANIFEST_SURFACE_UNAVAILABLE'
+    );
+    assert.equal(client.getStatus().bridge_enabled, false);
+    assert.equal(client.getStatus().protocol_ready, false);
+    assert.equal(client.getStatus().tools_discovered, 0);
+    client.disconnect();
+  });
+
+  await t.test('an uncorrelated refresh timeout clears prior native-v1 readiness', async () => {
+    let responseCount = 0;
+    const { client } = createFixture({
+      timeout: 15,
+      manifestResponseFactory: message => {
+        responseCount += 1;
+        if (responseCount === 1) {
+          return {
+            type: 'vcp_manifest_response',
+            data: {
+              requestId: message.data.requestId,
+              manifestSurface: 'native-v1',
+              plugins: [{ name: 'ReadyTool', nativeManifest: { name: 'ReadyTool' } }]
+            }
+          };
+        }
+        return {
+          type: 'vcp_manifest_response',
+          data: {
+            job_id: message.data.requestId,
+            manifestSurface: 'native-v1',
+            plugins: [{ name: 'UncorrelatedTool', nativeManifest: { name: 'UncorrelatedTool' } }]
+          }
+        };
+      }
+    });
+
+    await client.discoverManifests({ manifestSurface: 'native-v1' });
+    assert.equal(client.getStatus().protocol_ready, true);
+    assert.equal(client.getStatus().tools_discovered, 1);
+
+    await assert.rejects(
+      client.discoverManifests({ manifestSurface: 'native-v1' }),
+      error => error.code === 'VCP_REQUEST_TIMEOUT'
+    );
+    assert.equal(client.getStatus().bridge_enabled, false);
+    assert.equal(client.getStatus().protocol_ready, false);
+    assert.equal(client.getStatus().tools_discovered, 0);
+    client.disconnect();
+  });
+});
+
+test('unsupported requested manifest surfaces do not retry or fall back to legacy discovery', async () => {
+  const { bridge, client } = createFixture();
+  await assert.rejects(
+    client.discoverManifests({ manifestSurface: 'native-v2' }),
+    error => error.code === 'VCP_NATIVE_MANIFEST_SURFACE_UNAVAILABLE'
+  );
+  assert.equal(bridge.received.length, 0);
+  assert.equal(client.socket, null);
 });
 
 test('generic execution forwards arbitrary tool names, JSON arguments, and request ids', async () => {
