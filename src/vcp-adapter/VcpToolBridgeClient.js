@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const PROTOCOL = Object.freeze({
   manifestRequestType: 'get_vcp_manifests',
   manifestResponseType: 'vcp_manifest_response',
+  nativeManifestSurface: 'native-v1',
   executeRequestType: 'execute_vcp_tool',
   resultMessageType: 'vcp_tool_result',
   statusMessageTypes: Object.freeze(['vcp_tool_status']),
@@ -12,6 +13,8 @@ const PROTOCOL = Object.freeze({
 });
 
 const TERMINAL_REQUEST_STATUSES = new Set(['completed', 'failed', 'timeout']);
+const MAX_VCP_INBOUND_FRAME_BYTES = 4 * 1024 * 1024;
+const OVERSIZED_FRAME_ERROR_MESSAGE = 'vcp_response_too_complex';
 
 class VcpToolBridgeClientError extends Error {
   constructor(message, code) {
@@ -36,6 +39,35 @@ function normalizeRequestId(value) {
 
 function isTerminalRequestState(state) {
   return Boolean(state && TERMINAL_REQUEST_STATUSES.has(state.status));
+}
+
+function hasOwn(value, key) {
+  return Object.prototype.hasOwnProperty.call(value, key);
+}
+
+function knownInboundFrameByteLength(data) {
+  if (typeof data === 'string') return Buffer.byteLength(data, 'utf8');
+  if (Buffer.isBuffer(data)) return data.byteLength;
+  if (data instanceof ArrayBuffer) return data.byteLength;
+  if (ArrayBuffer.isView(data)) return data.byteLength;
+  if (typeof Blob === 'function' && data instanceof Blob) return data.size;
+  return null;
+}
+
+function isNativeManifestResponseData(data) {
+  if (!isPlainObject(data) || data.manifestSurface !== PROTOCOL.nativeManifestSurface) {
+    return false;
+  }
+  if (data.status === 'error' || hasOwn(data, 'error')) return false;
+  if (!Array.isArray(data.plugins)) return false;
+  return data.plugins.every(plugin => (
+    isPlainObject(plugin) &&
+    typeof plugin.name === 'string' &&
+    plugin.name.length > 0 &&
+    hasOwn(plugin, 'nativeManifest') &&
+    isPlainObject(plugin.nativeManifest) &&
+    plugin.nativeManifest.name === plugin.name
+  ));
 }
 
 function publicRequestState(state) {
@@ -244,13 +276,17 @@ class VcpToolBridgeClient {
     }
   }
 
-  _handleDisconnect(reason, socket = this.socket) {
+  _handleDisconnect(
+    reason,
+    socket = this.socket,
+    errorCode = 'VCP_BRIDGE_DISCONNECTED'
+  ) {
     if (socket && this.socket !== socket) return;
     const wasRequested = this.disconnectRequested;
     this.connected = false;
     this.protocolReady = false;
     this.socket = null;
-    const error = new VcpToolBridgeClientError(reason, 'VCP_BRIDGE_DISCONNECTED');
+    const error = new VcpToolBridgeClientError(reason, errorCode);
     if (!wasRequested) this.lastError = reason;
     if (this.connectReject) this._settleConnect(error);
 
@@ -264,6 +300,22 @@ class VcpToolBridgeClient {
       pending.reject(error);
     }
     this.pending.clear();
+  }
+
+  _rejectOversizedInboundFrame(socket) {
+    if (socket && this.socket !== socket) return;
+    this._handleDisconnect(
+      OVERSIZED_FRAME_ERROR_MESSAGE,
+      socket,
+      'VCP_RESPONSE_TOO_COMPLEX'
+    );
+    if (socket?.readyState < 2) {
+      try {
+        socket.close(1009, OVERSIZED_FRAME_ERROR_MESSAGE);
+      } catch {
+        // The frame is already rejected and the socket has been detached.
+      }
+    }
   }
 
   async _messageText(data) {
@@ -288,6 +340,16 @@ class VcpToolBridgeClient {
 
   async _handleMessage(event, socket = this.socket) {
     if (socket && this.socket !== socket) return;
+    let preflightBytes;
+    try {
+      preflightBytes = knownInboundFrameByteLength(event?.data);
+    } catch {
+      preflightBytes = null;
+    }
+    if (preflightBytes !== null && preflightBytes > MAX_VCP_INBOUND_FRAME_BYTES) {
+      this._rejectOversizedInboundFrame(socket);
+      return;
+    }
     let text;
     try {
       text = await this._messageText(event?.data);
@@ -297,6 +359,10 @@ class VcpToolBridgeClient {
       return;
     }
     if (socket && this.socket !== socket) return;
+    if (Buffer.byteLength(text, 'utf8') > MAX_VCP_INBOUND_FRAME_BYTES) {
+      this._rejectOversizedInboundFrame(socket);
+      return;
+    }
 
     let message;
     try {
@@ -313,12 +379,28 @@ class VcpToolBridgeClient {
       return;
     }
 
-    const bridgeRequestId = normalizeRequestId(
-      message?.data?.requestId ?? message?.data?.job_id ?? message?.data?.taskId
+    const rawRequestId = message?.data?.requestId;
+    const directRequestId = message.type === PROTOCOL.manifestResponseType
+      ? (typeof rawRequestId === 'string' && rawRequestId.length > 0 ? rawRequestId : null)
+      : normalizeRequestId(rawRequestId);
+    const bridgeRequestId = directRequestId || normalizeRequestId(
+      message?.data?.job_id ?? message?.data?.taskId
     );
     if (!bridgeRequestId) return;
-    const requestId = this.bridgeRequestAliases.get(bridgeRequestId) || bridgeRequestId;
+    const requestId = message.type === PROTOCOL.manifestResponseType
+      ? directRequestId
+      : this.bridgeRequestAliases.get(bridgeRequestId) || bridgeRequestId;
+    if (!requestId) return;
     const state = this.requestStates.get(requestId);
+
+    if (
+      state?.kind === 'manifest' &&
+      state.manifestSurface === PROTOCOL.nativeManifestSurface &&
+      message.type !== PROTOCOL.manifestResponseType
+    ) {
+      this._failNativeManifestRequest(requestId, state);
+      return;
+    }
 
     if (PROTOCOL.statusMessageTypes.includes(message.type)) {
       if (state && !isTerminalRequestState(state)) {
@@ -329,6 +411,14 @@ class VcpToolBridgeClient {
     }
 
     if (message.type === PROTOCOL.manifestResponseType) {
+      if (!state || state.kind !== 'manifest' || isTerminalRequestState(state)) return;
+      if (
+        state?.manifestSurface === PROTOCOL.nativeManifestSurface &&
+        !isNativeManifestResponseData(message.data)
+      ) {
+        this._failNativeManifestRequest(requestId, state);
+        return;
+      }
       const plugins = Array.isArray(message.data?.plugins) ? message.data.plugins : [];
       this.bridgeEnabled = true;
       this.protocolReady = true;
@@ -393,7 +483,33 @@ class VcpToolBridgeClient {
     pending.reject(error);
   }
 
-  async _request(type, data = {}, { requestId, kind, toolName = null } = {}) {
+  _failNativeManifestRequest(requestId, state) {
+    if (isTerminalRequestState(state)) return;
+    const message = 'vcp_native_manifest_surface_unavailable';
+    const error = new VcpToolBridgeClientError(
+      message,
+      'VCP_NATIVE_MANIFEST_SURFACE_UNAVAILABLE'
+    );
+    if (state) {
+      state.status = 'failed';
+      state.error = message;
+    }
+    this._clearNativeManifestReadiness();
+    this.lastError = message;
+    this._rejectPending(requestId, error);
+  }
+
+  _clearNativeManifestReadiness() {
+    this.bridgeEnabled = false;
+    this.protocolReady = false;
+    this.toolsDiscovered = 0;
+  }
+
+  async _request(
+    type,
+    data = {},
+    { requestId, kind, toolName = null, manifestSurface = null } = {}
+  ) {
     await this.connect();
     const normalizedRequestId = normalizeRequestId(requestId) || this.requestIdFactory();
     if (this.requestStates.has(normalizedRequestId)) {
@@ -404,6 +520,7 @@ class VcpToolBridgeClient {
       requestId: normalizedRequestId,
       kind,
       toolName,
+      manifestSurface,
       status: 'running',
       progress: null,
       result: null,
@@ -443,12 +560,36 @@ class VcpToolBridgeClient {
     return promise;
   }
 
-  async discoverManifests() {
-    const data = await this._request(PROTOCOL.manifestRequestType, {}, { kind: 'manifest' });
-    return {
+  async discoverManifests(options = {}) {
+    const manifestSurface = options?.manifestSurface ?? null;
+    if (manifestSurface !== null && manifestSurface !== PROTOCOL.nativeManifestSurface) {
+      throw new VcpToolBridgeClientError(
+        'vcp_native_manifest_surface_unavailable',
+        'VCP_NATIVE_MANIFEST_SURFACE_UNAVAILABLE'
+      );
+    }
+
+    const nativeV1Requested = manifestSurface === PROTOCOL.nativeManifestSurface;
+    let data;
+    try {
+      data = await this._request(
+        PROTOCOL.manifestRequestType,
+        nativeV1Requested ? { manifestSurface: PROTOCOL.nativeManifestSurface } : {},
+        {
+          kind: 'manifest',
+          manifestSurface: nativeV1Requested ? PROTOCOL.nativeManifestSurface : null
+        }
+      );
+    } catch (error) {
+      if (nativeV1Requested) this._clearNativeManifestReadiness();
+      throw error;
+    }
+    const result = {
       plugins: Array.isArray(data?.plugins) ? data.plugins : [],
       vcpVersion: data?.vcpVersion ?? null
     };
+    if (nativeV1Requested) result.manifestSurface = PROTOCOL.nativeManifestSurface;
+    return result;
   }
 
   async executeTool({ toolName, toolArgs, requestId } = {}) {
@@ -496,6 +637,7 @@ class VcpToolBridgeClient {
 }
 
 module.exports = {
+  MAX_VCP_INBOUND_FRAME_BYTES,
   PROTOCOL,
   VcpToolBridgeClient,
   VcpToolBridgeClientError,

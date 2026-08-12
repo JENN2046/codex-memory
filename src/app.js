@@ -2384,6 +2384,7 @@ function createCodexMemoryApplication(overrides = {}) {
           bridgeUrl: config.vcpAdapter.bridgeUrl,
           key: config.vcpAdapter.key,
           requestTimeoutMs: config.vcpAdapter.requestTimeoutMs,
+          allowedTools: config.vcpAdapter.allowedTools,
           WebSocketImpl: overrides.vcpAdapterWebSocketImpl
         })
       : null
