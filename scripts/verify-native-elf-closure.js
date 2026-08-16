@@ -72,7 +72,9 @@ function nativeFiles(root) {
         try { target = fs.statSync(file); } catch {
           fail('runtime_native_closure_symlink_forbidden');
         }
-        if (target.isDirectory() || name.endsWith('.node') || name.endsWith('.so')) {
+        const isNpmBinLink = file.includes(`${path.sep}node_modules${path.sep}.bin${path.sep}`);
+        if (target.isDirectory() || !isNpmBinLink || name.endsWith('.node') ||
+            name.includes('.so')) {
           fail('runtime_native_closure_symlink_forbidden');
         }
         // npm creates executable JS links under node_modules/.bin. They are
@@ -91,7 +93,7 @@ function nativeFiles(root) {
       }
     }
   };
-  for (const relative of ['opt/codex-memory', 'opt/vcptoolbox']) {
+  for (const relative of ['opt/codex-memory', 'opt/codex-memory-runtime', 'opt/vcptoolbox']) {
     const directory = path.join(root, relative);
     if (fs.existsSync(directory)) visit(directory);
   }

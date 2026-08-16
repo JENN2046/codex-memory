@@ -64,7 +64,12 @@ function preflightTarDescriptor(descriptor, size, fsModule = fs) {
       return true;
     }
     const contentBytes = memberSize(header);
-    position += 512 + Math.ceil(contentBytes / 512) * 512;
+    const padding = (512 - (contentBytes % 512)) % 512;
+    const paddingStart = position + 512 + contentBytes;
+    if (padding > 0 && !readAt(paddingStart, padding).every(byte => byte === 0)) {
+      fail('runtime_oci_archive_padding_invalid');
+    }
+    position += 512 + contentBytes + padding;
     entries += 1;
     if (position > size || entries > 4096) fail('runtime_oci_archive_structure_invalid');
   }
@@ -79,6 +84,9 @@ function readBoundedArchive(archive, fsModule = fs) {
     const before = fsModule.fstatSync(descriptor);
     if (!before.isFile() || before.size < 1024 ||
         before.size > MAXIMUM_OCI_ARCHIVE_BYTES) fail('runtime_oci_archive_size_invalid');
+    if (!Number.isSafeInteger(before.blocks) || before.blocks * 512 < before.size) {
+      fail('runtime_oci_archive_sparse_forbidden');
+    }
     preflightTarDescriptor(descriptor, before.size, fsModule);
     const buffer = fsModule.readFileSync(descriptor);
     const after = fsModule.fstatSync(descriptor);
@@ -165,6 +173,14 @@ function inspectOciArchive(archive, { fsModule = fs } = {}) {
       } catch { fail('runtime_oci_layer_invalid'); }
       expandedTotal += uncompressed.length;
       if (expandedTotal > 1024 * 1024 * 1024) fail('runtime_oci_layer_expansion_limit');
+      parseTarBuffer(uncompressed, {
+        allowedTypeFlags: ['0', '1', '2', '5'],
+        maximumArchiveBytes: 512 * 1024 * 1024,
+        maximumEntries: 100_000,
+        maximumFileBytes: 512 * 1024 * 1024,
+        maximumTotalBytes: 512 * 1024 * 1024,
+        requireCanonicalUstar: false
+      });
       return sha256Buffer(uncompressed);
     });
     if (JSON.stringify(computedDiffIds) !== JSON.stringify(diffIds)) {

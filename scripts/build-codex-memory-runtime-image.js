@@ -62,8 +62,6 @@ function buildRuntimeImage({ contextDirectory, outputArchive, expectedContextArt
   fs.mkdirSync(outputDirectory, { recursive: true, mode: 0o700 });
   const temporary = path.join(outputDirectory,
     `.${path.basename(outputArchive)}.${crypto.randomBytes(12).toString('hex')}.tmp`);
-  let published = false;
-  let publishedIdentity = null;
   const args = [
     'buildx', 'build', '--no-cache', '--progress=plain',
     '--platform=linux/amd64',
@@ -90,36 +88,21 @@ function buildRuntimeImage({ contextDirectory, outputArchive, expectedContextArt
     const evidence = verifyArchive(temporary, manifest);
     const file = fs.openSync(temporary, fs.constants.O_RDONLY);
     try { fs.fsyncSync(file); } finally { fs.closeSync(file); }
+    const readBack = verifyArchive(temporary, manifest);
+    if (readBack.archiveSha256 !== evidence.archiveSha256) {
+      fail('runtime_image_publication_readback_mismatch');
+    }
     try {
       fs.linkSync(temporary, outputArchive);
-      published = true;
     } catch (error) {
       if (error?.code === 'EEXIST') fail('runtime_image_output_exists');
       throw error;
     }
     fs.unlinkSync(temporary);
-    publishedIdentity = fs.lstatSync(outputArchive, { bigint: true });
     const directory = fs.openSync(outputDirectory, fs.constants.O_RDONLY);
     try { fs.fsyncSync(directory); } finally { fs.closeSync(directory); }
-    const readBack = verifyArchive(outputArchive, manifest);
-    if (readBack.archiveSha256 !== evidence.archiveSha256) {
-      fail('runtime_image_publication_readback_mismatch');
-    }
     return Object.freeze({ ...readBack, ...contextEvidence });
   } catch (error) {
-    if (published) {
-      try {
-        const current = fs.lstatSync(outputArchive, { bigint: true });
-        if (publishedIdentity && current.dev === publishedIdentity.dev &&
-            current.ino === publishedIdentity.ino &&
-            current.ctimeNs === publishedIdentity.ctimeNs &&
-            current.birthtimeNs === publishedIdentity.birthtimeNs) fs.unlinkSync(outputArchive);
-      } catch {}
-      try {
-        const directory = fs.openSync(outputDirectory, fs.constants.O_RDONLY);
-        try { fs.fsyncSync(directory); } finally { fs.closeSync(directory); }
-      } catch {}
-    }
     try { fs.unlinkSync(temporary); } catch {}
     throw error;
   }

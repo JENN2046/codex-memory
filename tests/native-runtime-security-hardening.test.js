@@ -58,7 +58,7 @@ function tar(entries) {
     header.fill(32, 148, 156);
     header[156] = (entry.type || '0').charCodeAt(0);
     if (entry.link) header.write(entry.link, 157, 100, 'utf8');
-    header.write('ustar\0', 257, 6, 'ascii');
+    header.write(entry.invalidMagic ? 'notar\0' : 'ustar\0', 257, 6, 'ascii');
     header.write('00', 263, 2, 'ascii');
     let checksum = 0;
     for (const byte of header) checksum += byte;
@@ -156,12 +156,16 @@ test('tar validator rejects traversal, links, duplicates, special nodes and limi
     tar([{ name: 'link', type: '2', link: '/etc/passwd' }]),
     tar([{ name: 'hard', type: '1', link: 'target' }]),
     tar([{ name: 'fifo', type: '6' }]),
+    tar([{ name: 'not-ustar', content: 'x', invalidMagic: true }]),
     tar([{ name: 'device', type: '3' }]),
     tar([{ name: 'contiguous', type: '7' }]),
     tar([{ name: 'sparse', type: 'S' }]),
     tar([{ name: 'pax', type: 'x' }]),
     tar([{ name: 'same', content: 'a' }, { name: 'same', content: 'b' }])
   ]) assert.throws(() => parseTarBuffer(value));
+  const badPadding = tar([{ name: 'padding', content: 'x' }]);
+  badPadding[513] = 1;
+  expectCode(() => parseTarBuffer(badPadding), 'runtime_tar_padding_invalid');
   expectCode(() => parseTarBuffer(tar([{ name: 'large', content: '1234' }]), {
     maximumFileBytes: 3
   }), 'runtime_tar_entry_too_large');
@@ -251,7 +255,12 @@ test('Provider policy requires Docker health and forbids mutable application mou
     value => { delete value.State.Health; },
     value => { value.State.Health.Status = 'unhealthy'; },
     value => value.Mounts.push({ Destination: '/app', Propagation: 'rprivate',
-      RW: true, Source: '/mutable/provider-code', Type: 'bind' })
+      RW: true, Source: '/mutable/provider-code', Type: 'bind' }),
+    value => { value.Mounts.push({ Destination: '/data', Propagation: 'rprivate',
+      RW: true, Source: 'provider-state', Type: 'volume' });
+    value.Config.Cmd = ['node', '/data/app/provider.js']; },
+    value => value.Mounts.push({ Destination: '/data', Propagation: 'rprivate',
+      RW: true, Source: '/proc/1/root/run/docker.sock', Type: 'bind' })
   ]) {
     const value = providerInspect(); mutate(value);
     expectCode(() => validateProviderCandidate(value),
@@ -571,29 +580,24 @@ test('atomic OCI publication removes the final name when independent readback fa
   assert.deepEqual(fs.readdirSync(root).filter(name => name.includes('.tmp')), []);
 });
 
-test('failed publisher never removes a concurrently replaced final inode', t => {
+test('atomic no-replace publication preserves a concurrent winner', t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-image-concurrent-final-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const fixture = context([{ name: 'codex-memory/deploy/native-runtime/Dockerfile',
     content: 'FROM scratch\n' }, { name: 'vcptoolbox/package.json', content: '{}\n' }]);
   const contextDirectory = path.join(root, 'context'); fs.mkdirSync(contextDirectory);
   fs.writeFileSync(path.join(contextDirectory, 'runtime-context.tar'), fixture.buffer);
-  const output = path.join(root, 'accepted.oci.tar'); let verifies = 0;
+  const output = path.join(root, 'accepted.oci.tar');
   expectCode(() => buildRuntimeImage({ contextDirectory,
     expectedContextArtifactSha256: sha256Buffer(fixture.buffer), outputArchive: output,
     spawnFile: (_command, args) => {
       const destination = args.find(value => value.startsWith('type=oci,dest='))
         .match(/dest=([^,]+)/u)[1];
-      fs.writeFileSync(destination, 'publisher-a'); return { status: 0 };
-    }, verifyArchive: archive => {
-      verifies += 1;
-      if (verifies === 2) {
-        fs.unlinkSync(archive); fs.writeFileSync(archive, 'publisher-b');
-        throw Object.assign(new Error('readback'),
-          { code: 'runtime_image_publication_readback_mismatch' });
-      }
-      return { archiveSha256: S('1'), accepted: true };
-    } }), 'runtime_image_publication_readback_mismatch');
+      fs.writeFileSync(destination, 'publisher-a');
+      fs.writeFileSync(output, 'publisher-b');
+      return { status: 0 };
+    }, verifyArchive: () => ({ archiveSha256: S('1'), accepted: true }) }),
+  'runtime_image_output_exists');
   assert.equal(fs.readFileSync(output, 'utf8'), 'publisher-b');
 });
 
@@ -615,7 +619,7 @@ test('tar parsing bounds zero padding and OCI reader rejects oversized file befo
   const sparse = {
     openSync: () => 12,
     fstatSync: () => ({ dev: 1, ino: 3, isFile: () => true,
-      mtimeMs: 0, size: 2 * 1024 * 1024 }),
+      blocks: 4096, mtimeMs: 0, size: 2 * 1024 * 1024 }),
     readSync: (_fd, buffer) => { buffer.fill(0); return buffer.length; },
     readFileSync: () => { wholeRead = true; throw new Error('must_not_read'); },
     closeSync: () => {}
@@ -629,7 +633,8 @@ test('OCI admission binds descriptor types/sizes and recomputes bounded layer di
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oci-semantic-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const make = (name, mutate = () => {}) => {
-    const uncompressed = tar([{ name: 'payload', content: 'accepted' }]);
+    const uncompressed = name === 'invalid-layer' ? Buffer.alloc(1024, 0x61) :
+      tar([{ name: 'payload', content: 'accepted' }]);
     const layer = zlib.gzipSync(uncompressed, { mtime: 0 });
     const layerDescriptor = { digest: sha(layer), size: layer.length,
       mediaType: 'application/vnd.oci.image.layer.v1.tar+gzip' };
@@ -666,4 +671,5 @@ test('OCI admission binds descriptor types/sizes and recomputes bounded layer di
   expectCode(() => inspectOciArchive(make('wrong-diff', ({ config }) => {
     config.rootfs.diff_ids[0] = S('f');
   })), 'runtime_oci_diff_id_mismatch');
+  assert.throws(() => inspectOciArchive(make('invalid-layer')));
 });

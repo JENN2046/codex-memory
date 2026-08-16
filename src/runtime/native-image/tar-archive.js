@@ -39,6 +39,18 @@ function normalizedName(name) {
   return normalized;
 }
 
+function validatedLinkTarget(name, target, hardLink) {
+  if (!target || target.includes('\0')) fail('runtime_tar_link_target_unsafe');
+  if (hardLink) return normalizedName(target);
+  const rooted = target.startsWith('/') ? target.slice(1) :
+    path.posix.join(path.posix.dirname(name), target);
+  const normalized = path.posix.normalize(rooted);
+  if (!normalized || normalized === '..' || normalized.startsWith('../')) {
+    fail('runtime_tar_link_target_unsafe');
+  }
+  return target;
+}
+
 function parseTarBuffer(buffer, limits = {}) {
   if (!Buffer.isBuffer(buffer) || buffer.length < BLOCK * 2 || buffer.length % BLOCK !== 0) {
     fail('runtime_tar_archive_invalid');
@@ -65,27 +77,43 @@ function parseTarBuffer(buffer, limits = {}) {
       checksum += index >= 148 && index < 156 ? 32 : header[index];
     }
     if (checksum !== storedChecksum) fail('runtime_tar_checksum_invalid');
+    const magic = header.subarray(257, 263).toString('latin1');
+    const version = header.subarray(263, 265).toString('latin1');
+    const canonicalUstar = magic === 'ustar\0' && version === '00';
+    const gnuUstar = magic === 'ustar ' && version === ' \0';
+    if (!canonicalUstar && (policy.requireCanonicalUstar !== false || !gnuUstar)) {
+      fail('runtime_tar_ustar_invalid');
+    }
     const prefix = field(header, 345, 155);
     const basename = field(header, 0, 100);
     const name = normalizedName(prefix ? `${prefix}/${basename}` : basename);
     if (names.has(name)) fail('runtime_tar_duplicate_path');
     names.add(name);
     const type = String.fromCharCode(header[156] || 48);
-    if (!['0', '5'].includes(type)) fail('runtime_tar_special_entry_forbidden');
+    const allowedTypes = policy.allowedTypeFlags || ['0', '5'];
+    if (!allowedTypes.includes(type)) fail('runtime_tar_special_entry_forbidden');
     const size = octal(header, 124, 12);
-    if (type === '5' && size !== 0) fail('runtime_tar_header_invalid');
+    if (type !== '0' && size !== 0) fail('runtime_tar_header_invalid');
     if (size > policy.maximumFileBytes) fail('runtime_tar_entry_too_large');
     totalBytes += size;
     if (totalBytes > policy.maximumTotalBytes) fail('runtime_tar_expansion_limit');
     const contentOffset = offset + BLOCK;
     const next = contentOffset + Math.ceil(size / BLOCK) * BLOCK;
     if (next > buffer.length) fail('runtime_tar_archive_truncated');
+    const paddingStart = contentOffset + size;
+    if (!buffer.subarray(paddingStart, next).every(byte => byte === 0)) {
+      fail('runtime_tar_padding_invalid');
+    }
+    const linkTarget = ['1', '2'].includes(type) ? validatedLinkTarget(
+      name, field(header, 157, 100), type === '1'
+    ) : null;
     entries.push(Object.freeze({
       content: type === '0' ? buffer.subarray(contentOffset, contentOffset + size) : null,
+      linkTarget,
       mode: octal(header, 100, 8),
       name,
       size,
-      type: type === '0' ? 'file' : 'directory'
+      type: ({ '0': 'file', '1': 'hardlink', '2': 'symlink', '5': 'directory' })[type]
     }));
     if (entries.length > policy.maximumEntries) fail('runtime_tar_entry_limit');
     offset = next;

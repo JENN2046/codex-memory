@@ -48,6 +48,11 @@ function socketPathExposed(source) {
     .includes(normalized) || '/var/run/docker.sock'.startsWith(`${normalized}/`) ||
     '/run/docker.sock'.startsWith(`${normalized}/`);
 }
+function hostKernelAlias(source) {
+  const normalized = path.posix.normalize(source);
+  return ['/proc', '/sys', '/dev'].some(root =>
+    normalized === root || normalized.startsWith(`${root}/`));
+}
 function requireNoDangerousHostSurface(projected, code) {
   if (projected.privileged || projected.capabilitiesAdd.length !== 0 ||
       projected.devices.length !== 0 || projected.deviceRequests.length !== 0 ||
@@ -56,7 +61,8 @@ function requireNoDangerousHostSurface(projected, code) {
       !['', 'private'].includes(projected.ipcMode) ||
       projected.mounts.some(mount => socketPathExposed(mount.source) ||
         socketPathExposed(mount.destination) || mount.propagation === 'shared' ||
-        mount.propagation === 'rshared')) fail(code);
+        mount.propagation === 'rshared' ||
+        (mount.type === 'bind' && hostKernelAlias(mount.source)))) fail(code);
 }
 
 function validateRuntimeCandidate(inspect, expected) {
@@ -116,11 +122,12 @@ function validateRuntimeCandidate(inspect, expected) {
   return Object.freeze(value);
 }
 
-function loopbackBinding(portBindings, port) {
+function loopbackBinding(portBindings, port, hostPort = null) {
   const keys = Object.keys(portBindings || {});
   return keys.length === 1 && keys[0] === port &&
     Array.isArray(portBindings[port]) && portBindings[port].length === 1 &&
-    portBindings[port][0]?.HostIp === '127.0.0.1';
+    portBindings[port][0]?.HostIp === '127.0.0.1' &&
+    (hostPort === null || portBindings[port][0]?.HostPort === hostPort);
 }
 function validateEdgeCandidate(inspect) {
   const value = projectContainerConfig(inspect);
@@ -132,6 +139,8 @@ function validateEdgeCandidate(inspect) {
       value.networkMode !== 'bridge' || !same(value.capabilitiesDrop, ['ALL']) ||
       !value.securityOpt.includes('no-new-privileges:true') ||
       value.logConfig?.Type !== 'none' || secret.length !== 1 || secret[0].rw ||
+      secret[0].type !== 'bind' ||
+      !secret[0].source.startsWith('/etc/codex-memory/') ||
       value.mounts.length !== 1 ||
       !loopbackBinding(value.portBindings, '8080/tcp')) {
     fail('edge_container_canonical_policy_mismatch');
@@ -141,12 +150,16 @@ function validateEdgeCandidate(inspect) {
 function validateProviderCandidate(inspect) {
   const value = projectContainerConfig(inspect);
   requireNoDangerousHostSurface(value, 'provider_container_canonical_policy_mismatch');
-  const stateMountOnly = value.mounts.every(mount =>
-    (mount.destination === '/data' || mount.destination.startsWith('/data/')) &&
-    ['bind', 'volume'].includes(mount.type) && mount.propagation === 'rprivate');
-  if (value.networkMode !== 'bridge' || !loopbackBinding(value.portBindings, '3000/tcp') ||
+  const stateMountOnly = value.mounts.length <= 1 && value.mounts.every(mount =>
+    mount.destination === '/data' && mount.type === 'volume' &&
+    mount.propagation === 'rprivate');
+  const executionSurface = [value.workingDirectory, ...value.command,
+    ...value.entrypoint, ...value.environment];
+  if (value.networkMode !== 'bridge' ||
+      !loopbackBinding(value.portBindings, '3000/tcp', '3000') ||
       inspect?.State?.Running !== true || inspect?.State?.Health?.Status !== 'healthy' ||
-      !stateMountOnly) {
+      !stateMountOnly || executionSurface.some(item =>
+        item === '/data' || item.startsWith('/data/') || item.includes('=/data/'))) {
     fail('provider_container_canonical_policy_mismatch');
   }
   return Object.freeze(value);
