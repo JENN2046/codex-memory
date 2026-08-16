@@ -42,6 +42,20 @@ const {
   VCP_RUNTIME_OPAQUE_LOCAL_PACKAGE_ROOTS,
   VCP_RUNTIME_SECURITY_ROOTS
 } = require('../src/core/VcpRuntimeContract');
+const {
+  AUTHORITY_RECORD_PATH,
+  IMAGE_BUILD_MANIFEST_PATH,
+  IMAGE_RUNTIME_ROOT,
+  IMAGE_VCP_ROOT,
+  PROFILE_SCHEMA_VERSION: IMAGE_PROFILE_SCHEMA_VERSION,
+  buildManifestDigest,
+  profileV7MigrationCandidate,
+  readBoundedJson,
+  validateAuthorityRecord,
+  validateBuildManifest,
+  validateEdgeReceipt,
+  validateRuntimeSelfEvidence
+} = require('../src/runtime/native-image/runtime-authority');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
 const SCRIPT_PATH = path.resolve(__filename);
@@ -180,6 +194,19 @@ const PROFILE_KEYS = Object.freeze([
   'vcpRuntimeContractDigest',
   'vcpRuntimeIdentitySchemaVersion'
 ]);
+const IMAGE_PROFILE_KEYS = Object.freeze([
+  ...PROFILE_KEYS,
+  'edgeLifecycleAuthority',
+  'hostLauncherAuthorityVersion',
+  'hostLauncherDigest',
+  'runtimeAuthorityMode',
+  'runtimeBuildManifestDigest',
+  'runtimeContainerId',
+  'runtimeImageConfigId',
+  'runtimeImageManifestDigest',
+  'runtimeRootfsChainDigest',
+  'stateMountContractDigest'
+]);
 const PRIVATE_FILE_MAX_BYTES = 262_144;
 const SAFE_GIT_OBJECT = /^[a-f0-9]{40}$/u;
 const SAFE_SHA256_DIGEST = /^sha256:[a-f0-9]{64}$/u;
@@ -261,7 +288,8 @@ function safeCode(error, fallback = 'codex_memory_stack_failed') {
 }
 
 function profileHttpEndpoint(profile) {
-  if (profile?.schemaVersion === PROFILE_SCHEMA_VERSION) {
+  if ([PROFILE_SCHEMA_VERSION, IMAGE_PROFILE_SCHEMA_VERSION]
+    .includes(profile?.schemaVersion)) {
     return CANONICAL_CODEX_MCP_ENDPOINT;
   }
   if ([
@@ -391,11 +419,19 @@ function profileVcpRuntimeIdentityMode(profile) {
 function profileHasRuntimeBinding(profile) {
   return [
     EXACT_HEAD_PROFILE_SCHEMA_VERSION,
-    PROFILE_SCHEMA_VERSION
+    PROFILE_SCHEMA_VERSION,
+    IMAGE_PROFILE_SCHEMA_VERSION
   ].includes(profile?.schemaVersion);
 }
 
 function profileControllerIdentityReceipt(profile) {
+  if (profile?.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION) {
+    return Object.freeze({
+      controllerSourceCommit: profile.runtimeBaseline,
+      runtimeBuildManifestDigest: profile.runtimeBuildManifestDigest,
+      schemaVersion: 3
+    });
+  }
   if (profile?.schemaVersion === PROFILE_SCHEMA_VERSION) {
     return Object.freeze({
       controllerSourceManifestDigest:
@@ -415,6 +451,12 @@ function profileControllerIdentityReceipt(profile) {
 }
 
 function controllerIdentityReceiptMatches(receipt, profile) {
+  if (profile?.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION) {
+    return receipt?.schemaVersion === 3 &&
+      receipt.controllerSourceCommit === profile.runtimeBaseline &&
+      receipt.runtimeBuildManifestDigest ===
+        profile.runtimeBuildManifestDigest;
+  }
   if (profile?.schemaVersion === PROFILE_SCHEMA_VERSION) {
     return receipt?.schemaVersion === 2 &&
       receipt.controllerSourceManifestVersion ===
@@ -1385,21 +1427,25 @@ function profileRetainedBindingMatches(profile, {
 }
 
 function validateProfile(value) {
-  const v6IdentityMode = value?.schemaVersion === PROFILE_SCHEMA_VERSION
+  const v6IdentityMode = [PROFILE_SCHEMA_VERSION, IMAGE_PROFILE_SCHEMA_VERSION]
+    .includes(value?.schemaVersion)
     ? profileVcpRuntimeIdentityMode(value)
     : null;
   const keys = value?.schemaVersion === LEGACY_PROFILE_SCHEMA_VERSION
     ? LEGACY_PROFILE_KEYS
     : value?.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION
       ? V5_PROFILE_KEYS
-      : v6IdentityMode === 'legacy'
+      : value?.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+        ? IMAGE_PROFILE_KEYS
+        : v6IdentityMode === 'legacy'
         ? LEGACY_V6_PROFILE_KEYS
         : PROFILE_KEYS;
   if (!exactKeys(value, keys) ||
       ![
         LEGACY_PROFILE_SCHEMA_VERSION,
         EXACT_HEAD_PROFILE_SCHEMA_VERSION,
-        PROFILE_SCHEMA_VERSION
+        PROFILE_SCHEMA_VERSION,
+        IMAGE_PROFILE_SCHEMA_VERSION
       ].includes(value.schemaVersion) ||
       !SAFE_GIT_OBJECT.test(value.runtimeBaseline || '') ||
       !SAFE_GIT_OBJECT.test(value.retainedBindingSource || '') ||
@@ -1457,6 +1503,33 @@ function validateProfile(value) {
         !path.isAbsolute(value.vcpRuntimeRepository) ||
         path.resolve(value.vcpRuntimeRepository) !==
           value.vcpRuntimeRepository
+      )) {
+    throw codedError('stack_profile_invalid');
+  }
+  if (value.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION &&
+      (
+        v6IdentityMode !== 'contract_v1' ||
+        value.runtimeAuthorityMode !== 'digest_pinned_read_only_image' ||
+        value.edgeLifecycleAuthority !== 'host_launcher' ||
+        value.hostLauncherAuthorityVersion !==
+          'codex-memory-native-host-launcher/v1' ||
+        !SAFE_SHA256_DIGEST.test(value.hostLauncherDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.runtimeBuildManifestDigest || '') ||
+        !SAFE_CONTAINER_ID.test(value.runtimeContainerId || '') ||
+        !SAFE_IMAGE_ID.test(value.runtimeImageConfigId || '') ||
+        !SAFE_SHA256_DIGEST.test(value.runtimeImageManifestDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.runtimeRootfsChainDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.stateMountContractDigest || '') ||
+        !SAFE_GIT_OBJECT.test(value.adoptedRepositoryHead || '') ||
+        value.controllerSourceManifestVersion !== MANIFEST_SCHEMA_VERSION ||
+        !SAFE_SHA256_DIGEST.test(value.controllerSourceManifestDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.governanceEnvironmentConfigDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.relayEnvironmentConfigDigest || '') ||
+        !SAFE_GIT_OBJECT.test(value.vcpRuntimeBaseline || '') ||
+        !SAFE_SHA256_DIGEST.test(value.vcpProviderConfigDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.vcpRuntimeScopeDigest || '') ||
+        typeof value.vcpRuntimeRepository !== 'string' ||
+        !path.isAbsolute(value.vcpRuntimeRepository)
       )) {
     throw codedError('stack_profile_invalid');
   }
@@ -2340,6 +2413,9 @@ function gitText(args, {
 }
 
 function vcpRuntimeRepository() {
+  if (process.env.CODEX_MEMORY_CONTAINER_SUPERVISOR === '1') {
+    return IMAGE_VCP_ROOT;
+  }
   return path.resolve(REPO_ROOT, '..', '..', 'runtime', 'VCPToolBox');
 }
 
@@ -4319,13 +4395,14 @@ function buildControllerChildEnvironment(environmentFile, {
     CODEX_MEMORY_STACK_RETAINED_BINDING_SOURCE:
       profile.retainedBindingSource
   };
-  if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+  if ([PROFILE_SCHEMA_VERSION, IMAGE_PROFILE_SCHEMA_VERSION]
+    .includes(profile.schemaVersion)) {
     childEnvironment.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_DIGEST =
       profile.controllerSourceManifestDigest;
     childEnvironment.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_VERSION =
       String(profile.controllerSourceManifestVersion);
     childEnvironment.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION =
-      String(PROFILE_SCHEMA_VERSION);
+      String(profile.schemaVersion);
     childEnvironment.CODEX_MEMORY_STACK_VCP_PROVIDER_CONFIG_DIGEST =
       profile.vcpProviderConfigDigest;
     childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_BASELINE =
@@ -4339,6 +4416,15 @@ function buildControllerChildEnvironment(environmentFile, {
         profile.vcpRuntimeContractDigest;
       childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_IDENTITY_SCHEMA_VERSION =
         String(profile.vcpRuntimeIdentitySchemaVersion);
+    }
+    if (profile.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION) {
+      childEnvironment.CODEX_MEMORY_CONTAINER_SUPERVISOR = '1';
+      childEnvironment.CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_DIGEST =
+        profile.runtimeBuildManifestDigest;
+      childEnvironment.CODEX_MEMORY_STACK_ADOPTED_REPOSITORY_HEAD =
+        profile.runtimeBaseline;
+      childEnvironment.VCP_ROOT = IMAGE_VCP_ROOT;
+      childEnvironment.VCPTOOLBOX_ROOT = IMAGE_VCP_ROOT;
     }
   } else if (profile.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION) {
     childEnvironment.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT =
@@ -5133,12 +5219,37 @@ function startOutcomeWithEvidence(outcome, started) {
 }
 
 async function startStackWithProfile(storedProfile, {
-  environment = process.env
+  environment = process.env,
+  containerEvidence = null
 } = {}) {
   let profile = storedProfile;
-  const source = inspectSourceCompatibility(storedProfile);
+  const containerMode = containerEvidence !== null;
+  if (containerMode && storedProfile.schemaVersion !==
+      IMAGE_PROFILE_SCHEMA_VERSION) {
+    throw codedError('stack_container_profile_schema_invalid');
+  }
+  const source = containerMode
+    ? Object.freeze({
+      adoptedHeadAncestor: true,
+      adoptedHeadReadable: true,
+      clean: true,
+      compatible: true,
+      controllerSourceMatch: true,
+      currentMain: true,
+      head: containerEvidence.buildManifest.codexMemoryCommit,
+      identityMode: 'digest_pinned_read_only_image',
+      manifestComplete: true,
+      manifestDigest: containerEvidence.authority.buildManifestDigest,
+      manifestRecognized: true,
+      manifestScopeClean: true,
+      manifestVersion: MANIFEST_SCHEMA_VERSION,
+      repositoryMatch: true,
+      upgradeEligible: false
+    })
+    : inspectSourceCompatibility(storedProfile);
   const transitionRequired =
-    storedProfile.schemaVersion !== PROFILE_SCHEMA_VERSION;
+    ![PROFILE_SCHEMA_VERSION, IMAGE_PROFILE_SCHEMA_VERSION]
+      .includes(storedProfile.schemaVersion);
   if (
     (!transitionRequired && !source.compatible) ||
     (transitionRequired && !source.upgradeEligible)
@@ -5169,9 +5280,25 @@ async function startStackWithProfile(storedProfile, {
         )) {
       throw codedError('stack_managed_environment_identity_mismatch');
     }
-    const vcpRuntime = inspectVcpRuntimeIdentity(profile);
+    const vcpRuntime = containerMode
+      ? Object.freeze({
+        admissionAllowed: true,
+        contractComplete: true,
+        contractDigest: profile.vcpRuntimeContractDigest,
+        contractMatch: true,
+        currentMain: true,
+        repository: IMAGE_VCP_ROOT,
+        repositoryMatch: true,
+        revision: containerEvidence.buildManifest.vcpCommit,
+        scopeClean: true,
+        scopeComplete: true,
+        scopeDigest: profile.vcpRuntimeScopeDigest
+      })
+      : inspectVcpRuntimeIdentity(profile);
     const vcpProviderConfigSnapshot = readVcpProviderEnvironmentSnapshot(
-      path.join(vcpRuntimeRepository(), 'config.env')
+      containerMode
+        ? '/run/secrets/codex-memory-vcp-provider.env'
+        : path.join(vcpRuntimeRepository(), 'config.env')
     );
     const vcpProviderEnvironment =
       vcpProviderConfigSnapshot.providerEnvironment;
@@ -5185,7 +5312,8 @@ async function startStackWithProfile(storedProfile, {
       )) {
         throw codedError('stack_vcp_provider_config_identity_mismatch');
       }
-      if (profile.schemaVersion === PROFILE_SCHEMA_VERSION) {
+      if ([PROFILE_SCHEMA_VERSION, IMAGE_PROFILE_SCHEMA_VERSION]
+        .includes(profile.schemaVersion)) {
         profile = storedProfile;
       } else {
         profile = profileWithControllerManifestBinding(
@@ -5207,18 +5335,39 @@ async function startStackWithProfile(storedProfile, {
     } else {
       throw codedError('stack_vcp_runtime_identity_mismatch');
     }
-    const activeSource = inspectSourceCompatibility(profile);
+    const activeSource = containerMode
+      ? source
+      : inspectSourceCompatibility(profile);
     if (!activeSource.compatible) {
       throw codedError('stack_source_compatibility_failed');
     }
-    const provider = inspectProviderContainer(profile.providerContainer);
+    const provider = containerMode
+      ? Object.freeze({
+        hostLoopbackOnly: true,
+        id: profile.providerContainerId,
+        imageId: profile.providerImageId,
+        reachable: true,
+        recognized: true,
+        revision: profile.providerRevision,
+        running: true
+      })
+      : inspectProviderContainer(profile.providerContainer);
     if (!profileProviderIdentityMatches(profile, provider)) {
       throw codedError('stack_provider_dependency_identity_mismatch');
     }
     if (!await portListening(3000)) {
       throw codedError('stack_provider_dependency_unavailable');
     }
-    const edgeBefore = inspectEdgeContainer(profile.edgeContainer);
+    const edgeBefore = containerMode
+      ? Object.freeze({
+        configurationSecure: true,
+        healthy: true,
+        id: profile.edgeContainerId,
+        revision: profile.runtimeBaseline,
+        running: true,
+        secure: true
+      })
+      : inspectEdgeContainer(profile.edgeContainer);
     requireProfileEdgeIdentity(profile, edgeBefore);
     const governanceChildEnvironment = buildControllerChildEnvironment(
       governanceEnvironment,
@@ -5330,8 +5479,8 @@ async function startStackWithProfile(storedProfile, {
       if (!providerCredentialFreshnessMatches({
         profile,
         providerConfigFile: path.join(
-          profile.vcpRuntimeRepository,
-          'config.env'
+          containerMode ? '/run/secrets' : profile.vcpRuntimeRepository,
+          containerMode ? 'codex-memory-vcp-provider.env' : 'config.env'
         ),
         runtimeRoot: runtimeDirectory(environment),
         shimPid: shim.pid
@@ -5438,11 +5587,11 @@ async function startStackWithProfile(storedProfile, {
         throw codedError('stack_governance_credential_stale');
       }
 
-      if (!edgeBefore.running) {
+      if (!containerMode && !edgeBefore.running) {
         runDocker(['start', profile.edgeContainerId]);
         started.add('edge');
       }
-      await waitFor(() => {
+      if (!containerMode) await waitFor(() => {
         try {
           const edge = inspectEdgeContainer(profile.edgeContainer);
           return edge.running && edge.healthy &&
@@ -5494,7 +5643,31 @@ async function startStackWithProfile(storedProfile, {
         throw codedError('stack_relay_credential_stale');
       }
 
-      const result = await inspectStack({ environment, profile });
+      const result = containerMode
+        ? Object.freeze({
+          accepted: true,
+          runtimeAccepted: true,
+          configured: true,
+          profileSchemaVersion: IMAGE_PROFILE_SCHEMA_VERSION,
+          profileUpgradeRequired: false,
+          source: Object.freeze({
+            clean: true,
+            compatible: true,
+            controllerIdentityMatch: true,
+            currentMain: true,
+            identityMode: 'digest_pinned_read_only_image',
+            repositoryMatch: true
+          }),
+          runtimeImage: Object.freeze({
+            authorityDigest: containerEvidence.runtimeEvidence.authorityDigest,
+            buildManifestDigest:
+              containerEvidence.runtimeEvidence.buildManifestDigest,
+            identityMatch: true
+          }),
+          secretValuesReturned: false,
+          rawMemoryReturned: false
+        })
+        : await inspectStack({ environment, profile });
       if (!result.accepted) throw codedError('stack_final_acceptance_failed');
       if (transitionRequired) {
         return startOutcomeWithEvidence(
@@ -6100,7 +6273,8 @@ function buildShimChildEnvironment(environment, {
   vcpRoot,
   mappingPath,
   providerEnvironment,
-  runtimeBindingDigest
+  runtimeBindingDigest,
+  providerConfigPath = path.join(vcpRoot, 'config.env')
 }) {
   if (!providerEnvironment || typeof providerEnvironment.apiKey !== 'string' ||
       typeof providerEnvironment.model !== 'string' ||
@@ -6115,7 +6289,7 @@ function buildShimChildEnvironment(environment, {
     WSL_NEWAPI_HOST: '127.0.0.1',
     VCP_ROOT: vcpRoot,
     VCPTOOLBOX_ROOT: vcpRoot,
-    VCP_CONFIG_ENV: path.join(vcpRoot, 'config.env'),
+    VCP_CONFIG_ENV: providerConfigPath,
     API_Key: providerEnvironment.apiKey,
     API_URL: 'http://127.0.0.1:3000',
     WhitelistEmbeddingModel: providerEnvironment.model,
@@ -6242,13 +6416,21 @@ function childControllerProfileFields() {
   );
   const controllerSourceManifestDigest =
     process.env.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_MANIFEST_DIGEST;
-  if (schemaVersion !== PROFILE_SCHEMA_VERSION ||
+  const adoptedRepositoryHead = schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+    ? process.env.CODEX_MEMORY_STACK_ADOPTED_REPOSITORY_HEAD
+    : null;
+  if (![PROFILE_SCHEMA_VERSION, IMAGE_PROFILE_SCHEMA_VERSION]
+      .includes(schemaVersion) ||
       controllerSourceManifestVersion !== MANIFEST_SCHEMA_VERSION ||
-      !SAFE_SHA256_DIGEST.test(controllerSourceManifestDigest || '')) {
+      !SAFE_SHA256_DIGEST.test(controllerSourceManifestDigest || '') ||
+      (schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION &&
+        !SAFE_GIT_OBJECT.test(adoptedRepositoryHead || ''))) {
     throw codedError('stack_child_controller_identity_invalid');
   }
   return Object.freeze({
-    adoptedRepositoryHead: gitText(['rev-parse', 'HEAD^{commit}']),
+    adoptedRepositoryHead: schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+      ? adoptedRepositoryHead
+      : gitText(['rev-parse', 'HEAD^{commit}']),
     controllerSourceManifestDigest,
     controllerSourceManifestVersion,
     schemaVersion
@@ -6286,19 +6468,26 @@ function managedShimArguments({ vcpRoot, runtimeRoot } = {}) {
 
 async function runShimChild() {
   assertChildMode();
+  const imageMode = process.env.CODEX_MEMORY_CONTAINER_SUPERVISOR === '1';
   const profile = {
     ...childControllerProfileFields(),
     runtimeRepository: REPO_ROOT,
     runtimeBaseline: process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE,
     ...childVcpRuntimeProfileFields(process.env)
   };
-  const source = inspectSourceCompatibility(profile);
-  if (!source.compatible) {
-    throw codedError('stack_source_compatibility_failed');
-  }
-  const vcpRuntime = inspectVcpRuntimeIdentity(profile);
-  if (!profileVcpRuntimeIdentityMatches(profile, vcpRuntime)) {
-    throw codedError('stack_vcp_runtime_identity_mismatch');
+  if (!imageMode) {
+    const source = inspectSourceCompatibility(profile);
+    if (!source.compatible) {
+      throw codedError('stack_source_compatibility_failed');
+    }
+    const vcpRuntime = inspectVcpRuntimeIdentity(profile);
+    if (!profileVcpRuntimeIdentityMatches(profile, vcpRuntime)) {
+      throw codedError('stack_vcp_runtime_identity_mismatch');
+    }
+  } else if (profile.schemaVersion !== IMAGE_PROFILE_SCHEMA_VERSION ||
+      profile.vcpRuntimeRepository !== IMAGE_VCP_ROOT ||
+      profile.runtimeRepository !== REPO_ROOT) {
+    throw codedError('stack_container_runtime_identity_mismatch');
   }
   const privateRoot = childPrivateRoot();
   const runtimeRoot = assertOwnerOnlyDirectory(
@@ -6310,7 +6499,9 @@ async function runShimChild() {
   );
   const vcpRoot = vcpRuntimeRepository();
   const providerConfigSnapshot = readVcpProviderEnvironmentSnapshot(
-    path.join(vcpRoot, 'config.env')
+    imageMode
+      ? '/run/secrets/codex-memory-vcp-provider.env'
+      : path.join(vcpRoot, 'config.env')
   );
   const providerEnvironment = providerConfigSnapshot.providerEnvironment;
   if (!profileVcpProviderConfigMatches(profile, providerEnvironment)) {
@@ -6330,6 +6521,9 @@ async function runShimChild() {
     vcpRoot,
     mappingPath,
     providerEnvironment,
+    providerConfigPath: imageMode
+      ? '/run/secrets/codex-memory-vcp-provider.env'
+      : path.join(vcpRoot, 'config.env'),
     runtimeBindingDigest:
       process.env.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST
   });
@@ -6728,6 +6922,163 @@ async function prepareGovernanceSocketsChild() {
   })}\n`);
 }
 
+function containerSupervisorAuthorityMatchesProfile(profile, authority) {
+  return Boolean(
+    profile?.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION &&
+    profile.runtimeAuthorityMode === 'digest_pinned_read_only_image' &&
+    profile.runtimeRepository === IMAGE_RUNTIME_ROOT &&
+    profile.vcpRuntimeRepository === IMAGE_VCP_ROOT &&
+    profile.runtimeBaseline === authority.codexMemoryCommit &&
+    profile.adoptedRepositoryHead === authority.codexMemoryCommit &&
+    profile.vcpRuntimeBaseline === authority.vcpCommit &&
+    profile.runtimeImageManifestDigest ===
+      authority.acceptedOciManifestDigest &&
+    profile.runtimeImageConfigId === authority.acceptedImageConfigId &&
+    profile.runtimeRootfsChainDigest === authority.rootfsChainDigest &&
+    profile.runtimeBuildManifestDigest === authority.buildManifestDigest &&
+    profile.runtimeContainerId === authority.expectedRuntimeContainerId &&
+    profile.stateMountContractDigest === authority.stateMountContractDigest &&
+    profile.hostLauncherAuthorityVersion === authority.hostLauncherVersion &&
+    profile.hostLauncherDigest === authority.hostLauncherDigest &&
+    profile.edgeLifecycleAuthority === authority.edgeLifecycleAuthority &&
+    profile.edgeContainerId === authority.edgeContainerId
+  );
+}
+
+function loadContainerSupervisorEvidence({
+  environment = process.env,
+  fsModule = fs,
+  runtimeRoot = REPO_ROOT,
+  vcpRoot = IMAGE_VCP_ROOT,
+  dockerSocketExists = fs.existsSync
+} = {}) {
+  const authorityPath = environment.CODEX_MEMORY_CONTAINER_AUTHORITY_PATH ||
+    AUTHORITY_RECORD_PATH;
+  const buildManifestPath =
+    environment.CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH ||
+    IMAGE_BUILD_MANIFEST_PATH;
+  const edgeReceiptPath = environment.CODEX_MEMORY_EDGE_RECEIPT_PATH ||
+    '/run/codex-memory/edge-receipt.json';
+  const profileFile = environment.CODEX_MEMORY_STACK_PROFILE_PATH ||
+    '/run/codex-memory/profile.json';
+  const authority = validateAuthorityRecord(readBoundedJson(authorityPath, {
+    fsModule
+  }));
+  const buildManifest = validateBuildManifest(readBoundedJson(
+    buildManifestPath, { fsModule }
+  ));
+  const edgeReceipt = validateEdgeReceipt(readBoundedJson(edgeReceiptPath, {
+    fsModule
+  }), authority);
+  const profile = validateProfile(readBoundedJson(profileFile, { fsModule }));
+  if (!containerSupervisorAuthorityMatchesProfile(profile, authority)) {
+    throw codedError('stack_container_authority_profile_mismatch');
+  }
+  const runtimeEvidence = validateRuntimeSelfEvidence({
+    authority,
+    buildManifest,
+    edgeReceipt,
+    runtimeRoot,
+    vcpRoot,
+    dockerSocketExists
+  });
+  if (buildManifestDigest(buildManifest) !== profile.runtimeBuildManifestDigest) {
+    throw codedError('stack_container_build_manifest_mismatch');
+  }
+  return Object.freeze({
+    authority,
+    buildManifest,
+    edgeReceipt,
+    profile,
+    runtimeEvidence
+  });
+}
+
+async function stopContainerManaged(profile, environment) {
+  const stopped = [];
+  for (const name of ['relay', 'governance', 'http', 'shim']) {
+    if (await stopManaged(name, { environment, profile })) stopped.push(name);
+  }
+  return Object.freeze(stopped);
+}
+
+async function superviseContainedRuntime(evidence, {
+  environment = process.env,
+  waitIntervalMs = 1_000
+} = {}) {
+  const startRecord = await startStackWithProfile(evidence.profile, {
+    containerEvidence: evidence,
+    environment
+  });
+  if (startRecord.outcome?.accepted !== true ||
+      startRecord.outcome?.runtimeAccepted !== true) {
+    throw codedError('stack_container_runtime_start_rejected');
+  }
+  let stopping = false;
+  let resolveStop;
+  const stopRequested = new Promise(resolve => { resolveStop = resolve; });
+  const requestStop = () => {
+    if (!stopping) {
+      stopping = true;
+      resolveStop('signal');
+    }
+  };
+  process.once('SIGTERM', requestStop);
+  process.once('SIGINT', requestStop);
+  const monitor = setInterval(() => {
+    if (stopping) return;
+    const healthy = Object.keys(COMPONENTS).every(name => {
+      const state = inspectManagedProcess(name, {
+        environment,
+        profile: evidence.profile
+      });
+      return state.running && state.controllerManaged;
+    });
+    if (!healthy) {
+      stopping = true;
+      resolveStop('child_exit');
+    }
+  }, waitIntervalMs);
+  monitor.unref();
+  const reason = await stopRequested;
+  clearInterval(monitor);
+  const stopped = await stopContainerManaged(evidence.profile, environment);
+  if (reason !== 'signal') throw codedError('stack_container_child_exited');
+  return Object.freeze({
+    accepted: true,
+    action: 'stopped',
+    edgeStopped: false,
+    providerStopped: false,
+    stoppedComponents: stopped
+  });
+}
+
+async function runContainerSupervisor({
+  environment = process.env,
+  evidence = null,
+  admissionOnly = environment
+    .CODEX_MEMORY_CONTAINER_SUPERVISOR_ADMISSION_ONLY === '1'
+} = {}) {
+  if (environment.CODEX_MEMORY_CONTAINER_SUPERVISOR !== '1') {
+    throw codedError('stack_container_supervisor_not_authorized');
+  }
+  process.umask(0o077);
+  const accepted = evidence || loadContainerSupervisorEvidence({ environment });
+  if (admissionOnly) {
+    return Object.freeze({
+      accepted: true,
+      action: 'container_supervisor_admission',
+      ...accepted.runtimeEvidence,
+      listenerPolicy: 'loopback_only',
+      mutableCheckoutRuntimeAuthority: false,
+      dockerSocketMounted: false,
+      secretValuesReturned: false,
+      rawMemoryReturned: false
+    });
+  }
+  return superviseContainedRuntime(accepted, { environment });
+}
+
 function printJson(value) {
   process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
 }
@@ -6756,6 +7107,10 @@ async function main(argv = process.argv.slice(2)) {
   if (command === '_probe-relay') return probeRelayChild();
   if (command === '_prepare-governance-sockets') {
     return prepareGovernanceSocketsChild();
+  }
+  if (command === '_container-supervisor') {
+    if (argv.length !== 1) throw codedError('stack_cli_argument_invalid');
+    return printJson(await runContainerSupervisor());
   }
   if (command === 'start') {
     if (argv.length !== 1) throw codedError('stack_cli_argument_invalid');
@@ -6803,6 +7158,8 @@ module.exports = {
   EDGE_CONTRACT_STATUS,
   EXACT_HEAD_PROFILE_SCHEMA_VERSION,
   GOVERNED_READ_SHIM_PORT,
+  IMAGE_PROFILE_KEYS,
+  IMAGE_PROFILE_SCHEMA_VERSION,
   PROFILE_KEYS,
   PROFILE_SCHEMA_VERSION,
   LEGACY_ROLLBACK_MCP_ENDPOINT,
@@ -6875,6 +7232,12 @@ module.exports = {
   profileWithControllerManifestBinding,
   profileWithSourceManifestRebinding,
   profileVcpRuntimeIdentityMatches,
+  containerSupervisorAuthorityMatchesProfile,
+  loadContainerSupervisorEvidence,
+  runContainerSupervisor,
+  superviseContainedRuntime,
+  stopContainerManaged,
+  profileV7MigrationCandidate,
   governanceCredentialFreshnessMatches,
   governancePrivateFileIdentities,
   providerCredentialFreshnessMatches,

@@ -505,7 +505,7 @@ test('controller CLI exposes an explicit rebind command and rejects ignored life
   }
 });
 
-test('schema v6 owns canonical 7625 while v4/v5 retain 7605 compatibility', () => {
+test('schema v6/v7 own canonical 7625 while v4/v5 retain 7605 compatibility', () => {
   assert.deepEqual(
     profileHttpEndpoint(profile()),
     CANONICAL_CODEX_MCP_ENDPOINT
@@ -538,8 +538,9 @@ test('schema v6 owns canonical 7625 while v4/v5 retain 7605 compatibility', () =
     }),
     6
   );
+  assert.equal(profileHttpEndpoint({ schemaVersion: 7 }).port, 7625);
   assert.throws(
-    () => profileHttpEndpoint({ schemaVersion: 7 }),
+    () => profileHttpEndpoint({ schemaVersion: 8 }),
     { code: 'stack_profile_http_endpoint_invalid' }
   );
   assert.throws(
