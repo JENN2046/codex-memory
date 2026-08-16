@@ -73,7 +73,7 @@ function validateNativeClosure(value) {
         library.machine !== 'Advanced Micro Devices X86-64' ||
         !/^DYN \(/u.test(library.type || '') ||
         (library.interpreter !== null &&
-          !/^\/(?:usr\/)?lib\/x86_64-linux-gnu\/ld-linux-x86-64\.so\.2$/u
+          !/^\/(?:lib64|(?:usr\/)?lib\/x86_64-linux-gnu)\/ld-linux-x86-64\.so\.2$/u
             .test(library.interpreter || '')) ||
         library.rpath !== null || library.runpath !== null ||
         !Array.isArray(library.needed) ||
