@@ -21,6 +21,9 @@ const {
   PROFILE_SCHEMA_VERSION,
   V5_PROFILE_KEYS,
   VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
+  VCP_RUNTIME_CLASSIFICATIONS,
+  VCP_RUNTIME_CONTRACT_PROJECTION,
+  VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
   VCP_RUNTIME_SOURCE_PATHS,
   acquireLifecycleProfile,
   acquireOwnerLock,
@@ -51,6 +54,7 @@ const {
   inspectProviderContainer,
   inspectSourceCompatibility,
   inspectVcpRuntimeIdentity,
+  inspectVcpRuntimeContractEvidence,
   isPidRunning,
   legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
@@ -90,6 +94,8 @@ const {
   validateRetainedBindingPayload,
   validateProfile,
   vcpProviderConfigDigest,
+  vcpRuntimeContractDigest,
+  vcpRuntimeContractMigrationCandidate,
   vcpRuntimeRepository,
   writeGovernancePrivateIdentityReceipt,
   writeProviderConfigIdentityReceipt,
@@ -99,6 +105,13 @@ const {
 const {
   getPublicToolDefinitions
 } = require('../src/adapters/codex-mcp/server');
+const {
+  canonicalProfileFingerprint,
+  commitOwnerProfileTransaction
+} = require('../scripts/codex-memory-owner-profile-transaction');
+const {
+  GOVERNED_READ_ATTEMPT_PROTOCOL
+} = require('../packages/chatgpt-r4-contracts/governed-read-attempt');
 
 const BASELINE = '3a0ca59fe2c0f3721d46513d7d6593cbe55b1118';
 const CONTROLLER_SOURCE_COMMIT =
@@ -114,6 +127,10 @@ const PROVIDER_CONTAINER_ID = 'cd'.repeat(32);
 const PROVIDER_IMAGE_ID = `sha256:${'ef'.repeat(32)}`;
 const PROVIDER_REVISION = '1234567890abcdef1234567890abcdef12345678';
 const VCP_SCOPE_DIGEST = `sha256:${'12'.repeat(32)}`;
+const VCP_CONTRACT_EVIDENCE_DIGEST = `sha256:${'13'.repeat(32)}`;
+const VCP_CONTRACT_DIGEST = vcpRuntimeContractDigest({
+  vcpContractEvidenceDigest: VCP_CONTRACT_EVIDENCE_DIGEST
+});
 const VCP_PROVIDER_ENVIRONMENT = Object.freeze({
   apiKey: 'synthetic-provider-key',
   model: 'synthetic-embedding-model',
@@ -191,6 +208,8 @@ function profile(overrides = {}) {
     edgeContainerId: EDGE_CONTAINER_ID,
     vcpProviderConfigDigest: VCP_PROVIDER_CONFIG_DIGEST,
     vcpRuntimeBaseline: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
+    vcpRuntimeContractDigest: VCP_CONTRACT_DIGEST,
+    vcpRuntimeIdentitySchemaVersion: VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
     vcpRuntimeRepository: '/vcp',
     vcpRuntimeScopeDigest: VCP_SCOPE_DIGEST,
     ...overrides
@@ -202,6 +221,8 @@ function v5Profile(overrides = {}) {
     adoptedRepositoryHead: _adoptedRepositoryHead,
     controllerSourceManifestDigest: _controllerSourceManifestDigest,
     controllerSourceManifestVersion: _controllerSourceManifestVersion,
+    vcpRuntimeContractDigest: _vcpRuntimeContractDigest,
+    vcpRuntimeIdentitySchemaVersion: _vcpRuntimeIdentitySchemaVersion,
     ...v5
   } = profile();
   return {
@@ -210,6 +231,84 @@ function v5Profile(overrides = {}) {
     controllerSourceCommit: V5_CONTROLLER_SOURCE_COMMIT,
     ...overrides
   };
+}
+
+function legacyV6Profile(overrides = {}) {
+  const {
+    vcpRuntimeContractDigest: _vcpRuntimeContractDigest,
+    vcpRuntimeIdentitySchemaVersion: _vcpRuntimeIdentitySchemaVersion,
+    ...legacyV6
+  } = profile();
+  return { ...legacyV6, ...overrides };
+}
+
+function gitFixture(root, args) {
+  const result = spawnSync('git', args, {
+    cwd: root,
+    encoding: 'utf8'
+  });
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return result.stdout.trim();
+}
+
+function commitVcpContractFixture(root, message = 'fixture') {
+  gitFixture(root, ['add', '-A']);
+  gitFixture(root, [
+    '-c', 'user.name=Codex Test',
+    '-c', 'user.email=codex-test@example.invalid',
+    'commit', '-m', message
+  ]);
+}
+
+function vcpContractFixture(t, {
+  embeddingSource = null,
+  knowledgeBaseSource = null
+} = {}) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-vcp-contract-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  fs.writeFileSync(
+    path.join(root, 'package.json'),
+    JSON.stringify({ name: 'vcptoolbox', version: '1.0.0' })
+  );
+  fs.writeFileSync(
+    path.join(root, 'EmbeddingUtils.js'),
+    embeddingSource ||
+      'async function getEmbeddingsBatch() { return [1]; }\n' +
+      'function cosineSimilarity() { return 1; }\n' +
+      'module.exports = { getEmbeddingsBatch, cosineSimilarity };\n'
+  );
+  fs.writeFileSync(
+    path.join(root, 'KnowledgeBaseManager.js'),
+    knowledgeBaseSource ||
+      "const helper = require('./security-helper');\n" +
+      'class KnowledgeBaseManager {\n' +
+      '  async initialize() { return helper.initialize(); }\n' +
+      '  async shutdown() { return helper.shutdown(); }\n' +
+      '}\n' +
+      'module.exports = new KnowledgeBaseManager();\n'
+  );
+  fs.writeFileSync(
+    path.join(root, 'security-helper.js'),
+    "const leaf = require('./security-leaf');\n" +
+      'module.exports = { initialize: () => leaf.value, shutdown: () => true };\n'
+  );
+  fs.writeFileSync(
+    path.join(root, 'security-leaf.js'),
+    'module.exports = { value: 1 };\n'
+  );
+  fs.writeFileSync(path.join(root, 'unrelated.js'), 'module.exports = 1;\n');
+  gitFixture(root, ['init', '-b', 'main']);
+  commitVcpContractFixture(root, 'initial fixture');
+  return root;
+}
+
+function vcpKnowledgeBaseSource(prelude, initializeBody = 'return true;') {
+  return `${prelude}\n` +
+    'class KnowledgeBaseManager {\n' +
+    `  async initialize() { ${initializeBody} }\n` +
+    '  async shutdown() {}\n' +
+    '}\n' +
+    'module.exports = new KnowledgeBaseManager();\n';
 }
 
 function legacyProfile(overrides = {}) {
@@ -266,6 +365,9 @@ function acceptedStack(overrides = {}) {
     vcpProviderConfigMatch: true,
     vcpProviderCredentialFresh: true,
     vcpRuntime: {
+      admissionAllowed: true,
+      contractComplete: true,
+      contractDigest: VCP_CONTRACT_DIGEST,
       recognized: true,
       revision: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
       repository: '/vcp',
@@ -2539,9 +2641,10 @@ test('legacy source compatibility remains historical and manifest failures rejec
   assert.equal(unsafe.controllerSourceMatch, false);
 });
 
-test('VCP runtime identity is pinned to the profile-selected commit and clean source scope', () => {
+test('VCP runtime contract admits clean build drift and blocks contract or worktree drift', () => {
   const repoRoot = '/owner/VCPToolBox';
   const revision = VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE];
+  const nextRevision = 'b'.repeat(40);
   const fsModule = {
     realpathSync(value) {
       return value;
@@ -2554,28 +2657,54 @@ test('VCP runtime identity is pinned to the profile-selected commit and clean so
       };
     }
   };
-  const inspect = scopedStatus => inspectVcpRuntimeIdentity(profile(), {
+  const inspect = ({
+    boundProfile = profile({ vcpRuntimeRepository: repoRoot }),
+    contractComplete = true,
+    evidenceDigest = VCP_CONTRACT_EVIDENCE_DIGEST,
+    head = revision,
+    status = ''
+  } = {}) => inspectVcpRuntimeIdentity(boundProfile, {
     repoRoot,
     expectedRepository: repoRoot,
     canonicalRepository: repoRoot,
     fsModule,
+    inspectContractEvidence: () => ({
+      complete: contractComplete,
+      dependencyFileCount: contractComplete ? 2 : 0,
+      evidenceDigest: contractComplete
+        ? evidenceDigest
+        : null,
+      externalDependencyCount: contractComplete ? 1 : 0,
+      securityFileCount: contractComplete ? 4 : 0,
+      stableErrorCode: contractComplete
+        ? null
+        : 'stack_vcp_runtime_contract_input_unavailable'
+    }),
+    observedAt: '2026-08-05T00:00:00.000Z',
     exec(_command, args) {
       if (args[0] === 'rev-parse' && args[1] === '--show-toplevel') {
         return `${repoRoot}\n`;
       }
       if (args[0] === 'rev-parse' && args[1] === 'HEAD^{commit}') {
-        return `${revision}\n`;
+        return `${head}\n`;
       }
       if (args[0] === 'rev-parse' &&
           args[1] === 'refs/remotes/origin/main^{commit}') {
-        return `${revision}\n`;
+        return `${head}\n`;
       }
       if (args[0] === 'status') {
-        assert.deepEqual(
-          args.slice(-VCP_RUNTIME_SOURCE_PATHS.length),
-          [...VCP_RUNTIME_SOURCE_PATHS]
-        );
-        return scopedStatus;
+        assert.deepEqual(args, [
+          'status',
+          '--porcelain=v1',
+          '--untracked-files=all'
+        ]);
+        return status;
+      }
+      if (args[0] === 'rev-parse' && args[1] === 'HEAD^{tree}') {
+        return `${head}\n`;
+      }
+      if (args[0] === 'rev-parse' && args[1] === 'HEAD:package.json') {
+        return `${'c'.repeat(40)}\n`;
       }
       if (args[0] === 'rev-parse' && args[1].startsWith('HEAD:')) {
         return `${'a'.repeat(40)}\n`;
@@ -2583,33 +2712,506 @@ test('VCP runtime identity is pinned to the profile-selected commit and clean so
       throw new Error('unexpected git call');
     }
   });
-  const accepted = inspect('');
+  const accepted = inspect();
   const boundProfile = profile({
     vcpRuntimeBaseline: revision,
     vcpRuntimeRepository: repoRoot,
     vcpRuntimeScopeDigest: accepted.scopeDigest
   });
   assert.equal(
-    profileVcpRuntimeIdentityMatches(boundProfile, accepted),
+    profileVcpRuntimeIdentityMatches(
+      boundProfile,
+      inspect({ boundProfile })
+    ),
     true
   );
-  assert.equal(accepted.scopeComplete, true);
+  assert.equal(
+    inspect({ boundProfile }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MATCH
+  );
   assert.equal(
     profileVcpRuntimeIdentityMatches(
       boundProfile,
-      inspect(' M KnowledgeBaseManager.js\n')
+      inspect({ boundProfile, head: nextRevision })
+    ),
+    true
+  );
+  assert.equal(
+    inspect({ boundProfile, head: nextRevision }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MATCH_BUILD_CHANGED
+  );
+  assert.equal(
+    profileVcpRuntimeIdentityMatches(
+      { ...boundProfile, vcpRuntimeContractDigest: `sha256:${'0'.repeat(64)}` },
+      { ...inspect({ boundProfile }), admissionAllowed: true }
     ),
     false
   );
   assert.equal(
-    profileVcpRuntimeIdentityMatches(
-      {
-        ...boundProfile,
-        vcpRuntimeBaseline: '0'.repeat(40)
-      },
-      accepted
+    inspect({ boundProfile, status: ' M KnowledgeBaseManager.js\n' })
+      .classification,
+    VCP_RUNTIME_CLASSIFICATIONS.BUILD_UNTRUSTED
+  );
+  assert.equal(
+    inspect({ boundProfile, contractComplete: false }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_UNAVAILABLE
+  );
+  assert.equal(
+    inspect({
+      boundProfile,
+      evidenceDigest: `sha256:${'9a'.repeat(32)}`
+    }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MISMATCH
+  );
+  assert.equal(
+    inspect({
+      boundProfile: profile({
+        vcpRuntimeContractDigest: `sha256:${'0'.repeat(64)}`,
+        vcpRuntimeRepository: repoRoot
+      })
+    }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.CONTRACT_MISMATCH
+  );
+  const legacyBound = legacyV6Profile({
+    vcpRuntimeBaseline: revision,
+    vcpRuntimeRepository: repoRoot,
+    vcpRuntimeScopeDigest: accepted.scopeDigest
+  });
+  assert.equal(
+    inspect({ boundProfile: legacyBound }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.LEGACY_IDENTITY_MATCH
+  );
+  assert.equal(
+    inspect({ boundProfile: legacyBound, head: nextRevision }).classification,
+    VCP_RUNTIME_CLASSIFICATIONS.LEGACY_REACCEPTANCE_REQUIRED
+  );
+});
+
+test('VCP runtime contract hard-gates capability and policy changes', () => {
+  assert.equal(
+    VCP_RUNTIME_CONTRACT_PROJECTION.nativeShimProtocol,
+    GOVERNED_READ_ATTEMPT_PROTOCOL
+  );
+  const base = {
+    capabilitySurface: [
+      'audit_memory',
+      'knowledge_base.search',
+      'memory_overview'
+    ],
+    componentBindingContract: {
+      embeddingModule: 'EmbeddingUtils.js#getEmbeddingsBatch',
+      knowledgeBaseModule: 'KnowledgeBaseManager.js#initialize,shutdown'
+    },
+    globalSearchPolicy: 'disabled',
+    manifestSchemaVersion: 1,
+    memoryReadPolicy: 'project_scoped_allowlisted_diaries',
+    memoryWritePolicy: 'disabled',
+    nativeShimProtocol: 'governed_read_attempt.v1',
+    providerPolicy: 'governed_embedding_child_only',
+    repositoryBinding: 'canonical_vcp_runtime_repository',
+    schemaVersion: 1
+  };
+  const changes = [
+    { memoryWritePolicy: 'enabled' },
+    { globalSearchPolicy: 'enabled' },
+    { providerPolicy: 'direct_execution' },
+    { capabilitySurface: [...base.capabilitySurface, 'record_memory'] },
+    { nativeShimProtocol: 'governed_read_attempt.v2' },
+    { repositoryBinding: 'substituted_runtime_repository' }
+  ];
+  for (const change of changes) {
+    assert.notEqual(
+      vcpRuntimeContractDigest({
+        staticPolicyProjection: { ...base, ...change },
+        vcpContractEvidenceDigest: VCP_CONTRACT_EVIDENCE_DIGEST
+      }),
+      VCP_CONTRACT_DIGEST
+    );
+  }
+  assert.throws(
+    () => vcpRuntimeContractDigest({
+      staticPolicyProjection: { ...base, unknownPolicy: false },
+      vcpContractEvidenceDigest: VCP_CONTRACT_EVIDENCE_DIGEST
+    }),
+    { code: 'stack_vcp_runtime_contract_invalid' }
+  );
+});
+
+test('VCP contract evidence binds root bodies, transitive closure, and ignores unrelated files', t => {
+  const bodyRoot = vcpContractFixture(t);
+  const beforeBody = inspectVcpRuntimeContractEvidence(bodyRoot);
+  assert.equal(beforeBody.complete, true);
+  fs.writeFileSync(
+    path.join(bodyRoot, 'EmbeddingUtils.js'),
+    'async function getEmbeddingsBatch() {}\n' +
+      'function cosineSimilarity() {}\n' +
+      'module.exports = { getEmbeddingsBatch, cosineSimilarity };\n'
+  );
+  commitVcpContractFixture(bodyRoot, 'same exports empty body');
+  const afterBody = inspectVcpRuntimeContractEvidence(bodyRoot);
+  assert.equal(afterBody.complete, true);
+  assert.notEqual(afterBody.evidenceDigest, beforeBody.evidenceDigest);
+  assert.notEqual(
+    vcpRuntimeContractDigest({
+      vcpContractEvidenceDigest: afterBody.evidenceDigest
+    }),
+    vcpRuntimeContractDigest({
+      vcpContractEvidenceDigest: beforeBody.evidenceDigest
+    })
+  );
+
+  const transitiveRoot = vcpContractFixture(t);
+  const beforeTransitive = inspectVcpRuntimeContractEvidence(transitiveRoot);
+  fs.writeFileSync(
+    path.join(transitiveRoot, 'security-leaf.js'),
+    "const helper = require('./security-helper');\n" +
+      'module.exports = { helper, value: 2 };\n'
+  );
+  commitVcpContractFixture(transitiveRoot, 'transitive security change');
+  const afterTransitive = inspectVcpRuntimeContractEvidence(transitiveRoot);
+  assert.equal(afterTransitive.complete, true);
+  assert.notEqual(
+    afterTransitive.evidenceDigest,
+    beforeTransitive.evidenceDigest
+  );
+  assert.equal(
+    inspectVcpRuntimeContractEvidence(transitiveRoot).evidenceDigest,
+    afterTransitive.evidenceDigest
+  );
+
+  const unrelatedRoot = vcpContractFixture(t);
+  const beforeUnrelated = inspectVcpRuntimeContractEvidence(unrelatedRoot);
+  fs.writeFileSync(
+    path.join(unrelatedRoot, 'unrelated.js'),
+    'module.exports = 2;\n'
+  );
+  commitVcpContractFixture(unrelatedRoot, 'unrelated build change');
+  const afterUnrelated = inspectVcpRuntimeContractEvidence(unrelatedRoot);
+  assert.equal(afterUnrelated.complete, true);
+  assert.equal(afterUnrelated.evidenceDigest, beforeUnrelated.evidenceDigest);
+  const packageManifest = JSON.parse(
+    fs.readFileSync(path.join(unrelatedRoot, 'package.json'), 'utf8')
+  );
+  packageManifest.version = '1.0.1';
+  packageManifest.scripts = { fixture: 'node unrelated.js' };
+  fs.writeFileSync(
+    path.join(unrelatedRoot, 'package.json'),
+    JSON.stringify(packageManifest)
+  );
+  commitVcpContractFixture(unrelatedRoot, 'unrelated package metadata change');
+  const afterPackageMetadata = inspectVcpRuntimeContractEvidence(unrelatedRoot);
+  assert.equal(afterPackageMetadata.complete, true);
+  assert.equal(
+    afterPackageMetadata.evidenceDigest,
+    beforeUnrelated.evidenceDigest
+  );
+});
+
+test('VCP contract evidence fails closed on path, Git, and dependency ambiguity', t => {
+  const missingRoot = vcpContractFixture(t);
+  fs.rmSync(path.join(missingRoot, 'EmbeddingUtils.js'));
+  commitVcpContractFixture(missingRoot, 'missing security root');
+  assert.equal(inspectVcpRuntimeContractEvidence(missingRoot).complete, false);
+
+  const symlinkRoot = vcpContractFixture(t);
+  fs.rmSync(path.join(symlinkRoot, 'EmbeddingUtils.js'));
+  fs.symlinkSync('security-helper.js', path.join(symlinkRoot, 'EmbeddingUtils.js'));
+  commitVcpContractFixture(symlinkRoot, 'symlink security root');
+  assert.equal(inspectVcpRuntimeContractEvidence(symlinkRoot).complete, false);
+
+  const untrackedRoot = vcpContractFixture(t);
+  fs.rmSync(path.join(untrackedRoot, 'EmbeddingUtils.js'));
+  commitVcpContractFixture(untrackedRoot, 'remove tracked security root');
+  fs.writeFileSync(
+    path.join(untrackedRoot, 'EmbeddingUtils.js'),
+    'async function getEmbeddingsBatch() {}\n' +
+      'function cosineSimilarity() {}\n' +
+      'module.exports = { getEmbeddingsBatch, cosineSimilarity };\n'
+  );
+  assert.equal(inspectVcpRuntimeContractEvidence(untrackedRoot).complete, false);
+
+  const dirtyRoot = vcpContractFixture(t);
+  fs.writeFileSync(
+    path.join(dirtyRoot, 'security-leaf.js'),
+    'module.exports = { value: 9 };\n'
+  );
+  assert.equal(inspectVcpRuntimeContractEvidence(dirtyRoot).complete, false);
+
+  const dynamicRoot = vcpContractFixture(t, {
+    knowledgeBaseSource:
+      "const target = 'security-helper';\n" +
+      "const helper = require('./' + target);\n" +
+      'class KnowledgeBaseManager { async initialize() { return helper; } ' +
+      'async shutdown() {} }\n' +
+      'module.exports = new KnowledgeBaseManager();\n'
+  });
+  assert.equal(inspectVcpRuntimeContractEvidence(dynamicRoot).complete, false);
+  assert.equal(
+    inspectVcpRuntimeContractEvidence(dynamicRoot).stableErrorCode,
+    'stack_vcp_runtime_contract_dependency_indirection_unsupported'
+  );
+
+  const traversalRoot = vcpContractFixture(t, {
+    knowledgeBaseSource:
+      "const helper = require('../outside-security-root');\n" +
+      'class KnowledgeBaseManager { async initialize() { return helper; } ' +
+      'async shutdown() {} }\n' +
+      'module.exports = new KnowledgeBaseManager();\n'
+  });
+  assert.equal(inspectVcpRuntimeContractEvidence(traversalRoot).complete, false);
+});
+
+test('VCP contract evidence fails closed on loader and execution indirection', t => {
+  const unsupportedLoaders = [
+    "const load = require; load('./security-helper');",
+    "let load = require; load('./security-helper');",
+    "let load; load = require; load('./security-helper');",
+    'const load = module.require;',
+    'const load = module.require.bind(module);',
+    'const holder = { load: require };',
+    'consume(require);',
+    'function expose() { return require; }',
+    "const { createRequire } = require('node:module');",
+    "const Module = require('node:module'); Module.createRequire(__filename);"
+  ];
+  for (const [index, prelude] of unsupportedLoaders.entries()) {
+    const root = vcpContractFixture(t, {
+      knowledgeBaseSource: vcpKnowledgeBaseSource(prelude)
+    });
+    const evidence = inspectVcpRuntimeContractEvidence(root);
+    assert.equal(evidence.complete, false, `loader fixture ${index}`);
+    assert.equal(evidence.evidenceDigest, null, `loader fixture ${index}`);
+    assert.equal(evidence.projection, null, `loader fixture ${index}`);
+    assert.equal(
+      evidence.stableErrorCode,
+      'stack_vcp_runtime_contract_dependency_indirection_unsupported',
+      `loader fixture ${index}`
+    );
+  }
+
+  const executionIndirections = [
+    "eval(\"require('./security-helper')\");",
+    'const execute = eval;',
+    'globalThis.eval("void 0");',
+    "new Function(\"return require('./security-helper')\");",
+    'const Constructor = Function;',
+    'global.Function("return 1");',
+    "vm.runInThisContext(\"require('./security-helper')\");",
+    'const execute = vm;',
+    "process.mainModule.require('./security-helper');",
+    'const legacyLoader = process.mainModule;',
+    'const root = global;',
+    "global.require('./security-helper');"
+  ];
+  for (const [index, prelude] of executionIndirections.entries()) {
+    const root = vcpContractFixture(t, {
+      knowledgeBaseSource: vcpKnowledgeBaseSource(prelude)
+    });
+    const evidence = inspectVcpRuntimeContractEvidence(root);
+    assert.equal(evidence.complete, false, `execution fixture ${index}`);
+    assert.equal(evidence.evidenceDigest, null, `execution fixture ${index}`);
+    assert.equal(evidence.projection, null, `execution fixture ${index}`);
+    assert.equal(
+      evidence.stableErrorCode,
+      'stack_vcp_runtime_contract_execution_indirection_unsupported',
+      `execution fixture ${index}`
+    );
+  }
+});
+
+test('VCP contract evidence rejects computed specifiers and shadowed loaders', t => {
+  const computedSpecifiers = [
+    "const name = 'security-helper'; require('./' + name);",
+    "const target = './security-helper'; require(target);",
+    "const name = 'security-helper'; require(`./${name}`);",
+    "const target = './security-helper'; import(target);",
+    "module['require']('./security-helper');",
+    "require?.('./security-helper');"
+  ];
+  for (const [index, prelude] of computedSpecifiers.entries()) {
+    const root = vcpContractFixture(t, {
+      knowledgeBaseSource: vcpKnowledgeBaseSource(prelude)
+    });
+    const evidence = inspectVcpRuntimeContractEvidence(root);
+    assert.equal(evidence.complete, false, `specifier fixture ${index}`);
+    assert.equal(evidence.evidenceDigest, null, `specifier fixture ${index}`);
+    assert.equal(evidence.projection, null, `specifier fixture ${index}`);
+    assert.equal(
+      evidence.stableErrorCode,
+      'stack_vcp_runtime_contract_dependency_indirection_unsupported',
+      `specifier fixture ${index}`
+    );
+  }
+
+  const shadowedRoot = vcpContractFixture(t, {
+    knowledgeBaseSource: vcpKnowledgeBaseSource(
+      "function load(require) { return require('./not-a-real-load'); }"
+    )
+  });
+  const shadowed = inspectVcpRuntimeContractEvidence(shadowedRoot);
+  assert.equal(shadowed.complete, false);
+  assert.equal(
+    shadowed.stableErrorCode,
+    'stack_vcp_runtime_contract_dependency_analysis_ambiguous'
+  );
+});
+
+test('VCP dependency analysis ignores comments and preserves static literals', t => {
+  const commentsRoot = vcpContractFixture(t, {
+    knowledgeBaseSource: vcpKnowledgeBaseSource(
+      '// const load = require;\n' +
+      'const text = "require(\\\'./fake\\\')";',
+      'return text.length > 0;'
+    )
+  });
+  assert.equal(inspectVcpRuntimeContractEvidence(commentsRoot).complete, true);
+
+  const directRoot = vcpContractFixture(t, {
+    knowledgeBaseSource: vcpKnowledgeBaseSource(
+      "const helper = module.require('./security-helper');",
+      'return helper.initialize();'
+    )
+  });
+  const before = inspectVcpRuntimeContractEvidence(directRoot);
+  assert.equal(before.complete, true);
+  fs.writeFileSync(
+    path.join(directRoot, 'security-helper.js'),
+    "const leaf = require('./security-leaf');\n" +
+      'module.exports = { initialize: () => leaf.value + 1, ' +
+      'shutdown: () => true };\n'
+  );
+  commitVcpContractFixture(directRoot, 'change direct static dependency');
+  const after = inspectVcpRuntimeContractEvidence(directRoot);
+  assert.equal(after.complete, true);
+  assert.notEqual(after.evidenceDigest, before.evidenceDigest);
+
+  const literalImportRoot = vcpContractFixture(t, {
+    knowledgeBaseSource: vcpKnowledgeBaseSource(
+      "import('./security-helper');"
+    )
+  });
+  assert.equal(
+    inspectVcpRuntimeContractEvidence(literalImportRoot).complete,
+    true
+  );
+});
+
+test('VCP contract evidence binds relevant external dependency identity', t => {
+  const root = vcpContractFixture(t, {
+    embeddingSource:
+      "const dependency = require('fixture-package');\n" +
+      'async function getEmbeddingsBatch() { return dependency.value; }\n' +
+      'function cosineSimilarity() { return 1; }\n' +
+      'module.exports = { getEmbeddingsBatch, cosineSimilarity };\n'
+  });
+  const packageManifest = {
+    name: 'vcptoolbox',
+    version: '1.0.0',
+    dependencies: { 'fixture-package': '1.0.0' }
+  };
+  const lock = {
+    lockfileVersion: 3,
+    packages: {
+      '': packageManifest,
+      'node_modules/fixture-package': {
+        version: '1.0.0',
+        integrity: 'sha512-QUFBQQ=='
+      }
+    }
+  };
+  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(packageManifest));
+  fs.writeFileSync(path.join(root, 'package-lock.json'), JSON.stringify(lock));
+  commitVcpContractFixture(root, 'bind external dependency');
+  const before = inspectVcpRuntimeContractEvidence(root);
+  assert.equal(before.complete, true);
+  lock.packages['node_modules/fixture-package'] = {
+    version: '2.0.0',
+    integrity: 'sha512-QkJCQg=='
+  };
+  fs.writeFileSync(path.join(root, 'package-lock.json'), JSON.stringify(lock));
+  commitVcpContractFixture(root, 'change external dependency');
+  const after = inspectVcpRuntimeContractEvidence(root);
+  assert.equal(after.complete, true);
+  assert.notEqual(after.evidenceDigest, before.evidenceDigest);
+});
+
+test('legacy schema-v6 migration package binds fingerprint and exact stale-safe P1 inputs', t => {
+  const legacy = legacyV6Profile();
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-vcp-migration-'));
+  t.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  fs.chmodSync(directory, 0o700);
+  const profilePath = path.join(directory, 'profile.json');
+  fs.writeFileSync(profilePath, `${JSON.stringify(legacy)}\n`, { mode: 0o600 });
+  fs.chmodSync(profilePath, 0o600);
+  const expectedCurrentFingerprint = canonicalProfileFingerprint(legacy);
+  const identity = {
+    buildDigest: `sha256:${'d1'.repeat(32)}`,
+    contractComplete: true,
+    contractDigest: VCP_CONTRACT_DIGEST,
+    contractEvidenceDigest: VCP_CONTRACT_EVIDENCE_DIGEST,
+    contractEvidenceSummary: {
+      dependencyFileCount: 2,
+      externalDependencyCount: 1,
+      securityFileCount: 4
+    },
+    currentMain: true,
+    manifestDigest: `sha256:${'d2'.repeat(32)}`,
+    repository: legacy.vcpRuntimeRepository,
+    repositoryMatch: true,
+    revision: 'd'.repeat(40),
+    scopeClean: true,
+    scopeComplete: true,
+    scopeDigest: `sha256:${'e'.repeat(64)}`
+  };
+  const beforeBytes = fs.readFileSync(profilePath, 'utf8');
+  const migration = vcpRuntimeContractMigrationCandidate(legacy, identity, {
+    expectedCurrentFingerprint,
+    profilePath
+  });
+  assert.equal(fs.readFileSync(profilePath, 'utf8'), beforeBytes);
+  assert.deepEqual(
+    migration,
+    vcpRuntimeContractMigrationCandidate(legacy, identity, {
+      expectedCurrentFingerprint,
+      profilePath
+    })
+  );
+  assert.equal(migration.schemaVersion, 1);
+  assert.equal(
+    migration.current.expectedCurrentFingerprint,
+    expectedCurrentFingerprint
+  );
+  assert.equal(
+    migration.transaction.expectedCurrentFingerprint,
+    expectedCurrentFingerprint
+  );
+  assert.equal(migration.transaction.profilePath, profilePath);
+  assert.strictEqual(migration.transaction.nextProfile, migration.nextProfile);
+  assert.equal(migration.nextProfile.schemaVersion, PROFILE_SCHEMA_VERSION);
+  assert.equal(
+    migration.nextProfile.vcpRuntimeIdentitySchemaVersion,
+    VCP_RUNTIME_IDENTITY_SCHEMA_VERSION
+  );
+  assert.equal(
+    migration.nextProfile.vcpRuntimeContractDigest,
+    VCP_CONTRACT_DIGEST
+  );
+  assert.equal(migration.nextProfile.vcpRuntimeBaseline, identity.revision);
+  assert.equal(migration.nextProfile.vcpRuntimeScopeDigest, identity.scopeDigest);
+  assert.equal(Object.hasOwn(legacy, 'vcpRuntimeContractDigest'), false);
+  const stale = legacyV6Profile({ vcpRuntimeBaseline: 'f'.repeat(40) });
+  fs.writeFileSync(profilePath, `${JSON.stringify(stale)}\n`, { mode: 0o600 });
+  fs.chmodSync(profilePath, 0o600);
+  const result = commitOwnerProfileTransaction(migration.transaction);
+  assert.equal(result.classification, 'STALE_CURRENT');
+  assert.deepEqual(JSON.parse(fs.readFileSync(profilePath, 'utf8')), stale);
+  assert.throws(
+    () => vcpRuntimeContractMigrationCandidate(
+      legacy,
+      { ...identity, contractComplete: false, contractEvidenceDigest: null },
+      { expectedCurrentFingerprint, profilePath }
     ),
-    false
+    { code: 'stack_vcp_runtime_migration_candidate_invalid' }
   );
 });
 
@@ -2941,6 +3543,9 @@ test('Relay secret-file rotation invalidates the running process without secret 
 
 test('legacy profiles bootstrap only reviewed identities into a v6 manifest binding', () => {
   const identity = {
+    admissionAllowed: true,
+    contractComplete: true,
+    contractDigest: VCP_CONTRACT_DIGEST,
     recognized: true,
     revision: VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE[BASELINE],
     repository: vcpRuntimeRepository(),
@@ -2992,6 +3597,11 @@ test('legacy profiles bootstrap only reviewed identities into a v6 manifest bind
     RELAY_ENVIRONMENT_CONFIG_DIGEST
   );
   assert.equal(upgraded.vcpRuntimeBaseline, identity.revision);
+  assert.equal(upgraded.vcpRuntimeContractDigest, VCP_CONTRACT_DIGEST);
+  assert.equal(
+    upgraded.vcpRuntimeIdentitySchemaVersion,
+    VCP_RUNTIME_IDENTITY_SCHEMA_VERSION
+  );
   assert.equal(upgraded.vcpRuntimeRepository, identity.repository);
   assert.equal(upgraded.vcpRuntimeScopeDigest, identity.scopeDigest);
   assert.equal(profileVcpRuntimeIdentityMatches(upgraded, identity), true);
