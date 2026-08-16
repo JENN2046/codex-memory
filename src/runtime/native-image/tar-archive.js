@@ -86,7 +86,9 @@ function parseTarBuffer(buffer, limits = {}) {
     }
     const prefix = field(header, 345, 155);
     const basename = field(header, 0, 100);
-    const name = normalizedName(prefix ? `${prefix}/${basename}` : basename);
+    const rawName = prefix ? `${prefix}/${basename}` : basename;
+    const name = policy.allowRootEntry === true && ['./', '.'].includes(rawName) ? '.' :
+      normalizedName(rawName);
     if (names.has(name)) fail('runtime_tar_duplicate_path');
     names.add(name);
     const type = String.fromCharCode(header[156] || 48);

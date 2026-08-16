@@ -175,6 +175,7 @@ function inspectOciArchive(archive, { fsModule = fs } = {}) {
       if (expandedTotal > 1024 * 1024 * 1024) fail('runtime_oci_layer_expansion_limit');
       parseTarBuffer(uncompressed, {
         allowedTypeFlags: ['0', '1', '2', '5'],
+        allowRootEntry: true,
         maximumArchiveBytes: 512 * 1024 * 1024,
         maximumEntries: 100_000,
         maximumFileBytes: 512 * 1024 * 1024,
