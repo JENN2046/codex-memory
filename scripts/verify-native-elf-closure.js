@@ -26,7 +26,18 @@ function nativeFiles(root) {
     for (const name of fs.readdirSync(directory).sort()) {
       const file = path.join(directory, name);
       const stat = fs.lstatSync(file);
-      if (stat.isSymbolicLink()) fail('runtime_native_closure_symlink_forbidden');
+      if (stat.isSymbolicLink()) {
+        let target;
+        try { target = fs.statSync(file); } catch {
+          fail('runtime_native_closure_symlink_forbidden');
+        }
+        if (target.isDirectory() || name.endsWith('.node') || name.endsWith('.so')) {
+          fail('runtime_native_closure_symlink_forbidden');
+        }
+        // npm creates executable JS links under node_modules/.bin. They are
+        // immutable image bytes but not native artifacts, so never follow them.
+        continue;
+      }
       if (stat.isDirectory()) visit(file);
       else if (stat.isFile() && (name.endsWith('.node') || name.endsWith('.so'))) output.push(file);
     }

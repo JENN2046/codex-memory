@@ -27,6 +27,7 @@ const { buildRuntimeImage, parseArguments: parseBuildArguments } = require(
   '../scripts/build-codex-memory-runtime-image'
 );
 const { runUnderLifecycleLock } = require('../deploy/native-runtime/host-launcher');
+const { nativeFiles } = require('../scripts/verify-native-elf-closure');
 
 const S = value => `sha256:${String(value).repeat(64).slice(0, 64)}`;
 const C = value => String(value).repeat(40).slice(0, 40);
@@ -297,6 +298,22 @@ test('native closure is mandatory and rejects substitution, RPATH, missing lib a
     const value = structuredClone(closure()); mutate(value);
     assert.throws(() => validateNativeClosure(value));
   }
+});
+test('native inventory ignores npm JS links but rejects native and directory symlink indirection', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'native-links-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const app = path.join(root, 'opt', 'codex-memory');
+  const vcp = path.join(root, 'opt', 'vcptoolbox');
+  fs.mkdirSync(path.join(app, 'node_modules', '.bin'), { recursive: true });
+  fs.mkdirSync(vcp, { recursive: true });
+  fs.writeFileSync(path.join(app, 'cli.js'), 'module.exports = true;\n');
+  fs.symlinkSync('../../cli.js', path.join(app, 'node_modules', '.bin', 'cli'));
+  assert.deepEqual(nativeFiles(root), []);
+  fs.symlinkSync('cli.js', path.join(app, 'unexpected.node'));
+  expectCode(() => nativeFiles(root), 'runtime_native_closure_symlink_forbidden');
+  fs.unlinkSync(path.join(app, 'unexpected.node'));
+  fs.symlinkSync('node_modules', path.join(app, 'linked-modules'));
+  expectCode(() => nativeFiles(root), 'runtime_native_closure_symlink_forbidden');
 });
 
 test('native admission re-hashes every governed ELF byte from the stopped container', () => {
