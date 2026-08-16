@@ -291,7 +291,11 @@ function closure() {
       artifact(EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256, 'a')] };
 }
 test('native closure is mandatory and rejects substitution, RPATH, missing lib and wrong arch', () => {
-  validateNativeClosure(closure());
+  const withTransitive = closure();
+  withTransitive.artifacts[0].resolvedLibraries.push({
+    name: 'libgcc_s.so.1', path: '/usr/lib/x86_64-linux-gnu/libgcc_s.so.1', sha256: S('5')
+  });
+  validateNativeClosure(withTransitive);
   for (const mutate of [
     value => { value.artifacts[1].sha256 = S('0'); },
     value => { value.artifacts[0].runpath = '/host/lib'; },

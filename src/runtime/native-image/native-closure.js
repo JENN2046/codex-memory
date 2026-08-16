@@ -51,15 +51,16 @@ function validateNativeClosure(value) {
       if (!library || !['/lib/x86_64-linux-gnu/', '/usr/lib/x86_64-linux-gnu/']
         .some(prefix => library.path.startsWith(prefix)) ||
         !/^sha256:[a-f0-9]{64}$/u.test(library.sha256 || '') ||
-        !artifact.needed.includes(library.name)) {
+        !/^[A-Za-z0-9_.+-]+\.so(?:\.[0-9]+)*$/u.test(library.name || '')) {
         fail('runtime_native_closure_dependency_invalid');
       }
     }
-    if (artifact.resolvedLibraries.length !== artifact.needed.length ||
+    if (artifact.needed.some(name =>
+      !artifact.resolvedLibraries.some(library => library.name === name)) ||
       new Set(artifact.resolvedLibraries.map(item => item.name)).size !==
-        artifact.needed.length ||
+        artifact.resolvedLibraries.length ||
       new Set(artifact.resolvedLibraries.map(item => item.path)).size !==
-        artifact.needed.length) fail('runtime_native_closure_dependency_missing');
+        artifact.resolvedLibraries.length) fail('runtime_native_closure_dependency_missing');
   }
   return Object.freeze(value);
 }

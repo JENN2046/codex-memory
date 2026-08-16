@@ -79,9 +79,14 @@ function inspect(root = '/') {
     if (rpath !== null || runpath !== null || needed.some(name => name.includes('/'))) {
       fail('runtime_native_loader_path_forbidden');
     }
-    const resolved = command('ldd', [expected]).split('\n').map(line =>
-      /^\s*(\S+)\s+=>\s+(\/\S+)\s+\(/u.exec(line)
-    ).filter(Boolean).map(match => ({ name: match[1], path: match[2] }));
+    const resolved = command('ldd', [expected]).split('\n').map(line => {
+      const linked = /^\s*(\S+)\s+=>\s+(\/\S+)\s+\(/u.exec(line);
+      if (linked) return { name: linked[1], path: fs.realpathSync(linked[2]) };
+      const direct = /^\s*(\/\S+)\s+\(/u.exec(line);
+      return direct ? {
+        name: path.basename(direct[1]), path: fs.realpathSync(direct[1])
+      } : null;
+    }).filter(Boolean);
     if (resolved.some(item => item.path.startsWith('/opt/') ||
         !fs.statSync(item.path).isFile())) fail('runtime_native_dependency_path_invalid');
     const glibcVersions = [...symbols.matchAll(/\bGLIBC_(\d+)\.(\d+)\b/gu)]
