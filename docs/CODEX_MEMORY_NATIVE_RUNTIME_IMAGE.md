@@ -6,7 +6,7 @@ runtime activation.
 
 ## Trust boundary
 
-The application trust root is one accepted OCI image manifest, its image
+The application trust root is one accepted OCI archive hash and manifest, its image
 configuration, ordered RootFS diff IDs, embedded build manifest, and exact
 pre-created container configuration. Node, codex-memory, the clean VCP runtime,
 Vexus, the dynamic loader, and userspace native libraries execute from that
@@ -47,6 +47,17 @@ interpreter is an explicit host-trust-base component. The launcher starts Edge,
 waits for bounded health, atomically emits a root-owned Edge receipt, re-verifies
 all identities, and starts the exact pre-created runtime container. Stop retains
 both containers and never stops the external Provider.
+
+The authority record and Edge receipt contain no secrets. Their installed files
+are root-owned, non-writable by group/other, and readable by the non-root runtime
+only through individual read-only bind mounts. Secret material uses separate
+owner-only mounts and is never placed in either receipt.
+
+Authority creation re-verifies the digest-addressed OCI archive and requires
+the imported local Docker image ID to equal its OCI manifest or config digest
+(Docker's containerd image store reports the manifest digest as `.Id` on the
+current Native host). It also requires the local ordered RootFS diff IDs to
+match the archive. The mutable tag is never consulted after import.
 
 The image-contained `container-supervisor` consumes the read-only authority
 record, embedded build manifest, schema-v7 profile, and fresh Edge receipt. It

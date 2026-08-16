@@ -14,6 +14,9 @@ const {
   validateAuthorityRecord,
   validateBuildManifest
 } = require('../src/runtime/native-image/runtime-authority');
+const {
+  verifyOciArchive
+} = require('./verify-codex-memory-runtime-image');
 
 function fail(code) { const error = new Error(code); error.code = code; throw error; }
 function inspect(kind, id) {
@@ -42,6 +45,15 @@ function main(argv = process.argv.slice(2)) {
   const manifest = validateBuildManifest(JSON.parse(fs.readFileSync(
     path.resolve(args['build-manifest']), 'utf8'
   )));
+  const archiveEvidence = verifyOciArchive(
+    path.resolve(args['oci-archive']),
+    path.resolve(args['build-manifest'])
+  );
+  if (![archiveEvidence.manifestDigest, archiveEvidence.configDigest]
+    .includes(image.Id) ||
+      archiveEvidence.rootfsChainDigest !== digest(image.RootFS.Layers)) {
+    fail('runtime_authority_imported_image_mismatch');
+  }
   const stateMountContract = {
     containerPath: args['state-destination'],
     readOnly: true,
@@ -49,8 +61,9 @@ function main(argv = process.argv.slice(2)) {
     stateRootClass: 'external_primary_r5c'
   };
   const candidate = validateAuthorityRecord({
-    acceptedImageConfigId: args['image-config-id'],
-    acceptedOciManifestDigest: args['oci-manifest-digest'],
+    acceptedImageConfigId: image.Id,
+    acceptedOciArchiveSha256: archiveEvidence.archiveSha256,
+    acceptedOciManifestDigest: archiveEvidence.manifestDigest,
     authoritySchemaVersion: AUTHORITY_SCHEMA,
     buildManifestDigest: digest(manifest),
     codexMemoryCommit: manifest.codexMemoryCommit,

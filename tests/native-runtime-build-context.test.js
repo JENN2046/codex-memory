@@ -191,6 +191,10 @@ test('systemd candidate uses root-owned installed launcher, not checkout', () =>
     'codex-memory-native-runtime.service'
   ), 'utf8');
   assert.match(source, /^User=root$/mu);
+  assert.match(source, /^Type=simple$/mu);
+  assert.match(source, /host-launcher\.js run --authority=/u);
+  assert.match(source, /^Restart=on-failure$/mu);
+  assert.match(source, /^RuntimeDirectory=codex-memory$/mu);
   assert.match(source,
     /\/usr\/local\/lib\/codex-memory-native-runtime\/deploy\/native-runtime\/host-launcher\.js/u);
   assert.doesNotMatch(source, /\/home\/jenn|AGENTS_OS_Workspace/u);

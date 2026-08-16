@@ -4,7 +4,7 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
-const { execFileSync } = require('node:child_process');
+const { execFileSync, spawn } = require('node:child_process');
 const {
   EDGE_RECEIPT_SCHEMA,
   authorityRecordDigest,
@@ -107,13 +107,15 @@ function atomicRootReceipt(file, value, {
     temporary,
     fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_WRONLY |
       (fs.constants.O_NOFOLLOW || 0),
-    0o600
+    0o644
   );
   try {
     fsModule.writeFileSync(descriptor, canonicalJson(value), 'utf8');
     fsModule.fsyncSync(descriptor);
     fsModule.fchownSync(descriptor, uid, gid);
-    fsModule.fchmodSync(descriptor, 0o600);
+    // The receipt is non-secret and must be readable by the non-root runtime
+    // container through its read-only bind mount. Only root may replace it.
+    fsModule.fchmodSync(descriptor, 0o644);
   } finally {
     fsModule.closeSync(descriptor);
   }
@@ -179,10 +181,16 @@ function verifyHostAuthority(authority, options = {}) {
       'CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH',
       'CODEX_MEMORY_STACK_PROFILE_PATH',
       'CODEX_MEMORY_STACK_RUNTIME_DIR',
+      'NODE_DISABLE_COMPILE_CACHE',
       'NODE_ENV',
+      'NODE_VERSION',
       'PATH',
+      'PUPPETEER_SKIP_DOWNLOAD',
+      'SOURCE_DATE_EPOCH',
+      'TZ',
       'VCP_ROOT',
-      'VCPTOOLBOX_ROOT'
+      'VCPTOOLBOX_ROOT',
+      'YARN_VERSION'
     ],
     expectedStateSource: options.expectedStateSource
   });
@@ -202,11 +210,18 @@ async function start(authority, options = {}) {
   const edge = await waitForHealthyEdge(authority, options);
   const bootId = options.bootId ||
     fs.readFileSync(options.bootIdPath || DEFAULT_BOOT_ID_PATH, 'utf8').trim();
-  const receipt = buildEdgeReceipt(edge, authority, bootId, options.now?.() || Date.now());
+  // Re-inspect immediately before receipt publication. A changed/recreated or
+  // newly unhealthy container is never substituted merely because it has the
+  // same human-readable name.
+  const finalEvidence = verifyHostAuthority(authority, options);
+  const receipt = buildEdgeReceipt(
+    finalEvidence.edge, authority, bootId, options.now?.() || Date.now()
+  );
   atomicRootReceipt(options.receiptPath || DEFAULT_RECEIPT_PATH, receipt, options);
-  // Re-inspect immediately before activation. A changed/recreated container is
-  // never substituted merely because it has the same human-readable name.
-  verifyHostAuthority(authority, options);
+  buildEdgeReceipt(
+    dockerInspect(authority.edgeContainerId, options), authority, bootId,
+    options.now?.() || Date.now()
+  );
   dockerAction(['start', authority.expectedRuntimeContainerId], options);
   return Object.freeze({
     accepted: true,
@@ -215,6 +230,66 @@ async function start(authority, options = {}) {
     runtimeContainerId: authority.expectedRuntimeContainerId,
     secretValuesReturned: false
   });
+}
+
+async function run(authority, options = {}) {
+  let stopRequested = false;
+  let stopNow = null;
+  const requestStop = () => {
+    stopRequested = true;
+    stopNow?.();
+  };
+  process.once('SIGTERM', requestStop);
+  process.once('SIGINT', requestStop);
+  try {
+    await start(authority, options);
+    if (stopRequested) {
+      return Object.freeze({
+        ...stop(authority, options), action: 'supervised_stop'
+      });
+    }
+    const spawnProcess = options.spawnProcess || spawn;
+    const waiter = spawnProcess(options.docker || DOCKER, [
+      'container', 'wait', authority.expectedRuntimeContainerId
+    ], { stdio: ['ignore', 'pipe', 'pipe'] });
+    let output = '';
+    let stopping = false;
+    const maximumOutput = 4_096;
+    waiter.stdout?.on('data', value => {
+      output = `${output}${value}`.slice(-maximumOutput);
+    });
+    return await new Promise((resolve, reject) => {
+      stopNow = () => {
+        if (stopping) return;
+        stopping = true;
+        try {
+          const result = stop(authority, options);
+          waiter.kill?.('SIGTERM');
+          resolve(Object.freeze({ ...result, action: 'supervised_stop' }));
+        } catch (error) {
+          reject(error);
+        }
+      };
+      if (stopRequested) return stopNow();
+      waiter.once('error', error => {
+        if (stopping) return;
+        try { stop(authority, options); } catch {}
+        reject(error);
+      });
+      waiter.once('close', () => {
+        if (stopping) return;
+        try { stop(authority, options); } catch {}
+        const status = Number.parseInt(output.trim(), 10);
+        const error = new Error('host_launcher_runtime_exited');
+        error.code = 'host_launcher_runtime_exited';
+        error.runtimeExitStatus = Number.isSafeInteger(status) ? status : null;
+        reject(error);
+      });
+    });
+  } finally {
+    process.off('SIGTERM', requestStop);
+    process.off('SIGINT', requestStop);
+  }
 }
 
 function stop(authority, options = {}) {
@@ -241,7 +316,9 @@ function stop(authority, options = {}) {
 
 function parseArguments(argv) {
   const command = argv[0];
-  if (!['start', 'stop', 'verify'].includes(command)) fail('host_launcher_command_invalid');
+  if (!['run', 'start', 'stop', 'verify'].includes(command)) {
+    fail('host_launcher_command_invalid');
+  }
   if (argv.length !== 2 || !argv[1].startsWith('--authority=')) {
     fail('host_launcher_argument_invalid');
   }
@@ -258,9 +335,11 @@ async function main(argv = process.argv.slice(2)) {
   }
   const { authorityFile, command } = parseArguments(argv);
   const authority = validateAuthorityRecord(readBoundedJson(authorityFile, {
-    requireRootOwner: true
+    requireRootOwner: true,
+    requireRootOwnedParent: true
   }));
   let result;
+  if (command === 'run') result = await run(authority);
   if (command === 'start') result = await start(authority);
   if (command === 'stop') result = stop(authority);
   if (command === 'verify') {
@@ -284,6 +363,7 @@ module.exports = {
   dockerInspect,
   dockerImageInspect,
   parseArguments,
+  run,
   start,
   stop,
   validateEdgeContainer,

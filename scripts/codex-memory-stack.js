@@ -204,6 +204,7 @@ const IMAGE_PROFILE_KEYS = Object.freeze([
   'runtimeContainerId',
   'runtimeImageConfigId',
   'runtimeImageManifestDigest',
+  'runtimeOciArchiveSha256',
   'runtimeRootfsChainDigest',
   'stateMountContractDigest'
 ]);
@@ -1518,6 +1519,7 @@ function validateProfile(value) {
         !SAFE_CONTAINER_ID.test(value.runtimeContainerId || '') ||
         !SAFE_IMAGE_ID.test(value.runtimeImageConfigId || '') ||
         !SAFE_SHA256_DIGEST.test(value.runtimeImageManifestDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.runtimeOciArchiveSha256 || '') ||
         !SAFE_SHA256_DIGEST.test(value.runtimeRootfsChainDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.stateMountContractDigest || '') ||
         !SAFE_GIT_OBJECT.test(value.adoptedRepositoryHead || '') ||
@@ -6933,6 +6935,7 @@ function containerSupervisorAuthorityMatchesProfile(profile, authority) {
     profile.vcpRuntimeBaseline === authority.vcpCommit &&
     profile.runtimeImageManifestDigest ===
       authority.acceptedOciManifestDigest &&
+    profile.runtimeOciArchiveSha256 === authority.acceptedOciArchiveSha256 &&
     profile.runtimeImageConfigId === authority.acceptedImageConfigId &&
     profile.runtimeRootfsChainDigest === authority.rootfsChainDigest &&
     profile.runtimeBuildManifestDigest === authority.buildManifestDigest &&
@@ -6967,9 +6970,20 @@ function loadContainerSupervisorEvidence({
   const buildManifest = validateBuildManifest(readBoundedJson(
     buildManifestPath, { fsModule }
   ));
+  let bootId;
+  try {
+    bootId = fsModule.readFileSync(
+      '/proc/sys/kernel/random/boot_id', 'utf8'
+    ).trim();
+  } catch {
+    throw codedError('stack_container_boot_identity_unavailable');
+  }
+  if (!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/u.test(bootId)) {
+    throw codedError('stack_container_boot_identity_invalid');
+  }
   const edgeReceipt = validateEdgeReceipt(readBoundedJson(edgeReceiptPath, {
     fsModule
-  }), authority);
+  }), authority, { bootId });
   const profile = validateProfile(readBoundedJson(profileFile, { fsModule }));
   if (!containerSupervisorAuthorityMatchesProfile(profile, authority)) {
     throw codedError('stack_container_authority_profile_mismatch');

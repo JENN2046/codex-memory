@@ -18,6 +18,7 @@ const {
   digest,
   hostTrustBundleDigest,
   profileV7MigrationCandidate,
+  readBoundedJson,
   validateAuthorityRecord,
   validateBuildManifest,
   validateContainerInspection,
@@ -30,9 +31,11 @@ const {
   validateProfile
 } = require('../scripts/codex-memory-stack');
 const {
+  atomicRootReceipt,
   buildEdgeReceipt,
   validateEdgeContainer,
-  validateImageForHost
+  validateImageForHost,
+  verifyHostAuthority
 } = require('../deploy/native-runtime/host-launcher');
 
 const S = value => `sha256:${String(value).repeat(64).slice(0, 64)}`;
@@ -109,6 +112,7 @@ function authority(inspect = baseInspect(), overrides = {}) {
   const manifest = buildManifest();
   return {
     acceptedImageConfigId: S('d'),
+    acceptedOciArchiveSha256: S('a'),
     acceptedOciManifestDigest: S('e'),
     authoritySchemaVersion: AUTHORITY_SCHEMA,
     buildManifestDigest: buildManifestDigest(manifest),
@@ -219,6 +223,17 @@ test('host trust bundle binds launcher and first-party authority module bytes', 
   assert.notEqual(hostTrustBundleDigest({ launcherFile, authorityModuleFile }), accepted);
 });
 
+test('bounded authority reads bind an opened regular file and reject symlinks', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-authority-read-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const target = path.join(root, 'authority.json');
+  const link = path.join(root, 'authority-link.json');
+  fs.writeFileSync(target, '{"accepted":true}\n', { mode: 0o600 });
+  fs.symlinkSync(target, link);
+  assert.deepEqual(readBoundedJson(target), { accepted: true });
+  expectCode(() => readBoundedJson(link), 'runtime_authority_file_unavailable');
+});
+
 test('G wrong image ID is rejected', () => {
   const inspect = baseInspect({ Image: S('0') });
   expectCode(() => validateContainerInspection(inspect, authority()),
@@ -284,6 +299,18 @@ for (const [label, mutate] of [
   }), 'runtime_container_security_contract_mismatch');
 });
 
+test('Docker private IPC is admitted while host IPC fails closed', () => {
+  const inspect = baseInspect();
+  inspect.HostConfig.IpcMode = 'private';
+  validateContainerInspection(inspect, authority(inspect), {
+    allowedEnvironmentNames: ['NODE_ENV']
+  });
+  inspect.HostConfig.IpcMode = 'host';
+  expectCode(() => validateContainerInspection(inspect, authority(inspect), {
+    allowedEnvironmentNames: ['NODE_ENV']
+  }), 'runtime_container_security_contract_mismatch');
+});
+
 test('R non-loopback listener configuration is not an allowed environment', () => {
   const inspect = baseInspect();
   inspect.Config.Env.push('CODEX_MEMORY_HTTP_HOST=0.0.0.0');
@@ -315,6 +342,13 @@ test('U stale Edge receipt is rejected', () => {
   const a = authorityWithEdge();
   expectCode(() => validateEdgeReceipt(edgeReceipt(a, 100), a, { now: 100_000 }),
     'runtime_edge_receipt_invalid');
+});
+
+test('Edge receipt from another boot is rejected', () => {
+  const a = authorityWithEdge();
+  expectCode(() => validateEdgeReceipt(edgeReceipt(a), a, {
+    bootId: 'different-boot-identity'
+  }), 'runtime_edge_receipt_stale');
 });
 
 test('V wrong Edge identity receipt is rejected', () => {
@@ -372,12 +406,55 @@ test('host image verifier binds config, rootfs and build-manifest label', () => 
   }, a), true);
 });
 
+test('host verifier binds its installed trust bundle before Docker identity', () => {
+  const runtime = baseInspect();
+  const initial = authorityWithEdge(runtime);
+  const accepted = authority(runtime, {
+    edgeConfigDigest: initial.edgeConfigDigest,
+    hostLauncherDigest: hostTrustBundleDigest({
+      authorityModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'runtime-authority.js'),
+      launcherFile: path.join(__dirname, '..', 'deploy', 'native-runtime',
+        'host-launcher.js')
+    })
+  });
+  const edge = edgeInspect(accepted);
+  const image = {
+    Config: { Labels: {
+      'io.codex-memory.runtime.build-manifest-digest': accepted.buildManifestDigest
+    } },
+    Id: accepted.acceptedImageConfigId,
+    RootFS: { Layers: [S('4'), S('5')] }
+  };
+  const execFile = (_binary, args) => JSON.stringify([
+    args[0] === 'image' ? image :
+      args[2] === accepted.expectedRuntimeContainerId ? runtime : edge
+  ]);
+  assert.equal(verifyHostAuthority(accepted, { execFile }).runtime.Id, runtime.Id);
+  expectCode(() => verifyHostAuthority({
+    ...accepted, hostLauncherDigest: S('0')
+  }, { execFile }), 'host_launcher_trust_bundle_mismatch');
+});
+
 test('host Edge receipt is derived from exact healthy Edge inspection', () => {
   const initial = authority();
   const edge = edgeInspect(initial);
   const a = authority(baseInspect(), { edgeConfigDigest: containerConfigDigest(edge) });
   const receipt = buildEdgeReceipt(edge, a, 'boot-identity-0001', 1_700_000_000_000);
   assert.equal(receipt.edgeContainerId, a.edgeContainerId);
+});
+
+test('atomic Edge receipt is non-secret, root-replaceable and runtime-readable', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-edge-receipt-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'edge.json');
+  atomicRootReceipt(file, { accepted: true }, {
+    gid: process.getgid(), uid: process.getuid()
+  });
+  const stat = fs.statSync(file);
+  assert.equal(stat.mode & 0o777, 0o644);
+  assert.deepEqual(JSON.parse(fs.readFileSync(file, 'utf8')), { accepted: true });
 });
 
 test('schema-v6 to v7 produces candidate only and preserves state/credential refs', () => {

@@ -173,6 +173,7 @@ function validateStateMountContract(value) {
 function validateAuthorityRecord(value) {
   const keys = [
     'acceptedImageConfigId',
+    'acceptedOciArchiveSha256',
     'acceptedOciManifestDigest',
     'authoritySchemaVersion',
     'buildManifestDigest',
@@ -202,6 +203,7 @@ function validateAuthorityRecord(value) {
   assertCommit(value.vcpCommit);
   for (const item of [
     value.acceptedImageConfigId,
+    value.acceptedOciArchiveSha256,
     value.acceptedOciManifestDigest,
     value.buildManifestDigest,
     value.containerConfigDigest,
@@ -320,7 +322,7 @@ function validateContainerInspection(inspect, authority, {
   }
   if (!['1000:1000', '1000'].includes(projected.user) ||
       projected.readOnlyRootfs !== true || projected.privileged ||
-      projected.pidMode || projected.ipcMode ||
+      projected.pidMode || !['', 'private'].includes(projected.ipcMode) ||
       projected.networkMode !== 'host' ||
       projected.restartPolicy !== 'no' ||
       projected.capabilitiesAdd.length !== 0 ||
@@ -378,26 +380,44 @@ function validateImageInspection(image, authority, buildManifest) {
 function readBoundedJson(file, {
   fsModule = fs,
   maximumBytes = 262_144,
-  requireRootOwner = false
+  requireRootOwner = false,
+  requireRootOwnedParent = false
 } = {}) {
-  let stat;
+  let descriptor;
+  if (requireRootOwnedParent) {
+    let parent;
+    try {
+      parent = fsModule.lstatSync(path.dirname(file));
+    } catch {
+      reject('runtime_authority_file_unavailable');
+    }
+    if (!parent.isDirectory() || parent.isSymbolicLink() ||
+        parent.uid !== 0 || (parent.mode & 0o022) !== 0) {
+      reject('runtime_authority_parent_insecure');
+    }
+  }
   try {
-    stat = fsModule.lstatSync(file);
+    descriptor = fsModule.openSync(
+      file,
+      fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0)
+    );
   } catch {
     reject('runtime_authority_file_unavailable');
   }
-  if (!stat.isFile() || stat.isSymbolicLink() || stat.size < 2 ||
-      stat.size > maximumBytes || (stat.mode & 0o022) !== 0 ||
-      (requireRootOwner && stat.uid !== 0)) {
-    reject('runtime_authority_file_insecure');
-  }
-  let value;
   try {
-    value = JSON.parse(fsModule.readFileSync(file, 'utf8'));
-  } catch {
-    reject('runtime_authority_file_invalid');
+    const stat = fsModule.fstatSync(descriptor);
+    if (!stat.isFile() || stat.size < 2 || stat.size > maximumBytes ||
+        (stat.mode & 0o022) !== 0 || (requireRootOwner && stat.uid !== 0)) {
+      reject('runtime_authority_file_insecure');
+    }
+    try {
+      return JSON.parse(fsModule.readFileSync(descriptor, 'utf8'));
+    } catch {
+      reject('runtime_authority_file_invalid');
+    }
+  } finally {
+    fsModule.closeSync(descriptor);
   }
-  return value;
 }
 
 function validateRuntimeSelfEvidence({ authority, buildManifest, edgeReceipt,
@@ -439,6 +459,7 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
     schemaVersion: PROFILE_SCHEMA_VERSION,
     runtimeAuthorityMode: 'digest_pinned_read_only_image',
     runtimeImageManifestDigest: authority.acceptedOciManifestDigest,
+    runtimeOciArchiveSha256: authority.acceptedOciArchiveSha256,
     runtimeImageConfigId: authority.acceptedImageConfigId,
     runtimeRootfsChainDigest: authority.rootfsChainDigest,
     runtimeBuildManifestDigest: authority.buildManifestDigest,
