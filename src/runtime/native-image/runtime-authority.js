@@ -50,6 +50,26 @@ function digest(value) {
     .update(canonicalJson(value), 'utf8').digest('hex')}`;
 }
 
+function sha256File(file) {
+  return `sha256:${crypto.createHash('sha256')
+    .update(fs.readFileSync(file)).digest('hex')}`;
+}
+
+function hostTrustBundleDigest({ launcherFile, authorityModuleFile }) {
+  const files = [
+    { installPath: 'deploy/native-runtime/host-launcher.js', source: launcherFile },
+    { installPath: 'src/runtime/native-image/runtime-authority.js', source: authorityModuleFile }
+  ].map(entry => ({
+    installPath: entry.installPath,
+    sha256: sha256File(path.resolve(entry.source))
+  }));
+  return digest({
+    files,
+    installRoot: '/usr/local/lib/codex-memory-native-runtime',
+    schemaVersion: 'codex-memory-host-trust-bundle/v1'
+  });
+}
+
 function exactKeys(value, expected) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const actual = Object.keys(value).sort();
@@ -464,6 +484,7 @@ module.exports = {
   canonicalJson,
   containerConfigDigest,
   digest,
+  hostTrustBundleDigest,
   profileV7MigrationCandidate,
   projectContainerConfig,
   readBoundedJson,

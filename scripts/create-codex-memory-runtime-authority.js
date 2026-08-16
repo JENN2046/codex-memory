@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const { execFileSync } = require('node:child_process');
@@ -11,14 +10,12 @@ const {
   canonicalJson,
   containerConfigDigest,
   digest,
+  hostTrustBundleDigest,
   validateAuthorityRecord,
   validateBuildManifest
 } = require('../src/runtime/native-image/runtime-authority');
 
 function fail(code) { const error = new Error(code); error.code = code; throw error; }
-function sha256File(file) {
-  return `sha256:${crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')}`;
-}
 function inspect(kind, id) {
   const parsed = JSON.parse(execFileSync('/usr/bin/docker', [kind, 'inspect', id], {
     encoding: 'utf8', maxBuffer: 4 * 1024 * 1024,
@@ -63,7 +60,10 @@ function main(argv = process.argv.slice(2)) {
     edgeImageIdentity: edge.Image,
     edgeLifecycleAuthority: 'host_launcher',
     expectedRuntimeContainerId: runtime.Id,
-    hostLauncherDigest: sha256File(path.resolve(args['host-launcher'])),
+    hostLauncherDigest: hostTrustBundleDigest({
+      authorityModuleFile: path.resolve(args['runtime-authority-module']),
+      launcherFile: path.resolve(args['host-launcher'])
+    }),
     hostLauncherVersion: 'codex-memory-native-host-launcher/v1',
     rootfsChainDigest: digest(image.RootFS.Layers),
     stateMountContract,

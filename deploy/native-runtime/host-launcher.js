@@ -10,6 +10,7 @@ const {
   authorityRecordDigest,
   canonicalJson,
   containerConfigDigest,
+  hostTrustBundleDigest,
   readBoundedJson,
   validateAuthorityRecord,
   validateContainerInspection
@@ -160,6 +161,13 @@ function waitForHealthyEdge(authority, options = {}) {
 }
 
 function verifyHostAuthority(authority, options = {}) {
+  const installedBundleDigest = hostTrustBundleDigest({
+    authorityModuleFile: require.resolve('../../src/runtime/native-image/runtime-authority'),
+    launcherFile: __filename
+  });
+  if (installedBundleDigest !== authority.hostLauncherDigest) {
+    fail('host_launcher_trust_bundle_mismatch');
+  }
   const image = dockerImageInspect(authority.acceptedImageConfigId, options);
   validateImageForHost(image, authority);
   const runtime = dockerInspect(authority.expectedRuntimeContainerId, options);

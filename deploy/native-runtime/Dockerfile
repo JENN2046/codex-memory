@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.7
+# syntax=docker/dockerfile:1.7@sha256:a57df69d0bcde6e3cc2d0d48d0bb6e1460860b000624869884aef78839d0d35b
 FROM node@sha256:8607a9064d4a571140998ae9e52a3b3fcf9cff361d04642d5971e6cd76d39e27
 
 ARG SOURCE_DATE_EPOCH

@@ -16,6 +16,7 @@ const {
   buildManifestDigest,
   containerConfigDigest,
   digest,
+  hostTrustBundleDigest,
   profileV7MigrationCandidate,
   validateAuthorityRecord,
   validateBuildManifest,
@@ -204,6 +205,18 @@ test('E correct Vexus filename with wrong SHA changes manifest identity', () => 
 
 test('F post-image node_modules mutation is outside image root identity', () => {
   assert.equal(digest([S('4'), S('5')]), authority().rootfsChainDigest);
+});
+
+test('host trust bundle binds launcher and first-party authority module bytes', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-host-bundle-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const launcherFile = path.join(root, 'launcher.js');
+  const authorityModuleFile = path.join(root, 'authority.js');
+  fs.writeFileSync(launcherFile, 'launcher-a\n');
+  fs.writeFileSync(authorityModuleFile, 'authority-a\n');
+  const accepted = hostTrustBundleDigest({ launcherFile, authorityModuleFile });
+  fs.writeFileSync(authorityModuleFile, 'authority-b\n');
+  assert.notEqual(hostTrustBundleDigest({ launcherFile, authorityModuleFile }), accepted);
 });
 
 test('G wrong image ID is rejected', () => {

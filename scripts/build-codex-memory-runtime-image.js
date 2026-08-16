@@ -39,6 +39,7 @@ function buildRuntimeImage({ contextDirectory, outputArchive, builder }) {
   const args = [
     'buildx', 'build', '--no-cache', '--progress=plain',
     '--platform=linux/amd64',
+    '--provenance=false', '--sbom=false',
     '--file', path.join(contextDirectory, 'codex-memory', 'deploy',
       'native-runtime', 'Dockerfile'),
     '--build-arg', `SOURCE_DATE_EPOCH=${manifest.sourceDateEpoch}`,

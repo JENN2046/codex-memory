@@ -167,6 +167,7 @@ test('Dockerfile pins platform manifest and prohibits runtime installation', () 
     __dirname, '..', 'deploy', 'native-runtime', 'Dockerfile'
   ), 'utf8');
   assert.match(source, /FROM node@sha256:8607a906/u);
+  assert.match(source, /^# syntax=docker\/dockerfile:1\.7@sha256:[a-f0-9]{64}$/mu);
   assert.doesNotMatch(source, /FROM\s+node:[^@\s]+/u);
   assert.match(source, /USER 1000:1000/u);
   assert.match(source, /_container-supervisor/u);
@@ -178,7 +179,8 @@ test('systemd candidate uses root-owned installed launcher, not checkout', () =>
     'codex-memory-native-runtime.service'
   ), 'utf8');
   assert.match(source, /^User=root$/mu);
-  assert.match(source, /\/usr\/local\/libexec\/codex-memory-native-host-launcher/u);
+  assert.match(source,
+    /\/usr\/local\/lib\/codex-memory-native-runtime\/deploy\/native-runtime\/host-launcher\.js/u);
   assert.doesNotMatch(source, /\/home\/jenn|AGENTS_OS_Workspace/u);
 });
 

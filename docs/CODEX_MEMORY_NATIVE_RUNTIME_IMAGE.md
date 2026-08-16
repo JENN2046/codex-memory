@@ -39,10 +39,14 @@ Neither a mutable tag nor runtime package installation is accepted authority.
 
 The root-owned host launcher verifies the exact local image ID, RootFS chain,
 build-manifest label, runtime container ID/configuration, and retained Edge
-container identity. It starts Edge, waits for bounded health, atomically emits
-a root-owned Edge receipt, re-verifies all identities, and starts the exact
-pre-created runtime container. Stop retains both containers and never stops the
-external Provider.
+container identity. Its installed trust bundle lives under
+`/usr/local/lib/codex-memory-native-runtime`, preserves the repository-relative
+launcher/module layout, and is bound as a whole by the authority record. The
+launcher checks that bundle digest before consulting Docker. The system Node
+interpreter is an explicit host-trust-base component. The launcher starts Edge,
+waits for bounded health, atomically emits a root-owned Edge receipt, re-verifies
+all identities, and starts the exact pre-created runtime container. Stop retains
+both containers and never stops the external Provider.
 
 The image-contained `container-supervisor` consumes the read-only authority
 record, embedded build manifest, schema-v7 profile, and fresh Edge receipt. It
