@@ -107,6 +107,11 @@ test('final context artifact bytes are independently bound back to accepted Git 
 
 test('isolated authority repository has the exact accepted Git tree', t => {
   const root = repository(t);
+  fs.writeFileSync(path.join(root, '.gitignore'), '*.node\n');
+  fs.writeFileSync(path.join(root, 'governed.node'), 'tracked-native-artifact\n');
+  git(root, ['add', '.gitignore']);
+  git(root, ['add', '--force', 'governed.node']);
+  git(root, ['commit', '-m', 'tracked ignored artifact']);
   const head = git(root, ['rev-parse', 'HEAD']);
   const destination = path.join(os.tmpdir(), `runtime-exact-repo-${process.pid}-${Date.now()}`);
   t.after(() => fs.rmSync(destination, { recursive: true, force: true }));

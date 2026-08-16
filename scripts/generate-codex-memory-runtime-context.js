@@ -118,7 +118,9 @@ function materializeExactRepository(repo, commit, destination, label) {
     git(destination, ['init', '-b', 'authority']);
     git(destination, ['config', 'user.name', 'Runtime Authority']);
     git(destination, ['config', 'user.email', 'runtime-authority@example.invalid']);
-    git(destination, ['add', '--all']);
+    // Reconstruct the accepted Git tree, including tracked artifacts whose
+    // names match ignore rules in the newly initialized authority repository.
+    git(destination, ['add', '--all', '--force']);
     execFileSync('git', ['-C', destination, 'commit', '-m', 'exact runtime authority'], {
       env: { ...process.env, GIT_AUTHOR_DATE: '2000-01-01T00:00:00Z',
         GIT_COMMITTER_DATE: '2000-01-01T00:00:00Z' },
