@@ -9,6 +9,7 @@ const { canonicalJson } = require('../src/runtime/native-image/runtime-authority
 const {
   EXPECTED_VEXUS_PATH,
   EXPECTED_VEXUS_SHA256,
+  EXPECTED_NATIVE_PATHS,
   NATIVE_CLOSURE_SCHEMA,
   validateNativeClosure
 } = require('../src/runtime/native-image/native-closure');
@@ -49,58 +50,58 @@ function nativeFiles(root) {
   return output;
 }
 function inspect(root = '/') {
-  const expected = path.join(root, EXPECTED_VEXUS_PATH.slice(1));
   const files = nativeFiles(root);
-  if (files.length !== 1 || files[0] !== expected || sha256(expected) !== EXPECTED_VEXUS_SHA256) {
+  const expectedFiles = EXPECTED_NATIVE_PATHS.map(value => path.join(root, value.slice(1)));
+  if (JSON.stringify(files) !== JSON.stringify(expectedFiles) ||
+      sha256(path.join(root, EXPECTED_VEXUS_PATH.slice(1))) !== EXPECTED_VEXUS_SHA256) {
     fail('runtime_native_artifact_set_mismatch');
   }
-  const header = command('readelf', ['-h', expected]);
-  const dynamic = command('readelf', ['-d', expected]);
-  const notes = command('readelf', ['-n', expected]);
-  const programHeaders = command('readelf', ['-l', expected]);
-  const symbols = command('objdump', ['-T', expected]);
-  const pick = (expression, code) => {
-    const match = expression.exec(header);
-    if (!match) fail(code);
-    return match[1].trim();
-  };
-  const needed = [...dynamic.matchAll(/\(NEEDED\).*\[([^\]]+)\]/gu)].map(match => match[1]).sort();
-  const rpath = /\(RPATH\).*\[([^\]]*)\]/u.exec(dynamic)?.[1] ?? null;
-  const runpath = /\(RUNPATH\).*\[([^\]]*)\]/u.exec(dynamic)?.[1] ?? null;
-  if (rpath !== null || runpath !== null || needed.some(name => name.includes('/'))) {
-    fail('runtime_native_loader_path_forbidden');
-  }
-  const resolved = command('ldd', [expected]).split('\n').map(line =>
-    /^\s*(\S+)\s+=>\s+(\/\S+)\s+\(/u.exec(line)
-  ).filter(Boolean).map(match => ({ name: match[1], path: match[2] }));
-  if (resolved.some(item => item.path.startsWith('/opt/') || !fs.statSync(item.path).isFile())) {
-    fail('runtime_native_dependency_path_invalid');
-  }
-  const glibcVersions = [...symbols.matchAll(/\bGLIBC_(\d+)\.(\d+)\b/gu)]
-    .map(match => [Number(match[1]), Number(match[2])]);
-  if (glibcVersions.length < 1) fail('runtime_native_glibc_evidence_missing');
-  glibcVersions.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-  const maximumGlibc = glibcVersions.at(-1).join('.');
-  const artifact = {
-    buildId: /Build ID:\s*([a-f0-9]+)/u.exec(notes)?.[1] || '',
-    elfClass: pick(/^\s*Class:\s*(.+)$/mu, 'runtime_native_elf_class_invalid'),
-    interpreter: /Requesting program interpreter:\s*([^\]]+)/u
-      .exec(programHeaders)?.[1] || null,
-    machine: pick(/^\s*Machine:\s*(.+)$/mu, 'runtime_native_elf_machine_invalid'),
-    maximumGlibc,
-    needed,
-    path: EXPECTED_VEXUS_PATH,
-    resolvedLibraries: resolved.sort((a, b) => a.name.localeCompare(b.name)).map(item => ({
-      name: item.name,
-      path: item.path,
-      sha256: sha256(item.path)
-    })),
-    rpath,
-    runpath,
-    sha256: sha256(expected),
-    type: pick(/^\s*Type:\s*(.+)$/mu, 'runtime_native_elf_type_invalid')
-  };
-  return validateNativeClosure({ artifacts: [artifact], schemaVersion: NATIVE_CLOSURE_SCHEMA });
+  const artifacts = expectedFiles.map((expected, index) => {
+    const header = command('readelf', ['-h', expected]);
+    const dynamic = command('readelf', ['-d', expected]);
+    const notes = command('readelf', ['-n', expected]);
+    const programHeaders = command('readelf', ['-l', expected]);
+    const symbols = command('objdump', ['-T', expected]);
+    const pick = (expression, code) => {
+      const match = expression.exec(header);
+      if (!match) fail(code);
+      return match[1].trim();
+    };
+    const needed = [...dynamic.matchAll(/\(NEEDED\).*\[([^\]]+)\]/gu)]
+      .map(match => match[1]).sort();
+    const rpath = /\(RPATH\).*\[([^\]]*)\]/u.exec(dynamic)?.[1] ?? null;
+    const runpath = /\(RUNPATH\).*\[([^\]]*)\]/u.exec(dynamic)?.[1] ?? null;
+    if (rpath !== null || runpath !== null || needed.some(name => name.includes('/'))) {
+      fail('runtime_native_loader_path_forbidden');
+    }
+    const resolved = command('ldd', [expected]).split('\n').map(line =>
+      /^\s*(\S+)\s+=>\s+(\/\S+)\s+\(/u.exec(line)
+    ).filter(Boolean).map(match => ({ name: match[1], path: match[2] }));
+    if (resolved.some(item => item.path.startsWith('/opt/') ||
+        !fs.statSync(item.path).isFile())) fail('runtime_native_dependency_path_invalid');
+    const glibcVersions = [...symbols.matchAll(/\bGLIBC_(\d+)\.(\d+)\b/gu)]
+      .map(match => [Number(match[1]), Number(match[2])]);
+    if (glibcVersions.length < 1) fail('runtime_native_glibc_evidence_missing');
+    glibcVersions.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    return {
+      buildId: /Build ID:\s*([a-f0-9]+)/u.exec(notes)?.[1] || '',
+      elfClass: pick(/^\s*Class:\s*(.+)$/mu, 'runtime_native_elf_class_invalid'),
+      interpreter: /Requesting program interpreter:\s*([^\]]+)/u
+        .exec(programHeaders)?.[1] || null,
+      machine: pick(/^\s*Machine:\s*(.+)$/mu, 'runtime_native_elf_machine_invalid'),
+      maximumGlibc: glibcVersions.at(-1).join('.'),
+      needed,
+      path: EXPECTED_NATIVE_PATHS[index],
+      resolvedLibraries: resolved.sort((a, b) => a.name.localeCompare(b.name)).map(item => ({
+        name: item.name, path: item.path, sha256: sha256(item.path)
+      })),
+      rpath,
+      runpath,
+      sha256: sha256(expected),
+      type: pick(/^\s*Type:\s*(.+)$/mu, 'runtime_native_elf_type_invalid')
+    };
+  });
+  return validateNativeClosure({ artifacts, schemaVersion: NATIVE_CLOSURE_SCHEMA });
 }
 
 function main(argv = process.argv.slice(2)) {

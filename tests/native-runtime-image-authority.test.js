@@ -35,7 +35,8 @@ const {
   validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
 } = require('../src/runtime/native-image/container-policy');
 const {
-  EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256, NATIVE_CLOSURE_SCHEMA,
+  EXPECTED_BETTER_SQLITE_PATH, EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256,
+  NATIVE_CLOSURE_SCHEMA,
   nativeClosureDigest, validateNativeClosure
 } = require('../src/runtime/native-image/native-closure');
 const {
@@ -72,15 +73,17 @@ const SOURCES = Object.freeze({
 });
 
 function nativeClosure() {
+  const artifact = (nativePath, nativeSha, marker) => ({
+    buildId: C(marker), elfClass: 'ELF64', interpreter: null,
+    machine: 'Advanced Micro Devices X86-64', maximumGlibc: '2.35',
+    needed: ['libc.so.6'], path: nativePath,
+    resolvedLibraries: [{ name: 'libc.so.6', path: '/lib/x86_64-linux-gnu/libc.so.6',
+      sha256: S('a') }], rpath: null, runpath: null, sha256: nativeSha,
+    type: 'DYN (Shared object file)'
+  });
   return {
-    artifacts: [{
-      buildId: C('1'), elfClass: 'ELF64', interpreter: null,
-      machine: 'Advanced Micro Devices X86-64', maximumGlibc: '2.35',
-      needed: ['libc.so.6'], path: EXPECTED_VEXUS_PATH,
-      resolvedLibraries: [{ name: 'libc.so.6', path: '/lib/x86_64-linux-gnu/libc.so.6', sha256: S('a') }],
-      rpath: null, runpath: null, sha256: EXPECTED_VEXUS_SHA256,
-      type: 'DYN (Shared object file)'
-    }],
+    artifacts: [artifact(EXPECTED_BETTER_SQLITE_PATH, S('b'), '2'),
+      artifact(EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256, '1')],
     schemaVersion: NATIVE_CLOSURE_SCHEMA
   };
 }

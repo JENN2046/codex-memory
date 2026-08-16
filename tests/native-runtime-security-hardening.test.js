@@ -18,7 +18,8 @@ const {
   validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
 } = require('../src/runtime/native-image/container-policy');
 const {
-  EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256, NATIVE_CLOSURE_SCHEMA,
+  EXPECTED_BETTER_SQLITE_PATH, EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256,
+  NATIVE_CLOSURE_SCHEMA,
   nativeClosureDigest, validateNativeClosure, verifyNativeClosureBytes
 } = require('../src/runtime/native-image/native-closure');
 const { verifyBuildContextBuffer } = require('../src/runtime/native-image/build-context');
@@ -279,17 +280,20 @@ test('unsafe candidate cannot self-authorize by recomputing its own digest', () 
 });
 
 function closure() {
-  return { schemaVersion: NATIVE_CLOSURE_SCHEMA, artifacts: [{ buildId: C('a'),
+  const artifact = (nativePath, nativeSha, marker) => ({ buildId: C(marker),
     elfClass: 'ELF64', interpreter: null, machine: 'Advanced Micro Devices X86-64',
     maximumGlibc: '2.35', needed: ['libc.so.6'],
-    path: EXPECTED_VEXUS_PATH, resolvedLibraries: [{ name: 'libc.so.6',
+    path: nativePath, resolvedLibraries: [{ name: 'libc.so.6',
       path: '/lib/x86_64-linux-gnu/libc.so.6', sha256: S('4') }], rpath: null,
-    runpath: null, sha256: EXPECTED_VEXUS_SHA256, type: 'DYN (Shared object file)' }] };
+    runpath: null, sha256: nativeSha, type: 'DYN (Shared object file)' });
+  return { schemaVersion: NATIVE_CLOSURE_SCHEMA,
+    artifacts: [artifact(EXPECTED_BETTER_SQLITE_PATH, S('b'), 'b'),
+      artifact(EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256, 'a')] };
 }
 test('native closure is mandatory and rejects substitution, RPATH, missing lib and wrong arch', () => {
   validateNativeClosure(closure());
   for (const mutate of [
-    value => { value.artifacts[0].sha256 = S('0'); },
+    value => { value.artifacts[1].sha256 = S('0'); },
     value => { value.artifacts[0].runpath = '/host/lib'; },
     value => { value.artifacts[0].resolvedLibraries = []; },
     value => { value.artifacts[0].machine = 'AArch64'; },
@@ -320,18 +324,18 @@ test('native admission re-hashes every governed ELF byte from the stopped contai
   const value = closure();
   const artifactBytes = Buffer.from('accepted-vexus');
   const libraryBytes = Buffer.from('accepted-libc');
-  value.artifacts[0].sha256 = sha256Buffer(artifactBytes);
-  value.artifacts[0].resolvedLibraries[0].sha256 = sha256Buffer(libraryBytes);
+  value.artifacts[1].sha256 = sha256Buffer(artifactBytes);
+  value.artifacts[1].resolvedLibraries[0].sha256 = sha256Buffer(libraryBytes);
   // This test exercises the generic closure-byte verifier with a test artifact;
   // the production schema separately pins Vexus to EXPECTED_VEXUS_SHA256.
-  value.artifacts[0].sha256 = EXPECTED_VEXUS_SHA256;
+  value.artifacts[1].sha256 = EXPECTED_VEXUS_SHA256;
   const reads = new Map([
     [EXPECTED_VEXUS_PATH, artifactBytes],
     ['/lib/x86_64-linux-gnu/libc.so.6', libraryBytes]
   ]);
   expectCode(() => verifyNativeClosureBytes(value, source => reads.get(source)),
     'runtime_native_closure_file_mismatch');
-  value.artifacts[0].sha256 = sha256Buffer(artifactBytes);
+  value.artifacts[1].sha256 = sha256Buffer(artifactBytes);
   expectCode(() => verifyNativeClosureBytes(value, source => reads.get(source)),
     'runtime_native_closure_invalid');
 });
