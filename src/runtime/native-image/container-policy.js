@@ -141,9 +141,12 @@ function validateEdgeCandidate(inspect) {
 function validateProviderCandidate(inspect) {
   const value = projectContainerConfig(inspect);
   requireNoDangerousHostSurface(value, 'provider_container_canonical_policy_mismatch');
+  const stateMountOnly = value.mounts.every(mount =>
+    (mount.destination === '/data' || mount.destination.startsWith('/data/')) &&
+    ['bind', 'volume'].includes(mount.type) && mount.propagation === 'rprivate');
   if (value.networkMode !== 'bridge' || !loopbackBinding(value.portBindings, '3000/tcp') ||
-      inspect?.State?.Running !== true ||
-      (inspect?.State?.Health && inspect.State.Health.Status !== 'healthy')) {
+      inspect?.State?.Running !== true || inspect?.State?.Health?.Status !== 'healthy' ||
+      !stateMountOnly) {
     fail('provider_container_canonical_policy_mismatch');
   }
   return Object.freeze(value);

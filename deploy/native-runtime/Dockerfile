@@ -82,12 +82,18 @@ RUN printf '%s\n' \
       python3.11-minimal=3.11.2-6+deb12u8 \
       libpython3.11-minimal=3.11.2-6+deb12u8 \
       libpython3.11-stdlib=3.11.2-6+deb12u8 \
+      binutils=2.40-2 \
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /var/cache/ldconfig/aux-cache /var/log/dpkg.log \
     && rm -rf /var/log/apt/*
 COPY --from=build --chown=node:node /opt/codex-memory /opt/codex-memory
 COPY --from=build --chown=node:node /opt/vcptoolbox /opt/vcptoolbox
 COPY --from=build --chown=root:root /opt/codex-memory-runtime /opt/codex-memory-runtime
+RUN node /opt/codex-memory/scripts/verify-native-elf-closure.js \
+      --root=/ --output=/opt/codex-memory-runtime/native-closure.final.json \
+    && cmp /opt/codex-memory-runtime/native-closure.json \
+      /opt/codex-memory-runtime/native-closure.final.json \
+    && rm /opt/codex-memory-runtime/native-closure.final.json
 WORKDIR /opt/codex-memory
 
 LABEL org.opencontainers.image.title="codex-memory-native-runtime" \

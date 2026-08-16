@@ -63,6 +63,7 @@ function buildRuntimeImage({ contextDirectory, outputArchive, expectedContextArt
   const temporary = path.join(outputDirectory,
     `.${path.basename(outputArchive)}.${crypto.randomBytes(12).toString('hex')}.tmp`);
   let published = false;
+  let publishedIdentity = null;
   const args = [
     'buildx', 'build', '--no-cache', '--progress=plain',
     '--platform=linux/amd64',
@@ -97,6 +98,7 @@ function buildRuntimeImage({ contextDirectory, outputArchive, expectedContextArt
       throw error;
     }
     fs.unlinkSync(temporary);
+    publishedIdentity = fs.lstatSync(outputArchive, { bigint: true });
     const directory = fs.openSync(outputDirectory, fs.constants.O_RDONLY);
     try { fs.fsyncSync(directory); } finally { fs.closeSync(directory); }
     const readBack = verifyArchive(outputArchive, manifest);
@@ -106,7 +108,13 @@ function buildRuntimeImage({ contextDirectory, outputArchive, expectedContextArt
     return Object.freeze({ ...readBack, ...contextEvidence });
   } catch (error) {
     if (published) {
-      try { fs.unlinkSync(outputArchive); } catch {}
+      try {
+        const current = fs.lstatSync(outputArchive, { bigint: true });
+        if (publishedIdentity && current.dev === publishedIdentity.dev &&
+            current.ino === publishedIdentity.ino &&
+            current.ctimeNs === publishedIdentity.ctimeNs &&
+            current.birthtimeNs === publishedIdentity.birthtimeNs) fs.unlinkSync(outputArchive);
+      } catch {}
       try {
         const directory = fs.openSync(outputDirectory, fs.constants.O_RDONLY);
         try { fs.fsyncSync(directory); } finally { fs.closeSync(directory); }

@@ -80,7 +80,15 @@ function nativeFiles(root) {
         continue;
       }
       if (stat.isDirectory()) visit(file);
-      else if (stat.isFile() && (name.endsWith('.node') || name.endsWith('.so'))) output.push(file);
+      else if (stat.isFile()) {
+        const descriptor = fs.openSync(file, fs.constants.O_RDONLY);
+        const magic = Buffer.alloc(4);
+        let count;
+        try { count = fs.readSync(descriptor, magic, 0, 4, 0); } finally { fs.closeSync(descriptor); }
+        if (count === 4 && magic.equals(Buffer.from([0x7f, 0x45, 0x4c, 0x46]))) {
+          output.push(file);
+        }
+      }
     }
   };
   for (const relative of ['opt/codex-memory', 'opt/vcptoolbox']) {

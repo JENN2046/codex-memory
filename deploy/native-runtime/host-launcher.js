@@ -476,14 +476,41 @@ function runUnderLifecycleLock(argv, {
 } = {}) {
   const directory = path.dirname(lockPath);
   fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
-  const result = spawnFile('/usr/bin/flock', [
-    '--exclusive', '--nonblock', '--conflict-exit-code', '75', lockPath,
-    '/usr/bin/env', 'CODEX_MEMORY_HOST_LIFECYCLE_LOCK_HELD=1',
-    '/usr/bin/node', __filename, ...argv
+  const result = spawnFile('/bin/bash', [
+    '-c',
+    'exec 9>"$1"; /usr/bin/flock --exclusive --nonblock --conflict-exit-code 75 9 || exit $?; export CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD=9; exec /usr/bin/node "$@"',
+    'codex-memory-lifecycle-lock', lockPath, __filename, ...argv
   ], { stdio: 'inherit', env: process.env });
   if (result.status === 75) fail('host_launcher_lifecycle_lock_busy');
   if (result.status !== 0) fail('host_launcher_locked_command_failed');
   return result.status;
+}
+
+function requireLifecycleLock({
+  fdValue = process.env.CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD,
+  lockPath = DEFAULT_LOCK_PATH,
+  fsModule = fs,
+  spawnFile = spawnSync
+} = {}) {
+  if (!/^\d+$/u.test(fdValue || '')) fail('host_launcher_lifecycle_lock_proof_missing');
+  const descriptor = Number(fdValue);
+  let held;
+  let expected;
+  try {
+    held = fsModule.fstatSync(descriptor);
+    expected = fsModule.statSync(lockPath);
+  } catch { fail('host_launcher_lifecycle_lock_proof_invalid'); }
+  if (!held.isFile() || held.dev !== expected.dev || held.ino !== expected.ino) {
+    fail('host_launcher_lifecycle_lock_proof_invalid');
+  }
+  const stdio = Array.from({ length: Math.max(10, descriptor + 1) }, () => 'ignore');
+  stdio[descriptor] = descriptor;
+  const proof = spawnFile('/usr/bin/flock', [
+    '--exclusive', '--nonblock', '--conflict-exit-code', '75',
+    String(descriptor), '/bin/true'
+  ], { stdio });
+  if (proof.status !== 0) fail('host_launcher_lifecycle_lock_proof_invalid');
+  return true;
 }
 
 async function main(argv = process.argv.slice(2)) {
@@ -492,10 +519,10 @@ async function main(argv = process.argv.slice(2)) {
   }
   const { authorityFile, command } = parseArguments(argv);
   if (command !== 'verify' &&
-      process.env.CODEX_MEMORY_HOST_LIFECYCLE_LOCK_HELD !== '1') {
-    runUnderLifecycleLock(argv);
-    return;
+      !process.env.CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD) {
+    runUnderLifecycleLock(argv); return;
   }
+  if (command !== 'verify') requireLifecycleLock();
   const authority = validateAuthorityRecord(readBoundedJson(authorityFile, {
     requireRootOwner: true,
     requireRootOwnedParent: true
@@ -523,6 +550,7 @@ if (require.main === module) {
 
 module.exports = {
   LAUNCHER_VERSION,
+  requireLifecycleLock,
   atomicRootReceipt,
   activateAuthority,
   buildEdgeReceipt,

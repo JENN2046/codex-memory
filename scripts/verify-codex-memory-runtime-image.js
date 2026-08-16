@@ -4,6 +4,7 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const zlib = require('node:zlib');
 const {
   canonicalJson,
   digest,
@@ -27,7 +28,48 @@ function safeArchiveMembers(archive) {
   return parseTarBuffer(readBoundedArchive(archive));
 }
 
-const MAXIMUM_OCI_ARCHIVE_BYTES = 2 * 1024 * 1024 * 1024;
+const MAXIMUM_OCI_ARCHIVE_BYTES = 256 * 1024 * 1024;
+const MAXIMUM_OCI_TRAILING_ZERO_BYTES = 1024 * 1024;
+
+function preflightTarDescriptor(descriptor, size, fsModule = fs) {
+  const readAt = (position, length) => {
+    const buffer = Buffer.alloc(length);
+    const count = fsModule.readSync(descriptor, buffer, 0, length, position);
+    if (count !== length) fail('runtime_oci_archive_changed');
+    return buffer;
+  };
+  const memberSize = header => {
+    const field = header.subarray(124, 136).toString('ascii').replace(/\0.*$/su, '').trim();
+    if (!/^[0-7]+$/u.test(field || '0')) fail('runtime_oci_archive_header_invalid');
+    const value = Number.parseInt(field || '0', 8);
+    if (!Number.isSafeInteger(value) || value < 0) fail('runtime_oci_archive_header_invalid');
+    return value;
+  };
+  let position = 0;
+  let entries = 0;
+  while (position + 1024 <= size) {
+    const header = readAt(position, 512);
+    if (header.every(byte => byte === 0)) {
+      if (!readAt(position + 512, 512).every(byte => byte === 0)) {
+        fail('runtime_oci_archive_unterminated');
+      }
+      const trailing = size - position - 1024;
+      if (trailing > MAXIMUM_OCI_TRAILING_ZERO_BYTES) {
+        fail('runtime_oci_archive_padding_limit');
+      }
+      for (let offset = position + 1024; offset < size; offset += 64 * 1024) {
+        const chunk = readAt(offset, Math.min(64 * 1024, size - offset));
+        if (!chunk.every(byte => byte === 0)) fail('runtime_oci_archive_trailing_data');
+      }
+      return true;
+    }
+    const contentBytes = memberSize(header);
+    position += 512 + Math.ceil(contentBytes / 512) * 512;
+    entries += 1;
+    if (position > size || entries > 4096) fail('runtime_oci_archive_structure_invalid');
+  }
+  fail('runtime_oci_archive_unterminated');
+}
 
 function readBoundedArchive(archive, fsModule = fs) {
   const descriptor = fsModule.openSync(
@@ -37,6 +79,7 @@ function readBoundedArchive(archive, fsModule = fs) {
     const before = fsModule.fstatSync(descriptor);
     if (!before.isFile() || before.size < 1024 ||
         before.size > MAXIMUM_OCI_ARCHIVE_BYTES) fail('runtime_oci_archive_size_invalid');
+    preflightTarDescriptor(descriptor, before.size, fsModule);
     const buffer = fsModule.readFileSync(descriptor);
     const after = fsModule.fstatSync(descriptor);
     if (before.dev !== after.dev || before.ino !== after.ino ||
@@ -55,12 +98,20 @@ function blobPath(value) {
   return `blobs/sha256/${value.slice('sha256:'.length)}`;
 }
 
-function verifyBlob(files, value) {
+function verifyBlob(files, value, expectedSize = null) {
   const entry = files.get(blobPath(value));
   if (!entry) fail('runtime_oci_blob_missing');
   const content = entry.content;
+  if (expectedSize !== null && (!Number.isSafeInteger(expectedSize) ||
+      expectedSize < 0 || content.length !== expectedSize)) {
+    fail('runtime_oci_descriptor_size_mismatch');
+  }
   if (sha256Buffer(content) !== value) fail('runtime_oci_blob_digest_mismatch');
   return content;
+}
+
+function requireMediaType(descriptor, expected) {
+  if (descriptor?.mediaType !== expected) fail('runtime_oci_media_type_invalid');
 }
 
 function inspectOciArchive(archive, { fsModule = fs } = {}) {
@@ -90,18 +141,34 @@ function inspectOciArchive(archive, { fsModule = fs } = {}) {
       fail('runtime_oci_index_invalid');
     }
     const descriptor = index.manifests[0];
-    const manifestContent = verifyBlob(files, descriptor.digest);
+    requireMediaType(descriptor, 'application/vnd.oci.image.manifest.v1+json');
+    const manifestContent = verifyBlob(files, descriptor.digest, descriptor.size);
     const manifest = JSON.parse(manifestContent.toString('utf8'));
     if (manifest?.schemaVersion !== 2 || !manifest?.config?.digest ||
         !Array.isArray(manifest?.layers) || manifest.layers.length < 1) {
       fail('runtime_oci_manifest_invalid');
     }
-    const configContent = verifyBlob(files, manifest.config.digest);
+    requireMediaType(manifest.config, 'application/vnd.oci.image.config.v1+json');
+    const configContent = verifyBlob(files, manifest.config.digest, manifest.config.size);
     const config = JSON.parse(configContent.toString('utf8'));
-    for (const layer of manifest.layers) verifyBlob(files, layer.digest);
     const diffIds = config?.rootfs?.diff_ids;
     if (!Array.isArray(diffIds) || diffIds.length !== manifest.layers.length) {
       fail('runtime_oci_rootfs_invalid');
+    }
+    let expandedTotal = 0;
+    const computedDiffIds = manifest.layers.map(layer => {
+      requireMediaType(layer, 'application/vnd.oci.image.layer.v1.tar+gzip');
+      const compressed = verifyBlob(files, layer.digest, layer.size);
+      let uncompressed;
+      try {
+        uncompressed = zlib.gunzipSync(compressed, { maxOutputLength: 512 * 1024 * 1024 });
+      } catch { fail('runtime_oci_layer_invalid'); }
+      expandedTotal += uncompressed.length;
+      if (expandedTotal > 1024 * 1024 * 1024) fail('runtime_oci_layer_expansion_limit');
+      return sha256Buffer(uncompressed);
+    });
+    if (JSON.stringify(computedDiffIds) !== JSON.stringify(diffIds)) {
+      fail('runtime_oci_diff_id_mismatch');
     }
     const labels = config?.config?.Labels || {};
     const buildManifestDigest =
@@ -167,6 +234,7 @@ module.exports = {
   MAXIMUM_OCI_ARCHIVE_BYTES,
   inspectOciArchive,
   readBoundedArchive,
+  preflightTarDescriptor,
   safeArchiveMembers,
   verifyBlob,
   verifyOciArchive

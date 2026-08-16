@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const zlib = require('node:zlib');
 const { spawn, spawnSync } = require('node:child_process');
 const test = require('node:test');
 const {
@@ -24,13 +25,15 @@ const {
 } = require('../src/runtime/native-image/native-closure');
 const { verifyBuildContextBuffer } = require('../src/runtime/native-image/build-context');
 const { parseTarBuffer } = require('../src/runtime/native-image/tar-archive');
-const { readBoundedArchive, MAXIMUM_OCI_ARCHIVE_BYTES } = require(
+const { inspectOciArchive, readBoundedArchive, MAXIMUM_OCI_ARCHIVE_BYTES } = require(
   '../scripts/verify-codex-memory-runtime-image'
 );
 const { buildRuntimeImage, parseArguments: parseBuildArguments } = require(
   '../scripts/build-codex-memory-runtime-image'
 );
-const { runUnderLifecycleLock } = require('../deploy/native-runtime/host-launcher');
+const { requireLifecycleLock, runUnderLifecycleLock } = require(
+  '../deploy/native-runtime/host-launcher'
+);
 const { nativeFiles } = require('../scripts/verify-native-elf-closure');
 
 const S = value => `sha256:${String(value).repeat(64).slice(0, 64)}`;
@@ -243,6 +246,18 @@ test('independent canonical policies admit exact Runtime, Edge and Provider', ()
   validateEdgeCandidate(edgeInspect());
   validateProviderCandidate(providerInspect());
 });
+test('Provider policy requires Docker health and forbids mutable application mounts', () => {
+  for (const mutate of [
+    value => { delete value.State.Health; },
+    value => { value.State.Health.Status = 'unhealthy'; },
+    value => value.Mounts.push({ Destination: '/app', Propagation: 'rprivate',
+      RW: true, Source: '/mutable/provider-code', Type: 'bind' })
+  ]) {
+    const value = providerInspect(); mutate(value);
+    expectCode(() => validateProviderCandidate(value),
+      'provider_container_canonical_policy_mismatch');
+  }
+});
 test('root authority dependency graph is acyclic and receipts cannot mint authority', () => {
   assert.equal(countAuthorityGraphCycles(AUTHORITY_DEPENDENCY_GRAPH), 0);
   assert.equal(AUTHORITY_DEPENDENCY_GRAPH.edgeReceipt, undefined);
@@ -343,6 +358,17 @@ test('native inventory ignores npm JS links but rejects native and directory sym
   fs.unlinkSync(path.join(app, 'unexpected.node'));
   fs.symlinkSync('node_modules', path.join(app, 'linked-modules'));
   expectCode(() => nativeFiles(root), 'runtime_native_closure_symlink_forbidden');
+});
+
+test('native inventory discovers ELF bytes regardless of filename or shared-library suffix', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'native-elf-inventory-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const app = path.join(root, 'opt', 'codex-memory'); fs.mkdirSync(app, { recursive: true });
+  const versioned = path.join(app, 'libpayload.so.1');
+  const unnamed = path.join(app, 'worker');
+  fs.writeFileSync(versioned, Buffer.from([0x7f, 0x45, 0x4c, 0x46, 0]));
+  fs.writeFileSync(unnamed, Buffer.from([0x7f, 0x45, 0x4c, 0x46, 1]));
+  assert.deepEqual(nativeFiles(root), [versioned, unnamed].sort());
 });
 
 test('native admission re-hashes every governed ELF byte from the stopped container', () => {
@@ -451,6 +477,19 @@ test('real flock serializes commands, survives stale path, and releases on holde
   ]).status, 0);
 });
 
+test('lifecycle lock proof requires an inherited lock-file descriptor, not an env marker', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'host-lock-proof-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const lockPath = path.join(root, 'lifecycle.lock');
+  fs.writeFileSync(lockPath, '');
+  const wrong = fs.openSync('/dev/null', 'r');
+  t.after(() => fs.closeSync(wrong));
+  expectCode(() => requireLifecycleLock({ fdValue: String(wrong), lockPath }),
+    'host_launcher_lifecycle_lock_proof_invalid');
+  expectCode(() => requireLifecycleLock({ fdValue: 'not-an-fd', lockPath }),
+    'host_launcher_lifecycle_lock_proof_missing');
+});
+
 test('atomic OCI publication never exposes failed temporary output under final name', t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-image-atomic-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
@@ -532,6 +571,32 @@ test('atomic OCI publication removes the final name when independent readback fa
   assert.deepEqual(fs.readdirSync(root).filter(name => name.includes('.tmp')), []);
 });
 
+test('failed publisher never removes a concurrently replaced final inode', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-image-concurrent-final-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const fixture = context([{ name: 'codex-memory/deploy/native-runtime/Dockerfile',
+    content: 'FROM scratch\n' }, { name: 'vcptoolbox/package.json', content: '{}\n' }]);
+  const contextDirectory = path.join(root, 'context'); fs.mkdirSync(contextDirectory);
+  fs.writeFileSync(path.join(contextDirectory, 'runtime-context.tar'), fixture.buffer);
+  const output = path.join(root, 'accepted.oci.tar'); let verifies = 0;
+  expectCode(() => buildRuntimeImage({ contextDirectory,
+    expectedContextArtifactSha256: sha256Buffer(fixture.buffer), outputArchive: output,
+    spawnFile: (_command, args) => {
+      const destination = args.find(value => value.startsWith('type=oci,dest='))
+        .match(/dest=([^,]+)/u)[1];
+      fs.writeFileSync(destination, 'publisher-a'); return { status: 0 };
+    }, verifyArchive: archive => {
+      verifies += 1;
+      if (verifies === 2) {
+        fs.unlinkSync(archive); fs.writeFileSync(archive, 'publisher-b');
+        throw Object.assign(new Error('readback'),
+          { code: 'runtime_image_publication_readback_mismatch' });
+      }
+      return { archiveSha256: S('1'), accepted: true };
+    } }), 'runtime_image_publication_readback_mismatch');
+  assert.equal(fs.readFileSync(output, 'utf8'), 'publisher-b');
+});
+
 test('tar parsing bounds zero padding and OCI reader rejects oversized file before reading', t => {
   const valid = tar([{ name: 'oci-layout', content: '{}' }]);
   expectCode(() => parseTarBuffer(Buffer.concat([valid, Buffer.alloc(2048)]), {
@@ -546,4 +611,59 @@ test('tar parsing bounds zero padding and OCI reader rejects oversized file befo
   };
   expectCode(() => readBoundedArchive('/opaque/oversized.oci', fake),
     'runtime_oci_archive_size_invalid');
+  let wholeRead = false;
+  const sparse = {
+    openSync: () => 12,
+    fstatSync: () => ({ dev: 1, ino: 3, isFile: () => true,
+      mtimeMs: 0, size: 2 * 1024 * 1024 }),
+    readSync: (_fd, buffer) => { buffer.fill(0); return buffer.length; },
+    readFileSync: () => { wholeRead = true; throw new Error('must_not_read'); },
+    closeSync: () => {}
+  };
+  expectCode(() => readBoundedArchive('/opaque/sparse-padding.oci', sparse),
+    'runtime_oci_archive_padding_limit');
+  assert.equal(wholeRead, false);
+});
+
+test('OCI admission binds descriptor types/sizes and recomputes bounded layer diff IDs', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oci-semantic-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const make = (name, mutate = () => {}) => {
+    const uncompressed = tar([{ name: 'payload', content: 'accepted' }]);
+    const layer = zlib.gzipSync(uncompressed, { mtime: 0 });
+    const layerDescriptor = { digest: sha(layer), size: layer.length,
+      mediaType: 'application/vnd.oci.image.layer.v1.tar+gzip' };
+    const configObject = { config: { Labels: {
+      'io.codex-memory.runtime.build-manifest-digest': S('1')
+    } }, rootfs: { diff_ids: [sha(uncompressed)] } };
+    mutate({ config: configObject, layer: layerDescriptor });
+    const config = Buffer.from(JSON.stringify(configObject));
+    const configDescriptor = { digest: sha(config), size: config.length,
+      mediaType: 'application/vnd.oci.image.config.v1+json' };
+    const manifestObject = { schemaVersion: 2, config: configDescriptor,
+      layers: [layerDescriptor] };
+    const manifest = Buffer.from(JSON.stringify(manifestObject));
+    const manifestDescriptor = { digest: sha(manifest), size: manifest.length,
+      mediaType: 'application/vnd.oci.image.manifest.v1+json' };
+    const index = Buffer.from(JSON.stringify({ schemaVersion: 2,
+      manifests: [manifestDescriptor] }));
+    const archive = tar([
+      { name: 'oci-layout', content: JSON.stringify({ imageLayoutVersion: '1.0.0' }) },
+      { name: 'index.json', content: index },
+      { name: `blobs/sha256/${manifestDescriptor.digest.slice(7)}`, content: manifest },
+      { name: `blobs/sha256/${configDescriptor.digest.slice(7)}`, content: config },
+      { name: `blobs/sha256/${layerDescriptor.digest.slice(7)}`, content: layer }
+    ]);
+    const file = path.join(root, `${name}.oci.tar`); fs.writeFileSync(file, archive); return file;
+  };
+  assert.match(inspectOciArchive(make('valid')).manifestDigest, /^sha256:/u);
+  expectCode(() => inspectOciArchive(make('wrong-layer-size', ({ layer }) => {
+    layer.size += 1;
+  })), 'runtime_oci_descriptor_size_mismatch');
+  expectCode(() => inspectOciArchive(make('wrong-media', ({ layer }) => {
+    layer.mediaType = 'application/octet-stream';
+  })), 'runtime_oci_media_type_invalid');
+  expectCode(() => inspectOciArchive(make('wrong-diff', ({ config }) => {
+    config.rootfs.diff_ids[0] = S('f');
+  })), 'runtime_oci_diff_id_mismatch');
 });

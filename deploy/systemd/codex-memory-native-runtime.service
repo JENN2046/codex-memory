@@ -10,7 +10,7 @@ User=root
 Group=root
 RuntimeDirectory=codex-memory
 RuntimeDirectoryMode=0700
-ExecStart=/usr/bin/flock --exclusive --nonblock /run/codex-memory/host-lifecycle.lock /usr/bin/env CODEX_MEMORY_HOST_LIFECYCLE_LOCK_HELD=1 /usr/bin/node /usr/local/lib/codex-memory-native-runtime/deploy/native-runtime/host-launcher.js run --authority=/etc/codex-memory/native-runtime-authority.json
+ExecStart=/bin/bash -c 'exec 9>/run/codex-memory/host-lifecycle.lock; /usr/bin/flock --exclusive --nonblock --conflict-exit-code 75 9 || exit $?; export CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD=9; exec /usr/bin/node /usr/local/lib/codex-memory-native-runtime/deploy/native-runtime/host-launcher.js run --authority=/etc/codex-memory/native-runtime-authority.json'
 TimeoutStartSec=90
 TimeoutStopSec=60
 Restart=on-failure
