@@ -87,34 +87,32 @@ function assertNoSymlinks(repo, commit, selectedPaths, label) {
 
 function materializeGitArchive(repo, commit, selectedPaths, destination, label) {
   assertNoSymlinks(repo, commit, selectedPaths, label);
-  const archive = path.join(
-    path.dirname(destination),
-    `.${label}-${crypto.randomBytes(8).toString('hex')}.tar`
-  );
-  try {
-    execFileSync('git', [
-      '-C', repo, 'archive', '--format=tar', `--output=${archive}`,
-      commit, '--', ...selectedPaths
-    ], { stdio: ['ignore', 'ignore', 'pipe'] });
-    fs.mkdirSync(destination, { mode: 0o700 });
-    execFileSync('tar', [
-      '--extract', '--file', archive, '--directory', destination,
-      '--no-same-owner', '--no-same-permissions'
-    ], { stdio: ['ignore', 'ignore', 'pipe'] });
-  } finally {
-    try { fs.unlinkSync(archive); } catch {}
+  fs.mkdirSync(destination, { mode: 0o700 });
+  const records = git(repo, [
+    'ls-tree', '-r', '-z', '--full-tree', commit, '--', ...selectedPaths
+  ], null).toString('utf8').split('\0').filter(Boolean);
+  if (records.length < 1) fail(`${label}_archive_empty`);
+  for (const record of records) {
+    const match = /^(100644|100755) blob ([a-f0-9]{40})\t(.+)$/u.exec(record);
+    if (!match) fail(`${label}_archive_path_unsafe`);
+    const relative = match[3];
+    if (relative.startsWith('/') || path.posix.normalize(relative) !== relative ||
+        /[\0\r\n]/u.test(relative)) fail(`${label}_archive_path_unsafe`);
+    const target = path.resolve(destination, relative);
+    if (!target.startsWith(`${path.resolve(destination)}${path.sep}`)) {
+      fail(`${label}_archive_path_unsafe`);
+    }
+    fs.mkdirSync(path.dirname(target), { recursive: true, mode: 0o700 });
+    const bytes = git(repo, ['cat-file', 'blob', match[2]], null);
+    fs.writeFileSync(target, bytes, {
+      flag: 'wx', mode: match[1] === '100755' ? 0o755 : 0o644
+    });
   }
 }
 
 function materializeExactRepository(repo, commit, destination, label) {
-  assertNoSymlinks(repo, commit, ['.'], label);
-  const archive = `${destination}.tar`;
+  materializeGitArchive(repo, commit, ['.'], destination, label);
   try {
-    execFileSync('git', ['-C', repo, 'archive', '--format=tar',
-      `--output=${archive}`, commit], { stdio: ['ignore', 'ignore', 'pipe'] });
-    fs.mkdirSync(destination, { mode: 0o700 });
-    execFileSync('tar', ['--extract', '--file', archive, '--directory', destination,
-      '--no-same-owner', '--no-same-permissions'], { stdio: ['ignore', 'ignore', 'pipe'] });
     git(destination, ['init', '-b', 'authority']);
     git(destination, ['config', 'user.name', 'Runtime Authority']);
     git(destination, ['config', 'user.email', 'runtime-authority@example.invalid']);
@@ -131,7 +129,10 @@ function materializeExactRepository(repo, commit, destination, label) {
         git(destination, ['status', '--porcelain=v1', '--untracked-files=all']) !== '') {
       fail(`${label}_isolated_tree_mismatch`);
     }
-  } finally { try { fs.unlinkSync(archive); } catch {} }
+  } catch (error) {
+    fs.rmSync(destination, { recursive: true, force: true });
+    throw error;
+  }
   return destination;
 }
 
