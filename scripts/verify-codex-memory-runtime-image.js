@@ -124,7 +124,7 @@ function requireMediaType(descriptor, expected) {
 
 function validateLayerFilesystem(entries, state = new Map()) {
   const root = entries.find(entry => entry.name === '.');
-  if (!root || root.type !== 'directory') fail('runtime_oci_layer_root_invalid');
+  if (root && root.type !== 'directory') fail('runtime_oci_layer_root_invalid');
   for (const entry of entries) {
     if (entry.name === '.') continue;
     const components = entry.name.split('/');
