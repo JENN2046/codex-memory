@@ -84,6 +84,11 @@ function nativeClosure() {
   return {
     artifacts: [artifact(EXPECTED_BETTER_SQLITE_PATH, S('b'), '2'),
       artifact(EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256, '1')],
+    libraries: [{ buildId: '', elfClass: 'ELF64', interpreter: null,
+      machine: 'Advanced Micro Devices X86-64', needed: [],
+      path: '/lib/x86_64-linux-gnu/libc.so.6', resolvedLibraries: [],
+      rpath: null, runpath: null, sha256: S('a'),
+      type: 'DYN (Shared object file)' }],
     schemaVersion: NATIVE_CLOSURE_SCHEMA
   };
 }

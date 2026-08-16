@@ -19,6 +19,7 @@ function fail(code) { const error = new Error(code); error.code = code; throw er
 function validateNativeClosure(value) {
   if (!value || value.schemaVersion !== NATIVE_CLOSURE_SCHEMA ||
       !Array.isArray(value.artifacts) || value.artifacts.length !== 2 ||
+      !Array.isArray(value.libraries) || value.libraries.length < 1 ||
       value.artifacts.some((item, index) => item?.path !== EXPECTED_NATIVE_PATHS[index])) {
     fail('runtime_native_closure_invalid');
   }
@@ -62,6 +63,63 @@ function validateNativeClosure(value) {
       new Set(artifact.resolvedLibraries.map(item => item.path)).size !==
         artifact.resolvedLibraries.length) fail('runtime_native_closure_dependency_missing');
   }
+  const librariesByPath = new Map();
+  for (const library of value.libraries) {
+    if (!library || librariesByPath.has(library.path) ||
+        !['/lib/x86_64-linux-gnu/', '/usr/lib/x86_64-linux-gnu/']
+          .some(prefix => library.path?.startsWith(prefix)) ||
+        !/^sha256:[a-f0-9]{64}$/u.test(library.sha256 || '') ||
+        library.elfClass !== 'ELF64' ||
+        library.machine !== 'Advanced Micro Devices X86-64' ||
+        !/^DYN \(/u.test(library.type || '') ||
+        (library.interpreter !== null &&
+          !/^\/(?:usr\/)?lib\/x86_64-linux-gnu\/ld-linux-x86-64\.so\.2$/u
+            .test(library.interpreter || '')) ||
+        library.rpath !== null || library.runpath !== null ||
+        !Array.isArray(library.needed) ||
+        !Array.isArray(library.resolvedLibraries)) {
+      fail('runtime_native_closure_library_invalid');
+    }
+    for (const needed of library.needed) {
+      if (!/^[A-Za-z0-9_.+-]+\.so(?:\.[0-9]+)*$/u.test(needed)) {
+        fail('runtime_native_closure_dependency_invalid');
+      }
+    }
+    if (new Set(library.needed).size !== library.needed.length) {
+      fail('runtime_native_closure_dependency_invalid');
+    }
+    librariesByPath.set(library.path, library);
+  }
+  const validateResolved = owner => {
+    for (const library of owner.resolvedLibraries) {
+      if (!library || !librariesByPath.has(library.path) ||
+          librariesByPath.get(library.path).sha256 !== library.sha256 ||
+          !/^sha256:[a-f0-9]{64}$/u.test(library.sha256 || '') ||
+          !/^[A-Za-z0-9_.+-]+\.so(?:\.[0-9]+)*$/u.test(library.name || '')) {
+        fail('runtime_native_closure_dependency_invalid');
+      }
+    }
+    if (owner.needed.some(name =>
+      !owner.resolvedLibraries.some(library => library.name === name)) ||
+      new Set(owner.resolvedLibraries.map(item => item.name)).size !==
+        owner.resolvedLibraries.length ||
+      new Set(owner.resolvedLibraries.map(item => item.path)).size !==
+        owner.resolvedLibraries.length) fail('runtime_native_closure_dependency_missing');
+  };
+  for (const library of value.libraries) validateResolved(library);
+  for (const artifact of value.artifacts) validateResolved(artifact);
+  const reachable = new Set();
+  const pending = value.artifacts.flatMap(item =>
+    item.resolvedLibraries.map(library => library.path));
+  while (pending.length > 0) {
+    const libraryPath = pending.pop();
+    if (reachable.has(libraryPath)) continue;
+    reachable.add(libraryPath);
+    const library = librariesByPath.get(libraryPath);
+    if (!library) fail('runtime_native_closure_dependency_missing');
+    pending.push(...library.resolvedLibraries.map(item => item.path));
+  }
+  if (reachable.size !== value.libraries.length) fail('runtime_native_closure_library_unreachable');
   return Object.freeze(value);
 }
 
@@ -70,9 +128,7 @@ function nativeClosureDigest(value) { return digest(validateNativeClosure(value)
 function verifyNativeClosureBytes(value, readFile) {
   const closure = validateNativeClosure(value);
   if (typeof readFile !== 'function') fail('runtime_native_closure_reader_invalid');
-  const expected = closure.artifacts.flatMap(
-    artifact => [artifact, ...artifact.resolvedLibraries]
-  );
+  const expected = [...closure.artifacts, ...closure.libraries];
   for (const item of expected) {
     let bytes;
     try { bytes = readFile(item.path); } catch {

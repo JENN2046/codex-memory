@@ -24,7 +24,26 @@ function sha256Buffer(value) {
 }
 
 function safeArchiveMembers(archive) {
-  return parseTarBuffer(fs.readFileSync(archive));
+  return parseTarBuffer(readBoundedArchive(archive));
+}
+
+const MAXIMUM_OCI_ARCHIVE_BYTES = 2 * 1024 * 1024 * 1024;
+
+function readBoundedArchive(archive, fsModule = fs) {
+  const descriptor = fsModule.openSync(
+    archive, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0)
+  );
+  try {
+    const before = fsModule.fstatSync(descriptor);
+    if (!before.isFile() || before.size < 1024 ||
+        before.size > MAXIMUM_OCI_ARCHIVE_BYTES) fail('runtime_oci_archive_size_invalid');
+    const buffer = fsModule.readFileSync(descriptor);
+    const after = fsModule.fstatSync(descriptor);
+    if (before.dev !== after.dev || before.ino !== after.ino ||
+        before.size !== after.size || before.mtimeMs !== after.mtimeMs ||
+        buffer.length !== before.size) fail('runtime_oci_archive_changed');
+    return buffer;
+  } finally { fsModule.closeSync(descriptor); }
 }
 
 function readJson(file, code) {
@@ -45,9 +64,9 @@ function verifyBlob(files, value) {
 }
 
 function inspectOciArchive(archive, { fsModule = fs } = {}) {
-  if (!fsModule.statSync(archive).isFile()) fail('runtime_oci_archive_invalid');
-  const buffer = fsModule.readFileSync(archive);
+  const buffer = readBoundedArchive(archive, fsModule);
   const entries = parseTarBuffer(buffer, {
+    maximumArchiveBytes: MAXIMUM_OCI_ARCHIVE_BYTES,
     maximumEntries: 4096,
     maximumFileBytes: 1024 * 1024 * 1024,
     maximumTotalBytes: 4 * 1024 * 1024 * 1024
@@ -145,7 +164,9 @@ if (require.main === module) {
 }
 
 module.exports = {
+  MAXIMUM_OCI_ARCHIVE_BYTES,
   inspectOciArchive,
+  readBoundedArchive,
   safeArchiveMembers,
   verifyBlob,
   verifyOciArchive

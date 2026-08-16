@@ -24,6 +24,9 @@ const {
 } = require('../src/runtime/native-image/native-closure');
 const { verifyBuildContextBuffer } = require('../src/runtime/native-image/build-context');
 const { parseTarBuffer } = require('../src/runtime/native-image/tar-archive');
+const { readBoundedArchive, MAXIMUM_OCI_ARCHIVE_BYTES } = require(
+  '../scripts/verify-codex-memory-runtime-image'
+);
 const { buildRuntimeImage, parseArguments: parseBuildArguments } = require(
   '../scripts/build-codex-memory-runtime-image'
 );
@@ -288,13 +291,22 @@ function closure() {
     runpath: null, sha256: nativeSha, type: 'DYN (Shared object file)' });
   return { schemaVersion: NATIVE_CLOSURE_SCHEMA,
     artifacts: [artifact(EXPECTED_BETTER_SQLITE_PATH, S('b'), 'b'),
-      artifact(EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256, 'a')] };
+      artifact(EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256, 'a')],
+    libraries: [{ buildId: '', elfClass: 'ELF64', interpreter: null,
+      machine: 'Advanced Micro Devices X86-64', needed: [],
+      path: '/lib/x86_64-linux-gnu/libc.so.6', resolvedLibraries: [],
+      rpath: null, runpath: null, sha256: S('4'),
+      type: 'DYN (Shared object file)' }] };
 }
 test('native closure is mandatory and rejects substitution, RPATH, missing lib and wrong arch', () => {
   const withTransitive = closure();
   withTransitive.artifacts[0].resolvedLibraries.push({
     name: 'libgcc_s.so.1', path: '/usr/lib/x86_64-linux-gnu/libgcc_s.so.1', sha256: S('5')
   });
+  withTransitive.libraries.push({ buildId: '', elfClass: 'ELF64', interpreter: null,
+    machine: 'Advanced Micro Devices X86-64', needed: [],
+    path: '/usr/lib/x86_64-linux-gnu/libgcc_s.so.1', resolvedLibraries: [],
+    rpath: null, runpath: null, sha256: S('5'), type: 'DYN (Shared object file)' });
   validateNativeClosure(withTransitive);
   for (const mutate of [
     value => { value.artifacts[1].sha256 = S('0'); },
@@ -302,6 +314,15 @@ test('native closure is mandatory and rejects substitution, RPATH, missing lib a
     value => { value.artifacts[0].resolvedLibraries = []; },
     value => { value.artifacts[0].machine = 'AArch64'; },
     value => value.artifacts.push({ ...value.artifacts[0], path: '/opt/extra.node' })
+  ]) {
+    const value = structuredClone(closure()); mutate(value);
+    assert.throws(() => validateNativeClosure(value));
+  }
+  for (const mutate of [
+    value => { value.libraries[0].runpath = '/run/codex-memory'; },
+    value => { value.libraries[0].needed = ['libpayload.so']; },
+    value => { value.libraries[0].machine = 'AArch64'; },
+    value => { value.libraries.push(structuredClone(value.libraries[0])); }
   ]) {
     const value = structuredClone(closure()); mutate(value);
     assert.throws(() => validateNativeClosure(value));
@@ -329,7 +350,10 @@ test('native admission re-hashes every governed ELF byte from the stopped contai
   const artifactBytes = Buffer.from('accepted-vexus');
   const libraryBytes = Buffer.from('accepted-libc');
   value.artifacts[1].sha256 = sha256Buffer(artifactBytes);
-  value.artifacts[1].resolvedLibraries[0].sha256 = sha256Buffer(libraryBytes);
+  for (const artifact of value.artifacts) {
+    artifact.resolvedLibraries[0].sha256 = sha256Buffer(libraryBytes);
+  }
+  value.libraries[0].sha256 = sha256Buffer(libraryBytes);
   // This test exercises the generic closure-byte verifier with a test artifact;
   // the production schema separately pins Vexus to EXPECTED_VEXUS_SHA256.
   value.artifacts[1].sha256 = EXPECTED_VEXUS_SHA256;
@@ -479,4 +503,47 @@ test('atomic OCI publication exposes only independently verified complete bytes'
   assert.equal(evidence.archiveSha256, expected);
   assert.deepEqual(fs.readFileSync(output), complete);
   assert.deepEqual(fs.readdirSync(root).filter(name => name.includes('.tmp')), []);
+});
+
+test('atomic OCI publication removes the final name when independent readback fails', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-image-readback-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const fixture = context([{ name: 'codex-memory/deploy/native-runtime/Dockerfile',
+    content: 'FROM scratch\n' }, { name: 'vcptoolbox/package.json', content: '{}\n' }]);
+  const contextDirectory = path.join(root, 'context');
+  fs.mkdirSync(contextDirectory);
+  fs.writeFileSync(path.join(contextDirectory, 'runtime-context.tar'), fixture.buffer);
+  const output = path.join(root, 'accepted.oci.tar');
+  let verifies = 0;
+  expectCode(() => buildRuntimeImage({ contextDirectory,
+    expectedContextArtifactSha256: sha256Buffer(fixture.buffer), outputArchive: output,
+    spawnFile: (_command, args) => {
+      const destination = args.find(value => value.startsWith('type=oci,dest='))
+        .match(/dest=([^,]+)/u)[1];
+      fs.writeFileSync(destination, 'complete');
+      return { status: 0 };
+    }, verifyArchive: () => {
+      verifies += 1;
+      if (verifies === 2) throw Object.assign(new Error('readback'),
+        { code: 'runtime_image_publication_readback_mismatch' });
+      return { archiveSha256: S('1'), accepted: true };
+    } }), 'runtime_image_publication_readback_mismatch');
+  assert.equal(fs.existsSync(output), false);
+  assert.deepEqual(fs.readdirSync(root).filter(name => name.includes('.tmp')), []);
+});
+
+test('tar parsing bounds zero padding and OCI reader rejects oversized file before reading', t => {
+  const valid = tar([{ name: 'oci-layout', content: '{}' }]);
+  expectCode(() => parseTarBuffer(Buffer.concat([valid, Buffer.alloc(2048)]), {
+    maximumTrailingZeroBytes: 1024
+  }), 'runtime_tar_trailing_padding_limit');
+  const fake = {
+    openSync: () => 11,
+    fstatSync: () => ({ dev: 1, ino: 2, isFile: () => true,
+      mtimeMs: 0, size: MAXIMUM_OCI_ARCHIVE_BYTES + 1 }),
+    readFileSync: () => { throw new Error('must_not_read'); },
+    closeSync: () => {}
+  };
+  expectCode(() => readBoundedArchive('/opaque/oversized.oci', fake),
+    'runtime_oci_archive_size_invalid');
 });

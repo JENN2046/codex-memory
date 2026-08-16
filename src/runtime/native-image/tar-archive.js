@@ -4,8 +4,10 @@ const path = require('node:path');
 
 const BLOCK = 512;
 const DEFAULT_LIMITS = Object.freeze({
+  maximumArchiveBytes: 2 * 1024 * 1024 * 1024,
   maximumEntries: 20_000,
   maximumFileBytes: 512 * 1024 * 1024,
+  maximumTrailingZeroBytes: 1024 * 1024,
   maximumTotalBytes: 2 * 1024 * 1024 * 1024
 });
 
@@ -42,6 +44,7 @@ function parseTarBuffer(buffer, limits = {}) {
     fail('runtime_tar_archive_invalid');
   }
   const policy = { ...DEFAULT_LIMITS, ...limits };
+  if (buffer.length > policy.maximumArchiveBytes) fail('runtime_tar_archive_too_large');
   const entries = [];
   const names = new Set();
   let offset = 0;
@@ -88,6 +91,9 @@ function parseTarBuffer(buffer, limits = {}) {
     offset = next;
   }
   if (zeroBlocks < 2) fail('runtime_tar_archive_unterminated');
+  if (buffer.length - offset > policy.maximumTrailingZeroBytes) {
+    fail('runtime_tar_trailing_padding_limit');
+  }
   for (; offset < buffer.length; offset += 1) {
     if (buffer[offset] !== 0) fail('runtime_tar_trailing_data');
   }

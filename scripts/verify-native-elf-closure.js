@@ -21,6 +21,46 @@ function sha256(file) {
 function command(name, args) {
   return execFileSync(name, args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 }
+function sortText(left, right) { return left < right ? -1 : left > right ? 1 : 0; }
+function elfEvidence(file) {
+  const header = command('readelf', ['-h', file]);
+  const dynamic = command('readelf', ['-d', file]);
+  const notes = command('readelf', ['-n', file]);
+  const programHeaders = command('readelf', ['-l', file]);
+  const pick = (expression, code) => {
+    const match = expression.exec(header);
+    if (!match) fail(code);
+    return match[1].trim();
+  };
+  const needed = [...dynamic.matchAll(/\(NEEDED\).*\[([^\]]+)\]/gu)]
+    .map(match => match[1]).sort(sortText);
+  const rpath = /\(RPATH\).*\[([^\]]*)\]/u.exec(dynamic)?.[1] ?? null;
+  const runpath = /\(RUNPATH\).*\[([^\]]*)\]/u.exec(dynamic)?.[1] ?? null;
+  if (rpath !== null || runpath !== null || needed.some(name => name.includes('/'))) {
+    fail('runtime_native_loader_path_forbidden');
+  }
+  return {
+    buildId: /Build ID:\s*([a-f0-9]+)/u.exec(notes)?.[1] || '',
+    elfClass: pick(/^\s*Class:\s*(.+)$/mu, 'runtime_native_elf_class_invalid'),
+    interpreter: /Requesting program interpreter:\s*([^\]]+)/u
+      .exec(programHeaders)?.[1] || null,
+    machine: pick(/^\s*Machine:\s*(.+)$/mu, 'runtime_native_elf_machine_invalid'),
+    needed,
+    rpath,
+    runpath,
+    type: pick(/^\s*Type:\s*(.+)$/mu, 'runtime_native_elf_type_invalid')
+  };
+}
+function resolvedDependencies(file) {
+  const output = command('ldd', [file]);
+  if (/=>\s+not found\b/u.test(output)) fail('runtime_native_dependency_missing');
+  return output.split('\n').map(line => {
+    const linked = /^\s*(\S+)\s+=>\s+(\/\S+)\s+\(/u.exec(line);
+    if (linked) return { name: linked[1], path: fs.realpathSync(linked[2]) };
+    const direct = /^\s*(\/\S+)\s+\(/u.exec(line);
+    return direct ? { name: path.basename(direct[1]), path: fs.realpathSync(direct[1]) } : null;
+  }).filter(Boolean).sort((a, b) => sortText(a.name, b.name));
+}
 function nativeFiles(root) {
   const output = [];
   const visit = directory => {
@@ -62,31 +102,9 @@ function inspect(root = '/') {
     fail('runtime_native_vexus_digest_mismatch');
   }
   const artifacts = expectedFiles.map((expected, index) => {
-    const header = command('readelf', ['-h', expected]);
-    const dynamic = command('readelf', ['-d', expected]);
-    const notes = command('readelf', ['-n', expected]);
-    const programHeaders = command('readelf', ['-l', expected]);
+    const elf = elfEvidence(expected);
     const symbols = command('objdump', ['-T', expected]);
-    const pick = (expression, code) => {
-      const match = expression.exec(header);
-      if (!match) fail(code);
-      return match[1].trim();
-    };
-    const needed = [...dynamic.matchAll(/\(NEEDED\).*\[([^\]]+)\]/gu)]
-      .map(match => match[1]).sort();
-    const rpath = /\(RPATH\).*\[([^\]]*)\]/u.exec(dynamic)?.[1] ?? null;
-    const runpath = /\(RUNPATH\).*\[([^\]]*)\]/u.exec(dynamic)?.[1] ?? null;
-    if (rpath !== null || runpath !== null || needed.some(name => name.includes('/'))) {
-      fail('runtime_native_loader_path_forbidden');
-    }
-    const resolved = command('ldd', [expected]).split('\n').map(line => {
-      const linked = /^\s*(\S+)\s+=>\s+(\/\S+)\s+\(/u.exec(line);
-      if (linked) return { name: linked[1], path: fs.realpathSync(linked[2]) };
-      const direct = /^\s*(\/\S+)\s+\(/u.exec(line);
-      return direct ? {
-        name: path.basename(direct[1]), path: fs.realpathSync(direct[1])
-      } : null;
-    }).filter(Boolean);
+    const resolved = resolvedDependencies(expected);
     if (resolved.some(item => item.path.startsWith('/opt/') ||
         !fs.statSync(item.path).isFile())) fail('runtime_native_dependency_path_invalid');
     const glibcVersions = [...symbols.matchAll(/\bGLIBC_(\d+)\.(\d+)\b/gu)]
@@ -94,24 +112,45 @@ function inspect(root = '/') {
     if (glibcVersions.length < 1) fail('runtime_native_glibc_evidence_missing');
     glibcVersions.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
     return {
-      buildId: /Build ID:\s*([a-f0-9]+)/u.exec(notes)?.[1] || '',
-      elfClass: pick(/^\s*Class:\s*(.+)$/mu, 'runtime_native_elf_class_invalid'),
-      interpreter: /Requesting program interpreter:\s*([^\]]+)/u
-        .exec(programHeaders)?.[1] || null,
-      machine: pick(/^\s*Machine:\s*(.+)$/mu, 'runtime_native_elf_machine_invalid'),
+      ...elf,
       maximumGlibc: glibcVersions.at(-1).join('.'),
-      needed,
       path: EXPECTED_NATIVE_PATHS[index],
-      resolvedLibraries: resolved.sort((a, b) => a.name.localeCompare(b.name)).map(item => ({
+      resolvedLibraries: resolved.map(item => ({
         name: item.name, path: item.path, sha256: sha256(item.path)
       })),
-      rpath,
-      runpath,
-      sha256: sha256(expected),
-      type: pick(/^\s*Type:\s*(.+)$/mu, 'runtime_native_elf_type_invalid')
+      sha256: sha256(expected)
     };
   });
-  return validateNativeClosure({ artifacts, schemaVersion: NATIVE_CLOSURE_SCHEMA });
+  const pending = [...new Set(artifacts.flatMap(artifact =>
+    artifact.resolvedLibraries.map(item => item.path)))];
+  const seen = new Set();
+  const libraries = [];
+  while (pending.length > 0) {
+    const libraryPath = pending.shift();
+    if (seen.has(libraryPath)) continue;
+    seen.add(libraryPath);
+    if (!['/lib/x86_64-linux-gnu/', '/usr/lib/x86_64-linux-gnu/']
+      .some(prefix => libraryPath.startsWith(prefix)) ||
+      !fs.statSync(libraryPath).isFile()) fail('runtime_native_dependency_path_invalid');
+    const elf = elfEvidence(libraryPath);
+    const resolved = resolvedDependencies(libraryPath);
+    if (elf.needed.some(name => !resolved.some(item => item.name === name))) {
+      fail('runtime_native_dependency_missing');
+    }
+    for (const item of resolved) {
+      if (!seen.has(item.path)) pending.push(item.path);
+    }
+    libraries.push({
+      ...elf,
+      path: libraryPath,
+      resolvedLibraries: resolved.map(item => ({
+        name: item.name, path: item.path, sha256: sha256(item.path)
+      })),
+      sha256: sha256(libraryPath)
+    });
+  }
+  libraries.sort((a, b) => sortText(a.path, b.path));
+  return validateNativeClosure({ artifacts, libraries, schemaVersion: NATIVE_CLOSURE_SCHEMA });
 }
 
 function main(argv = process.argv.slice(2)) {
