@@ -5,6 +5,7 @@ ARG SOURCE_DATE_EPOCH
 ARG BUILD_MANIFEST_DIGEST
 
 ENV NODE_ENV=production \
+    NODE_DISABLE_COMPILE_CACHE=1 \
     PUPPETEER_SKIP_DOWNLOAD=true \
     TZ=UTC \
     SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}
@@ -26,19 +27,23 @@ RUN printf '%s\n' \
       python3.11-minimal=3.11.2-6+deb12u8 \
       libpython3.11-minimal=3.11.2-6+deb12u8 \
       libpython3.11-stdlib=3.11.2-6+deb12u8 \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -f /var/cache/ldconfig/aux-cache /var/log/dpkg.log \
+    && rm -rf /var/log/apt/*
 
 WORKDIR /opt/codex-memory
 COPY --chown=node:node codex-memory/package.json codex-memory/package-lock.json ./
 RUN npm ci --omit=dev --no-audit --no-fund \
-    && npm cache clean --force
+    && npm cache clean --force \
+    && rm -rf /root/.npm /tmp/node-compile-cache
 COPY --chown=node:node codex-memory/ ./
 
 WORKDIR /opt/vcptoolbox
 COPY --chown=node:node runtime/vcp-dependencies/package.json \
   runtime/vcp-dependencies/package-lock.json ./
 RUN npm ci --omit=dev --no-audit --no-fund \
-    && npm cache clean --force
+    && npm cache clean --force \
+    && rm -rf /root/.npm /tmp/node-compile-cache
 COPY --chown=node:node vcptoolbox/ ./
 
 WORKDIR /opt/codex-memory

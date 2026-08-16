@@ -171,6 +171,9 @@ test('Dockerfile pins platform manifest and prohibits runtime installation', () 
   assert.doesNotMatch(source, /FROM\s+node:[^@\s]+/u);
   assert.match(source, /USER 1000:1000/u);
   assert.match(source, /_container-supervisor/u);
+  assert.match(source, /NODE_DISABLE_COMPILE_CACHE=1/u);
+  assert.match(source, /rm -rf \/root\/\.npm \/tmp\/node-compile-cache/u);
+  assert.match(source, /rm -f \/var\/cache\/ldconfig\/aux-cache \/var\/log\/dpkg\.log/u);
 });
 
 test('OCI builder normalizes layer timestamps and disables mutable attestations', () => {
