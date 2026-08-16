@@ -40,7 +40,7 @@ function verifyBuildContextBuffer(buffer) {
     actual.push(declared);
   }
   if (actual.length !== expected.size ||
-      digest(actual.sort((a, b) => a.path.localeCompare(b.path))) !==
+      digest(actual.sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0)) !==
         manifest.buildContextFileManifestDigest) {
     fail('runtime_context_inventory_mismatch');
   }

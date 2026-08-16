@@ -80,7 +80,7 @@ function context(entries) {
   const fileManifest = entries.map(entry => ({
     mode: entry.mode === 0o755 ? '100755' : '100644', path: entry.name,
     sha256: sha(Buffer.from(entry.content)), size: Buffer.byteLength(entry.content)
-  })).sort((a, b) => a.path.localeCompare(b.path));
+  })).sort((a, b) => a.path < b.path ? -1 : a.path > b.path ? 1 : 0);
   const manifest = buildManifest(fileManifest);
   return { buffer: tar([
     { name: 'codex-memory', type: '5' },
@@ -94,6 +94,8 @@ function context(entries) {
 test('manifested context bytes are the exact in-memory BuildKit input', () => {
   const fixture = context([
     { name: 'codex-memory/Dockerfile', content: 'FROM scratch\n' },
+    { name: 'codex-memory/a-Z.js', content: 'z\n' },
+    { name: 'codex-memory/a_.js', content: 'underscore\n' },
     { name: 'vcptoolbox/vexus.node', content: 'accepted' }
   ]);
   const evidence = verifyBuildContextBuffer(fixture.buffer);
