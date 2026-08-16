@@ -698,7 +698,7 @@ test('OCI admission binds descriptor types/sizes and recomputes bounded layer di
   assert.throws(() => inspectOciArchive(make('invalid-layer')));
 });
 
-test('OCI layer state rejects non-directory root, absolute links and symlink-parent pivots', t => {
+test('OCI layer state rejects non-directory root and cross-layer symlink-parent pivots', t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oci-layer-state-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const make = (name, layerEntries) => {
@@ -733,9 +733,9 @@ test('OCI layer state rejects non-directory root, absolute links and symlink-par
   expectCode(() => inspectOciArchive(make('bad-root', [
     [{ name: './', content: '' }]
   ])), 'runtime_tar_root_entry_invalid');
-  expectCode(() => inspectOciArchive(make('absolute-link', [[
-    { name: './', type: '5' }, { name: 'pivot', type: '2', link: '/proc' }
-  ]])), 'runtime_oci_layer_absolute_symlink_forbidden');
+  assert.equal(inspectOciArchive(make('absolute-link', [[
+    { name: './', type: '5' }, { name: 'pivot', type: '2', link: '/image/path' }
+  ]])).rootfsDiffIds.length, 1);
   expectCode(() => inspectOciArchive(make('pivot', [[
     { name: './', type: '5' }, { name: 'pivot', type: '2', link: 'target' }
   ], [

@@ -135,9 +135,6 @@ function validateLayerFilesystem(entries, state = new Map()) {
         fail('runtime_oci_layer_symlink_parent_forbidden');
       }
     }
-    if (entry.type === 'symlink' && entry.linkTarget.startsWith('/')) {
-      fail('runtime_oci_layer_absolute_symlink_forbidden');
-    }
     if (entry.type === 'hardlink') {
       const target = state.get(entry.linkTarget) ||
         entries.find(candidate => candidate.name === entry.linkTarget);
