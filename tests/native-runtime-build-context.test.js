@@ -173,6 +173,15 @@ test('Dockerfile pins platform manifest and prohibits runtime installation', () 
   assert.match(source, /_container-supervisor/u);
 });
 
+test('OCI builder normalizes layer timestamps and disables mutable attestations', () => {
+  const source = fs.readFileSync(path.join(
+    __dirname, '..', 'scripts', 'build-codex-memory-runtime-image.js'
+  ), 'utf8');
+  assert.match(source, /rewrite-timestamp=true/u);
+  assert.match(source, /--provenance=false/u);
+  assert.match(source, /--sbom=false/u);
+});
+
 test('systemd candidate uses root-owned installed launcher, not checkout', () => {
   const source = fs.readFileSync(path.join(
     __dirname, '..', 'deploy', 'systemd',

@@ -44,7 +44,7 @@ function buildRuntimeImage({ contextDirectory, outputArchive, builder }) {
       'native-runtime', 'Dockerfile'),
     '--build-arg', `SOURCE_DATE_EPOCH=${manifest.sourceDateEpoch}`,
     '--build-arg', `BUILD_MANIFEST_DIGEST=${digest(manifest)}`,
-    '--output', `type=oci,dest=${outputArchive},name=codex-memory-native-runtime:test`,
+    '--output', `type=oci,dest=${outputArchive},name=codex-memory-native-runtime:test,rewrite-timestamp=true`,
     contextDirectory
   ];
   if (builder) args.splice(2, 0, '--builder', builder);
