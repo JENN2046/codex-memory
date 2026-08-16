@@ -151,6 +151,105 @@ function vcpContractPaths(repository) {
   ])].sort());
 }
 
+function pruneRuntimePackageLock(sourceLock, rootDependencies) {
+  if (sourceLock?.lockfileVersion !== 3 ||
+      !sourceLock.packages || typeof sourceLock.packages !== 'object' ||
+      !rootDependencies || typeof rootDependencies !== 'object' ||
+      Array.isArray(rootDependencies) || Object.keys(rootDependencies).length < 1) {
+    fail('vcp_runtime_lock_invalid');
+  }
+  const resolveDependencyKey = (requesterKey, dependency) => {
+    let ancestor = requesterKey;
+    while (true) {
+      const candidate = ancestor
+        ? `${ancestor}/node_modules/${dependency}`
+        : `node_modules/${dependency}`;
+      if (sourceLock.packages[candidate]) return candidate;
+      if (!ancestor) return null;
+      const match = /^(.*?)(?:\/)?node_modules\/(?:@[^/]+\/)?[^/]+$/u
+        .exec(ancestor);
+      ancestor = match ? match[1] : '';
+    }
+  };
+  const selected = new Set(['']);
+  const queue = Object.keys(rootDependencies).map(
+    dependency => `node_modules/${dependency}`
+  );
+  while (queue.length > 0) {
+    const key = queue.shift();
+    if (selected.has(key)) continue;
+    const entry = sourceLock.packages[key];
+    if (!entry || typeof entry.version !== 'string' ||
+        typeof entry.integrity !== 'string') fail('vcp_runtime_lock_dependency_missing');
+    selected.add(key);
+    for (const dependency of Object.keys(entry.dependencies || {})) {
+      const dependencyKey = resolveDependencyKey(key, dependency);
+      if (!dependencyKey) fail('vcp_runtime_lock_dependency_missing');
+      queue.push(dependencyKey);
+    }
+    for (const dependency of Object.keys({
+      ...(entry.optionalDependencies || {}),
+      ...(entry.peerDependencies || {})
+    })) {
+      const dependencyKey = resolveDependencyKey(key, dependency);
+      if (dependencyKey) queue.push(dependencyKey);
+      else if (entry.peerDependencies?.[dependency] &&
+          entry.peerDependenciesMeta?.[dependency]?.optional !== true) {
+        fail('vcp_runtime_lock_dependency_missing');
+      }
+    }
+  }
+  const packageManifest = Object.freeze({
+    name: 'codex-memory-vcp-runtime-dependencies',
+    version: '1.0.0',
+    private: true,
+    dependencies: rootDependencies
+  });
+  const lock = Object.freeze({
+    name: packageManifest.name,
+    version: packageManifest.version,
+    lockfileVersion: 3,
+    requires: true,
+    packages: Object.fromEntries([...selected].sort().map(key => {
+      if (key === '') return [key, {
+        name: packageManifest.name,
+        version: packageManifest.version,
+        dependencies: rootDependencies
+      }];
+      return [key, sourceLock.packages[key]];
+    }))
+  });
+  return Object.freeze({ lock, packageManifest, selected });
+}
+
+function materializeVcpRuntimeDependencies(repository, destination) {
+  const evidence = inspectVcpRuntimeContractEvidence(repository);
+  if (evidence?.complete !== true ||
+      !Array.isArray(evidence?.projection?.relevantExternalDependencies)) {
+    fail(evidence?.stableErrorCode || 'vcp_contract_evidence_unavailable');
+  }
+  const sourceLock = JSON.parse(fs.readFileSync(
+    path.join(repository, 'package-lock.json'), 'utf8'
+  ));
+  const rootDependencies = Object.fromEntries(
+    evidence.projection.relevantExternalDependencies.map(entry => [
+      entry.packageName, entry.version
+    ])
+  );
+  const { lock, packageManifest, selected } = pruneRuntimePackageLock(
+    sourceLock, rootDependencies
+  );
+  fs.mkdirSync(destination, { recursive: true, mode: 0o700 });
+  fs.writeFileSync(path.join(destination, 'package.json'),
+    `${JSON.stringify(packageManifest, null, 2)}\n`, { mode: 0o600 });
+  fs.writeFileSync(path.join(destination, 'package-lock.json'),
+    `${JSON.stringify(lock, null, 2)}\n`, { mode: 0o600 });
+  return Object.freeze({
+    dependencyCount: selected.size - 1,
+    externalDependencyCount: Object.keys(rootDependencies).length
+  });
+}
+
 function generateBuildContext({
   codexMemoryRepository,
   codexMemoryCommit,
@@ -175,6 +274,10 @@ function generateBuildContext({
     materializeGitArchive(
       codexMemoryRepository, codexMemoryCommit, CODEX_PATHS,
       path.join(staging, 'codex-memory'), 'codex-memory'
+    );
+    materializeVcpRuntimeDependencies(
+      vcpRepository,
+      path.join(staging, 'runtime', 'vcp-dependencies')
     );
     materializeGitArchive(
       vcpRepository, vcpCommit, vcpContractPaths(vcpRepository),
@@ -208,7 +311,10 @@ function generateBuildContext({
       vcpTree: treeDigest(vcpRepository, vcpCommit),
       vexusSha256: VEXUS_SHA256
     });
-    fs.mkdirSync(path.join(staging, 'runtime'), { mode: 0o700 });
+    fs.mkdirSync(path.join(staging, 'runtime'), {
+      recursive: true,
+      mode: 0o700
+    });
     fs.writeFileSync(
       path.join(staging, 'runtime', 'runtime-build-manifest.json'),
       canonicalJson(manifest),
@@ -280,6 +386,8 @@ module.exports = {
   assertCleanExactRepository,
   generateBuildContext,
   materializeGitArchive,
+  materializeVcpRuntimeDependencies,
+  pruneRuntimePackageLock,
   vcpContractPaths,
   visitFiles
 };

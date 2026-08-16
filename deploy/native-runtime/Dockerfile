@@ -35,7 +35,8 @@ RUN npm ci --omit=dev --no-audit --no-fund \
 COPY --chown=node:node codex-memory/ ./
 
 WORKDIR /opt/vcptoolbox
-COPY --chown=node:node vcptoolbox/package.json vcptoolbox/package-lock.json ./
+COPY --chown=node:node runtime/vcp-dependencies/package.json \
+  runtime/vcp-dependencies/package-lock.json ./
 RUN npm ci --omit=dev --no-audit --no-fund \
     && npm cache clean --force
 COPY --chown=node:node vcptoolbox/ ./

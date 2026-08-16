@@ -9,6 +9,7 @@ const test = require('node:test');
 const {
   assertCleanExactRepository,
   materializeGitArchive,
+  pruneRuntimePackageLock,
   visitFiles
 } = require('../scripts/generate-codex-memory-runtime-context');
 const {
@@ -95,6 +96,29 @@ test('file manifest is sorted and content-bound without symlinks', t => {
   fs.mkdirSync(path.join(root, 'z')); fs.writeFileSync(path.join(root, 'z', 'b'), 'b');
   fs.writeFileSync(path.join(root, 'a'), 'a');
   assert.deepEqual(visitFiles(root).map(entry => entry.path), ['a', 'z/b']);
+});
+
+test('runtime npm closure keeps required nested dependency version and excludes unrelated packages', () => {
+  const integrity = `sha512-${Buffer.from('integrity').toString('base64')}`;
+  const source = {
+    lockfileVersion: 3,
+    packages: {
+      '': { dependencies: { accepted: '1.0.0', unrelated: '9.0.0' } },
+      'node_modules/accepted': {
+        dependencies: { nested: '^1.0.0' }, integrity, version: '1.0.0'
+      },
+      'node_modules/accepted/node_modules/nested': {
+        integrity, version: '1.2.0'
+      },
+      'node_modules/nested': { integrity, version: '2.0.0' },
+      'node_modules/unrelated': { integrity, version: '9.0.0' }
+    }
+  };
+  const result = pruneRuntimePackageLock(source, { accepted: '1.0.0' });
+  assert.deepEqual(Object.keys(result.lock.packages), [
+    '', 'node_modules/accepted', 'node_modules/accepted/node_modules/nested'
+  ]);
+  assert.equal(Object.hasOwn(result.lock.packages, 'node_modules/unrelated'), false);
 });
 
 function createPlan() {
