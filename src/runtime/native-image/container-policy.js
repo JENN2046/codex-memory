@@ -102,15 +102,16 @@ function validateRuntimeCandidate(inspect, expected) {
     fail('runtime_container_canonical_policy_mismatch');
   }
   const expectedMounts = [
-    [expected.authority, AUTHORITY_RECORD_PATH, false],
-    [expected.edgeReceipt, EDGE_RECEIPT_PATH, false],
-    [expected.providerReceipt, PROVIDER_RECEIPT_PATH, false],
-    [expected.profile, PROFILE_PATH, false],
-    [expected.providerEnvironment, PROVIDER_ENV_PATH, false],
-    [expected.primaryState, expected.primaryStateDestination, false],
-    [expected.runtimeDirectory, RUNTIME_DATA_PATH, true]
+    [expected.authority, AUTHORITY_RECORD_PATH, false, ''],
+    [expected.edgeReceipt, EDGE_RECEIPT_PATH, false, ''],
+    [expected.providerReceipt, PROVIDER_RECEIPT_PATH, false, ''],
+    [expected.profile, PROFILE_PATH, false, ''],
+    [expected.providerEnvironment, PROVIDER_ENV_PATH, false, ''],
+    [expected.primaryState, expected.primaryStateDestination, false, ''],
+    [expected.runtimeDirectory, RUNTIME_DATA_PATH, true, '']
   ].sort((a, b) => a[1].localeCompare(b[1]));
-  const actual = value.mounts.map(mount => [mount.source, mount.destination, mount.rw]);
+  const actual = value.mounts.map(mount =>
+    [mount.source, mount.destination, mount.rw, mount.name]);
   if (!same(actual, expectedMounts) || value.mounts.some(mount => mount.type !== 'bind')) {
     fail('runtime_container_canonical_policy_mismatch');
   }
@@ -152,14 +153,21 @@ function validateProviderCandidate(inspect) {
   requireNoDangerousHostSurface(value, 'provider_container_canonical_policy_mismatch');
   const stateMountOnly = value.mounts.length <= 1 && value.mounts.every(mount =>
     mount.destination === '/data' && mount.type === 'volume' &&
+    /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u.test(mount.name) &&
     mount.propagation === 'rprivate');
   const executionSurface = [value.workingDirectory, ...value.command,
     ...value.entrypoint, ...value.environment];
+  const dataPath = item => typeof item !== 'string' ||
+    /(^|[^A-Za-z0-9_.-])\/data(?:\/|$)/u.test(item) ||
+    (item.startsWith('/') && path.posix.normalize(item) === '/data');
+  const executable = [...value.entrypoint, ...value.command][0] || '';
+  const interpreter = path.posix.basename(executable);
   if (value.networkMode !== 'bridge' ||
       !loopbackBinding(value.portBindings, '3000/tcp', '3000') ||
       inspect?.State?.Running !== true || inspect?.State?.Health?.Status !== 'healthy' ||
-      !stateMountOnly || executionSurface.some(item =>
-        item === '/data' || item.startsWith('/data/') || item.includes('=/data/'))) {
+      !stateMountOnly || executionSurface.some(dataPath) ||
+      (value.mounts.length === 1 &&
+        ['sh', 'bash', 'dash', 'env', 'node', 'python', 'python3'].includes(interpreter))) {
     fail('provider_container_canonical_policy_mismatch');
   }
   return Object.freeze(value);

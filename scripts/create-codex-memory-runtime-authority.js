@@ -63,6 +63,21 @@ function parse(argv) {
   return values;
 }
 
+function validateExternallyAcceptedImageEvidence(accepted, archiveEvidence, manifest) {
+  const actual = {
+    archiveSha256: archiveEvidence.archiveSha256,
+    buildManifestDigest: digest(manifest),
+    configDigest: archiveEvidence.configDigest,
+    contextDigest: manifest.buildContextFileManifestDigest,
+    manifestDigest: archiveEvidence.manifestDigest,
+    rootfsChainDigest: archiveEvidence.rootfsChainDigest
+  };
+  if (Object.keys(actual).some(key => accepted?.[key] !== actual[key])) {
+    fail('runtime_authority_external_image_identity_mismatch');
+  }
+  return Object.freeze({ ...actual });
+}
+
 function main(argv = process.argv.slice(2)) {
   const args = parse(argv);
   const runtime = inspect('container', args['runtime-container-id']);
@@ -76,6 +91,15 @@ function main(argv = process.argv.slice(2)) {
     path.resolve(args['oci-archive']),
     path.resolve(args['build-manifest'])
   );
+  const externallyAccepted = {
+    archiveSha256: args['expected-oci-archive-sha256'],
+    buildManifestDigest: args['expected-build-manifest-digest'],
+    configDigest: args['expected-image-config-id'],
+    contextDigest: args['expected-build-context-digest'],
+    manifestDigest: args['expected-oci-manifest-digest'],
+    rootfsChainDigest: args['expected-rootfs-chain-digest']
+  };
+  validateExternallyAcceptedImageEvidence(externallyAccepted, archiveEvidence, manifest);
   const profileFile = path.resolve(args.profile || '');
   const profileBytes = fs.readFileSync(profileFile);
   let profile;
@@ -163,3 +187,5 @@ if (require.main === module) {
     process.exitCode = 1;
   }
 }
+
+module.exports = { main, validateExternallyAcceptedImageEvidence };

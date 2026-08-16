@@ -49,6 +49,8 @@ const {
   buildProviderReceipt,
   validateEdgeContainer,
   validateImageForHost,
+  validateProviderContainer,
+  validateStableHostMountSource,
   verifyHostAuthority
 } = require('../deploy/native-runtime/host-launcher');
 
@@ -367,6 +369,39 @@ test('bounded authority reads bind an opened regular file and reject symlinks', 
   fs.symlinkSync(target, link);
   assert.deepEqual(readBoundedJson(target), { accepted: true });
   expectCode(() => readBoundedJson(link), 'runtime_authority_file_unavailable');
+});
+
+test('stable host mount source rejects lexical aliases and symlink replacement', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-stable-mount-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const real = path.join(root, 'real');
+  const link = path.join(root, 'link');
+  fs.writeFileSync(real, 'bounded');
+  fs.symlinkSync(real, link);
+  assert.equal(validateStableHostMountSource(real, { allowedRoots: [root] }), real);
+  expectCode(() => validateStableHostMountSource(link, { allowedRoots: [root] }),
+    'host_launcher_mount_source_symlink_forbidden');
+  expectCode(() => validateStableHostMountSource(`${root}/../${path.basename(root)}/real`,
+    { allowedRoots: [root] }), 'host_launcher_mount_source_root_invalid');
+});
+
+test('Provider named volume is identity-bound and local bind-driver options reject', () => {
+  const base = authority();
+  const provider = providerInspect(base);
+  provider.Config.Entrypoint = ['/usr/local/bin/new-api'];
+  provider.Mounts = [{ Destination: '/data', Name: 'provider-state',
+    Propagation: 'rprivate', RW: true, Source: 'provider-state', Type: 'volume' }];
+  const accepted = authority(baseInspect(), {
+    providerConfigDigest: containerConfigDigest(provider)
+  });
+  const execFile = (_binary, args) => JSON.stringify([{
+    Driver: 'local', Name: args[2], Options: {}
+  }]);
+  assert.equal(validateProviderContainer(provider, accepted, { execFile }), true);
+  expectCode(() => validateProviderContainer(provider, accepted, {
+    execFile: (_binary, args) => JSON.stringify([{ Driver: 'local', Name: args[2],
+      Options: { device: '/var/run', o: 'bind', type: 'none' } }])
+  }), 'host_launcher_provider_volume_authority_mismatch');
 });
 
 test('G wrong image ID is rejected', () => {

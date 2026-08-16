@@ -21,6 +21,21 @@ function fail(code) {
   throw error;
 }
 
+function sameFileIdentity(left, right) {
+  return left.dev === right.dev && left.ino === right.ino &&
+    left.size === right.size && left.mtimeMs === right.mtimeMs;
+}
+
+function requirePrivateOutputDirectory(directory) {
+  const stat = fs.lstatSync(directory);
+  const uid = typeof process.getuid === 'function' ? process.getuid() : stat.uid;
+  if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== uid ||
+      (stat.mode & 0o077) !== 0 || fs.realpathSync(directory) !== path.resolve(directory)) {
+    fail('runtime_image_output_directory_insecure');
+  }
+  return stat;
+}
+
 function parseArguments(argv) {
   const values = {};
   for (const arg of argv) {
@@ -60,6 +75,7 @@ function buildRuntimeImage({ contextDirectory, outputArchive, expectedContextArt
   if (fs.existsSync(outputArchive)) fail('runtime_image_output_exists');
   const outputDirectory = path.dirname(outputArchive);
   fs.mkdirSync(outputDirectory, { recursive: true, mode: 0o700 });
+  requirePrivateOutputDirectory(outputDirectory);
   const temporary = path.join(outputDirectory,
     `.${path.basename(outputArchive)}.${crypto.randomBytes(12).toString('hex')}.tmp`);
   const args = [
@@ -73,6 +89,7 @@ function buildRuntimeImage({ contextDirectory, outputArchive, expectedContextArt
     '-'
   ];
   if (builder) args.splice(2, 0, '--builder', builder);
+  let publicationDescriptor = null;
   try {
     const result = spawnFile('docker', args, {
       env: {
@@ -85,24 +102,44 @@ function buildRuntimeImage({ contextDirectory, outputArchive, expectedContextArt
       stdio: ['pipe', 'inherit', 'inherit']
     });
     if (result.status !== 0) fail('runtime_image_build_failed');
+    fs.chmodSync(temporary, 0o600);
+    publicationDescriptor = fs.openSync(temporary,
+      fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+    const heldIdentity = fs.fstatSync(publicationDescriptor);
+    if (!heldIdentity.isFile() || heldIdentity.nlink !== 1) {
+      fail('runtime_image_publication_source_invalid');
+    }
+    fs.fsyncSync(publicationDescriptor);
     const evidence = verifyArchive(temporary, manifest);
-    const file = fs.openSync(temporary, fs.constants.O_RDONLY);
-    try { fs.fsyncSync(file); } finally { fs.closeSync(file); }
+    if (!sameFileIdentity(heldIdentity, fs.lstatSync(temporary))) {
+      fail('runtime_image_publication_source_changed');
+    }
     const readBack = verifyArchive(temporary, manifest);
-    if (readBack.archiveSha256 !== evidence.archiveSha256) {
+    if (readBack.archiveSha256 !== evidence.archiveSha256 ||
+        !sameFileIdentity(heldIdentity, fs.lstatSync(temporary))) {
       fail('runtime_image_publication_readback_mismatch');
     }
+    requirePrivateOutputDirectory(outputDirectory);
     try {
       fs.linkSync(temporary, outputArchive);
     } catch (error) {
       if (error?.code === 'EEXIST') fail('runtime_image_output_exists');
       throw error;
     }
+    const publishedIdentity = fs.lstatSync(outputArchive);
+    if (!sameFileIdentity(heldIdentity, publishedIdentity) || publishedIdentity.nlink !== 2) {
+      fail('runtime_image_publication_identity_mismatch');
+    }
+    fs.closeSync(publicationDescriptor);
+    publicationDescriptor = null;
     fs.unlinkSync(temporary);
     const directory = fs.openSync(outputDirectory, fs.constants.O_RDONLY);
     try { fs.fsyncSync(directory); } finally { fs.closeSync(directory); }
     return Object.freeze({ ...readBack, ...contextEvidence });
   } catch (error) {
+    if (publicationDescriptor !== null) {
+      try { fs.closeSync(publicationDescriptor); } catch {}
+    }
     try { fs.unlinkSync(temporary); } catch {}
     throw error;
   }
@@ -126,4 +163,6 @@ if (require.main === module) {
   }
 }
 
-module.exports = { buildRuntimeImage, parseArguments };
+module.exports = {
+  buildRuntimeImage, parseArguments, requirePrivateOutputDirectory, sameFileIdentity
+};

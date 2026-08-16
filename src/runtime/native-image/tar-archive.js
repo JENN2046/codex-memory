@@ -94,6 +94,7 @@ function parseTarBuffer(buffer, limits = {}) {
     const type = String.fromCharCode(header[156] || 48);
     const allowedTypes = policy.allowedTypeFlags || ['0', '5'];
     if (!allowedTypes.includes(type)) fail('runtime_tar_special_entry_forbidden');
+    if (name === '.' && type !== '5') fail('runtime_tar_root_entry_invalid');
     const size = octal(header, 124, 12);
     if (type !== '0' && size !== 0) fail('runtime_tar_header_invalid');
     if (size > policy.maximumFileBytes) fail('runtime_tar_entry_too_large');

@@ -37,6 +37,13 @@ const DEFAULT_LOCK_PATH = '/run/codex-memory/host-lifecycle.lock';
 const DEFAULT_AUTHORITY_PATH = '/etc/codex-memory/native-runtime-authority.json';
 const DEFAULT_BOOT_ID_PATH = '/proc/sys/kernel/random/boot_id';
 const CONTAINER_ID = /^[a-f0-9]{64}$/u;
+const STABLE_MOUNT_ROOTS = Object.freeze([
+  '/etc/codex-memory',
+  '/home/jenn/.local/share/codex-memory',
+  '/run/codex-memory',
+  '/srv/codex-memory',
+  '/var/lib/codex-memory'
+]);
 
 function fail(code) {
   const error = new Error(code);
@@ -80,6 +87,22 @@ function dockerImageInspect(id, options = {}) {
   return parsed[0];
 }
 
+function dockerVolumeInspect(name, options = {}) {
+  const { execFile = execFileSync, docker = DOCKER } = options;
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u.test(name || '')) {
+    fail('host_launcher_volume_name_invalid');
+  }
+  const value = execFile(docker, ['volume', 'inspect', name], {
+    encoding: 'utf8', maxBuffer: 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  const parsed = parseJson(value, 'host_launcher_volume_inspect_invalid');
+  if (!Array.isArray(parsed) || parsed.length !== 1) {
+    fail('host_launcher_volume_inspect_invalid');
+  }
+  return parsed[0];
+}
+
 function dockerContainerFile(id, source, options = {}) {
   const { execFile = execFileSync, docker = DOCKER } = options;
   const buffer = execFile(docker, ['container', 'cp', `${id}:${source}`, '-'], {
@@ -92,6 +115,37 @@ function dockerContainerFile(id, source, options = {}) {
   }));
   if (files.size !== 1) fail('host_launcher_container_file_invalid');
   return [...files.values()][0].content;
+}
+
+function validateStableHostMountSource(source, {
+  allowedRoots = STABLE_MOUNT_ROOTS,
+  fsModule = fs,
+  requireRootOwner = false
+} = {}) {
+  const resolved = path.resolve(source || '');
+  if (source !== resolved) fail('host_launcher_mount_source_root_invalid');
+  const allowed = allowedRoots.some(root =>
+    resolved === root || resolved.startsWith(`${root}/`));
+  if (!allowed) fail('host_launcher_mount_source_root_invalid');
+  const root = path.parse(resolved).root;
+  let current = root;
+  for (const component of resolved.slice(root.length).split('/').filter(Boolean)) {
+    current = path.join(current, component);
+    let stat;
+    try { stat = fsModule.lstatSync(current); } catch {
+      fail('host_launcher_mount_source_unavailable');
+    }
+    if (stat.isSymbolicLink()) fail('host_launcher_mount_source_symlink_forbidden');
+    if (requireRootOwner && (stat.uid !== 0 || (stat.mode & 0o022) !== 0)) {
+      fail('host_launcher_mount_source_ownership_invalid');
+    }
+  }
+  let real;
+  try { real = fsModule.realpathSync(resolved); } catch {
+    fail('host_launcher_mount_source_unavailable');
+  }
+  if (real !== resolved) fail('host_launcher_mount_source_identity_mismatch');
+  return resolved;
 }
 
 function validateImageForHost(image, authority) {
@@ -122,7 +176,7 @@ function validateEdgeContainer(edge, authority) {
   return true;
 }
 
-function validateProviderContainer(provider, authority) {
+function validateProviderContainer(provider, authority, options = {}) {
   if (provider?.Id !== authority.providerContainerId ||
       provider?.Image !== authority.providerImageIdentity ||
       containerConfigDigest(provider) !== authority.providerConfigDigest ||
@@ -131,7 +185,14 @@ function validateProviderContainer(provider, authority) {
       authority.providerPolicyDigest !== PROVIDER_POLICY_DIGEST) {
     fail('host_launcher_provider_identity_mismatch');
   }
-  validateProviderCandidate(provider);
+  const projected = validateProviderCandidate(provider);
+  for (const mount of projected.mounts) {
+    const volume = dockerVolumeInspect(mount.name, options);
+    if (volume?.Name !== mount.name || volume?.Driver !== 'local' ||
+        (volume.Options && Object.keys(volume.Options).length !== 0)) {
+      fail('host_launcher_provider_volume_authority_mismatch');
+    }
+  }
   return true;
 }
 
@@ -189,8 +250,8 @@ function buildEdgeReceipt(edge, authority, bootId, now = Date.now()) {
   });
 }
 
-function buildProviderReceipt(provider, authority, bootId, now = Date.now()) {
-  validateProviderContainer(provider, authority);
+function buildProviderReceipt(provider, authority, bootId, now = Date.now(), options = {}) {
+  validateProviderContainer(provider, authority, options);
   return Object.freeze({
     launchEpoch: bootId,
     launcherAuthorityDigest: authorityRecordDigest(authority),
@@ -246,6 +307,15 @@ function verifyHostAuthority(authority, options = {}) {
     ...authority.runtimeMountSources,
     primaryStateDestination: authority.stateMountContract.containerPath
   });
+  if (options.requireRootFiles !== false) {
+    for (const [name, source] of Object.entries(authority.runtimeMountSources)) {
+      validateStableHostMountSource(source, {
+        fsModule: options.fsModule || fs,
+        requireRootOwner: ['authority', 'edgeReceipt', 'profile',
+          'providerEnvironment', 'providerReceipt'].includes(name)
+      });
+    }
+  }
   validateContainerInspection(runtime, authority, {
     allowedEnvironmentNames: options.allowedEnvironmentNames || [
       'CODEX_MEMORY_CONTAINER_AUTHORITY_PATH',
@@ -270,8 +340,15 @@ function verifyHostAuthority(authority, options = {}) {
   });
   const edge = dockerInspect(authority.edgeContainerId, options);
   validateEdgeContainer(edge, authority);
+  if (options.requireRootFiles !== false) {
+    for (const mount of edge.Mounts || []) {
+      if (mount.Type === 'bind') validateStableHostMountSource(mount.Source, {
+        fsModule: options.fsModule || fs, requireRootOwner: true
+      });
+    }
+  }
   const provider = dockerInspect(authority.providerContainerId, options);
-  validateProviderContainer(provider, authority);
+  validateProviderContainer(provider, authority, options);
   const profileBytes = readBoundedBuffer(authority.profilePath, {
     fsModule: options.fsModule || fs,
     requireRootOwner: options.requireRootFiles !== false,
@@ -316,7 +393,7 @@ async function start(authority, options = {}) {
   );
   atomicRootReceipt(options.receiptPath || DEFAULT_RECEIPT_PATH, receipt, options);
   const providerReceipt = buildProviderReceipt(
-    finalEvidence.provider, authority, bootId, options.now?.() || Date.now()
+    finalEvidence.provider, authority, bootId, options.now?.() || Date.now(), options
   );
   atomicRootReceipt(
     options.providerReceiptPath || DEFAULT_PROVIDER_RECEIPT_PATH,
@@ -325,7 +402,7 @@ async function start(authority, options = {}) {
   const beforeStart = verifyHostAuthority(authority, options);
   buildEdgeReceipt(beforeStart.edge, authority, bootId, options.now?.() || Date.now());
   buildProviderReceipt(
-    beforeStart.provider, authority, bootId, options.now?.() || Date.now()
+    beforeStart.provider, authority, bootId, options.now?.() || Date.now(), options
   );
   dockerAction(['start', authority.expectedRuntimeContainerId], options);
   return Object.freeze({
@@ -564,6 +641,7 @@ module.exports = {
   validateEdgeContainer,
   validateProviderContainer,
   validateImageForHost,
+  validateStableHostMountSource,
   verifyHostAuthority,
   waitForHealthyEdge,
   runUnderLifecycleLock

@@ -122,6 +122,37 @@ function requireMediaType(descriptor, expected) {
   if (descriptor?.mediaType !== expected) fail('runtime_oci_media_type_invalid');
 }
 
+function validateLayerFilesystem(entries, state = new Map()) {
+  const root = entries.find(entry => entry.name === '.');
+  if (!root || root.type !== 'directory') fail('runtime_oci_layer_root_invalid');
+  for (const entry of entries) {
+    if (entry.name === '.') continue;
+    const components = entry.name.split('/');
+    let ancestor = '';
+    for (const component of components.slice(0, -1)) {
+      ancestor = ancestor ? `${ancestor}/${component}` : component;
+      if (state.get(ancestor)?.type === 'symlink') {
+        fail('runtime_oci_layer_symlink_parent_forbidden');
+      }
+    }
+    if (entry.type === 'symlink' && entry.linkTarget.startsWith('/')) {
+      fail('runtime_oci_layer_absolute_symlink_forbidden');
+    }
+    if (entry.type === 'hardlink') {
+      const target = state.get(entry.linkTarget) ||
+        entries.find(candidate => candidate.name === entry.linkTarget);
+      if (!target || !['file', 'hardlink'].includes(target.type)) {
+        fail('runtime_oci_layer_hardlink_target_invalid');
+      }
+    }
+    state.set(entry.name, Object.freeze({
+      linkTarget: entry.linkTarget,
+      type: entry.type
+    }));
+  }
+  return state;
+}
+
 function inspectOciArchive(archive, { fsModule = fs } = {}) {
   const buffer = readBoundedArchive(archive, fsModule);
   const entries = parseTarBuffer(buffer, {
@@ -164,6 +195,7 @@ function inspectOciArchive(archive, { fsModule = fs } = {}) {
       fail('runtime_oci_rootfs_invalid');
     }
     let expandedTotal = 0;
+    const layerFilesystem = new Map();
     const computedDiffIds = manifest.layers.map(layer => {
       requireMediaType(layer, 'application/vnd.oci.image.layer.v1.tar+gzip');
       const compressed = verifyBlob(files, layer.digest, layer.size);
@@ -173,7 +205,7 @@ function inspectOciArchive(archive, { fsModule = fs } = {}) {
       } catch { fail('runtime_oci_layer_invalid'); }
       expandedTotal += uncompressed.length;
       if (expandedTotal > 1024 * 1024 * 1024) fail('runtime_oci_layer_expansion_limit');
-      parseTarBuffer(uncompressed, {
+      const layerEntries = parseTarBuffer(uncompressed, {
         allowedTypeFlags: ['0', '1', '2', '5'],
         allowRootEntry: true,
         maximumArchiveBytes: 512 * 1024 * 1024,
@@ -182,6 +214,7 @@ function inspectOciArchive(archive, { fsModule = fs } = {}) {
         maximumTotalBytes: 512 * 1024 * 1024,
         requireCanonicalUstar: false
       });
+      validateLayerFilesystem(layerEntries, layerFilesystem);
       return sha256Buffer(uncompressed);
     });
     if (JSON.stringify(computedDiffIds) !== JSON.stringify(diffIds)) {
@@ -254,5 +287,6 @@ module.exports = {
   preflightTarDescriptor,
   safeArchiveMembers,
   verifyBlob,
+  validateLayerFilesystem,
   verifyOciArchive
 };

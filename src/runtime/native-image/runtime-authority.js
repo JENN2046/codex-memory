@@ -455,6 +455,7 @@ function validateProviderReceipt(value, authority, {
 function normalizeMount(mount) {
   return Object.freeze({
     destination: mount?.Destination || '',
+    name: mount?.Name || '',
     propagation: mount?.Propagation || '',
     rw: mount?.RW === true,
     source: mount?.Source || '',

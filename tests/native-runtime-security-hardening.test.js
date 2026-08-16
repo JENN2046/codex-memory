@@ -31,6 +31,9 @@ const { inspectOciArchive, readBoundedArchive, MAXIMUM_OCI_ARCHIVE_BYTES } = req
 const { buildRuntimeImage, parseArguments: parseBuildArguments } = require(
   '../scripts/build-codex-memory-runtime-image'
 );
+const { validateExternallyAcceptedImageEvidence } = require(
+  '../scripts/create-codex-memory-runtime-authority'
+);
 const { requireLifecycleLock, runUnderLifecycleLock } = require(
   '../deploy/native-runtime/host-launcher'
 );
@@ -148,6 +151,27 @@ test('a self-consistent replacement context cannot satisfy the operator-bound ar
     expectedContextArtifactSha256: sha256Buffer(accepted.buffer),
     outputArchive: path.join(root, 'image.oci.tar')
   }), 'runtime_context_artifact_authority_mismatch');
+});
+
+test('root authority creation requires every externally pinned image identity', () => {
+  const manifest = buildManifest([{ mode: '100644', path: 'a', sha256: S('1'), size: 1 }]);
+  const archive = {
+    archiveSha256: S('2'), configDigest: S('3'), manifestDigest: S('4'),
+    rootfsChainDigest: S('5')
+  };
+  const accepted = {
+    archiveSha256: archive.archiveSha256,
+    buildManifestDigest: digest(manifest),
+    configDigest: archive.configDigest,
+    contextDigest: manifest.buildContextFileManifestDigest,
+    manifestDigest: archive.manifestDigest,
+    rootfsChainDigest: archive.rootfsChainDigest
+  };
+  assert.deepEqual(validateExternallyAcceptedImageEvidence(accepted, archive, manifest), accepted);
+  for (const key of Object.keys(accepted)) {
+    expectCode(() => validateExternallyAcceptedImageEvidence({ ...accepted, [key]: S('f') },
+      archive, manifest), 'runtime_authority_external_image_identity_mismatch');
+  }
 });
 
 test('tar validator rejects traversal, links, duplicates, special nodes and limits', () => {
@@ -634,7 +658,7 @@ test('OCI admission binds descriptor types/sizes and recomputes bounded layer di
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const make = (name, mutate = () => {}) => {
     const uncompressed = name === 'invalid-layer' ? Buffer.alloc(1024, 0x61) :
-      tar([{ name: 'payload', content: 'accepted' }]);
+      tar([{ name: './', type: '5' }, { name: 'payload', content: 'accepted' }]);
     const layer = zlib.gzipSync(uncompressed, { mtime: 0 });
     const layerDescriptor = { digest: sha(layer), size: layer.length,
       mediaType: 'application/vnd.oci.image.layer.v1.tar+gzip' };
@@ -672,4 +696,49 @@ test('OCI admission binds descriptor types/sizes and recomputes bounded layer di
     config.rootfs.diff_ids[0] = S('f');
   })), 'runtime_oci_diff_id_mismatch');
   assert.throws(() => inspectOciArchive(make('invalid-layer')));
+});
+
+test('OCI layer state rejects non-directory root, absolute links and symlink-parent pivots', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'oci-layer-state-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const make = (name, layerEntries) => {
+    const layers = layerEntries.map(entries => {
+      const raw = tar(entries);
+      const packed = zlib.gzipSync(raw, { mtime: 0 });
+      return { raw, packed, descriptor: { digest: sha(packed), size: packed.length,
+        mediaType: 'application/vnd.oci.image.layer.v1.tar+gzip' } };
+    });
+    const configObject = { config: { Labels: {
+      'io.codex-memory.runtime.build-manifest-digest': S('1')
+    } }, rootfs: { diff_ids: layers.map(value => sha(value.raw)) } };
+    const config = Buffer.from(JSON.stringify(configObject));
+    const configDescriptor = { digest: sha(config), size: config.length,
+      mediaType: 'application/vnd.oci.image.config.v1+json' };
+    const manifestObject = { schemaVersion: 2, config: configDescriptor,
+      layers: layers.map(value => value.descriptor) };
+    const manifest = Buffer.from(JSON.stringify(manifestObject));
+    const manifestDescriptor = { digest: sha(manifest), size: manifest.length,
+      mediaType: 'application/vnd.oci.image.manifest.v1+json' };
+    const archive = tar([
+      { name: 'oci-layout', content: '{"imageLayoutVersion":"1.0.0"}' },
+      { name: 'index.json', content: JSON.stringify({ manifests: [manifestDescriptor] }) },
+      { name: 'blobs', type: '5' }, { name: 'blobs/sha256', type: '5' },
+      { name: `blobs/sha256/${configDescriptor.digest.slice(7)}`, content: config },
+      { name: `blobs/sha256/${manifestDescriptor.digest.slice(7)}`, content: manifest },
+      ...layers.map(value => ({ name: `blobs/sha256/${value.descriptor.digest.slice(7)}`,
+        content: value.packed }))
+    ]);
+    const file = path.join(root, `${name}.tar`); fs.writeFileSync(file, archive); return file;
+  };
+  expectCode(() => inspectOciArchive(make('bad-root', [
+    [{ name: './', content: '' }]
+  ])), 'runtime_tar_root_entry_invalid');
+  expectCode(() => inspectOciArchive(make('absolute-link', [[
+    { name: './', type: '5' }, { name: 'pivot', type: '2', link: '/proc' }
+  ]])), 'runtime_oci_layer_absolute_symlink_forbidden');
+  expectCode(() => inspectOciArchive(make('pivot', [[
+    { name: './', type: '5' }, { name: 'pivot', type: '2', link: 'target' }
+  ], [
+    { name: './', type: '5' }, { name: 'pivot/file', content: 'x' }
+  ]])), 'runtime_oci_layer_symlink_parent_forbidden');
 });
