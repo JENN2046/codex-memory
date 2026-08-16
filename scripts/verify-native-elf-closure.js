@@ -52,9 +52,14 @@ function nativeFiles(root) {
 function inspect(root = '/') {
   const files = nativeFiles(root);
   const expectedFiles = EXPECTED_NATIVE_PATHS.map(value => path.join(root, value.slice(1)));
-  if (JSON.stringify(files) !== JSON.stringify(expectedFiles) ||
-      sha256(path.join(root, EXPECTED_VEXUS_PATH.slice(1))) !== EXPECTED_VEXUS_SHA256) {
+  if (files.length !== expectedFiles.length) {
+    fail('runtime_native_artifact_count_mismatch');
+  }
+  if (JSON.stringify(files) !== JSON.stringify(expectedFiles)) {
     fail('runtime_native_artifact_set_mismatch');
+  }
+  if (sha256(path.join(root, EXPECTED_VEXUS_PATH.slice(1))) !== EXPECTED_VEXUS_SHA256) {
+    fail('runtime_native_vexus_digest_mismatch');
   }
   const artifacts = expectedFiles.map((expected, index) => {
     const header = command('readelf', ['-h', expected]);

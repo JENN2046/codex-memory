@@ -46,6 +46,13 @@ RUN npm ci --omit=dev --no-audit --no-fund \
     && npm cache clean --force \
     && rm -rf /root/.npm /tmp/node-compile-cache
 COPY --chown=node:node vcptoolbox/ ./
+RUN rm -f \
+      rust-vexus-lite/vexus-lite.darwin-arm64.node \
+      rust-vexus-lite/vexus-lite.linux-arm64-gnu.node \
+      rust-vexus-lite/vexus-lite.linux-arm64-musl.node \
+      rust-vexus-lite/vexus-lite.linux-x64-musl.node \
+      rust-vexus-lite/vexus-lite.node \
+      rust-vexus-lite/vexus-lite.win32-x64-msvc.node
 
 WORKDIR /opt/codex-memory
 COPY --chown=root:root runtime/runtime-build-manifest.json \

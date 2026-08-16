@@ -214,6 +214,8 @@ test('Dockerfile pins platform manifest and prohibits runtime installation', () 
   assert.match(source, /NODE_DISABLE_COMPILE_CACHE=1/u);
   assert.match(source, /rm -rf \/root\/\.npm \/tmp\/node-compile-cache/u);
   assert.match(source, /rm -f \/var\/cache\/ldconfig\/aux-cache \/var\/log\/dpkg\.log/u);
+  assert.match(source, /rm -f \\\n+      rust-vexus-lite\/vexus-lite\.darwin-arm64\.node/u);
+  assert.doesNotMatch(source, /rm -f \\\n+      rust-vexus-lite\/vexus-lite\.linux-x64-gnu\.node/u);
 });
 
 test('OCI builder normalizes layer timestamps and disables mutable attestations', () => {
