@@ -24,7 +24,7 @@ function fail(code) {
 function parseArguments(argv) {
   const values = {};
   for (const arg of argv) {
-    const match = /^--([a-z-]+)=(.+)$/u.exec(arg);
+    const match = /^--([a-z0-9-]+)=(.+)$/u.exec(arg);
     if (!match) fail('runtime_image_build_argument_invalid');
     values[match[1]] = match[2];
   }
@@ -126,4 +126,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { buildRuntimeImage };
+module.exports = { buildRuntimeImage, parseArguments };

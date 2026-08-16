@@ -23,7 +23,9 @@ const {
 } = require('../src/runtime/native-image/native-closure');
 const { verifyBuildContextBuffer } = require('../src/runtime/native-image/build-context');
 const { parseTarBuffer } = require('../src/runtime/native-image/tar-archive');
-const { buildRuntimeImage } = require('../scripts/build-codex-memory-runtime-image');
+const { buildRuntimeImage, parseArguments: parseBuildArguments } = require(
+  '../scripts/build-codex-memory-runtime-image'
+);
 const { runUnderLifecycleLock } = require('../deploy/native-runtime/host-launcher');
 
 const S = value => `sha256:${String(value).repeat(64).slice(0, 64)}`;
@@ -96,6 +98,11 @@ test('manifested context bytes are the exact in-memory BuildKit input', () => {
   ]);
   const evidence = verifyBuildContextBuffer(fixture.buffer);
   assert.equal(evidence.builderConsumedContextDigest, evidence.manifestedContextDigest);
+});
+test('builder CLI requires an explicit SHA-256 context authority argument', () => {
+  assert.deepEqual(parseBuildArguments([
+    '--context=/tmp/context', `--context-sha256=${S('a')}`, '--output=/tmp/image.oci.tar'
+  ]), { context: '/tmp/context', 'context-sha256': S('a'), output: '/tmp/image.oci.tar' });
 });
 test('post-manifest changed, added, deleted, symlink and Vexus-substitute inputs reject', () => {
   const accepted = [
