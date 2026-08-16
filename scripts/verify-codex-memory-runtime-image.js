@@ -3,14 +3,15 @@
 
 const crypto = require('node:crypto');
 const fs = require('node:fs');
-const os = require('node:os');
 const path = require('node:path');
-const { execFileSync } = require('node:child_process');
 const {
   canonicalJson,
   digest,
   validateBuildManifest
 } = require('../src/runtime/native-image/runtime-authority');
+const { parseTarBuffer, regularFiles } = require(
+  '../src/runtime/native-image/tar-archive'
+);
 
 function fail(code) {
   const error = new Error(code);
@@ -23,54 +24,62 @@ function sha256Buffer(value) {
 }
 
 function safeArchiveMembers(archive) {
-  const output = execFileSync('tar', ['-tf', archive], { encoding: 'utf8' });
-  for (const member of output.split('\n').filter(Boolean)) {
-    const normalized = path.posix.normalize(member);
-    if (member.startsWith('/') || normalized === '..' ||
-        normalized.startsWith('../')) fail('runtime_oci_archive_path_unsafe');
-  }
+  return parseTarBuffer(fs.readFileSync(archive));
 }
 
 function readJson(file, code) {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { fail(code); }
 }
 
-function blobPath(root, value) {
+function blobPath(value) {
   if (!/^sha256:[a-f0-9]{64}$/u.test(value || '')) fail('runtime_oci_digest_invalid');
-  return path.join(root, 'blobs', 'sha256', value.slice('sha256:'.length));
+  return `blobs/sha256/${value.slice('sha256:'.length)}`;
 }
 
-function verifyBlob(root, value) {
-  const file = blobPath(root, value);
-  const content = fs.readFileSync(file);
+function verifyBlob(files, value) {
+  const entry = files.get(blobPath(value));
+  if (!entry) fail('runtime_oci_blob_missing');
+  const content = entry.content;
   if (sha256Buffer(content) !== value) fail('runtime_oci_blob_digest_mismatch');
   return content;
 }
 
 function inspectOciArchive(archive, { fsModule = fs } = {}) {
   if (!fsModule.statSync(archive).isFile()) fail('runtime_oci_archive_invalid');
-  safeArchiveMembers(archive);
-  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-oci-'));
+  const buffer = fsModule.readFileSync(archive);
+  const entries = parseTarBuffer(buffer, {
+    maximumEntries: 4096,
+    maximumFileBytes: 1024 * 1024 * 1024,
+    maximumTotalBytes: 4 * 1024 * 1024 * 1024
+  });
+  const files = regularFiles(entries);
+  const allowedDirectories = new Set(['blobs', 'blobs/sha256']);
+  for (const entry of entries) {
+    if (entry.type === 'directory' && !allowedDirectories.has(entry.name)) {
+      fail('runtime_oci_archive_layout_invalid');
+    }
+    if (entry.type === 'file' && !['oci-layout', 'index.json'].includes(entry.name) &&
+        !/^blobs\/sha256\/[a-f0-9]{64}$/u.test(entry.name)) {
+      fail('runtime_oci_archive_layout_invalid');
+    }
+  }
   try {
-    execFileSync('tar', ['-xf', archive, '-C', temporary], {
-      stdio: ['ignore', 'ignore', 'pipe']
-    });
-    const layout = readJson(path.join(temporary, 'oci-layout'), 'runtime_oci_layout_invalid');
-    const index = readJson(path.join(temporary, 'index.json'), 'runtime_oci_index_invalid');
+    const layout = JSON.parse(files.get('oci-layout')?.content.toString('utf8') || '');
+    const index = JSON.parse(files.get('index.json')?.content.toString('utf8') || '');
     if (layout?.imageLayoutVersion !== '1.0.0' ||
         !Array.isArray(index?.manifests) || index.manifests.length !== 1) {
       fail('runtime_oci_index_invalid');
     }
     const descriptor = index.manifests[0];
-    const manifestContent = verifyBlob(temporary, descriptor.digest);
+    const manifestContent = verifyBlob(files, descriptor.digest);
     const manifest = JSON.parse(manifestContent.toString('utf8'));
     if (manifest?.schemaVersion !== 2 || !manifest?.config?.digest ||
         !Array.isArray(manifest?.layers) || manifest.layers.length < 1) {
       fail('runtime_oci_manifest_invalid');
     }
-    const configContent = verifyBlob(temporary, manifest.config.digest);
+    const configContent = verifyBlob(files, manifest.config.digest);
     const config = JSON.parse(configContent.toString('utf8'));
-    for (const layer of manifest.layers) verifyBlob(temporary, layer.digest);
+    for (const layer of manifest.layers) verifyBlob(files, layer.digest);
     const diffIds = config?.rootfs?.diff_ids;
     if (!Array.isArray(diffIds) || diffIds.length !== manifest.layers.length) {
       fail('runtime_oci_rootfs_invalid');
@@ -82,7 +91,7 @@ function inspectOciArchive(archive, { fsModule = fs } = {}) {
       fail('runtime_oci_build_manifest_label_invalid');
     }
     return Object.freeze({
-      archiveSha256: sha256Buffer(fs.readFileSync(archive)),
+      archiveSha256: sha256Buffer(buffer),
       buildManifestDigest,
       configDigest: manifest.config.digest,
       imageConfigId: manifest.config.digest,
@@ -90,16 +99,17 @@ function inspectOciArchive(archive, { fsModule = fs } = {}) {
       rootfsChainDigest: digest(diffIds),
       rootfsDiffIds: Object.freeze([...diffIds])
     });
-  } finally {
-    fs.rmSync(temporary, { recursive: true, force: true });
+  } catch (error) {
+    if (error?.code) throw error;
+    fail('runtime_oci_archive_json_invalid');
   }
 }
 
-function verifyOciArchive(archive, buildManifestFile) {
+function verifyOciArchive(archive, buildManifestInput) {
   const image = inspectOciArchive(archive);
-  const manifest = validateBuildManifest(readJson(
-    buildManifestFile, 'runtime_build_manifest_file_invalid'
-  ));
+  const manifest = validateBuildManifest(typeof buildManifestInput === 'string'
+    ? readJson(buildManifestInput, 'runtime_build_manifest_file_invalid')
+    : buildManifestInput);
   const expected = digest(manifest);
   if (image.buildManifestDigest !== expected) {
     fail('runtime_oci_build_manifest_mismatch');

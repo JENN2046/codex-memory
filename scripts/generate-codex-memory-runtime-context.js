@@ -15,6 +15,9 @@ const {
 const {
   inspectVcpRuntimeContractEvidence
 } = require('./codex-memory-stack');
+const { parseTarBuffer, regularFiles } = require(
+  '../src/runtime/native-image/tar-archive'
+);
 
 const CODEX_PATHS = Object.freeze([
   'apps/local-recall-relay',
@@ -103,6 +106,33 @@ function materializeGitArchive(repo, commit, selectedPaths, destination, label) 
   }
 }
 
+function materializeExactRepository(repo, commit, destination, label) {
+  assertNoSymlinks(repo, commit, ['.'], label);
+  const archive = `${destination}.tar`;
+  try {
+    execFileSync('git', ['-C', repo, 'archive', '--format=tar',
+      `--output=${archive}`, commit], { stdio: ['ignore', 'ignore', 'pipe'] });
+    fs.mkdirSync(destination, { mode: 0o700 });
+    execFileSync('tar', ['--extract', '--file', archive, '--directory', destination,
+      '--no-same-owner', '--no-same-permissions'], { stdio: ['ignore', 'ignore', 'pipe'] });
+    git(destination, ['init', '-b', 'authority']);
+    git(destination, ['config', 'user.name', 'Runtime Authority']);
+    git(destination, ['config', 'user.email', 'runtime-authority@example.invalid']);
+    git(destination, ['add', '--all']);
+    execFileSync('git', ['-C', destination, 'commit', '-m', 'exact runtime authority'], {
+      env: { ...process.env, GIT_AUTHOR_DATE: '2000-01-01T00:00:00Z',
+        GIT_COMMITTER_DATE: '2000-01-01T00:00:00Z' },
+      stdio: ['ignore', 'ignore', 'pipe']
+    });
+    if (git(destination, ['rev-parse', 'HEAD^{tree}']).trim() !==
+        git(repo, ['rev-parse', `${commit}^{tree}`]).trim() ||
+        git(destination, ['status', '--porcelain=v1', '--untracked-files=all']) !== '') {
+      fail(`${label}_isolated_tree_mismatch`);
+    }
+  } finally { try { fs.unlinkSync(archive); } catch {} }
+  return destination;
+}
+
 function visitFiles(root, relative = '') {
   const directory = path.join(root, relative);
   const output = [];
@@ -136,6 +166,43 @@ function treeDigest(repo, commit) {
   const tree = git(repo, ['rev-parse', `${commit}^{tree}`]).trim();
   if (!/^[a-f0-9]{40}$/u.test(tree)) fail('git_tree_invalid');
   return sha256Buffer(Buffer.from(tree, 'utf8'));
+}
+
+function gitBlobInventory(repo, commit, selectedPaths) {
+  const output = git(repo, [
+    'ls-tree', '-r', '-z', '--full-tree', commit, '--', ...selectedPaths
+  ], null);
+  const inventory = new Map();
+  for (const record of output.toString('utf8').split('\0')) {
+    if (!record) continue;
+    const match = /^(100644|100755) blob ([a-f0-9]{40})\t(.+)$/u.exec(record);
+    if (!match || inventory.has(match[3])) fail('runtime_context_git_inventory_invalid');
+    inventory.set(match[3], { blob: match[2], mode: match[1] });
+  }
+  if (inventory.size < 1) fail('runtime_context_git_inventory_invalid');
+  return inventory;
+}
+
+function gitBlobId(content) {
+  const header = Buffer.from(`blob ${content.length}\0`, 'utf8');
+  return crypto.createHash('sha1').update(header).update(content).digest('hex');
+}
+
+function assertContextGitAuthority(buffer, authorities) {
+  const files = regularFiles(parseTarBuffer(buffer));
+  for (const { commit, prefix, repository, selectedPaths } of authorities) {
+    const expected = gitBlobInventory(repository, commit, selectedPaths);
+    const observed = [...files].filter(([name]) => name.startsWith(`${prefix}/`));
+    if (observed.length !== expected.size) fail('runtime_context_git_authority_mismatch');
+    for (const [relative, identity] of expected) {
+      const entry = files.get(`${prefix}/${relative}`);
+      const mode = entry && (entry.mode & 0o111) === 0 ? '100644' : '100755';
+      if (!entry || mode !== identity.mode || gitBlobId(entry.content) !== identity.blob) {
+        fail('runtime_context_git_authority_mismatch');
+      }
+    }
+  }
+  return true;
 }
 
 function vcpContractPaths(repository) {
@@ -270,17 +337,24 @@ function generateBuildContext({
     encoding: 'utf8'
   });
   fs.chmodSync(staging, 0o700);
+  const authorityVcp = fs.mkdtempSync(path.join(parent, '.runtime-vcp-authority-'));
   try {
+    fs.rmSync(authorityVcp, { recursive: true, force: true });
+    materializeExactRepository(
+      vcpRepository, vcpCommit, authorityVcp, 'vcp_authority'
+    );
     materializeGitArchive(
       codexMemoryRepository, codexMemoryCommit, CODEX_PATHS,
       path.join(staging, 'codex-memory'), 'codex-memory'
     );
     materializeVcpRuntimeDependencies(
-      vcpRepository,
+      authorityVcp,
       path.join(staging, 'runtime', 'vcp-dependencies')
     );
+    const selectedVcpPaths = vcpContractPaths(authorityVcp);
     materializeGitArchive(
-      vcpRepository, vcpCommit, vcpContractPaths(vcpRepository),
+      authorityVcp, git(authorityVcp, ['rev-parse', 'HEAD']).trim(),
+      selectedVcpPaths,
       path.join(staging, 'vcptoolbox'), 'vcptoolbox'
     );
     const vexus = path.join(
@@ -320,14 +394,47 @@ function generateBuildContext({
       canonicalJson(manifest),
       { encoding: 'utf8', mode: 0o600 }
     );
-    fs.renameSync(staging, outputDirectory);
+    const publication = fs.mkdtempSync(path.join(parent, '.runtime-context-publication-'));
+    const archive = path.join(publication, 'runtime-context.tar');
+    execFileSync('tar', [
+      '--create', '--format=ustar', '--sort=name',
+      `--mtime=@${manifest.sourceDateEpoch}`, '--owner=0', '--group=0',
+      '--numeric-owner', '--mode=u+rwX,go+rX,go-w',
+      '--file', archive, '--directory', staging,
+      'codex-memory', 'runtime', 'vcptoolbox'
+    ], { stdio: ['ignore', 'ignore', 'pipe'] });
+    const descriptor = fs.openSync(archive, fs.constants.O_RDONLY);
+    try { fs.fsyncSync(descriptor); } finally { fs.closeSync(descriptor); }
+    const archiveBuffer = fs.readFileSync(archive);
+    assertContextGitAuthority(archiveBuffer, [{
+      commit: codexMemoryCommit,
+      prefix: 'codex-memory',
+      repository: codexMemoryRepository,
+      selectedPaths: CODEX_PATHS
+    }, {
+      commit: vcpCommit,
+      prefix: 'vcptoolbox',
+      repository: vcpRepository,
+      selectedPaths: selectedVcpPaths
+    }]);
+    fs.copyFileSync(
+      path.join(staging, 'runtime', 'runtime-build-manifest.json'),
+      path.join(publication, 'runtime-build-manifest.json'),
+      fs.constants.COPYFILE_EXCL
+    );
+    fs.renameSync(publication, outputDirectory);
+    fs.rmSync(staging, { recursive: true, force: true });
+    fs.rmSync(authorityVcp, { recursive: true, force: true });
     return Object.freeze({
       buildContextFileManifestDigest: manifest.buildContextFileManifestDigest,
+      contextArtifactSha256: sha256Buffer(archiveBuffer),
+      contextArchive: path.join(outputDirectory, 'runtime-context.tar'),
       manifest,
       outputDirectory
     });
   } catch (error) {
     fs.rmSync(staging, { recursive: true, force: true });
+    fs.rmSync(authorityVcp, { recursive: true, force: true });
     throw error;
   }
 }
@@ -363,6 +470,7 @@ function main(argv = process.argv.slice(2)) {
     accepted: true,
     buildContextFileManifestDigest:
       result.buildContextFileManifestDigest,
+    contextArtifactSha256: result.contextArtifactSha256,
     outputDirectory: result.outputDirectory,
     secretValuesReturned: false
   })}`);
@@ -383,9 +491,11 @@ module.exports = {
   CODEX_PATHS,
   VCP_PATHS,
   VEXUS_SHA256,
+  assertContextGitAuthority,
   assertCleanExactRepository,
   generateBuildContext,
   materializeGitArchive,
+  materializeExactRepository,
   materializeVcpRuntimeDependencies,
   pruneRuntimePackageLock,
   vcpContractPaths,

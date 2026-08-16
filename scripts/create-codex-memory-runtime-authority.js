@@ -11,9 +11,24 @@ const {
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
+  sha256Buffer,
   validateAuthorityRecord,
   validateBuildManifest
 } = require('../src/runtime/native-image/runtime-authority');
+const {
+  EDGE_POLICY_DIGEST,
+  PROVIDER_POLICY_DIGEST,
+  RUNTIME_POLICY_DIGEST,
+  validateEdgeCandidate,
+  validateProviderCandidate,
+  validateRuntimeCandidate
+} = require('../src/runtime/native-image/container-policy');
+const {
+  nativeClosureDigest,
+  validateNativeClosure,
+  verifyNativeClosureBytes
+} = require('../src/runtime/native-image/native-closure');
+const { parseTarBuffer, regularFiles } = require('../src/runtime/native-image/tar-archive');
 const {
   verifyOciArchive
 } = require('./verify-codex-memory-runtime-image');
@@ -26,6 +41,17 @@ function inspect(kind, id) {
   }));
   if (!Array.isArray(parsed) || parsed.length !== 1) fail('runtime_authority_inspect_invalid');
   return parsed[0];
+}
+function containerFile(id, source) {
+  const buffer = execFileSync('/usr/bin/docker', ['container', 'cp', `${id}:${source}`, '-'], {
+    encoding: null, maxBuffer: 8 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe']
+  });
+  const files = regularFiles(parseTarBuffer(buffer, {
+    maximumEntries: 8, maximumFileBytes: 32 * 1024 * 1024,
+    maximumTotalBytes: 32 * 1024 * 1024
+  }));
+  if (files.size !== 1) fail('runtime_authority_container_file_invalid');
+  return [...files.values()][0].content;
 }
 function parse(argv) {
   const values = {};
@@ -41,6 +67,7 @@ function main(argv = process.argv.slice(2)) {
   const args = parse(argv);
   const runtime = inspect('container', args['runtime-container-id']);
   const edge = inspect('container', args['edge-container-id']);
+  const provider = inspect('container', args['provider-container-id']);
   const image = inspect('image', args['image-config-id']);
   const manifest = validateBuildManifest(JSON.parse(fs.readFileSync(
     path.resolve(args['build-manifest']), 'utf8'
@@ -49,6 +76,17 @@ function main(argv = process.argv.slice(2)) {
     path.resolve(args['oci-archive']),
     path.resolve(args['build-manifest'])
   );
+  const profileFile = path.resolve(args.profile || '');
+  const profileBytes = fs.readFileSync(profileFile);
+  let profile;
+  try { profile = JSON.parse(profileBytes.toString('utf8')); } catch {
+    fail('runtime_authority_profile_invalid');
+  }
+  if (profile?.schemaVersion !== 7) fail('runtime_authority_profile_invalid');
+  const nativeClosure = validateNativeClosure(JSON.parse(containerFile(
+    runtime.Id, '/opt/codex-memory-runtime/native-closure.json'
+  ).toString('utf8')));
+  verifyNativeClosureBytes(nativeClosure, source => containerFile(runtime.Id, source));
   if (![archiveEvidence.manifestDigest, archiveEvidence.configDigest]
     .includes(image.Id) ||
       archiveEvidence.rootfsChainDigest !== digest(image.RootFS.Layers)) {
@@ -60,6 +98,23 @@ function main(argv = process.argv.slice(2)) {
     schemaVersion: STATE_MOUNT_SCHEMA,
     stateRootClass: 'external_primary_r5c'
   };
+  const runtimeMountSources = {
+    authority: path.resolve(args['authority-path'] || ''),
+    edgeReceipt: path.resolve(args['edge-receipt'] || ''),
+    primaryState: path.resolve(args.state || ''),
+    profile: profileFile,
+    providerEnvironment: path.resolve(args['provider-environment'] || ''),
+    providerReceipt: path.resolve(args['provider-receipt'] || ''),
+    runtimeDirectory: path.resolve(args['runtime-directory'] || '')
+  };
+  validateRuntimeCandidate(runtime, {
+    ...runtimeMountSources,
+    primaryStateDestination: stateMountContract.containerPath
+  });
+  validateEdgeCandidate(edge);
+  validateProviderCandidate(provider);
+  const providerRevision = provider?.Config?.Labels?.['org.opencontainers.image.revision'];
+  const edgeRevision = edge?.Config?.Labels?.['org.opencontainers.image.revision'];
   const candidate = validateAuthorityRecord({
     acceptedImageConfigId: image.Id,
     acceptedOciArchiveSha256: archiveEvidence.archiveSha256,
@@ -72,13 +127,29 @@ function main(argv = process.argv.slice(2)) {
     edgeContainerId: edge.Id,
     edgeImageIdentity: edge.Image,
     edgeLifecycleAuthority: 'host_launcher',
+    edgePolicyDigest: EDGE_POLICY_DIGEST,
+    edgeRevision,
     expectedRuntimeContainerId: runtime.Id,
     hostLauncherDigest: hostTrustBundleDigest({
       authorityModuleFile: path.resolve(args['runtime-authority-module']),
-      launcherFile: path.resolve(args['host-launcher'])
+      launcherFile: path.resolve(args['host-launcher']),
+      nativeClosureModuleFile: path.resolve(args['native-closure-module']),
+      policyModuleFile: path.resolve(args['container-policy-module']),
+      tarArchiveModuleFile: path.resolve(args['tar-archive-module'])
     }),
     hostLauncherVersion: 'codex-memory-native-host-launcher/v1',
+    nativeClosureDigest: nativeClosureDigest(nativeClosure),
+    profilePath: profileFile,
+    profileSchemaVersion: 7,
+    profileSha256: sha256Buffer(profileBytes),
+    providerConfigDigest: containerConfigDigest(provider),
+    providerContainerId: provider.Id,
+    providerImageIdentity: provider.Image,
+    providerPolicyDigest: PROVIDER_POLICY_DIGEST,
+    providerRevision,
     rootfsChainDigest: digest(image.RootFS.Layers),
+    runtimeMountSources,
+    runtimePolicyDigest: RUNTIME_POLICY_DIGEST,
     stateMountContract,
     stateMountContractDigest: digest(stateMountContract),
     vcpCommit: manifest.vcpCommit

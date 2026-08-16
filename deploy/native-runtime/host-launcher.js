@@ -4,21 +4,37 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
-const { execFileSync, spawn } = require('node:child_process');
+const { execFileSync, spawn, spawnSync } = require('node:child_process');
 const {
   EDGE_RECEIPT_SCHEMA,
+  PROVIDER_RECEIPT_SCHEMA,
   authorityRecordDigest,
   canonicalJson,
   containerConfigDigest,
   hostTrustBundleDigest,
   readBoundedJson,
+  readBoundedBuffer,
+  sha256Buffer,
   validateAuthorityRecord,
   validateContainerInspection
 } = require('../../src/runtime/native-image/runtime-authority');
+const {
+  EDGE_POLICY_DIGEST, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
+  validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
+} = require('../../src/runtime/native-image/container-policy');
+const { nativeClosureDigest, validateNativeClosure, verifyNativeClosureBytes } = require(
+  '../../src/runtime/native-image/native-closure'
+);
+const { parseTarBuffer, regularFiles } = require(
+  '../../src/runtime/native-image/tar-archive'
+);
 
 const LAUNCHER_VERSION = 'codex-memory-native-host-launcher/v1';
 const DOCKER = '/usr/bin/docker';
 const DEFAULT_RECEIPT_PATH = '/run/codex-memory/edge-receipt.json';
+const DEFAULT_PROVIDER_RECEIPT_PATH = '/run/codex-memory/provider-receipt.json';
+const DEFAULT_LOCK_PATH = '/run/codex-memory/host-lifecycle.lock';
+const DEFAULT_AUTHORITY_PATH = '/etc/codex-memory/native-runtime-authority.json';
 const DEFAULT_BOOT_ID_PATH = '/proc/sys/kernel/random/boot_id';
 const CONTAINER_ID = /^[a-f0-9]{64}$/u;
 
@@ -64,6 +80,20 @@ function dockerImageInspect(id, options = {}) {
   return parsed[0];
 }
 
+function dockerContainerFile(id, source, options = {}) {
+  const { execFile = execFileSync, docker = DOCKER } = options;
+  const buffer = execFile(docker, ['container', 'cp', `${id}:${source}`, '-'], {
+    encoding: null, maxBuffer: 8 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  const files = regularFiles(parseTarBuffer(buffer, {
+    maximumEntries: 8, maximumFileBytes: 32 * 1024 * 1024,
+    maximumTotalBytes: 32 * 1024 * 1024
+  }));
+  if (files.size !== 1) fail('host_launcher_container_file_invalid');
+  return [...files.values()][0].content;
+}
+
 function validateImageForHost(image, authority) {
   if (image?.Id !== authority.acceptedImageConfigId ||
       image?.Config?.Labels?.['io.codex-memory.runtime.build-manifest-digest'] !==
@@ -80,11 +110,28 @@ function validateEdgeContainer(edge, authority) {
   if (edge?.Id !== authority.edgeContainerId ||
       edge?.Image !== authority.edgeImageIdentity ||
       containerConfigDigest(edge) !== authority.edgeConfigDigest ||
+      edge?.Config?.Labels?.['org.opencontainers.image.revision'] !==
+        authority.edgeRevision ||
       edge?.HostConfig?.Privileged === true ||
       edge?.HostConfig?.ReadonlyRootfs !== true ||
-      edge?.HostConfig?.RestartPolicy?.Name !== 'no') {
+      edge?.HostConfig?.RestartPolicy?.Name !== 'no' ||
+      authority.edgePolicyDigest !== EDGE_POLICY_DIGEST) {
     fail('host_launcher_edge_identity_mismatch');
   }
+  validateEdgeCandidate(edge);
+  return true;
+}
+
+function validateProviderContainer(provider, authority) {
+  if (provider?.Id !== authority.providerContainerId ||
+      provider?.Image !== authority.providerImageIdentity ||
+      containerConfigDigest(provider) !== authority.providerConfigDigest ||
+      provider?.Config?.Labels?.['org.opencontainers.image.revision'] !==
+        authority.providerRevision ||
+      authority.providerPolicyDigest !== PROVIDER_POLICY_DIGEST) {
+    fail('host_launcher_provider_identity_mismatch');
+  }
+  validateProviderCandidate(provider);
   return true;
 }
 
@@ -134,10 +181,26 @@ function buildEdgeReceipt(edge, authority, bootId, now = Date.now()) {
     edgeContainerId: authority.edgeContainerId,
     edgeHealth: 'healthy',
     edgeImageIdentity: authority.edgeImageIdentity,
+    edgeRevision: authority.edgeRevision,
     launchEpoch: bootId,
     launcherAuthorityDigest: authorityRecordDigest(authority),
     observedAt: now,
     schemaVersion: EDGE_RECEIPT_SCHEMA
+  });
+}
+
+function buildProviderReceipt(provider, authority, bootId, now = Date.now()) {
+  validateProviderContainer(provider, authority);
+  return Object.freeze({
+    launchEpoch: bootId,
+    launcherAuthorityDigest: authorityRecordDigest(authority),
+    observedAt: now,
+    providerConfigDigest: authority.providerConfigDigest,
+    providerContainerId: authority.providerContainerId,
+    providerHealth: 'healthy',
+    providerImageIdentity: authority.providerImageIdentity,
+    providerRevision: authority.providerRevision,
+    schemaVersion: PROVIDER_RECEIPT_SCHEMA
   });
 }
 
@@ -165,7 +228,10 @@ function waitForHealthyEdge(authority, options = {}) {
 function verifyHostAuthority(authority, options = {}) {
   const installedBundleDigest = hostTrustBundleDigest({
     authorityModuleFile: require.resolve('../../src/runtime/native-image/runtime-authority'),
-    launcherFile: __filename
+    launcherFile: __filename,
+    nativeClosureModuleFile: require.resolve('../../src/runtime/native-image/native-closure'),
+    policyModuleFile: require.resolve('../../src/runtime/native-image/container-policy'),
+    tarArchiveModuleFile: require.resolve('../../src/runtime/native-image/tar-archive')
   });
   if (installedBundleDigest !== authority.hostLauncherDigest) {
     fail('host_launcher_trust_bundle_mismatch');
@@ -173,11 +239,19 @@ function verifyHostAuthority(authority, options = {}) {
   const image = dockerImageInspect(authority.acceptedImageConfigId, options);
   validateImageForHost(image, authority);
   const runtime = dockerInspect(authority.expectedRuntimeContainerId, options);
+  if (authority.runtimePolicyDigest !== RUNTIME_POLICY_DIGEST) {
+    fail('host_launcher_runtime_policy_mismatch');
+  }
+  validateRuntimeCandidate(runtime, {
+    ...authority.runtimeMountSources,
+    primaryStateDestination: authority.stateMountContract.containerPath
+  });
   validateContainerInspection(runtime, authority, {
     allowedEnvironmentNames: options.allowedEnvironmentNames || [
       'CODEX_MEMORY_CONTAINER_AUTHORITY_PATH',
       'CODEX_MEMORY_CONTAINER_SUPERVISOR',
       'CODEX_MEMORY_EDGE_RECEIPT_PATH',
+      'CODEX_MEMORY_PROVIDER_RECEIPT_PATH',
       'CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH',
       'CODEX_MEMORY_STACK_PROFILE_PATH',
       'CODEX_MEMORY_STACK_RUNTIME_DIR',
@@ -192,11 +266,34 @@ function verifyHostAuthority(authority, options = {}) {
       'VCPTOOLBOX_ROOT',
       'YARN_VERSION'
     ],
-    expectedStateSource: options.expectedStateSource
+    expectedStateSource: authority.runtimeMountSources.primaryState
   });
   const edge = dockerInspect(authority.edgeContainerId, options);
   validateEdgeContainer(edge, authority);
-  return Object.freeze({ edge, image, runtime });
+  const provider = dockerInspect(authority.providerContainerId, options);
+  validateProviderContainer(provider, authority);
+  const profileBytes = readBoundedBuffer(authority.profilePath, {
+    fsModule: options.fsModule || fs,
+    requireRootOwner: options.requireRootFiles !== false,
+    requireRootOwnedParent: options.requireRootFiles !== false
+  });
+  if (sha256Buffer(profileBytes) !== authority.profileSha256 ||
+      JSON.parse(profileBytes.toString('utf8'))?.schemaVersion !== 7) {
+    fail('host_launcher_profile_authority_mismatch');
+  }
+  const containerFile = options.containerFile || dockerContainerFile;
+  const nativeClosure = validateNativeClosure(JSON.parse(containerFile(
+    authority.expectedRuntimeContainerId,
+    '/opt/codex-memory-runtime/native-closure.json', options
+  ).toString('utf8')));
+  if (nativeClosureDigest(nativeClosure) !== authority.nativeClosureDigest) {
+    fail('host_launcher_native_closure_mismatch');
+  }
+  const closureBytesVerifier = options.verifyNativeClosureBytes || verifyNativeClosureBytes;
+  closureBytesVerifier(nativeClosure, source => containerFile(
+    authority.expectedRuntimeContainerId, source, options
+  ));
+  return Object.freeze({ edge, image, nativeClosure, profileBytes, provider, runtime });
 }
 
 async function start(authority, options = {}) {
@@ -218,9 +315,17 @@ async function start(authority, options = {}) {
     finalEvidence.edge, authority, bootId, options.now?.() || Date.now()
   );
   atomicRootReceipt(options.receiptPath || DEFAULT_RECEIPT_PATH, receipt, options);
-  buildEdgeReceipt(
-    dockerInspect(authority.edgeContainerId, options), authority, bootId,
-    options.now?.() || Date.now()
+  const providerReceipt = buildProviderReceipt(
+    finalEvidence.provider, authority, bootId, options.now?.() || Date.now()
+  );
+  atomicRootReceipt(
+    options.providerReceiptPath || DEFAULT_PROVIDER_RECEIPT_PATH,
+    providerReceipt, options
+  );
+  const beforeStart = verifyHostAuthority(authority, options);
+  buildEdgeReceipt(beforeStart.edge, authority, bootId, options.now?.() || Date.now());
+  buildProviderReceipt(
+    beforeStart.provider, authority, bootId, options.now?.() || Date.now()
   );
   dockerAction(['start', authority.expectedRuntimeContainerId], options);
   return Object.freeze({
@@ -314,9 +419,46 @@ function stop(authority, options = {}) {
   });
 }
 
+function activateAuthority(candidateFile, {
+  targetFile = DEFAULT_AUTHORITY_PATH,
+  requireRootFiles = true,
+  ...options
+} = {}) {
+  if (path.resolve(candidateFile) === path.resolve(targetFile)) {
+    fail('host_launcher_authority_activation_source_invalid');
+  }
+  const candidate = validateAuthorityRecord(readBoundedJson(candidateFile, {
+    fsModule: options.fsModule || fs,
+    requireRootOwner: requireRootFiles,
+    requireRootOwnedParent: requireRootFiles
+  }));
+  const evidence = verifyHostAuthority(candidate, { ...options, requireRootFiles });
+  if (evidence.runtime?.State?.Running === true) {
+    fail('host_launcher_authority_activation_runtime_active');
+  }
+  if ((options.fsModule || fs).existsSync(targetFile)) {
+    const current = validateAuthorityRecord(readBoundedJson(targetFile, {
+      fsModule: options.fsModule || fs,
+      requireRootOwner: requireRootFiles,
+      requireRootOwnedParent: requireRootFiles
+    }));
+    if (dockerInspect(current.expectedRuntimeContainerId, options)?.State?.Running === true) {
+      fail('host_launcher_authority_activation_current_runtime_active');
+    }
+  }
+  atomicRootReceipt(targetFile, candidate, options);
+  return Object.freeze({
+    accepted: true,
+    action: 'authority_activated',
+    authorityDigest: authorityRecordDigest(candidate),
+    runtimeContainerId: candidate.expectedRuntimeContainerId,
+    secretValuesReturned: false
+  });
+}
+
 function parseArguments(argv) {
   const command = argv[0];
-  if (!['run', 'start', 'stop', 'verify'].includes(command)) {
+  if (!['activate', 'rollback', 'run', 'start', 'stop', 'verify'].includes(command)) {
     fail('host_launcher_command_invalid');
   }
   if (argv.length !== 2 || !argv[1].startsWith('--authority=')) {
@@ -329,16 +471,39 @@ function parseArguments(argv) {
   return { authorityFile, command };
 }
 
+function runUnderLifecycleLock(argv, {
+  spawnFile = spawnSync, lockPath = DEFAULT_LOCK_PATH
+} = {}) {
+  const directory = path.dirname(lockPath);
+  fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+  const result = spawnFile('/usr/bin/flock', [
+    '--exclusive', '--nonblock', '--conflict-exit-code', '75', lockPath,
+    '/usr/bin/env', 'CODEX_MEMORY_HOST_LIFECYCLE_LOCK_HELD=1',
+    '/usr/bin/node', __filename, ...argv
+  ], { stdio: 'inherit', env: process.env });
+  if (result.status === 75) fail('host_launcher_lifecycle_lock_busy');
+  if (result.status !== 0) fail('host_launcher_locked_command_failed');
+  return result.status;
+}
+
 async function main(argv = process.argv.slice(2)) {
   if (typeof process.getuid !== 'function' || process.getuid() !== 0) {
     fail('host_launcher_root_required');
   }
   const { authorityFile, command } = parseArguments(argv);
+  if (command !== 'verify' &&
+      process.env.CODEX_MEMORY_HOST_LIFECYCLE_LOCK_HELD !== '1') {
+    runUnderLifecycleLock(argv);
+    return;
+  }
   const authority = validateAuthorityRecord(readBoundedJson(authorityFile, {
     requireRootOwner: true,
     requireRootOwnedParent: true
   }));
   let result;
+  if (command === 'activate' || command === 'rollback') {
+    result = activateAuthority(authorityFile);
+  }
   if (command === 'run') result = await run(authority);
   if (command === 'start') result = await start(authority);
   if (command === 'stop') result = stop(authority);
@@ -359,7 +524,9 @@ if (require.main === module) {
 module.exports = {
   LAUNCHER_VERSION,
   atomicRootReceipt,
+  activateAuthority,
   buildEdgeReceipt,
+  buildProviderReceipt,
   dockerInspect,
   dockerImageInspect,
   parseArguments,
@@ -367,7 +534,9 @@ module.exports = {
   start,
   stop,
   validateEdgeContainer,
+  validateProviderContainer,
   validateImageForHost,
   verifyHostAuthority,
-  waitForHealthyEdge
+  waitForHealthyEdge,
+  runUnderLifecycleLock
 };

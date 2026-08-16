@@ -4,6 +4,7 @@ const path = require('node:path');
 const {
   AUTHORITY_RECORD_PATH,
   EDGE_RECEIPT_PATH,
+  PROVIDER_RECEIPT_PATH,
   IMAGE_BUILD_MANIFEST_PATH
 } = require('./runtime-authority');
 
@@ -37,6 +38,7 @@ function buildDockerCreateArguments({
   primaryStateSource,
   primaryStateDestination,
   profileSource,
+  providerReceiptSource,
   providerEnvironmentSource,
   runtimeDirectorySource
 }) {
@@ -49,6 +51,8 @@ function buildDockerCreateArguments({
     '--user', '1000:1000',
     '--read-only',
     '--network', 'host',
+    '--ipc', 'private',
+    '--log-driver', 'none',
     '--restart', 'no',
     '--cap-drop', 'ALL',
     '--security-opt', 'no-new-privileges:true',
@@ -56,6 +60,7 @@ function buildDockerCreateArguments({
     '--tmpfs', '/run/codex-memory-runtime:rw,noexec,nosuid,nodev,mode=0700,uid=1000,gid=1000',
     '--mount', readOnlyBind(authoritySource, AUTHORITY_RECORD_PATH),
     '--mount', readOnlyBind(edgeReceiptSource, EDGE_RECEIPT_PATH),
+    '--mount', readOnlyBind(providerReceiptSource, PROVIDER_RECEIPT_PATH),
     '--mount', readOnlyBind(profileSource, '/run/codex-memory/profile.json'),
     '--mount', readOnlyBind(
       providerEnvironmentSource,
@@ -66,6 +71,7 @@ function buildDockerCreateArguments({
       'runtime_container_runtime_directory_invalid')},dst=/run/codex-memory-runtime-data`,
     '--env', `CODEX_MEMORY_CONTAINER_AUTHORITY_PATH=${AUTHORITY_RECORD_PATH}`,
     '--env', `CODEX_MEMORY_EDGE_RECEIPT_PATH=${EDGE_RECEIPT_PATH}`,
+    '--env', `CODEX_MEMORY_PROVIDER_RECEIPT_PATH=${PROVIDER_RECEIPT_PATH}`,
     '--env', `CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH=${IMAGE_BUILD_MANIFEST_PATH}`,
     '--env', 'CODEX_MEMORY_STACK_PROFILE_PATH=/run/codex-memory/profile.json',
     '--env', 'CODEX_MEMORY_STACK_RUNTIME_DIR=/run/codex-memory-runtime-data',

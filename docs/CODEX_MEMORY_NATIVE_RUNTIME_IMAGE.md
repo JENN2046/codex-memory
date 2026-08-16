@@ -23,9 +23,17 @@ never given the Docker socket.
 ## Exact build input
 
 `generate-codex-memory-runtime-context.js` requires two clean, exact-HEAD Git
-worktrees. It materializes allowlisted paths using `git archive`, rejects
+worktrees. It materializes allowlisted paths from exact Git objects, rejects
 symlinks and special files, verifies the governed Vexus SHA-256, and publishes
-the context only after a second content inventory. The manifest binds both
+a deterministic USTAR context artifact only after a second content inventory.
+The builder opens that artifact once with `O_NOFOLLOW`, verifies its complete
+inventory, and sends those same in-memory bytes to BuildKit over stdin. It
+never asks BuildKit to re-read the manifested staging directory and has no
+mutable-checkout fallback. Before publication it independently maps every
+archived source byte back to the blob ID in each accepted Git tree. The build
+command also requires the operator-carried SHA-256 of the whole context
+artifact, so a later self-consistent replacement artifact cannot self-authorize.
+The manifest binds both
 commits and trees, both lockfiles, the Vexus binary, the platform-specific base
 manifest, every context file, build tool versions, and `SOURCE_DATE_EPOCH`.
 
@@ -37,9 +45,12 @@ Neither a mutable tag nor runtime package installation is accepted authority.
 
 ## Host and container responsibilities
 
-The root-owned host launcher verifies the exact local image ID, RootFS chain,
-build-manifest label, runtime container ID/configuration, and retained Edge
-container identity. Its installed trust bundle lives under
+The root-owned host launcher verifies the exact schema-v7 profile bytes, local
+image ID, RootFS chain, build-manifest label, runtime container ID/configuration,
+actual Provider identity, and retained Edge identity. Container observations
+must independently satisfy reviewed Runtime, Provider, and Edge canonical
+policies before an authority candidate can be emitted; candidate configuration
+cannot define policy. Its installed trust bundle lives under
 `/usr/local/lib/codex-memory-native-runtime`, preserves the repository-relative
 launcher/module layout, and is bound as a whole by the authority record. The
 launcher checks that bundle digest before consulting Docker. The system Node
@@ -48,7 +59,7 @@ waits for bounded health, atomically emits a root-owned Edge receipt, re-verifie
 all identities, and starts the exact pre-created runtime container. Stop retains
 both containers and never stops the external Provider.
 
-The authority record and Edge receipt contain no secrets. Their installed files
+The authority record and Provider/Edge receipts contain no secrets. Their installed files
 are root-owned, non-writable by group/other, and readable by the non-root runtime
 only through individual read-only bind mounts. Secret material uses separate
 owner-only mounts and is never placed in either receipt.
@@ -60,9 +71,49 @@ current Native host). It also requires the local ordered RootFS diff IDs to
 match the archive. The mutable tag is never consulted after import.
 
 The image-contained `container-supervisor` consumes the read-only authority
-record, embedded build manifest, schema-v7 profile, and fresh Edge receipt. It
+record, embedded build manifest, schema-v7 profile, and fresh Provider/Edge
+receipts. It
 does not inspect host Git, call Docker, or fall back to repository paths. It
 owns only image-contained VCP/HTTP/governance/relay children.
+
+Every state-changing host operation is serialized by one root-owned `flock`
+whose file descriptor spans the complete start, stop, activation, rollback, or
+supervision command. Process exit or crash releases the kernel lock; a stale
+pathname does not represent ownership. A second operation fails closed rather
+than interleaving lifecycle transitions.
+
+## Authority dependency graph
+
+The graph is acyclic. Reviewed source defines the launcher, exact profile-byte
+binding, independent policies, build-context rules, and native-closure gate.
+Those inputs produce the root-owned host authority record. The record binds the
+profile SHA-256, OCI/config/RootFS identities, exact pre-created Runtime,
+Provider and Edge identities, policy digests, state-mount digest, native closure
+digest, and installed launcher bundle. The launcher validates observed Docker
+state against that record and policies, then emits boot/freshness-bound Provider
+and Edge receipts. The read-only image consumes the record and receipts but
+cannot mint or modify any of them. No application-side claim feeds back into
+host authority creation.
+
+Profile migration consumes a separately validated, profile-independent runtime
+component projection; it does not consume the final authority record that will
+later bind the profile. The resulting exact candidate bytes are hashed, and
+only then may a final host authority candidate be assembled with that SHA-256.
+This two-stage contract removes a profile/authority self-hash cycle.
+
+The mandatory native build gate inventories every governed `.node` artifact,
+requires the exact Vexus SHA-256, rejects RPATH/RUNPATH and ungoverned native
+artifacts, resolves every `DT_NEEDED` library inside the image, and records each
+library hash. Authority creation and every host admission re-read and hash the
+actual files from the stopped container before accepting the closure digest.
+Host library lookup is never accepted.
+
+Rollback OCI archives use a private temporary file, complete verification,
+file `fsync`, fail-closed atomic link publication, directory `fsync`, and
+read-back verification. Archive inspection performs no filesystem extraction;
+its bounded USTAR parser accepts only canonical regular files/directories,
+rejects links, special nodes, traversal, duplicate paths and expansion limits,
+and accepts only the OCI layout allowlist.
 
 ## State and credentials
 

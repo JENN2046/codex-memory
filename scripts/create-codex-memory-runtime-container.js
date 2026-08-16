@@ -30,6 +30,7 @@ function main(argv = process.argv.slice(2)) {
     primaryStateDestination: value['state-destination'],
     primaryStateSource: value.state,
     profileSource: value.profile,
+    providerReceiptSource: value['provider-receipt'],
     providerEnvironmentSource: value['provider-environment'],
     runtimeDirectorySource: value['runtime-directory']
   });

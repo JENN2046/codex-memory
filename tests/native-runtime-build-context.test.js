@@ -7,8 +7,10 @@ const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 const test = require('node:test');
 const {
+  assertContextGitAuthority,
   assertCleanExactRepository,
   materializeGitArchive,
+  materializeExactRepository,
   pruneRuntimePackageLock,
   visitFiles
 } = require('../scripts/generate-codex-memory-runtime-context');
@@ -81,6 +83,38 @@ test('Git archive materialization uses accepted commit after checkout mutation',
     'module.exports = "A";\n');
 });
 
+test('final context artifact bytes are independently bound back to accepted Git blobs', t => {
+  const root = repository(t);
+  const head = git(root, ['rev-parse', 'HEAD']);
+  const staging = fs.mkdtempSync(path.join(os.tmpdir(), 'runtime-context-authority-'));
+  t.after(() => fs.rmSync(staging, { recursive: true, force: true }));
+  fs.mkdirSync(path.join(staging, 'codex-memory'));
+  const source = path.join(staging, 'codex-memory', 'accepted.js');
+  const create = () => {
+    const result = spawnSync('tar', ['--create', '--format=ustar', '--file=-',
+      '--directory', staging, 'codex-memory'], { encoding: null });
+    assert.equal(result.status, 0, result.stderr?.toString());
+    return result.stdout;
+  };
+  fs.writeFileSync(source, 'module.exports = "A";\n');
+  assert.equal(assertContextGitAuthority(create(), [{ commit: head,
+    prefix: 'codex-memory', repository: root, selectedPaths: ['accepted.js'] }]), true);
+  fs.writeFileSync(source, 'module.exports = "substituted";\n');
+  expectCode(() => assertContextGitAuthority(create(), [{ commit: head,
+    prefix: 'codex-memory', repository: root, selectedPaths: ['accepted.js'] }]),
+  'runtime_context_git_authority_mismatch');
+});
+
+test('isolated authority repository has the exact accepted Git tree', t => {
+  const root = repository(t);
+  const head = git(root, ['rev-parse', 'HEAD']);
+  const destination = path.join(os.tmpdir(), `runtime-exact-repo-${process.pid}-${Date.now()}`);
+  t.after(() => fs.rmSync(destination, { recursive: true, force: true }));
+  materializeExactRepository(root, head, destination, 'fixture');
+  assert.equal(git(destination, ['rev-parse', 'HEAD^{tree}']),
+    git(root, ['rev-parse', `${head}^{tree}`]));
+});
+
 test('committed symlink is rejected from build context', t => {
   const root = repository(t);
   fs.symlinkSync('/etc/passwd', path.join(root, 'escape'));
@@ -130,6 +164,7 @@ function createPlan() {
     primaryStateDestination: '/synthetic/container/r5c',
     primaryStateSource: '/synthetic/r5c',
     profileSource: '/synthetic/profile.json',
+    providerReceiptSource: '/synthetic/provider-receipt.json',
     providerEnvironmentSource: '/synthetic/provider.env',
     runtimeDirectorySource: '/synthetic/runtime'
   });

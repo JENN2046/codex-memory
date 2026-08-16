@@ -47,13 +47,16 @@ const {
   IMAGE_BUILD_MANIFEST_PATH,
   IMAGE_RUNTIME_ROOT,
   IMAGE_VCP_ROOT,
+  PROVIDER_RECEIPT_PATH,
   PROFILE_SCHEMA_VERSION: IMAGE_PROFILE_SCHEMA_VERSION,
   buildManifestDigest,
   profileV7MigrationCandidate,
+  readBoundedBuffer,
   readBoundedJson,
   validateAuthorityRecord,
   validateBuildManifest,
   validateEdgeReceipt,
+  validateProviderReceipt,
   validateRuntimeSelfEvidence
 } = require('../src/runtime/native-image/runtime-authority');
 
@@ -197,10 +200,16 @@ const PROFILE_KEYS = Object.freeze([
 const IMAGE_PROFILE_KEYS = Object.freeze([
   ...PROFILE_KEYS,
   'edgeLifecycleAuthority',
+  'edgePolicyDigest',
+  'edgeRuntimeConfigDigest',
   'hostLauncherAuthorityVersion',
   'hostLauncherDigest',
   'runtimeAuthorityMode',
   'runtimeBuildManifestDigest',
+  'nativeClosureDigest',
+  'providerPolicyDigest',
+  'providerRuntimeConfigDigest',
+  'runtimePolicyDigest',
   'runtimeContainerId',
   'runtimeImageConfigId',
   'runtimeImageManifestDigest',
@@ -1515,6 +1524,12 @@ function validateProfile(value) {
         value.hostLauncherAuthorityVersion !==
           'codex-memory-native-host-launcher/v1' ||
         !SAFE_SHA256_DIGEST.test(value.hostLauncherDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.nativeClosureDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.runtimePolicyDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.edgePolicyDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.edgeRuntimeConfigDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.providerPolicyDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.providerRuntimeConfigDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.runtimeBuildManifestDigest || '') ||
         !SAFE_CONTAINER_ID.test(value.runtimeContainerId || '') ||
         !SAFE_IMAGE_ID.test(value.runtimeImageConfigId || '') ||
@@ -5346,11 +5361,11 @@ async function startStackWithProfile(storedProfile, {
     const provider = containerMode
       ? Object.freeze({
         hostLoopbackOnly: true,
-        id: profile.providerContainerId,
-        imageId: profile.providerImageId,
+        id: containerEvidence.providerReceipt.providerContainerId,
+        imageId: containerEvidence.providerReceipt.providerImageIdentity,
         reachable: true,
         recognized: true,
-        revision: profile.providerRevision,
+        revision: containerEvidence.providerReceipt.providerRevision,
         running: true
       })
       : inspectProviderContainer(profile.providerContainer);
@@ -6944,7 +6959,17 @@ function containerSupervisorAuthorityMatchesProfile(profile, authority) {
     profile.hostLauncherAuthorityVersion === authority.hostLauncherVersion &&
     profile.hostLauncherDigest === authority.hostLauncherDigest &&
     profile.edgeLifecycleAuthority === authority.edgeLifecycleAuthority &&
-    profile.edgeContainerId === authority.edgeContainerId
+    profile.nativeClosureDigest === authority.nativeClosureDigest &&
+    profile.runtimePolicyDigest === authority.runtimePolicyDigest &&
+    profile.edgePolicyDigest === authority.edgePolicyDigest &&
+    profile.providerPolicyDigest === authority.providerPolicyDigest &&
+    profile.edgeContainerId === authority.edgeContainerId &&
+    profile.edgeRuntimeConfigDigest === authority.edgeConfigDigest &&
+    profile.runtimeBaseline === authority.edgeRevision &&
+    profile.providerContainerId === authority.providerContainerId &&
+    profile.providerImageId === authority.providerImageIdentity &&
+    profile.providerRevision === authority.providerRevision &&
+    profile.providerRuntimeConfigDigest === authority.providerConfigDigest
   );
 }
 
@@ -6962,6 +6987,8 @@ function loadContainerSupervisorEvidence({
     IMAGE_BUILD_MANIFEST_PATH;
   const edgeReceiptPath = environment.CODEX_MEMORY_EDGE_RECEIPT_PATH ||
     '/run/codex-memory/edge-receipt.json';
+  const providerReceiptPath = environment.CODEX_MEMORY_PROVIDER_RECEIPT_PATH ||
+    PROVIDER_RECEIPT_PATH;
   const profileFile = environment.CODEX_MEMORY_STACK_PROFILE_PATH ||
     '/run/codex-memory/profile.json';
   const authority = validateAuthorityRecord(readBoundedJson(authorityPath, {
@@ -6984,7 +7011,17 @@ function loadContainerSupervisorEvidence({
   const edgeReceipt = validateEdgeReceipt(readBoundedJson(edgeReceiptPath, {
     fsModule
   }), authority, { bootId });
-  const profile = validateProfile(readBoundedJson(profileFile, { fsModule }));
+  const providerReceipt = validateProviderReceipt(readBoundedJson(
+    providerReceiptPath, { fsModule }
+  ), authority, { bootId });
+  const profileBytes = readBoundedBuffer(profileFile, { fsModule });
+  let profile;
+  try { profile = validateProfile(JSON.parse(profileBytes.toString('utf8'))); } catch {
+    throw codedError('stack_container_profile_invalid');
+  }
+  const nativeClosure = readBoundedJson(
+    '/opt/codex-memory-runtime/native-closure.json', { fsModule }
+  );
   if (!containerSupervisorAuthorityMatchesProfile(profile, authority)) {
     throw codedError('stack_container_authority_profile_mismatch');
   }
@@ -6992,6 +7029,9 @@ function loadContainerSupervisorEvidence({
     authority,
     buildManifest,
     edgeReceipt,
+    nativeClosure,
+    profileBytes,
+    providerReceipt,
     runtimeRoot,
     vcpRoot,
     dockerSocketExists
@@ -7003,6 +7043,7 @@ function loadContainerSupervisorEvidence({
     authority,
     buildManifest,
     edgeReceipt,
+    providerReceipt,
     profile,
     runtimeEvidence
   });

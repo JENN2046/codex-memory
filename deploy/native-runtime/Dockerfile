@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
-FROM node@sha256:8607a9064d4a571140998ae9e52a3b3fcf9cff361d04642d5971e6cd76d39e27
+FROM node@sha256:8607a9064d4a571140998ae9e52a3b3fcf9cff361d04642d5971e6cd76d39e27 AS build
 
 ARG SOURCE_DATE_EPOCH
 ARG BUILD_MANIFEST_DIGEST
@@ -27,6 +27,7 @@ RUN printf '%s\n' \
       python3.11-minimal=3.11.2-6+deb12u8 \
       libpython3.11-minimal=3.11.2-6+deb12u8 \
       libpython3.11-stdlib=3.11.2-6+deb12u8 \
+      binutils=2.40-2 \
     && rm -rf /var/lib/apt/lists/* \
     && rm -f /var/cache/ldconfig/aux-cache /var/log/dpkg.log \
     && rm -rf /var/log/apt/*
@@ -49,6 +50,38 @@ COPY --chown=node:node vcptoolbox/ ./
 WORKDIR /opt/codex-memory
 COPY --chown=root:root runtime/runtime-build-manifest.json \
   /opt/codex-memory-runtime/runtime-build-manifest.json
+RUN node /opt/codex-memory/scripts/verify-native-elf-closure.js \
+      --root=/ --output=/opt/codex-memory-runtime/native-closure.json
+
+FROM node@sha256:8607a9064d4a571140998ae9e52a3b3fcf9cff361d04642d5971e6cd76d39e27 AS runtime
+ARG SOURCE_DATE_EPOCH
+ARG BUILD_MANIFEST_DIGEST
+ENV NODE_ENV=production \
+    NODE_DISABLE_COMPILE_CACHE=1 \
+    PUPPETEER_SKIP_DOWNLOAD=true \
+    TZ=UTC \
+    SOURCE_DATE_EPOCH=${SOURCE_DATE_EPOCH}
+RUN printf '%s\n' \
+      'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian/20260817T000000Z bookworm main' \
+      'deb [check-valid-until=no] http://snapshot.debian.org/archive/debian-security/20260817T000000Z bookworm-security main' \
+      > /etc/apt/sources.list \
+    && rm -f /etc/apt/sources.list.d/* \
+    && apt-get -o Acquire::Check-Valid-Until=false update \
+    && apt-get install -y --no-install-recommends \
+      python3=3.11.2-1+b1 \
+      python3-minimal=3.11.2-1+b1 \
+      libpython3-stdlib=3.11.2-1+b1 \
+      python3.11=3.11.2-6+deb12u8 \
+      python3.11-minimal=3.11.2-6+deb12u8 \
+      libpython3.11-minimal=3.11.2-6+deb12u8 \
+      libpython3.11-stdlib=3.11.2-6+deb12u8 \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -f /var/cache/ldconfig/aux-cache /var/log/dpkg.log \
+    && rm -rf /var/log/apt/*
+COPY --from=build --chown=node:node /opt/codex-memory /opt/codex-memory
+COPY --from=build --chown=node:node /opt/vcptoolbox /opt/vcptoolbox
+COPY --from=build --chown=root:root /opt/codex-memory-runtime /opt/codex-memory-runtime
+WORKDIR /opt/codex-memory
 
 LABEL org.opencontainers.image.title="codex-memory-native-runtime" \
       org.opencontainers.image.revision="runtime-build-manifest" \
