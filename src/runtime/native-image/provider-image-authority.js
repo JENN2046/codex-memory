@@ -5,6 +5,7 @@ const { parseTarBuffer, regularFiles } = require('./tar-archive');
 
 const DOCKER_CONTAINERD_MANIFEST_IDENTITY =
   'docker-containerd-manifest-identity/v1';
+const PROVIDER_POLICY_SCHEMA = 'codex-memory-provider-container-policy/v3';
 const SHA256 = /^sha256:[a-f0-9]{64}$/u;
 
 function fail(code) {
@@ -108,7 +109,10 @@ function validateProviderImageArchive(archiveBytes, expected) {
 }
 
 function validateProviderDaemonImageObservation(image, expected) {
-  if (expected?.imageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY) {
+  if (expected?.schemaVersion !== PROVIDER_POLICY_SCHEMA) {
+    fail('provider_image_policy_schema_unsupported');
+  }
+  if (expected.imageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY) {
     fail('provider_image_store_identity_model_unsupported');
   }
   const repositoryDigest = `${expected.imageRepository}@${expected.ociManifestDigest}`;
@@ -145,6 +149,7 @@ function validateProviderImageAdmission(image, archiveBytes, expected) {
 
 module.exports = {
   DOCKER_CONTAINERD_MANIFEST_IDENTITY,
+  PROVIDER_POLICY_SCHEMA,
   validateProviderDaemonImageObservation,
   validateProviderImageAdmission,
   validateProviderImageArchive

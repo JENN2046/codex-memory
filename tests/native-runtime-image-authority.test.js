@@ -747,6 +747,9 @@ test('Provider identity schema revisions and semantic layers cannot be downgrade
     providerDaemonImageIdentity: a.providerImageConfigDigest,
     providerImageConfigDigest: a.providerDaemonImageIdentity
   }), 'runtime_authority_provider_identity_invalid');
+  expectCode(() => validateAuthorityRecord({
+    ...a, providerImageIdentity: a.providerDaemonImageIdentity
+  }), 'runtime_authority_record_invalid');
   const components = profileAuthorityComponents(a);
   expectCode(() => require('../src/runtime/native-image/runtime-authority')
     .validateProfileAuthorityComponents({
@@ -767,6 +770,12 @@ test('Provider identity schema revisions and semantic layers cannot be downgrade
   const { providerOciManifestDigest: _missing, ...missing } = receipt;
   expectCode(() => validateProviderReceipt(missing, a, { now: 100 }),
     'runtime_provider_receipt_invalid');
+  expectCode(() => validateProviderReceipt({
+    ...receipt, providerDaemonImageIdentity: S('0')
+  }, a, { now: 100 }), 'runtime_provider_receipt_identity_mismatch');
+  expectCode(() => validateProviderReceipt({
+    ...receipt, providerContainerId: I('0')
+  }, a, { now: 100 }), 'runtime_provider_receipt_identity_mismatch');
 });
 
 test('atomic Edge receipt is non-secret, root-replaceable and runtime-readable', t => {

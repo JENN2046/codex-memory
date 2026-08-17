@@ -64,7 +64,8 @@ function fixture(mutate = () => {}) {
     imageSource: labels['org.opencontainers.image.source'],
     imageStoreIdentityModel: DOCKER_CONTAINERD_MANIFEST_IDENTITY,
     imageVersion: labels['org.opencontainers.image.version'],
-    ociManifestDigest: manifestDigest, os: 'linux'
+    ociManifestDigest: manifestDigest, os: 'linux',
+    schemaVersion: 'codex-memory-provider-container-policy/v3'
   };
   const image = {
     Architecture: 'amd64', Config: { Labels: labels },
@@ -121,7 +122,8 @@ test('exact Native Docker 29/containerd Provider observation is admitted', () =>
     imageRevision: '6ce7305cd36f16506fb6a2c3c524a5a318539ba7',
     imageSource: 'https://github.com/QuantumNous/new-api',
     imageStoreIdentityModel: DOCKER_CONTAINERD_MANIFEST_IDENTITY,
-    imageVersion: 'v1.0.0-rc.20', ociManifestDigest: manifest, os: 'linux'
+    imageVersion: 'v1.0.0-rc.20', ociManifestDigest: manifest, os: 'linux',
+    schemaVersion: 'codex-memory-provider-container-policy/v3'
   };
   assert.deepEqual(validateProviderDaemonImageObservation({
     Architecture: 'amd64', Config: { Labels: {
@@ -145,6 +147,7 @@ const identityAttacks = [
   ['repository digest substitution', value => { value.image.RepoDigests = [`example/provider@sha256:${'0'.repeat(64)}`]; }],
   ['mutable tag without digest authority', value => { value.image.RepoDigests = []; value.image.RepoTags = ['example/provider:latest']; }],
   ['unknown image-store identity model', value => { value.expected.imageStoreIdentityModel = 'unknown/v1'; }],
+  ['Provider policy v2 downgrade', value => { value.expected.schemaVersion = 'codex-memory-provider-container-policy/v2'; }],
   ['ambiguous classic config-ID observation', value => { value.image.Id = value.expected.imageConfigDigest; }],
   ['wrong architecture', value => { value.image.Architecture = 'arm64'; }],
   ['wrong revision', value => { value.image.Config.Labels['org.opencontainers.image.revision'] = 'b'.repeat(40); }]
@@ -154,10 +157,10 @@ for (const [name, mutate] of identityAttacks) test(`rejects ${name}`, () => {
   reject(mutate);
 });
 
-test('identity layer adversarial matrix contains ten independent cases', () => {
+test('identity layer adversarial matrix contains eleven independent cases', () => {
   const wrong = `sha256:${'0'.repeat(64)}`;
   assert.equal(wrong.length, 71);
-  assert.equal(identityAttacks.length, 10);
+  assert.equal(identityAttacks.length, 11);
 });
 
 test('config bytes and availability are mandatory', () => {
