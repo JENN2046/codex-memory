@@ -438,8 +438,16 @@ function authority() {
     hostLauncherDigest: S('8'), hostLauncherVersion: 'codex-memory-native-host-launcher/v1',
     nativeClosureDigest: nativeClosureDigest(closure()), profilePath: SOURCES.profile,
     profileSchemaVersion: 7, profileSha256: S('9'),
-    providerConfigDigest: containerConfigDigest(provider), providerContainerId: provider.Id,
-    providerImageIdentity: provider.Image, providerPolicyDigest: PROVIDER_POLICY_DIGEST,
+    providerContainerConfigDigest: containerConfigDigest(provider),
+    providerContainerId: provider.Id,
+    providerDaemonImageIdentity: provider.Image,
+    providerImageConfigDigest: require('../src/runtime/native-image/container-policy')
+      .PROVIDER_POLICY.imageConfigDigest,
+    providerImageStoreIdentityModel: require('../src/runtime/native-image/container-policy')
+      .PROVIDER_POLICY.imageStoreIdentityModel,
+    providerOciManifestDigest: require('../src/runtime/native-image/container-policy')
+      .PROVIDER_POLICY.ociManifestDigest,
+    providerPolicyDigest: PROVIDER_POLICY_DIGEST,
     providerRevision: HISTORICAL_PROVIDER_REVISION,
     rootfsChainDigest: S('a'), runtimeMountSources: SOURCES,
     runtimePolicyDigest: RUNTIME_POLICY_DIGEST, stateMountContract: state,
@@ -450,13 +458,18 @@ test('Provider receipt is boot, freshness, profile identity and root authority b
   const a = authority();
   const receipt = { launchEpoch: 'boot-identity-0001',
     launcherAuthorityDigest: authorityRecordDigest(a), observedAt: 100,
-    providerConfigDigest: a.providerConfigDigest, providerContainerId: a.providerContainerId,
-    providerHealth: 'healthy', providerImageIdentity: a.providerImageIdentity,
+    providerContainerConfigDigest: a.providerContainerConfigDigest,
+    providerContainerId: a.providerContainerId,
+    providerDaemonImageIdentity: a.providerDaemonImageIdentity,
+    providerHealth: 'healthy',
+    providerImageConfigDigest: a.providerImageConfigDigest,
+    providerImageStoreIdentityModel: a.providerImageStoreIdentityModel,
+    providerOciManifestDigest: a.providerOciManifestDigest,
     providerRevision: a.providerRevision, schemaVersion: PROVIDER_RECEIPT_SCHEMA };
   validateProviderReceipt(receipt, a, { now: 100, bootId: receipt.launchEpoch });
   for (const mutate of [value => { value.observedAt = 0; },
     value => { value.providerContainerId = I('0'); },
-    value => { value.providerImageIdentity = S('0'); },
+    value => { value.providerDaemonImageIdentity = S('0'); },
     value => { value.providerHealth = 'unhealthy'; },
     value => { value.launchEpoch = 'different-boot-000'; }]) {
     const changed = { ...receipt }; mutate(changed);

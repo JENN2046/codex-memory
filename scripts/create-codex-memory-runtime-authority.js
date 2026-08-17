@@ -67,6 +67,12 @@ function containerChanges(id) {
     return Object.freeze({ kind: match[1], path: match[2] });
   });
 }
+function imageArchive(id) {
+  return execFileSync('/usr/bin/docker', ['image', 'save', id], {
+    encoding: null, maxBuffer: 512 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+}
 function parse(argv) {
   const values = {};
   for (const arg of argv) {
@@ -152,7 +158,9 @@ function main(argv = process.argv.slice(2)) {
   });
   validateEdgeCandidate(edge);
   validateProviderCandidate(provider);
-  validateProviderImageCandidate(providerImage);
+  const providerImageEvidence = validateProviderImageCandidate(
+    providerImage, imageArchive(provider.Image)
+  );
   validateProviderExecutableBytes(containerFile(provider.Id, '/new-api'));
   validateProviderContainerChanges(containerChanges(provider.Id));
   const providerRevision = provider?.Config?.Labels?.['org.opencontainers.image.revision'];
@@ -177,6 +185,8 @@ function main(argv = process.argv.slice(2)) {
       launcherFile: path.resolve(args['host-launcher']),
       nativeClosureModuleFile: path.resolve(args['native-closure-module']),
       policyModuleFile: path.resolve(args['container-policy-module']),
+      providerImageAuthorityModuleFile:
+        path.resolve(args['provider-image-authority-module']),
       tarArchiveModuleFile: path.resolve(args['tar-archive-module'])
     }),
     hostLauncherVersion: 'codex-memory-native-host-launcher/v1',
@@ -184,9 +194,12 @@ function main(argv = process.argv.slice(2)) {
     profilePath: profileFile,
     profileSchemaVersion: 7,
     profileSha256: sha256Buffer(profileBytes),
-    providerConfigDigest: containerConfigDigest(provider),
+    providerContainerConfigDigest: containerConfigDigest(provider),
     providerContainerId: provider.Id,
-    providerImageIdentity: provider.Image,
+    providerDaemonImageIdentity: providerImageEvidence.daemonImageIdentity,
+    providerImageConfigDigest: providerImageEvidence.imageConfigDigest,
+    providerImageStoreIdentityModel: providerImageEvidence.imageStoreIdentityModel,
+    providerOciManifestDigest: providerImageEvidence.ociManifestDigest,
     providerPolicyDigest: PROVIDER_POLICY_DIGEST,
     providerRevision,
     rootfsChainDigest: digest(image.RootFS.Layers),

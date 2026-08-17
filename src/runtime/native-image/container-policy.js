@@ -8,10 +8,14 @@ const {
   digest,
   projectContainerConfig
 } = require('./runtime-authority');
+const {
+  DOCKER_CONTAINERD_MANIFEST_IDENTITY,
+  validateProviderImageAdmission
+} = require('./provider-image-authority');
 
 const RUNTIME_POLICY_VERSION = 'codex-memory-runtime-container-policy/v2';
 const EDGE_POLICY_VERSION = 'codex-memory-edge-container-policy/v1';
-const PROVIDER_POLICY_VERSION = 'codex-memory-provider-container-policy/v2';
+const PROVIDER_POLICY_VERSION = 'codex-memory-provider-container-policy/v3';
 const PROFILE_PATH = '/run/codex-memory/profile.json';
 const PROVIDER_ENV_PATH = '/run/secrets/codex-memory-vcp-provider.env';
 const RUNTIME_DATA_PATH = '/run/codex-memory-runtime-data';
@@ -50,8 +54,13 @@ const PROVIDER_POLICY = Object.freeze({
     requiredStatus: 200,
     timeoutMs: 2_000
   }),
-  imageConfigId: 'sha256:8ca23f4e6c9ff728e7ad277fbe2538f7a5a43ea40a26c23b04c0d6b48208c018',
-  imageManifestDigest:
+  architecture: 'amd64',
+  daemonImageIdentity:
+    'sha256:69aef0d276a5e00fb6f6d9f11b199fd9ec42d89a0857924547ee4249ad2094a3',
+  imageConfigDigest:
+    'sha256:8ca23f4e6c9ff728e7ad277fbe2538f7a5a43ea40a26c23b04c0d6b48208c018',
+  imageStoreIdentityModel: DOCKER_CONTAINERD_MANIFEST_IDENTITY,
+  ociManifestDigest:
     'sha256:69aef0d276a5e00fb6f6d9f11b199fd9ec42d89a0857924547ee4249ad2094a3',
   imageRepository: 'calciumion/new-api',
   imageRevision: '6ce7305cd36f16506fb6a2c3c524a5a318539ba7',
@@ -59,6 +68,7 @@ const PROVIDER_POLICY = Object.freeze({
   imageVersion: 'v1.0.0-rc.20',
   networkDriver: 'bridge',
   networkMode: 'new-api-wsl_default',
+  os: 'linux',
   privileged: false,
   restartPolicy: 'unless-stopped',
   schemaVersion: PROVIDER_POLICY_VERSION,
@@ -208,7 +218,7 @@ function validateProviderCandidate(inspect) {
   ].includes(interpreter);
   const environment = envObject(value.environment);
   const labels = value.labels || {};
-  if (inspect?.Image !== PROVIDER_POLICY.imageConfigId ||
+  if (inspect?.Image !== PROVIDER_POLICY.daemonImageIdentity ||
       value.networkMode !== PROVIDER_POLICY.networkMode ||
       !loopbackBinding(value.portBindings, '3000/tcp', '3000') ||
       inspect?.Name !== PROVIDER_POLICY.containerName ||
@@ -230,15 +240,13 @@ function validateProviderCandidate(inspect) {
   return Object.freeze(value);
 }
 
-function validateProviderImageCandidate(image) {
-  const expectedRepositoryDigest =
-    `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.imageManifestDigest}`;
-  if (image?.Id !== PROVIDER_POLICY.imageConfigId ||
-      !Array.isArray(image?.RepoDigests) ||
-      !image.RepoDigests.includes(expectedRepositoryDigest)) {
+function validateProviderImageCandidate(image, archiveBytes) {
+  try {
+    return validateProviderImageAdmission(image, archiveBytes, PROVIDER_POLICY);
+  } catch (error) {
+    if (error?.code) fail(error.code);
     fail('provider_image_canonical_policy_mismatch');
   }
-  return true;
 }
 
 function validateProviderExecutableBytes(bytes) {

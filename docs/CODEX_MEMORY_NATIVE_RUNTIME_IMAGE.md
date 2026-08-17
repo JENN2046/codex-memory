@@ -59,7 +59,7 @@ waits for bounded health, atomically emits a root-owned Edge receipt, re-verifie
 all identities, and starts the exact pre-created runtime container. Stop retains
 both containers and never stops the external Provider.
 
-Provider policy `codex-memory-provider-container-policy/v2` models the admitted
+Provider policy `codex-memory-provider-container-policy/v3` models the admitted
 historical `new-api-wsl` contract without treating its `/data` state volume as
 an execution root. It requires the exact image-local absolute `/new-api`
 entrypoint, rejects shell/interpreter indirection and every code bind mount,
@@ -67,8 +67,19 @@ binds the exact `PORT`, `SQLITE_PATH`, and `TZ` environment contract, and admits
 only the named `/data` volume plus the loopback-only Compose network/port
 contract. Provider image, container, configuration, revision, policy digest,
 and volume/network identities remain independently bound by the root authority
-and host launcher. Policy v2 also pins the historical image config and amd64
-manifest digests. Authority creation and every host admission extract
+and host launcher. Policy v3 separately pins the portable amd64 OCI manifest,
+the config blob referenced by that manifest, the supported daemon-local image
+identity, and the container's observed image identity. On the admitted Native
+Docker/containerd store, the daemon and container identities equal the manifest
+digest; they are never relabeled as the distinct config digest.
+
+Every Provider admission performs a bounded host-local `docker image save` of
+the exact daemon identity. A strict no-extraction archive parser recomputes the
+OCI manifest and config blob hashes and proves that the daemon-local manifest
+commits the accepted config bytes. This check requires no registry access,
+does not inspect `/var/lib/docker`, and has no mutable-tag fallback. Unknown or
+mixed image-store identity representations fail closed. Authority creation and
+every host admission also extract
 `/new-api` without following links, require a regular x86-64 ELF, and reject
 container writable-layer changes outside the accepted `/data` state root. This
 binds executable provenance to the exact image rather than trusting the
@@ -82,6 +93,14 @@ does not follow redirects, applies fixed header/body/time limits, and sends no
 credential. A Provider receipt can report `healthy` only after both gates pass;
 `Running=true` alone never establishes health, and a health response never
 establishes identity.
+
+The authority record uses
+`codex-memory-native-runtime-authority/v2`, its Provider component projection
+uses `codex-memory-profile-runtime-authority-components/v2`, and Provider
+receipts use `codex-memory-provider-runtime-receipt/v2`. Each carries distinct
+fields for container configuration, daemon image identity, OCI manifest,
+image-config blob, and image-store model. Legacy v1 records/receipts and
+Provider policy v2 cannot be interpreted under the new semantics.
 
 The authority record and Provider/Edge receipts contain no secrets. Their installed files
 are root-owned, non-writable by group/other, and readable by the non-root runtime

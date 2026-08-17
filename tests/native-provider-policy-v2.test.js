@@ -64,13 +64,16 @@ function requestFixture({
   };
 }
 
-test('Provider policy v2 has a new digest-bound schema', () => {
-  assert.equal(PROVIDER_POLICY_VERSION, 'codex-memory-provider-container-policy/v2');
+test('Provider policy v3 separates OCI, config and daemon identities', () => {
+  assert.equal(PROVIDER_POLICY_VERSION, 'codex-memory-provider-container-policy/v3');
   assert.equal(PROVIDER_POLICY.dockerHealthcheck, 'absent');
-  assert.equal(PROVIDER_POLICY.imageConfigId,
+  assert.equal(PROVIDER_POLICY.imageConfigDigest,
     'sha256:8ca23f4e6c9ff728e7ad277fbe2538f7a5a43ea40a26c23b04c0d6b48208c018');
-  assert.equal(PROVIDER_POLICY.imageManifestDigest,
+  assert.equal(PROVIDER_POLICY.ociManifestDigest,
     'sha256:69aef0d276a5e00fb6f6d9f11b199fd9ec42d89a0857924547ee4249ad2094a3');
+  assert.equal(PROVIDER_POLICY.daemonImageIdentity, PROVIDER_POLICY.ociManifestDigest);
+  assert.equal(PROVIDER_POLICY.imageStoreIdentityModel,
+    'docker-containerd-manifest-identity/v1');
   assert.equal(PROVIDER_POLICY_DIGEST, digest(PROVIDER_POLICY));
   assert.notEqual(PROVIDER_POLICY_DIGEST,
     'sha256:cf4ce5edf3de9f47725d7603ec4fd4acb5b4f9e6e232077c837636aee4d24e46');
@@ -167,25 +170,17 @@ test('unexpected environment capable of module loading is rejected', () => {
   expectPolicyReject(value => value.Config.Env.push('NODE_PATH=/data/plugins'));
 });
 
-test('exact historical image config and platform manifest are admitted', () => {
-  assert.equal(validateProviderImageCandidate({
-    Id: PROVIDER_POLICY.imageConfigId,
-    RepoDigests: [
-      `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.imageManifestDigest}`
-    ]
-  }), true);
-});
-
-test('lookalike image config or manifest is rejected', () => {
+test('image admission fails closed without host-local config archive proof', () => {
   assert.throws(() => validateProviderImageCandidate({
-    Id: `sha256:${'0'.repeat(64)}`,
+    Architecture: 'amd64', Config: { Labels: {
+      'org.opencontainers.image.revision': PROVIDER_POLICY.imageRevision,
+      'org.opencontainers.image.source': PROVIDER_POLICY.imageSource,
+      'org.opencontainers.image.version': PROVIDER_POLICY.imageVersion
+    } }, Descriptor: { digest: PROVIDER_POLICY.ociManifestDigest },
+    Id: PROVIDER_POLICY.daemonImageIdentity, Os: 'linux',
     RepoDigests: [
-      `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.imageManifestDigest}`
+      `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.ociManifestDigest}`
     ]
-  }));
-  assert.throws(() => validateProviderImageCandidate({
-    Id: PROVIDER_POLICY.imageConfigId,
-    RepoDigests: [`${PROVIDER_POLICY.imageRepository}@sha256:${'0'.repeat(64)}`]
   }));
 });
 

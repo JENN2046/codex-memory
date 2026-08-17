@@ -198,7 +198,7 @@ const PROFILE_KEYS = Object.freeze([
   'vcpRuntimeIdentitySchemaVersion'
 ]);
 const IMAGE_PROFILE_KEYS = Object.freeze([
-  ...PROFILE_KEYS,
+  ...PROFILE_KEYS.filter(key => key !== 'providerImageId'),
   'edgeLifecycleAuthority',
   'edgePolicyDigest',
   'edgeRuntimeConfigDigest',
@@ -208,6 +208,10 @@ const IMAGE_PROFILE_KEYS = Object.freeze([
   'runtimeBuildManifestDigest',
   'nativeClosureDigest',
   'providerPolicyDigest',
+  'providerDaemonImageIdentity',
+  'providerImageConfigDigest',
+  'providerImageStoreIdentityModel',
+  'providerOciManifestDigest',
   'providerRuntimeConfigDigest',
   'runtimePolicyDigest',
   'runtimeContainerId',
@@ -1463,7 +1467,8 @@ function validateProfile(value) {
       !SAFE_CONTAINER_ID.test(value.edgeContainerId || '') ||
       value.providerContainer !== PROVIDER_CONTAINER_DEFAULT ||
       !SAFE_CONTAINER_ID.test(value.providerContainerId || '') ||
-      !SAFE_IMAGE_ID.test(value.providerImageId || '') ||
+      (value.schemaVersion !== IMAGE_PROFILE_SCHEMA_VERSION &&
+        !SAFE_IMAGE_ID.test(value.providerImageId || '')) ||
       !SAFE_GIT_OBJECT.test(value.providerRevision || '') ||
       typeof value.privateRoot !== 'string' ||
       !path.isAbsolute(value.privateRoot) ||
@@ -1529,6 +1534,11 @@ function validateProfile(value) {
         !SAFE_SHA256_DIGEST.test(value.edgePolicyDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.edgeRuntimeConfigDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.providerPolicyDigest || '') ||
+        !SAFE_IMAGE_ID.test(value.providerDaemonImageIdentity || '') ||
+        !SAFE_SHA256_DIGEST.test(value.providerImageConfigDigest || '') ||
+        value.providerImageStoreIdentityModel !==
+          'docker-containerd-manifest-identity/v1' ||
+        !SAFE_SHA256_DIGEST.test(value.providerOciManifestDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.providerRuntimeConfigDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.runtimeBuildManifestDigest || '') ||
         !SAFE_CONTAINER_ID.test(value.runtimeContainerId || '') ||
@@ -3779,11 +3789,14 @@ function inspectProviderContainer(name, options = {}) {
 }
 
 function profileProviderIdentityMatches(profile, provider) {
+  const acceptedImage = profile?.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+    ? profile?.providerDaemonImageIdentity
+    : profile?.providerImageId;
   return Boolean(
     provider?.recognized === true &&
     provider?.running === true &&
     provider?.id === profile?.providerContainerId &&
-    provider?.imageId === profile?.providerImageId &&
+    provider?.imageId === acceptedImage &&
     provider?.revision === profile?.providerRevision
   );
 }
@@ -5362,7 +5375,7 @@ async function startStackWithProfile(storedProfile, {
       ? Object.freeze({
         hostLoopbackOnly: true,
         id: containerEvidence.providerReceipt.providerContainerId,
-        imageId: containerEvidence.providerReceipt.providerImageIdentity,
+        imageId: containerEvidence.providerReceipt.providerDaemonImageIdentity,
         reachable: true,
         recognized: true,
         revision: containerEvidence.providerReceipt.providerRevision,
@@ -6967,9 +6980,12 @@ function containerSupervisorAuthorityMatchesProfile(profile, authority) {
     profile.edgeRuntimeConfigDigest === authority.edgeConfigDigest &&
     profile.runtimeBaseline === authority.edgeRevision &&
     profile.providerContainerId === authority.providerContainerId &&
-    profile.providerImageId === authority.providerImageIdentity &&
+    profile.providerDaemonImageIdentity === authority.providerDaemonImageIdentity &&
+    profile.providerImageConfigDigest === authority.providerImageConfigDigest &&
+    profile.providerImageStoreIdentityModel === authority.providerImageStoreIdentityModel &&
+    profile.providerOciManifestDigest === authority.providerOciManifestDigest &&
     profile.providerRevision === authority.providerRevision &&
-    profile.providerRuntimeConfigDigest === authority.providerConfigDigest
+    profile.providerRuntimeConfigDigest === authority.providerContainerConfigDigest
   );
 }
 
