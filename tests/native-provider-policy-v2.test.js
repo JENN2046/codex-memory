@@ -7,6 +7,8 @@ const {
   PROVIDER_POLICY,
   PROVIDER_POLICY_DIGEST,
   PROVIDER_POLICY_VERSION,
+  PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES,
+  PROVIDER_EXECUTABLE_MAX_BYTES,
   validateProviderCandidate,
   validateProviderContainerChanges,
   validateProviderExecutableBytes,
@@ -244,6 +246,9 @@ test('volume authority rejects identity, mode, type, driver and option substitut
   expectPolicyReject(() => {}, { volume: volumeObservation({ Options: { device: '/host' } }) });
   expectPolicyReject(() => {}, { volume: volumeObservation({ Scope: 'global' }) });
   expectPolicyReject(() => {}, { volume: volumeObservation({ Name: 'other' }) });
+  for (const Options of [false, 0, '', []]) {
+    expectPolicyReject(() => {}, { volume: volumeObservation({ Options }) });
+  }
 });
 
 test('image admission fails closed without host-local config archive proof', () => {
@@ -261,6 +266,8 @@ test('image admission fails closed without host-local config archive proof', () 
 });
 
 test('image-local x86-64 ELF executable evidence is admitted', () => {
+  assert.ok(PROVIDER_EXECUTABLE_MAX_BYTES >= 136_028_322);
+  assert.ok(PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES > PROVIDER_EXECUTABLE_MAX_BYTES);
   assert.equal(validateProviderExecutableBytes(executableElf()), true);
 });
 

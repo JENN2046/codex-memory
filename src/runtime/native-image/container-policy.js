@@ -20,6 +20,8 @@ const PROVIDER_POLICY_VERSION = 'codex-memory-provider-container-policy/v4';
 const PROFILE_PATH = '/run/codex-memory/profile.json';
 const PROVIDER_ENV_PATH = '/run/secrets/codex-memory-vcp-provider.env';
 const RUNTIME_DATA_PATH = '/run/codex-memory-runtime-data';
+const PROVIDER_EXECUTABLE_MAX_BYTES = 160 * 1024 * 1024;
+const PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES = PROVIDER_EXECUTABLE_MAX_BYTES + 2 * 1024 * 1024;
 
 const RUNTIME_POLICY = Object.freeze({
   capabilitiesAdd: [], capabilitiesDrop: ['ALL'], ipcMode: 'private',
@@ -104,11 +106,13 @@ function mergedProviderEnvironment(imageInheritedEnvironment) {
 function validateProviderVolumeCandidate(mount, volume) {
   const expected = PROVIDER_POLICY.stateMount;
   const options = volume?.Options;
+  const optionsAccepted = options === null || options === undefined ||
+    (!Array.isArray(options) && typeof options === 'object' &&
+      Object.getPrototypeOf(options) === Object.prototype && Object.keys(options).length === 0);
   if (!mount || mount.destination !== expected.destination || mount.type !== expected.type ||
       mount.name !== expected.name || mount.rw !== expected.readWrite ||
       mount.propagation !== '' || volume?.Name !== expected.name ||
-      volume?.Driver !== 'local' || volume?.Scope !== 'local' ||
-      (options !== null && options !== undefined && Object.keys(options).length !== 0)) {
+      volume?.Driver !== 'local' || volume?.Scope !== 'local' || !optionsAccepted) {
     fail('provider_volume_canonical_policy_mismatch');
   }
   return Object.freeze({
@@ -318,6 +322,7 @@ const PROVIDER_POLICY_DIGEST = digest(PROVIDER_POLICY);
 module.exports = {
   EDGE_POLICY, EDGE_POLICY_DIGEST, EDGE_POLICY_VERSION,
   PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, PROVIDER_POLICY_VERSION,
+  PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES, PROVIDER_EXECUTABLE_MAX_BYTES,
   RUNTIME_POLICY, RUNTIME_POLICY_DIGEST, RUNTIME_POLICY_VERSION,
   mergedProviderEnvironment,
   validateEdgeCandidate, validateProviderCandidate, validateProviderContainerChanges,

@@ -21,7 +21,9 @@ const {
   validateContainerInspection
 } = require('../../src/runtime/native-image/runtime-authority');
 const {
-  EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
+  EDGE_POLICY_DIGEST, PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES,
+  PROVIDER_EXECUTABLE_MAX_BYTES, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST,
+  RUNTIME_POLICY_DIGEST,
   validateEdgeCandidate, validateProviderCandidate, validateProviderContainerChanges,
   validateProviderExecutableBytes, validateProviderImageCandidate, validateRuntimeCandidate
 } = require('../../src/runtime/native-image/container-policy');
@@ -135,13 +137,18 @@ function dockerNetworkInspect(name, options = {}) {
 
 function dockerContainerFile(id, source, options = {}) {
   const { execFile = execFileSync, docker = DOCKER } = options;
+  const providerExecutable = source === PROVIDER_POLICY.executable;
+  const maximumFileBytes = providerExecutable
+    ? PROVIDER_EXECUTABLE_MAX_BYTES : 32 * 1024 * 1024;
+  const maximumArchiveBytes = providerExecutable
+    ? PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES : 8 * 1024 * 1024;
   const buffer = execFile(docker, ['container', 'cp', `${id}:${source}`, '-'], {
-    encoding: null, maxBuffer: 8 * 1024 * 1024,
+    encoding: null, maxBuffer: maximumArchiveBytes,
     stdio: ['ignore', 'pipe', 'pipe']
   });
   const files = regularFiles(parseTarBuffer(buffer, {
-    maximumEntries: 8, maximumFileBytes: 32 * 1024 * 1024,
-    maximumTotalBytes: 32 * 1024 * 1024
+    maximumEntries: 8, maximumFileBytes,
+    maximumTotalBytes: maximumFileBytes
   }));
   if (files.size !== 1) fail('host_launcher_container_file_invalid');
   return [...files.values()][0].content;
