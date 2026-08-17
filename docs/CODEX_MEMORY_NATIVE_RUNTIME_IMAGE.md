@@ -1,0 +1,146 @@
+# Codex Memory Native Runtime Image Authority
+
+This document defines the Gate 5T digest-pinned native runtime candidate. It
+does not authorize installation, profile mutation, production state mounts, or
+runtime activation.
+
+## Trust boundary
+
+The application trust root is one accepted OCI archive hash and manifest, its image
+configuration, ordered RootFS diff IDs, embedded build manifest, and exact
+pre-created container configuration. Node, codex-memory, the clean VCP runtime,
+Vexus, the dynamic loader, and userspace native libraries execute from that
+image. A mutable Git checkout is provenance and build input only; it is never a
+runtime execution root.
+
+The host trust base is the Ubuntu kernel, root-owned systemd system manager,
+root-owned installed launcher and authority record, Docker/containerd, the
+root-owned Docker content store, and the trusted host administrator. Malicious
+root, a compromised kernel/container runtime, and a Docker-capable same-user
+process are outside the application threat model. The application container is
+never given the Docker socket.
+
+## Exact build input
+
+`generate-codex-memory-runtime-context.js` requires two clean, exact-HEAD Git
+worktrees. It materializes allowlisted paths from exact Git objects, rejects
+symlinks and special files, verifies the governed Vexus SHA-256, and publishes
+a deterministic USTAR context artifact only after a second content inventory.
+The builder opens that artifact once with `O_NOFOLLOW`, verifies its complete
+inventory, and sends those same in-memory bytes to BuildKit over stdin. It
+never asks BuildKit to re-read the manifested staging directory and has no
+mutable-checkout fallback. Before publication it independently maps every
+archived source byte back to the blob ID in each accepted Git tree. The build
+command also requires the operator-carried SHA-256 of the whole context
+artifact, so a later self-consistent replacement artifact cannot self-authorize.
+The manifest binds both
+commits and trees, both lockfiles, the Vexus binary, the platform-specific base
+manifest, every context file, build tool versions, and `SOURCE_DATE_EPOCH`.
+
+The base is the linux/amd64 manifest
+`sha256:8607a9064d4a571140998ae9e52a3b3fcf9cff361d04642d5971e6cd76d39e27`
+from index
+`sha256:6c74791e557ce11fc957704f6d4fe134a7bc8d6f5ca4403205b2966bd488f6b3`.
+Neither a mutable tag nor runtime package installation is accepted authority.
+
+## Host and container responsibilities
+
+The root-owned host launcher verifies the exact schema-v7 profile bytes, local
+image ID, RootFS chain, build-manifest label, runtime container ID/configuration,
+actual Provider identity, and retained Edge identity. Container observations
+must independently satisfy reviewed Runtime, Provider, and Edge canonical
+policies before an authority candidate can be emitted; candidate configuration
+cannot define policy. Its installed trust bundle lives under
+`/usr/local/lib/codex-memory-native-runtime`, preserves the repository-relative
+launcher/module layout, and is bound as a whole by the authority record. The
+launcher checks that bundle digest before consulting Docker. The system Node
+interpreter is an explicit host-trust-base component. The launcher starts Edge,
+waits for bounded health, atomically emits a root-owned Edge receipt, re-verifies
+all identities, and starts the exact pre-created runtime container. Stop retains
+both containers and never stops the external Provider.
+
+The authority record and Provider/Edge receipts contain no secrets. Their installed files
+are root-owned, non-writable by group/other, and readable by the non-root runtime
+only through individual read-only bind mounts. Secret material uses separate
+owner-only mounts and is never placed in either receipt.
+
+Authority creation re-verifies the digest-addressed OCI archive and requires
+the imported local Docker image ID to equal its OCI manifest or config digest
+(Docker's containerd image store reports the manifest digest as `.Id` on the
+current Native host). It also requires the local ordered RootFS diff IDs to
+match the archive. The mutable tag is never consulted after import.
+
+The image-contained `container-supervisor` consumes the read-only authority
+record, embedded build manifest, schema-v7 profile, and fresh Provider/Edge
+receipts. It
+does not inspect host Git, call Docker, or fall back to repository paths. It
+owns only image-contained VCP/HTTP/governance/relay children.
+
+Every state-changing host operation is serialized by one root-owned `flock`
+whose file descriptor spans the complete start, stop, activation, rollback, or
+supervision command. Process exit or crash releases the kernel lock; a stale
+pathname does not represent ownership. A second operation fails closed rather
+than interleaving lifecycle transitions.
+
+## Authority dependency graph
+
+The graph is acyclic. Reviewed source defines the launcher, exact profile-byte
+binding, independent policies, build-context rules, and native-closure gate.
+Those inputs produce the root-owned host authority record. The record binds the
+profile SHA-256, OCI/config/RootFS identities, exact pre-created Runtime,
+Provider and Edge identities, policy digests, state-mount digest, native closure
+digest, and installed launcher bundle. The launcher validates observed Docker
+state against that record and policies, then emits boot/freshness-bound Provider
+and Edge receipts. The read-only image consumes the record and receipts but
+cannot mint or modify any of them. No application-side claim feeds back into
+host authority creation.
+
+Profile migration consumes a separately validated, profile-independent runtime
+component projection; it does not consume the final authority record that will
+later bind the profile. The resulting exact candidate bytes are hashed, and
+only then may a final host authority candidate be assembled with that SHA-256.
+This two-stage contract removes a profile/authority self-hash cycle.
+
+The mandatory native build gate inventories every governed `.node` artifact,
+requires the exact Vexus SHA-256, rejects RPATH/RUNPATH and ungoverned native
+artifacts, resolves every `DT_NEEDED` library inside the image, and records each
+library hash. Authority creation and every host admission re-read and hash the
+actual files from the stopped container before accepting the closure digest.
+Host library lookup is never accepted.
+
+Rollback OCI archives use a private temporary file, complete verification,
+file `fsync`, fail-closed atomic link publication, directory `fsync`, and
+read-back verification. Archive inspection performs no filesystem extraction;
+its bounded USTAR parser accepts only canonical regular files/directories,
+rejects links, special nodes, traversal, duplicate paths and expansion limits,
+and accepts only the OCI layout allowlist.
+
+## State and credentials
+
+Primary r5c state remains an external read-only bind mount with an exact mount
+contract. Derived runtime data uses a dedicated bounded writable mount and
+tmpfs. The image contains no memory, diary, vector, Provider state, or secret.
+Future credentials are read-only external mounts and process-local values; they
+are never build arguments, labels, or authority-record fields.
+
+## Schema v7 and transition
+
+Schema v6 remains readable. Schema v7 makes the digest-pinned image and exact
+container the execution authority and classifies Edge lifecycle ownership as
+`host_launcher`. `profileV7MigrationCandidate` produces an in-memory candidate
+only, preserves primary state and credential references, and performs no
+durable write. There is no automatic v6-to-v7 acceptance.
+
+## R1 disposition
+
+- Reuse: Git/npm dependency discovery, contract evidence, source/Vexus
+  digesting, dirty exclusion, native ABI and RPATH checks.
+- Adapt: contract digest to the embedded build manifest; lease substitution,
+  concurrency, and stale-authority scenarios to OCI/container identity tests;
+  lease reporting to image/config/RootFS/container evidence.
+- Drop: byte-lease publication and GC, in-memory bootstrap, custom module
+  loaders, anonymous addon loading, lease-root execution, and every mutable
+  checkout fallback.
+
+The separate uncommitted R1 worktree is evidence only and is not imported by
+this implementation.

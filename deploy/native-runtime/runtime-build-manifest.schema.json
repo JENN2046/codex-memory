@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codex-memory.invalid/schemas/runtime-build-manifest-v1.json",
+  "additionalProperties": false,
+  "required": [
+    "runtimeBuildManifestVersion",
+    "codexMemoryCommit",
+    "codexMemoryTree",
+    "vcpCommit",
+    "vcpTree",
+    "vexusSha256",
+    "baseImageIndexDigest",
+    "baseImagePlatformDigest",
+    "nodeVersion",
+    "lockfileDigests",
+    "buildContextFileManifestDigest",
+    "fileManifest",
+    "sourceDateEpoch",
+    "buildToolVersions"
+  ],
+  "properties": {
+    "runtimeBuildManifestVersion": { "const": "codex-memory-runtime-build-manifest/v1" },
+    "codexMemoryCommit": { "pattern": "^[a-f0-9]{40}$", "type": "string" },
+    "codexMemoryTree": { "$ref": "#/$defs/sha256" },
+    "vcpCommit": { "pattern": "^[a-f0-9]{40}$", "type": "string" },
+    "vcpTree": { "$ref": "#/$defs/sha256" },
+    "vexusSha256": { "$ref": "#/$defs/sha256" },
+    "baseImageIndexDigest": { "$ref": "#/$defs/sha256" },
+    "baseImagePlatformDigest": { "$ref": "#/$defs/sha256" },
+    "nodeVersion": { "const": "22.23.1" },
+    "lockfileDigests": {
+      "additionalProperties": false,
+      "properties": {
+        "codexMemory": { "$ref": "#/$defs/sha256" },
+        "vcp": { "$ref": "#/$defs/sha256" }
+      },
+      "required": ["codexMemory", "vcp"],
+      "type": "object"
+    },
+    "buildContextFileManifestDigest": { "$ref": "#/$defs/sha256" },
+    "fileManifest": { "items": { "type": "object" }, "minItems": 1, "type": "array" },
+    "sourceDateEpoch": { "minimum": 1, "type": "integer" },
+    "buildToolVersions": { "type": "object" }
+  },
+  "$defs": {
+    "sha256": { "pattern": "^sha256:[a-f0-9]{64}$", "type": "string" }
+  },
+  "type": "object"
+}

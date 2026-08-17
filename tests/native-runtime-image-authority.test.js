@@ -1,0 +1,701 @@
+'use strict';
+
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const test = require('node:test');
+const {
+  AUTHORITY_SCHEMA,
+  BUILD_MANIFEST_SCHEMA,
+  EDGE_RECEIPT_SCHEMA,
+  PROVIDER_RECEIPT_SCHEMA,
+  IMAGE_RUNTIME_ROOT,
+  IMAGE_VCP_ROOT,
+  STATE_MOUNT_SCHEMA,
+  authorityRecordDigest,
+  buildManifestDigest,
+  containerConfigDigest,
+  digest,
+  hostTrustBundleDigest,
+  profileAuthorityComponents,
+  profileV7MigrationCandidate,
+  readBoundedJson,
+  sha256Buffer,
+  validateAuthorityRecord,
+  validateBuildManifest,
+  validateContainerInspection,
+  validateEdgeReceipt,
+  validateProviderReceipt,
+  validateImageInspection,
+  validateRuntimeSelfEvidence
+} = require('../src/runtime/native-image/runtime-authority');
+const {
+  EDGE_POLICY_DIGEST, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
+  validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
+} = require('../src/runtime/native-image/container-policy');
+const {
+  EXPECTED_BETTER_SQLITE_PATH, EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256,
+  NATIVE_CLOSURE_SCHEMA,
+  nativeClosureDigest, validateNativeClosure
+} = require('../src/runtime/native-image/native-closure');
+const {
+  containerSupervisorAuthorityMatchesProfile,
+  validateProfile
+} = require('../scripts/codex-memory-stack');
+const {
+  atomicRootReceipt,
+  buildEdgeReceipt,
+  buildProviderReceipt,
+  validateEdgeContainer,
+  validateImageForHost,
+  validateProviderContainer,
+  validateStableHostMountSource,
+  verifyHostAuthority
+} = require('../deploy/native-runtime/host-launcher');
+
+const S = value => `sha256:${String(value).repeat(64).slice(0, 64)}`;
+const C = value => String(value).repeat(40).slice(0, 40);
+const I = value => String(value).repeat(64).slice(0, 64);
+const PROFILE_BYTES = Buffer.from('{"schemaVersion":7}\n');
+const ALLOWED_RUNTIME_ENV = Object.freeze([
+  'CODEX_MEMORY_CONTAINER_AUTHORITY_PATH', 'CODEX_MEMORY_CONTAINER_SUPERVISOR',
+  'CODEX_MEMORY_EDGE_RECEIPT_PATH', 'CODEX_MEMORY_PROVIDER_RECEIPT_PATH',
+  'CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH', 'CODEX_MEMORY_STACK_PROFILE_PATH',
+  'CODEX_MEMORY_STACK_RUNTIME_DIR', 'NODE_ENV', 'VCP_ROOT', 'VCPTOOLBOX_ROOT'
+]);
+const SOURCES = Object.freeze({
+  authority: '/etc/codex-memory/authority.json',
+  edgeReceipt: '/run/codex-memory/edge-receipt.json',
+  primaryState: '/synthetic/r5c',
+  profile: '/etc/codex-memory/profile.json',
+  providerEnvironment: '/etc/codex-memory/provider.env',
+  providerReceipt: '/run/codex-memory/provider-receipt.json',
+  runtimeDirectory: '/var/lib/codex-memory/runtime'
+});
+
+function nativeClosure() {
+  const artifact = (nativePath, nativeSha, marker) => ({
+    buildId: C(marker), elfClass: 'ELF64', interpreter: null,
+    machine: 'Advanced Micro Devices X86-64', maximumGlibc: '2.35',
+    needed: ['libc.so.6'], path: nativePath,
+    resolvedLibraries: [{ name: 'libc.so.6', path: '/lib/x86_64-linux-gnu/libc.so.6',
+      sha256: S('a') }], rpath: null, runpath: null, sha256: nativeSha,
+    type: 'DYN (Shared object file)'
+  });
+  return {
+    artifacts: [artifact(EXPECTED_BETTER_SQLITE_PATH, S('b'), '2'),
+      artifact(EXPECTED_VEXUS_PATH, EXPECTED_VEXUS_SHA256, '1')],
+    libraries: [{ buildId: '', elfClass: 'ELF64', interpreter: null,
+      machine: 'Advanced Micro Devices X86-64', needed: [],
+      path: '/lib/x86_64-linux-gnu/libc.so.6', resolvedLibraries: [],
+      rpath: null, runpath: null, sha256: S('a'),
+      type: 'DYN (Shared object file)' }],
+    schemaVersion: NATIVE_CLOSURE_SCHEMA
+  };
+}
+
+function buildManifest(overrides = {}) {
+  const fileManifest = [
+    { mode: '100644', path: 'codex-memory/package.json', sha256: S('1'), size: 2 },
+    { mode: '100755', path: 'vcptoolbox/KnowledgeBaseManager.js', sha256: S('2'), size: 3 }
+  ];
+  return {
+    baseImageIndexDigest: S('3'),
+    baseImagePlatformDigest: S('4'),
+    buildContextFileManifestDigest: digest(fileManifest),
+    buildToolVersions: { buildx: 'buildx-v1', docker: '29.7.2' },
+    codexMemoryCommit: C('a'),
+    codexMemoryTree: S('5'),
+    fileManifest,
+    lockfileDigests: { codexMemory: S('6'), vcp: S('7') },
+    nodeVersion: '22.23.1',
+    runtimeBuildManifestVersion: BUILD_MANIFEST_SCHEMA,
+    sourceDateEpoch: 1_700_000_000,
+    vcpCommit: C('b'),
+    vcpTree: S('8'),
+    vexusSha256: S('9'),
+    ...overrides
+  };
+}
+
+function baseInspect(overrides = {}) {
+  return {
+    Config: {
+      Cmd: [],
+      Entrypoint: [
+        '/usr/local/bin/node',
+        '/opt/codex-memory/scripts/codex-memory-stack.js',
+        '_container-supervisor'
+      ],
+      Env: [
+        'CODEX_MEMORY_CONTAINER_AUTHORITY_PATH=/run/codex-memory/authority.json',
+        'CODEX_MEMORY_CONTAINER_SUPERVISOR=1',
+        'CODEX_MEMORY_EDGE_RECEIPT_PATH=/run/codex-memory/edge-receipt.json',
+        'CODEX_MEMORY_PROVIDER_RECEIPT_PATH=/run/codex-memory/provider-receipt.json',
+        'CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH=/opt/codex-memory-runtime/runtime-build-manifest.json',
+        'CODEX_MEMORY_STACK_PROFILE_PATH=/run/codex-memory/profile.json',
+        'CODEX_MEMORY_STACK_RUNTIME_DIR=/run/codex-memory-runtime-data',
+        'NODE_ENV=production', 'VCP_ROOT=/opt/vcptoolbox',
+        'VCPTOOLBOX_ROOT=/opt/vcptoolbox'
+      ],
+      User: '1000:1000', WorkingDir: '/opt/codex-memory'
+    },
+    HostConfig: {
+      CapAdd: [],
+      CapDrop: ['ALL'],
+      CgroupnsMode: '', Devices: [], DeviceRequests: [],
+      IpcMode: 'private', LogConfig: { Type: 'none' },
+      NetworkMode: 'host',
+      PidMode: '', PortBindings: {},
+      Privileged: false,
+      ReadonlyRootfs: true,
+      RestartPolicy: { Name: 'no' },
+      SecurityOpt: ['no-new-privileges:true'],
+      Tmpfs: {
+        '/run/codex-memory-runtime': 'rw,noexec,nosuid,nodev,mode=0700,uid=1000,gid=1000',
+        '/tmp': 'rw,noexec,nosuid,nodev,mode=0700,uid=1000,gid=1000'
+      }, UsernsMode: '', UTSMode: ''
+    },
+    Id: I('c'),
+    Image: S('d'),
+    Mounts: [
+      { Destination: '/run/codex-memory/authority.json', Propagation: 'rprivate', RW: false, Source: SOURCES.authority, Type: 'bind' },
+      { Destination: '/run/codex-memory/edge-receipt.json', Propagation: 'rprivate', RW: false, Source: SOURCES.edgeReceipt, Type: 'bind' },
+      { Destination: '/run/codex-memory/profile.json', Propagation: 'rprivate', RW: false, Source: SOURCES.profile, Type: 'bind' },
+      { Destination: '/run/codex-memory/provider-receipt.json', Propagation: 'rprivate', RW: false, Source: SOURCES.providerReceipt, Type: 'bind' },
+      { Destination: '/run/secrets/codex-memory-vcp-provider.env', Propagation: 'rprivate', RW: false, Source: SOURCES.providerEnvironment, Type: 'bind' },
+      { Destination: '/run/codex-memory-runtime-data', Propagation: 'rprivate', RW: true, Source: SOURCES.runtimeDirectory, Type: 'bind' },
+      { Destination: '/srv/codex-memory/r5c', Propagation: 'rprivate', RW: false, Source: SOURCES.primaryState, Type: 'bind' }
+    ],
+    State: { Running: false },
+    ...overrides
+  };
+}
+
+function authority(inspect = baseInspect(), overrides = {}) {
+  const stateMountContract = {
+    containerPath: '/srv/codex-memory/r5c',
+    readOnly: true,
+    schemaVersion: STATE_MOUNT_SCHEMA,
+    stateRootClass: 'external_primary_r5c'
+  };
+  const manifest = buildManifest();
+  return {
+    acceptedImageConfigId: S('d'),
+    acceptedOciArchiveSha256: S('a'),
+    acceptedOciManifestDigest: S('e'),
+    authoritySchemaVersion: AUTHORITY_SCHEMA,
+    buildManifestDigest: buildManifestDigest(manifest),
+    codexMemoryCommit: manifest.codexMemoryCommit,
+    containerConfigDigest: containerConfigDigest(inspect),
+    edgeConfigDigest: S('f'),
+    edgeContainerId: I('1'),
+    edgeImageIdentity: S('2'),
+    edgeLifecycleAuthority: 'host_launcher',
+    edgeRevision: manifest.codexMemoryCommit,
+    edgePolicyDigest: EDGE_POLICY_DIGEST,
+    expectedRuntimeContainerId: inspect.Id,
+    hostLauncherDigest: S('3'),
+    hostLauncherVersion: 'codex-memory-native-host-launcher/v1',
+    nativeClosureDigest: nativeClosureDigest(nativeClosure()),
+    profilePath: SOURCES.profile,
+    profileSchemaVersion: 7,
+    profileSha256: sha256Buffer(PROFILE_BYTES),
+    providerConfigDigest: S('8'),
+    providerContainerId: I('8'),
+    providerImageIdentity: S('8'),
+    providerPolicyDigest: PROVIDER_POLICY_DIGEST,
+    providerRevision: C('8'),
+    rootfsChainDigest: digest([S('4'), S('5')]),
+    runtimeMountSources: SOURCES,
+    runtimePolicyDigest: RUNTIME_POLICY_DIGEST,
+    stateMountContract,
+    stateMountContractDigest: digest(stateMountContract),
+    vcpCommit: manifest.vcpCommit,
+    ...overrides
+  };
+}
+
+function edgeInspect(a = authority(), overrides = {}) {
+  return {
+    Config: { Cmd: [], Entrypoint: [], Env: [], Labels: {
+      'org.opencontainers.image.revision': a.edgeRevision
+    }, User: '1000:1000', WorkingDir: '/opt/edge' },
+    HostConfig: {
+      CapAdd: [], CapDrop: ['ALL'], CgroupnsMode: '', Devices: [], DeviceRequests: [],
+      IpcMode: 'private', LogConfig: { Type: 'none' }, NetworkMode: 'bridge',
+      PidMode: '', Privileged: false, ReadonlyRootfs: true,
+      PortBindings: { '8080/tcp': [{ HostIp: '127.0.0.1', HostPort: '18080' }] },
+      RestartPolicy: { Name: 'no' }, SecurityOpt: ['no-new-privileges:true'],
+      Tmpfs: {}, UsernsMode: '', UTSMode: ''
+    },
+    Id: a.edgeContainerId,
+    Image: a.edgeImageIdentity,
+    Mounts: [{ Destination: '/run/secrets/codex-memory-r4', Propagation: 'rprivate', RW: false, Source: '/etc/codex-memory/edge-secret', Type: 'bind' }],
+    State: { Health: { Status: 'healthy' }, Running: true },
+    ...overrides
+  };
+}
+
+function providerInspect(a = authority(), overrides = {}) {
+  return {
+    Config: { Cmd: [], Entrypoint: [], Env: [], Labels: {
+      'org.opencontainers.image.revision': a.providerRevision
+    }, User: '1000:1000' },
+    HostConfig: {
+      CapAdd: [], CapDrop: [], CgroupnsMode: '', Devices: [], DeviceRequests: [],
+      IpcMode: 'private', LogConfig: { Type: 'json-file' }, NetworkMode: 'bridge',
+      PidMode: '', PortBindings: { '3000/tcp': [{ HostIp: '127.0.0.1', HostPort: '3000' }] },
+      Privileged: false, ReadonlyRootfs: false, RestartPolicy: { Name: 'always' },
+      SecurityOpt: [], Tmpfs: {}, UsernsMode: '', UTSMode: ''
+    },
+    Id: a.providerContainerId, Image: a.providerImageIdentity, Mounts: [],
+    State: { Health: { Status: 'healthy' }, Running: true }, ...overrides
+  };
+}
+
+function authorityWithEdge(inspect = baseInspect()) {
+  const initial = authority(inspect);
+  const edge = edgeInspect(initial);
+  const provider = providerInspect(initial);
+  return authority(inspect, {
+    edgeConfigDigest: containerConfigDigest(edge),
+    providerConfigDigest: containerConfigDigest(provider)
+  });
+}
+
+function edgeReceipt(a, now = Date.now()) {
+  return {
+    edgeConfigDigest: a.edgeConfigDigest,
+    edgeContainerId: a.edgeContainerId,
+    edgeHealth: 'healthy',
+    edgeImageIdentity: a.edgeImageIdentity,
+    edgeRevision: a.edgeRevision,
+    launchEpoch: 'boot-identity-0001',
+    launcherAuthorityDigest: authorityRecordDigest(a),
+    observedAt: now,
+    schemaVersion: EDGE_RECEIPT_SCHEMA
+  };
+}
+function providerReceipt(a, now = Date.now()) {
+  return {
+    launchEpoch: 'boot-identity-0001', launcherAuthorityDigest: authorityRecordDigest(a),
+    observedAt: now, providerConfigDigest: a.providerConfigDigest,
+    providerContainerId: a.providerContainerId, providerHealth: 'healthy',
+    providerImageIdentity: a.providerImageIdentity, providerRevision: a.providerRevision,
+    schemaVersion: PROVIDER_RECEIPT_SCHEMA
+  };
+}
+
+function expectCode(fn, code) {
+  assert.throws(fn, error => error?.code === code);
+}
+
+function selfEvidence(a, overrides = {}) {
+  return {
+    authority: a, buildManifest: buildManifest(), edgeReceipt: edgeReceipt(a),
+    nativeClosure: nativeClosure(), profileBytes: PROFILE_BYTES,
+    providerReceipt: providerReceipt(a), runtimeRoot: IMAGE_RUNTIME_ROOT,
+    vcpRoot: IMAGE_VCP_ROOT, dockerSocketExists: () => false, ...overrides
+  };
+}
+
+test('build manifest is exact and content-bound', () => {
+  assert.equal(validateBuildManifest(buildManifest()).nodeVersion, '22.23.1');
+});
+
+test('A checkout mutation cannot change accepted embedded manifest', () => {
+  const accepted = buildManifest();
+  const changed = buildManifest({ codexMemoryTree: S('a') });
+  assert.notEqual(buildManifestDigest(accepted), buildManifestDigest(changed));
+});
+
+test('B VCP checkout replacement changes the content identity', () => {
+  const accepted = buildManifest();
+  assert.notEqual(buildManifestDigest(accepted), buildManifestDigest({
+    ...accepted, vcpTree: S('b')
+  }));
+});
+
+test('C dirty/untracked substitution cannot be represented in exact file manifest', () => {
+  const value = buildManifest();
+  value.fileManifest.push({ mode: '100644', path: 'untracked.js', sha256: S('1'), size: 1 });
+  expectCode(() => validateBuildManifest(value), 'runtime_build_manifest_file_invalid');
+});
+
+test('D wrong Vexus binary digest is rejected by image authority', () => {
+  const image = { Id: S('d'), RootFS: { Layers: [S('4'), S('5')] } };
+  const a = authority();
+  expectCode(() => validateImageInspection(image, a,
+    buildManifest({ vexusSha256: S('0') })), 'runtime_image_identity_mismatch');
+});
+
+test('E correct Vexus filename with wrong SHA changes manifest identity', () => {
+  assert.notEqual(buildManifestDigest(buildManifest()),
+    buildManifestDigest(buildManifest({ vexusSha256: S('0') })));
+});
+
+test('F post-image node_modules mutation is outside image root identity', () => {
+  assert.equal(digest([S('4'), S('5')]), authority().rootfsChainDigest);
+});
+
+test('host trust bundle binds launcher and first-party authority module bytes', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-host-bundle-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const launcherFile = path.join(root, 'launcher.js');
+  const authorityModuleFile = path.join(root, 'authority.js');
+  const policyModuleFile = path.join(root, 'policy.js');
+  const nativeClosureModuleFile = path.join(root, 'native.js');
+  const tarArchiveModuleFile = path.join(root, 'tar.js');
+  fs.writeFileSync(launcherFile, 'launcher-a\n');
+  fs.writeFileSync(authorityModuleFile, 'authority-a\n');
+  fs.writeFileSync(policyModuleFile, 'policy-a\n');
+  fs.writeFileSync(nativeClosureModuleFile, 'native-a\n');
+  fs.writeFileSync(tarArchiveModuleFile, 'tar-a\n');
+  const files = { launcherFile, authorityModuleFile, policyModuleFile,
+    nativeClosureModuleFile, tarArchiveModuleFile };
+  const accepted = hostTrustBundleDigest(files);
+  fs.writeFileSync(authorityModuleFile, 'authority-b\n');
+  assert.notEqual(hostTrustBundleDigest(files), accepted);
+});
+
+test('bounded authority reads bind an opened regular file and reject symlinks', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-authority-read-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const target = path.join(root, 'authority.json');
+  const link = path.join(root, 'authority-link.json');
+  fs.writeFileSync(target, '{"accepted":true}\n', { mode: 0o600 });
+  fs.symlinkSync(target, link);
+  assert.deepEqual(readBoundedJson(target), { accepted: true });
+  expectCode(() => readBoundedJson(link), 'runtime_authority_file_unavailable');
+});
+
+test('stable host mount source rejects lexical aliases and symlink replacement', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-stable-mount-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const real = path.join(root, 'real');
+  const link = path.join(root, 'link');
+  fs.writeFileSync(real, 'bounded');
+  fs.symlinkSync(real, link);
+  assert.equal(validateStableHostMountSource(real, { allowedRoots: [root] }), real);
+  expectCode(() => validateStableHostMountSource(link, { allowedRoots: [root] }),
+    'host_launcher_mount_source_symlink_forbidden');
+  expectCode(() => validateStableHostMountSource(`${root}/../${path.basename(root)}/real`,
+    { allowedRoots: [root] }), 'host_launcher_mount_source_root_invalid');
+});
+
+test('Provider named volume is identity-bound and local bind-driver options reject', () => {
+  const base = authority();
+  const provider = providerInspect(base);
+  provider.Config.Entrypoint = ['/usr/local/bin/new-api'];
+  provider.Mounts = [{ Destination: '/data', Name: 'provider-state',
+    Propagation: 'rprivate', RW: true, Source: 'provider-state', Type: 'volume' }];
+  const accepted = authority(baseInspect(), {
+    providerConfigDigest: containerConfigDigest(provider)
+  });
+  const execFile = (_binary, args) => JSON.stringify([{
+    Driver: 'local', Name: args[2], Options: {}
+  }]);
+  assert.equal(validateProviderContainer(provider, accepted, { execFile }), true);
+  expectCode(() => validateProviderContainer(provider, accepted, {
+    execFile: (_binary, args) => JSON.stringify([{ Driver: 'local', Name: args[2],
+      Options: { device: '/var/run', o: 'bind', type: 'none' } }])
+  }), 'host_launcher_provider_volume_authority_mismatch');
+});
+
+test('G wrong image ID is rejected', () => {
+  const inspect = baseInspect({ Image: S('0') });
+  expectCode(() => validateContainerInspection(inspect, authority()),
+    'runtime_container_identity_mismatch');
+});
+
+test('H correct tag is irrelevant when image ID differs', () => {
+  const inspect = baseInspect();
+  inspect.Config.Image = 'codex-memory:test';
+  inspect.Image = S('0');
+  expectCode(() => validateContainerInspection(inspect, authority()),
+    'runtime_container_identity_mismatch');
+});
+
+test('I wrong RootFS chain is rejected', () => {
+  const a = authority();
+  const image = { Id: a.acceptedImageConfigId, RootFS: { Layers: [S('0')] } };
+  expectCode(() => validateImageInspection(image, a, buildManifest()),
+    'runtime_image_rootfs_mismatch');
+});
+
+test('J wrong build-manifest digest is rejected', () => {
+  const a = authority(baseInspect(), { buildManifestDigest: S('0') });
+  expectCode(() => validateImageInspection({
+    Id: a.acceptedImageConfigId, RootFS: { Layers: [S('4'), S('5')] }
+  }, a, buildManifest()), 'runtime_image_identity_mismatch');
+});
+
+test('K recreated container with same name is rejected by ID', () => {
+  const inspect = baseInspect({ Id: I('0') });
+  expectCode(() => validateContainerInspection(inspect, authority()),
+    'runtime_container_identity_mismatch');
+});
+
+test('L application-code bind mount is rejected', () => {
+  const inspect = baseInspect();
+  inspect.Mounts.push({ Destination: '/opt/codex-memory/src', RW: false, Source: '/repo/src', Type: 'bind' });
+  const a = authority(inspect);
+  expectCode(() => validateContainerInspection(inspect, a, {
+    allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  }), 'runtime_container_code_mount_forbidden');
+});
+
+test('M Docker socket mount is rejected', () => {
+  const inspect = baseInspect();
+  inspect.Mounts.push({ Destination: '/var/run/docker.sock', RW: true, Source: '/var/run/docker.sock', Type: 'bind' });
+  const a = authority(inspect);
+  expectCode(() => validateContainerInspection(inspect, a, {
+    allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  }), 'runtime_container_docker_socket_forbidden');
+});
+
+for (const [label, mutate] of [
+  ['N writable rootfs', i => { i.HostConfig.ReadonlyRootfs = false; }],
+  ['O privileged', i => { i.HostConfig.Privileged = true; }],
+  ['P no-new-privileges removed', i => { i.HostConfig.SecurityOpt = []; }],
+  ['Q wrong network mode', i => { i.HostConfig.NetworkMode = 'bridge'; }]
+]) test(`${label} is rejected`, () => {
+  const inspect = baseInspect(); mutate(inspect);
+  const a = authority(inspect);
+  expectCode(() => validateContainerInspection(inspect, a, {
+    allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  }), 'runtime_container_security_contract_mismatch');
+});
+
+test('Docker private IPC is admitted while host IPC fails closed', () => {
+  const inspect = baseInspect();
+  inspect.HostConfig.IpcMode = 'private';
+  validateContainerInspection(inspect, authority(inspect), {
+    allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  });
+  inspect.HostConfig.IpcMode = 'host';
+  expectCode(() => validateContainerInspection(inspect, authority(inspect), {
+    allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  }), 'runtime_container_security_contract_mismatch');
+});
+
+test('R non-loopback listener configuration is not an allowed environment', () => {
+  const inspect = baseInspect();
+  inspect.Config.Env.push('CODEX_MEMORY_HTTP_HOST=0.0.0.0');
+  const a = authority(inspect);
+  expectCode(() => validateContainerInspection(inspect, a, {
+    allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  }), 'runtime_container_environment_unapproved');
+});
+
+test('S writable primary state is rejected', () => {
+  const inspect = baseInspect();
+  inspect.Mounts.find(m => m.Destination === '/srv/codex-memory/r5c').RW = true;
+  const a = authority(inspect);
+  expectCode(() => validateContainerInspection(inspect, a, {
+    allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  }), 'runtime_container_state_mount_mismatch');
+});
+
+test('T unexpected secret environment is rejected', () => {
+  const inspect = baseInspect();
+  inspect.Config.Env.push('TOKEN=synthetic-not-real');
+  const a = authority(inspect);
+  expectCode(() => validateContainerInspection(inspect, a, {
+    allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  }), 'runtime_container_environment_unapproved');
+});
+
+test('U stale Edge receipt is rejected', () => {
+  const a = authorityWithEdge();
+  expectCode(() => validateEdgeReceipt(edgeReceipt(a, 100), a, { now: 100_000 }),
+    'runtime_edge_receipt_invalid');
+});
+
+test('Edge receipt from another boot is rejected', () => {
+  const a = authorityWithEdge();
+  expectCode(() => validateEdgeReceipt(edgeReceipt(a), a, {
+    bootId: 'different-boot-identity'
+  }), 'runtime_edge_receipt_stale');
+});
+
+test('V wrong Edge identity receipt is rejected', () => {
+  const a = authorityWithEdge();
+  const receipt = edgeReceipt(a);
+  receipt.edgeContainerId = I('9');
+  expectCode(() => validateEdgeReceipt(receipt, a, { now: receipt.observedAt }),
+    'runtime_edge_receipt_identity_mismatch');
+});
+
+test('W competing runtime candidate cannot satisfy accepted container ID', () => {
+  const accepted = authority();
+  const candidate = baseInspect({ Id: I('9') });
+  expectCode(() => validateContainerInspection(candidate, accepted),
+    'runtime_container_identity_mismatch');
+});
+
+test('X runtime self-evidence is independent of checkout availability', () => {
+  const a = authorityWithEdge();
+  const value = validateRuntimeSelfEvidence(selfEvidence(a));
+  assert.equal(value.accepted, true);
+});
+
+test('Y mutable source fallback path fails self-evidence', () => {
+  const a = authorityWithEdge();
+  expectCode(() => validateRuntimeSelfEvidence(selfEvidence(a, {
+    runtimeRoot: '/repo'
+  })), 'runtime_self_evidence_mismatch');
+});
+
+test('Z Docker socket presence fails self-evidence', () => {
+  const a = authorityWithEdge();
+  expectCode(() => validateRuntimeSelfEvidence(selfEvidence(a, {
+    dockerSocketExists: () => true
+  })), 'runtime_self_evidence_mismatch');
+});
+
+test('host image verifier binds config, rootfs and build-manifest label', () => {
+  const a = authority();
+  assert.equal(validateImageForHost({
+    Config: { Labels: { 'io.codex-memory.runtime.build-manifest-digest': a.buildManifestDigest } },
+    Id: a.acceptedImageConfigId,
+    RootFS: { Layers: [S('4'), S('5')] }
+  }, a), true);
+});
+
+test('host verifier binds installed trust, profile, policies, Provider and native closure', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-host-verify-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const profilePath = path.join(root, 'profile.json');
+  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
+  const sources = { ...SOURCES, profile: profilePath };
+  const runtime = baseInspect();
+  runtime.Mounts.find(m => m.Destination === '/run/codex-memory/profile.json').Source = profilePath;
+  const initial = authorityWithEdge(runtime);
+  const accepted = authority(runtime, {
+    edgeConfigDigest: initial.edgeConfigDigest,
+    profilePath,
+    runtimeMountSources: sources,
+    providerConfigDigest: containerConfigDigest(providerInspect(initial)),
+    hostLauncherDigest: hostTrustBundleDigest({
+      authorityModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'runtime-authority.js'),
+      launcherFile: path.join(__dirname, '..', 'deploy', 'native-runtime',
+        'host-launcher.js'),
+      nativeClosureModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'native-closure.js'),
+      policyModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'container-policy.js'),
+      tarArchiveModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'tar-archive.js')
+    })
+  });
+  const edge = edgeInspect(accepted);
+  const provider = providerInspect(accepted);
+  const image = {
+    Config: { Labels: {
+      'io.codex-memory.runtime.build-manifest-digest': accepted.buildManifestDigest
+    } },
+    Id: accepted.acceptedImageConfigId,
+    RootFS: { Layers: [S('4'), S('5')] }
+  };
+  const execFile = (_binary, args) => JSON.stringify([args[0] === 'image' ? image :
+    args[2] === accepted.expectedRuntimeContainerId ? runtime :
+      args[2] === accepted.edgeContainerId ? edge : provider]);
+  const options = {
+    containerFile: () => Buffer.from(JSON.stringify(nativeClosure())),
+    execFile, requireRootFiles: false,
+    verifyNativeClosureBytes: value => validateNativeClosure(value)
+  };
+  assert.equal(verifyHostAuthority(accepted, options).runtime.Id, runtime.Id);
+  fs.writeFileSync(profilePath, Buffer.concat([PROFILE_BYTES, Buffer.from(' ')]), { mode: 0o600 });
+  expectCode(() => verifyHostAuthority(accepted, options),
+    'host_launcher_profile_authority_mismatch');
+  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
+  fs.writeFileSync(profilePath, '{"schemaVersion":6}\n', { mode: 0o600 });
+  expectCode(() => verifyHostAuthority(accepted, options),
+    'host_launcher_profile_authority_mismatch');
+  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
+  const replacement = path.join(root, 'replacement-profile.json');
+  fs.writeFileSync(replacement, PROFILE_BYTES, { mode: 0o600 });
+  fs.unlinkSync(profilePath);
+  fs.symlinkSync(replacement, profilePath);
+  expectCode(() => verifyHostAuthority(accepted, options),
+    'runtime_authority_file_unavailable');
+  fs.unlinkSync(profilePath);
+  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
+  expectCode(() => verifyHostAuthority({
+    ...accepted, hostLauncherDigest: S('0')
+  }, options), 'host_launcher_trust_bundle_mismatch');
+});
+
+test('host Edge receipt is derived from exact healthy Edge inspection', () => {
+  const a = authorityWithEdge();
+  const edge = edgeInspect(a);
+  const receipt = buildEdgeReceipt(edge, a, 'boot-identity-0001', 1_700_000_000_000);
+  assert.equal(receipt.edgeContainerId, a.edgeContainerId);
+});
+
+test('atomic Edge receipt is non-secret, root-replaceable and runtime-readable', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-edge-receipt-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  fs.chmodSync(root, 0o700);
+  const file = path.join(root, 'edge.json');
+  atomicRootReceipt(file, { accepted: true }, {
+    gid: process.getgid(), uid: process.getuid()
+  });
+  const stat = fs.statSync(file);
+  assert.equal(stat.mode & 0o777, 0o644);
+  assert.deepEqual(JSON.parse(fs.readFileSync(file, 'utf8')), { accepted: true });
+});
+
+test('schema-v6 to v7 produces candidate only and preserves state/credential refs', () => {
+  const inspect = baseInspect();
+  const a = authority(inspect);
+  const current = {
+    adoptedRepositoryHead: C('1'),
+    controllerSourceManifestDigest: S('1'),
+    controllerSourceManifestVersion: 1,
+    edgeContainer: 'codex-memory-full-stack-001-edge',
+    edgeContainerId: a.edgeContainerId,
+    governanceEnvironment: 'governance/runtime.env',
+    governanceEnvironmentConfigDigest: S('2'),
+    privateRoot: '/srv/codex-memory/r5c',
+    providerContainer: 'new-api-wsl',
+    providerContainerId: a.providerContainerId,
+    providerImageId: a.providerImageIdentity,
+    providerRevision: a.providerRevision,
+    relayEnvironment: 'relay/runtime.env',
+    relayEnvironmentConfigDigest: S('4'),
+    retainedBinding: 'binding.json',
+    retainedBindingSource: C('4'),
+    runtimeBaseline: C('5'),
+    runtimeRepository: '/repo',
+    schemaVersion: 6,
+    vcpProviderConfigDigest: S('5'),
+    vcpRuntimeBaseline: C('6'),
+    vcpRuntimeContractDigest: S('6'),
+    vcpRuntimeIdentitySchemaVersion: 1,
+    vcpRuntimeRepository: '/vcp',
+    vcpRuntimeScopeDigest: S('7')
+  };
+  const result = profileV7MigrationCandidate(current, profileAuthorityComponents(a), {
+    expectedCurrentFingerprint: digest(current)
+  });
+  assert.equal(result.candidateOnly, true);
+  assert.equal(result.durableMutationPerformed, false);
+  assert.equal(result.stateRootUnchanged, true);
+  assert.equal(result.credentialReferencesUnchanged, true);
+  assert.equal(result.nextProfile.schemaVersion, 7);
+  assert.equal(result.nextProfile.runtimeRepository, IMAGE_RUNTIME_ROOT);
+  assert.equal(result.nextProfile.vcpRuntimeRepository, IMAGE_VCP_ROOT);
+  assert.equal(result.nextProfile.providerContainerId, a.providerContainerId);
+  assert.equal(result.nextProfile.providerImageId, a.providerImageIdentity);
+  assert.equal(result.nextProfile.providerRevision, a.providerRevision);
+  assert.equal(result.nextProfile.providerRuntimeConfigDigest, a.providerConfigDigest);
+  assert.equal(result.nextProfile.edgeRuntimeConfigDigest, a.edgeConfigDigest);
+  assert.equal(containerSupervisorAuthorityMatchesProfile(result.nextProfile, a), true);
+  assert.equal(validateProfile(result.nextProfile).schemaVersion, 7);
+});

@@ -9,8 +9,10 @@ const test = require('node:test');
 
 const {
   PROFILE_SCHEMA_VERSION,
+  VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
   V5_PROFILE_KEYS,
-  validateProfile
+  validateProfile,
+  vcpRuntimeContractDigest
 } = require('../scripts/codex-memory-stack');
 const {
   MAX_PROFILE_BYTES,
@@ -49,6 +51,16 @@ function profile(overrides = {}) {
     vcpRuntimeScopeDigest: SHA('7'),
     ...overrides
   };
+}
+
+function contractProfile(overrides = {}) {
+  return profile({
+    vcpRuntimeContractDigest: vcpRuntimeContractDigest({
+      vcpContractEvidenceDigest: SHA('8')
+    }),
+    vcpRuntimeIdentitySchemaVersion: VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
+    ...overrides
+  });
 }
 
 function v5Profile() {
@@ -203,6 +215,26 @@ test('canonical fingerprint binds every validated profile field', () => {
     'vcpRuntimeRepository',
     'vcpRuntimeScopeDigest'
   ].sort());
+});
+
+test('explicit schema-v6 contract migration commits atomically', t => {
+  const { target } = fixture(t);
+  const current = profile();
+  const next = contractProfile({
+    vcpRuntimeBaseline: GIT('8'),
+    vcpRuntimeScopeDigest: SHA('9')
+  });
+  const result = commitOwnerProfileTransaction({
+    profilePath: target,
+    expectedCurrentFingerprint: canonicalProfileFingerprint(current),
+    nextProfile: next
+  });
+  assert.equal(result.classification, 'COMMITTED');
+  assert.deepEqual(JSON.parse(fs.readFileSync(target, 'utf8')), next);
+  assert.notEqual(
+    canonicalProfileFingerprint(current),
+    canonicalProfileFingerprint(next)
+  );
 });
 
 test('expected old profile commits and reads back exact next fingerprint', t => {
