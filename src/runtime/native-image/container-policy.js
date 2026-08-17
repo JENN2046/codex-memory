@@ -10,12 +10,13 @@ const {
 } = require('./runtime-authority');
 const {
   DOCKER_CONTAINERD_MANIFEST_IDENTITY,
+  environmentMap,
   validateProviderImageAdmission
 } = require('./provider-image-authority');
 
 const RUNTIME_POLICY_VERSION = 'codex-memory-runtime-container-policy/v2';
 const EDGE_POLICY_VERSION = 'codex-memory-edge-container-policy/v1';
-const PROVIDER_POLICY_VERSION = 'codex-memory-provider-container-policy/v3';
+const PROVIDER_POLICY_VERSION = 'codex-memory-provider-container-policy/v4';
 const PROFILE_PATH = '/run/codex-memory/profile.json';
 const PROVIDER_ENV_PATH = '/run/secrets/codex-memory-vcp-provider.env';
 const RUNTIME_DATA_PATH = '/run/codex-memory-runtime-data';
@@ -36,7 +37,7 @@ const PROVIDER_POLICY = Object.freeze({
   composeProject: 'new-api-wsl',
   composeService: 'new-api',
   containerName: '/new-api-wsl',
-  environment: Object.freeze({
+  composeEnvironment: Object.freeze({
     PORT: '3000',
     SQLITE_PATH: '/data/new-api.db',
     TZ: 'Asia/Shanghai'
@@ -84,13 +85,36 @@ const PROVIDER_POLICY = Object.freeze({
 function fail(code) { const error = new Error(code); error.code = code; throw error; }
 function same(value, expected) { return JSON.stringify(value) === JSON.stringify(expected); }
 function envObject(entries) {
-  const output = {};
-  for (const entry of entries) {
-    const index = entry.indexOf('=');
-    if (index < 1 || Object.hasOwn(output, entry.slice(0, index))) fail('container_policy_environment_invalid');
-    output[entry.slice(0, index)] = entry.slice(index + 1);
+  return environmentMap(entries, 'container_policy_environment_invalid');
+}
+function mergedProviderEnvironment(imageInheritedEnvironment) {
+  if (!imageInheritedEnvironment || Array.isArray(imageInheritedEnvironment) ||
+      Object.getPrototypeOf(imageInheritedEnvironment) !== Object.prototype) {
+    fail('provider_image_environment_invalid');
   }
-  return output;
+  const inheritedEntries = Object.entries(imageInheritedEnvironment).map(([name, value]) => {
+    if (typeof value !== 'string') fail('provider_image_environment_invalid');
+    return `${name}=${value}`;
+  });
+  const inherited = environmentMap(inheritedEntries, 'provider_image_environment_invalid');
+  return Object.freeze(Object.fromEntries(Object.entries({
+    ...inherited, ...PROVIDER_POLICY.composeEnvironment
+  }).sort(([left], [right]) => left.localeCompare(right))));
+}
+function validateProviderVolumeCandidate(mount, volume) {
+  const expected = PROVIDER_POLICY.stateMount;
+  const options = volume?.Options;
+  if (!mount || mount.destination !== expected.destination || mount.type !== expected.type ||
+      mount.name !== expected.name || mount.rw !== expected.readWrite ||
+      mount.propagation !== '' || volume?.Name !== expected.name ||
+      volume?.Driver !== 'local' || volume?.Scope !== 'local' ||
+      (options !== null && options !== undefined && Object.keys(options).length !== 0)) {
+    fail('provider_volume_canonical_policy_mismatch');
+  }
+  return Object.freeze({
+    rawPropagation: mount.propagation,
+    semanticPropagation: 'rprivate'
+  });
 }
 function socketPathExposed(source) {
   const normalized = path.posix.normalize(source);
@@ -198,14 +222,17 @@ function validateEdgeCandidate(inspect) {
   }
   return Object.freeze(value);
 }
-function validateProviderCandidate(inspect) {
+function validateProviderCandidate(inspect, imageEvidence, { volumeObservation } = {}) {
   const value = projectContainerConfig(inspect);
   requireNoDangerousHostSurface(value, 'provider_container_canonical_policy_mismatch');
   const expectedMount = PROVIDER_POLICY.stateMount;
   const stateMountOnly = value.mounts.length === 1 && value.mounts.every(mount =>
     mount.destination === expectedMount.destination &&
     mount.type === expectedMount.type && mount.name === expectedMount.name &&
-    mount.rw === expectedMount.readWrite && mount.propagation === 'rprivate');
+    mount.rw === expectedMount.readWrite);
+  const propagation = stateMountOnly
+    ? validateProviderVolumeCandidate(value.mounts[0], volumeObservation)
+    : null;
   const executable = value.entrypoint.length > 0 ? value.entrypoint[0] : value.command[0];
   const executableAbsolute = typeof executable === 'string' && executable.startsWith('/') &&
     path.posix.normalize(executable) === executable;
@@ -217,6 +244,16 @@ function validateProviderCandidate(inspect) {
     'sh', 'bash', 'dash', 'env', 'node', 'nodejs', 'python', 'python3'
   ].includes(interpreter);
   const environment = envObject(value.environment);
+  if (!imageEvidence ||
+      imageEvidence.daemonImageIdentity !== PROVIDER_POLICY.daemonImageIdentity ||
+      imageEvidence.imageConfigDigest !== PROVIDER_POLICY.imageConfigDigest ||
+      imageEvidence.imageStoreIdentityModel !== PROVIDER_POLICY.imageStoreIdentityModel ||
+      imageEvidence.ociManifestDigest !== PROVIDER_POLICY.ociManifestDigest) {
+    fail('provider_image_canonical_policy_mismatch');
+  }
+  const expectedEnvironment = mergedProviderEnvironment(
+    imageEvidence.imageInheritedEnvironment
+  );
   const labels = value.labels || {};
   if (inspect?.Image !== PROVIDER_POLICY.daemonImageIdentity ||
       value.networkMode !== PROVIDER_POLICY.networkMode ||
@@ -228,7 +265,7 @@ function validateProviderCandidate(inspect) {
       !same(value.entrypoint, [PROVIDER_POLICY.executable]) ||
       !same(value.command, []) || !executableAbsolute || executableInState ||
       indirectInterpreter || !stateMountOnly ||
-      !same(environment, PROVIDER_POLICY.environment) ||
+      !same(environment, expectedEnvironment) ||
       labels['com.docker.compose.project'] !== PROVIDER_POLICY.composeProject ||
       labels['com.docker.compose.service'] !== PROVIDER_POLICY.composeService ||
       labels['com.docker.compose.config-hash'] !== PROVIDER_POLICY.composeConfigHash ||
@@ -237,7 +274,10 @@ function validateProviderCandidate(inspect) {
       labels['org.opencontainers.image.version'] !== PROVIDER_POLICY.imageVersion) {
     fail('provider_container_canonical_policy_mismatch');
   }
-  return Object.freeze(value);
+  return Object.freeze({ ...value,
+    imageInheritedEnvironment: imageEvidence.imageInheritedEnvironment,
+    mountPropagationSemantics: propagation.semanticPropagation
+  });
 }
 
 function validateProviderImageCandidate(image, archiveBytes) {
@@ -279,6 +319,8 @@ module.exports = {
   EDGE_POLICY, EDGE_POLICY_DIGEST, EDGE_POLICY_VERSION,
   PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, PROVIDER_POLICY_VERSION,
   RUNTIME_POLICY, RUNTIME_POLICY_DIGEST, RUNTIME_POLICY_VERSION,
+  mergedProviderEnvironment,
   validateEdgeCandidate, validateProviderCandidate, validateProviderContainerChanges,
-  validateProviderExecutableBytes, validateProviderImageCandidate, validateRuntimeCandidate
+  validateProviderExecutableBytes, validateProviderImageCandidate,
+  validateProviderVolumeCandidate, validateRuntimeCandidate
 };

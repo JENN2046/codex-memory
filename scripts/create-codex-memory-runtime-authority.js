@@ -16,7 +16,7 @@ const {
   validateBuildManifest
 } = require('../src/runtime/native-image/runtime-authority');
 const {
-  EDGE_POLICY_DIGEST,
+  EDGE_POLICY_DIGEST, PROVIDER_POLICY,
   PROVIDER_POLICY_DIGEST,
   RUNTIME_POLICY_DIGEST,
   validateEdgeCandidate,
@@ -157,10 +157,13 @@ function main(argv = process.argv.slice(2)) {
     primaryStateDestination: stateMountContract.containerPath
   });
   validateEdgeCandidate(edge);
-  validateProviderCandidate(provider);
   const providerImageEvidence = validateProviderImageCandidate(
     providerImage, imageArchive(provider.Image)
   );
+  const providerVolume = inspect('volume', PROVIDER_POLICY.stateMount.name);
+  validateProviderCandidate(provider, providerImageEvidence, {
+    volumeObservation: providerVolume
+  });
   validateProviderExecutableBytes(containerFile(provider.Id, '/new-api'));
   validateProviderContainerChanges(containerChanges(provider.Id));
   const providerRevision = provider?.Config?.Labels?.['org.opencontainers.image.revision'];

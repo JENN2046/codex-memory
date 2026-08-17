@@ -37,13 +37,16 @@ function tar(entries) {
 }
 
 function fixture(mutate = () => {}) {
+  const inheritedEnvironment = [
+    'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+  ];
   const labels = {
     'org.opencontainers.image.revision': 'a'.repeat(40),
     'org.opencontainers.image.source': 'https://example.invalid/provider',
     'org.opencontainers.image.version': 'v1'
   };
   const config = Buffer.from(JSON.stringify({
-    architecture: 'amd64', config: { Labels: labels }, os: 'linux'
+    architecture: 'amd64', config: { Env: inheritedEnvironment, Labels: labels }, os: 'linux'
   }));
   const layer = Buffer.from('synthetic-layer');
   const configDigest = sha(config);
@@ -65,10 +68,10 @@ function fixture(mutate = () => {}) {
     imageStoreIdentityModel: DOCKER_CONTAINERD_MANIFEST_IDENTITY,
     imageVersion: labels['org.opencontainers.image.version'],
     ociManifestDigest: manifestDigest, os: 'linux',
-    schemaVersion: 'codex-memory-provider-container-policy/v3'
+    schemaVersion: 'codex-memory-provider-container-policy/v4'
   };
   const image = {
-    Architecture: 'amd64', Config: { Labels: labels },
+    Architecture: 'amd64', Config: { Env: inheritedEnvironment, Labels: labels },
     Descriptor: { digest: manifestDigest }, Id: manifestDigest, Os: 'linux',
     RepoDigests: [`example/provider@${manifestDigest}`]
   };
@@ -109,6 +112,9 @@ test('exact Docker containerd manifest identity mapping is admitted', () => {
   ), {
     daemonImageIdentity: value.expected.daemonImageIdentity,
     imageConfigDigest: value.expected.imageConfigDigest,
+    imageInheritedEnvironment: {
+      PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+    },
     imageStoreIdentityModel: DOCKER_CONTAINERD_MANIFEST_IDENTITY,
     ociManifestDigest: value.expected.ociManifestDigest
   });
@@ -123,10 +129,12 @@ test('exact Native Docker 29/containerd Provider observation is admitted', () =>
     imageSource: 'https://github.com/QuantumNous/new-api',
     imageStoreIdentityModel: DOCKER_CONTAINERD_MANIFEST_IDENTITY,
     imageVersion: 'v1.0.0-rc.20', ociManifestDigest: manifest, os: 'linux',
-    schemaVersion: 'codex-memory-provider-container-policy/v3'
+    schemaVersion: 'codex-memory-provider-container-policy/v4'
   };
   assert.deepEqual(validateProviderDaemonImageObservation({
-    Architecture: 'amd64', Config: { Labels: {
+    Architecture: 'amd64', Config: { Env: [
+      'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+    ], Labels: {
       'org.opencontainers.image.revision': expected.imageRevision,
       'org.opencontainers.image.source': expected.imageSource,
       'org.opencontainers.image.version': expected.imageVersion
@@ -147,7 +155,7 @@ const identityAttacks = [
   ['repository digest substitution', value => { value.image.RepoDigests = [`example/provider@sha256:${'0'.repeat(64)}`]; }],
   ['mutable tag without digest authority', value => { value.image.RepoDigests = []; value.image.RepoTags = ['example/provider:latest']; }],
   ['unknown image-store identity model', value => { value.expected.imageStoreIdentityModel = 'unknown/v1'; }],
-  ['Provider policy v2 downgrade', value => { value.expected.schemaVersion = 'codex-memory-provider-container-policy/v2'; }],
+  ['Provider policy v3 downgrade', value => { value.expected.schemaVersion = 'codex-memory-provider-container-policy/v3'; }],
   ['ambiguous classic config-ID observation', value => { value.image.Id = value.expected.imageConfigDigest; }],
   ['wrong architecture', value => { value.image.Architecture = 'arm64'; }],
   ['wrong revision', value => { value.image.Config.Labels['org.opencontainers.image.revision'] = 'b'.repeat(40); }]
@@ -171,6 +179,25 @@ test('config bytes and availability are mandatory', () => {
   reject(value => {
     const name = `blobs/sha256/${value.expected.imageConfigDigest.slice(7)}`;
     value.entries = value.entries.filter(entry => entry.name !== name);
+  });
+});
+
+test('daemon image environment must equal the exact hashed OCI config environment', () => {
+  reject(value => { value.image.Config.Env[0] = 'PATH=/mutable/bin'; });
+  reject(value => { value.image.Config.Env.push('NODE_PATH=/data/plugins'); });
+  reject(value => { value.image.Config.Env = []; });
+});
+
+test('OCI config environment rejects duplicates and malformed entries', () => {
+  for (const env of [
+    ['PATH=/usr/bin', 'PATH=/other'], ['MALFORMED'], ['1INVALID=value'],
+    ['PATH=/usr/bin\nNODE_PATH=/data']
+  ]) reject(value => {
+    const configName = `blobs/sha256/${value.expected.imageConfigDigest.slice(7)}`;
+    const entry = value.entries.find(candidate => candidate.name === configName);
+    const parsed = JSON.parse(Buffer.from(entry.content).toString('utf8'));
+    parsed.config.Env = env;
+    entry.content = JSON.stringify(parsed);
   });
 });
 

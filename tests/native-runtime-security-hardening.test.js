@@ -15,7 +15,7 @@ const {
   validateAuthorityRecord, validateProviderReceipt
 } = require('../src/runtime/native-image/runtime-authority');
 const {
-  EDGE_POLICY_DIGEST, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
+  EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
   validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
 } = require('../src/runtime/native-image/container-policy');
 const {
@@ -263,17 +263,36 @@ function edgeInspect() {
 function providerInspect() {
   return historicalProviderInspect();
 }
+function providerImageEvidence() {
+  return {
+    daemonImageIdentity: PROVIDER_POLICY.daemonImageIdentity,
+    imageConfigDigest: PROVIDER_POLICY.imageConfigDigest,
+    imageInheritedEnvironment: {
+      PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+    },
+    imageStoreIdentityModel: PROVIDER_POLICY.imageStoreIdentityModel,
+    ociManifestDigest: PROVIDER_POLICY.ociManifestDigest
+  };
+}
+function providerVolumeObservation() {
+  return { Driver: 'local', Name: 'new-api-wsl-data-v1', Options: null, Scope: 'local' };
+}
+function validateProvider(value) {
+  return validateProviderCandidate(value, providerImageEvidence(), {
+    volumeObservation: providerVolumeObservation()
+  });
+}
 
 test('independent canonical policies admit exact Runtime, Edge and Provider', () => {
   validateRuntimeCandidate(runtimeInspect(), { ...SOURCES,
     primaryStateDestination: '/srv/codex-memory/r5c' });
   validateEdgeCandidate(edgeInspect());
-  validateProviderCandidate(providerInspect());
+  validateProvider(providerInspect());
 });
 test('Provider identity policy is independent of Docker health and forbids code mounts', () => {
   const withoutHealth = providerInspect();
   delete withoutHealth.State.Health;
-  validateProviderCandidate(withoutHealth);
+  validateProvider(withoutHealth);
   for (const mutate of [
     value => value.Mounts.push({ Destination: '/app', Propagation: 'rprivate',
       RW: true, Source: '/mutable/provider-code', Type: 'bind' }),
@@ -282,7 +301,7 @@ test('Provider identity policy is independent of Docker health and forbids code 
       RW: true, Source: '/proc/1/root/run/docker.sock', Type: 'bind' }; }
   ]) {
     const value = providerInspect(); mutate(value);
-    expectCode(() => validateProviderCandidate(value),
+    expectCode(() => validateProvider(value),
       'provider_container_canonical_policy_mismatch');
   }
 });

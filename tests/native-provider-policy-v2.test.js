@@ -12,15 +12,34 @@ const {
   validateProviderExecutableBytes,
   validateProviderImageCandidate
 } = require('../src/runtime/native-image/container-policy');
+const { environmentMap } = require('../src/runtime/native-image/provider-image-authority');
 const { digest } = require('../src/runtime/native-image/runtime-authority');
 const { probeProviderHealth } = require('../deploy/native-runtime/host-launcher');
 const { historicalProviderInspect } = require('./fixtures/native-provider-inspect-v2');
 
-function expectPolicyReject(mutate) {
+const IMAGE_PATH = '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin';
+function imageEvidence(overrides = {}) {
+  return {
+    daemonImageIdentity: PROVIDER_POLICY.daemonImageIdentity,
+    imageConfigDigest: PROVIDER_POLICY.imageConfigDigest,
+    imageInheritedEnvironment: { PATH: IMAGE_PATH },
+    imageStoreIdentityModel: PROVIDER_POLICY.imageStoreIdentityModel,
+    ociManifestDigest: PROVIDER_POLICY.ociManifestDigest,
+    ...overrides
+  };
+}
+function volumeObservation(overrides = {}) {
+  return { Driver: 'local', Name: PROVIDER_POLICY.stateMount.name,
+    Options: null, Scope: 'local', ...overrides };
+}
+function admit(value, evidence = imageEvidence(), volume = volumeObservation()) {
+  return validateProviderCandidate(value, evidence, { volumeObservation: volume });
+}
+function expectPolicyReject(mutate, { evidence = imageEvidence(), volume = volumeObservation() } = {}) {
   const value = historicalProviderInspect();
   mutate(value);
-  assert.throws(() => validateProviderCandidate(value), error =>
-    error?.code === 'provider_container_canonical_policy_mismatch');
+  assert.throws(() => admit(value, evidence, volume), error =>
+    /provider_(?:container|image|volume).*policy_mismatch|environment_invalid/u.test(error?.code));
 }
 
 function executableElf() {
@@ -64,8 +83,8 @@ function requestFixture({
   };
 }
 
-test('Provider policy v3 separates OCI, config and daemon identities', () => {
-  assert.equal(PROVIDER_POLICY_VERSION, 'codex-memory-provider-container-policy/v3');
+test('Provider policy v4 separates OCI, config and daemon identities', () => {
+  assert.equal(PROVIDER_POLICY_VERSION, 'codex-memory-provider-container-policy/v4');
   assert.equal(PROVIDER_POLICY.dockerHealthcheck, 'absent');
   assert.equal(PROVIDER_POLICY.imageConfigDigest,
     'sha256:8ca23f4e6c9ff728e7ad277fbe2538f7a5a43ea40a26c23b04c0d6b48208c018');
@@ -83,18 +102,31 @@ test('exact historical Provider inspect is admitted without Docker HEALTHCHECK',
   const value = historicalProviderInspect();
   assert.equal(value.Config.Healthcheck, null);
   assert.equal(value.State.Health, undefined);
-  assert.equal(validateProviderCandidate(value).workingDirectory, '/data');
+  assert.equal(admit(value).workingDirectory, '/data');
 });
 
 test('WorkingDir=/data with immutable absolute image executable is admitted', () => {
-  const projected = validateProviderCandidate(historicalProviderInspect());
+  const projected = admit(historicalProviderInspect());
   assert.deepEqual(projected.entrypoint, ['/new-api']);
   assert.equal(projected.workingDirectory, '/data');
 });
 
 test('SQLITE_PATH=/data/new-api.db is admitted as the exact state locator', () => {
-  const projected = validateProviderCandidate(historicalProviderInspect());
+  const projected = admit(historicalProviderInspect());
   assert.ok(projected.environment.includes('SQLITE_PATH=/data/new-api.db'));
+});
+
+test('exact stopped Docker 29 inspect normalizes immutable image Env and volume propagation', () => {
+  const projected = admit(historicalProviderInspect());
+  assert.deepEqual(projected.imageInheritedEnvironment, { PATH: IMAGE_PATH });
+  assert.equal(projected.mounts[0].propagation, '');
+  assert.equal(projected.mountPropagationSemantics, 'rprivate');
+});
+
+test('environment comparison is a deterministic semantic map, not array ordering', () => {
+  const value = historicalProviderInspect();
+  value.Config.Env.reverse();
+  assert.equal(admit(value).workingDirectory, '/data');
 });
 
 test('executable under /data is rejected', () => {
@@ -170,9 +202,53 @@ test('unexpected environment capable of module loading is rejected', () => {
   expectPolicyReject(value => value.Config.Env.push('NODE_PATH=/data/plugins'));
 });
 
+test('environment authority rejects altered, missing, extra, duplicate and malformed entries', () => {
+  const attacks = [
+    value => { value.Config.Env = value.Config.Env.map(entry => entry.startsWith('PATH=') ? 'PATH=/mutable/bin' : entry); },
+    value => { value.Config.Env = value.Config.Env.filter(entry => !entry.startsWith('PATH=')); },
+    value => { value.Config.Env.push('EXTRA=value'); },
+    value => { value.Config.Env = value.Config.Env.filter(entry => !entry.startsWith('PORT=')); },
+    value => { value.Config.Env = value.Config.Env.map(entry => entry.startsWith('PORT=') ? 'PORT=4000' : entry); },
+    value => { value.Config.Env = value.Config.Env.map(entry => entry.startsWith('SQLITE_PATH=') ? 'SQLITE_PATH=/data/other.db' : entry); },
+    value => { value.Config.Env = value.Config.Env.map(entry => entry.startsWith('TZ=') ? 'TZ=UTC' : entry); },
+    value => { value.Config.Env.push(`PATH=${IMAGE_PATH}`); },
+    value => { value.Config.Env.push('MALFORMED'); }
+  ];
+  for (const attack of attacks) expectPolicyReject(attack);
+  expectPolicyReject(() => {}, { evidence: imageEvidence({
+    imageInheritedEnvironment: { PATH: '/different/image/path' }
+  }) });
+  assert.equal(attacks.length + 1, 10);
+});
+
+test('environment parser independently rejects duplicate and malformed OCI Config.Env', () => {
+  for (const entries of [
+    ['PATH=/usr/bin', 'PATH=/other'], ['MALFORMED'], ['1INVALID=value'],
+    ['PATH=/usr/bin\nNODE_PATH=/data']
+  ]) assert.throws(() => environmentMap(entries));
+});
+
+test('named local volume empty raw propagation is the only admitted representation', () => {
+  assert.equal(admit(historicalProviderInspect()).mountPropagationSemantics, 'rprivate');
+  const propagationAttacks = ['rprivate', 'shared', 'rshared', 'slave', 'rslave'];
+  for (const propagation of propagationAttacks) expectPolicyReject(value => {
+    value.Mounts[0].Propagation = propagation;
+  });
+});
+
+test('volume authority rejects identity, mode, type, driver and option substitutions', () => {
+  expectPolicyReject(value => { value.Mounts[0].Destination = '/other'; });
+  expectPolicyReject(value => { value.Mounts[0].RW = false; });
+  expectPolicyReject(value => { value.Mounts[0].Type = 'bind'; value.Mounts[0].Name = ''; });
+  expectPolicyReject(() => {}, { volume: volumeObservation({ Driver: 'nfs' }) });
+  expectPolicyReject(() => {}, { volume: volumeObservation({ Options: { device: '/host' } }) });
+  expectPolicyReject(() => {}, { volume: volumeObservation({ Scope: 'global' }) });
+  expectPolicyReject(() => {}, { volume: volumeObservation({ Name: 'other' }) });
+});
+
 test('image admission fails closed without host-local config archive proof', () => {
   assert.throws(() => validateProviderImageCandidate({
-    Architecture: 'amd64', Config: { Labels: {
+    Architecture: 'amd64', Config: { Env: [`PATH=${IMAGE_PATH}`], Labels: {
       'org.opencontainers.image.revision': PROVIDER_POLICY.imageRevision,
       'org.opencontainers.image.source': PROVIDER_POLICY.imageSource,
       'org.opencontainers.image.version': PROVIDER_POLICY.imageVersion

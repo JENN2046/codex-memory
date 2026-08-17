@@ -230,7 +230,6 @@ function validateProviderContainer(provider, authority, options = {}) {
       authority.providerPolicyDigest !== PROVIDER_POLICY_DIGEST) {
     fail('host_launcher_provider_identity_mismatch');
   }
-  const projected = validateProviderCandidate(provider);
   const imageInspector = options.providerImageInspect || dockerImageInspect;
   const image = imageInspector(provider.Image, options);
   const imageArchive = options.providerImageArchive || dockerProviderImageArchive;
@@ -244,6 +243,10 @@ function validateProviderContainer(provider, authority, options = {}) {
       imageEvidence.ociManifestDigest !== authority.providerOciManifestDigest) {
     fail('host_launcher_provider_image_identity_mismatch');
   }
+  const volume = dockerVolumeInspect(PROVIDER_POLICY.stateMount.name, options);
+  const projected = validateProviderCandidate(provider, imageEvidence, {
+    volumeObservation: volume
+  });
   const containerFile = options.containerFile || dockerContainerFile;
   validateProviderExecutableBytes(containerFile(
     provider.Id, PROVIDER_POLICY.executable, options
@@ -255,13 +258,6 @@ function validateProviderContainer(provider, authority, options = {}) {
       network?.Driver !== PROVIDER_POLICY.networkDriver ||
       network?.Internal === true) {
     fail('host_launcher_provider_network_authority_mismatch');
-  }
-  for (const mount of projected.mounts) {
-    const volume = dockerVolumeInspect(mount.name, options);
-    if (volume?.Name !== mount.name || volume?.Driver !== 'local' ||
-        (volume.Options && Object.keys(volume.Options).length !== 0)) {
-      fail('host_launcher_provider_volume_authority_mismatch');
-    }
   }
   return true;
 }
