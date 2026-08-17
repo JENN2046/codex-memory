@@ -59,6 +59,30 @@ waits for bounded health, atomically emits a root-owned Edge receipt, re-verifie
 all identities, and starts the exact pre-created runtime container. Stop retains
 both containers and never stops the external Provider.
 
+Provider policy `codex-memory-provider-container-policy/v2` models the admitted
+historical `new-api-wsl` contract without treating its `/data` state volume as
+an execution root. It requires the exact image-local absolute `/new-api`
+entrypoint, rejects shell/interpreter indirection and every code bind mount,
+binds the exact `PORT`, `SQLITE_PATH`, and `TZ` environment contract, and admits
+only the named `/data` volume plus the loopback-only Compose network/port
+contract. Provider image, container, configuration, revision, policy digest,
+and volume/network identities remain independently bound by the root authority
+and host launcher. Policy v2 also pins the historical image config and amd64
+manifest digests. Authority creation and every host admission extract
+`/new-api` without following links, require a regular x86-64 ELF, and reject
+container writable-layer changes outside the accepted `/data` state root. This
+binds executable provenance to the exact image rather than trusting the
+Entrypoint string alone.
+
+Provider identity and health are separate gates. The accepted image has no
+Docker `HEALTHCHECK`, so the launcher first verifies the exact Docker identity
+and configuration, then performs a first-party bounded `GET` to the constant
+loopback endpoint `http://127.0.0.1:3000/api/status`. It accepts only HTTP 200,
+does not follow redirects, applies fixed header/body/time limits, and sends no
+credential. A Provider receipt can report `healthy` only after both gates pass;
+`Running=true` alone never establishes health, and a health response never
+establishes identity.
+
 The authority record and Provider/Edge receipts contain no secrets. Their installed files
 are root-owned, non-writable by group/other, and readable by the non-root runtime
 only through individual read-only bind mounts. Secret material uses separate

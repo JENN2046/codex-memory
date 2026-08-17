@@ -21,6 +21,9 @@ const {
   RUNTIME_POLICY_DIGEST,
   validateEdgeCandidate,
   validateProviderCandidate,
+  validateProviderContainerChanges,
+  validateProviderExecutableBytes,
+  validateProviderImageCandidate,
   validateRuntimeCandidate
 } = require('../src/runtime/native-image/container-policy');
 const {
@@ -53,6 +56,17 @@ function containerFile(id, source) {
   if (files.size !== 1) fail('runtime_authority_container_file_invalid');
   return [...files.values()][0].content;
 }
+function containerChanges(id) {
+  const output = execFileSync('/usr/bin/docker', ['container', 'diff', id], {
+    encoding: 'utf8', maxBuffer: 4 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if (typeof output !== 'string') fail('runtime_authority_container_diff_invalid');
+  return output.trim() === '' ? [] : output.trimEnd().split('\n').map(line => {
+    const match = /^([ACD]) (\/.+)$/u.exec(line);
+    if (!match) fail('runtime_authority_container_diff_invalid');
+    return Object.freeze({ kind: match[1], path: match[2] });
+  });
+}
 function parse(argv) {
   const values = {};
   for (const arg of argv) {
@@ -83,6 +97,7 @@ function main(argv = process.argv.slice(2)) {
   const runtime = inspect('container', args['runtime-container-id']);
   const edge = inspect('container', args['edge-container-id']);
   const provider = inspect('container', args['provider-container-id']);
+  const providerImage = inspect('image', provider.Image);
   const image = inspect('image', args['image-config-id']);
   const manifest = validateBuildManifest(JSON.parse(fs.readFileSync(
     path.resolve(args['build-manifest']), 'utf8'
@@ -137,6 +152,9 @@ function main(argv = process.argv.slice(2)) {
   });
   validateEdgeCandidate(edge);
   validateProviderCandidate(provider);
+  validateProviderImageCandidate(providerImage);
+  validateProviderExecutableBytes(containerFile(provider.Id, '/new-api'));
+  validateProviderContainerChanges(containerChanges(provider.Id));
   const providerRevision = provider?.Config?.Labels?.['org.opencontainers.image.revision'];
   const edgeRevision = edge?.Config?.Labels?.['org.opencontainers.image.revision'];
   const candidate = validateAuthorityRecord({

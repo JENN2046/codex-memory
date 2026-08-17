@@ -3,6 +3,7 @@
 
 const crypto = require('node:crypto');
 const fs = require('node:fs');
+const http = require('node:http');
 const path = require('node:path');
 const { execFileSync, spawn, spawnSync } = require('node:child_process');
 const {
@@ -11,6 +12,7 @@ const {
   authorityRecordDigest,
   canonicalJson,
   containerConfigDigest,
+  digest,
   hostTrustBundleDigest,
   readBoundedJson,
   readBoundedBuffer,
@@ -19,8 +21,9 @@ const {
   validateContainerInspection
 } = require('../../src/runtime/native-image/runtime-authority');
 const {
-  EDGE_POLICY_DIGEST, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
-  validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
+  EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
+  validateEdgeCandidate, validateProviderCandidate, validateProviderContainerChanges,
+  validateProviderExecutableBytes, validateProviderImageCandidate, validateRuntimeCandidate
 } = require('../../src/runtime/native-image/container-policy');
 const { nativeClosureDigest, validateNativeClosure, verifyNativeClosureBytes } = require(
   '../../src/runtime/native-image/native-closure'
@@ -103,6 +106,22 @@ function dockerVolumeInspect(name, options = {}) {
   return parsed[0];
 }
 
+function dockerNetworkInspect(name, options = {}) {
+  const { execFile = execFileSync, docker = DOCKER } = options;
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u.test(name || '')) {
+    fail('host_launcher_network_name_invalid');
+  }
+  const value = execFile(docker, ['network', 'inspect', name], {
+    encoding: 'utf8', maxBuffer: 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  const parsed = parseJson(value, 'host_launcher_network_inspect_invalid');
+  if (!Array.isArray(parsed) || parsed.length !== 1) {
+    fail('host_launcher_network_inspect_invalid');
+  }
+  return parsed[0];
+}
+
 function dockerContainerFile(id, source, options = {}) {
   const { execFile = execFileSync, docker = DOCKER } = options;
   const buffer = execFile(docker, ['container', 'cp', `${id}:${source}`, '-'], {
@@ -115,6 +134,21 @@ function dockerContainerFile(id, source, options = {}) {
   }));
   if (files.size !== 1) fail('host_launcher_container_file_invalid');
   return [...files.values()][0].content;
+}
+
+function dockerContainerChanges(id, options = {}) {
+  const { execFile = execFileSync, docker = DOCKER } = options;
+  if (!CONTAINER_ID.test(id || '')) fail('host_launcher_container_id_invalid');
+  const output = execFile(docker, ['container', 'diff', id], {
+    encoding: 'utf8', maxBuffer: 4 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if (typeof output !== 'string') fail('host_launcher_container_diff_invalid');
+  return output.trim() === '' ? [] : output.trimEnd().split('\n').map(line => {
+    const match = /^([ACD]) (\/.+)$/u.exec(line);
+    if (!match) fail('host_launcher_container_diff_invalid');
+    return Object.freeze({ kind: match[1], path: match[2] });
+  });
 }
 
 function validateStableHostMountSource(source, {
@@ -186,6 +220,20 @@ function validateProviderContainer(provider, authority, options = {}) {
     fail('host_launcher_provider_identity_mismatch');
   }
   const projected = validateProviderCandidate(provider);
+  const imageInspector = options.providerImageInspect || dockerImageInspect;
+  validateProviderImageCandidate(imageInspector(provider.Image, options));
+  const containerFile = options.containerFile || dockerContainerFile;
+  validateProviderExecutableBytes(containerFile(
+    provider.Id, PROVIDER_POLICY.executable, options
+  ));
+  const containerChanges = options.providerContainerChanges || dockerContainerChanges;
+  validateProviderContainerChanges(containerChanges(provider.Id, options));
+  const network = dockerNetworkInspect(projected.networkMode, options);
+  if (network?.Name !== projected.networkMode ||
+      network?.Driver !== PROVIDER_POLICY.networkDriver ||
+      network?.Internal === true) {
+    fail('host_launcher_provider_network_authority_mismatch');
+  }
   for (const mount of projected.mounts) {
     const volume = dockerVolumeInspect(mount.name, options);
     if (volume?.Name !== mount.name || volume?.Driver !== 'local' ||
@@ -250,8 +298,89 @@ function buildEdgeReceipt(edge, authority, bootId, now = Date.now()) {
   });
 }
 
-function buildProviderReceipt(provider, authority, bootId, now = Date.now(), options = {}) {
+function probeProviderHealth({
+  clearTimer = clearTimeout,
+  request = http.request,
+  setTimer = setTimeout
+} = {}) {
+  const contract = PROVIDER_POLICY.health;
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let wallClockTimer = null;
+    const finish = (error, result) => {
+      if (settled) return;
+      settled = true;
+      if (wallClockTimer !== null) clearTimer(wallClockTimer);
+      if (error) reject(error); else resolve(result);
+    };
+    const rejectHealth = () => {
+      const error = new Error('host_launcher_provider_health_failed');
+      error.code = 'host_launcher_provider_health_failed';
+      finish(error);
+    };
+    let req;
+    try {
+      req = request({
+        agent: false,
+        headers: { Accept: 'application/json' },
+        hostname: contract.hostname,
+        maxHeaderSize: contract.maximumHeaderBytes,
+        method: contract.method,
+        path: contract.path,
+        port: contract.port
+      }, response => {
+        let bytes = 0;
+        if (response.statusCode !== contract.requiredStatus ||
+            response.headers?.location !== undefined) {
+          response.resume?.();
+          rejectHealth();
+          return;
+        }
+        response.on('data', chunk => {
+          bytes += Buffer.byteLength(chunk);
+          if (bytes > contract.maximumBodyBytes) {
+            req.destroy();
+            rejectHealth();
+          }
+        });
+        response.once('aborted', rejectHealth);
+        response.once('error', rejectHealth);
+        response.once('end', () => finish(null, Object.freeze({
+          accepted: true,
+          bodyBytes: bytes,
+          contractDigest: digest(contract),
+          providerHealth: 'healthy',
+          statusCode: response.statusCode
+        })));
+      });
+    } catch {
+      rejectHealth();
+      return;
+    }
+    req.once('error', rejectHealth);
+    wallClockTimer = setTimer(() => {
+      req.destroy();
+      rejectHealth();
+    }, contract.timeoutMs);
+    req.setTimeout(contract.timeoutMs, () => {
+      req.destroy();
+      rejectHealth();
+    });
+    req.end();
+  });
+}
+
+async function buildProviderReceipt(
+  provider, authority, bootId, now = Date.now(), options = {}
+) {
   validateProviderContainer(provider, authority, options);
+  if (provider?.State?.Running !== true) fail('host_launcher_provider_not_running');
+  const health = await (options.providerHealthProbe || probeProviderHealth)(options);
+  if (health?.accepted !== true || health?.providerHealth !== 'healthy' ||
+      health?.contractDigest !== digest(PROVIDER_POLICY.health) ||
+      health?.statusCode !== PROVIDER_POLICY.health.requiredStatus) {
+    fail('host_launcher_provider_health_failed');
+  }
   return Object.freeze({
     launchEpoch: bootId,
     launcherAuthorityDigest: authorityRecordDigest(authority),
@@ -392,7 +521,7 @@ async function start(authority, options = {}) {
     finalEvidence.edge, authority, bootId, options.now?.() || Date.now()
   );
   atomicRootReceipt(options.receiptPath || DEFAULT_RECEIPT_PATH, receipt, options);
-  const providerReceipt = buildProviderReceipt(
+  const providerReceipt = await buildProviderReceipt(
     finalEvidence.provider, authority, bootId, options.now?.() || Date.now(), options
   );
   atomicRootReceipt(
@@ -401,7 +530,7 @@ async function start(authority, options = {}) {
   );
   const beforeStart = verifyHostAuthority(authority, options);
   buildEdgeReceipt(beforeStart.edge, authority, bootId, options.now?.() || Date.now());
-  buildProviderReceipt(
+  await buildProviderReceipt(
     beforeStart.provider, authority, bootId, options.now?.() || Date.now(), options
   );
   dockerAction(['start', authority.expectedRuntimeContainerId], options);
@@ -632,9 +761,12 @@ module.exports = {
   activateAuthority,
   buildEdgeReceipt,
   buildProviderReceipt,
+  dockerContainerChanges,
   dockerInspect,
   dockerImageInspect,
+  dockerNetworkInspect,
   parseArguments,
+  probeProviderHealth,
   run,
   start,
   stop,
