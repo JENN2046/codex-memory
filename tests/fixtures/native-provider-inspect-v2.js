@@ -2,8 +2,8 @@
 
 const HISTORICAL_PROVIDER_CONTAINER_ID =
   '16ab6cccfad656b332ae8d27ea96fa4aaee2c1a8d132b609c3d8596e42e6426f';
-const HISTORICAL_PROVIDER_IMAGE_CONFIG =
-  'sha256:8ca23f4e6c9ff728e7ad277fbe2538f7a5a43ea40a26c23b04c0d6b48208c018';
+const HISTORICAL_PROVIDER_DAEMON_IMAGE_IDENTITY =
+  'sha256:69aef0d276a5e00fb6f6d9f11b199fd9ec42d89a0857924547ee4249ad2094a3';
 const HISTORICAL_PROVIDER_REVISION = '6ce7305cd36f16506fb6a2c3c524a5a318539ba7';
 
 function historicalProviderInspect(overrides = {}) {
@@ -48,7 +48,7 @@ function historicalProviderInspect(overrides = {}) {
       UTSMode: ''
     },
     Id: HISTORICAL_PROVIDER_CONTAINER_ID,
-    Image: HISTORICAL_PROVIDER_IMAGE_CONFIG,
+    Image: HISTORICAL_PROVIDER_DAEMON_IMAGE_IDENTITY,
     Mounts: [{
       Destination: '/data',
       Driver: 'local',
@@ -67,7 +67,7 @@ function historicalProviderInspect(overrides = {}) {
 
 module.exports = {
   HISTORICAL_PROVIDER_CONTAINER_ID,
-  HISTORICAL_PROVIDER_IMAGE_CONFIG,
+  HISTORICAL_PROVIDER_DAEMON_IMAGE_IDENTITY,
   HISTORICAL_PROVIDER_REVISION,
   historicalProviderInspect
 };

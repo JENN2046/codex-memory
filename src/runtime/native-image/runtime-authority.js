@@ -3,14 +3,17 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const {
+  DOCKER_CONTAINERD_MANIFEST_IDENTITY
+} = require('./provider-image-authority');
 
 const BUILD_MANIFEST_SCHEMA = 'codex-memory-runtime-build-manifest/v1';
-const AUTHORITY_SCHEMA = 'codex-memory-native-runtime-authority/v1';
+const AUTHORITY_SCHEMA = 'codex-memory-native-runtime-authority/v2';
 const EDGE_RECEIPT_SCHEMA = 'codex-memory-edge-runtime-receipt/v1';
-const PROVIDER_RECEIPT_SCHEMA = 'codex-memory-provider-runtime-receipt/v1';
+const PROVIDER_RECEIPT_SCHEMA = 'codex-memory-provider-runtime-receipt/v2';
 const STATE_MOUNT_SCHEMA = 'codex-memory-primary-state-mount/v1';
 const PROFILE_AUTHORITY_COMPONENT_SCHEMA =
-  'codex-memory-profile-runtime-authority-components/v1';
+  'codex-memory-profile-runtime-authority-components/v2';
 const AUTHORITY_DEPENDENCY_GRAPH = Object.freeze({
   buildContext: Object.freeze(['runtimeImage']),
   canonicalPolicies: Object.freeze(['profileCandidate', 'hostAuthority']),
@@ -90,12 +93,15 @@ function sha256File(file) {
 }
 
 function hostTrustBundleDigest({ launcherFile, authorityModuleFile,
-  policyModuleFile, nativeClosureModuleFile, tarArchiveModuleFile }) {
+  policyModuleFile, nativeClosureModuleFile, providerImageAuthorityModuleFile,
+  tarArchiveModuleFile }) {
   const files = [
     { installPath: 'deploy/native-runtime/host-launcher.js', source: launcherFile },
     { installPath: 'src/runtime/native-image/runtime-authority.js', source: authorityModuleFile },
     { installPath: 'src/runtime/native-image/container-policy.js', source: policyModuleFile },
     { installPath: 'src/runtime/native-image/native-closure.js', source: nativeClosureModuleFile },
+    { installPath: 'src/runtime/native-image/provider-image-authority.js',
+      source: providerImageAuthorityModuleFile },
     { installPath: 'src/runtime/native-image/tar-archive.js', source: tarArchiveModuleFile }
   ].map(entry => ({
     installPath: entry.installPath,
@@ -208,6 +214,17 @@ function validateStateMountContract(value) {
   return Object.freeze({ ...value });
 }
 
+function validateProviderAuthorityIdentity(value, code) {
+  // Lazy import avoids making the canonical policy depend on a caller-supplied
+  // authority record while keeping module initialization acyclic.
+  const { PROVIDER_POLICY, PROVIDER_POLICY_DIGEST } = require('./container-policy');
+  if (value.providerPolicyDigest !== PROVIDER_POLICY_DIGEST ||
+      value.providerDaemonImageIdentity !== PROVIDER_POLICY.daemonImageIdentity ||
+      value.providerImageConfigDigest !== PROVIDER_POLICY.imageConfigDigest ||
+      value.providerImageStoreIdentityModel !== PROVIDER_POLICY.imageStoreIdentityModel ||
+      value.providerOciManifestDigest !== PROVIDER_POLICY.ociManifestDigest) reject(code);
+}
+
 function validateAuthorityRecord(value) {
   const keys = [
     'acceptedImageConfigId',
@@ -230,9 +247,12 @@ function validateAuthorityRecord(value) {
     'profilePath',
     'profileSchemaVersion',
     'profileSha256',
-    'providerConfigDigest',
+    'providerContainerConfigDigest',
     'providerContainerId',
-    'providerImageIdentity',
+    'providerDaemonImageIdentity',
+    'providerImageConfigDigest',
+    'providerImageStoreIdentityModel',
+    'providerOciManifestDigest',
     'providerPolicyDigest',
     'providerRevision',
     'rootfsChainDigest',
@@ -247,6 +267,7 @@ function validateAuthorityRecord(value) {
       value.edgeLifecycleAuthority !== 'host_launcher' ||
       value.hostLauncherVersion !== 'codex-memory-native-host-launcher/v1' ||
       value.profileSchemaVersion !== 7 ||
+      value.providerImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
       !CONTAINER_ID.test(value.edgeContainerId || '') ||
       !CONTAINER_ID.test(value.providerContainerId || '') ||
       !CONTAINER_ID.test(value.expectedRuntimeContainerId || '')) {
@@ -271,13 +292,16 @@ function validateAuthorityRecord(value) {
     value.hostLauncherDigest,
     value.nativeClosureDigest,
     value.profileSha256,
-    value.providerConfigDigest,
-    value.providerImageIdentity,
+    value.providerContainerConfigDigest,
+    value.providerDaemonImageIdentity,
+    value.providerImageConfigDigest,
+    value.providerOciManifestDigest,
     value.providerPolicyDigest,
     value.rootfsChainDigest,
     value.runtimePolicyDigest,
     value.stateMountContractDigest
   ]) assertDigest(item);
+  validateProviderAuthorityIdentity(value, 'runtime_authority_provider_identity_invalid');
   assertAbsolutePath(value.profilePath);
   const mountKeys = [
     'authority', 'edgeReceipt', 'primaryState', 'profile',
@@ -310,13 +334,16 @@ function validateProfileAuthorityComponents(value) {
     'edgeConfigDigest', 'edgeContainerId', 'edgeLifecycleAuthority',
     'edgePolicyDigest', 'edgeRevision', 'expectedRuntimeContainerId',
     'hostLauncherDigest', 'hostLauncherVersion', 'nativeClosureDigest',
-    'profileAuthorityComponentSchemaVersion', 'providerConfigDigest',
-    'providerContainerId', 'providerImageIdentity', 'providerPolicyDigest',
+    'profileAuthorityComponentSchemaVersion', 'providerContainerConfigDigest',
+    'providerContainerId', 'providerDaemonImageIdentity',
+    'providerImageConfigDigest', 'providerImageStoreIdentityModel',
+    'providerOciManifestDigest', 'providerPolicyDigest',
     'providerRevision', 'rootfsChainDigest', 'runtimePolicyDigest',
     'stateMountContractDigest', 'vcpCommit'
   ];
   if (!exactKeys(value, keys) ||
       value.profileAuthorityComponentSchemaVersion !== PROFILE_AUTHORITY_COMPONENT_SCHEMA ||
+      value.providerImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
       value.edgeLifecycleAuthority !== 'host_launcher' ||
       value.hostLauncherVersion !== 'codex-memory-native-host-launcher/v1' ||
       !CONTAINER_ID.test(value.edgeContainerId || '') ||
@@ -335,11 +362,13 @@ function validateProfileAuthorityComponents(value) {
     value.acceptedImageConfigId, value.acceptedOciArchiveSha256,
     value.acceptedOciManifestDigest, value.buildManifestDigest,
     value.edgeConfigDigest, value.edgePolicyDigest, value.hostLauncherDigest,
-    value.nativeClosureDigest, value.providerConfigDigest,
-    value.providerImageIdentity, value.providerPolicyDigest,
+    value.nativeClosureDigest, value.providerContainerConfigDigest,
+    value.providerDaemonImageIdentity, value.providerImageConfigDigest,
+    value.providerOciManifestDigest, value.providerPolicyDigest,
     value.rootfsChainDigest, value.runtimePolicyDigest,
     value.stateMountContractDigest
   ]) assertDigest(item, 'runtime_profile_authority_components_invalid');
+  validateProviderAuthorityIdentity(value, 'runtime_profile_authority_components_invalid');
   return Object.freeze({ ...value });
 }
 
@@ -361,9 +390,12 @@ function profileAuthorityComponents(authority) {
     hostLauncherVersion: value.hostLauncherVersion,
     nativeClosureDigest: value.nativeClosureDigest,
     profileAuthorityComponentSchemaVersion: PROFILE_AUTHORITY_COMPONENT_SCHEMA,
-    providerConfigDigest: value.providerConfigDigest,
+    providerContainerConfigDigest: value.providerContainerConfigDigest,
     providerContainerId: value.providerContainerId,
-    providerImageIdentity: value.providerImageIdentity,
+    providerDaemonImageIdentity: value.providerDaemonImageIdentity,
+    providerImageConfigDigest: value.providerImageConfigDigest,
+    providerImageStoreIdentityModel: value.providerImageStoreIdentityModel,
+    providerOciManifestDigest: value.providerOciManifestDigest,
     providerPolicyDigest: value.providerPolicyDigest,
     providerRevision: value.providerRevision,
     rootfsChainDigest: value.rootfsChainDigest,
@@ -424,11 +456,14 @@ function validateProviderReceipt(value, authority, {
 } = {}) {
   const keys = [
     'launchEpoch', 'launcherAuthorityDigest', 'observedAt',
-    'providerConfigDigest', 'providerContainerId', 'providerHealth',
-    'providerImageIdentity', 'providerRevision', 'schemaVersion'
+    'providerContainerConfigDigest', 'providerContainerId',
+    'providerDaemonImageIdentity', 'providerHealth', 'providerImageConfigDigest',
+    'providerImageStoreIdentityModel', 'providerOciManifestDigest',
+    'providerRevision', 'schemaVersion'
   ];
   if (!exactKeys(value, keys) || value.schemaVersion !== PROVIDER_RECEIPT_SCHEMA ||
       value.providerHealth !== 'healthy' ||
+      value.providerImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
       !CONTAINER_ID.test(value.providerContainerId || '') ||
       !Number.isSafeInteger(value.observedAt) || value.observedAt > now ||
       now - value.observedAt > maximumAgeMs ||
@@ -436,13 +471,19 @@ function validateProviderReceipt(value, authority, {
     reject('runtime_provider_receipt_invalid');
   }
   assertCommit(value.providerRevision, 'runtime_provider_receipt_invalid');
-  for (const item of [value.launcherAuthorityDigest, value.providerConfigDigest,
-    value.providerImageIdentity]) assertDigest(item, 'runtime_provider_receipt_invalid');
+  for (const item of [value.launcherAuthorityDigest,
+    value.providerContainerConfigDigest, value.providerDaemonImageIdentity,
+    value.providerImageConfigDigest, value.providerOciManifestDigest]) {
+    assertDigest(item, 'runtime_provider_receipt_invalid');
+  }
   const accepted = validateAuthorityRecord(authority);
   if (value.launcherAuthorityDigest !== authorityRecordDigest(accepted) ||
       value.providerContainerId !== accepted.providerContainerId ||
-      value.providerImageIdentity !== accepted.providerImageIdentity ||
-      value.providerConfigDigest !== accepted.providerConfigDigest ||
+      value.providerDaemonImageIdentity !== accepted.providerDaemonImageIdentity ||
+      value.providerImageConfigDigest !== accepted.providerImageConfigDigest ||
+      value.providerImageStoreIdentityModel !== accepted.providerImageStoreIdentityModel ||
+      value.providerOciManifestDigest !== accepted.providerOciManifestDigest ||
+      value.providerContainerConfigDigest !== accepted.providerContainerConfigDigest ||
       value.providerRevision !== accepted.providerRevision) {
     reject('runtime_provider_receipt_identity_mismatch');
   }
@@ -694,8 +735,9 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
     reject('runtime_profile_v7_migration_source_invalid');
   }
   const authority = validateProfileAuthorityComponents(imageAuthority);
+  const { providerImageId: _legacyProviderImageId, ...profileWithoutAmbiguousImageId } = profile;
   const nextProfile = Object.freeze({
-    ...profile,
+    ...profileWithoutAmbiguousImageId,
     schemaVersion: PROFILE_SCHEMA_VERSION,
     runtimeAuthorityMode: 'digest_pinned_read_only_image',
     runtimeImageManifestDigest: authority.acceptedOciManifestDigest,
@@ -708,7 +750,7 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
     edgePolicyDigest: authority.edgePolicyDigest,
     edgeRuntimeConfigDigest: authority.edgeConfigDigest,
     providerPolicyDigest: authority.providerPolicyDigest,
-    providerRuntimeConfigDigest: authority.providerConfigDigest,
+    providerRuntimeConfigDigest: authority.providerContainerConfigDigest,
     runtimeContainerId: authority.expectedRuntimeContainerId,
     stateMountContractDigest: authority.stateMountContractDigest,
     hostLauncherAuthorityVersion: authority.hostLauncherVersion,
@@ -719,7 +761,10 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
     adoptedRepositoryHead: authority.codexMemoryCommit,
     runtimeRepository: IMAGE_RUNTIME_ROOT,
     providerContainerId: authority.providerContainerId,
-    providerImageId: authority.providerImageIdentity,
+    providerDaemonImageIdentity: authority.providerDaemonImageIdentity,
+    providerImageConfigDigest: authority.providerImageConfigDigest,
+    providerImageStoreIdentityModel: authority.providerImageStoreIdentityModel,
+    providerOciManifestDigest: authority.providerOciManifestDigest,
     providerRevision: authority.providerRevision,
     vcpRuntimeBaseline: authority.vcpCommit,
     vcpRuntimeRepository: IMAGE_VCP_ROOT

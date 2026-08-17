@@ -91,10 +91,19 @@ function providerEvidenceOptions(overrides = {}) {
   return {
     containerFile: () => providerElf(),
     providerContainerChanges: () => [],
+    providerImageAdmission: () => ({
+      daemonImageIdentity: PROVIDER_POLICY.daemonImageIdentity,
+      imageConfigDigest: PROVIDER_POLICY.imageConfigDigest,
+      imageStoreIdentityModel: PROVIDER_POLICY.imageStoreIdentityModel,
+      ociManifestDigest: PROVIDER_POLICY.ociManifestDigest
+    }),
+    providerImageArchive: () => Buffer.alloc(0),
     providerImageInspect: () => ({
-      Id: PROVIDER_POLICY.imageConfigId,
+      Architecture: 'amd64', Config: { Labels: {} },
+      Descriptor: { digest: PROVIDER_POLICY.ociManifestDigest },
+      Id: PROVIDER_POLICY.daemonImageIdentity, Os: 'linux',
       RepoDigests: [
-        `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.imageManifestDigest}`
+        `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.ociManifestDigest}`
       ]
     }),
     ...overrides
@@ -229,9 +238,12 @@ function authority(inspect = baseInspect(), overrides = {}) {
     profilePath: SOURCES.profile,
     profileSchemaVersion: 7,
     profileSha256: sha256Buffer(PROFILE_BYTES),
-    providerConfigDigest: S('8'),
+    providerContainerConfigDigest: S('8'),
     providerContainerId: I('8'),
-    providerImageIdentity: PROVIDER_POLICY.imageConfigId,
+    providerDaemonImageIdentity: PROVIDER_POLICY.daemonImageIdentity,
+    providerImageConfigDigest: PROVIDER_POLICY.imageConfigDigest,
+    providerImageStoreIdentityModel: PROVIDER_POLICY.imageStoreIdentityModel,
+    providerOciManifestDigest: PROVIDER_POLICY.ociManifestDigest,
     providerPolicyDigest: PROVIDER_POLICY_DIGEST,
     providerRevision: HISTORICAL_PROVIDER_REVISION,
     rootfsChainDigest: digest([S('4'), S('5')]),
@@ -268,7 +280,7 @@ function edgeInspect(a = authority(), overrides = {}) {
 function providerInspect(a = authority(), overrides = {}) {
   const value = historicalProviderInspect();
   value.Id = a.providerContainerId;
-  value.Image = a.providerImageIdentity;
+  value.Image = a.providerDaemonImageIdentity;
   value.Config.Labels['org.opencontainers.image.revision'] = a.providerRevision;
   return Object.assign(value, overrides);
 }
@@ -279,7 +291,7 @@ function authorityWithEdge(inspect = baseInspect()) {
   const provider = providerInspect(initial);
   return authority(inspect, {
     edgeConfigDigest: containerConfigDigest(edge),
-    providerConfigDigest: containerConfigDigest(provider)
+    providerContainerConfigDigest: containerConfigDigest(provider)
   });
 }
 
@@ -299,9 +311,13 @@ function edgeReceipt(a, now = Date.now()) {
 function providerReceipt(a, now = Date.now()) {
   return {
     launchEpoch: 'boot-identity-0001', launcherAuthorityDigest: authorityRecordDigest(a),
-    observedAt: now, providerConfigDigest: a.providerConfigDigest,
+    observedAt: now, providerContainerConfigDigest: a.providerContainerConfigDigest,
     providerContainerId: a.providerContainerId, providerHealth: 'healthy',
-    providerImageIdentity: a.providerImageIdentity, providerRevision: a.providerRevision,
+    providerDaemonImageIdentity: a.providerDaemonImageIdentity,
+    providerImageConfigDigest: a.providerImageConfigDigest,
+    providerImageStoreIdentityModel: a.providerImageStoreIdentityModel,
+    providerOciManifestDigest: a.providerOciManifestDigest,
+    providerRevision: a.providerRevision,
     schemaVersion: PROVIDER_RECEIPT_SCHEMA
   };
 }
@@ -365,14 +381,17 @@ test('host trust bundle binds launcher and first-party authority module bytes', 
   const authorityModuleFile = path.join(root, 'authority.js');
   const policyModuleFile = path.join(root, 'policy.js');
   const nativeClosureModuleFile = path.join(root, 'native.js');
+  const providerImageAuthorityModuleFile = path.join(root, 'provider-image.js');
   const tarArchiveModuleFile = path.join(root, 'tar.js');
   fs.writeFileSync(launcherFile, 'launcher-a\n');
   fs.writeFileSync(authorityModuleFile, 'authority-a\n');
   fs.writeFileSync(policyModuleFile, 'policy-a\n');
   fs.writeFileSync(nativeClosureModuleFile, 'native-a\n');
+  fs.writeFileSync(providerImageAuthorityModuleFile, 'provider-image-a\n');
   fs.writeFileSync(tarArchiveModuleFile, 'tar-a\n');
   const files = { launcherFile, authorityModuleFile, policyModuleFile,
-    nativeClosureModuleFile, tarArchiveModuleFile };
+    nativeClosureModuleFile, providerImageAuthorityModuleFile,
+    tarArchiveModuleFile };
   const accepted = hostTrustBundleDigest(files);
   fs.writeFileSync(authorityModuleFile, 'authority-b\n');
   assert.notEqual(hostTrustBundleDigest(files), accepted);
@@ -407,7 +426,7 @@ test('Provider named volume is identity-bound and local bind-driver options reje
   const base = authority();
   const provider = providerInspect(base);
   const accepted = authority(baseInspect(), {
-    providerConfigDigest: containerConfigDigest(provider)
+    providerContainerConfigDigest: containerConfigDigest(provider)
   });
   const execFile = (_binary, args) => JSON.stringify([args[0] === 'network' ? {
     Driver: 'bridge', Internal: false, Name: args[2]
@@ -603,7 +622,7 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
     edgeConfigDigest: initial.edgeConfigDigest,
     profilePath,
     runtimeMountSources: sources,
-    providerConfigDigest: containerConfigDigest(providerInspect(initial)),
+    providerContainerConfigDigest: containerConfigDigest(providerInspect(initial)),
     hostLauncherDigest: hostTrustBundleDigest({
       authorityModuleFile: path.join(__dirname, '..', 'src', 'runtime',
         'native-image', 'runtime-authority.js'),
@@ -613,6 +632,8 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
         'native-image', 'native-closure.js'),
       policyModuleFile: path.join(__dirname, '..', 'src', 'runtime',
         'native-image', 'container-policy.js'),
+      providerImageAuthorityModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'provider-image-authority.js'),
       tarArchiveModuleFile: path.join(__dirname, '..', 'src', 'runtime',
         'native-image', 'tar-archive.js')
     })
@@ -716,6 +737,38 @@ test('host Provider receipt requires exact running identity and canonical HTTP h
   ), error => error?.code === 'host_launcher_provider_health_failed');
 });
 
+test('Provider identity schema revisions and semantic layers cannot be downgraded or swapped', () => {
+  const a = authorityWithEdge();
+  expectCode(() => validateAuthorityRecord({
+    ...a, authoritySchemaVersion: 'codex-memory-native-runtime-authority/v1'
+  }), 'runtime_authority_record_invalid');
+  expectCode(() => validateAuthorityRecord({
+    ...a,
+    providerDaemonImageIdentity: a.providerImageConfigDigest,
+    providerImageConfigDigest: a.providerDaemonImageIdentity
+  }), 'runtime_authority_provider_identity_invalid');
+  const components = profileAuthorityComponents(a);
+  expectCode(() => require('../src/runtime/native-image/runtime-authority')
+    .validateProfileAuthorityComponents({
+      ...components,
+      profileAuthorityComponentSchemaVersion:
+        'codex-memory-profile-runtime-authority-components/v1'
+    }), 'runtime_profile_authority_components_invalid');
+  expectCode(() => require('../src/runtime/native-image/runtime-authority')
+    .validateProfileAuthorityComponents({
+      ...components,
+      providerImageConfigDigest: components.providerOciManifestDigest,
+      providerOciManifestDigest: components.providerImageConfigDigest
+    }), 'runtime_profile_authority_components_invalid');
+  const receipt = providerReceipt(a, 100);
+  expectCode(() => validateProviderReceipt({
+    ...receipt, schemaVersion: 'codex-memory-provider-runtime-receipt/v1'
+  }, a, { now: 100 }), 'runtime_provider_receipt_invalid');
+  const { providerOciManifestDigest: _missing, ...missing } = receipt;
+  expectCode(() => validateProviderReceipt(missing, a, { now: 100 }),
+    'runtime_provider_receipt_invalid');
+});
+
 test('atomic Edge receipt is non-secret, root-replaceable and runtime-readable', t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-edge-receipt-'));
   t.after(() => fs.rmSync(root, { force: true, recursive: true }));
@@ -743,7 +796,7 @@ test('schema-v6 to v7 produces candidate only and preserves state/credential ref
     privateRoot: '/srv/codex-memory/r5c',
     providerContainer: 'new-api-wsl',
     providerContainerId: a.providerContainerId,
-    providerImageId: a.providerImageIdentity,
+    providerImageId: a.providerDaemonImageIdentity,
     providerRevision: a.providerRevision,
     relayEnvironment: 'relay/runtime.env',
     relayEnvironmentConfigDigest: S('4'),
@@ -770,9 +823,18 @@ test('schema-v6 to v7 produces candidate only and preserves state/credential ref
   assert.equal(result.nextProfile.runtimeRepository, IMAGE_RUNTIME_ROOT);
   assert.equal(result.nextProfile.vcpRuntimeRepository, IMAGE_VCP_ROOT);
   assert.equal(result.nextProfile.providerContainerId, a.providerContainerId);
-  assert.equal(result.nextProfile.providerImageId, a.providerImageIdentity);
+  assert.equal(result.nextProfile.providerImageId, undefined);
+  assert.equal(result.nextProfile.providerDaemonImageIdentity,
+    a.providerDaemonImageIdentity);
+  assert.equal(result.nextProfile.providerImageConfigDigest,
+    a.providerImageConfigDigest);
+  assert.equal(result.nextProfile.providerImageStoreIdentityModel,
+    a.providerImageStoreIdentityModel);
+  assert.equal(result.nextProfile.providerOciManifestDigest,
+    a.providerOciManifestDigest);
   assert.equal(result.nextProfile.providerRevision, a.providerRevision);
-  assert.equal(result.nextProfile.providerRuntimeConfigDigest, a.providerConfigDigest);
+  assert.equal(result.nextProfile.providerRuntimeConfigDigest,
+    a.providerContainerConfigDigest);
   assert.equal(result.nextProfile.edgeRuntimeConfigDigest, a.edgeConfigDigest);
   assert.equal(containerSupervisorAuthorityMatchesProfile(result.nextProfile, a), true);
   assert.equal(validateProfile(result.nextProfile).schemaVersion, 7);

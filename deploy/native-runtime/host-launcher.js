@@ -90,6 +90,17 @@ function dockerImageInspect(id, options = {}) {
   return parsed[0];
 }
 
+function dockerProviderImageArchive(id, options = {}) {
+  const { execFile = execFileSync, docker = DOCKER } = options;
+  if (!/^sha256:[a-f0-9]{64}$/u.test(id || '')) {
+    fail('host_launcher_image_id_invalid');
+  }
+  return execFile(docker, ['image', 'save', id], {
+    encoding: null, maxBuffer: 512 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+}
+
 function dockerVolumeInspect(name, options = {}) {
   const { execFile = execFileSync, docker = DOCKER } = options;
   if (!/^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u.test(name || '')) {
@@ -212,8 +223,8 @@ function validateEdgeContainer(edge, authority) {
 
 function validateProviderContainer(provider, authority, options = {}) {
   if (provider?.Id !== authority.providerContainerId ||
-      provider?.Image !== authority.providerImageIdentity ||
-      containerConfigDigest(provider) !== authority.providerConfigDigest ||
+      provider?.Image !== authority.providerDaemonImageIdentity ||
+      containerConfigDigest(provider) !== authority.providerContainerConfigDigest ||
       provider?.Config?.Labels?.['org.opencontainers.image.revision'] !==
         authority.providerRevision ||
       authority.providerPolicyDigest !== PROVIDER_POLICY_DIGEST) {
@@ -221,7 +232,18 @@ function validateProviderContainer(provider, authority, options = {}) {
   }
   const projected = validateProviderCandidate(provider);
   const imageInspector = options.providerImageInspect || dockerImageInspect;
-  validateProviderImageCandidate(imageInspector(provider.Image, options));
+  const image = imageInspector(provider.Image, options);
+  const imageArchive = options.providerImageArchive || dockerProviderImageArchive;
+  const imageAdmission = options.providerImageAdmission || validateProviderImageCandidate;
+  const imageEvidence = imageAdmission(
+    image, imageArchive(provider.Image, options)
+  );
+  if (imageEvidence.daemonImageIdentity !== authority.providerDaemonImageIdentity ||
+      imageEvidence.imageConfigDigest !== authority.providerImageConfigDigest ||
+      imageEvidence.imageStoreIdentityModel !== authority.providerImageStoreIdentityModel ||
+      imageEvidence.ociManifestDigest !== authority.providerOciManifestDigest) {
+    fail('host_launcher_provider_image_identity_mismatch');
+  }
   const containerFile = options.containerFile || dockerContainerFile;
   validateProviderExecutableBytes(containerFile(
     provider.Id, PROVIDER_POLICY.executable, options
@@ -385,10 +407,13 @@ async function buildProviderReceipt(
     launchEpoch: bootId,
     launcherAuthorityDigest: authorityRecordDigest(authority),
     observedAt: now,
-    providerConfigDigest: authority.providerConfigDigest,
+    providerContainerConfigDigest: authority.providerContainerConfigDigest,
     providerContainerId: authority.providerContainerId,
+    providerDaemonImageIdentity: authority.providerDaemonImageIdentity,
     providerHealth: 'healthy',
-    providerImageIdentity: authority.providerImageIdentity,
+    providerImageConfigDigest: authority.providerImageConfigDigest,
+    providerImageStoreIdentityModel: authority.providerImageStoreIdentityModel,
+    providerOciManifestDigest: authority.providerOciManifestDigest,
     providerRevision: authority.providerRevision,
     schemaVersion: PROVIDER_RECEIPT_SCHEMA
   });
@@ -421,6 +446,8 @@ function verifyHostAuthority(authority, options = {}) {
     launcherFile: __filename,
     nativeClosureModuleFile: require.resolve('../../src/runtime/native-image/native-closure'),
     policyModuleFile: require.resolve('../../src/runtime/native-image/container-policy'),
+    providerImageAuthorityModuleFile:
+      require.resolve('../../src/runtime/native-image/provider-image-authority'),
     tarArchiveModuleFile: require.resolve('../../src/runtime/native-image/tar-archive')
   });
   if (installedBundleDigest !== authority.hostLauncherDigest) {
@@ -764,6 +791,7 @@ module.exports = {
   dockerContainerChanges,
   dockerInspect,
   dockerImageInspect,
+  dockerProviderImageArchive,
   dockerNetworkInspect,
   parseArguments,
   probeProviderHealth,
