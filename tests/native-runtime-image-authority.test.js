@@ -94,12 +94,17 @@ function providerEvidenceOptions(overrides = {}) {
     providerImageAdmission: () => ({
       daemonImageIdentity: PROVIDER_POLICY.daemonImageIdentity,
       imageConfigDigest: PROVIDER_POLICY.imageConfigDigest,
+      imageInheritedEnvironment: {
+        PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+      },
       imageStoreIdentityModel: PROVIDER_POLICY.imageStoreIdentityModel,
       ociManifestDigest: PROVIDER_POLICY.ociManifestDigest
     }),
     providerImageArchive: () => Buffer.alloc(0),
     providerImageInspect: () => ({
-      Architecture: 'amd64', Config: { Labels: {} },
+      Architecture: 'amd64', Config: { Env: [
+        'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+      ], Labels: {} },
       Descriptor: { digest: PROVIDER_POLICY.ociManifestDigest },
       Id: PROVIDER_POLICY.daemonImageIdentity, Os: 'linux',
       RepoDigests: [
@@ -282,6 +287,7 @@ function providerInspect(a = authority(), overrides = {}) {
   value.Id = a.providerContainerId;
   value.Image = a.providerDaemonImageIdentity;
   value.Config.Labels['org.opencontainers.image.revision'] = a.providerRevision;
+  value.State.Running = true;
   return Object.assign(value, overrides);
 }
 
@@ -430,22 +436,22 @@ test('Provider named volume is identity-bound and local bind-driver options reje
   });
   const execFile = (_binary, args) => JSON.stringify([args[0] === 'network' ? {
     Driver: 'bridge', Internal: false, Name: args[2]
-  } : { Driver: 'local', Name: args[2], Options: {} }]);
+  } : { Driver: 'local', Name: args[2], Options: {}, Scope: 'local' }]);
   assert.equal(validateProviderContainer(provider, accepted,
     providerEvidenceOptions({ execFile })), true);
   expectCode(() => validateProviderContainer(provider, accepted, {
     ...providerEvidenceOptions(),
     execFile: (_binary, args) => JSON.stringify([args[0] === 'network' ? {
       Driver: 'host', Internal: false, Name: args[2]
-    } : { Driver: 'local', Name: args[2], Options: {} }])
+    } : { Driver: 'local', Name: args[2], Options: {}, Scope: 'local' }])
   }), 'host_launcher_provider_network_authority_mismatch');
   expectCode(() => validateProviderContainer(provider, accepted, {
     ...providerEvidenceOptions(),
     execFile: (_binary, args) => JSON.stringify([args[0] === 'network' ? {
       Driver: 'bridge', Internal: false, Name: args[2]
-    } : { Driver: 'local', Name: args[2],
+    } : { Driver: 'local', Name: args[2], Scope: 'local',
       Options: { device: '/var/run', o: 'bind', type: 'none' } }])
-  }), 'host_launcher_provider_volume_authority_mismatch');
+  }), 'provider_volume_canonical_policy_mismatch');
 });
 
 test('G wrong image ID is rejected', () => {
@@ -649,7 +655,7 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
   };
   const execFile = (_binary, args) => JSON.stringify([args[0] === 'image' ? image :
     args[0] === 'network' ? { Driver: 'bridge', Internal: false, Name: args[2] } :
-      args[0] === 'volume' ? { Driver: 'local', Name: args[2], Options: {} } :
+      args[0] === 'volume' ? { Driver: 'local', Name: args[2], Options: {}, Scope: 'local' } :
         args[2] === accepted.expectedRuntimeContainerId ? runtime :
           args[2] === accepted.edgeContainerId ? edge : provider]);
   const options = {
@@ -693,7 +699,7 @@ test('host Provider receipt requires exact running identity and canonical HTTP h
   const provider = providerInspect(a);
   const execFile = (_binary, args) => JSON.stringify([args[0] === 'network' ? {
     Driver: 'bridge', Internal: false, Name: args[2]
-  } : { Driver: 'local', Name: args[2], Options: {} }]);
+  } : { Driver: 'local', Name: args[2], Options: {}, Scope: 'local' }]);
   const providerHealthProbe = async () => ({
     accepted: true,
     contractDigest: digest(require('../src/runtime/native-image/container-policy')

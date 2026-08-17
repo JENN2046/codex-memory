@@ -5,8 +5,9 @@ const { parseTarBuffer, regularFiles } = require('./tar-archive');
 
 const DOCKER_CONTAINERD_MANIFEST_IDENTITY =
   'docker-containerd-manifest-identity/v1';
-const PROVIDER_POLICY_SCHEMA = 'codex-memory-provider-container-policy/v3';
+const PROVIDER_POLICY_SCHEMA = 'codex-memory-provider-container-policy/v4';
 const SHA256 = /^sha256:[a-f0-9]{64}$/u;
+const ENVIRONMENT_NAME = /^[A-Za-z_][A-Za-z0-9_]*$/u;
 
 function fail(code) {
   const error = new Error(code);
@@ -20,6 +21,24 @@ function sha256(bytes) {
 
 function parseJson(bytes, code) {
   try { return JSON.parse(bytes.toString('utf8')); } catch { fail(code); }
+}
+
+function environmentMap(entries, code = 'provider_image_environment_invalid') {
+  if (!Array.isArray(entries) || entries.length > 256) fail(code);
+  const values = new Map();
+  for (const entry of entries) {
+    if (typeof entry !== 'string' || entry.length > 32_768 || /[\0\r\n]/u.test(entry)) {
+      fail(code);
+    }
+    const separator = entry.indexOf('=');
+    if (separator < 1) fail(code);
+    const name = entry.slice(0, separator);
+    const value = entry.slice(separator + 1);
+    if (!ENVIRONMENT_NAME.test(name) || values.has(name)) fail(code);
+    values.set(name, value);
+  }
+  return Object.freeze(Object.fromEntries([...values.entries()].sort(([left], [right]) =>
+    left.localeCompare(right))));
 }
 
 function digestPath(value) {
@@ -74,6 +93,7 @@ function validateProviderImageArchive(archiveBytes, expected) {
   if (config?.architecture !== expected.architecture || config?.os !== expected.os) {
     fail('provider_image_archive_platform_invalid');
   }
+  const imageInheritedEnvironment = environmentMap(config?.config?.Env || []);
   const allowedFiles = new Set(['index.json', 'manifest.json', 'oci-layout',
     digestPath(descriptor.digest), digestPath(manifest.config.digest)]);
   for (const layer of manifest.layers) {
@@ -104,6 +124,7 @@ function validateProviderImageArchive(archiveBytes, expected) {
   }
   return Object.freeze({
     imageConfigDigest: manifest.config.digest,
+    imageInheritedEnvironment,
     ociManifestDigest: descriptor.digest
   });
 }
@@ -139,9 +160,15 @@ function validateProviderDaemonImageObservation(image, expected) {
 function validateProviderImageAdmission(image, archiveBytes, expected) {
   const daemon = validateProviderDaemonImageObservation(image, expected);
   const archive = validateProviderImageArchive(archiveBytes, expected);
+  const observedImageEnvironment = environmentMap(image?.Config?.Env || []);
+  if (JSON.stringify(observedImageEnvironment) !==
+      JSON.stringify(archive.imageInheritedEnvironment)) {
+    fail('provider_image_environment_mismatch');
+  }
   return Object.freeze({
     daemonImageIdentity: daemon.daemonImageIdentity,
     imageConfigDigest: archive.imageConfigDigest,
+    imageInheritedEnvironment: archive.imageInheritedEnvironment,
     imageStoreIdentityModel: daemon.imageStoreIdentityModel,
     ociManifestDigest: archive.ociManifestDigest
   });
@@ -150,6 +177,7 @@ function validateProviderImageAdmission(image, archiveBytes, expected) {
 module.exports = {
   DOCKER_CONTAINERD_MANIFEST_IDENTITY,
   PROVIDER_POLICY_SCHEMA,
+  environmentMap,
   validateProviderDaemonImageObservation,
   validateProviderImageAdmission,
   validateProviderImageArchive

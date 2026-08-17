@@ -59,15 +59,19 @@ waits for bounded health, atomically emits a root-owned Edge receipt, re-verifie
 all identities, and starts the exact pre-created runtime container. Stop retains
 both containers and never stops the external Provider.
 
-Provider policy `codex-memory-provider-container-policy/v3` models the admitted
+Provider policy `codex-memory-provider-container-policy/v4` models the admitted
 historical `new-api-wsl` contract without treating its `/data` state volume as
 an execution root. It requires the exact image-local absolute `/new-api`
 entrypoint, rejects shell/interpreter indirection and every code bind mount,
-binds the exact `PORT`, `SQLITE_PATH`, and `TZ` environment contract, and admits
-only the named `/data` volume plus the loopback-only Compose network/port
+binds image-inherited environment to the exact OCI config blob, deterministically
+overlays the exact `PORT`, `SQLITE_PATH`, and `TZ` Compose contract, and admits
+Docker's empty raw propagation field only for the exact local named volume as
+the canonical `rprivate` semantic. It rejects arbitrary environment additions,
+bind mounts, non-local drivers, driver options, and all other propagation values.
+It admits only the named `/data` volume and loopback-only Compose network/port
 contract. Provider image, container, configuration, revision, policy digest,
 and volume/network identities remain independently bound by the root authority
-and host launcher. Policy v3 separately pins the portable amd64 OCI manifest,
+and host launcher. Policy v4 separately pins the portable amd64 OCI manifest,
 the config blob referenced by that manifest, the supported daemon-local image
 identity, and the container's observed image identity. On the admitted Native
 Docker/containerd store, the daemon and container identities equal the manifest

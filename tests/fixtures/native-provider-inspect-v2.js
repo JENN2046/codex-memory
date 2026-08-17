@@ -1,7 +1,7 @@
 'use strict';
 
 const HISTORICAL_PROVIDER_CONTAINER_ID =
-  '16ab6cccfad656b332ae8d27ea96fa4aaee2c1a8d132b609c3d8596e42e6426f';
+  'b029e01fa779462ef79f5bb41eec31871488cf62de836879e91ddb9edc647fa9';
 const HISTORICAL_PROVIDER_DAEMON_IMAGE_IDENTITY =
   'sha256:69aef0d276a5e00fb6f6d9f11b199fd9ec42d89a0857924547ee4249ad2094a3';
 const HISTORICAL_PROVIDER_REVISION = '6ce7305cd36f16506fb6a2c3c524a5a318539ba7';
@@ -11,9 +11,10 @@ function historicalProviderInspect(overrides = {}) {
     Config: {
       Cmd: null,
       Entrypoint: ['/new-api'],
-      Env: ['PORT=3000', 'SQLITE_PATH=/data/new-api.db', 'TZ=Asia/Shanghai'],
+      Env: ['SQLITE_PATH=/data/new-api.db', 'TZ=Asia/Shanghai', 'PORT=3000',
+        'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'],
       Healthcheck: null,
-      Image: 'calciumion/new-api:v1.0.0-rc.20',
+      Image: 'calciumion/new-api:latest',
       Labels: {
         'com.docker.compose.config-hash':
           '9dc742607c45aeff4044f5a46d0c6ea0012a5a4bbe3c1ba089993239dde8e56d',
@@ -54,13 +55,13 @@ function historicalProviderInspect(overrides = {}) {
       Driver: 'local',
       Mode: 'rw',
       Name: 'new-api-wsl-data-v1',
-      Propagation: 'rprivate',
+      Propagation: '',
       RW: true,
       Source: '/var/lib/docker/volumes/new-api-wsl-data-v1/_data',
       Type: 'volume'
     }],
     Name: '/new-api-wsl',
-    State: { Running: true }
+    State: { Running: false }
   };
   return Object.assign(value, overrides);
 }

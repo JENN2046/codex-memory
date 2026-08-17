@@ -16,7 +16,8 @@ const {
   validateBuildManifest
 } = require('../src/runtime/native-image/runtime-authority');
 const {
-  EDGE_POLICY_DIGEST,
+  EDGE_POLICY_DIGEST, PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES,
+  PROVIDER_EXECUTABLE_MAX_BYTES, PROVIDER_POLICY,
   PROVIDER_POLICY_DIGEST,
   RUNTIME_POLICY_DIGEST,
   validateEdgeCandidate,
@@ -46,12 +47,17 @@ function inspect(kind, id) {
   return parsed[0];
 }
 function containerFile(id, source) {
+  const providerExecutable = source === PROVIDER_POLICY.executable;
+  const maximumFileBytes = providerExecutable
+    ? PROVIDER_EXECUTABLE_MAX_BYTES : 32 * 1024 * 1024;
+  const maximumArchiveBytes = providerExecutable
+    ? PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES : 8 * 1024 * 1024;
   const buffer = execFileSync('/usr/bin/docker', ['container', 'cp', `${id}:${source}`, '-'], {
-    encoding: null, maxBuffer: 8 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe']
+    encoding: null, maxBuffer: maximumArchiveBytes, stdio: ['ignore', 'pipe', 'pipe']
   });
   const files = regularFiles(parseTarBuffer(buffer, {
-    maximumEntries: 8, maximumFileBytes: 32 * 1024 * 1024,
-    maximumTotalBytes: 32 * 1024 * 1024
+    maximumEntries: 8, maximumFileBytes,
+    maximumTotalBytes: maximumFileBytes
   }));
   if (files.size !== 1) fail('runtime_authority_container_file_invalid');
   return [...files.values()][0].content;
@@ -157,10 +163,13 @@ function main(argv = process.argv.slice(2)) {
     primaryStateDestination: stateMountContract.containerPath
   });
   validateEdgeCandidate(edge);
-  validateProviderCandidate(provider);
   const providerImageEvidence = validateProviderImageCandidate(
     providerImage, imageArchive(provider.Image)
   );
+  const providerVolume = inspect('volume', PROVIDER_POLICY.stateMount.name);
+  validateProviderCandidate(provider, providerImageEvidence, {
+    volumeObservation: providerVolume
+  });
   validateProviderExecutableBytes(containerFile(provider.Id, '/new-api'));
   validateProviderContainerChanges(containerChanges(provider.Id));
   const providerRevision = provider?.Config?.Labels?.['org.opencontainers.image.revision'];
