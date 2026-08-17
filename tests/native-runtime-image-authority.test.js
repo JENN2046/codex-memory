@@ -53,6 +53,10 @@ const {
   validateStableHostMountSource,
   verifyHostAuthority
 } = require('../deploy/native-runtime/host-launcher');
+const {
+  HISTORICAL_PROVIDER_REVISION,
+  historicalProviderInspect
+} = require('./fixtures/native-provider-inspect-v2');
 
 const S = value => `sha256:${String(value).repeat(64).slice(0, 64)}`;
 const C = value => String(value).repeat(40).slice(0, 40);
@@ -206,7 +210,7 @@ function authority(inspect = baseInspect(), overrides = {}) {
     providerContainerId: I('8'),
     providerImageIdentity: S('8'),
     providerPolicyDigest: PROVIDER_POLICY_DIGEST,
-    providerRevision: C('8'),
+    providerRevision: HISTORICAL_PROVIDER_REVISION,
     rootfsChainDigest: digest([S('4'), S('5')]),
     runtimeMountSources: SOURCES,
     runtimePolicyDigest: RUNTIME_POLICY_DIGEST,
@@ -239,20 +243,11 @@ function edgeInspect(a = authority(), overrides = {}) {
 }
 
 function providerInspect(a = authority(), overrides = {}) {
-  return {
-    Config: { Cmd: [], Entrypoint: [], Env: [], Labels: {
-      'org.opencontainers.image.revision': a.providerRevision
-    }, User: '1000:1000' },
-    HostConfig: {
-      CapAdd: [], CapDrop: [], CgroupnsMode: '', Devices: [], DeviceRequests: [],
-      IpcMode: 'private', LogConfig: { Type: 'json-file' }, NetworkMode: 'bridge',
-      PidMode: '', PortBindings: { '3000/tcp': [{ HostIp: '127.0.0.1', HostPort: '3000' }] },
-      Privileged: false, ReadonlyRootfs: false, RestartPolicy: { Name: 'always' },
-      SecurityOpt: [], Tmpfs: {}, UsernsMode: '', UTSMode: ''
-    },
-    Id: a.providerContainerId, Image: a.providerImageIdentity, Mounts: [],
-    State: { Health: { Status: 'healthy' }, Running: true }, ...overrides
-  };
+  const value = historicalProviderInspect();
+  value.Id = a.providerContainerId;
+  value.Image = a.providerImageIdentity;
+  value.Config.Labels['org.opencontainers.image.revision'] = a.providerRevision;
+  return Object.assign(value, overrides);
 }
 
 function authorityWithEdge(inspect = baseInspect()) {
@@ -388,18 +383,22 @@ test('stable host mount source rejects lexical aliases and symlink replacement',
 test('Provider named volume is identity-bound and local bind-driver options reject', () => {
   const base = authority();
   const provider = providerInspect(base);
-  provider.Config.Entrypoint = ['/usr/local/bin/new-api'];
-  provider.Mounts = [{ Destination: '/data', Name: 'provider-state',
-    Propagation: 'rprivate', RW: true, Source: 'provider-state', Type: 'volume' }];
   const accepted = authority(baseInspect(), {
     providerConfigDigest: containerConfigDigest(provider)
   });
-  const execFile = (_binary, args) => JSON.stringify([{
-    Driver: 'local', Name: args[2], Options: {}
-  }]);
+  const execFile = (_binary, args) => JSON.stringify([args[0] === 'network' ? {
+    Driver: 'bridge', Internal: false, Name: args[2]
+  } : { Driver: 'local', Name: args[2], Options: {} }]);
   assert.equal(validateProviderContainer(provider, accepted, { execFile }), true);
   expectCode(() => validateProviderContainer(provider, accepted, {
-    execFile: (_binary, args) => JSON.stringify([{ Driver: 'local', Name: args[2],
+    execFile: (_binary, args) => JSON.stringify([args[0] === 'network' ? {
+      Driver: 'host', Internal: false, Name: args[2]
+    } : { Driver: 'local', Name: args[2], Options: {} }])
+  }), 'host_launcher_provider_network_authority_mismatch');
+  expectCode(() => validateProviderContainer(provider, accepted, {
+    execFile: (_binary, args) => JSON.stringify([args[0] === 'network' ? {
+      Driver: 'bridge', Internal: false, Name: args[2]
+    } : { Driver: 'local', Name: args[2],
       Options: { device: '/var/run', o: 'bind', type: 'none' } }])
   }), 'host_launcher_provider_volume_authority_mismatch');
 });
@@ -602,8 +601,10 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
     RootFS: { Layers: [S('4'), S('5')] }
   };
   const execFile = (_binary, args) => JSON.stringify([args[0] === 'image' ? image :
-    args[2] === accepted.expectedRuntimeContainerId ? runtime :
-      args[2] === accepted.edgeContainerId ? edge : provider]);
+    args[0] === 'network' ? { Driver: 'bridge', Internal: false, Name: args[2] } :
+      args[0] === 'volume' ? { Driver: 'local', Name: args[2], Options: {} } :
+        args[2] === accepted.expectedRuntimeContainerId ? runtime :
+          args[2] === accepted.edgeContainerId ? edge : provider]);
   const options = {
     containerFile: () => Buffer.from(JSON.stringify(nativeClosure())),
     execFile, requireRootFiles: false,
@@ -636,6 +637,53 @@ test('host Edge receipt is derived from exact healthy Edge inspection', () => {
   const edge = edgeInspect(a);
   const receipt = buildEdgeReceipt(edge, a, 'boot-identity-0001', 1_700_000_000_000);
   assert.equal(receipt.edgeContainerId, a.edgeContainerId);
+});
+
+test('host Provider receipt requires exact running identity and canonical HTTP health', async () => {
+  const a = authorityWithEdge();
+  const provider = providerInspect(a);
+  const execFile = (_binary, args) => JSON.stringify([args[0] === 'network' ? {
+    Driver: 'bridge', Internal: false, Name: args[2]
+  } : { Driver: 'local', Name: args[2], Options: {} }]);
+  const providerHealthProbe = async () => ({
+    accepted: true,
+    contractDigest: digest(require('../src/runtime/native-image/container-policy')
+      .PROVIDER_POLICY.health),
+    providerHealth: 'healthy',
+    statusCode: 200
+  });
+  const receipt = await buildProviderReceipt(
+    provider, a, 'boot-identity-0001', 1_700_000_000_000,
+    { execFile, providerHealthProbe }
+  );
+  assert.equal(receipt.providerHealth, 'healthy');
+  assert.equal(receipt.providerContainerId, a.providerContainerId);
+
+  const stopped = providerInspect(a);
+  stopped.State.Running = false;
+  await assert.rejects(buildProviderReceipt(
+    stopped, a, 'boot-identity-0001', 1_700_000_000_000,
+    { execFile, providerHealthProbe }
+  ), error => error?.code === 'host_launcher_provider_not_running');
+
+  const replacement = providerInspect(a);
+  replacement.Id = I('0');
+  await assert.rejects(buildProviderReceipt(
+    replacement, a, 'boot-identity-0001', 1_700_000_000_000,
+    { execFile, providerHealthProbe }
+  ), error => error?.code === 'host_launcher_provider_identity_mismatch');
+
+  const wrongImage = providerInspect(a);
+  wrongImage.Image = S('0');
+  await assert.rejects(buildProviderReceipt(
+    wrongImage, a, 'boot-identity-0001', 1_700_000_000_000,
+    { execFile, providerHealthProbe }
+  ), error => error?.code === 'host_launcher_provider_identity_mismatch');
+
+  await assert.rejects(buildProviderReceipt(
+    provider, a, 'boot-identity-0001', 1_700_000_000_000,
+    { execFile, providerHealthProbe: async () => ({ accepted: false }) }
+  ), error => error?.code === 'host_launcher_provider_health_failed');
 });
 
 test('atomic Edge receipt is non-secret, root-replaceable and runtime-readable', t => {

@@ -11,7 +11,7 @@ const {
 
 const RUNTIME_POLICY_VERSION = 'codex-memory-runtime-container-policy/v2';
 const EDGE_POLICY_VERSION = 'codex-memory-edge-container-policy/v1';
-const PROVIDER_POLICY_VERSION = 'codex-memory-provider-container-policy/v1';
+const PROVIDER_POLICY_VERSION = 'codex-memory-provider-container-policy/v2';
 const PROFILE_PATH = '/run/codex-memory/profile.json';
 const PROVIDER_ENV_PATH = '/run/secrets/codex-memory-vcp-provider.env';
 const RUNTIME_DATA_PATH = '/run/codex-memory-runtime-data';
@@ -28,7 +28,43 @@ const EDGE_POLICY = Object.freeze({
   restartPolicy: 'no', schemaVersion: EDGE_POLICY_VERSION
 });
 const PROVIDER_POLICY = Object.freeze({
-  networkMode: 'bridge', privileged: false, schemaVersion: PROVIDER_POLICY_VERSION
+  composeConfigHash: '9dc742607c45aeff4044f5a46d0c6ea0012a5a4bbe3c1ba089993239dde8e56d',
+  composeProject: 'new-api-wsl',
+  composeService: 'new-api',
+  containerName: '/new-api-wsl',
+  environment: Object.freeze({
+    PORT: '3000',
+    SQLITE_PATH: '/data/new-api.db',
+    TZ: 'Asia/Shanghai'
+  }),
+  dockerHealthcheck: 'absent',
+  executable: '/new-api',
+  health: Object.freeze({
+    hostname: '127.0.0.1',
+    maximumBodyBytes: 16_384,
+    maximumHeaderBytes: 8_192,
+    method: 'GET',
+    path: '/api/status',
+    port: 3000,
+    redirects: false,
+    requiredStatus: 200,
+    timeoutMs: 2_000
+  }),
+  imageRevision: '6ce7305cd36f16506fb6a2c3c524a5a318539ba7',
+  imageSource: 'https://github.com/QuantumNous/new-api',
+  imageVersion: 'v1.0.0-rc.20',
+  networkDriver: 'bridge',
+  networkMode: 'new-api-wsl_default',
+  privileged: false,
+  restartPolicy: 'unless-stopped',
+  schemaVersion: PROVIDER_POLICY_VERSION,
+  stateMount: Object.freeze({
+    destination: '/data',
+    name: 'new-api-wsl-data-v1',
+    readWrite: true,
+    type: 'volume'
+  }),
+  workingDirectory: '/data'
 });
 
 function fail(code) { const error = new Error(code); error.code = code; throw error; }
@@ -151,23 +187,39 @@ function validateEdgeCandidate(inspect) {
 function validateProviderCandidate(inspect) {
   const value = projectContainerConfig(inspect);
   requireNoDangerousHostSurface(value, 'provider_container_canonical_policy_mismatch');
-  const stateMountOnly = value.mounts.length <= 1 && value.mounts.every(mount =>
-    mount.destination === '/data' && mount.type === 'volume' &&
-    /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u.test(mount.name) &&
-    mount.propagation === 'rprivate');
-  const executionSurface = [value.workingDirectory, ...value.command,
-    ...value.entrypoint, ...value.environment];
-  const dataPath = item => typeof item !== 'string' ||
-    /(^|[^A-Za-z0-9_.-])\/data(?:\/|$)/u.test(item) ||
-    (item.startsWith('/') && path.posix.normalize(item) === '/data');
-  const executable = [...value.entrypoint, ...value.command][0] || '';
-  const interpreter = path.posix.basename(executable);
-  if (value.networkMode !== 'bridge' ||
+  const expectedMount = PROVIDER_POLICY.stateMount;
+  const stateMountOnly = value.mounts.length === 1 && value.mounts.every(mount =>
+    mount.destination === expectedMount.destination &&
+    mount.type === expectedMount.type && mount.name === expectedMount.name &&
+    mount.rw === expectedMount.readWrite && mount.propagation === 'rprivate');
+  const executable = value.entrypoint.length > 0 ? value.entrypoint[0] : value.command[0];
+  const executableAbsolute = typeof executable === 'string' && executable.startsWith('/') &&
+    path.posix.normalize(executable) === executable;
+  const executableInState = executableAbsolute &&
+    (executable === expectedMount.destination ||
+      executable.startsWith(`${expectedMount.destination}/`));
+  const interpreter = path.posix.basename(executable || '');
+  const indirectInterpreter = [
+    'sh', 'bash', 'dash', 'env', 'node', 'nodejs', 'python', 'python3'
+  ].includes(interpreter);
+  const environment = envObject(value.environment);
+  const labels = value.labels || {};
+  if (value.networkMode !== PROVIDER_POLICY.networkMode ||
       !loopbackBinding(value.portBindings, '3000/tcp', '3000') ||
-      inspect?.State?.Running !== true || inspect?.State?.Health?.Status !== 'healthy' ||
-      !stateMountOnly || executionSurface.some(dataPath) ||
-      (value.mounts.length === 1 &&
-        ['sh', 'bash', 'dash', 'env', 'node', 'python', 'python3'].includes(interpreter))) {
+      inspect?.Name !== PROVIDER_POLICY.containerName ||
+      value.privileged || value.restartPolicy !== PROVIDER_POLICY.restartPolicy ||
+      (PROVIDER_POLICY.dockerHealthcheck === 'absent' && value.healthcheck !== null) ||
+      value.workingDirectory !== PROVIDER_POLICY.workingDirectory ||
+      !same(value.entrypoint, [PROVIDER_POLICY.executable]) ||
+      !same(value.command, []) || !executableAbsolute || executableInState ||
+      indirectInterpreter || !stateMountOnly ||
+      !same(environment, PROVIDER_POLICY.environment) ||
+      labels['com.docker.compose.project'] !== PROVIDER_POLICY.composeProject ||
+      labels['com.docker.compose.service'] !== PROVIDER_POLICY.composeService ||
+      labels['com.docker.compose.config-hash'] !== PROVIDER_POLICY.composeConfigHash ||
+      labels['org.opencontainers.image.revision'] !== PROVIDER_POLICY.imageRevision ||
+      labels['org.opencontainers.image.source'] !== PROVIDER_POLICY.imageSource ||
+      labels['org.opencontainers.image.version'] !== PROVIDER_POLICY.imageVersion) {
     fail('provider_container_canonical_policy_mismatch');
   }
   return Object.freeze(value);

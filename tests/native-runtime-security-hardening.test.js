@@ -38,6 +38,10 @@ const { requireLifecycleLock, runUnderLifecycleLock } = require(
   '../deploy/native-runtime/host-launcher'
 );
 const { nativeFiles } = require('../scripts/verify-native-elf-closure');
+const {
+  HISTORICAL_PROVIDER_REVISION,
+  historicalProviderInspect
+} = require('./fixtures/native-provider-inspect-v2');
 
 const S = value => `sha256:${String(value).repeat(64).slice(0, 64)}`;
 const C = value => String(value).repeat(40).slice(0, 40);
@@ -257,15 +261,7 @@ function edgeInspect() {
     State: { Health: { Status: 'healthy' }, Running: true } };
 }
 function providerInspect() {
-  return { Config: { Cmd: [], Entrypoint: [], Env: [], Labels: {
-    'org.opencontainers.image.revision': C('3') }, User: '1000:1000' },
-  HostConfig: { CapAdd: [], CapDrop: [], CgroupnsMode: '', Devices: [], DeviceRequests: [],
-    IpcMode: 'private', LogConfig: { Type: 'json-file' }, NetworkMode: 'bridge',
-    PidMode: '', PortBindings: { '3000/tcp': [{ HostIp: '127.0.0.1', HostPort: '3000' }] },
-    Privileged: false, ReadonlyRootfs: false, RestartPolicy: { Name: 'always' },
-    SecurityOpt: [], Tmpfs: {}, UsernsMode: '', UTSMode: '' },
-  Id: I('3'), Image: S('3'), Mounts: [],
-  State: { Health: { Status: 'healthy' }, Running: true } };
+  return historicalProviderInspect();
 }
 
 test('independent canonical policies admit exact Runtime, Edge and Provider', () => {
@@ -274,17 +270,16 @@ test('independent canonical policies admit exact Runtime, Edge and Provider', ()
   validateEdgeCandidate(edgeInspect());
   validateProviderCandidate(providerInspect());
 });
-test('Provider policy requires Docker health and forbids mutable application mounts', () => {
+test('Provider identity policy is independent of Docker health and forbids code mounts', () => {
+  const withoutHealth = providerInspect();
+  delete withoutHealth.State.Health;
+  validateProviderCandidate(withoutHealth);
   for (const mutate of [
-    value => { delete value.State.Health; },
-    value => { value.State.Health.Status = 'unhealthy'; },
     value => value.Mounts.push({ Destination: '/app', Propagation: 'rprivate',
       RW: true, Source: '/mutable/provider-code', Type: 'bind' }),
-    value => { value.Mounts.push({ Destination: '/data', Propagation: 'rprivate',
-      RW: true, Source: 'provider-state', Type: 'volume' });
-    value.Config.Cmd = ['node', '/data/app/provider.js']; },
-    value => value.Mounts.push({ Destination: '/data', Propagation: 'rprivate',
-      RW: true, Source: '/proc/1/root/run/docker.sock', Type: 'bind' })
+    value => { value.Config.Entrypoint = ['/data/new-api']; },
+    value => { value.Mounts[0] = { Destination: '/data', Propagation: 'rprivate',
+      RW: true, Source: '/proc/1/root/run/docker.sock', Type: 'bind' }; }
   ]) {
     const value = providerInspect(); mutate(value);
     expectCode(() => validateProviderCandidate(value),
@@ -445,7 +440,8 @@ function authority() {
     profileSchemaVersion: 7, profileSha256: S('9'),
     providerConfigDigest: containerConfigDigest(provider), providerContainerId: provider.Id,
     providerImageIdentity: provider.Image, providerPolicyDigest: PROVIDER_POLICY_DIGEST,
-    providerRevision: C('3'), rootfsChainDigest: S('a'), runtimeMountSources: SOURCES,
+    providerRevision: HISTORICAL_PROVIDER_REVISION,
+    rootfsChainDigest: S('a'), runtimeMountSources: SOURCES,
     runtimePolicyDigest: RUNTIME_POLICY_DIGEST, stateMountContract: state,
     stateMountContractDigest: digest(state), vcpCommit: C('2')
   });
