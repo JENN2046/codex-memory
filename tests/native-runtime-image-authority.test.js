@@ -748,8 +748,20 @@ test('Provider identity schema revisions and semantic layers cannot be downgrade
     providerImageConfigDigest: a.providerDaemonImageIdentity
   }), 'runtime_authority_provider_identity_invalid');
   expectCode(() => validateAuthorityRecord({
+    ...a,
+    providerContainerConfigDigest: a.providerImageConfigDigest,
+    providerImageConfigDigest: a.providerContainerConfigDigest
+  }), 'runtime_authority_provider_identity_invalid');
+  expectCode(() => validateAuthorityRecord({
     ...a, providerImageIdentity: a.providerDaemonImageIdentity
   }), 'runtime_authority_record_invalid');
+  for (const field of ['providerDaemonImageIdentity', 'providerImageConfigDigest',
+    'providerOciManifestDigest']) {
+    const missingIdentity = { ...a };
+    delete missingIdentity[field];
+    expectCode(() => validateAuthorityRecord(missingIdentity),
+      'runtime_authority_record_invalid');
+  }
   const components = profileAuthorityComponents(a);
   expectCode(() => require('../src/runtime/native-image/runtime-authority')
     .validateProfileAuthorityComponents({
@@ -767,9 +779,13 @@ test('Provider identity schema revisions and semantic layers cannot be downgrade
   expectCode(() => validateProviderReceipt({
     ...receipt, schemaVersion: 'codex-memory-provider-runtime-receipt/v1'
   }, a, { now: 100 }), 'runtime_provider_receipt_invalid');
-  const { providerOciManifestDigest: _missing, ...missing } = receipt;
-  expectCode(() => validateProviderReceipt(missing, a, { now: 100 }),
-    'runtime_provider_receipt_invalid');
+  for (const field of ['providerDaemonImageIdentity', 'providerImageConfigDigest',
+    'providerOciManifestDigest']) {
+    const missingIdentity = { ...receipt };
+    delete missingIdentity[field];
+    expectCode(() => validateProviderReceipt(missingIdentity, a, { now: 100 }),
+      'runtime_provider_receipt_invalid');
+  }
   expectCode(() => validateProviderReceipt({
     ...receipt, providerDaemonImageIdentity: S('0')
   }, a, { now: 100 }), 'runtime_provider_receipt_identity_mismatch');
