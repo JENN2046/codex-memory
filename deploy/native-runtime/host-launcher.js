@@ -22,7 +22,8 @@ const {
 } = require('../../src/runtime/native-image/runtime-authority');
 const {
   EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
-  validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
+  validateEdgeCandidate, validateProviderCandidate, validateProviderContainerChanges,
+  validateProviderExecutableBytes, validateProviderImageCandidate, validateRuntimeCandidate
 } = require('../../src/runtime/native-image/container-policy');
 const { nativeClosureDigest, validateNativeClosure, verifyNativeClosureBytes } = require(
   '../../src/runtime/native-image/native-closure'
@@ -135,6 +136,21 @@ function dockerContainerFile(id, source, options = {}) {
   return [...files.values()][0].content;
 }
 
+function dockerContainerChanges(id, options = {}) {
+  const { execFile = execFileSync, docker = DOCKER } = options;
+  if (!CONTAINER_ID.test(id || '')) fail('host_launcher_container_id_invalid');
+  const output = execFile(docker, ['container', 'diff', id], {
+    encoding: 'utf8', maxBuffer: 4 * 1024 * 1024,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  if (typeof output !== 'string') fail('host_launcher_container_diff_invalid');
+  return output.trim() === '' ? [] : output.trimEnd().split('\n').map(line => {
+    const match = /^([ACD]) (\/.+)$/u.exec(line);
+    if (!match) fail('host_launcher_container_diff_invalid');
+    return Object.freeze({ kind: match[1], path: match[2] });
+  });
+}
+
 function validateStableHostMountSource(source, {
   allowedRoots = STABLE_MOUNT_ROOTS,
   fsModule = fs,
@@ -204,6 +220,14 @@ function validateProviderContainer(provider, authority, options = {}) {
     fail('host_launcher_provider_identity_mismatch');
   }
   const projected = validateProviderCandidate(provider);
+  const imageInspector = options.providerImageInspect || dockerImageInspect;
+  validateProviderImageCandidate(imageInspector(provider.Image, options));
+  const containerFile = options.containerFile || dockerContainerFile;
+  validateProviderExecutableBytes(containerFile(
+    provider.Id, PROVIDER_POLICY.executable, options
+  ));
+  const containerChanges = options.providerContainerChanges || dockerContainerChanges;
+  validateProviderContainerChanges(containerChanges(provider.Id, options));
   const network = dockerNetworkInspect(projected.networkMode, options);
   if (network?.Name !== projected.networkMode ||
       network?.Driver !== PROVIDER_POLICY.networkDriver ||
@@ -737,6 +761,7 @@ module.exports = {
   activateAuthority,
   buildEdgeReceipt,
   buildProviderReceipt,
+  dockerContainerChanges,
   dockerInspect,
   dockerImageInspect,
   dockerNetworkInspect,

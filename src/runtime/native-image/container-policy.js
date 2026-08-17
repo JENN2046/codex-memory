@@ -50,6 +50,10 @@ const PROVIDER_POLICY = Object.freeze({
     requiredStatus: 200,
     timeoutMs: 2_000
   }),
+  imageConfigId: 'sha256:8ca23f4e6c9ff728e7ad277fbe2538f7a5a43ea40a26c23b04c0d6b48208c018',
+  imageManifestDigest:
+    'sha256:69aef0d276a5e00fb6f6d9f11b199fd9ec42d89a0857924547ee4249ad2094a3',
+  imageRepository: 'calciumion/new-api',
   imageRevision: '6ce7305cd36f16506fb6a2c3c524a5a318539ba7',
   imageSource: 'https://github.com/QuantumNous/new-api',
   imageVersion: 'v1.0.0-rc.20',
@@ -204,7 +208,8 @@ function validateProviderCandidate(inspect) {
   ].includes(interpreter);
   const environment = envObject(value.environment);
   const labels = value.labels || {};
-  if (value.networkMode !== PROVIDER_POLICY.networkMode ||
+  if (inspect?.Image !== PROVIDER_POLICY.imageConfigId ||
+      value.networkMode !== PROVIDER_POLICY.networkMode ||
       !loopbackBinding(value.portBindings, '3000/tcp', '3000') ||
       inspect?.Name !== PROVIDER_POLICY.containerName ||
       value.privileged || value.restartPolicy !== PROVIDER_POLICY.restartPolicy ||
@@ -225,6 +230,39 @@ function validateProviderCandidate(inspect) {
   return Object.freeze(value);
 }
 
+function validateProviderImageCandidate(image) {
+  const expectedRepositoryDigest =
+    `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.imageManifestDigest}`;
+  if (image?.Id !== PROVIDER_POLICY.imageConfigId ||
+      !Array.isArray(image?.RepoDigests) ||
+      !image.RepoDigests.includes(expectedRepositoryDigest)) {
+    fail('provider_image_canonical_policy_mismatch');
+  }
+  return true;
+}
+
+function validateProviderExecutableBytes(bytes) {
+  if (!Buffer.isBuffer(bytes) || bytes.length < 64 ||
+      bytes[0] !== 0x7f || bytes.subarray(1, 4).toString('ascii') !== 'ELF' ||
+      bytes[4] !== 2 || bytes[5] !== 1 || bytes.readUInt16LE(18) !== 62) {
+    fail('provider_executable_image_authority_mismatch');
+  }
+  return true;
+}
+
+function validateProviderContainerChanges(changes) {
+  if (!Array.isArray(changes)) fail('provider_container_changes_invalid');
+  const stateRoot = PROVIDER_POLICY.stateMount.destination;
+  for (const change of changes) {
+    const target = path.posix.normalize(change?.path || '');
+    if (!['A', 'C', 'D'].includes(change?.kind) || !target.startsWith('/') ||
+        (target !== stateRoot && !target.startsWith(`${stateRoot}/`))) {
+      fail('provider_executable_image_authority_mismatch');
+    }
+  }
+  return true;
+}
+
 const RUNTIME_POLICY_DIGEST = digest(RUNTIME_POLICY);
 const EDGE_POLICY_DIGEST = digest(EDGE_POLICY);
 const PROVIDER_POLICY_DIGEST = digest(PROVIDER_POLICY);
@@ -233,5 +271,6 @@ module.exports = {
   EDGE_POLICY, EDGE_POLICY_DIGEST, EDGE_POLICY_VERSION,
   PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, PROVIDER_POLICY_VERSION,
   RUNTIME_POLICY, RUNTIME_POLICY_DIGEST, RUNTIME_POLICY_VERSION,
-  validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
+  validateEdgeCandidate, validateProviderCandidate, validateProviderContainerChanges,
+  validateProviderExecutableBytes, validateProviderImageCandidate, validateRuntimeCandidate
 };

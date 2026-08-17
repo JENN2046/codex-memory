@@ -31,7 +31,7 @@ const {
   validateRuntimeSelfEvidence
 } = require('../src/runtime/native-image/runtime-authority');
 const {
-  EDGE_POLICY_DIGEST, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
+  EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
   validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
 } = require('../src/runtime/native-image/container-policy');
 const {
@@ -77,6 +77,29 @@ const SOURCES = Object.freeze({
   providerReceipt: '/run/codex-memory/provider-receipt.json',
   runtimeDirectory: '/var/lib/codex-memory/runtime'
 });
+
+function providerElf() {
+  const value = Buffer.alloc(64);
+  value.writeUInt32BE(0x7f454c46, 0);
+  value[4] = 2;
+  value[5] = 1;
+  value.writeUInt16LE(62, 18);
+  return value;
+}
+
+function providerEvidenceOptions(overrides = {}) {
+  return {
+    containerFile: () => providerElf(),
+    providerContainerChanges: () => [],
+    providerImageInspect: () => ({
+      Id: PROVIDER_POLICY.imageConfigId,
+      RepoDigests: [
+        `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.imageManifestDigest}`
+      ]
+    }),
+    ...overrides
+  };
+}
 
 function nativeClosure() {
   const artifact = (nativePath, nativeSha, marker) => ({
@@ -208,7 +231,7 @@ function authority(inspect = baseInspect(), overrides = {}) {
     profileSha256: sha256Buffer(PROFILE_BYTES),
     providerConfigDigest: S('8'),
     providerContainerId: I('8'),
-    providerImageIdentity: S('8'),
+    providerImageIdentity: PROVIDER_POLICY.imageConfigId,
     providerPolicyDigest: PROVIDER_POLICY_DIGEST,
     providerRevision: HISTORICAL_PROVIDER_REVISION,
     rootfsChainDigest: digest([S('4'), S('5')]),
@@ -389,13 +412,16 @@ test('Provider named volume is identity-bound and local bind-driver options reje
   const execFile = (_binary, args) => JSON.stringify([args[0] === 'network' ? {
     Driver: 'bridge', Internal: false, Name: args[2]
   } : { Driver: 'local', Name: args[2], Options: {} }]);
-  assert.equal(validateProviderContainer(provider, accepted, { execFile }), true);
+  assert.equal(validateProviderContainer(provider, accepted,
+    providerEvidenceOptions({ execFile })), true);
   expectCode(() => validateProviderContainer(provider, accepted, {
+    ...providerEvidenceOptions(),
     execFile: (_binary, args) => JSON.stringify([args[0] === 'network' ? {
       Driver: 'host', Internal: false, Name: args[2]
     } : { Driver: 'local', Name: args[2], Options: {} }])
   }), 'host_launcher_provider_network_authority_mismatch');
   expectCode(() => validateProviderContainer(provider, accepted, {
+    ...providerEvidenceOptions(),
     execFile: (_binary, args) => JSON.stringify([args[0] === 'network' ? {
       Driver: 'bridge', Internal: false, Name: args[2]
     } : { Driver: 'local', Name: args[2],
@@ -606,7 +632,9 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
         args[2] === accepted.expectedRuntimeContainerId ? runtime :
           args[2] === accepted.edgeContainerId ? edge : provider]);
   const options = {
-    containerFile: () => Buffer.from(JSON.stringify(nativeClosure())),
+    ...providerEvidenceOptions(),
+    containerFile: (_id, source) => source === PROVIDER_POLICY.executable
+      ? providerElf() : Buffer.from(JSON.stringify(nativeClosure())),
     execFile, requireRootFiles: false,
     verifyNativeClosureBytes: value => validateNativeClosure(value)
   };
@@ -654,7 +682,7 @@ test('host Provider receipt requires exact running identity and canonical HTTP h
   });
   const receipt = await buildProviderReceipt(
     provider, a, 'boot-identity-0001', 1_700_000_000_000,
-    { execFile, providerHealthProbe }
+    providerEvidenceOptions({ execFile, providerHealthProbe })
   );
   assert.equal(receipt.providerHealth, 'healthy');
   assert.equal(receipt.providerContainerId, a.providerContainerId);
@@ -663,26 +691,28 @@ test('host Provider receipt requires exact running identity and canonical HTTP h
   stopped.State.Running = false;
   await assert.rejects(buildProviderReceipt(
     stopped, a, 'boot-identity-0001', 1_700_000_000_000,
-    { execFile, providerHealthProbe }
+    providerEvidenceOptions({ execFile, providerHealthProbe })
   ), error => error?.code === 'host_launcher_provider_not_running');
 
   const replacement = providerInspect(a);
   replacement.Id = I('0');
   await assert.rejects(buildProviderReceipt(
     replacement, a, 'boot-identity-0001', 1_700_000_000_000,
-    { execFile, providerHealthProbe }
+    providerEvidenceOptions({ execFile, providerHealthProbe })
   ), error => error?.code === 'host_launcher_provider_identity_mismatch');
 
   const wrongImage = providerInspect(a);
   wrongImage.Image = S('0');
   await assert.rejects(buildProviderReceipt(
     wrongImage, a, 'boot-identity-0001', 1_700_000_000_000,
-    { execFile, providerHealthProbe }
+    providerEvidenceOptions({ execFile, providerHealthProbe })
   ), error => error?.code === 'host_launcher_provider_identity_mismatch');
 
   await assert.rejects(buildProviderReceipt(
     provider, a, 'boot-identity-0001', 1_700_000_000_000,
-    { execFile, providerHealthProbe: async () => ({ accepted: false }) }
+    providerEvidenceOptions({
+      execFile, providerHealthProbe: async () => ({ accepted: false })
+    })
   ), error => error?.code === 'host_launcher_provider_health_failed');
 });
 

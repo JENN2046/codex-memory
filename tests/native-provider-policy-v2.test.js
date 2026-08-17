@@ -7,7 +7,10 @@ const {
   PROVIDER_POLICY,
   PROVIDER_POLICY_DIGEST,
   PROVIDER_POLICY_VERSION,
-  validateProviderCandidate
+  validateProviderCandidate,
+  validateProviderContainerChanges,
+  validateProviderExecutableBytes,
+  validateProviderImageCandidate
 } = require('../src/runtime/native-image/container-policy');
 const { digest } = require('../src/runtime/native-image/runtime-authority');
 const { probeProviderHealth } = require('../deploy/native-runtime/host-launcher');
@@ -18,6 +21,15 @@ function expectPolicyReject(mutate) {
   mutate(value);
   assert.throws(() => validateProviderCandidate(value), error =>
     error?.code === 'provider_container_canonical_policy_mismatch');
+}
+
+function executableElf() {
+  const value = Buffer.alloc(64);
+  value.writeUInt32BE(0x7f454c46, 0);
+  value[4] = 2;
+  value[5] = 1;
+  value.writeUInt16LE(62, 18);
+  return value;
 }
 
 function requestFixture({
@@ -55,6 +67,10 @@ function requestFixture({
 test('Provider policy v2 has a new digest-bound schema', () => {
   assert.equal(PROVIDER_POLICY_VERSION, 'codex-memory-provider-container-policy/v2');
   assert.equal(PROVIDER_POLICY.dockerHealthcheck, 'absent');
+  assert.equal(PROVIDER_POLICY.imageConfigId,
+    'sha256:8ca23f4e6c9ff728e7ad277fbe2538f7a5a43ea40a26c23b04c0d6b48208c018');
+  assert.equal(PROVIDER_POLICY.imageManifestDigest,
+    'sha256:69aef0d276a5e00fb6f6d9f11b199fd9ec42d89a0857924547ee4249ad2094a3');
   assert.equal(PROVIDER_POLICY_DIGEST, digest(PROVIDER_POLICY));
   assert.notEqual(PROVIDER_POLICY_DIGEST,
     'sha256:cf4ce5edf3de9f47725d7603ec4fd4acb5b4f9e6e232077c837636aee4d24e46');
@@ -149,6 +165,54 @@ test('unexpected Docker HEALTHCHECK configuration is rejected as config drift', 
 
 test('unexpected environment capable of module loading is rejected', () => {
   expectPolicyReject(value => value.Config.Env.push('NODE_PATH=/data/plugins'));
+});
+
+test('exact historical image config and platform manifest are admitted', () => {
+  assert.equal(validateProviderImageCandidate({
+    Id: PROVIDER_POLICY.imageConfigId,
+    RepoDigests: [
+      `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.imageManifestDigest}`
+    ]
+  }), true);
+});
+
+test('lookalike image config or manifest is rejected', () => {
+  assert.throws(() => validateProviderImageCandidate({
+    Id: `sha256:${'0'.repeat(64)}`,
+    RepoDigests: [
+      `${PROVIDER_POLICY.imageRepository}@${PROVIDER_POLICY.imageManifestDigest}`
+    ]
+  }));
+  assert.throws(() => validateProviderImageCandidate({
+    Id: PROVIDER_POLICY.imageConfigId,
+    RepoDigests: [`${PROVIDER_POLICY.imageRepository}@sha256:${'0'.repeat(64)}`]
+  }));
+});
+
+test('image-local x86-64 ELF executable evidence is admitted', () => {
+  assert.equal(validateProviderExecutableBytes(executableElf()), true);
+});
+
+test('symlink/script extraction or wrong architecture cannot satisfy executable evidence', () => {
+  assert.throws(() => validateProviderExecutableBytes(Buffer.from('#!/bin/sh\n/data/run\n')));
+  const wrongArchitecture = executableElf();
+  wrongArchitecture.writeUInt16LE(183, 18);
+  assert.throws(() => validateProviderExecutableBytes(wrongArchitecture));
+});
+
+test('container writable-layer changes are allowed only under the accepted state root', () => {
+  assert.equal(validateProviderContainerChanges([
+    { kind: 'C', path: '/data/new-api.db' }
+  ]), true);
+  assert.throws(() => validateProviderContainerChanges([
+    { kind: 'C', path: '/new-api' }
+  ]));
+  assert.throws(() => validateProviderContainerChanges([
+    { kind: 'C', path: '/' }
+  ]));
+  assert.throws(() => validateProviderContainerChanges([
+    { kind: 'C', path: '/usr/lib/libprovider.so' }
+  ]));
 });
 
 test('canonical external Provider health accepts bounded HTTP 200', async () => {
