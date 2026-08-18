@@ -8,15 +8,17 @@ const {
 } = require('./provider-image-authority');
 
 const BUILD_MANIFEST_SCHEMA = 'codex-memory-runtime-build-manifest/v1';
-const AUTHORITY_SCHEMA = 'codex-memory-native-runtime-authority/v2';
-const EDGE_RECEIPT_SCHEMA = 'codex-memory-edge-runtime-receipt/v1';
+const AUTHORITY_SCHEMA = 'codex-memory-native-runtime-authority/v3';
+const EDGE_RECEIPT_SCHEMA = 'codex-memory-edge-runtime-receipt/v2';
 const PROVIDER_RECEIPT_SCHEMA = 'codex-memory-provider-runtime-receipt/v2';
 const STATE_MOUNT_SCHEMA = 'codex-memory-primary-state-mount/v1';
 const PROFILE_AUTHORITY_COMPONENT_SCHEMA =
-  'codex-memory-profile-runtime-authority-components/v2';
+  'codex-memory-profile-runtime-authority-components/v3';
 const AUTHORITY_DEPENDENCY_GRAPH = Object.freeze({
   buildContext: Object.freeze(['runtimeImage']),
   canonicalPolicies: Object.freeze(['profileCandidate', 'hostAuthority']),
+  edgeBuildContext: Object.freeze(['edgeImageArtifact']),
+  edgeImageArtifact: Object.freeze(['edgeObservation']),
   edgeObservation: Object.freeze(['profileCandidate', 'hostAuthority']),
   hostAuthority: Object.freeze(['hostLauncherAdmission']),
   hostLauncherAdmission: Object.freeze(['edgeReceipt', 'providerReceipt', 'runtimeActivation']),
@@ -24,7 +26,9 @@ const AUTHORITY_DEPENDENCY_GRAPH = Object.freeze({
   nativeClosure: Object.freeze(['hostAuthority']),
   profileCandidate: Object.freeze(['hostAuthority']),
   providerObservation: Object.freeze(['profileCandidate', 'hostAuthority']),
-  reviewedSource: Object.freeze(['buildContext', 'canonicalPolicies', 'launcherBundle']),
+  reviewedSource: Object.freeze([
+    'buildContext', 'canonicalPolicies', 'edgeBuildContext', 'launcherBundle'
+  ]),
   runtimeContainer: Object.freeze(['profileCandidate', 'hostAuthority']),
   runtimeImage: Object.freeze(['nativeClosure', 'runtimeContainer'])
 });
@@ -42,6 +46,7 @@ const SHA256 = /^sha256:[a-f0-9]{64}$/u;
 const CONTAINER_ID = /^[a-f0-9]{64}$/u;
 const SAFE_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u;
 const SAFE_ABSOLUTE_PATH = /^\/(?:[A-Za-z0-9._-]+\/?)+$/u;
+const OPAQUE_REFERENCE = /^[A-Za-z0-9][A-Za-z0-9._:/-]{2,255}$/u;
 
 class RuntimeAuthorityError extends Error {
   constructor(code) {
@@ -52,6 +57,17 @@ class RuntimeAuthorityError extends Error {
 
 function reject(code) {
   throw new RuntimeAuthorityError(code);
+}
+
+function validateEdgeSupplyChainReferences(value) {
+  const references = [value?.edgeBindingReference, value?.edgeOperatorReference,
+    value?.edgeHostProjectReference, value?.edgePreviousBindingReference];
+  if (!SHA256.test(value?.edgeBindingDigest || '') ||
+      references.some(reference => !OPAQUE_REFERENCE.test(reference || '') ||
+        /placeholder|example|todo/iu.test(reference))) {
+    reject('runtime_edge_supply_chain_reference_invalid');
+  }
+  return true;
 }
 
 function countAuthorityGraphCycles(graph = AUTHORITY_DEPENDENCY_GRAPH) {
@@ -93,13 +109,16 @@ function sha256File(file) {
 }
 
 function hostTrustBundleDigest({ launcherFile, authorityModuleFile,
-  policyModuleFile, nativeClosureModuleFile, providerImageAuthorityModuleFile,
+  policyModuleFile, nativeClosureModuleFile, edgeImageAuthorityModuleFile,
+  providerImageAuthorityModuleFile,
   tarArchiveModuleFile }) {
   const files = [
     { installPath: 'deploy/native-runtime/host-launcher.js', source: launcherFile },
     { installPath: 'src/runtime/native-image/runtime-authority.js', source: authorityModuleFile },
     { installPath: 'src/runtime/native-image/container-policy.js', source: policyModuleFile },
     { installPath: 'src/runtime/native-image/native-closure.js', source: nativeClosureModuleFile },
+    { installPath: 'src/runtime/native-image/edge-image-authority.js',
+      source: edgeImageAuthorityModuleFile },
     { installPath: 'src/runtime/native-image/provider-image-authority.js',
       source: providerImageAuthorityModuleFile },
     { installPath: 'src/runtime/native-image/tar-archive.js', source: tarArchiveModuleFile }
@@ -225,6 +244,12 @@ function validateProviderAuthorityIdentity(value, code) {
       value.providerOciManifestDigest !== PROVIDER_POLICY.ociManifestDigest) reject(code);
 }
 
+function validateEdgeAuthorityIdentity(value, code) {
+  if (value.edgeImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
+      value.edgeDaemonImageIdentity !== value.edgeOciManifestDigest ||
+      value.edgeSourceCommit !== value.edgeRevision) reject(code);
+}
+
 function validateAuthorityRecord(value) {
   const keys = [
     'acceptedImageConfigId',
@@ -235,11 +260,24 @@ function validateAuthorityRecord(value) {
     'codexMemoryCommit',
     'containerConfigDigest',
     'edgePolicyDigest',
+    'edgeArtifactSha256',
+    'edgeBindingDigest',
+    'edgeBindingReference',
+    'edgeBuildContextDigest',
+    'edgeBuildManifestDigest',
     'edgeConfigDigest',
     'edgeContainerId',
-    'edgeImageIdentity',
+    'edgeDaemonImageIdentity',
+    'edgeImageConfigDigest',
+    'edgeImageStoreIdentityModel',
     'edgeLifecycleAuthority',
+    'edgeLockfileSha256',
+    'edgeHostProjectReference',
+    'edgeOciManifestDigest',
+    'edgeOperatorReference',
+    'edgePreviousBindingReference',
     'edgeRevision',
+    'edgeSourceCommit',
     'expectedRuntimeContainerId',
     'hostLauncherDigest',
     'hostLauncherVersion',
@@ -267,6 +305,7 @@ function validateAuthorityRecord(value) {
       value.edgeLifecycleAuthority !== 'host_launcher' ||
       value.hostLauncherVersion !== 'codex-memory-native-host-launcher/v1' ||
       value.profileSchemaVersion !== 7 ||
+      value.edgeImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
       value.providerImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
       !CONTAINER_ID.test(value.edgeContainerId || '') ||
       !CONTAINER_ID.test(value.providerContainerId || '') ||
@@ -277,17 +316,22 @@ function validateAuthorityRecord(value) {
   assertCommit(value.vcpCommit);
   assertCommit(value.providerRevision);
   assertCommit(value.edgeRevision);
-  if (value.edgeRevision !== value.codexMemoryCommit) {
-    reject('runtime_authority_edge_revision_mismatch');
-  }
+  assertCommit(value.edgeSourceCommit);
   for (const item of [
     value.acceptedImageConfigId,
     value.acceptedOciArchiveSha256,
     value.acceptedOciManifestDigest,
     value.buildManifestDigest,
     value.containerConfigDigest,
+    value.edgeArtifactSha256,
+    value.edgeBindingDigest,
+    value.edgeBuildContextDigest,
+    value.edgeBuildManifestDigest,
     value.edgeConfigDigest,
-    value.edgeImageIdentity,
+    value.edgeDaemonImageIdentity,
+    value.edgeImageConfigDigest,
+    value.edgeLockfileSha256,
+    value.edgeOciManifestDigest,
     value.edgePolicyDigest,
     value.hostLauncherDigest,
     value.nativeClosureDigest,
@@ -301,6 +345,8 @@ function validateAuthorityRecord(value) {
     value.runtimePolicyDigest,
     value.stateMountContractDigest
   ]) assertDigest(item);
+  validateEdgeAuthorityIdentity(value, 'runtime_authority_edge_identity_invalid');
+  validateEdgeSupplyChainReferences(value);
   validateProviderAuthorityIdentity(value, 'runtime_authority_provider_identity_invalid');
   assertAbsolutePath(value.profilePath);
   const mountKeys = [
@@ -332,7 +378,12 @@ function validateProfileAuthorityComponents(value) {
     'acceptedImageConfigId', 'acceptedOciArchiveSha256',
     'acceptedOciManifestDigest', 'buildManifestDigest', 'codexMemoryCommit',
     'edgeConfigDigest', 'edgeContainerId', 'edgeLifecycleAuthority',
-    'edgePolicyDigest', 'edgeRevision', 'expectedRuntimeContainerId',
+    'edgeArtifactSha256', 'edgeBuildContextDigest', 'edgeBuildManifestDigest',
+    'edgeBindingDigest', 'edgeBindingReference',
+    'edgeDaemonImageIdentity', 'edgeImageConfigDigest', 'edgeImageStoreIdentityModel',
+    'edgeHostProjectReference', 'edgeLockfileSha256', 'edgeOciManifestDigest',
+    'edgeOperatorReference', 'edgePolicyDigest', 'edgePreviousBindingReference',
+    'edgeRevision', 'edgeSourceCommit', 'expectedRuntimeContainerId',
     'hostLauncherDigest', 'hostLauncherVersion', 'nativeClosureDigest',
     'profileAuthorityComponentSchemaVersion', 'providerContainerConfigDigest',
     'providerContainerId', 'providerDaemonImageIdentity',
@@ -343,6 +394,7 @@ function validateProfileAuthorityComponents(value) {
   ];
   if (!exactKeys(value, keys) ||
       value.profileAuthorityComponentSchemaVersion !== PROFILE_AUTHORITY_COMPONENT_SCHEMA ||
+      value.edgeImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
       value.providerImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
       value.edgeLifecycleAuthority !== 'host_launcher' ||
       value.hostLauncherVersion !== 'codex-memory-native-host-launcher/v1' ||
@@ -351,23 +403,27 @@ function validateProfileAuthorityComponents(value) {
       !CONTAINER_ID.test(value.expectedRuntimeContainerId || '')) {
     reject('runtime_profile_authority_components_invalid');
   }
-  for (const commit of [value.codexMemoryCommit, value.edgeRevision,
+  for (const commit of [value.codexMemoryCommit, value.edgeRevision, value.edgeSourceCommit,
     value.providerRevision, value.vcpCommit]) assertCommit(
     commit, 'runtime_profile_authority_components_invalid'
   );
-  if (value.edgeRevision !== value.codexMemoryCommit) {
-    reject('runtime_profile_authority_components_invalid');
-  }
   for (const item of [
     value.acceptedImageConfigId, value.acceptedOciArchiveSha256,
     value.acceptedOciManifestDigest, value.buildManifestDigest,
-    value.edgeConfigDigest, value.edgePolicyDigest, value.hostLauncherDigest,
+    value.edgeArtifactSha256, value.edgeBuildContextDigest,
+    value.edgeBindingDigest,
+    value.edgeBuildManifestDigest, value.edgeConfigDigest,
+    value.edgeDaemonImageIdentity, value.edgeImageConfigDigest,
+    value.edgeLockfileSha256, value.edgeOciManifestDigest,
+    value.edgePolicyDigest, value.hostLauncherDigest,
     value.nativeClosureDigest, value.providerContainerConfigDigest,
     value.providerDaemonImageIdentity, value.providerImageConfigDigest,
     value.providerOciManifestDigest, value.providerPolicyDigest,
     value.rootfsChainDigest, value.runtimePolicyDigest,
     value.stateMountContractDigest
   ]) assertDigest(item, 'runtime_profile_authority_components_invalid');
+  validateEdgeAuthorityIdentity(value, 'runtime_profile_authority_components_invalid');
+  validateEdgeSupplyChainReferences(value);
   validateProviderAuthorityIdentity(value, 'runtime_profile_authority_components_invalid');
   return Object.freeze({ ...value });
 }
@@ -382,9 +438,23 @@ function profileAuthorityComponents(authority) {
     codexMemoryCommit: value.codexMemoryCommit,
     edgeConfigDigest: value.edgeConfigDigest,
     edgeContainerId: value.edgeContainerId,
+    edgeArtifactSha256: value.edgeArtifactSha256,
+    edgeBindingDigest: value.edgeBindingDigest,
+    edgeBindingReference: value.edgeBindingReference,
+    edgeBuildContextDigest: value.edgeBuildContextDigest,
+    edgeBuildManifestDigest: value.edgeBuildManifestDigest,
+    edgeDaemonImageIdentity: value.edgeDaemonImageIdentity,
+    edgeImageConfigDigest: value.edgeImageConfigDigest,
+    edgeImageStoreIdentityModel: value.edgeImageStoreIdentityModel,
+    edgeHostProjectReference: value.edgeHostProjectReference,
     edgeLifecycleAuthority: value.edgeLifecycleAuthority,
+    edgeLockfileSha256: value.edgeLockfileSha256,
+    edgeOciManifestDigest: value.edgeOciManifestDigest,
+    edgeOperatorReference: value.edgeOperatorReference,
     edgePolicyDigest: value.edgePolicyDigest,
+    edgePreviousBindingReference: value.edgePreviousBindingReference,
     edgeRevision: value.edgeRevision,
+    edgeSourceCommit: value.edgeSourceCommit,
     expectedRuntimeContainerId: value.expectedRuntimeContainerId,
     hostLauncherDigest: value.hostLauncherDigest,
     hostLauncherVersion: value.hostLauncherVersion,
@@ -413,8 +483,13 @@ function validateEdgeReceipt(value, authority, {
   const keys = [
     'edgeConfigDigest',
     'edgeContainerId',
+    'edgeArtifactSha256',
+    'edgeBuildContextDigest',
+    'edgeDaemonImageIdentity',
     'edgeHealth',
-    'edgeImageIdentity',
+    'edgeImageConfigDigest',
+    'edgeImageStoreIdentityModel',
+    'edgeOciManifestDigest',
     'edgeRevision',
     'launchEpoch',
     'launcherAuthorityDigest',
@@ -424,6 +499,7 @@ function validateEdgeReceipt(value, authority, {
   if (!exactKeys(value, keys) || value.schemaVersion !== EDGE_RECEIPT_SCHEMA ||
       !CONTAINER_ID.test(value.edgeContainerId || '') ||
       !SHA1.test(value.edgeRevision || '') ||
+      value.edgeImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
       value.edgeHealth !== 'healthy' ||
       typeof value.launchEpoch !== 'string' || value.launchEpoch.length < 16 ||
       !Number.isSafeInteger(value.observedAt) ||
@@ -432,7 +508,11 @@ function validateEdgeReceipt(value, authority, {
   }
   for (const item of [
     value.edgeConfigDigest,
-    value.edgeImageIdentity,
+    value.edgeArtifactSha256,
+    value.edgeBuildContextDigest,
+    value.edgeDaemonImageIdentity,
+    value.edgeImageConfigDigest,
+    value.edgeOciManifestDigest,
     value.launcherAuthorityDigest
   ]) assertDigest(item, 'runtime_edge_receipt_invalid');
   const accepted = validateAuthorityRecord(authority);
@@ -440,7 +520,12 @@ function validateEdgeReceipt(value, authority, {
     reject('runtime_edge_receipt_launcher_mismatch');
   }
   if (value.edgeContainerId !== accepted.edgeContainerId ||
-      value.edgeImageIdentity !== accepted.edgeImageIdentity ||
+      value.edgeArtifactSha256 !== accepted.edgeArtifactSha256 ||
+      value.edgeBuildContextDigest !== accepted.edgeBuildContextDigest ||
+      value.edgeDaemonImageIdentity !== accepted.edgeDaemonImageIdentity ||
+      value.edgeImageConfigDigest !== accepted.edgeImageConfigDigest ||
+      value.edgeImageStoreIdentityModel !== accepted.edgeImageStoreIdentityModel ||
+      value.edgeOciManifestDigest !== accepted.edgeOciManifestDigest ||
       value.edgeRevision !== accepted.edgeRevision ||
       value.edgeConfigDigest !== accepted.edgeConfigDigest) {
     reject('runtime_edge_receipt_identity_mismatch');
@@ -749,6 +834,21 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
     runtimePolicyDigest: authority.runtimePolicyDigest,
     edgePolicyDigest: authority.edgePolicyDigest,
     edgeRuntimeConfigDigest: authority.edgeConfigDigest,
+    edgeArtifactSha256: authority.edgeArtifactSha256,
+    edgeBindingDigest: authority.edgeBindingDigest,
+    edgeBindingReference: authority.edgeBindingReference,
+    edgeBuildContextDigest: authority.edgeBuildContextDigest,
+    edgeBuildManifestDigest: authority.edgeBuildManifestDigest,
+    edgeDaemonImageIdentity: authority.edgeDaemonImageIdentity,
+    edgeHostProjectReference: authority.edgeHostProjectReference,
+    edgeImageConfigDigest: authority.edgeImageConfigDigest,
+    edgeImageStoreIdentityModel: authority.edgeImageStoreIdentityModel,
+    edgeLockfileSha256: authority.edgeLockfileSha256,
+    edgeOciManifestDigest: authority.edgeOciManifestDigest,
+    edgeOperatorReference: authority.edgeOperatorReference,
+    edgePreviousBindingReference: authority.edgePreviousBindingReference,
+    edgeSourceCommit: authority.edgeSourceCommit,
+    profileAuthorityComponentSchemaVersion: PROFILE_AUTHORITY_COMPONENT_SCHEMA,
     providerPolicyDigest: authority.providerPolicyDigest,
     providerRuntimeConfigDigest: authority.providerContainerConfigDigest,
     runtimeContainerId: authority.expectedRuntimeContainerId,

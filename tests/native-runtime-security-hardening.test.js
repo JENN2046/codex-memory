@@ -15,7 +15,8 @@ const {
   validateAuthorityRecord, validateProviderReceipt
 } = require('../src/runtime/native-image/runtime-authority');
 const {
-  EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
+  EDGE_POLICY, EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST,
+  RUNTIME_POLICY_DIGEST,
   validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
 } = require('../src/runtime/native-image/container-policy');
 const {
@@ -31,7 +32,10 @@ const { inspectOciArchive, readBoundedArchive, MAXIMUM_OCI_ARCHIVE_BYTES } = req
 const { buildRuntimeImage, parseArguments: parseBuildArguments } = require(
   '../scripts/build-codex-memory-runtime-image'
 );
-const { validateExternallyAcceptedImageEvidence } = require(
+const {
+  validateExternallyAcceptedEdgeEvidence,
+  validateExternallyAcceptedImageEvidence
+} = require(
   '../scripts/create-codex-memory-runtime-authority'
 );
 const { requireLifecycleLock, runUnderLifecycleLock } = require(
@@ -178,6 +182,20 @@ test('root authority creation requires every externally pinned image identity', 
   }
 });
 
+test('root authority creation cannot derive portable Edge identity from a container', () => {
+  const evidence = {
+    artifactSha256: S('1'), buildContextDigest: S('2'),
+    buildManifestDigest: S('3'), imageConfigDigest: S('4'),
+    lockfileSha256: S('5'), ociManifestDigest: S('6'), sourceCommit: C('a')
+  };
+  assert.deepEqual(validateExternallyAcceptedEdgeEvidence(evidence, evidence), evidence);
+  for (const field of Object.keys(evidence)) {
+    const candidate = { ...evidence, [field]: field === 'sourceCommit' ? C('b') : S('0') };
+    expectCode(() => validateExternallyAcceptedEdgeEvidence(candidate, evidence),
+      'runtime_authority_external_edge_image_identity_mismatch');
+  }
+});
+
 test('tar validator rejects traversal, links, duplicates, special nodes and limits', () => {
   for (const value of [
     tar([{ name: '../escape', content: 'x' }]),
@@ -247,9 +265,36 @@ function runtimeInspect() {
   };
 }
 function edgeInspect() {
-  return { Config: { Cmd: [], Entrypoint: [], Env: [], Labels: {
+  const overrides = {
+    CODEX_MEMORY_R4_AUTH0_ISSUER: 'https://tenant.invalid/',
+    CODEX_MEMORY_R4_AUTH0_JWKS_URI: 'https://tenant.invalid/.well-known/jwks.json',
+    CODEX_MEMORY_R4_BINDING_DIGEST: S('c'),
+    CODEX_MEMORY_R4_BINDING_REFERENCE: 'binding:r4:accepted',
+    CODEX_MEMORY_R4_EDGE_ARTIFACT_SHA256: S('b'),
+    CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID: 'edge-key-v1',
+    CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY:
+      'file:/run/secrets/codex-memory-r4/edge-private.pem',
+    CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY:
+      'file:/run/secrets/codex-memory-r4/edge-public.pem',
+    CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE: 'host:private-development',
+    CODEX_MEMORY_R4_LOCKFILE_SHA256: S('0'),
+    CODEX_MEMORY_R4_OAUTH_CLIENT_ID: 'oauth-client-v1',
+    CODEX_MEMORY_R4_OPERATOR_REFERENCE: 'operator:jenn-owner',
+    CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT: 'sha256:operator-fingerprint',
+    CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE: 'binding:r4:previous',
+    CODEX_MEMORY_R4_PUBLIC_ORIGIN: 'https://memory.invalid',
+    CODEX_MEMORY_R4_RELAY_AUTH_TOKEN: 'file:/run/secrets/codex-memory-r4/relay-token',
+    CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID: 'relay-key-v1',
+    CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY:
+      'file:/run/secrets/codex-memory-r4/relay-public.pem',
+    CODEX_MEMORY_R4_SOURCE_COMMIT: C('1')
+  };
+  return { Config: { Cmd: [], Entrypoint: [...EDGE_POLICY.entrypoint],
+    Env: Object.entries({ ...EDGE_POLICY.imageEnvironment, ...overrides })
+      .map(([name, value]) => `${name}=${value}`),
+    Healthcheck: structuredClone(EDGE_POLICY.healthcheck), Labels: {
     'org.opencontainers.image.revision': C('1')
-  }, User: '1000:1000', WorkingDir: '/opt/edge' },
+  }, User: '1000:1000', WorkingDir: EDGE_POLICY.workingDirectory },
     HostConfig: { CapAdd: [], CapDrop: ['ALL'], CgroupnsMode: '', Devices: [],
       DeviceRequests: [], IpcMode: 'private', LogConfig: { Type: 'none' },
       NetworkMode: 'bridge', PidMode: '', PortBindings: {
@@ -288,6 +333,25 @@ test('independent canonical policies admit exact Runtime, Edge and Provider', ()
     primaryStateDestination: '/srv/codex-memory/r5c' });
   validateEdgeCandidate(edgeInspect());
   validateProvider(providerInspect());
+});
+test('Edge execution policy rejects candidate-defined code and environment authority', () => {
+  for (const mutate of [
+    value => { value.Config.Entrypoint = ['node',
+      '/run/secrets/codex-memory-r4/evil.js']; },
+    value => { value.Config.Cmd = ['/run/secrets/codex-memory-r4/evil.js']; },
+    value => { value.Config.WorkingDir = '/run/secrets/codex-memory-r4'; },
+    value => { value.Config.Healthcheck.Test = ['CMD-SHELL', 'true']; },
+    value => { value.Config.Env.push(
+      'NODE_OPTIONS=--require=/run/secrets/codex-memory-r4/evil.js'); },
+    value => { const index = value.Config.Env.findIndex(entry => entry.startsWith('PATH='));
+      value.Config.Env[index] = 'PATH=/run/secrets/codex-memory-r4'; },
+    value => { value.Config.Env = value.Config.Env.filter(entry =>
+      !entry.startsWith('CODEX_MEMORY_R4_PUBLIC_ORIGIN=')); }
+  ]) {
+    const value = structuredClone(edgeInspect()); mutate(value);
+    expectCode(() => validateEdgeCandidate(value),
+      'edge_container_canonical_policy_mismatch');
+  }
 });
 test('Provider identity policy is independent of Docker health and forbids code mounts', () => {
   const withoutHealth = providerInspect();
@@ -451,9 +515,17 @@ function authority() {
     buildManifestDigest: S('7'), codexMemoryCommit: C('1'),
     containerConfigDigest: containerConfigDigest(runtime),
     edgeConfigDigest: containerConfigDigest(edge), edgeContainerId: edge.Id,
-    edgeImageIdentity: edge.Image, edgeLifecycleAuthority: 'host_launcher',
-    edgeRevision: C('1'),
-    edgePolicyDigest: EDGE_POLICY_DIGEST, expectedRuntimeContainerId: runtime.Id,
+    edgeArtifactSha256: S('b'), edgeBindingDigest: S('c'),
+    edgeBindingReference: 'binding:r4:accepted', edgeBuildContextDigest: S('d'),
+    edgeBuildManifestDigest: S('e'), edgeDaemonImageIdentity: edge.Image,
+    edgeHostProjectReference: 'host:private-development', edgeImageConfigDigest: S('f'),
+    edgeImageStoreIdentityModel: 'docker-containerd-manifest-identity/v1',
+    edgeLifecycleAuthority: 'host_launcher', edgeLockfileSha256: S('0'),
+    edgeOciManifestDigest: edge.Image, edgeOperatorReference: 'operator:jenn-owner',
+    edgePolicyDigest: EDGE_POLICY_DIGEST,
+    edgePreviousBindingReference: 'binding:r4:previous', edgeRevision: C('1'),
+    edgeSourceCommit: C('1'),
+    expectedRuntimeContainerId: runtime.Id,
     hostLauncherDigest: S('8'), hostLauncherVersion: 'codex-memory-native-host-launcher/v1',
     nativeClosureDigest: nativeClosureDigest(closure()), profilePath: SOURCES.profile,
     profileSchemaVersion: 7, profileSha256: S('9'),

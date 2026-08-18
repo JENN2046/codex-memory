@@ -31,7 +31,8 @@ const {
   validateRuntimeSelfEvidence
 } = require('../src/runtime/native-image/runtime-authority');
 const {
-  EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, RUNTIME_POLICY_DIGEST,
+  EDGE_POLICY, EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST,
+  RUNTIME_POLICY_DIGEST,
   validateEdgeCandidate, validateProviderCandidate, validateRuntimeCandidate
 } = require('../src/runtime/native-image/container-policy');
 const {
@@ -232,9 +233,22 @@ function authority(inspect = baseInspect(), overrides = {}) {
     containerConfigDigest: containerConfigDigest(inspect),
     edgeConfigDigest: S('f'),
     edgeContainerId: I('1'),
-    edgeImageIdentity: S('2'),
+    edgeArtifactSha256: S('2'),
+    edgeBindingDigest: S('b'),
+    edgeBindingReference: 'binding:r4:accepted',
+    edgeBuildContextDigest: S('3'),
+    edgeBuildManifestDigest: S('4'),
+    edgeDaemonImageIdentity: S('5'),
+    edgeHostProjectReference: 'host:private-development',
+    edgeImageConfigDigest: S('6'),
+    edgeImageStoreIdentityModel: 'docker-containerd-manifest-identity/v1',
     edgeLifecycleAuthority: 'host_launcher',
+    edgeLockfileSha256: S('7'),
+    edgeOciManifestDigest: S('5'),
+    edgeOperatorReference: 'operator:jenn-owner',
     edgeRevision: manifest.codexMemoryCommit,
+    edgePreviousBindingReference: 'binding:r4:previous',
+    edgeSourceCommit: manifest.codexMemoryCommit,
     edgePolicyDigest: EDGE_POLICY_DIGEST,
     expectedRuntimeContainerId: inspect.Id,
     hostLauncherDigest: S('3'),
@@ -262,10 +276,38 @@ function authority(inspect = baseInspect(), overrides = {}) {
 }
 
 function edgeInspect(a = authority(), overrides = {}) {
+  const environment = {
+    ...EDGE_POLICY.imageEnvironment,
+    CODEX_MEMORY_R4_AUTH0_ISSUER: 'https://tenant.invalid/',
+    CODEX_MEMORY_R4_AUTH0_JWKS_URI: 'https://tenant.invalid/.well-known/jwks.json',
+    CODEX_MEMORY_R4_BINDING_DIGEST: a.edgeBindingDigest,
+    CODEX_MEMORY_R4_BINDING_REFERENCE: a.edgeBindingReference,
+    CODEX_MEMORY_R4_EDGE_ARTIFACT_SHA256: a.edgeArtifactSha256,
+    CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID: 'edge-key-v1',
+    CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY:
+      'file:/run/secrets/codex-memory-r4/edge-private.pem',
+    CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY:
+      'file:/run/secrets/codex-memory-r4/edge-public.pem',
+    CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE: a.edgeHostProjectReference,
+    CODEX_MEMORY_R4_LOCKFILE_SHA256: a.edgeLockfileSha256,
+    CODEX_MEMORY_R4_OAUTH_CLIENT_ID: 'oauth-client-v1',
+    CODEX_MEMORY_R4_OPERATOR_REFERENCE: a.edgeOperatorReference,
+    CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT: 'sha256:operator-fingerprint',
+    CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE: a.edgePreviousBindingReference,
+    CODEX_MEMORY_R4_PUBLIC_ORIGIN: 'https://memory.invalid',
+    CODEX_MEMORY_R4_RELAY_AUTH_TOKEN:
+      'file:/run/secrets/codex-memory-r4/relay-token',
+    CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID: 'relay-key-v1',
+    CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY:
+      'file:/run/secrets/codex-memory-r4/relay-public.pem',
+    CODEX_MEMORY_R4_SOURCE_COMMIT: a.edgeSourceCommit
+  };
   return {
-    Config: { Cmd: [], Entrypoint: [], Env: [], Labels: {
+    Config: { Cmd: [], Entrypoint: [...EDGE_POLICY.entrypoint],
+      Env: Object.entries(environment).map(([name, value]) => `${name}=${value}`),
+      Healthcheck: structuredClone(EDGE_POLICY.healthcheck), Labels: {
       'org.opencontainers.image.revision': a.edgeRevision
-    }, User: '1000:1000', WorkingDir: '/opt/edge' },
+    }, User: '1000:1000', WorkingDir: EDGE_POLICY.workingDirectory },
     HostConfig: {
       CapAdd: [], CapDrop: ['ALL'], CgroupnsMode: '', Devices: [], DeviceRequests: [],
       IpcMode: 'private', LogConfig: { Type: 'none' }, NetworkMode: 'bridge',
@@ -275,7 +317,7 @@ function edgeInspect(a = authority(), overrides = {}) {
       Tmpfs: {}, UsernsMode: '', UTSMode: ''
     },
     Id: a.edgeContainerId,
-    Image: a.edgeImageIdentity,
+    Image: a.edgeDaemonImageIdentity,
     Mounts: [{ Destination: '/run/secrets/codex-memory-r4', Propagation: 'rprivate', RW: false, Source: '/etc/codex-memory/edge-secret', Type: 'bind' }],
     State: { Health: { Status: 'healthy' }, Running: true },
     ...overrides
@@ -305,13 +347,47 @@ function edgeReceipt(a, now = Date.now()) {
   return {
     edgeConfigDigest: a.edgeConfigDigest,
     edgeContainerId: a.edgeContainerId,
+    edgeArtifactSha256: a.edgeArtifactSha256,
+    edgeBuildContextDigest: a.edgeBuildContextDigest,
+    edgeDaemonImageIdentity: a.edgeDaemonImageIdentity,
     edgeHealth: 'healthy',
-    edgeImageIdentity: a.edgeImageIdentity,
+    edgeImageConfigDigest: a.edgeImageConfigDigest,
+    edgeImageStoreIdentityModel: a.edgeImageStoreIdentityModel,
+    edgeOciManifestDigest: a.edgeOciManifestDigest,
     edgeRevision: a.edgeRevision,
     launchEpoch: 'boot-identity-0001',
     launcherAuthorityDigest: authorityRecordDigest(a),
     observedAt: now,
     schemaVersion: EDGE_RECEIPT_SCHEMA
+  };
+}
+
+function edgeEvidenceOptions(a, overrides = {}) {
+  const evidence = {
+    artifactSha256: S('a'),
+    buildContextDigest: a.edgeBuildContextDigest,
+    buildManifestDigest: a.edgeBuildManifestDigest,
+    imageConfigDigest: a.edgeImageConfigDigest,
+    imageStoreIdentityModel: a.edgeImageStoreIdentityModel,
+    lockfileSha256: a.edgeLockfileSha256,
+    ociManifestDigest: a.edgeOciManifestDigest,
+    schemaVersion: 'codex-memory-edge-image-authority/v1',
+    sourceCommit: a.edgeSourceCommit
+  };
+  return {
+    edgeImageAdmission: () => evidence,
+    edgeImageArchive: () => Buffer.alloc(0),
+    edgeImageInspect: () => ({
+      Architecture: 'amd64', Config: { Labels: {
+        'io.codex-memory.edge.build-context-digest': a.edgeBuildContextDigest,
+        'io.codex-memory.edge.build-manifest-digest': a.edgeBuildManifestDigest,
+        'io.codex-memory.edge.lockfile-sha256': a.edgeLockfileSha256,
+        'org.opencontainers.image.revision': a.edgeSourceCommit
+      } }, Descriptor: { digest: a.edgeOciManifestDigest },
+      Id: a.edgeDaemonImageIdentity, Os: 'linux',
+      RepoDigests: [`codex-memory-chatgpt-edge@${a.edgeOciManifestDigest}`]
+    }),
+    ...overrides
   };
 }
 function providerReceipt(a, now = Date.now()) {
@@ -380,6 +456,16 @@ test('F post-image node_modules mutation is outside image root identity', () => 
   assert.equal(digest([S('4'), S('5')]), authority().rootfsChainDigest);
 });
 
+test('Edge source authority is explicit and need not impersonate a later Runtime commit', () => {
+  const a = authorityWithEdge();
+  const edgeCommit = C('e');
+  const accepted = validateAuthorityRecord({
+    ...a, edgeRevision: edgeCommit, edgeSourceCommit: edgeCommit
+  });
+  assert.equal(accepted.codexMemoryCommit, C('a'));
+  assert.equal(accepted.edgeSourceCommit, edgeCommit);
+});
+
 test('host trust bundle binds launcher and first-party authority module bytes', t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-host-bundle-'));
   t.after(() => fs.rmSync(root, { force: true, recursive: true }));
@@ -387,16 +473,19 @@ test('host trust bundle binds launcher and first-party authority module bytes', 
   const authorityModuleFile = path.join(root, 'authority.js');
   const policyModuleFile = path.join(root, 'policy.js');
   const nativeClosureModuleFile = path.join(root, 'native.js');
+  const edgeImageAuthorityModuleFile = path.join(root, 'edge-image.js');
   const providerImageAuthorityModuleFile = path.join(root, 'provider-image.js');
   const tarArchiveModuleFile = path.join(root, 'tar.js');
   fs.writeFileSync(launcherFile, 'launcher-a\n');
   fs.writeFileSync(authorityModuleFile, 'authority-a\n');
   fs.writeFileSync(policyModuleFile, 'policy-a\n');
   fs.writeFileSync(nativeClosureModuleFile, 'native-a\n');
+  fs.writeFileSync(edgeImageAuthorityModuleFile, 'edge-image-a\n');
   fs.writeFileSync(providerImageAuthorityModuleFile, 'provider-image-a\n');
   fs.writeFileSync(tarArchiveModuleFile, 'tar-a\n');
   const files = { launcherFile, authorityModuleFile, policyModuleFile,
-    nativeClosureModuleFile, providerImageAuthorityModuleFile,
+    nativeClosureModuleFile, edgeImageAuthorityModuleFile,
+    providerImageAuthorityModuleFile,
     tarArchiveModuleFile };
   const accepted = hostTrustBundleDigest(files);
   fs.writeFileSync(authorityModuleFile, 'authority-b\n');
@@ -632,6 +721,8 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
     hostLauncherDigest: hostTrustBundleDigest({
       authorityModuleFile: path.join(__dirname, '..', 'src', 'runtime',
         'native-image', 'runtime-authority.js'),
+      edgeImageAuthorityModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'edge-image-authority.js'),
       launcherFile: path.join(__dirname, '..', 'deploy', 'native-runtime',
         'host-launcher.js'),
       nativeClosureModuleFile: path.join(__dirname, '..', 'src', 'runtime',
@@ -659,6 +750,7 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
         args[2] === accepted.expectedRuntimeContainerId ? runtime :
           args[2] === accepted.edgeContainerId ? edge : provider]);
   const options = {
+    ...edgeEvidenceOptions(accepted),
     ...providerEvidenceOptions(),
     containerFile: (_id, source) => source === PROVIDER_POLICY.executable
       ? providerElf() : Buffer.from(JSON.stringify(nativeClosure())),
@@ -690,7 +782,8 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
 test('host Edge receipt is derived from exact healthy Edge inspection', () => {
   const a = authorityWithEdge();
   const edge = edgeInspect(a);
-  const receipt = buildEdgeReceipt(edge, a, 'boot-identity-0001', 1_700_000_000_000);
+  const receipt = buildEdgeReceipt(edge, a, 'boot-identity-0001',
+    1_700_000_000_000, edgeEvidenceOptions(a));
   assert.equal(receipt.edgeContainerId, a.edgeContainerId);
 });
 
@@ -749,6 +842,9 @@ test('Provider identity schema revisions and semantic layers cannot be downgrade
     ...a, authoritySchemaVersion: 'codex-memory-native-runtime-authority/v1'
   }), 'runtime_authority_record_invalid');
   expectCode(() => validateAuthorityRecord({
+    ...a, authoritySchemaVersion: 'codex-memory-native-runtime-authority/v2'
+  }), 'runtime_authority_record_invalid');
+  expectCode(() => validateAuthorityRecord({
     ...a,
     providerDaemonImageIdentity: a.providerImageConfigDigest,
     providerImageConfigDigest: a.providerDaemonImageIdentity
@@ -761,6 +857,14 @@ test('Provider identity schema revisions and semantic layers cannot be downgrade
   expectCode(() => validateAuthorityRecord({
     ...a, providerImageIdentity: a.providerDaemonImageIdentity
   }), 'runtime_authority_record_invalid');
+  expectCode(() => validateAuthorityRecord({
+    ...a, edgeImageIdentity: a.edgeDaemonImageIdentity
+  }), 'runtime_authority_record_invalid');
+  expectCode(() => validateAuthorityRecord({
+    ...a,
+    edgeImageConfigDigest: a.edgeOciManifestDigest,
+    edgeOciManifestDigest: a.edgeImageConfigDigest
+  }), 'runtime_authority_edge_identity_invalid');
   for (const field of ['providerDaemonImageIdentity', 'providerImageConfigDigest',
     'providerOciManifestDigest']) {
     const missingIdentity = { ...a };
@@ -774,6 +878,12 @@ test('Provider identity schema revisions and semantic layers cannot be downgrade
       ...components,
       profileAuthorityComponentSchemaVersion:
         'codex-memory-profile-runtime-authority-components/v1'
+    }), 'runtime_profile_authority_components_invalid');
+  expectCode(() => require('../src/runtime/native-image/runtime-authority')
+    .validateProfileAuthorityComponents({
+      ...components,
+      profileAuthorityComponentSchemaVersion:
+        'codex-memory-profile-runtime-authority-components/v2'
     }), 'runtime_profile_authority_components_invalid');
   expectCode(() => require('../src/runtime/native-image/runtime-authority')
     .validateProfileAuthorityComponents({
@@ -798,6 +908,17 @@ test('Provider identity schema revisions and semantic layers cannot be downgrade
   expectCode(() => validateProviderReceipt({
     ...receipt, providerContainerId: I('0')
   }, a, { now: 100 }), 'runtime_provider_receipt_identity_mismatch');
+  const oldEdgeReceipt = edgeReceipt(a, 100);
+  expectCode(() => validateEdgeReceipt({
+    ...oldEdgeReceipt, schemaVersion: 'codex-memory-edge-runtime-receipt/v1'
+  }, a, { now: 100 }), 'runtime_edge_receipt_invalid');
+  for (const field of ['edgeDaemonImageIdentity', 'edgeImageConfigDigest',
+    'edgeOciManifestDigest']) {
+    const missing = { ...oldEdgeReceipt };
+    delete missing[field];
+    expectCode(() => validateEdgeReceipt(missing, a, { now: 100 }),
+      'runtime_edge_receipt_invalid');
+  }
 });
 
 test('atomic Edge receipt is non-secret, root-replaceable and runtime-readable', t => {

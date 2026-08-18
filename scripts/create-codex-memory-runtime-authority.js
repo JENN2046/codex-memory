@@ -28,6 +28,12 @@ const {
   validateRuntimeCandidate
 } = require('../src/runtime/native-image/container-policy');
 const {
+  validateEdgeContainerSupplyChain,
+  validateEdgeDaemonImageObservation,
+  validateEdgeOciArchive,
+  validateEdgeSupplyChainReferences
+} = require('../src/runtime/native-image/edge-image-authority');
+const {
   nativeClosureDigest,
   validateNativeClosure,
   verifyNativeClosureBytes
@@ -36,6 +42,7 @@ const { parseTarBuffer, regularFiles } = require('../src/runtime/native-image/ta
 const {
   verifyOciArchive
 } = require('./verify-codex-memory-runtime-image');
+const { verifyEdgeOciArchive } = require('./verify-codex-memory-edge-image');
 
 function fail(code) { const error = new Error(code); error.code = code; throw error; }
 function inspect(kind, id) {
@@ -104,6 +111,22 @@ function validateExternallyAcceptedImageEvidence(accepted, archiveEvidence, mani
   return Object.freeze({ ...actual });
 }
 
+function validateExternallyAcceptedEdgeEvidence(accepted, evidence) {
+  const actual = {
+    artifactSha256: evidence.artifactSha256,
+    buildContextDigest: evidence.buildContextDigest,
+    buildManifestDigest: evidence.buildManifestDigest,
+    imageConfigDigest: evidence.imageConfigDigest,
+    lockfileSha256: evidence.lockfileSha256,
+    ociManifestDigest: evidence.ociManifestDigest,
+    sourceCommit: evidence.sourceCommit
+  };
+  if (Object.keys(actual).some(key => accepted?.[key] !== actual[key])) {
+    fail('runtime_authority_external_edge_image_identity_mismatch');
+  }
+  return Object.freeze({ ...actual });
+}
+
 function main(argv = process.argv.slice(2)) {
   const args = parse(argv);
   const runtime = inspect('container', args['runtime-container-id']);
@@ -127,6 +150,19 @@ function main(argv = process.argv.slice(2)) {
     rootfsChainDigest: args['expected-rootfs-chain-digest']
   };
   validateExternallyAcceptedImageEvidence(externallyAccepted, archiveEvidence, manifest);
+  const edgeArchiveEvidence = verifyEdgeOciArchive(
+    path.resolve(args['edge-oci-archive'] || ''),
+    path.resolve(args['edge-build-manifest'] || '')
+  );
+  validateExternallyAcceptedEdgeEvidence({
+    artifactSha256: args['expected-edge-artifact-sha256'],
+    buildContextDigest: args['expected-edge-build-context-digest'],
+    buildManifestDigest: args['expected-edge-build-manifest-digest'],
+    imageConfigDigest: args['expected-edge-image-config-digest'],
+    lockfileSha256: args['expected-edge-lockfile-sha256'],
+    ociManifestDigest: args['expected-edge-oci-manifest-digest'],
+    sourceCommit: args['expected-edge-source-commit']
+  }, edgeArchiveEvidence);
   const profileFile = path.resolve(args.profile || '');
   const profileBytes = fs.readFileSync(profileFile);
   let profile;
@@ -163,6 +199,29 @@ function main(argv = process.argv.slice(2)) {
     primaryStateDestination: stateMountContract.containerPath
   });
   validateEdgeCandidate(edge);
+  const edgeImage = inspect('image', edge.Image);
+  const edgeLocalArchiveEvidence = validateEdgeOciArchive(imageArchive(edge.Image));
+  for (const field of ['imageConfigDigest',
+    'imageStoreIdentityModel', 'lockfileSha256', 'ociManifestDigest', 'sourceCommit']) {
+    if (edgeLocalArchiveEvidence[field] !== edgeArchiveEvidence[field]) {
+      fail('runtime_authority_edge_local_image_identity_mismatch');
+    }
+  }
+  const edgeDaemonEvidence = validateEdgeDaemonImageObservation(edgeImage, edgeArchiveEvidence);
+  const edgeSupplyChainReferences = validateEdgeSupplyChainReferences({
+    edgeBindingDigest: args['expected-edge-binding-digest'],
+    edgeBindingReference: args['expected-edge-binding-reference'],
+    edgeHostProjectReference: args['expected-edge-host-project-reference'],
+    edgeOperatorReference: args['expected-edge-operator-reference'],
+    edgePreviousBindingReference: args['expected-edge-previous-binding-reference']
+  });
+  validateEdgeContainerSupplyChain(edge, {
+    edgeArtifactSha256: edgeArchiveEvidence.artifactSha256,
+    edgeDaemonImageIdentity: edgeDaemonEvidence.daemonImageIdentity,
+    edgeLockfileSha256: edgeArchiveEvidence.lockfileSha256,
+    edgeSourceCommit: edgeArchiveEvidence.sourceCommit,
+    ...edgeSupplyChainReferences
+  });
   const providerImageEvidence = validateProviderImageCandidate(
     providerImage, imageArchive(provider.Image)
   );
@@ -184,13 +243,23 @@ function main(argv = process.argv.slice(2)) {
     containerConfigDigest: containerConfigDigest(runtime),
     edgeConfigDigest: containerConfigDigest(edge),
     edgeContainerId: edge.Id,
-    edgeImageIdentity: edge.Image,
+    edgeArtifactSha256: edgeArchiveEvidence.artifactSha256,
+    ...edgeSupplyChainReferences,
+    edgeBuildContextDigest: edgeArchiveEvidence.buildContextDigest,
+    edgeBuildManifestDigest: edgeArchiveEvidence.buildManifestDigest,
+    edgeDaemonImageIdentity: edgeDaemonEvidence.daemonImageIdentity,
+    edgeImageConfigDigest: edgeArchiveEvidence.imageConfigDigest,
+    edgeImageStoreIdentityModel: edgeDaemonEvidence.imageStoreIdentityModel,
     edgeLifecycleAuthority: 'host_launcher',
+    edgeLockfileSha256: edgeArchiveEvidence.lockfileSha256,
+    edgeOciManifestDigest: edgeArchiveEvidence.ociManifestDigest,
     edgePolicyDigest: EDGE_POLICY_DIGEST,
     edgeRevision,
+    edgeSourceCommit: edgeArchiveEvidence.sourceCommit,
     expectedRuntimeContainerId: runtime.Id,
     hostLauncherDigest: hostTrustBundleDigest({
       authorityModuleFile: path.resolve(args['runtime-authority-module']),
+      edgeImageAuthorityModuleFile: path.resolve(args['edge-image-authority-module']),
       launcherFile: path.resolve(args['host-launcher']),
       nativeClosureModuleFile: path.resolve(args['native-closure-module']),
       policyModuleFile: path.resolve(args['container-policy-module']),
@@ -228,4 +297,8 @@ if (require.main === module) {
   }
 }
 
-module.exports = { main, validateExternallyAcceptedImageEvidence };
+module.exports = {
+  main,
+  validateExternallyAcceptedEdgeEvidence,
+  validateExternallyAcceptedImageEvidence
+};
