@@ -21,6 +21,7 @@ const {
   PROVIDER_POLICY_DIGEST,
   RUNTIME_POLICY_DIGEST,
   validateEdgeCandidate,
+  validateEdgeSecretMountAuthority,
   validateProviderCandidate,
   validateProviderContainerChanges,
   validateProviderExecutableBytes,
@@ -199,6 +200,7 @@ function main(argv = process.argv.slice(2)) {
     primaryStateDestination: stateMountContract.containerPath
   });
   validateEdgeCandidate(edge);
+  validateEdgeSecretMountAuthority(edge);
   const edgeImage = inspect('image', edge.Image);
   const edgeLocalArchiveEvidence = validateEdgeOciArchive(imageArchive(edge.Image));
   for (const field of ['imageConfigDigest',

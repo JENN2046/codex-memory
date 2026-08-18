@@ -10,6 +10,10 @@ const test = require('node:test');
 
 const { sha256 } = require('../../packages/chatgpt-r4-contracts');
 const {
+  EDGE_RUNTIME_GID,
+  EDGE_RUNTIME_UID,
+  EDGE_SECRET_DIRECTORY_MODE,
+  EDGE_SECRET_FILE_MODE,
   assertDistinctEd25519Authorities,
   assertEd25519KeyPair,
   createStrictEd25519PublicKey,
@@ -17,25 +21,46 @@ const {
   validateSupplyChainEnvironment
 } = require('../../apps/chatgpt-edge/external-main');
 
-test('D2A runtime authority accepts only owner-only file references and non-placeholder identity', t => {
+test('D2A runtime authority accepts only root-controlled group-readable file references', t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4d-secrets-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const secretFile = path.join(root, 'relay-token');
-  fs.writeFileSync(secretFile, 'synthetic-secret-value-not-a-live-token', { mode: 0o600 });
-  assert.equal(readSecretReference(`file:${secretFile}`, { secretRoot: root }), 'synthetic-secret-value-not-a-live-token');
+  const secretValue = 'synthetic-secret-value-not-a-live-token';
+  fs.writeFileSync(secretFile, secretValue, { mode: 0o600 });
+  const rootStat = fakeStat({ directory: true, gid: EDGE_RUNTIME_GID,
+    mode: EDGE_SECRET_DIRECTORY_MODE, uid: 0 });
+  const fileStat = fakeStat({ gid: EDGE_RUNTIME_GID, mode: EDGE_SECRET_FILE_MODE,
+    size: Buffer.byteLength(secretValue), uid: 0 });
+  const options = {
+    lstatSync: target => target === root ? rootStat : fileStat,
+    readFileSync: fs.readFileSync,
+    readdirSync: fs.readdirSync,
+    realpathSync: fs.realpathSync,
+    runtimeGid: EDGE_RUNTIME_GID,
+    runtimeGroups: [EDGE_RUNTIME_GID],
+    runtimeUid: EDGE_RUNTIME_UID,
+    secretRoot: root
+  };
+  assert.equal(readSecretReference(`file:${secretFile}`, options), secretValue);
+  assert.throws(() => readSecretReference(`file:${secretFile}`, {
+    ...options, runtimeGroups: [0, EDGE_RUNTIME_GID]
+  }), { code: 'edge_runtime_identity_invalid' });
 
   const outside = path.join(os.tmpdir(), `codex-memory-r4d-outside-${crypto.randomUUID()}`);
   fs.writeFileSync(outside, 'synthetic-outside-value', { mode: 0o600 });
   t.after(() => fs.rmSync(outside, { force: true }));
-  assert.throws(() => readSecretReference(`file:${outside}`, { secretRoot: root }), {
+  assert.throws(() => readSecretReference(`file:${outside}`, options), {
     code: 'edge_secret_reference_outside_root'
   });
-  assert.throws(() => readSecretReference('synthetic-plaintext-token', { secretRoot: root }), {
+  assert.throws(() => readSecretReference('synthetic-plaintext-token', options), {
     code: 'edge_secret_reference_invalid'
   });
 
-  fs.chmodSync(secretFile, 0o644);
-  assert.throws(() => readSecretReference(`file:${secretFile}`, { secretRoot: root }), {
+  assert.throws(() => readSecretReference(`file:${secretFile}`, {
+    ...options,
+    lstatSync: target => target === root ? rootStat :
+      fakeStat({ gid: EDGE_RUNTIME_GID, mode: 0o444, size: fileStat.size, uid: 0 })
+  }), {
     code: 'edge_secret_file_security_invalid'
   });
 
@@ -114,6 +139,9 @@ test('D2A Docker build context is narrow and base image is digest-pinned', () =>
     '!apps/chatgpt-edge/external-http-runtime.js',
     '!apps/chatgpt-edge/external-main.js',
     '!apps/chatgpt-edge/external-mcp.js',
+    '!apps/chatgpt-edge/governed-context-resolution-coordinator.js',
+    '!apps/chatgpt-edge/governed-context-resolution-retention.js',
+    '!apps/chatgpt-edge/governed-read-attempt-retention.js',
     '!apps/chatgpt-edge/index.js',
     '!apps/chatgpt-edge/loopback-runtime.js',
     '!apps/chatgpt-edge/package-boundary.json',
@@ -134,6 +162,11 @@ test('D2A Docker build context is narrow and base image is digest-pinned', () =>
     '!packages/chatgpt-r4-contracts/constants.js',
     '!packages/chatgpt-r4-contracts/errors.js',
     '!packages/chatgpt-r4-contracts/external-runtime-preflight.js',
+    '!packages/chatgpt-r4-contracts/edge-data-response-v2.js',
+    '!packages/chatgpt-r4-contracts/governed-context-resolution.js',
+    '!packages/chatgpt-r4-contracts/governed-failure-registry.js',
+    '!packages/chatgpt-r4-contracts/governed-read-attempt.js',
+    '!packages/chatgpt-r4-contracts/governed-runtime-identity-transition.js',
     '!packages/chatgpt-r4-contracts/index.js',
     '!packages/chatgpt-r4-contracts/package.json',
     '!packages/chatgpt-r4-contracts/replay-guard.js',
@@ -147,7 +180,8 @@ test('D2A Docker build context is narrow and base image is digest-pinned', () =>
   assert.match(dockerfile, /> \/app\/\.build-source-commit/u);
   assert.match(dockerfile, /chmod 0444 \/app\/package\.json \/app\/package-lock\.json \/app\/\.build-source-commit/u);
   assert.doesNotMatch(dockerfile, /COPY --chown=node:node/u);
-  assert.match(dockerfile, /^USER node$/mu);
+  assert.match(dockerfile, /install -d -o 0 -g 1000 -m 0750 \/run\/secrets\/codex-memory-r4/u);
+  assert.match(dockerfile, /^USER 1000:1000$/mu);
   assert.match(dockerfile, /HEALTHCHECK/u);
   assert.match(dockerfile, /ENTRYPOINT \["node", "apps\/chatgpt-edge\/external-main\.js"\]/u);
   assert.match(dockerignore, /^\*\*$/mu);
@@ -155,6 +189,15 @@ test('D2A Docker build context is narrow and base image is digest-pinned', () =>
   assert.equal(dockerContextAllowlist.every(entry => !entry.includes('*')), true);
   assert.equal(dockerContextAllowlist.some(entry => /(?:^|\/)(?:\.env|logs?|tmp|scratch)(?:[./]|$)/u.test(entry)), false);
 });
+
+function fakeStat({ directory = false, gid, mode, size = 0, uid }) {
+  return {
+    gid, mode, size, uid,
+    isDirectory: () => directory,
+    isFile: () => !directory,
+    isSymbolicLink: () => false
+  };
+}
 
 test('D2A CommonJS entrypoint loads when require(esm) is disabled', () => {
   assert.doesNotThrow(() => execFileSync(process.execPath, [

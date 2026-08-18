@@ -22,9 +22,9 @@ COPY packages/chatgpt-r4-contracts ./packages/chatgpt-r4-contracts
 COPY apps/chatgpt-memory-scope-widget ./apps/chatgpt-memory-scope-widget
 COPY apps/chatgpt-edge ./apps/chatgpt-edge
 
-RUN install -d -o node -g node -m 0700 /run/secrets/codex-memory-r4
+RUN install -d -o 0 -g 1000 -m 0750 /run/secrets/codex-memory-r4
 
-USER node
+USER 1000:1000
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \

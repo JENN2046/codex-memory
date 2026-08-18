@@ -24,7 +24,8 @@ const {
   EDGE_POLICY_DIGEST, PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES,
   PROVIDER_EXECUTABLE_MAX_BYTES, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST,
   RUNTIME_POLICY_DIGEST,
-  validateEdgeCandidate, validateProviderCandidate, validateProviderContainerChanges,
+  validateEdgeCandidate, validateEdgeSecretMountAuthority,
+  validateProviderCandidate, validateProviderContainerChanges,
   validateProviderExecutableBytes, validateProviderImageCandidate, validateRuntimeCandidate
 } = require('../../src/runtime/native-image/container-policy');
 const { nativeClosureDigest, validateNativeClosure, verifyNativeClosureBytes } = require(
@@ -259,6 +260,7 @@ function validateEdgeContainer(edge, authority, options = {}) {
     fail('host_launcher_edge_image_identity_mismatch');
   }
   validateEdgeCandidate(edge);
+  validateEdgeSecretMountAuthority(edge, { fsModule: options.fsModule || fs });
   validateEdgeContainerSupplyChain(edge, authority);
   return true;
 }

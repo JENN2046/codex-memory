@@ -400,6 +400,7 @@ test('unsafe candidate cannot self-authorize by recomputing its own digest', () 
     value => { value.HostConfig.CapDrop = []; },
     value => { value.HostConfig.RestartPolicy.Name = 'always'; },
     value => { value.Config.User = '0:0'; },
+    value => { value.HostConfig.GroupAdd = ['0']; },
     value => { value.HostConfig.NetworkMode = 'host'; },
     value => { value.Mounts[0].RW = true; }
   ]) {

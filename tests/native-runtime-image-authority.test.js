@@ -324,6 +324,37 @@ function edgeInspect(a = authority(), overrides = {}) {
   };
 }
 
+function edgeSecretFilesystem() {
+  const source = '/etc/codex-memory/edge-secret';
+  const names = ['edge-private.pem', 'edge-public.pem', 'relay-public.pem', 'relay-token'];
+  const contents = Object.fromEntries(names.map(name =>
+    [path.join(source, name), Buffer.from(`synthetic-${name}`)]));
+  const directoryStat = (gid, mode) => ({ gid, mode, size: 0, uid: 0,
+    isDirectory: () => true, isFile: () => false, isSymbolicLink: () => false });
+  const fileStat = bytes => ({ gid: 1000, mode: 0o440, size: bytes.length, uid: 0,
+    isDirectory: () => false, isFile: () => true, isSymbolicLink: () => false });
+  return {
+    ...fs,
+    lstatSync(target) {
+      if (target === '/' || target === '/etc' || target === '/etc/codex-memory') {
+        return directoryStat(0, 0o755);
+      }
+      if (target === source) return directoryStat(1000, 0o750);
+      if (contents[target]) return fileStat(contents[target]);
+      return fs.lstatSync(target);
+    },
+    readFileSync(target, ...args) {
+      return contents[target] || fs.readFileSync(target, ...args);
+    },
+    readdirSync(target, ...args) {
+      return target === source ? [...names] : fs.readdirSync(target, ...args);
+    },
+    realpathSync(target, ...args) {
+      return target === source || contents[target] ? target : fs.realpathSync(target, ...args);
+    }
+  };
+}
+
 function providerInspect(a = authority(), overrides = {}) {
   const value = historicalProviderInspect();
   value.Id = a.providerContainerId;
@@ -754,7 +785,7 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
     ...providerEvidenceOptions(),
     containerFile: (_id, source) => source === PROVIDER_POLICY.executable
       ? providerElf() : Buffer.from(JSON.stringify(nativeClosure())),
-    execFile, requireRootFiles: false,
+    execFile, fsModule: edgeSecretFilesystem(), requireRootFiles: false,
     verifyNativeClosureBytes: value => validateNativeClosure(value)
   };
   assert.equal(verifyHostAuthority(accepted, options).runtime.Id, runtime.Id);
@@ -783,7 +814,9 @@ test('host Edge receipt is derived from exact healthy Edge inspection', () => {
   const a = authorityWithEdge();
   const edge = edgeInspect(a);
   const receipt = buildEdgeReceipt(edge, a, 'boot-identity-0001',
-    1_700_000_000_000, edgeEvidenceOptions(a));
+    1_700_000_000_000, {
+      ...edgeEvidenceOptions(a), fsModule: edgeSecretFilesystem()
+    });
   assert.equal(receipt.edgeContainerId, a.edgeContainerId);
 });
 

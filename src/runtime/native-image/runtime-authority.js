@@ -594,6 +594,11 @@ function projectContainerConfig(inspect) {
   const config = inspect?.Config || {};
   const mounts = (inspect?.Mounts || []).map(normalizeMount)
     .sort((a, b) => a.destination.localeCompare(b.destination));
+  const supplementaryGroups = host.GroupAdd;
+  const projectedSupplementaryGroups = supplementaryGroups == null ||
+    (Array.isArray(supplementaryGroups) && supplementaryGroups.length === 0)
+    ? {} : { supplementaryGroups: Array.isArray(supplementaryGroups)
+      ? [...supplementaryGroups].sort() : supplementaryGroups };
   return Object.freeze({
     capabilitiesAdd: [...(host.CapAdd || [])].sort(),
     capabilitiesDrop: [...(host.CapDrop || [])].sort(),
@@ -616,6 +621,7 @@ function projectContainerConfig(inspect) {
     readOnlyRootfs: host.ReadonlyRootfs === true,
     restartPolicy: host.RestartPolicy?.Name || '',
     securityOpt: [...(host.SecurityOpt || [])].sort(),
+    ...projectedSupplementaryGroups,
     tmpfs: host.Tmpfs || {},
     usernsMode: host.UsernsMode || '',
     utsMode: host.UTSMode || '',
