@@ -39,8 +39,9 @@ function secretFs(mutation = {}) {
       }
       if (target === SOURCE) return mutation.root || stat({ directory: true,
         gid: EDGE_RUNTIME_GID, mode: EDGE_SECRET_DIRECTORY_MODE });
-      if (contents[target]) return mutation.file || stat({ gid: EDGE_RUNTIME_GID,
-        mode: EDGE_SECRET_FILE_MODE, size: contents[target].length });
+      if (contents[target]) return stat({ gid: EDGE_RUNTIME_GID,
+        mode: EDGE_SECRET_FILE_MODE, size: contents[target].length,
+        ...(mutation.file || {}) });
       throw Object.assign(new Error('not found'), { code: 'ENOENT' });
     },
     readFileSync(target) {
@@ -119,20 +120,14 @@ test('root-controlled group-readable Edge secret authority is admitted', () => {
 
 test('Edge secret ownership adversarial matrix rejects every unsafe candidate', () => {
   const hostCases = [
-    { name: 'root-root-0600', fs: secretFs({ file: stat({ gid: 0, mode: 0o600,
-      size: 24 }) }) },
-    { name: 'user-owned', fs: secretFs({ file: stat({ gid: 1000, mode: 0o440,
-      size: 24, uid: 1000 }) }) },
-    { name: 'world-readable', fs: secretFs({ file: stat({ gid: 1000, mode: 0o444,
-      size: 24 }) }) },
-    { name: 'group-writable', fs: secretFs({ file: stat({ gid: 1000, mode: 0o460,
-      size: 24 }) }) },
-    { name: 'wrong-gid', fs: secretFs({ file: stat({ gid: 2000, mode: 0o440,
-      size: 24 }) }) },
+    { name: 'root-root-0600', fs: secretFs({ file: { gid: 0, mode: 0o600 } }) },
+    { name: 'user-owned', fs: secretFs({ file: { uid: 1000 } }) },
+    { name: 'world-readable', fs: secretFs({ file: { mode: 0o444 } }) },
+    { name: 'group-writable', fs: secretFs({ file: { mode: 0o460 } }) },
+    { name: 'wrong-gid', fs: secretFs({ file: { gid: 2000 } }) },
     { name: 'symlink-root', fs: secretFs({ root: stat({ gid: 1000, mode: 0o750,
       symlink: true }) }) },
-    { name: 'symlink-file', fs: secretFs({ file: stat({ gid: 1000, mode: 0o440,
-      size: 24, symlink: true }) }) },
+    { name: 'symlink-file', fs: secretFs({ file: { symlink: true } }) },
     { name: 'extra-file', fs: secretFs({ entries: [...SECRET_NAMES, 'unexpected'] }) }
   ];
   for (const candidate of hostCases) {
