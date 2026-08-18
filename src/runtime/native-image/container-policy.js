@@ -15,7 +15,7 @@ const {
 } = require('./provider-image-authority');
 
 const RUNTIME_POLICY_VERSION = 'codex-memory-runtime-container-policy/v2';
-const EDGE_POLICY_VERSION = 'codex-memory-edge-container-policy/v1';
+const EDGE_POLICY_VERSION = 'codex-memory-edge-container-policy/v2';
 const PROVIDER_POLICY_VERSION = 'codex-memory-provider-container-policy/v4';
 const PROFILE_PATH = '/run/codex-memory/profile.json';
 const PROVIDER_ENV_PATH = '/run/secrets/codex-memory-vcp-provider.env';
@@ -32,7 +32,27 @@ const RUNTIME_POLICY = Object.freeze({
 const EDGE_POLICY = Object.freeze({
   capabilitiesAdd: [], capabilitiesDrop: ['ALL'], networkMode: 'bridge',
   noNewPrivileges: true, privileged: false, readOnlyRootfs: true,
-  restartPolicy: 'no', schemaVersion: EDGE_POLICY_VERSION
+  command: Object.freeze([]),
+  entrypoint: Object.freeze(['node', 'apps/chatgpt-edge/external-main.js']),
+  healthcheck: Object.freeze({
+    Test: Object.freeze(['CMD-SHELL',
+      'node -e "const h=require(\'node:http\');const u=new URL(process.env.CODEX_MEMORY_R4_PUBLIC_ORIGIN);const r=h.request({host:\'127.0.0.1\',port:process.env.CODEX_MEMORY_R4_EDGE_PORT,path:\'/healthz\',headers:{host:u.host,\'x-forwarded-proto\':\'https\'}},x=>process.exit(x.statusCode===200?0:1));r.on(\'error\',()=>process.exit(1));r.end()"']),
+    Interval: 30_000_000_000,
+    Timeout: 5_000_000_000,
+    StartPeriod: 5_000_000_000,
+    Retries: 3
+  }),
+  imageEnvironment: Object.freeze({
+    CODEX_MEMORY_R4_CONTAINER_LOOPBACK_PUBLISH_REQUIRED: 'true',
+    CODEX_MEMORY_R4_EDGE_BIND_HOST: '0.0.0.0',
+    CODEX_MEMORY_R4_EDGE_PORT: '8080',
+    NODE_ENV: 'production',
+    NODE_VERSION: '22.23.1',
+    PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
+    YARN_VERSION: '1.22.22'
+  }),
+  restartPolicy: 'no', schemaVersion: EDGE_POLICY_VERSION,
+  workingDirectory: '/app'
 });
 const PROVIDER_POLICY = Object.freeze({
   composeConfigHash: '9dc742607c45aeff4044f5a46d0c6ea0012a5a4bbe3c1ba089993239dde8e56d',
@@ -208,6 +228,65 @@ function loopbackBinding(portBindings, port, hostPort = null) {
     portBindings[port][0]?.HostIp === '127.0.0.1' &&
     (hostPort === null || portBindings[port][0]?.HostPort === hostPort);
 }
+const EDGE_OVERRIDE_ENVIRONMENT_NAMES = Object.freeze([
+  'CODEX_MEMORY_R4_AUTH0_ISSUER',
+  'CODEX_MEMORY_R4_AUTH0_JWKS_URI',
+  'CODEX_MEMORY_R4_BINDING_DIGEST',
+  'CODEX_MEMORY_R4_BINDING_REFERENCE',
+  'CODEX_MEMORY_R4_EDGE_ARTIFACT_SHA256',
+  'CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID',
+  'CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY',
+  'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY',
+  'CODEX_MEMORY_R4_HOST_PROJECT_REFERENCE',
+  'CODEX_MEMORY_R4_LOCKFILE_SHA256',
+  'CODEX_MEMORY_R4_OAUTH_CLIENT_ID',
+  'CODEX_MEMORY_R4_OPERATOR_REFERENCE',
+  'CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT',
+  'CODEX_MEMORY_R4_PREVIOUS_BINDING_REFERENCE',
+  'CODEX_MEMORY_R4_PUBLIC_ORIGIN',
+  'CODEX_MEMORY_R4_RELAY_AUTH_TOKEN',
+  'CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID',
+  'CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY',
+  'CODEX_MEMORY_R4_SOURCE_COMMIT'
+]);
+function validateEdgeEnvironment(environment) {
+  const expectedNames = [...Object.keys(EDGE_POLICY.imageEnvironment),
+    ...EDGE_OVERRIDE_ENVIRONMENT_NAMES].sort();
+  if (!same(Object.keys(environment).sort(), expectedNames)) {
+    fail('edge_container_canonical_policy_mismatch');
+  }
+  for (const [name, expected] of Object.entries(EDGE_POLICY.imageEnvironment)) {
+    if (environment[name] !== expected) fail('edge_container_canonical_policy_mismatch');
+  }
+  const secretReferences = [
+    'CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY',
+    'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY',
+    'CODEX_MEMORY_R4_RELAY_AUTH_TOKEN',
+    'CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY'
+  ].map(name => environment[name]);
+  if (secretReferences.some(value =>
+    !/^file:\/run\/secrets\/codex-memory-r4\/[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u
+      .test(value || '')) || new Set(secretReferences).size !== secretReferences.length) {
+    fail('edge_container_canonical_policy_mismatch');
+  }
+  for (const name of ['CODEX_MEMORY_R4_PUBLIC_ORIGIN', 'CODEX_MEMORY_R4_AUTH0_ISSUER',
+    'CODEX_MEMORY_R4_AUTH0_JWKS_URI']) {
+    let url;
+    try { url = new URL(environment[name]); } catch { fail('edge_container_canonical_policy_mismatch'); }
+    if (url.protocol !== 'https:' || url.username || url.password || url.hash) {
+      fail('edge_container_canonical_policy_mismatch');
+    }
+  }
+  for (const name of ['CODEX_MEMORY_R4_EDGE_SIGNING_KEY_ID',
+    'CODEX_MEMORY_R4_RELAY_SIGNING_KEY_ID', 'CODEX_MEMORY_R4_OAUTH_CLIENT_ID',
+    'CODEX_MEMORY_R4_OPERATOR_SUBJECT_FINGERPRINT']) {
+    if (!/^[A-Za-z0-9][A-Za-z0-9._:@/-]{2,255}$/u.test(environment[name] || '') ||
+        /placeholder|example|todo/iu.test(environment[name])) {
+      fail('edge_container_canonical_policy_mismatch');
+    }
+  }
+  return true;
+}
 function validateEdgeCandidate(inspect) {
   const value = projectContainerConfig(inspect);
   requireNoDangerousHostSurface(value, 'edge_container_canonical_policy_mismatch');
@@ -221,9 +300,14 @@ function validateEdgeCandidate(inspect) {
       secret[0].type !== 'bind' ||
       !secret[0].source.startsWith('/etc/codex-memory/') ||
       value.mounts.length !== 1 ||
-      !loopbackBinding(value.portBindings, '8080/tcp')) {
+      !loopbackBinding(value.portBindings, '8080/tcp') ||
+      value.workingDirectory !== EDGE_POLICY.workingDirectory ||
+      !same(value.entrypoint, EDGE_POLICY.entrypoint) ||
+      !same(value.command, EDGE_POLICY.command) ||
+      !same(value.healthcheck, EDGE_POLICY.healthcheck)) {
     fail('edge_container_canonical_policy_mismatch');
   }
+  validateEdgeEnvironment(envObject(value.environment));
   return Object.freeze(value);
 }
 function validateProviderCandidate(inspect, imageEvidence, { volumeObservation } = {}) {

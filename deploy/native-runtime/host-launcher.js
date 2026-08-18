@@ -30,6 +30,11 @@ const {
 const { nativeClosureDigest, validateNativeClosure, verifyNativeClosureBytes } = require(
   '../../src/runtime/native-image/native-closure'
 );
+const {
+  validateEdgeContainerSupplyChain,
+  validateEdgeDaemonImageObservation,
+  validateEdgeOciArchive
+} = require('../../src/runtime/native-image/edge-image-authority');
 const { parseTarBuffer, regularFiles } = require(
   '../../src/runtime/native-image/tar-archive'
 );
@@ -212,9 +217,9 @@ function validateImageForHost(image, authority) {
   return true;
 }
 
-function validateEdgeContainer(edge, authority) {
+function validateEdgeContainer(edge, authority, options = {}) {
   if (edge?.Id !== authority.edgeContainerId ||
-      edge?.Image !== authority.edgeImageIdentity ||
+      edge?.Image !== authority.edgeDaemonImageIdentity ||
       containerConfigDigest(edge) !== authority.edgeConfigDigest ||
       edge?.Config?.Labels?.['org.opencontainers.image.revision'] !==
         authority.edgeRevision ||
@@ -224,7 +229,37 @@ function validateEdgeContainer(edge, authority) {
       authority.edgePolicyDigest !== EDGE_POLICY_DIGEST) {
     fail('host_launcher_edge_identity_mismatch');
   }
+  const imageInspector = options.edgeImageInspect || dockerImageInspect;
+  const image = imageInspector(edge.Image, options);
+  const imageArchive = options.edgeImageArchive || dockerProviderImageArchive;
+  const archiveAdmission = options.edgeImageAdmission || validateEdgeOciArchive;
+  const archiveEvidence = archiveAdmission(imageArchive(edge.Image, options));
+  const acceptedImage = Object.freeze({
+    artifactSha256: authority.edgeArtifactSha256,
+    buildContextDigest: authority.edgeBuildContextDigest,
+    buildManifestDigest: authority.edgeBuildManifestDigest,
+    imageConfigDigest: authority.edgeImageConfigDigest,
+    imageStoreIdentityModel: authority.edgeImageStoreIdentityModel,
+    lockfileSha256: authority.edgeLockfileSha256,
+    ociManifestDigest: authority.edgeOciManifestDigest,
+    schemaVersion: archiveEvidence.schemaVersion,
+    sourceCommit: authority.edgeSourceCommit
+  });
+  for (const field of ['imageConfigDigest', 'imageStoreIdentityModel', 'lockfileSha256',
+    'ociManifestDigest', 'sourceCommit']) {
+    if (archiveEvidence[field] !== acceptedImage[field]) {
+      fail('host_launcher_edge_image_identity_mismatch');
+    }
+  }
+  const daemonEvidence = validateEdgeDaemonImageObservation(image, acceptedImage);
+  if (daemonEvidence.daemonImageIdentity !== authority.edgeDaemonImageIdentity ||
+      daemonEvidence.imageConfigDigest !== authority.edgeImageConfigDigest ||
+      daemonEvidence.imageStoreIdentityModel !== authority.edgeImageStoreIdentityModel ||
+      daemonEvidence.ociManifestDigest !== authority.edgeOciManifestDigest) {
+    fail('host_launcher_edge_image_identity_mismatch');
+  }
   validateEdgeCandidate(edge);
+  validateEdgeContainerSupplyChain(edge, authority);
   return true;
 }
 
@@ -305,16 +340,21 @@ function atomicRootReceipt(file, value, {
   try { fsModule.fsyncSync(dirDescriptor); } finally { fsModule.closeSync(dirDescriptor); }
 }
 
-function buildEdgeReceipt(edge, authority, bootId, now = Date.now()) {
-  validateEdgeContainer(edge, authority);
+function buildEdgeReceipt(edge, authority, bootId, now = Date.now(), options = {}) {
+  validateEdgeContainer(edge, authority, options);
   if (edge?.State?.Running !== true || edge?.State?.Health?.Status !== 'healthy') {
     fail('host_launcher_edge_unhealthy');
   }
   return Object.freeze({
     edgeConfigDigest: authority.edgeConfigDigest,
     edgeContainerId: authority.edgeContainerId,
+    edgeArtifactSha256: authority.edgeArtifactSha256,
+    edgeBuildContextDigest: authority.edgeBuildContextDigest,
+    edgeDaemonImageIdentity: authority.edgeDaemonImageIdentity,
     edgeHealth: 'healthy',
-    edgeImageIdentity: authority.edgeImageIdentity,
+    edgeImageConfigDigest: authority.edgeImageConfigDigest,
+    edgeImageStoreIdentityModel: authority.edgeImageStoreIdentityModel,
+    edgeOciManifestDigest: authority.edgeOciManifestDigest,
     edgeRevision: authority.edgeRevision,
     launchEpoch: bootId,
     launcherAuthorityDigest: authorityRecordDigest(authority),
@@ -446,6 +486,8 @@ function waitForHealthyEdge(authority, options = {}) {
 function verifyHostAuthority(authority, options = {}) {
   const installedBundleDigest = hostTrustBundleDigest({
     authorityModuleFile: require.resolve('../../src/runtime/native-image/runtime-authority'),
+    edgeImageAuthorityModuleFile:
+      require.resolve('../../src/runtime/native-image/edge-image-authority'),
     launcherFile: __filename,
     nativeClosureModuleFile: require.resolve('../../src/runtime/native-image/native-closure'),
     policyModuleFile: require.resolve('../../src/runtime/native-image/container-policy'),
@@ -498,7 +540,7 @@ function verifyHostAuthority(authority, options = {}) {
     expectedStateSource: authority.runtimeMountSources.primaryState
   });
   const edge = dockerInspect(authority.edgeContainerId, options);
-  validateEdgeContainer(edge, authority);
+  validateEdgeContainer(edge, authority, options);
   if (options.requireRootFiles !== false) {
     for (const mount of edge.Mounts || []) {
       if (mount.Type === 'bind') validateStableHostMountSource(mount.Source, {
@@ -548,7 +590,7 @@ async function start(authority, options = {}) {
   // same human-readable name.
   const finalEvidence = verifyHostAuthority(authority, options);
   const receipt = buildEdgeReceipt(
-    finalEvidence.edge, authority, bootId, options.now?.() || Date.now()
+    finalEvidence.edge, authority, bootId, options.now?.() || Date.now(), options
   );
   atomicRootReceipt(options.receiptPath || DEFAULT_RECEIPT_PATH, receipt, options);
   const providerReceipt = await buildProviderReceipt(
@@ -559,7 +601,7 @@ async function start(authority, options = {}) {
     providerReceipt, options
   );
   const beforeStart = verifyHostAuthority(authority, options);
-  buildEdgeReceipt(beforeStart.edge, authority, bootId, options.now?.() || Date.now());
+  buildEdgeReceipt(beforeStart.edge, authority, bootId, options.now?.() || Date.now(), options);
   await buildProviderReceipt(
     beforeStart.provider, authority, bootId, options.now?.() || Date.now(), options
   );
@@ -641,7 +683,7 @@ function stop(authority, options = {}) {
     stopped.push('runtime');
   }
   const edge = dockerInspect(authority.edgeContainerId, options);
-  validateEdgeContainer(edge, authority);
+  validateEdgeContainer(edge, authority, options);
   if (edge?.State?.Running === true) {
     dockerAction(['stop', '--time', '10', authority.edgeContainerId], options);
     stopped.push('edge');

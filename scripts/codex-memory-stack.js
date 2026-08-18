@@ -199,8 +199,22 @@ const PROFILE_KEYS = Object.freeze([
 ]);
 const IMAGE_PROFILE_KEYS = Object.freeze([
   ...PROFILE_KEYS.filter(key => key !== 'providerImageId'),
+  'edgeArtifactSha256',
+  'edgeBindingDigest',
+  'edgeBindingReference',
+  'edgeBuildContextDigest',
+  'edgeBuildManifestDigest',
+  'edgeDaemonImageIdentity',
+  'edgeHostProjectReference',
+  'edgeImageConfigDigest',
+  'edgeImageStoreIdentityModel',
   'edgeLifecycleAuthority',
+  'edgeLockfileSha256',
+  'edgeOciManifestDigest',
+  'edgeOperatorReference',
   'edgePolicyDigest',
+  'edgePreviousBindingReference',
+  'edgeSourceCommit',
   'edgeRuntimeConfigDigest',
   'hostLauncherAuthorityVersion',
   'hostLauncherDigest',
@@ -213,6 +227,7 @@ const IMAGE_PROFILE_KEYS = Object.freeze([
   'providerImageStoreIdentityModel',
   'providerOciManifestDigest',
   'providerRuntimeConfigDigest',
+  'profileAuthorityComponentSchemaVersion',
   'runtimePolicyDigest',
   'runtimeContainerId',
   'runtimeImageConfigId',
@@ -227,6 +242,7 @@ const SAFE_SHA256_DIGEST = /^sha256:[a-f0-9]{64}$/u;
 const SAFE_CONTAINER_ID = /^[a-f0-9]{64}$/u;
 const SAFE_IMAGE_ID = /^sha256:[a-f0-9]{64}$/u;
 const SAFE_CONTAINER_NAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$/u;
+const SAFE_OPAQUE_REFERENCE = /^[A-Za-z0-9][A-Za-z0-9._:/-]{2,255}$/u;
 const SAFE_CODE = /^[a-z][a-z0-9_]{0,95}$/u;
 const SAFE_CHILD_PATH = '/usr/bin:/bin';
 const SAFE_MANAGED_ENVIRONMENT_NAME =
@@ -1533,6 +1549,26 @@ function validateProfile(value) {
         !SAFE_SHA256_DIGEST.test(value.runtimePolicyDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.edgePolicyDigest || '') ||
         !SAFE_SHA256_DIGEST.test(value.edgeRuntimeConfigDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.edgeArtifactSha256 || '') ||
+        !SAFE_SHA256_DIGEST.test(value.edgeBindingDigest || '') ||
+        !SAFE_OPAQUE_REFERENCE.test(value.edgeBindingReference || '') ||
+        !SAFE_SHA256_DIGEST.test(value.edgeBuildContextDigest || '') ||
+        !SAFE_SHA256_DIGEST.test(value.edgeBuildManifestDigest || '') ||
+        !SAFE_IMAGE_ID.test(value.edgeDaemonImageIdentity || '') ||
+        !SAFE_OPAQUE_REFERENCE.test(value.edgeHostProjectReference || '') ||
+        !SAFE_SHA256_DIGEST.test(value.edgeImageConfigDigest || '') ||
+        value.edgeImageStoreIdentityModel !==
+          'docker-containerd-manifest-identity/v1' ||
+        !SAFE_SHA256_DIGEST.test(value.edgeLockfileSha256 || '') ||
+        !SAFE_SHA256_DIGEST.test(value.edgeOciManifestDigest || '') ||
+        !SAFE_OPAQUE_REFERENCE.test(value.edgeOperatorReference || '') ||
+        !SAFE_OPAQUE_REFERENCE.test(value.edgePreviousBindingReference || '') ||
+        [value.edgeBindingReference, value.edgeHostProjectReference,
+          value.edgeOperatorReference, value.edgePreviousBindingReference]
+          .some(reference => /placeholder|example|todo/iu.test(reference)) ||
+        !SAFE_GIT_OBJECT.test(value.edgeSourceCommit || '') ||
+        value.profileAuthorityComponentSchemaVersion !==
+          'codex-memory-profile-runtime-authority-components/v3' ||
         !SAFE_SHA256_DIGEST.test(value.providerPolicyDigest || '') ||
         !SAFE_IMAGE_ID.test(value.providerDaemonImageIdentity || '') ||
         !SAFE_SHA256_DIGEST.test(value.providerImageConfigDigest || '') ||
@@ -6978,7 +7014,23 @@ function containerSupervisorAuthorityMatchesProfile(profile, authority) {
     profile.providerPolicyDigest === authority.providerPolicyDigest &&
     profile.edgeContainerId === authority.edgeContainerId &&
     profile.edgeRuntimeConfigDigest === authority.edgeConfigDigest &&
-    profile.runtimeBaseline === authority.edgeRevision &&
+    profile.edgeArtifactSha256 === authority.edgeArtifactSha256 &&
+    profile.edgeBindingDigest === authority.edgeBindingDigest &&
+    profile.edgeBindingReference === authority.edgeBindingReference &&
+    profile.edgeBuildContextDigest === authority.edgeBuildContextDigest &&
+    profile.edgeBuildManifestDigest === authority.edgeBuildManifestDigest &&
+    profile.edgeDaemonImageIdentity === authority.edgeDaemonImageIdentity &&
+    profile.edgeHostProjectReference === authority.edgeHostProjectReference &&
+    profile.edgeImageConfigDigest === authority.edgeImageConfigDigest &&
+    profile.edgeImageStoreIdentityModel === authority.edgeImageStoreIdentityModel &&
+    profile.edgeLockfileSha256 === authority.edgeLockfileSha256 &&
+    profile.edgeOciManifestDigest === authority.edgeOciManifestDigest &&
+    profile.edgeOperatorReference === authority.edgeOperatorReference &&
+    profile.edgePreviousBindingReference === authority.edgePreviousBindingReference &&
+    profile.edgeSourceCommit === authority.edgeSourceCommit &&
+    profile.profileAuthorityComponentSchemaVersion ===
+      'codex-memory-profile-runtime-authority-components/v3' &&
+    profile.edgeSourceCommit === authority.edgeRevision &&
     profile.providerContainerId === authority.providerContainerId &&
     profile.providerDaemonImageIdentity === authority.providerDaemonImageIdentity &&
     profile.providerImageConfigDigest === authority.providerImageConfigDigest &&

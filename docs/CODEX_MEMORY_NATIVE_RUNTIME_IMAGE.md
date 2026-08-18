@@ -99,12 +99,62 @@ credential. A Provider receipt can report `healthy` only after both gates pass;
 establishes identity.
 
 The authority record uses
-`codex-memory-native-runtime-authority/v2`, its Provider component projection
-uses `codex-memory-profile-runtime-authority-components/v2`, and Provider
-receipts use `codex-memory-provider-runtime-receipt/v2`. Each carries distinct
+`codex-memory-native-runtime-authority/v3`, its profile authority component
+projection uses `codex-memory-profile-runtime-authority-components/v3`,
+Provider receipts use `codex-memory-provider-runtime-receipt/v2`, and Edge
+receipts use `codex-memory-edge-runtime-receipt/v2`. Each carries distinct
 fields for container configuration, daemon image identity, OCI manifest,
 image-config blob, and image-store model. Legacy v1 records/receipts and
-Provider policy v2 cannot be interpreted under the new semantics.
+older authority/profile/Edge-receipt schemas cannot be interpreted under the
+new semantics.
+
+## Edge image supply-chain authority
+
+An Edge container is never its own image trust root. The accepted chain begins
+with the canonical Git commit and the repository's deny-all `.dockerignore`
+allowlist. `generate-codex-memory-edge-context.js` materializes only those exact
+Git blobs, adds the exact `.dockerignore` control file to the inventory, rejects
+symlinks and undeclared inputs, and emits a deterministic USTAR context plus a
+canonical `codex-memory-edge-build-manifest/v1` manifest. The manifest binds the
+source commit/tree, pinned base index and platform manifests, package-lock
+SHA-256, every admitted file, build tools, and `SOURCE_DATE_EPOCH`. The builder
+opens that artifact once, verifies its operator-carried SHA-256 and complete
+inventory, and sends those same bytes to BuildKit on stdin.
+
+The exact OCI output is validated without host extraction. Admission hashes the
+archive, manifest, config and every referenced layer, requires linux/amd64,
+checks the exact revision label, and reconstructs the layered image view to
+verify `/app/.build-source-commit` and `/app/package-lock.json`. For this
+contract, `CODEX_MEMORY_R4_EDGE_ARTIFACT_SHA256` has one meaning: the SHA-256 of
+the originally accepted exact Edge OCI archive. It is operator-carried during
+authority creation and compared with the independently verified archive; a
+future container environment can only repeat that accepted value.
+
+The root authority separately binds the original archive, Edge build-context
+and build-manifest digests, lockfile, source commit, OCI manifest, OCI config,
+daemon image identity, and supported image-store model. On the admitted Native
+Docker/containerd store the daemon ID and future `container.Image` equal the OCI
+manifest digest; neither is relabeled as the distinct config digest. Every host
+admission saves and strictly validates the exact daemon image locally, compares
+its manifest/config/source/lockfile evidence to the root authority, applies the
+independent Edge container policy, and only then checks health. A mutable tag or
+revision label alone is never authority.
+
+Edge policy `codex-memory-edge-container-policy/v2` independently fixes the
+image-default `node apps/chatgpt-edge/external-main.js` entrypoint, empty
+command, `/app` working directory, and exact image healthcheck. It accepts only
+the exact image-inherited environment plus the reviewed deployment-variable
+set, validates secret values as file references below the dedicated secret
+root, and rejects every extra variable. In particular, `NODE_OPTIONS`, altered
+`PATH`, interpreter/command overrides, and executable paths below the secret
+mount cannot be incorporated into a candidate-derived container digest.
+
+The authority also binds the Edge binding digest and the bounded binding,
+operator, host-project and previous-binding references. Secret values remain
+separate file references rooted under `/run/secrets/codex-memory-r4`; they are
+not copied into OCI layers, authority records, receipts, or build logs. Edge
+lifecycle ownership remains `host_launcher` and Edge policy remains
+`codex-memory-edge-container-policy/v2`.
 
 The authority record and Provider/Edge receipts contain no secrets. Their installed files
 are root-owned, non-writable by group/other, and readable by the non-root runtime
