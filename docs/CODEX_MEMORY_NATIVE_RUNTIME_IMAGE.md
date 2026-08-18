@@ -143,7 +143,8 @@ revision label alone is never authority.
 Edge policy `codex-memory-edge-container-policy/v3` independently fixes the
 image-default `node apps/chatgpt-edge/external-main.js` entrypoint, empty
 command, `/app` working directory, exact numeric runtime identity `1000:1000`,
-and exact image healthcheck. It accepts only
+an empty Docker supplementary-group set, and exact image healthcheck. The
+process also verifies that its effective group set contains only GID 1000. It accepts only
 the exact image-inherited environment plus the reviewed deployment-variable
 set, validates secret values as file references below the dedicated secret
 root, and rejects every extra variable. In particular, `NODE_OPTIONS`, altered

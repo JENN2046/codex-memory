@@ -65,6 +65,7 @@ const EDGE_POLICY = Object.freeze({
     YARN_VERSION: '1.22.22'
   }),
   runtimeUser: `${EDGE_RUNTIME_UID}:${EDGE_RUNTIME_GID}`,
+  supplementaryGroups: Object.freeze([]),
   secretMount: Object.freeze({
     destination: EDGE_SECRET_ROOT,
     directoryGid: EDGE_RUNTIME_GID,
@@ -329,7 +330,8 @@ function validateEdgeCandidate(inspect) {
       value.workingDirectory !== EDGE_POLICY.workingDirectory ||
       !same(value.entrypoint, EDGE_POLICY.entrypoint) ||
       !same(value.command, EDGE_POLICY.command) ||
-      !same(value.healthcheck, EDGE_POLICY.healthcheck)) {
+      !same(value.healthcheck, EDGE_POLICY.healthcheck) ||
+      value.supplementaryGroups !== undefined) {
     fail('edge_container_canonical_policy_mismatch');
   }
   validateEdgeEnvironment(envObject(value.environment));

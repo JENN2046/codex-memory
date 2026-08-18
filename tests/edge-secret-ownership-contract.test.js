@@ -5,6 +5,9 @@ const path = require('node:path');
 const test = require('node:test');
 
 const {
+  containerConfigDigest
+} = require('../src/runtime/native-image/runtime-authority');
+const {
   EDGE_POLICY,
   EDGE_RUNTIME_GID,
   EDGE_RUNTIME_UID,
@@ -118,6 +121,14 @@ test('root-controlled group-readable Edge secret authority is admitted', () => {
   });
 });
 
+test('supplementary groups are policy-rejected and container-config bound', () => {
+  const accepted = edgeInspect();
+  const elevated = structuredClone(accepted);
+  elevated.HostConfig.GroupAdd = ['0'];
+  assert.notEqual(containerConfigDigest(elevated), containerConfigDigest(accepted));
+  rejection(() => validateEdgeCandidate(elevated));
+});
+
 test('Edge secret ownership adversarial matrix rejects every unsafe candidate', () => {
   const hostCases = [
     { name: 'root-root-0600', fs: secretFs({ file: { gid: 0, mode: 0o600 } }) },
@@ -138,6 +149,7 @@ test('Edge secret ownership adversarial matrix rejects every unsafe candidate', 
 
   const containerCases = [
     value => { value.Config.User = '1001:1000'; },
+    value => { value.HostConfig.GroupAdd = ['0']; },
     value => { value.HostConfig.UsernsMode = 'private'; },
     value => { value.Mounts[0].RW = true; },
     value => { value.Mounts[0].Source = '/var/lib/codex-memory/edge-secret'; },
@@ -159,5 +171,5 @@ test('Edge secret ownership adversarial matrix rejects every unsafe candidate', 
       validateEdgeSecretMountAuthority(inspect, { fsModule: secretFs() });
     });
   }
-  assert.equal(hostCases.length + containerCases.length, 17);
+  assert.equal(hostCases.length + containerCases.length, 18);
 });

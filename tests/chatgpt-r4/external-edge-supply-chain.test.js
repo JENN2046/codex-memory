@@ -37,10 +37,14 @@ test('D2A runtime authority accepts only root-controlled group-readable file ref
     readdirSync: fs.readdirSync,
     realpathSync: fs.realpathSync,
     runtimeGid: EDGE_RUNTIME_GID,
+    runtimeGroups: [EDGE_RUNTIME_GID],
     runtimeUid: EDGE_RUNTIME_UID,
     secretRoot: root
   };
   assert.equal(readSecretReference(`file:${secretFile}`, options), secretValue);
+  assert.throws(() => readSecretReference(`file:${secretFile}`, {
+    ...options, runtimeGroups: [0, EDGE_RUNTIME_GID]
+  }), { code: 'edge_runtime_identity_invalid' });
 
   const outside = path.join(os.tmpdir(), `codex-memory-r4d-outside-${crypto.randomUUID()}`);
   fs.writeFileSync(outside, 'synthetic-outside-value', { mode: 0o600 });

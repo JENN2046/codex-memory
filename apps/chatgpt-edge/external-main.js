@@ -199,9 +199,12 @@ function readSecretReference(reference, {
   readFileSync = fs.readFileSync,
   realpathSync = fs.realpathSync,
   runtimeUid = typeof process.getuid === 'function' ? process.getuid() : null,
-  runtimeGid = typeof process.getgid === 'function' ? process.getgid() : null
+  runtimeGid = typeof process.getgid === 'function' ? process.getgid() : null,
+  runtimeGroups = typeof process.getgroups === 'function' ? process.getgroups() : null
 } = {}) {
-  if (runtimeUid !== EDGE_RUNTIME_UID || runtimeGid !== EDGE_RUNTIME_GID) {
+  if (runtimeUid !== EDGE_RUNTIME_UID || runtimeGid !== EDGE_RUNTIME_GID ||
+      !Array.isArray(runtimeGroups) || runtimeGroups.length !== 1 ||
+      runtimeGroups[0] !== EDGE_RUNTIME_GID) {
     reject('edge_runtime_identity_invalid');
   }
   const { root, target } = resolveSecretReference(reference, { secretRoot, realpathSync });
