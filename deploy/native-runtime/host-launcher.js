@@ -44,6 +44,10 @@ const LAUNCHER_VERSION = 'codex-memory-native-host-launcher/v1';
 const DOCKER = '/usr/bin/docker';
 const DEFAULT_RECEIPT_PATH = '/run/codex-memory/edge-receipt.json';
 const DEFAULT_PROVIDER_RECEIPT_PATH = '/run/codex-memory/provider-receipt.json';
+const EPHEMERAL_RECEIPT_ROOT = '/run/codex-memory';
+const EPHEMERAL_RECEIPT_PLACEHOLDER_SCHEMA =
+  'codex-memory-ephemeral-receipt-placeholder/v1';
+const MAXIMUM_RECEIPT_MOUNT_BYTES = 64 * 1024;
 const DEFAULT_LOCK_PATH = '/run/codex-memory/host-lifecycle.lock';
 const DEFAULT_AUTHORITY_PATH = '/etc/codex-memory/native-runtime-authority.json';
 const DEFAULT_BOOT_ID_PATH = '/proc/sys/kernel/random/boot_id';
@@ -54,6 +58,25 @@ const STABLE_MOUNT_ROOTS = Object.freeze([
   '/run/codex-memory',
   '/srv/codex-memory',
   '/var/lib/codex-memory'
+]);
+const RUNTIME_ALLOWED_ENVIRONMENT_NAMES = Object.freeze([
+  'CODEX_MEMORY_CONTAINER_AUTHORITY_PATH',
+  'CODEX_MEMORY_CONTAINER_SUPERVISOR',
+  'CODEX_MEMORY_EDGE_RECEIPT_PATH',
+  'CODEX_MEMORY_PROVIDER_RECEIPT_PATH',
+  'CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH',
+  'CODEX_MEMORY_STACK_PROFILE_PATH',
+  'CODEX_MEMORY_STACK_RUNTIME_DIR',
+  'NODE_DISABLE_COMPILE_CACHE',
+  'NODE_ENV',
+  'NODE_VERSION',
+  'PATH',
+  'PUPPETEER_SKIP_DOWNLOAD',
+  'SOURCE_DATE_EPOCH',
+  'TZ',
+  'VCP_ROOT',
+  'VCPTOOLBOX_ROOT',
+  'YARN_VERSION'
 ]);
 
 function fail(code) {
@@ -204,6 +227,144 @@ function validateStableHostMountSource(source, {
   }
   if (real !== resolved) fail('host_launcher_mount_source_identity_mismatch');
   return resolved;
+}
+
+function canonicalReceiptMountPaths(authority, options = {}) {
+  const edge = authority?.runtimeMountSources?.edgeReceipt;
+  const provider = authority?.runtimeMountSources?.providerReceipt;
+  if (edge !== DEFAULT_RECEIPT_PATH || provider !== DEFAULT_PROVIDER_RECEIPT_PATH ||
+      path.dirname(edge || '') !== EPHEMERAL_RECEIPT_ROOT ||
+      path.dirname(provider || '') !== EPHEMERAL_RECEIPT_ROOT ||
+      path.resolve(edge || '') !== edge || path.resolve(provider || '') !== provider ||
+      (options.receiptPath !== undefined && options.receiptPath !== edge) ||
+      (options.providerReceiptPath !== undefined && options.providerReceiptPath !== provider)) {
+    fail('host_launcher_receipt_bootstrap_path_invalid');
+  }
+  return Object.freeze({ edge, provider });
+}
+
+function validateEphemeralReceiptRoot(fsModule) {
+  for (const current of ['/', '/run', EPHEMERAL_RECEIPT_ROOT]) {
+    let stat;
+    try { stat = fsModule.lstatSync(current); } catch {
+      fail('host_launcher_receipt_bootstrap_root_unavailable');
+    }
+    if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== 0 ||
+        (stat.mode & 0o022) !== 0) {
+      fail('host_launcher_receipt_bootstrap_root_invalid');
+    }
+  }
+  let real;
+  try { real = fsModule.realpathSync(EPHEMERAL_RECEIPT_ROOT); } catch {
+    fail('host_launcher_receipt_bootstrap_root_unavailable');
+  }
+  if (real !== EPHEMERAL_RECEIPT_ROOT) {
+    fail('host_launcher_receipt_bootstrap_root_invalid');
+  }
+}
+
+function inspectReceiptMountSource(file, fsModule) {
+  let stat;
+  try { stat = fsModule.lstatSync(file); } catch (error) {
+    if (error?.code === 'ENOENT') return null;
+    fail('host_launcher_receipt_bootstrap_source_unavailable');
+  }
+  if (!stat.isFile() || stat.isSymbolicLink() || stat.uid !== 0 ||
+      (stat.mode & 0o022) !== 0 || stat.size < 1 ||
+      stat.size > MAXIMUM_RECEIPT_MOUNT_BYTES) {
+    fail('host_launcher_receipt_bootstrap_source_invalid');
+  }
+  let real;
+  try { real = fsModule.realpathSync(file); } catch {
+    fail('host_launcher_receipt_bootstrap_source_unavailable');
+  }
+  if (real !== file) fail('host_launcher_receipt_bootstrap_source_invalid');
+  let descriptor;
+  let opened;
+  try {
+    descriptor = fsModule.openSync(
+      file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0)
+    );
+    opened = fsModule.fstatSync(descriptor);
+  } catch {
+    fail('host_launcher_receipt_bootstrap_source_unavailable');
+  } finally {
+    if (descriptor !== undefined) fsModule.closeSync(descriptor);
+  }
+  if (!opened.isFile() || opened.uid !== 0 || (opened.mode & 0o022) !== 0 ||
+      opened.size < 1 || opened.size > MAXIMUM_RECEIPT_MOUNT_BYTES ||
+      opened.dev !== stat.dev || opened.ino !== stat.ino || opened.size !== stat.size) {
+    fail('host_launcher_receipt_bootstrap_source_invalid');
+  }
+  return stat;
+}
+
+function createReceiptMountPlaceholder(file, fsModule) {
+  const bytes = Buffer.from(canonicalJson({
+    placeholder: true,
+    schemaVersion: EPHEMERAL_RECEIPT_PLACEHOLDER_SCHEMA
+  }));
+  let descriptor;
+  let descriptorStat;
+  try {
+    descriptor = fsModule.openSync(
+      file,
+      fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_WRONLY |
+        (fs.constants.O_NOFOLLOW || 0),
+      0o644
+    );
+  } catch {
+    fail('host_launcher_receipt_bootstrap_create_failed');
+  }
+  try {
+    fsModule.writeFileSync(descriptor, bytes);
+    fsModule.fchownSync(descriptor, 0, 0);
+    fsModule.fchmodSync(descriptor, 0o644);
+    fsModule.fsyncSync(descriptor);
+    descriptorStat = fsModule.fstatSync(descriptor);
+    if (!descriptorStat.isFile() || descriptorStat.uid !== 0 || descriptorStat.gid !== 0 ||
+        (descriptorStat.mode & 0o777) !== 0o644 || descriptorStat.size !== bytes.length) {
+      fail('host_launcher_receipt_bootstrap_create_failed');
+    }
+  } finally {
+    fsModule.closeSync(descriptor);
+  }
+  const pathStat = inspectReceiptMountSource(file, fsModule);
+  if (!pathStat || pathStat.dev !== descriptorStat.dev || pathStat.ino !== descriptorStat.ino) {
+    fail('host_launcher_receipt_bootstrap_create_failed');
+  }
+  return pathStat;
+}
+
+function prepareEphemeralReceiptMountSources(authority, options = {}) {
+  const fsModule = options.fsModule || fs;
+  const receiptPaths = canonicalReceiptMountPaths(authority, options);
+  const runtime = dockerInspect(authority?.expectedRuntimeContainerId, options);
+  if (runtime?.Id !== authority?.expectedRuntimeContainerId ||
+      containerConfigDigest(runtime) !== authority?.containerConfigDigest) {
+    fail('host_launcher_receipt_bootstrap_runtime_identity_mismatch');
+  }
+  validateEphemeralReceiptRoot(fsModule);
+  const observations = Object.entries(receiptPaths).map(([name, file]) =>
+    [name, file, inspectReceiptMountSource(file, fsModule)]);
+  const missing = observations.filter(([, , stat]) => stat === null);
+  if (missing.length > 0 && runtime?.State?.Running === true) {
+    fail('host_launcher_receipt_bootstrap_runtime_active');
+  }
+  for (const [, file] of missing) createReceiptMountPlaceholder(file, fsModule);
+  if (missing.length > 0) {
+    let descriptor;
+    try { descriptor = fsModule.openSync(EPHEMERAL_RECEIPT_ROOT, fs.constants.O_RDONLY); } catch {
+      fail('host_launcher_receipt_bootstrap_root_unavailable');
+    }
+    try { fsModule.fsyncSync(descriptor); } finally { fsModule.closeSync(descriptor); }
+  }
+  return Object.freeze({
+    created: Object.freeze(missing.map(([name]) => name)),
+    preserved: Object.freeze(observations.filter(([, , stat]) => stat !== null)
+      .map(([name]) => name)),
+    placeholderSchemaVersion: EPHEMERAL_RECEIPT_PLACEHOLDER_SCHEMA
+  });
 }
 
 function validateImageForHost(image, authority) {
@@ -485,7 +646,7 @@ function waitForHealthyEdge(authority, options = {}) {
   })();
 }
 
-function verifyHostAuthority(authority, options = {}) {
+function inspectRuntimeAuthority(authority, options = {}) {
   const installedBundleDigest = hostTrustBundleDigest({
     authorityModuleFile: require.resolve('../../src/runtime/native-image/runtime-authority'),
     edgeImageAuthorityModuleFile:
@@ -510,6 +671,16 @@ function verifyHostAuthority(authority, options = {}) {
     ...authority.runtimeMountSources,
     primaryStateDestination: authority.stateMountContract.containerPath
   });
+  validateContainerInspection(runtime, authority, {
+    allowedEnvironmentNames: options.allowedEnvironmentNames ||
+      RUNTIME_ALLOWED_ENVIRONMENT_NAMES,
+    expectedStateSource: authority.runtimeMountSources.primaryState
+  });
+  return Object.freeze({ image, runtime });
+}
+
+function verifyHostAuthority(authority, options = {}) {
+  const { image, runtime } = inspectRuntimeAuthority(authority, options);
   if (options.requireRootFiles !== false) {
     for (const [name, source] of Object.entries(authority.runtimeMountSources)) {
       validateStableHostMountSource(source, {
@@ -519,28 +690,6 @@ function verifyHostAuthority(authority, options = {}) {
       });
     }
   }
-  validateContainerInspection(runtime, authority, {
-    allowedEnvironmentNames: options.allowedEnvironmentNames || [
-      'CODEX_MEMORY_CONTAINER_AUTHORITY_PATH',
-      'CODEX_MEMORY_CONTAINER_SUPERVISOR',
-      'CODEX_MEMORY_EDGE_RECEIPT_PATH',
-      'CODEX_MEMORY_PROVIDER_RECEIPT_PATH',
-      'CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH',
-      'CODEX_MEMORY_STACK_PROFILE_PATH',
-      'CODEX_MEMORY_STACK_RUNTIME_DIR',
-      'NODE_DISABLE_COMPILE_CACHE',
-      'NODE_ENV',
-      'NODE_VERSION',
-      'PATH',
-      'PUPPETEER_SKIP_DOWNLOAD',
-      'SOURCE_DATE_EPOCH',
-      'TZ',
-      'VCP_ROOT',
-      'VCPTOOLBOX_ROOT',
-      'YARN_VERSION'
-    ],
-    expectedStateSource: authority.runtimeMountSources.primaryState
-  });
   const edge = dockerInspect(authority.edgeContainerId, options);
   validateEdgeContainer(edge, authority, options);
   if (options.requireRootFiles !== false) {
@@ -577,6 +726,8 @@ function verifyHostAuthority(authority, options = {}) {
 }
 
 async function start(authority, options = {}) {
+  inspectRuntimeAuthority(authority, options);
+  prepareEphemeralReceiptMountSources(authority, options);
   const evidence = verifyHostAuthority(authority, options);
   if (evidence.runtime?.State?.Running === true) {
     fail('host_launcher_runtime_already_running');
@@ -594,14 +745,12 @@ async function start(authority, options = {}) {
   const receipt = buildEdgeReceipt(
     finalEvidence.edge, authority, bootId, options.now?.() || Date.now(), options
   );
-  atomicRootReceipt(options.receiptPath || DEFAULT_RECEIPT_PATH, receipt, options);
+  const receiptPaths = canonicalReceiptMountPaths(authority, options);
+  atomicRootReceipt(receiptPaths.edge, receipt, options);
   const providerReceipt = await buildProviderReceipt(
     finalEvidence.provider, authority, bootId, options.now?.() || Date.now(), options
   );
-  atomicRootReceipt(
-    options.providerReceiptPath || DEFAULT_PROVIDER_RECEIPT_PATH,
-    providerReceipt, options
-  );
+  atomicRootReceipt(receiptPaths.provider, providerReceipt, options);
   const beforeStart = verifyHostAuthority(authority, options);
   buildEdgeReceipt(beforeStart.edge, authority, bootId, options.now?.() || Date.now(), options);
   await buildProviderReceipt(
@@ -829,6 +978,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  EPHEMERAL_RECEIPT_PLACEHOLDER_SCHEMA,
   LAUNCHER_VERSION,
   requireLifecycleLock,
   atomicRootReceipt,
@@ -845,6 +995,8 @@ module.exports = {
   run,
   start,
   stop,
+  inspectRuntimeAuthority,
+  prepareEphemeralReceiptMountSources,
   validateEdgeContainer,
   validateProviderContainer,
   validateImageForHost,

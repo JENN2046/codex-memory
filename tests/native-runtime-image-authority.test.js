@@ -48,6 +48,7 @@ const {
   atomicRootReceipt,
   buildEdgeReceipt,
   buildProviderReceipt,
+  start,
   validateEdgeContainer,
   validateImageForHost,
   validateProviderContainer,
@@ -352,6 +353,57 @@ function edgeSecretFilesystem() {
     realpathSync(target, ...args) {
       return target === source || contents[target] ? target : fs.realpathSync(target, ...args);
     }
+  };
+}
+
+function coldBootFilesystem(backingRoot) {
+  const base = edgeSecretFilesystem();
+  const canonicalRoot = '/run/codex-memory';
+  const translate = target => target === canonicalRoot
+    ? backingRoot
+    : target.startsWith(`${canonicalRoot}/`)
+      ? path.join(backingRoot, target.slice(canonicalRoot.length + 1))
+      : target;
+  const rootStat = mode => ({ dev: 1, gid: 0, ino: 1, mode, size: 0, uid: 0,
+    isDirectory: () => true, isFile: () => false, isSymbolicLink: () => false });
+  const rootOwned = stat => ({
+    dev: stat.dev, gid: 0, ino: stat.ino, mode: stat.mode, size: stat.size, uid: 0,
+    isDirectory: () => stat.isDirectory(),
+    isFile: () => stat.isFile(),
+    isSymbolicLink: () => stat.isSymbolicLink()
+  });
+  return {
+    ...base,
+    existsSync(target) { return fs.existsSync(translate(target)); },
+    fchmodSync: fs.fchmodSync,
+    fchownSync() {},
+    closeSync: fs.closeSync,
+    fstatSync(descriptor) { return rootOwned(fs.fstatSync(descriptor)); },
+    fsyncSync: fs.fsyncSync,
+    lstatSync(target) {
+      if (target === '/' || target === '/run') return rootStat(0o755);
+      if (target === canonicalRoot || target.startsWith(`${canonicalRoot}/`)) {
+        return rootOwned(fs.lstatSync(translate(target)));
+      }
+      return base.lstatSync(target);
+    },
+    mkdirSync(target, options) { return fs.mkdirSync(translate(target), options); },
+    openSync(target, flags, mode) { return fs.openSync(translate(target), flags, mode); },
+    readFileSync(target, ...args) {
+      return typeof target === 'string' &&
+        (target === canonicalRoot || target.startsWith(`${canonicalRoot}/`))
+        ? fs.readFileSync(translate(target), ...args)
+        : base.readFileSync(target, ...args);
+    },
+    realpathSync(target, ...args) {
+      if (target === canonicalRoot || target.startsWith(`${canonicalRoot}/`)) {
+        const real = fs.realpathSync(translate(target), ...args);
+        return `${canonicalRoot}${real.slice(backingRoot.length)}`;
+      }
+      return base.realpathSync(target, ...args);
+    },
+    renameSync(from, to) { fs.renameSync(translate(from), translate(to)); },
+    writeFileSync: fs.writeFileSync
   };
 }
 
@@ -808,6 +860,104 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
   expectCode(() => verifyHostAuthority({
     ...accepted, hostLauncherDigest: S('0')
   }, options), 'host_launcher_trust_bundle_mismatch');
+});
+
+test('simulated cold boot replaces placeholders with fresh receipts before Runtime start', async t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-cold-boot-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const receiptRoot = path.join(root, 'run');
+  fs.mkdirSync(receiptRoot, { mode: 0o700 });
+  const fsModule = coldBootFilesystem(receiptRoot);
+  const profilePath = path.join(root, 'profile.json');
+  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
+  const sources = { ...SOURCES, profile: profilePath };
+  const runtime = baseInspect();
+  runtime.Mounts.find(m => m.Destination === '/run/codex-memory/profile.json').Source =
+    profilePath;
+  const initial = authorityWithEdge(runtime);
+  const accepted = authority(runtime, {
+    edgeConfigDigest: initial.edgeConfigDigest,
+    profilePath,
+    runtimeMountSources: sources,
+    providerContainerConfigDigest: containerConfigDigest(providerInspect(initial)),
+    hostLauncherDigest: hostTrustBundleDigest({
+      authorityModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'runtime-authority.js'),
+      edgeImageAuthorityModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'edge-image-authority.js'),
+      launcherFile: path.join(__dirname, '..', 'deploy', 'native-runtime',
+        'host-launcher.js'),
+      nativeClosureModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'native-closure.js'),
+      policyModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'container-policy.js'),
+      providerImageAuthorityModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'provider-image-authority.js'),
+      tarArchiveModuleFile: path.join(__dirname, '..', 'src', 'runtime',
+        'native-image', 'tar-archive.js')
+    })
+  });
+  const edge = edgeInspect(accepted);
+  const provider = providerInspect(accepted);
+  const image = {
+    Config: { Labels: {
+      'io.codex-memory.runtime.build-manifest-digest': accepted.buildManifestDigest
+    } },
+    Id: accepted.acceptedImageConfigId,
+    RootFS: { Layers: [S('4'), S('5')] }
+  };
+  const bootId = 'boot-identity-cold-0001';
+  const events = [];
+  const execFile = (_binary, args) => {
+    if (args[0] === 'start') {
+      assert.equal(args[1], accepted.expectedRuntimeContainerId);
+      const edgeValue = JSON.parse(fs.readFileSync(
+        path.join(receiptRoot, 'edge-receipt.json'), 'utf8'));
+      const providerValue = JSON.parse(fs.readFileSync(
+        path.join(receiptRoot, 'provider-receipt.json'), 'utf8'));
+      validateEdgeReceipt(edgeValue, accepted, { bootId, now: 100 });
+      validateProviderReceipt(providerValue, accepted, { bootId, now: 100 });
+      events.push('fresh-receipts-before-runtime-start');
+      runtime.State.Running = true;
+      return '';
+    }
+    return JSON.stringify([args[0] === 'image' ? image :
+      args[0] === 'network' ? { Driver: 'bridge', Internal: false, Name: args[2] } :
+        args[0] === 'volume' ? {
+          Driver: 'local', Name: args[2], Options: {}, Scope: 'local'
+        } : args[2] === accepted.expectedRuntimeContainerId ? runtime :
+          args[2] === accepted.edgeContainerId ? edge : provider]);
+  };
+  const options = {
+    ...edgeEvidenceOptions(accepted),
+    ...providerEvidenceOptions(),
+    bootId,
+    containerFile: (_id, source) => source === PROVIDER_POLICY.executable
+      ? providerElf() : Buffer.from(JSON.stringify(nativeClosure())),
+    execFile,
+    fsModule,
+    now: () => 100,
+    providerHealthProbe: async () => ({
+      accepted: true,
+      contractDigest: digest(PROVIDER_POLICY.health),
+      providerHealth: 'healthy',
+      statusCode: 200
+    }),
+    requireRootFiles: false,
+    verifyNativeClosureBytes: value => validateNativeClosure(value)
+  };
+  assert.equal(fs.existsSync(path.join(receiptRoot, 'edge-receipt.json')), false);
+  assert.equal(fs.existsSync(path.join(receiptRoot, 'provider-receipt.json')), false);
+  const result = await start(accepted, options);
+  assert.equal(result.runtimeContainerId, accepted.expectedRuntimeContainerId);
+  assert.deepEqual(events, ['fresh-receipts-before-runtime-start']);
+  assert.equal(runtime.State.Running, true);
+  assert.equal(JSON.parse(fs.readFileSync(
+    path.join(receiptRoot, 'edge-receipt.json'), 'utf8')).schemaVersion,
+  EDGE_RECEIPT_SCHEMA);
+  assert.equal(JSON.parse(fs.readFileSync(
+    path.join(receiptRoot, 'provider-receipt.json'), 'utf8')).schemaVersion,
+  PROVIDER_RECEIPT_SCHEMA);
 });
 
 test('host Edge receipt is derived from exact healthy Edge inspection', () => {
