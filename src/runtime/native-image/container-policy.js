@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('node:fs');
 const path = require('node:path');
 const {
   AUTHORITY_RECORD_PATH,
@@ -15,13 +16,25 @@ const {
 } = require('./provider-image-authority');
 
 const RUNTIME_POLICY_VERSION = 'codex-memory-runtime-container-policy/v2';
-const EDGE_POLICY_VERSION = 'codex-memory-edge-container-policy/v2';
+const EDGE_POLICY_VERSION = 'codex-memory-edge-container-policy/v3';
 const PROVIDER_POLICY_VERSION = 'codex-memory-provider-container-policy/v4';
 const PROFILE_PATH = '/run/codex-memory/profile.json';
 const PROVIDER_ENV_PATH = '/run/secrets/codex-memory-vcp-provider.env';
 const RUNTIME_DATA_PATH = '/run/codex-memory-runtime-data';
 const PROVIDER_EXECUTABLE_MAX_BYTES = 160 * 1024 * 1024;
 const PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES = PROVIDER_EXECUTABLE_MAX_BYTES + 2 * 1024 * 1024;
+const EDGE_RUNTIME_UID = 1000;
+const EDGE_RUNTIME_GID = 1000;
+const EDGE_SECRET_ROOT = '/run/secrets/codex-memory-r4';
+const EDGE_SECRET_DIRECTORY_MODE = 0o750;
+const EDGE_SECRET_FILE_MODE = 0o440;
+const EDGE_SECRET_MAXIMUM_BYTES = 16_384;
+const EDGE_SECRET_REFERENCE_ENVIRONMENT = Object.freeze([
+  'CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY',
+  'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY',
+  'CODEX_MEMORY_R4_RELAY_AUTH_TOKEN',
+  'CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY'
+]);
 
 const RUNTIME_POLICY = Object.freeze({
   capabilitiesAdd: [], capabilitiesDrop: ['ALL'], ipcMode: 'private',
@@ -50,6 +63,18 @@ const EDGE_POLICY = Object.freeze({
     NODE_VERSION: '22.23.1',
     PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
     YARN_VERSION: '1.22.22'
+  }),
+  runtimeUser: `${EDGE_RUNTIME_UID}:${EDGE_RUNTIME_GID}`,
+  secretMount: Object.freeze({
+    destination: EDGE_SECRET_ROOT,
+    directoryGid: EDGE_RUNTIME_GID,
+    directoryMode: EDGE_SECRET_DIRECTORY_MODE,
+    directoryUid: 0,
+    fileGid: EDGE_RUNTIME_GID,
+    fileMode: EDGE_SECRET_FILE_MODE,
+    fileUid: 0,
+    maximumFileBytes: EDGE_SECRET_MAXIMUM_BYTES,
+    sourceRoot: '/etc/codex-memory'
   }),
   restartPolicy: 'no', schemaVersion: EDGE_POLICY_VERSION,
   workingDirectory: '/app'
@@ -290,10 +315,10 @@ function validateEdgeEnvironment(environment) {
 function validateEdgeCandidate(inspect) {
   const value = projectContainerConfig(inspect);
   requireNoDangerousHostSurface(value, 'edge_container_canonical_policy_mismatch');
-  const nonRoot = value.user === 'node' || /^[1-9][0-9]*(?::[1-9][0-9]*)?$/u.test(value.user);
   const secret = value.mounts.filter(mount =>
-    mount.destination === '/run/secrets/codex-memory-r4');
-  if (!nonRoot || !value.readOnlyRootfs || value.restartPolicy !== 'no' ||
+    mount.destination === EDGE_SECRET_ROOT);
+  if (value.user !== EDGE_POLICY.runtimeUser || !value.readOnlyRootfs ||
+      value.restartPolicy !== 'no' ||
       value.networkMode !== 'bridge' || !same(value.capabilitiesDrop, ['ALL']) ||
       !value.securityOpt.includes('no-new-privileges:true') ||
       value.logConfig?.Type !== 'none' || secret.length !== 1 || secret[0].rw ||
@@ -309,6 +334,100 @@ function validateEdgeCandidate(inspect) {
   }
   validateEdgeEnvironment(envObject(value.environment));
   return Object.freeze(value);
+}
+
+function validateEdgeSecretMountAuthority(inspect, { fsModule = fs } = {}) {
+  const value = projectContainerConfig(inspect);
+  const mount = value.mounts.find(candidate => candidate.destination === EDGE_SECRET_ROOT);
+  if (!mount || mount.type !== 'bind' || mount.rw ||
+      typeof mount.source !== 'string' || path.resolve(mount.source) !== mount.source ||
+      !mount.source.startsWith(`${EDGE_POLICY.secretMount.sourceRoot}/`)) {
+    fail('edge_secret_mount_authority_invalid');
+  }
+  const sourceComponents = mount.source.split('/').filter(Boolean);
+  let current = '/';
+  let filesystemRoot;
+  try { filesystemRoot = fsModule.lstatSync('/'); } catch {
+    fail('edge_secret_mount_authority_unavailable');
+  }
+  if (!filesystemRoot.isDirectory() || filesystemRoot.isSymbolicLink() ||
+      filesystemRoot.uid !== 0 || (filesystemRoot.mode & 0o022) !== 0) {
+    fail('edge_secret_mount_authority_invalid');
+  }
+  for (const component of sourceComponents) {
+    current = path.join(current, component);
+    let stat;
+    try { stat = fsModule.lstatSync(current); } catch {
+      fail('edge_secret_mount_authority_unavailable');
+    }
+    const secretDirectory = current === mount.source;
+    if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== 0 ||
+        (secretDirectory
+          ? stat.gid !== EDGE_RUNTIME_GID ||
+            (stat.mode & 0o777) !== EDGE_SECRET_DIRECTORY_MODE
+          : (stat.mode & 0o022) !== 0)) {
+      fail('edge_secret_mount_authority_invalid');
+    }
+  }
+  let realSource;
+  let directoryEntries;
+  try {
+    realSource = fsModule.realpathSync(mount.source);
+    directoryEntries = fsModule.readdirSync(mount.source);
+  } catch { fail('edge_secret_mount_authority_unavailable'); }
+  if (realSource !== mount.source || !Array.isArray(directoryEntries) ||
+      directoryEntries.some(name => typeof name !== 'string')) {
+    fail('edge_secret_mount_authority_invalid');
+  }
+  const environment = envObject(value.environment);
+  const referencedNames = EDGE_SECRET_REFERENCE_ENVIRONMENT.map(name => {
+    const reference = environment[name];
+    if (typeof reference !== 'string' || !reference.startsWith('file:')) {
+      fail('edge_secret_mount_reference_invalid');
+    }
+    const target = reference.slice(5);
+    if (!path.posix.isAbsolute(target) || path.posix.normalize(target) !== target ||
+        path.posix.dirname(target) !== EDGE_SECRET_ROOT) {
+      fail('edge_secret_mount_reference_invalid');
+    }
+    const basename = path.posix.basename(target);
+    if (!basename || basename === '.' || basename === '..') {
+      fail('edge_secret_mount_reference_invalid');
+    }
+    return basename;
+  });
+  if (new Set(referencedNames).size !== EDGE_SECRET_REFERENCE_ENVIRONMENT.length ||
+      JSON.stringify([...directoryEntries].sort()) !==
+        JSON.stringify([...referencedNames].sort())) {
+    fail('edge_secret_mount_reference_invalid');
+  }
+  for (const name of referencedNames) {
+    const hostPath = path.join(mount.source, name);
+    let stat;
+    let real;
+    let bytes;
+    try {
+      stat = fsModule.lstatSync(hostPath);
+      real = fsModule.realpathSync(hostPath);
+      bytes = fsModule.readFileSync(hostPath);
+    } catch { fail('edge_secret_mount_authority_unavailable'); }
+    if (!Buffer.isBuffer(bytes) || real !== hostPath || !stat.isFile() ||
+        stat.isSymbolicLink() || stat.uid !== 0 || stat.gid !== EDGE_RUNTIME_GID ||
+        (stat.mode & 0o777) !== EDGE_SECRET_FILE_MODE || stat.size !== bytes.length ||
+        stat.size < 1 || stat.size > EDGE_SECRET_MAXIMUM_BYTES || bytes.includes(0)) {
+      fail('edge_secret_mount_authority_invalid');
+    }
+  }
+  return Object.freeze({
+    directoryGid: EDGE_RUNTIME_GID,
+    directoryMode: EDGE_SECRET_DIRECTORY_MODE,
+    directoryUid: 0,
+    fileGid: EDGE_RUNTIME_GID,
+    fileMode: EDGE_SECRET_FILE_MODE,
+    fileUid: 0,
+    referencedFiles: Object.freeze([...referencedNames].sort()),
+    source: mount.source
+  });
 }
 function validateProviderCandidate(inspect, imageEvidence, { volumeObservation } = {}) {
   const value = projectContainerConfig(inspect);
@@ -404,12 +523,15 @@ const EDGE_POLICY_DIGEST = digest(EDGE_POLICY);
 const PROVIDER_POLICY_DIGEST = digest(PROVIDER_POLICY);
 
 module.exports = {
+  EDGE_RUNTIME_GID, EDGE_RUNTIME_UID, EDGE_SECRET_DIRECTORY_MODE,
+  EDGE_SECRET_FILE_MODE, EDGE_SECRET_MAXIMUM_BYTES, EDGE_SECRET_REFERENCE_ENVIRONMENT,
   EDGE_POLICY, EDGE_POLICY_DIGEST, EDGE_POLICY_VERSION,
   PROVIDER_POLICY, PROVIDER_POLICY_DIGEST, PROVIDER_POLICY_VERSION,
   PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES, PROVIDER_EXECUTABLE_MAX_BYTES,
   RUNTIME_POLICY, RUNTIME_POLICY_DIGEST, RUNTIME_POLICY_VERSION,
   mergedProviderEnvironment,
-  validateEdgeCandidate, validateProviderCandidate, validateProviderContainerChanges,
+  validateEdgeCandidate, validateEdgeSecretMountAuthority,
+  validateProviderCandidate, validateProviderContainerChanges,
   validateProviderExecutableBytes, validateProviderImageCandidate,
   validateProviderVolumeCandidate, validateRuntimeCandidate
 };

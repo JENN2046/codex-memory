@@ -140,26 +140,37 @@ its manifest/config/source/lockfile evidence to the root authority, applies the
 independent Edge container policy, and only then checks health. A mutable tag or
 revision label alone is never authority.
 
-Edge policy `codex-memory-edge-container-policy/v2` independently fixes the
+Edge policy `codex-memory-edge-container-policy/v3` independently fixes the
 image-default `node apps/chatgpt-edge/external-main.js` entrypoint, empty
-command, `/app` working directory, and exact image healthcheck. It accepts only
+command, `/app` working directory, exact numeric runtime identity `1000:1000`,
+and exact image healthcheck. It accepts only
 the exact image-inherited environment plus the reviewed deployment-variable
 set, validates secret values as file references below the dedicated secret
 root, and rejects every extra variable. In particular, `NODE_OPTIONS`, altered
 `PATH`, interpreter/command overrides, and executable paths below the secret
 mount cannot be incorporated into a candidate-derived container digest.
 
+The production secret source remains host-root controlled without making the
+secret world-readable. Its parent chain is root-owned and non-writable by
+group/other; the exact secret directory is `root:1000` mode `0750`, and each of
+the four exact regular secret files is `root:1000` mode `0440`. The launcher
+validates the source realpath, complete directory inventory, ownership, modes,
+sizes, and distinct confined references before admission. The exact non-root
+Edge process can read through the group bit, cannot write or replace the source
+bytes, and receives the directory through a read-only bind mount.
+
 The authority also binds the Edge binding digest and the bounded binding,
 operator, host-project and previous-binding references. Secret values remain
 separate file references rooted under `/run/secrets/codex-memory-r4`; they are
 not copied into OCI layers, authority records, receipts, or build logs. Edge
 lifecycle ownership remains `host_launcher` and Edge policy remains
-`codex-memory-edge-container-policy/v2`.
+`codex-memory-edge-container-policy/v3`.
 
 The authority record and Provider/Edge receipts contain no secrets. Their installed files
 are root-owned, non-writable by group/other, and readable by the non-root runtime
-only through individual read-only bind mounts. Secret material uses separate
-owner-only mounts and is never placed in either receipt.
+only through individual read-only bind mounts. Secret material uses the
+root-controlled group-readable contract above and is never placed in either
+receipt.
 
 Authority creation re-verifies the digest-addressed OCI archive and requires
 the imported local Docker image ID to equal its OCI manifest or config digest

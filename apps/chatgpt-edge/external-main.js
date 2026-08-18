@@ -11,13 +11,19 @@ const { createExternalEdgeRuntime } = require('./external-http-runtime');
 const DEFAULT_SECRET_ROOT = '/run/secrets/codex-memory-r4';
 const DEFAULT_LOCKFILE_PATH = path.resolve(__dirname, '../../package-lock.json');
 const DEFAULT_BUILD_SOURCE_FILE = path.resolve(__dirname, '../../.build-source-commit');
+const EDGE_RUNTIME_UID = 1000;
+const EDGE_RUNTIME_GID = 1000;
+const EDGE_SECRET_DIRECTORY_MODE = 0o750;
+const EDGE_SECRET_FILE_MODE = 0o440;
+const EDGE_SECRET_MAXIMUM_BYTES = 16_384;
 
 function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
   secretRoot = DEFAULT_SECRET_ROOT,
   lockfilePath = DEFAULT_LOCKFILE_PATH,
   buildSourceFile = DEFAULT_BUILD_SOURCE_FILE,
+  lstatSync = fs.lstatSync,
+  readdirSync = fs.readdirSync,
   readFileSync = fs.readFileSync,
-  statSync = fs.statSync,
   realpathSync = fs.realpathSync
 } = {}) {
   let buildSourceCommit;
@@ -28,22 +34,16 @@ function loadExternalEdgeRuntimeFromEnvironment(environment = process.env, {
     reject('edge_runtime_build_source_unavailable');
   }
   validateSupplyChainEnvironment(environment, { lockfilePath, buildSourceCommit, readFileSync });
-  const edgePrivateKeyPem = readSecretReference(
+  const secretReferences = [
     getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_PRIVATE_KEY'),
-    { secretRoot, readFileSync, statSync, realpathSync }
-  );
-  const edgePublicKeyPem = readSecretReference(
     getEnvironment(environment, 'CODEX_MEMORY_R4_EDGE_SIGNING_PUBLIC_KEY'),
-    { secretRoot, readFileSync, statSync, realpathSync }
-  );
-  const relayPublicKeyPem = readSecretReference(
     getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_SIGNING_PUBLIC_KEY'),
-    { secretRoot, readFileSync, statSync, realpathSync }
-  );
-  const relayAuthToken = readSecretReference(
-    getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_AUTH_TOKEN'),
-    { secretRoot, readFileSync, statSync, realpathSync }
-  );
+    getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_AUTH_TOKEN')
+  ];
+  validateDistinctSecretReferences(secretReferences, { secretRoot, realpathSync });
+  const secretOptions = { lstatSync, readdirSync, readFileSync, realpathSync, secretRoot };
+  const [edgePrivateKeyPem, edgePublicKeyPem, relayPublicKeyPem, relayAuthToken] =
+    secretReferences.map(reference => readSecretReference(reference, secretOptions));
 
   let edgePrivateKey;
   let edgePublicKey;
@@ -194,8 +194,46 @@ function normalizeBuildSourceCommit(value) {
 
 function readSecretReference(reference, {
   secretRoot = DEFAULT_SECRET_ROOT,
+  lstatSync = fs.lstatSync,
+  readdirSync = fs.readdirSync,
   readFileSync = fs.readFileSync,
-  statSync = fs.statSync,
+  realpathSync = fs.realpathSync,
+  runtimeUid = typeof process.getuid === 'function' ? process.getuid() : null,
+  runtimeGid = typeof process.getgid === 'function' ? process.getgid() : null
+} = {}) {
+  if (runtimeUid !== EDGE_RUNTIME_UID || runtimeGid !== EDGE_RUNTIME_GID) {
+    reject('edge_runtime_identity_invalid');
+  }
+  const { root, target } = resolveSecretReference(reference, { secretRoot, realpathSync });
+  let stat;
+  let rootStat;
+  let entries;
+  try {
+    rootStat = lstatSync(root);
+    stat = lstatSync(target);
+    entries = readdirSync(root);
+  } catch {
+    reject('edge_secret_reference_unavailable');
+  }
+  if (!rootStat.isDirectory() || rootStat.isSymbolicLink() || rootStat.uid !== 0 ||
+      rootStat.gid !== EDGE_RUNTIME_GID ||
+      (rootStat.mode & 0o777) !== EDGE_SECRET_DIRECTORY_MODE ||
+      !stat.isFile() || stat.isSymbolicLink() || stat.uid !== 0 ||
+      stat.gid !== EDGE_RUNTIME_GID || (stat.mode & 0o777) !== EDGE_SECRET_FILE_MODE ||
+      stat.size < 1 || stat.size > EDGE_SECRET_MAXIMUM_BYTES ||
+      !Array.isArray(entries) || entries.some(name => typeof name !== 'string')) {
+    reject('edge_secret_file_security_invalid');
+  }
+  const value = readFileSync(target, 'utf8');
+  if (typeof value !== 'string' || value.length < 1 ||
+      Buffer.byteLength(value, 'utf8') > EDGE_SECRET_MAXIMUM_BYTES || value.includes('\0')) {
+    reject('edge_secret_value_invalid');
+  }
+  return value;
+}
+
+function resolveSecretReference(reference, {
+  secretRoot = DEFAULT_SECRET_ROOT,
   realpathSync = fs.realpathSync
 } = {}) {
   if (typeof reference !== 'string' || !reference.startsWith('file:')) {
@@ -215,26 +253,16 @@ function readSecretReference(reference, {
   if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) {
     reject('edge_secret_reference_outside_root');
   }
-  let stat;
-  let rootStat;
-  try {
-    rootStat = statSync(root);
-    stat = statSync(target);
-  } catch {
-    reject('edge_secret_reference_unavailable');
+  return Object.freeze({ root, target });
+}
+
+function validateDistinctSecretReferences(references, options = {}) {
+  if (!Array.isArray(references) || references.length !== 4) {
+    reject('edge_secret_reference_set_invalid');
   }
-  const currentUid = typeof process.getuid === 'function' ? process.getuid() : null;
-  if (!rootStat.isDirectory() || (rootStat.mode & 0o077) !== 0 ||
-      (currentUid !== null && rootStat.uid !== currentUid) ||
-      !stat.isFile() || (stat.mode & 0o077) !== 0 ||
-      (currentUid !== null && stat.uid !== currentUid) || stat.size < 1 || stat.size > 16_384) {
-    reject('edge_secret_file_security_invalid');
-  }
-  const value = readFileSync(target, 'utf8');
-  if (typeof value !== 'string' || value.length < 1 || value.length > 16_384 || value.includes('\0')) {
-    reject('edge_secret_value_invalid');
-  }
-  return value;
+  const targets = references.map(reference => resolveSecretReference(reference, options).target);
+  if (new Set(targets).size !== targets.length) reject('edge_secret_reference_set_invalid');
+  return true;
 }
 
 function normalizeSingleLineSecret(value) {
@@ -292,6 +320,11 @@ module.exports = {
   DEFAULT_SECRET_ROOT,
   DEFAULT_LOCKFILE_PATH,
   DEFAULT_BUILD_SOURCE_FILE,
+  EDGE_RUNTIME_GID,
+  EDGE_RUNTIME_UID,
+  EDGE_SECRET_DIRECTORY_MODE,
+  EDGE_SECRET_FILE_MODE,
+  EDGE_SECRET_MAXIMUM_BYTES,
   assertDigest,
   assertDistinctEd25519Authorities,
   assertEd25519KeyPair,
@@ -302,5 +335,6 @@ module.exports = {
   parseIntegerEnvironment,
   readSecretReference,
   getEnvironment,
+  validateDistinctSecretReferences,
   validateSupplyChainEnvironment
 };
