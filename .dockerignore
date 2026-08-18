@@ -9,6 +9,9 @@
 !apps/chatgpt-edge/external-http-runtime.js
 !apps/chatgpt-edge/external-main.js
 !apps/chatgpt-edge/external-mcp.js
+!apps/chatgpt-edge/governed-context-resolution-coordinator.js
+!apps/chatgpt-edge/governed-context-resolution-retention.js
+!apps/chatgpt-edge/governed-read-attempt-retention.js
 !apps/chatgpt-edge/index.js
 !apps/chatgpt-edge/loopback-runtime.js
 !apps/chatgpt-edge/package-boundary.json
@@ -29,6 +32,11 @@
 !packages/chatgpt-r4-contracts/constants.js
 !packages/chatgpt-r4-contracts/errors.js
 !packages/chatgpt-r4-contracts/external-runtime-preflight.js
+!packages/chatgpt-r4-contracts/edge-data-response-v2.js
+!packages/chatgpt-r4-contracts/governed-context-resolution.js
+!packages/chatgpt-r4-contracts/governed-failure-registry.js
+!packages/chatgpt-r4-contracts/governed-read-attempt.js
+!packages/chatgpt-r4-contracts/governed-runtime-identity-transition.js
 !packages/chatgpt-r4-contracts/index.js
 !packages/chatgpt-r4-contracts/package.json
 !packages/chatgpt-r4-contracts/replay-guard.js
