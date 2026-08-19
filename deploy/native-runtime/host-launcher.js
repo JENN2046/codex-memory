@@ -9,18 +9,26 @@ const { execFileSync, spawn, spawnSync } = require('node:child_process');
 const {
   EDGE_RECEIPT_SCHEMA,
   PROVIDER_RECEIPT_SCHEMA,
+  VCP_PROVIDER_ENVIRONMENT_MAX_BYTES,
+  VCP_PROVIDER_HOST_ENVIRONMENT_PATH,
+  VCP_PROVIDER_HOST_MODE,
+  VCP_PROVIDER_HOST_UID,
+  VCP_PROVIDER_RUNTIME_GID,
   authorityRecordDigest,
   canonicalJson,
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
+  parseVcpProviderEnvironment,
   profileAuthorityComponents,
   readBoundedJson,
   readBoundedBuffer,
   sha256Buffer,
   validateAuthorityRecord,
   validateContainerInspection,
-  validateImageProfile
+  validateImageProfile,
+  vcpProviderEnvironmentRuntimeAccess,
+  vcpProviderConfigDigest
 } = require('../../src/runtime/native-image/runtime-authority');
 const {
   EDGE_POLICY_DIGEST, PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES,
@@ -229,6 +237,88 @@ function validateStableHostMountSource(source, {
   }
   if (real !== resolved) fail('host_launcher_mount_source_identity_mismatch');
   return resolved;
+}
+
+function sameProviderEnvironmentIdentity(left, right) {
+  return ['dev', 'ino', 'size', 'mtimeMs', 'ctimeMs'].every(name =>
+    left[name] === right[name]
+  );
+}
+
+function validateProviderEnvironmentMountSource(source, {
+  fsModule = fs
+} = {}) {
+  if (source !== VCP_PROVIDER_HOST_ENVIRONMENT_PATH ||
+      path.resolve(source || '') !== source) {
+    fail('host_launcher_provider_environment_path_invalid');
+  }
+  for (const current of ['/', '/etc', '/etc/codex-memory']) {
+    let stat;
+    try { stat = fsModule.lstatSync(current); } catch {
+      fail('host_launcher_provider_environment_unavailable');
+    }
+    if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== 0 ||
+        (stat.mode & 0o022) !== 0) {
+      fail('host_launcher_provider_environment_parent_invalid');
+    }
+  }
+  let linkStat;
+  let real;
+  try {
+    linkStat = fsModule.lstatSync(source);
+    real = fsModule.realpathSync(source);
+  } catch {
+    fail('host_launcher_provider_environment_unavailable');
+  }
+  if (real !== source || linkStat.isSymbolicLink() || !linkStat.isFile() ||
+      linkStat.uid !== VCP_PROVIDER_HOST_UID ||
+      linkStat.gid !== VCP_PROVIDER_RUNTIME_GID ||
+      (linkStat.mode & 0o777) !== VCP_PROVIDER_HOST_MODE ||
+      linkStat.size < 1 || linkStat.size > VCP_PROVIDER_ENVIRONMENT_MAX_BYTES) {
+    fail('host_launcher_provider_environment_security_invalid');
+  }
+  let descriptor;
+  try {
+    descriptor = fsModule.openSync(
+      source,
+      fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0)
+    );
+    const before = fsModule.fstatSync(descriptor);
+    if (!before.isFile() || before.uid !== VCP_PROVIDER_HOST_UID ||
+        before.gid !== VCP_PROVIDER_RUNTIME_GID ||
+        (before.mode & 0o777) !== VCP_PROVIDER_HOST_MODE ||
+        before.dev !== linkStat.dev || before.ino !== linkStat.ino ||
+        before.size < 1 || before.size > VCP_PROVIDER_ENVIRONMENT_MAX_BYTES) {
+      fail('host_launcher_provider_environment_security_invalid');
+    }
+    const bytes = fsModule.readFileSync(descriptor);
+    const after = fsModule.fstatSync(descriptor);
+    const runtimeAccess = vcpProviderEnvironmentRuntimeAccess(after);
+    if (!sameProviderEnvironmentIdentity(before, after) || !after.isFile() ||
+        after.uid !== VCP_PROVIDER_HOST_UID ||
+        after.gid !== VCP_PROVIDER_RUNTIME_GID ||
+        (after.mode & 0o777) !== VCP_PROVIDER_HOST_MODE ||
+        !runtimeAccess.runtimeCanRead || runtimeAccess.runtimeCanWrite) {
+      fail('host_launcher_provider_environment_identity_changed');
+    }
+    let configDigest;
+    try {
+      configDigest = vcpProviderConfigDigest(parseVcpProviderEnvironment(bytes));
+    } catch {
+      fail('host_launcher_provider_environment_semantic_invalid');
+    }
+    return Object.freeze({
+      configDigest,
+      path: source,
+      replaceableByRuntime: false,
+      ...runtimeAccess
+    });
+  } catch (error) {
+    if (error?.code?.startsWith?.('host_launcher_')) throw error;
+    fail('host_launcher_provider_environment_unavailable');
+  } finally {
+    if (descriptor !== undefined) fsModule.closeSync(descriptor);
+  }
 }
 
 function canonicalReceiptMountPaths(authority, options = {}) {
@@ -699,10 +789,11 @@ function verifyHostAuthority(authority, options = {}) {
   const { image, runtime } = inspectRuntimeAuthority(authority, options);
   if (options.requireRootFiles !== false) {
     for (const [name, source] of Object.entries(authority.runtimeMountSources)) {
+      if (name === 'providerEnvironment') continue;
       validateStableHostMountSource(source, {
         fsModule: options.fsModule || fs,
         requireRootOwner: ['authority', 'edgeReceipt', 'profile',
-          'providerEnvironment', 'providerReceipt'].includes(name)
+          'providerReceipt'].includes(name)
       });
     }
   }
@@ -722,7 +813,17 @@ function verifyHostAuthority(authority, options = {}) {
     requireRootOwner: options.requireRootFiles !== false,
     requireRootOwnedParent: options.requireRootFiles !== false
   });
-  validateHostProfileBytes(profileBytes, authority);
+  const profile = validateHostProfileBytes(profileBytes, authority);
+  const providerEnvironmentValidator = options.providerEnvironmentValidator ||
+    validateProviderEnvironmentMountSource;
+  const providerEnvironment = providerEnvironmentValidator(
+    authority.runtimeMountSources.providerEnvironment,
+    { fsModule: options.fsModule || fs }
+  );
+  if (!/^sha256:[a-f0-9]{64}$/u.test(providerEnvironment?.configDigest || '') ||
+      providerEnvironment.configDigest !== profile.vcpProviderConfigDigest) {
+    fail('host_launcher_provider_environment_digest_mismatch');
+  }
   const containerFile = options.containerFile || dockerContainerFile;
   const nativeClosure = validateNativeClosure(JSON.parse(containerFile(
     authority.expectedRuntimeContainerId,
@@ -1014,6 +1115,7 @@ module.exports = {
   validateProviderContainer,
   validateImageForHost,
   validateHostProfileBytes,
+  validateProviderEnvironmentMountSource,
   validateStableHostMountSource,
   verifyHostAuthority,
   waitForHealthyEdge,
