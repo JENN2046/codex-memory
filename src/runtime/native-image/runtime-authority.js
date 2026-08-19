@@ -575,6 +575,15 @@ function validateImageProfile(value, expectedAuthorityComponents) {
   validateImageProfileReference(value.governanceEnvironment);
   validateImageProfileReference(value.relayEnvironment);
   validateImageProfileReference(value.retainedBinding);
+  const stateMountContract = validateStateMountContract({
+    containerPath: value.privateRoot,
+    readOnly: true,
+    schemaVersion: STATE_MOUNT_SCHEMA,
+    stateRootClass: 'external_primary_r5c'
+  });
+  if (value.stateMountContractDigest !== digest(stateMountContract)) {
+    reject('runtime_image_profile_state_mount_mismatch');
+  }
   if (expectedAuthorityComponents !== undefined) {
     const authority = validateProfileAuthorityComponents(expectedAuthorityComponents);
     const bindings = {
