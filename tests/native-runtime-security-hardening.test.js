@@ -384,7 +384,12 @@ test('schema-v7 admission uses the shared validator without reversing host depen
   const launcher = fs.readFileSync(path.join(root,
     'deploy/native-runtime/host-launcher.js'), 'utf8');
   assert.match(shared, /function validateImageProfile\(/u);
+  assert.match(shared, /function vcpImageRuntimeAuthorityDigest\(/u);
   assert.match(stack, /validateImageProfile\(value\)/u);
+  assert.match(stack, /function deriveContainerVcpRuntimeIdentity\(/u);
+  assert.match(stack, /vcpImageRuntimeAuthorityDigest\(components\)/u);
+  assert.doesNotMatch(stack,
+    /contractDigest:\s*profile\.vcpRuntimeContractDigest,\s*contractMatch:\s*true/u);
   assert.match(creator, /validateAuthorityProfileBytes\(profileBytes\)/u);
   assert.match(launcher, /validateHostProfileBytes\(profileBytes, authority\)/u);
   assert.doesNotMatch(launcher, /scripts\/codex-memory-stack/u);

@@ -356,6 +356,17 @@ and build observation, but unrelated version or script metadata is not treated
 as a memory-security contract change; external packages actually used by the
 security closure remain bound through their exact lockfile entries.
 
+Schema-v7 image profiles use a separate identity namespace:
+`vcpRuntimeIdentitySchemaVersion: 2` means Runtime image authority, not a Host
+checkout contract. Its digest is derived from validated profile-authority
+components v3 and binds the Runtime build-manifest digest, accepted OCI archive
+and manifest identities, RootFS chain, and exact VCP commit. Migration replaces
+any schema-v6 Host contract digest with this image-authority digest; a historical
+schema-v6 profile needs no Host checkout read to migrate. Container admission
+independently re-derives the digest from the mounted Root Authority and embedded
+build manifest. A profile-supplied digest, a schema-1 replay, or a different
+build/OCI/RootFS/VCP authority therefore fails closed before child startup.
+
 The observed build identity is separate audit evidence: repository head,
 complete tree digest, package-manifest digest, scoped content digest, clean
 state, and observation time. A clean `main == origin/main` build may change
