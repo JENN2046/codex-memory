@@ -81,7 +81,7 @@ const SOURCES = Object.freeze({
   edgeReceipt: '/run/codex-memory/edge-receipt.json',
   primaryState: '/synthetic/r5c',
   profile: '/etc/codex-memory/profile.json',
-  providerEnvironment: '/etc/codex-memory/provider.env',
+  providerEnvironment: '/etc/codex-memory/vcp-provider.env',
   providerReceipt: '/run/codex-memory/provider-receipt.json',
   runtimeDirectory: '/var/lib/codex-memory/runtime'
 });
@@ -894,9 +894,14 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
     containerFile: (_id, source) => source === PROVIDER_POLICY.executable
       ? providerElf() : Buffer.from(JSON.stringify(nativeClosure())),
     execFile, fsModule: edgeSecretFilesystem(), requireRootFiles: false,
+    providerEnvironmentValidator: () => ({ configDigest: S('5') }),
     verifyNativeClosureBytes: value => validateNativeClosure(value)
   };
   assert.equal(verifyHostAuthority(accepted, options).runtime.Id, runtime.Id);
+  expectCode(() => verifyHostAuthority(accepted, {
+    ...options,
+    providerEnvironmentValidator: () => ({ configDigest: S('0') })
+  }), 'host_launcher_provider_environment_digest_mismatch');
   fs.writeFileSync(profilePath, Buffer.concat([
     acceptedProfileBytes, Buffer.from(' ')
   ]), { mode: 0o600 });
@@ -1014,6 +1019,7 @@ test('simulated cold boot replaces placeholders with fresh receipts before Runti
       providerHealth: 'healthy',
       statusCode: 200
     }),
+    providerEnvironmentValidator: () => ({ configDigest: S('5') }),
     requireRootFiles: false,
     verifyNativeClosureBytes: value => validateNativeClosure(value)
   };
@@ -1114,6 +1120,13 @@ test('Provider identity schema revisions and semantic layers cannot be downgrade
   expectCode(() => validateAuthorityRecord({
     ...a, edgeImageIdentity: a.edgeDaemonImageIdentity
   }), 'runtime_authority_record_invalid');
+  expectCode(() => validateAuthorityRecord({
+    ...a,
+    runtimeMountSources: {
+      ...a.runtimeMountSources,
+      providerEnvironment: '/var/lib/codex-memory/provider.env'
+    }
+  }), 'runtime_authority_provider_environment_path_mismatch');
   expectCode(() => validateAuthorityRecord({
     ...a,
     edgeImageConfigDigest: a.edgeOciManifestDigest,

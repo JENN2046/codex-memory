@@ -46,8 +46,30 @@ const {
   verifyOciArchive
 } = require('./verify-codex-memory-runtime-image');
 const { verifyEdgeOciArchive } = require('./verify-codex-memory-edge-image');
+const {
+  validateProviderEnvironmentMountSource
+} = require('../deploy/native-runtime/host-launcher');
 
 function fail(code) { const error = new Error(code); error.code = code; throw error; }
+function validateProviderEnvironmentAuthorityBinding(source, profile, {
+  fsModule = fs,
+  validator = validateProviderEnvironmentMountSource
+} = {}) {
+  let evidence;
+  try { evidence = validator(source, { fsModule }); } catch {
+    fail('runtime_authority_provider_environment_invalid');
+  }
+  if (!/^sha256:[a-f0-9]{64}$/u.test(evidence?.configDigest || '') ||
+      evidence.configDigest !== profile?.vcpProviderConfigDigest) {
+    fail('runtime_authority_provider_environment_digest_mismatch');
+  }
+  return Object.freeze({
+    configDigest: evidence.configDigest,
+    path: source,
+    runtimeCanRead: evidence.runtimeCanRead === true,
+    runtimeCanWrite: evidence.runtimeCanWrite === true
+  });
+}
 function validateAuthorityProfileBytes(profileBytes) {
   if (!Buffer.isBuffer(profileBytes) || profileBytes.length < 2 ||
       profileBytes.length > 262_144) fail('runtime_authority_profile_invalid');
@@ -204,6 +226,10 @@ function main(argv = process.argv.slice(2)) {
     providerReceipt: path.resolve(args['provider-receipt'] || ''),
     runtimeDirectory: path.resolve(args['runtime-directory'] || '')
   };
+  validateProviderEnvironmentAuthorityBinding(
+    runtimeMountSources.providerEnvironment,
+    profile
+  );
   validateRuntimeCandidate(runtime, {
     ...runtimeMountSources,
     primaryStateDestination: stateMountContract.containerPath
@@ -316,6 +342,7 @@ if (require.main === module) {
 module.exports = {
   main,
   validateAuthorityProfileBytes,
+  validateProviderEnvironmentAuthorityBinding,
   validateExternallyAcceptedEdgeEvidence,
   validateExternallyAcceptedImageEvidence
 };

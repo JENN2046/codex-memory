@@ -3,6 +3,7 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
+const { parseEnv } = require('node:util');
 const {
   DOCKER_CONTAINERD_MANIFEST_IDENTITY
 } = require('./provider-image-authority');
@@ -102,6 +103,14 @@ const IMAGE_BUILD_MANIFEST_PATH =
 const AUTHORITY_RECORD_PATH = '/run/codex-memory/authority.json';
 const EDGE_RECEIPT_PATH = '/run/codex-memory/edge-receipt.json';
 const PROVIDER_RECEIPT_PATH = '/run/codex-memory/provider-receipt.json';
+const VCP_PROVIDER_HOST_ENVIRONMENT_PATH = '/etc/codex-memory/vcp-provider.env';
+const VCP_PROVIDER_RUNTIME_ENVIRONMENT_PATH =
+  '/run/secrets/codex-memory-vcp-provider.env';
+const VCP_PROVIDER_ENVIRONMENT_MAX_BYTES = 262_144;
+const VCP_PROVIDER_HOST_UID = 0;
+const VCP_PROVIDER_RUNTIME_UID = 1000;
+const VCP_PROVIDER_RUNTIME_GID = 1000;
+const VCP_PROVIDER_HOST_MODE = 0o440;
 const DOCKER_SOCKET_PATH = '/var/run/docker.sock';
 const SHA1 = /^[a-f0-9]{40}$/u;
 const SHA256 = /^sha256:[a-f0-9]{64}$/u;
@@ -163,6 +172,62 @@ function canonicalJson(value) {
 function digest(value) {
   return `sha256:${crypto.createHash('sha256')
     .update(canonicalJson(value), 'utf8').digest('hex')}`;
+}
+
+function parseVcpProviderEnvironment(content, { parse = parseEnv } = {}) {
+  const buffer = Buffer.isBuffer(content) ? content : Buffer.from(
+    typeof content === 'string' ? content : ''
+  );
+  if (buffer.length < 1 || buffer.length > VCP_PROVIDER_ENVIRONMENT_MAX_BYTES) {
+    reject('runtime_vcp_provider_environment_invalid');
+  }
+  let parsed;
+  try {
+    parsed = parse(buffer.toString('utf8'));
+  } catch {
+    reject('runtime_vcp_provider_environment_invalid');
+  }
+  const apiKeyValue = parsed?.API_Key;
+  if (typeof apiKeyValue !== 'string') {
+    reject('runtime_vcp_provider_environment_invalid');
+  }
+  const apiKey = apiKeyValue.endsWith('\n')
+    ? apiKeyValue.slice(0, -1) : apiKeyValue;
+  const model = parsed?.WhitelistEmbeddingModel;
+  const dimension = parsed?.VECTORDB_DIMENSION;
+  if (!apiKey || apiKey.includes('\r') || apiKey.includes('\n') ||
+      apiKey.trim() !== apiKey ||
+      !/^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u.test(model || '') ||
+      !/^[1-9][0-9]{0,5}$/u.test(dimension || '')) {
+    reject('runtime_vcp_provider_environment_invalid');
+  }
+  return Object.freeze({ apiKey, model, dimension });
+}
+
+function vcpProviderConfigDigest(providerEnvironment) {
+  const model = providerEnvironment?.model;
+  const dimension = providerEnvironment?.dimension;
+  if (!/^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u.test(model || '') ||
+      !/^[1-9][0-9]{0,5}$/u.test(dimension || '')) {
+    reject('runtime_vcp_provider_environment_invalid');
+  }
+  return `sha256:${crypto.createHash('sha256').update(
+    `model\0${model}\ndimension\0${dimension}\n`,
+    'utf8'
+  ).digest('hex')}`;
+}
+
+function vcpProviderEnvironmentRuntimeAccess(stat) {
+  const mode = stat?.mode & 0o777;
+  const permissionBits = stat?.uid === VCP_PROVIDER_RUNTIME_UID
+    ? { read: 0o400, write: 0o200 }
+    : stat?.gid === VCP_PROVIDER_RUNTIME_GID
+      ? { read: 0o040, write: 0o020 }
+      : { read: 0o004, write: 0o002 };
+  return Object.freeze({
+    runtimeCanRead: (mode & permissionBits.read) !== 0,
+    runtimeCanWrite: (mode & permissionBits.write) !== 0
+  });
 }
 
 function sha256File(file) {
@@ -423,6 +488,10 @@ function validateAuthorityRecord(value) {
   }
   if (value.runtimeMountSources.profile !== value.profilePath) {
     reject('runtime_authority_profile_path_mismatch');
+  }
+  if (value.runtimeMountSources.providerEnvironment !==
+      VCP_PROVIDER_HOST_ENVIRONMENT_PATH) {
+    reject('runtime_authority_provider_environment_path_mismatch');
   }
   const state = validateStateMountContract(value.stateMountContract);
   if (digest(state) !== value.stateMountContractDigest) {
@@ -1117,6 +1186,13 @@ module.exports = {
   EDGE_RECEIPT_SCHEMA,
   PROVIDER_RECEIPT_PATH,
   PROVIDER_RECEIPT_SCHEMA,
+  VCP_PROVIDER_ENVIRONMENT_MAX_BYTES,
+  VCP_PROVIDER_HOST_ENVIRONMENT_PATH,
+  VCP_PROVIDER_HOST_MODE,
+  VCP_PROVIDER_HOST_UID,
+  VCP_PROVIDER_RUNTIME_ENVIRONMENT_PATH,
+  VCP_PROVIDER_RUNTIME_GID,
+  VCP_PROVIDER_RUNTIME_UID,
   IMAGE_BUILD_MANIFEST_PATH,
   IMAGE_PROFILE_KEYS,
   IMAGE_RUNTIME_ROOT,
@@ -1132,6 +1208,7 @@ module.exports = {
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
+  parseVcpProviderEnvironment,
   profileAuthorityComponents,
   profileV7MigrationCandidate,
   projectContainerConfig,
@@ -1148,5 +1225,7 @@ module.exports = {
   validateProfileAuthorityComponents,
   validateImageInspection,
   validateRuntimeSelfEvidence,
-  validateStateMountContract
+  validateStateMountContract,
+  vcpProviderEnvironmentRuntimeAccess,
+  vcpProviderConfigDigest
 };

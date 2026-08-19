@@ -50,7 +50,13 @@ const {
   IMAGE_VCP_ROOT,
   PROVIDER_RECEIPT_PATH,
   PROFILE_SCHEMA_VERSION: IMAGE_PROFILE_SCHEMA_VERSION,
+  VCP_PROVIDER_ENVIRONMENT_MAX_BYTES,
+  VCP_PROVIDER_HOST_MODE,
+  VCP_PROVIDER_HOST_UID,
+  VCP_PROVIDER_RUNTIME_ENVIRONMENT_PATH,
+  VCP_PROVIDER_RUNTIME_GID,
   buildManifestDigest,
+  parseVcpProviderEnvironment,
   profileAuthorityComponents,
   profileV7MigrationCandidate,
   readBoundedBuffer,
@@ -60,7 +66,9 @@ const {
   validateEdgeReceipt,
   validateImageProfile,
   validateProviderReceipt,
-  validateRuntimeSelfEvidence
+  validateRuntimeSelfEvidence,
+  vcpProviderEnvironmentRuntimeAccess,
+  vcpProviderConfigDigest: sharedVcpProviderConfigDigest
 } = require('../src/runtime/native-image/runtime-authority');
 
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -791,20 +799,104 @@ function readVcpProviderEnvironment(file, {
     maximumBytes: PRIVATE_FILE_MAX_BYTES,
     fsModule
   });
-  let parsed;
   try {
-    parsed = parse(fsModule.readFileSync(target, 'utf8'));
+    return parseVcpProviderEnvironment(
+      fsModule.readFileSync(target),
+      { parse }
+    );
   } catch {
     throw codedError('stack_vcp_provider_environment_invalid');
   }
-  const apiKey = singleLineSecret(parsed?.API_Key || '');
-  const model = parsed?.WhitelistEmbeddingModel;
-  const dimension = parsed?.VECTORDB_DIMENSION;
-  if (!/^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u.test(model || '') ||
-      !/^[1-9][0-9]{0,5}$/u.test(dimension || '')) {
-    throw codedError('stack_vcp_provider_environment_invalid');
+}
+
+function runtimeProviderEnvironmentIdentity(stat) {
+  return Object.freeze(Object.fromEntries([
+    ['device', stat.dev],
+    ['inode', stat.ino],
+    ['size', stat.size],
+    ['mtimeNs', stat.mtimeNs ?? Math.trunc(stat.mtimeMs * 1_000_000)],
+    ['ctimeNs', stat.ctimeNs ?? Math.trunc(stat.ctimeMs * 1_000_000)]
+  ].map(([name, value]) => [name, String(value)])));
+}
+
+function sameRuntimeProviderEnvironmentIdentity(left, right) {
+  return ['dev', 'ino', 'size', 'mtimeMs', 'ctimeMs'].every(name =>
+    left[name] === right[name]
+  );
+}
+
+function assertRootControlledRuntimeReadableProviderEnvironment(file, {
+  fsModule = fs
+} = {}) {
+  if (file !== VCP_PROVIDER_RUNTIME_ENVIRONMENT_PATH ||
+      path.resolve(file || '') !== file) {
+    throw codedError('stack_runtime_provider_environment_path_invalid');
   }
-  return Object.freeze({ apiKey, model, dimension });
+  for (const current of ['/', '/run', '/run/secrets']) {
+    let stat;
+    try { stat = fsModule.lstatSync(current); } catch {
+      throw codedError('stack_runtime_provider_environment_unavailable');
+    }
+    if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== 0 ||
+        (stat.mode & 0o022) !== 0) {
+      throw codedError('stack_runtime_provider_environment_parent_invalid');
+    }
+  }
+  let linkStat;
+  let real;
+  try {
+    linkStat = fsModule.lstatSync(file);
+    real = fsModule.realpathSync(file);
+  } catch {
+    throw codedError('stack_runtime_provider_environment_unavailable');
+  }
+  if (real !== file || linkStat.isSymbolicLink() || !linkStat.isFile() ||
+      linkStat.uid !== VCP_PROVIDER_HOST_UID ||
+      linkStat.gid !== VCP_PROVIDER_RUNTIME_GID ||
+      (linkStat.mode & 0o777) !== VCP_PROVIDER_HOST_MODE ||
+      linkStat.size < 1 || linkStat.size > VCP_PROVIDER_ENVIRONMENT_MAX_BYTES) {
+    throw codedError('stack_runtime_provider_environment_security_invalid');
+  }
+  let descriptor;
+  try {
+    descriptor = fsModule.openSync(
+      file,
+      fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0)
+    );
+    const before = fsModule.fstatSync(descriptor);
+    if (!before.isFile() || before.uid !== VCP_PROVIDER_HOST_UID ||
+        before.gid !== VCP_PROVIDER_RUNTIME_GID ||
+        (before.mode & 0o777) !== VCP_PROVIDER_HOST_MODE ||
+        before.dev !== linkStat.dev || before.ino !== linkStat.ino ||
+        before.size < 1 || before.size > VCP_PROVIDER_ENVIRONMENT_MAX_BYTES) {
+      throw codedError('stack_runtime_provider_environment_security_invalid');
+    }
+    const bytes = fsModule.readFileSync(descriptor);
+    const after = fsModule.fstatSync(descriptor);
+    const runtimeAccess = vcpProviderEnvironmentRuntimeAccess(after);
+    if (!sameRuntimeProviderEnvironmentIdentity(before, after) || !after.isFile() ||
+        after.uid !== VCP_PROVIDER_HOST_UID ||
+        after.gid !== VCP_PROVIDER_RUNTIME_GID ||
+        (after.mode & 0o777) !== VCP_PROVIDER_HOST_MODE ||
+        !runtimeAccess.runtimeCanRead || runtimeAccess.runtimeCanWrite) {
+      throw codedError('stack_runtime_provider_environment_identity_changed');
+    }
+    let providerEnvironment;
+    try { providerEnvironment = parseVcpProviderEnvironment(bytes); } catch {
+      throw codedError('stack_vcp_provider_environment_invalid');
+    }
+    return Object.freeze({
+      fileIdentity: runtimeProviderEnvironmentIdentity(after),
+      providerEnvironment,
+      replaceableByRuntime: false,
+      ...runtimeAccess
+    });
+  } catch (error) {
+    if (error?.code?.startsWith?.('stack_')) throw error;
+    throw codedError('stack_runtime_provider_environment_unavailable');
+  } finally {
+    if (descriptor !== undefined) fsModule.closeSync(descriptor);
+  }
 }
 
 function ownerFileIdentity(file, {
@@ -857,6 +949,10 @@ function readVcpProviderEnvironmentSnapshot(file, options = {}) {
     fileIdentity: after,
     providerEnvironment
   });
+}
+
+function readRuntimeVcpProviderEnvironmentSnapshot(file, options = {}) {
+  return assertRootControlledRuntimeReadableProviderEnvironment(file, options);
 }
 
 function validateProviderConfigIdentityReceipt(value) {
@@ -1366,16 +1462,11 @@ function relayCredentialFreshnessMatches({
 }
 
 function vcpProviderConfigDigest(providerEnvironment) {
-  const model = providerEnvironment?.model;
-  const dimension = providerEnvironment?.dimension;
-  if (!/^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$/u.test(model || '') ||
-      !/^[1-9][0-9]{0,5}$/u.test(dimension || '')) {
+  try {
+    return sharedVcpProviderConfigDigest(providerEnvironment);
+  } catch {
     throw codedError('stack_vcp_provider_environment_invalid');
   }
-  return `sha256:${crypto.createHash('sha256').update(
-    `model\0${model}\ndimension\0${dimension}\n`,
-    'utf8'
-  ).digest('hex')}`;
 }
 
 function profileVcpProviderConfigMatches(profile, providerEnvironment) {
@@ -5266,11 +5357,12 @@ async function startStackWithProfile(storedProfile, {
         scopeDigest: profile.vcpRuntimeScopeDigest
       })
       : inspectVcpRuntimeIdentity(profile);
-    const vcpProviderConfigSnapshot = readVcpProviderEnvironmentSnapshot(
-      containerMode
-        ? '/run/secrets/codex-memory-vcp-provider.env'
-        : path.join(vcpRuntimeRepository(), 'config.env')
-    );
+    const vcpProviderConfigFile = containerMode
+      ? VCP_PROVIDER_RUNTIME_ENVIRONMENT_PATH
+      : path.join(vcpRuntimeRepository(), 'config.env');
+    const vcpProviderConfigSnapshot = containerMode
+      ? readRuntimeVcpProviderEnvironmentSnapshot(vcpProviderConfigFile)
+      : readVcpProviderEnvironmentSnapshot(vcpProviderConfigFile);
     const vcpProviderEnvironment =
       vcpProviderConfigSnapshot.providerEnvironment;
     if (profileHasRuntimeBinding(profile)) {
@@ -5449,6 +5541,7 @@ async function startStackWithProfile(storedProfile, {
       });
       if (!providerCredentialFreshnessMatches({
         profile,
+        providerConfigIdentity: vcpProviderConfigSnapshot.fileIdentity,
         providerConfigFile: path.join(
           containerMode ? '/run/secrets' : profile.vcpRuntimeRepository,
           containerMode ? 'codex-memory-vcp-provider.env' : 'config.env'
@@ -6469,11 +6562,12 @@ async function runShimChild() {
     privateRoot
   );
   const vcpRoot = vcpRuntimeRepository();
-  const providerConfigSnapshot = readVcpProviderEnvironmentSnapshot(
-    imageMode
-      ? '/run/secrets/codex-memory-vcp-provider.env'
-      : path.join(vcpRoot, 'config.env')
-  );
+  const providerConfigFile = imageMode
+    ? VCP_PROVIDER_RUNTIME_ENVIRONMENT_PATH
+    : path.join(vcpRoot, 'config.env');
+  const providerConfigSnapshot = imageMode
+    ? readRuntimeVcpProviderEnvironmentSnapshot(providerConfigFile)
+    : readVcpProviderEnvironmentSnapshot(providerConfigFile);
   const providerEnvironment = providerConfigSnapshot.providerEnvironment;
   if (!profileVcpProviderConfigMatches(profile, providerEnvironment)) {
     throw codedError('stack_vcp_provider_config_identity_mismatch');
@@ -7191,6 +7285,7 @@ module.exports = {
   inspectSourceCompatibility,
   inspectVcpRuntimeIdentity,
   inspectVcpRuntimeContractEvidence,
+  assertRootControlledRuntimeReadableProviderEnvironment,
   isPidRunning,
   legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
@@ -7233,6 +7328,7 @@ module.exports = {
   readLinuxProcessStartTicks,
   readPidFile,
   readVcpProviderEnvironmentSnapshot,
+  readRuntimeVcpProviderEnvironmentSnapshot,
   safeCode,
   sourceManifestRebindEligible,
   validateExpectedMappingEnvironment,

@@ -223,7 +223,7 @@ test('tar validator rejects traversal, links, duplicates, special nodes and limi
 const SOURCES = Object.freeze({
   authority: '/etc/codex-memory/authority.json', edgeReceipt: '/run/codex-memory/edge.json',
   primaryState: '/srv/codex-memory/r5c', profile: '/etc/codex-memory/profile.json',
-  providerEnvironment: '/etc/codex-memory/provider.env',
+  providerEnvironment: '/etc/codex-memory/vcp-provider.env',
   providerReceipt: '/run/codex-memory/provider.json',
   runtimeDirectory: '/var/lib/codex-memory/runtime'
 });

@@ -170,7 +170,7 @@ function createPlan() {
     primaryStateSource: '/synthetic/r5c',
     profileSource: '/synthetic/profile.json',
     providerReceiptSource: '/synthetic/provider-receipt.json',
-    providerEnvironmentSource: '/synthetic/provider.env',
+    providerEnvironmentSource: '/etc/codex-memory/vcp-provider.env',
     runtimeDirectorySource: '/synthetic/runtime'
   });
 }
@@ -188,6 +188,23 @@ test('container plan has no Docker socket or application code bind mount', () =>
   assert.equal(joined.includes('/var/run/docker.sock'), false);
   assert.equal(joined.includes('dst=/opt/codex-memory'), false);
   assert.equal(joined.includes('dst=/opt/vcptoolbox'), false);
+});
+
+test('container plan rejects a non-canonical Provider environment source', () => {
+  const options = {
+    authoritySource: '/synthetic/authority.json',
+    edgeReceiptSource: '/synthetic/edge-receipt.json',
+    imageConfigId: `sha256:${'1'.repeat(64)}`,
+    name: 'codex-memory-runtime-test',
+    primaryStateDestination: '/synthetic/container/r5c',
+    primaryStateSource: '/synthetic/r5c',
+    profileSource: '/synthetic/profile.json',
+    providerReceiptSource: '/synthetic/provider-receipt.json',
+    providerEnvironmentSource: '/var/lib/codex-memory/provider.env',
+    runtimeDirectorySource: '/synthetic/runtime'
+  };
+  expectCode(() => buildDockerCreateArguments(options),
+    'runtime_container_provider_environment_source_invalid');
 });
 
 test('host launcher accepts only bounded /etc authority path', () => {

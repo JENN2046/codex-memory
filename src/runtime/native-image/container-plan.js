@@ -5,7 +5,8 @@ const {
   AUTHORITY_RECORD_PATH,
   EDGE_RECEIPT_PATH,
   PROVIDER_RECEIPT_PATH,
-  IMAGE_BUILD_MANIFEST_PATH
+  IMAGE_BUILD_MANIFEST_PATH,
+  VCP_PROVIDER_HOST_ENVIRONMENT_PATH
 } = require('./runtime-authority');
 
 const SAFE_ID = /^sha256:[a-f0-9]{64}$/u;
@@ -44,6 +45,9 @@ function buildDockerCreateArguments({
 }) {
   if (!SAFE_ID.test(imageConfigId || '') || !SAFE_NAME.test(name || '')) {
     fail('runtime_container_identity_input_invalid');
+  }
+  if (providerEnvironmentSource !== VCP_PROVIDER_HOST_ENVIRONMENT_PATH) {
+    fail('runtime_container_provider_environment_source_invalid');
   }
   const args = [
     'container', 'create',
