@@ -30,7 +30,8 @@ const {
   validateImageProfile,
   validateProviderReceipt,
   validateImageInspection,
-  validateRuntimeSelfEvidence
+  validateRuntimeSelfEvidence,
+  validateStateMountContract
 } = require('../src/runtime/native-image/runtime-authority');
 const {
   EDGE_POLICY, EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST,
@@ -221,13 +222,17 @@ function baseInspect(overrides = {}) {
   };
 }
 
-function authority(inspect = baseInspect(), overrides = {}) {
-  const stateMountContract = {
-    containerPath: '/srv/codex-memory/r5c',
+function stateContract(containerPath = '/srv/codex-memory/r5c') {
+  return {
+    containerPath,
     readOnly: true,
     schemaVersion: STATE_MOUNT_SCHEMA,
     stateRootClass: 'external_primary_r5c'
   };
+}
+
+function authority(inspect = baseInspect(), overrides = {}) {
+  const stateMountContract = stateContract('/srv/codex-memory/r5c');
   const manifest = buildManifest();
   const value = {
     acceptedImageConfigId: S('d'),
@@ -906,6 +911,14 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
   expectCode(() => verifyHostAuthority({
     ...accepted, profileSha256: sha256Buffer(semanticInvalid)
   }, options), 'host_launcher_profile_authority_mismatch');
+  const wrongPathProfileBytes = Buffer.from(canonicalJson({
+    ...imageProfile(accepted),
+    privateRoot: '/srv/codex-memory/alternate-r5c'
+  }));
+  fs.writeFileSync(profilePath, wrongPathProfileBytes, { mode: 0o600 });
+  expectCode(() => verifyHostAuthority({
+    ...accepted, profileSha256: sha256Buffer(wrongPathProfileBytes)
+  }, options), 'host_launcher_profile_authority_mismatch');
   fs.writeFileSync(profilePath, acceptedProfileBytes, { mode: 0o600 });
   const replacement = path.join(root, 'replacement-profile.json');
   fs.writeFileSync(replacement, acceptedProfileBytes, { mode: 0o600 });
@@ -1211,13 +1224,94 @@ test('schema-v7 authority binding rejects every governed digest substitution', (
     'stateMountContractDigest'
   ]) {
     expectCode(() => validateImageProfile({ ...valid, [field]: S('0') }, components),
-      'runtime_image_profile_authority_mismatch');
+      field === 'stateMountContractDigest'
+        ? 'runtime_image_profile_state_mount_mismatch'
+        : 'runtime_image_profile_authority_mismatch');
   }
   expectCode(() => validateImageProfile({
     ...valid,
     runtimeImageConfigId: valid.runtimeImageManifestDigest,
     runtimeImageManifestDigest: valid.runtimeImageConfigId
   }, components), 'runtime_image_profile_authority_mismatch');
+});
+
+test('schema-v7 private root is canonically bound to its state mount contract', () => {
+  const a = authorityWithEdge();
+  const valid = imageProfile(a);
+  const components = profileAuthorityComponents(a);
+  assert.equal(valid.privateRoot, a.stateMountContract.containerPath);
+  assert.equal(valid.stateMountContractDigest, digest(stateContract(valid.privateRoot)));
+  assert.deepEqual(validateImageProfile(valid, components), valid);
+
+  const wrongPrivateRoot = {
+    ...valid,
+    privateRoot: '/srv/codex-memory/alternate-r5c'
+  };
+  expectCode(() => validateImageProfile(wrongPrivateRoot),
+    'runtime_image_profile_state_mount_mismatch');
+  expectCode(() => validateProfile(wrongPrivateRoot), 'stack_profile_invalid');
+  assert.equal(containerSupervisorAuthorityMatchesProfile(wrongPrivateRoot, a), false);
+
+  const otherContract = stateContract('/srv/codex-memory/other-r5c');
+  const digestForOtherPath = {
+    ...valid,
+    stateMountContractDigest: digest(otherContract)
+  };
+  expectCode(() => validateImageProfile(digestForOtherPath),
+    'runtime_image_profile_state_mount_mismatch');
+  expectCode(() => validateAuthorityProfileBytes(
+    Buffer.from(canonicalJson(digestForOtherPath))
+  ), 'runtime_authority_profile_invalid');
+  expectCode(() => validateHostProfileBytes(
+    Buffer.from(canonicalJson(digestForOtherPath)), {
+      ...a,
+      profileSha256: sha256Buffer(Buffer.from(canonicalJson(digestForOtherPath)))
+    }
+  ), 'host_launcher_profile_authority_mismatch');
+
+  assert.equal(valid.profileAuthorityComponentSchemaVersion,
+    'codex-memory-profile-runtime-authority-components/v3');
+  assert.equal(components.profileAuthorityComponentSchemaVersion,
+    'codex-memory-profile-runtime-authority-components/v3');
+});
+
+test('schema-v7 migration rejects state components for another private root', () => {
+  const correctAuthority = authorityWithEdge();
+  const current = currentProfile(correctAuthority);
+  const correct = profileV7MigrationCandidate(
+    current, profileAuthorityComponents(correctAuthority), {
+      expectedCurrentFingerprint: digest(current)
+    }
+  );
+  assert.equal(correct.stateRootUnchanged, true);
+  assert.equal(correct.nextProfile.privateRoot, current.privateRoot);
+  assert.equal(correct.nextProfile.stateMountContractDigest,
+    digest(stateContract(current.privateRoot)));
+
+  const otherContract = stateContract('/srv/codex-memory/other-r5c');
+  const wrongAuthority = authority(baseInspect(), {
+    profileSha256: S('0'),
+    stateMountContract: otherContract,
+    stateMountContractDigest: digest(otherContract)
+  });
+  expectCode(() => profileV7MigrationCandidate(
+    currentProfile(wrongAuthority), profileAuthorityComponents(wrongAuthority), {
+      expectedCurrentFingerprint: digest(currentProfile(wrongAuthority))
+    }
+  ), 'runtime_image_profile_state_mount_mismatch');
+});
+
+test('state mount contract semantics stay exact without a schema bump', () => {
+  const valid = stateContract();
+  assert.deepEqual(validateStateMountContract(valid), valid);
+  for (const candidate of [
+    { ...valid, readOnly: false },
+    { ...valid, stateRootClass: 'external_secondary_r5c' },
+    { ...valid, schemaVersion: 'codex-memory-runtime-state-mount/v2' }
+  ]) {
+    expectCode(() => validateStateMountContract(candidate),
+      'runtime_state_mount_contract_invalid');
+  }
 });
 
 test('authority creation and host admission reject schema-only profile bytes', () => {
