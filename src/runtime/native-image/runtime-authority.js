@@ -35,6 +35,68 @@ const AUTHORITY_DEPENDENCY_GRAPH = Object.freeze({
 const PROFILE_SCHEMA_VERSION = 7;
 const IMAGE_RUNTIME_ROOT = '/opt/codex-memory';
 const IMAGE_VCP_ROOT = '/opt/vcptoolbox';
+const IMAGE_PROFILE_KEYS = Object.freeze([
+  'adoptedRepositoryHead',
+  'controllerSourceManifestDigest',
+  'controllerSourceManifestVersion',
+  'edgeArtifactSha256',
+  'edgeBindingDigest',
+  'edgeBindingReference',
+  'edgeBuildContextDigest',
+  'edgeBuildManifestDigest',
+  'edgeContainer',
+  'edgeContainerId',
+  'edgeDaemonImageIdentity',
+  'edgeHostProjectReference',
+  'edgeImageConfigDigest',
+  'edgeImageStoreIdentityModel',
+  'edgeLifecycleAuthority',
+  'edgeLockfileSha256',
+  'edgeOciManifestDigest',
+  'edgeOperatorReference',
+  'edgePolicyDigest',
+  'edgePreviousBindingReference',
+  'edgeRuntimeConfigDigest',
+  'edgeSourceCommit',
+  'governanceEnvironment',
+  'governanceEnvironmentConfigDigest',
+  'hostLauncherAuthorityVersion',
+  'hostLauncherDigest',
+  'nativeClosureDigest',
+  'privateRoot',
+  'profileAuthorityComponentSchemaVersion',
+  'providerContainer',
+  'providerContainerId',
+  'providerDaemonImageIdentity',
+  'providerImageConfigDigest',
+  'providerImageStoreIdentityModel',
+  'providerOciManifestDigest',
+  'providerPolicyDigest',
+  'providerRevision',
+  'providerRuntimeConfigDigest',
+  'relayEnvironment',
+  'relayEnvironmentConfigDigest',
+  'retainedBinding',
+  'retainedBindingSource',
+  'runtimeAuthorityMode',
+  'runtimeBaseline',
+  'runtimeBuildManifestDigest',
+  'runtimeContainerId',
+  'runtimeImageConfigId',
+  'runtimeImageManifestDigest',
+  'runtimeOciArchiveSha256',
+  'runtimePolicyDigest',
+  'runtimeRepository',
+  'runtimeRootfsChainDigest',
+  'schemaVersion',
+  'stateMountContractDigest',
+  'vcpProviderConfigDigest',
+  'vcpRuntimeBaseline',
+  'vcpRuntimeContractDigest',
+  'vcpRuntimeIdentitySchemaVersion',
+  'vcpRuntimeRepository',
+  'vcpRuntimeScopeDigest'
+]);
 const IMAGE_BUILD_MANIFEST_PATH =
   '/opt/codex-memory-runtime/runtime-build-manifest.json';
 const AUTHORITY_RECORD_PATH = '/run/codex-memory/authority.json';
@@ -428,6 +490,144 @@ function validateProfileAuthorityComponents(value) {
   return Object.freeze({ ...value });
 }
 
+function validateImageProfileReference(value) {
+  if (typeof value !== 'string' || !value || value.includes('\0') ||
+      path.isAbsolute(value) || path.normalize(value) !== value ||
+      value === '..' || value.startsWith(`..${path.sep}`)) {
+    reject('runtime_image_profile_invalid');
+  }
+  return value;
+}
+
+function validateImageProfile(value, expectedAuthorityComponents) {
+  const digestFields = [
+    'controllerSourceManifestDigest',
+    'edgeArtifactSha256',
+    'edgeBindingDigest',
+    'edgeBuildContextDigest',
+    'edgeBuildManifestDigest',
+    'edgeDaemonImageIdentity',
+    'edgeImageConfigDigest',
+    'edgeLockfileSha256',
+    'edgeOciManifestDigest',
+    'edgePolicyDigest',
+    'edgeRuntimeConfigDigest',
+    'governanceEnvironmentConfigDigest',
+    'hostLauncherDigest',
+    'nativeClosureDigest',
+    'providerDaemonImageIdentity',
+    'providerImageConfigDigest',
+    'providerOciManifestDigest',
+    'providerPolicyDigest',
+    'providerRuntimeConfigDigest',
+    'relayEnvironmentConfigDigest',
+    'runtimeBuildManifestDigest',
+    'runtimeImageConfigId',
+    'runtimeImageManifestDigest',
+    'runtimeOciArchiveSha256',
+    'runtimePolicyDigest',
+    'runtimeRootfsChainDigest',
+    'stateMountContractDigest',
+    'vcpProviderConfigDigest',
+    'vcpRuntimeContractDigest',
+    'vcpRuntimeScopeDigest'
+  ];
+  const commitFields = [
+    'adoptedRepositoryHead', 'edgeSourceCommit', 'providerRevision',
+    'retainedBindingSource', 'runtimeBaseline', 'vcpRuntimeBaseline'
+  ];
+  const containerFields = [
+    'edgeContainerId', 'providerContainerId', 'runtimeContainerId'
+  ];
+  const references = [
+    value?.edgeBindingReference, value?.edgeHostProjectReference,
+    value?.edgeOperatorReference, value?.edgePreviousBindingReference
+  ];
+  if (!exactKeys(value, IMAGE_PROFILE_KEYS) ||
+      value.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+      value.runtimeAuthorityMode !== 'digest_pinned_read_only_image' ||
+      value.runtimeRepository !== IMAGE_RUNTIME_ROOT ||
+      value.vcpRuntimeRepository !== IMAGE_VCP_ROOT ||
+      value.profileAuthorityComponentSchemaVersion !==
+        PROFILE_AUTHORITY_COMPONENT_SCHEMA ||
+      value.edgeLifecycleAuthority !== 'host_launcher' ||
+      value.hostLauncherAuthorityVersion !==
+        'codex-memory-native-host-launcher/v1' ||
+      value.edgeImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
+      value.providerImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
+      value.providerContainer !== 'new-api-wsl' ||
+      value.controllerSourceManifestVersion !== 1 ||
+      value.vcpRuntimeIdentitySchemaVersion !== 1 ||
+      !SAFE_NAME.test(value.edgeContainer || '') ||
+      typeof value.privateRoot !== 'string' ||
+      !path.isAbsolute(value.privateRoot) ||
+      path.resolve(value.privateRoot) !== value.privateRoot ||
+      value.runtimeBaseline !== value.adoptedRepositoryHead ||
+      value.edgeDaemonImageIdentity !== value.edgeOciManifestDigest ||
+      value.providerDaemonImageIdentity !== value.providerOciManifestDigest ||
+      commitFields.some(field => !SHA1.test(value[field] || '')) ||
+      containerFields.some(field => !CONTAINER_ID.test(value[field] || '')) ||
+      digestFields.some(field => !SHA256.test(value[field] || '')) ||
+      references.some(reference => !OPAQUE_REFERENCE.test(reference || '') ||
+        /placeholder|example|todo/iu.test(reference))) {
+    reject('runtime_image_profile_invalid');
+  }
+  validateImageProfileReference(value.governanceEnvironment);
+  validateImageProfileReference(value.relayEnvironment);
+  validateImageProfileReference(value.retainedBinding);
+  if (expectedAuthorityComponents !== undefined) {
+    const authority = validateProfileAuthorityComponents(expectedAuthorityComponents);
+    const bindings = {
+      adoptedRepositoryHead: authority.codexMemoryCommit,
+      edgeArtifactSha256: authority.edgeArtifactSha256,
+      edgeBindingDigest: authority.edgeBindingDigest,
+      edgeBindingReference: authority.edgeBindingReference,
+      edgeBuildContextDigest: authority.edgeBuildContextDigest,
+      edgeBuildManifestDigest: authority.edgeBuildManifestDigest,
+      edgeContainerId: authority.edgeContainerId,
+      edgeDaemonImageIdentity: authority.edgeDaemonImageIdentity,
+      edgeHostProjectReference: authority.edgeHostProjectReference,
+      edgeImageConfigDigest: authority.edgeImageConfigDigest,
+      edgeImageStoreIdentityModel: authority.edgeImageStoreIdentityModel,
+      edgeLifecycleAuthority: authority.edgeLifecycleAuthority,
+      edgeLockfileSha256: authority.edgeLockfileSha256,
+      edgeOciManifestDigest: authority.edgeOciManifestDigest,
+      edgeOperatorReference: authority.edgeOperatorReference,
+      edgePolicyDigest: authority.edgePolicyDigest,
+      edgePreviousBindingReference: authority.edgePreviousBindingReference,
+      edgeRuntimeConfigDigest: authority.edgeConfigDigest,
+      edgeSourceCommit: authority.edgeSourceCommit,
+      hostLauncherAuthorityVersion: authority.hostLauncherVersion,
+      hostLauncherDigest: authority.hostLauncherDigest,
+      nativeClosureDigest: authority.nativeClosureDigest,
+      profileAuthorityComponentSchemaVersion:
+        authority.profileAuthorityComponentSchemaVersion,
+      providerContainerId: authority.providerContainerId,
+      providerDaemonImageIdentity: authority.providerDaemonImageIdentity,
+      providerImageConfigDigest: authority.providerImageConfigDigest,
+      providerImageStoreIdentityModel: authority.providerImageStoreIdentityModel,
+      providerOciManifestDigest: authority.providerOciManifestDigest,
+      providerPolicyDigest: authority.providerPolicyDigest,
+      providerRevision: authority.providerRevision,
+      providerRuntimeConfigDigest: authority.providerContainerConfigDigest,
+      runtimeBaseline: authority.codexMemoryCommit,
+      runtimeBuildManifestDigest: authority.buildManifestDigest,
+      runtimeContainerId: authority.expectedRuntimeContainerId,
+      runtimeImageConfigId: authority.acceptedImageConfigId,
+      runtimeImageManifestDigest: authority.acceptedOciManifestDigest,
+      runtimeOciArchiveSha256: authority.acceptedOciArchiveSha256,
+      runtimePolicyDigest: authority.runtimePolicyDigest,
+      runtimeRootfsChainDigest: authority.rootfsChainDigest,
+      stateMountContractDigest: authority.stateMountContractDigest,
+      vcpRuntimeBaseline: authority.vcpCommit
+    };
+    if (Object.entries(bindings).some(([field, expected]) => value[field] !== expected)) {
+      reject('runtime_image_profile_authority_mismatch');
+    }
+  }
+  return Object.freeze({ ...value });
+}
+
 function profileAuthorityComponents(authority) {
   const value = validateAuthorityRecord(authority);
   return validateProfileAuthorityComponents({
@@ -791,6 +991,14 @@ function validateRuntimeSelfEvidence({ authority, buildManifest, edgeReceipt,
   validateProviderReceipt(providerReceipt, accepted);
   const { nativeClosureDigest, validateNativeClosure } = require('./native-closure');
   const closure = validateNativeClosure(nativeClosure);
+  try {
+    validateImageProfile(
+      JSON.parse(profileBytes.toString('utf8')),
+      profileAuthorityComponents(accepted)
+    );
+  } catch {
+    reject('runtime_self_evidence_mismatch');
+  }
   if (path.resolve(runtimeRoot) !== IMAGE_RUNTIME_ROOT ||
       path.resolve(vcpRoot || '') !== IMAGE_VCP_ROOT ||
       dockerSocketExists(DOCKER_SOCKET_PATH) ||
@@ -827,7 +1035,7 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
   }
   const authority = validateProfileAuthorityComponents(imageAuthority);
   const { providerImageId: _legacyProviderImageId, ...profileWithoutAmbiguousImageId } = profile;
-  const nextProfile = Object.freeze({
+  const nextProfile = validateImageProfile({
     ...profileWithoutAmbiguousImageId,
     schemaVersion: PROFILE_SCHEMA_VERSION,
     runtimeAuthorityMode: 'digest_pinned_read_only_image',
@@ -874,7 +1082,7 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
     providerRevision: authority.providerRevision,
     vcpRuntimeBaseline: authority.vcpCommit,
     vcpRuntimeRepository: IMAGE_VCP_ROOT
-  });
+  }, authority);
   return Object.freeze({
     candidateOnly: true,
     currentProfileFingerprint: expectedCurrentFingerprint,
@@ -901,6 +1109,7 @@ module.exports = {
   PROVIDER_RECEIPT_PATH,
   PROVIDER_RECEIPT_SCHEMA,
   IMAGE_BUILD_MANIFEST_PATH,
+  IMAGE_PROFILE_KEYS,
   IMAGE_RUNTIME_ROOT,
   IMAGE_VCP_ROOT,
   PROFILE_AUTHORITY_COMPONENT_SCHEMA,
@@ -923,6 +1132,7 @@ module.exports = {
   sha256File,
   validateAuthorityRecord,
   validateBuildManifest,
+  validateImageProfile,
   validateContainerInspection,
   validateEdgeReceipt,
   validateProviderReceipt,

@@ -14,11 +14,13 @@ const {
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
+  profileAuthorityComponents,
   readBoundedJson,
   readBoundedBuffer,
   sha256Buffer,
   validateAuthorityRecord,
-  validateContainerInspection
+  validateContainerInspection,
+  validateImageProfile
 } = require('../../src/runtime/native-image/runtime-authority');
 const {
   EDGE_POLICY_DIGEST, PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES,
@@ -679,6 +681,20 @@ function inspectRuntimeAuthority(authority, options = {}) {
   return Object.freeze({ image, runtime });
 }
 
+function validateHostProfileBytes(profileBytes, authority) {
+  if (sha256Buffer(profileBytes) !== authority.profileSha256) {
+    fail('host_launcher_profile_authority_mismatch');
+  }
+  try {
+    return validateImageProfile(
+      JSON.parse(profileBytes.toString('utf8')),
+      profileAuthorityComponents(authority)
+    );
+  } catch {
+    fail('host_launcher_profile_authority_mismatch');
+  }
+}
+
 function verifyHostAuthority(authority, options = {}) {
   const { image, runtime } = inspectRuntimeAuthority(authority, options);
   if (options.requireRootFiles !== false) {
@@ -706,10 +722,7 @@ function verifyHostAuthority(authority, options = {}) {
     requireRootOwner: options.requireRootFiles !== false,
     requireRootOwnedParent: options.requireRootFiles !== false
   });
-  if (sha256Buffer(profileBytes) !== authority.profileSha256 ||
-      JSON.parse(profileBytes.toString('utf8'))?.schemaVersion !== 7) {
-    fail('host_launcher_profile_authority_mismatch');
-  }
+  validateHostProfileBytes(profileBytes, authority);
   const containerFile = options.containerFile || dockerContainerFile;
   const nativeClosure = validateNativeClosure(JSON.parse(containerFile(
     authority.expectedRuntimeContainerId,
@@ -1000,6 +1013,7 @@ module.exports = {
   validateEdgeContainer,
   validateProviderContainer,
   validateImageForHost,
+  validateHostProfileBytes,
   validateStableHostMountSource,
   verifyHostAuthority,
   waitForHealthyEdge,

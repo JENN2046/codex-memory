@@ -374,6 +374,22 @@ test('root authority dependency graph is acyclic and receipts cannot mint author
   assert.equal(AUTHORITY_DEPENDENCY_GRAPH.edgeReceipt, undefined);
   assert.equal(AUTHORITY_DEPENDENCY_GRAPH.providerReceipt, undefined);
 });
+test('schema-v7 admission uses the shared validator without reversing host dependencies', () => {
+  const root = path.resolve(__dirname, '..');
+  const shared = fs.readFileSync(path.join(root,
+    'src/runtime/native-image/runtime-authority.js'), 'utf8');
+  const stack = fs.readFileSync(path.join(root, 'scripts/codex-memory-stack.js'), 'utf8');
+  const creator = fs.readFileSync(path.join(root,
+    'scripts/create-codex-memory-runtime-authority.js'), 'utf8');
+  const launcher = fs.readFileSync(path.join(root,
+    'deploy/native-runtime/host-launcher.js'), 'utf8');
+  assert.match(shared, /function validateImageProfile\(/u);
+  assert.match(stack, /validateImageProfile\(value\)/u);
+  assert.match(creator, /validateAuthorityProfileBytes\(profileBytes\)/u);
+  assert.match(launcher, /validateHostProfileBytes\(profileBytes, authority\)/u);
+  assert.doesNotMatch(launcher, /scripts\/codex-memory-stack/u);
+  assert.equal(countAuthorityGraphCycles(AUTHORITY_DEPENDENCY_GRAPH), 0);
+});
 test('unsafe candidate cannot self-authorize by recomputing its own digest', () => {
   const mutations = [
     value => { value.HostConfig.Privileged = true; },

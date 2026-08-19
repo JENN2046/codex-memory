@@ -11,9 +11,11 @@ const {
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
+  profileAuthorityComponents,
   sha256Buffer,
   validateAuthorityRecord,
-  validateBuildManifest
+  validateBuildManifest,
+  validateImageProfile
 } = require('../src/runtime/native-image/runtime-authority');
 const {
   EDGE_POLICY_DIGEST, PROVIDER_EXECUTABLE_ARCHIVE_MAX_BYTES,
@@ -46,6 +48,17 @@ const {
 const { verifyEdgeOciArchive } = require('./verify-codex-memory-edge-image');
 
 function fail(code) { const error = new Error(code); error.code = code; throw error; }
+function validateAuthorityProfileBytes(profileBytes) {
+  if (!Buffer.isBuffer(profileBytes) || profileBytes.length < 2 ||
+      profileBytes.length > 262_144) fail('runtime_authority_profile_invalid');
+  let parsed;
+  try { parsed = JSON.parse(profileBytes.toString('utf8')); } catch {
+    fail('runtime_authority_profile_invalid');
+  }
+  try { return validateImageProfile(parsed); } catch {
+    fail('runtime_authority_profile_invalid');
+  }
+}
 function inspect(kind, id) {
   const parsed = JSON.parse(execFileSync('/usr/bin/docker', [kind, 'inspect', id], {
     encoding: 'utf8', maxBuffer: 4 * 1024 * 1024,
@@ -166,11 +179,7 @@ function main(argv = process.argv.slice(2)) {
   }, edgeArchiveEvidence);
   const profileFile = path.resolve(args.profile || '');
   const profileBytes = fs.readFileSync(profileFile);
-  let profile;
-  try { profile = JSON.parse(profileBytes.toString('utf8')); } catch {
-    fail('runtime_authority_profile_invalid');
-  }
-  if (profile?.schemaVersion !== 7) fail('runtime_authority_profile_invalid');
+  const profile = validateAuthorityProfileBytes(profileBytes);
   const nativeClosure = validateNativeClosure(JSON.parse(containerFile(
     runtime.Id, '/opt/codex-memory-runtime/native-closure.json'
   ).toString('utf8')));
@@ -289,6 +298,11 @@ function main(argv = process.argv.slice(2)) {
     stateMountContractDigest: digest(stateMountContract),
     vcpCommit: manifest.vcpCommit
   });
+  try {
+    validateImageProfile(profile, profileAuthorityComponents(candidate));
+  } catch {
+    fail('runtime_authority_profile_authority_mismatch');
+  }
   process.stdout.write(canonicalJson(candidate));
 }
 
@@ -301,6 +315,7 @@ if (require.main === module) {
 
 module.exports = {
   main,
+  validateAuthorityProfileBytes,
   validateExternallyAcceptedEdgeEvidence,
   validateExternallyAcceptedImageEvidence
 };
