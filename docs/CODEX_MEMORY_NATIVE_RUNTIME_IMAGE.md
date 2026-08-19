@@ -185,6 +185,14 @@ receipts. It
 does not inspect host Git, call Docker, or fall back to repository paths. It
 owns only image-contained VCP/HTTP/governance/relay children.
 
+Schema-v7 identifies that image-contained VCP with identity schema `2`. The
+profile's VCP authority digest is derived from profile-authority components v3:
+the build-manifest digest, accepted OCI archive and manifest identities, RootFS
+chain, and exact VCP commit. The supervisor re-derives the same projection from
+the independently validated Root Authority and embedded build manifest. Host
+checkout contract schema `1`, arbitrary profile digests, and image-authority
+substitution are rejected; the mutable Host VCP checkout is not consulted.
+
 Every state-changing host operation is serialized by one root-owned `flock`
 whose file descriptor spans the complete start, stop, activation, rollback, or
 supervision command. Process exit or crash releases the kernel lock; a stale

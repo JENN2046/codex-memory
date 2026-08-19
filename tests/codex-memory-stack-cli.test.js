@@ -23,6 +23,7 @@ const {
   VCP_RUNTIME_BASELINE_BY_CODEX_BASELINE,
   VCP_RUNTIME_CLASSIFICATIONS,
   VCP_RUNTIME_CONTRACT_PROJECTION,
+  VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
   VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
   VCP_RUNTIME_SOURCE_PATHS,
   acquireLifecycleProfile,
@@ -81,6 +82,7 @@ const {
   profileVcpProviderConfigMatches,
   profileWithControllerManifestBinding,
   profileWithSourceManifestRebinding,
+  profileVcpRuntimeIdentityMode,
   profileVcpRuntimeIdentityMatches,
   providerCredentialFreshnessMatches,
   projectHttpHealthPayload,
@@ -1643,6 +1645,32 @@ test('controller child environment binds v6 manifest and historical v5 identitie
     child.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST,
     boundProfile.vcpRuntimeScopeDigest
   );
+  const imageProfile = {
+    ...boundProfile,
+    adoptedRepositoryHead: CONTROLLER_SOURCE_COMMIT,
+    runtimeBaseline: CONTROLLER_SOURCE_COMMIT,
+    runtimeBuildManifestDigest: `sha256:${'91'.repeat(32)}`,
+    schemaVersion: 7,
+    vcpRuntimeBaseline: '9'.repeat(40),
+    vcpRuntimeContractDigest: `sha256:${'92'.repeat(32)}`,
+    vcpRuntimeIdentitySchemaVersion:
+      VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
+    vcpRuntimeRepository: '/opt/vcptoolbox'
+  };
+  const imageChild = buildControllerChildEnvironment(environmentFile, {
+    profile: imageProfile,
+    environment
+  });
+  assert.equal(imageChild.CODEX_MEMORY_CONTAINER_SUPERVISOR, '1');
+  assert.equal(imageChild.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION, '7');
+  assert.equal(imageChild.CODEX_MEMORY_STACK_VCP_RUNTIME_CONTRACT_DIGEST,
+    imageProfile.vcpRuntimeContractDigest);
+  assert.equal(
+    imageChild.CODEX_MEMORY_STACK_VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
+    String(VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION)
+  );
+  assert.equal(imageChild.VCP_ROOT, '/opt/vcptoolbox');
+  assert.equal(imageChild.VCPTOOLBOX_ROOT, '/opt/vcptoolbox');
   const relayChild = buildControllerChildEnvironment(environmentFile, {
     profile: boundProfile,
     environment,
@@ -2786,6 +2814,29 @@ test('VCP runtime contract admits clean build drift and blocks contract or workt
     inspect({ boundProfile: legacyBound, head: nextRevision }).classification,
     VCP_RUNTIME_CLASSIFICATIONS.LEGACY_REACCEPTANCE_REQUIRED
   );
+});
+
+test('VCP identity modes reject schema-v6/schema-v7 cross-mode replay', () => {
+  const host = profile();
+  assert.equal(profileVcpRuntimeIdentityMode(host), 'contract_v1');
+  assert.equal(profileVcpRuntimeIdentityMode({
+    ...host,
+    schemaVersion: 7,
+    vcpRuntimeIdentitySchemaVersion:
+      VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION
+  }), 'image_authority_v1');
+  assert.equal(profileVcpRuntimeIdentityMode({
+    ...host,
+    schemaVersion: 7
+  }), 'unsupported');
+  assert.equal(profileVcpRuntimeIdentityMode({
+    ...host,
+    vcpRuntimeIdentitySchemaVersion:
+      VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION
+  }), 'unsupported');
+  const partial = { ...host };
+  delete partial.vcpRuntimeContractDigest;
+  assert.equal(profileVcpRuntimeIdentityMode(partial), 'unsupported');
 });
 
 test('VCP runtime contract hard-gates capability and policy changes', () => {

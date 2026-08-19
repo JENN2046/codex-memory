@@ -13,6 +13,8 @@ const {
   IMAGE_RUNTIME_ROOT,
   IMAGE_VCP_ROOT,
   STATE_MOUNT_SCHEMA,
+  VCP_IMAGE_RUNTIME_AUTHORITY_SCHEMA,
+  VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
   authorityRecordDigest,
   buildManifestDigest,
   canonicalJson,
@@ -31,7 +33,8 @@ const {
   validateProviderReceipt,
   validateImageInspection,
   validateRuntimeSelfEvidence,
-  validateStateMountContract
+  validateStateMountContract,
+  vcpImageRuntimeAuthorityDigest
 } = require('../src/runtime/native-image/runtime-authority');
 const {
   EDGE_POLICY, EDGE_POLICY_DIGEST, PROVIDER_POLICY, PROVIDER_POLICY_DIGEST,
@@ -44,7 +47,10 @@ const {
   nativeClosureDigest, validateNativeClosure
 } = require('../src/runtime/native-image/native-closure');
 const {
+  deriveContainerVcpRuntimeIdentity,
   containerSupervisorAuthorityMatchesProfile,
+  profileVcpRuntimeIdentityMatches,
+  profileVcpRuntimeIdentityMode,
   validateProfile
 } = require('../scripts/codex-memory-stack');
 const {
@@ -318,6 +324,15 @@ function currentProfile(a) {
     vcpRuntimeRepository: '/vcp',
     vcpRuntimeScopeDigest: S('7')
   };
+}
+
+function historicalProfile(a, overrides = {}) {
+  const {
+    vcpRuntimeContractDigest: _vcpRuntimeContractDigest,
+    vcpRuntimeIdentitySchemaVersion: _vcpRuntimeIdentitySchemaVersion,
+    ...historical
+  } = currentProfile(a);
+  return { ...historical, ...overrides };
 }
 
 function imageProfile(a) {
@@ -1246,6 +1261,138 @@ test('schema-v7 authority binding rejects every governed digest substitution', (
     runtimeImageConfigId: valid.runtimeImageManifestDigest,
     runtimeImageManifestDigest: valid.runtimeImageConfigId
   }, components), 'runtime_image_profile_authority_mismatch');
+});
+
+test('image VCP authority digest is a components-v3 projection over the accepted image chain', () => {
+  const a = authorityWithEdge();
+  const components = profileAuthorityComponents(a);
+  const accepted = vcpImageRuntimeAuthorityDigest(components);
+  assert.equal(VCP_IMAGE_RUNTIME_AUTHORITY_SCHEMA,
+    'codex-memory-vcp-image-runtime-authority/v1');
+  assert.equal(VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION, 2);
+  assert.equal(components.profileAuthorityComponentSchemaVersion,
+    'codex-memory-profile-runtime-authority-components/v3');
+  assert.equal(BUILD_MANIFEST_SCHEMA, 'codex-memory-runtime-build-manifest/v1');
+  for (const [field, replacement] of [
+    ['buildManifestDigest', S('0')],
+    ['acceptedOciArchiveSha256', S('1')],
+    ['acceptedOciManifestDigest', S('2')],
+    ['rootfsChainDigest', S('3')],
+    ['vcpCommit', C('0')]
+  ]) {
+    assert.notEqual(
+      vcpImageRuntimeAuthorityDigest({ ...components, [field]: replacement }),
+      accepted,
+      field
+    );
+  }
+});
+
+test('historical schema-v6 migrates directly to independently bound image VCP identity', () => {
+  const a = authorityWithEdge();
+  const components = profileAuthorityComponents(a);
+  const historical = historicalProfile(a, {
+    vcpRuntimeRepository: '/unavailable/dirty-host-vcp-checkout'
+  });
+  const result = profileV7MigrationCandidate(historical, components, {
+    expectedCurrentFingerprint: digest(historical)
+  });
+  assert.equal(result.nextProfile.schemaVersion, 7);
+  assert.equal(result.nextProfile.vcpRuntimeIdentitySchemaVersion,
+    VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION);
+  assert.equal(result.nextProfile.vcpRuntimeContractDigest,
+    vcpImageRuntimeAuthorityDigest(components));
+  assert.equal(result.nextProfile.vcpRuntimeBaseline, components.vcpCommit);
+  assert.equal(result.nextProfile.vcpRuntimeRepository, IMAGE_VCP_ROOT);
+  assert.equal(Object.hasOwn(historical, 'vcpRuntimeContractDigest'), false);
+  assert.equal(Object.hasOwn(historical, 'vcpRuntimeIdentitySchemaVersion'), false);
+  assert.deepEqual(validateImageProfile(result.nextProfile, components),
+    result.nextProfile);
+
+  const otherHostCheckout = historicalProfile(a, {
+    vcpRuntimeRepository: '/another/drifted-host-vcp-checkout',
+    vcpRuntimeScopeDigest: S('0')
+  });
+  const otherResult = profileV7MigrationCandidate(otherHostCheckout, components, {
+    expectedCurrentFingerprint: digest(otherHostCheckout)
+  });
+  assert.equal(otherResult.nextProfile.vcpRuntimeContractDigest,
+    result.nextProfile.vcpRuntimeContractDigest);
+});
+
+test('contract-aware schema-v6 host identity is replaced, never replayed, in schema-v7', () => {
+  const a = authorityWithEdge();
+  const components = profileAuthorityComponents(a);
+  const hostContractProfile = currentProfile(a);
+  const hostContractDigest = hostContractProfile.vcpRuntimeContractDigest;
+  const result = profileV7MigrationCandidate(hostContractProfile, components, {
+    expectedCurrentFingerprint: digest(hostContractProfile)
+  });
+  assert.equal(result.nextProfile.vcpRuntimeIdentitySchemaVersion,
+    VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION);
+  assert.equal(result.nextProfile.vcpRuntimeContractDigest,
+    vcpImageRuntimeAuthorityDigest(components));
+  assert.notEqual(result.nextProfile.vcpRuntimeContractDigest, hostContractDigest);
+  assert.equal(profileVcpRuntimeIdentityMode(result.nextProfile),
+    'image_authority_v1');
+});
+
+test('schema-v7 rejects host-contract replay, arbitrary digest and authority substitution', () => {
+  const a = authorityWithEdge();
+  const components = profileAuthorityComponents(a);
+  const valid = imageProfile(a);
+  expectCode(() => validateImageProfile({
+    ...valid,
+    vcpRuntimeIdentitySchemaVersion: 1
+  }, components), 'runtime_image_profile_invalid');
+  expectCode(() => validateImageProfile({
+    ...valid,
+    vcpRuntimeContractDigest: S('0')
+  }, components), 'runtime_image_profile_vcp_image_authority_mismatch');
+  expectCode(() => validateImageProfile(valid, {
+    ...components,
+    buildManifestDigest: S('0')
+  }), 'runtime_image_profile_vcp_image_authority_mismatch');
+  expectCode(() => validateProfile({
+    ...currentProfile(a),
+    vcpRuntimeIdentitySchemaVersion:
+      VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION
+  }), 'stack_profile_invalid');
+});
+
+test('container VCP identity is rederived from authority and build evidence', () => {
+  const a = authorityWithEdge();
+  const profile = imageProfile(a);
+  const manifest = buildManifest();
+  const identity = deriveContainerVcpRuntimeIdentity(profile, {
+    authority: a,
+    buildManifest: manifest
+  });
+  assert.equal(identity.authorityVerified, true);
+  assert.equal(identity.imageAuthorityDigest,
+    vcpImageRuntimeAuthorityDigest(profileAuthorityComponents(a)));
+  assert.equal(identity.revision, a.vcpCommit);
+  assert.equal(identity.repository, IMAGE_VCP_ROOT);
+  assert.equal(profileVcpRuntimeIdentityMatches(profile, identity), true);
+
+  const selfAsserted = {
+    ...profile,
+    vcpRuntimeContractDigest: S('0')
+  };
+  expectCode(() => deriveContainerVcpRuntimeIdentity(selfAsserted, {
+    authority: a,
+    buildManifest: manifest
+  }), 'stack_container_vcp_image_authority_mismatch');
+  assert.equal(containerSupervisorAuthorityMatchesProfile(selfAsserted, a), false);
+
+  expectCode(() => deriveContainerVcpRuntimeIdentity(profile, {
+    authority: a,
+    buildManifest: buildManifest({ vcpCommit: C('0') })
+  }), 'stack_container_vcp_image_authority_mismatch');
+  assert.equal(profileVcpRuntimeIdentityMatches(profile, {
+    ...identity,
+    imageAuthorityDigest: S('0')
+  }), false);
 });
 
 test('schema-v7 private root is canonically bound to its state mount contract', () => {

@@ -50,6 +50,7 @@ const {
   IMAGE_VCP_ROOT,
   PROVIDER_RECEIPT_PATH,
   PROFILE_SCHEMA_VERSION: IMAGE_PROFILE_SCHEMA_VERSION,
+  VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
   VCP_PROVIDER_ENVIRONMENT_MAX_BYTES,
   VCP_PROVIDER_HOST_MODE,
   VCP_PROVIDER_HOST_UID,
@@ -67,6 +68,7 @@ const {
   validateImageProfile,
   validateProviderReceipt,
   validateRuntimeSelfEvidence,
+  vcpImageRuntimeAuthorityDigest,
   vcpProviderEnvironmentRuntimeAccess,
   vcpProviderConfigDigest: sharedVcpProviderConfigDigest
 } = require('../src/runtime/native-image/runtime-authority');
@@ -266,6 +268,7 @@ const VCP_RUNTIME_SOURCE_PATHS = Object.freeze([
 ]);
 const VCP_RUNTIME_BUILD_SCHEMA_VERSION = 1;
 const VCP_RUNTIME_CLASSIFICATIONS = Object.freeze({
+  IMAGE_AUTHORITY_MATCH: 'VCP_RUNTIME_IMAGE_AUTHORITY_MATCH',
   CONTRACT_MATCH: 'VCP_RUNTIME_CONTRACT_MATCH',
   CONTRACT_MATCH_BUILD_CHANGED:
     'VCP_RUNTIME_CONTRACT_MATCH_BUILD_CHANGED',
@@ -408,12 +411,24 @@ function profileVcpRuntimeIdentityMode(profile) {
     'vcpRuntimeIdentitySchemaVersion'
   );
   const hasDigest = Object.hasOwn(profile, 'vcpRuntimeContractDigest');
-  if (!hasSchema && !hasDigest) return 'legacy';
+  if (!hasSchema && !hasDigest) {
+    return profile.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+      ? 'unsupported'
+      : 'legacy';
+  }
   if (hasSchema && hasDigest &&
+      profile.schemaVersion === PROFILE_SCHEMA_VERSION &&
       profile.vcpRuntimeIdentitySchemaVersion ===
         VCP_RUNTIME_IDENTITY_SCHEMA_VERSION &&
       SAFE_SHA256_DIGEST.test(profile.vcpRuntimeContractDigest || '')) {
     return 'contract_v1';
+  }
+  if (hasSchema && hasDigest &&
+      profile.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION &&
+      profile.vcpRuntimeIdentitySchemaVersion ===
+        VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION &&
+      SAFE_SHA256_DIGEST.test(profile.vcpRuntimeContractDigest || '')) {
+    return 'image_authority_v1';
   }
   return 'unsupported';
 }
@@ -3363,6 +3378,20 @@ function inspectVcpRuntimeIdentity(profile, {
 
 function profileVcpRuntimeIdentityMatches(profile, identity) {
   const identityMode = profileVcpRuntimeIdentityMode(profile);
+  if (identityMode === 'image_authority_v1') {
+    return Boolean(
+      profile?.schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION &&
+      SAFE_GIT_OBJECT.test(profile?.vcpRuntimeBaseline || '') &&
+      SAFE_SHA256_DIGEST.test(profile?.vcpRuntimeContractDigest || '') &&
+      SAFE_SHA256_DIGEST.test(profile?.vcpRuntimeScopeDigest || '') &&
+      identity?.admissionAllowed === true &&
+      identity?.authorityVerified === true &&
+      identity?.imageAuthorityDigest === profile.vcpRuntimeContractDigest &&
+      identity?.revision === profile.vcpRuntimeBaseline &&
+      identity?.repository === IMAGE_VCP_ROOT &&
+      identity?.repositoryMatch === true
+    );
+  }
   const acceptedIdentityMatches = identityMode === 'legacy'
     ? identity?.revision === profile?.vcpRuntimeBaseline &&
       identity?.scopeDigest === profile?.vcpRuntimeScopeDigest
@@ -4473,7 +4502,9 @@ function buildControllerChildEnvironment(environmentFile, {
       profile.vcpRuntimeRepository;
     childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST =
       profile.vcpRuntimeScopeDigest;
-    if (profileVcpRuntimeIdentityMode(profile) === 'contract_v1') {
+    if (['contract_v1', 'image_authority_v1'].includes(
+      profileVcpRuntimeIdentityMode(profile)
+    )) {
       childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_CONTRACT_DIGEST =
         profile.vcpRuntimeContractDigest;
       childEnvironment.CODEX_MEMORY_STACK_VCP_RUNTIME_IDENTITY_SCHEMA_VERSION =
@@ -5343,19 +5374,7 @@ async function startStackWithProfile(storedProfile, {
       throw codedError('stack_managed_environment_identity_mismatch');
     }
     const vcpRuntime = containerMode
-      ? Object.freeze({
-        admissionAllowed: true,
-        contractComplete: true,
-        contractDigest: profile.vcpRuntimeContractDigest,
-        contractMatch: true,
-        currentMain: true,
-        repository: IMAGE_VCP_ROOT,
-        repositoryMatch: true,
-        revision: containerEvidence.buildManifest.vcpCommit,
-        scopeClean: true,
-        scopeComplete: true,
-        scopeDigest: profile.vcpRuntimeScopeDigest
-      })
+      ? deriveContainerVcpRuntimeIdentity(profile, containerEvidence)
       : inspectVcpRuntimeIdentity(profile);
     const vcpProviderConfigFile = containerMode
       ? VCP_PROVIDER_RUNTIME_ENVIRONMENT_PATH
@@ -6549,6 +6568,7 @@ async function runShimChild() {
       throw codedError('stack_vcp_runtime_identity_mismatch');
     }
   } else if (profile.schemaVersion !== IMAGE_PROFILE_SCHEMA_VERSION ||
+      profileVcpRuntimeIdentityMode(profile) !== 'image_authority_v1' ||
       profile.vcpRuntimeRepository !== IMAGE_VCP_ROOT ||
       profile.runtimeRepository !== REPO_ROOT) {
     throw codedError('stack_container_runtime_identity_mismatch');
@@ -6996,6 +7016,47 @@ function containerSupervisorAuthorityMatchesProfile(profile, authority) {
   }
 }
 
+function deriveContainerVcpRuntimeIdentity(profile, {
+  authority,
+  buildManifest
+} = {}) {
+  const components = profileAuthorityComponents(authority);
+  const manifest = validateBuildManifest(buildManifest);
+  const imageAuthorityDigest = vcpImageRuntimeAuthorityDigest(components);
+  if (profileVcpRuntimeIdentityMode(profile) !== 'image_authority_v1' ||
+      buildManifestDigest(manifest) !== components.buildManifestDigest ||
+      manifest.vcpCommit !== components.vcpCommit ||
+      profile.vcpRuntimeContractDigest !== imageAuthorityDigest) {
+    throw codedError('stack_container_vcp_image_authority_mismatch');
+  }
+  try {
+    validateImageProfile(profile, components);
+  } catch {
+    throw codedError('stack_container_vcp_image_authority_mismatch');
+  }
+  return Object.freeze({
+    admissionAllowed: true,
+    authorityVerified: true,
+    buildChanged: false,
+    buildDigest: components.buildManifestDigest,
+    classification: VCP_RUNTIME_CLASSIFICATIONS.IMAGE_AUTHORITY_MATCH,
+    contractComplete: true,
+    contractDigest: imageAuthorityDigest,
+    contractMatch: true,
+    currentMain: null,
+    identityMode: 'image_authority_v1',
+    imageAuthorityDigest,
+    manifestDigest: components.buildManifestDigest,
+    recognized: true,
+    repository: IMAGE_VCP_ROOT,
+    repositoryMatch: true,
+    revision: components.vcpCommit,
+    scopeClean: true,
+    scopeComplete: true,
+    scopeDigest: profile.vcpRuntimeScopeDigest
+  });
+}
+
 function loadContainerSupervisorEvidence({
   environment = process.env,
   fsModule = fs,
@@ -7062,13 +7123,18 @@ function loadContainerSupervisorEvidence({
   if (buildManifestDigest(buildManifest) !== profile.runtimeBuildManifestDigest) {
     throw codedError('stack_container_build_manifest_mismatch');
   }
+  const vcpRuntimeIdentity = deriveContainerVcpRuntimeIdentity(profile, {
+    authority,
+    buildManifest
+  });
   return Object.freeze({
     authority,
     buildManifest,
     edgeReceipt,
     providerReceipt,
     profile,
-    runtimeEvidence
+    runtimeEvidence,
+    vcpRuntimeIdentity
   });
 }
 
@@ -7249,6 +7315,7 @@ module.exports = {
   VCP_RUNTIME_CLASSIFICATIONS,
   VCP_RUNTIME_CONTRACT_PROJECTION,
   VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
+  VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
   VCP_RUNTIME_SOURCE_PATHS,
   acquireLifecycleProfile,
   acquireOwnerLock,
@@ -7274,6 +7341,7 @@ module.exports = {
   coordinateSourceManifestRebind,
   controllerCommandMatchesComponent,
   deriveRuntimeRepositoryFromHttpIdentity,
+  deriveContainerVcpRuntimeIdentity,
   discoverPrivateRoot,
   exactKeys,
   extractEnvFileArgument,
@@ -7310,6 +7378,7 @@ module.exports = {
   profileVcpProviderConfigMatches,
   profileWithControllerManifestBinding,
   profileWithSourceManifestRebinding,
+  profileVcpRuntimeIdentityMode,
   profileVcpRuntimeIdentityMatches,
   containerSupervisorAuthorityMatchesProfile,
   loadContainerSupervisorEvidence,

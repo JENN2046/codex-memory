@@ -34,6 +34,9 @@ const AUTHORITY_DEPENDENCY_GRAPH = Object.freeze({
   runtimeImage: Object.freeze(['nativeClosure', 'runtimeContainer'])
 });
 const PROFILE_SCHEMA_VERSION = 7;
+const VCP_IMAGE_RUNTIME_AUTHORITY_SCHEMA =
+  'codex-memory-vcp-image-runtime-authority/v1';
+const VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION = 2;
 const IMAGE_RUNTIME_ROOT = '/opt/codex-memory';
 const IMAGE_VCP_ROOT = '/opt/vcptoolbox';
 const IMAGE_PROFILE_KEYS = Object.freeze([
@@ -559,6 +562,18 @@ function validateProfileAuthorityComponents(value) {
   return Object.freeze({ ...value });
 }
 
+function vcpImageRuntimeAuthorityDigest(value) {
+  const authority = validateProfileAuthorityComponents(value);
+  return digest({
+    buildManifestDigest: authority.buildManifestDigest,
+    runtimeOciArchiveSha256: authority.acceptedOciArchiveSha256,
+    runtimeOciManifestDigest: authority.acceptedOciManifestDigest,
+    runtimeRootfsChainDigest: authority.rootfsChainDigest,
+    schemaVersion: VCP_IMAGE_RUNTIME_AUTHORITY_SCHEMA,
+    vcpCommit: authority.vcpCommit
+  });
+}
+
 function validateImageProfileReference(value) {
   if (typeof value !== 'string' || !value || value.includes('\0') ||
       path.isAbsolute(value) || path.normalize(value) !== value ||
@@ -626,7 +641,8 @@ function validateImageProfile(value, expectedAuthorityComponents) {
       value.providerImageStoreIdentityModel !== DOCKER_CONTAINERD_MANIFEST_IDENTITY ||
       value.providerContainer !== 'new-api-wsl' ||
       value.controllerSourceManifestVersion !== 1 ||
-      value.vcpRuntimeIdentitySchemaVersion !== 1 ||
+      value.vcpRuntimeIdentitySchemaVersion !==
+        VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION ||
       !SAFE_NAME.test(value.edgeContainer || '') ||
       typeof value.privateRoot !== 'string' ||
       !path.isAbsolute(value.privateRoot) ||
@@ -655,6 +671,10 @@ function validateImageProfile(value, expectedAuthorityComponents) {
   }
   if (expectedAuthorityComponents !== undefined) {
     const authority = validateProfileAuthorityComponents(expectedAuthorityComponents);
+    if (value.vcpRuntimeContractDigest !==
+        vcpImageRuntimeAuthorityDigest(authority)) {
+      reject('runtime_image_profile_vcp_image_authority_mismatch');
+    }
     const bindings = {
       adoptedRepositoryHead: authority.codexMemoryCommit,
       edgeArtifactSha256: authority.edgeArtifactSha256,
@@ -1112,9 +1132,14 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
     reject('runtime_profile_v7_migration_source_invalid');
   }
   const authority = validateProfileAuthorityComponents(imageAuthority);
-  const { providerImageId: _legacyProviderImageId, ...profileWithoutAmbiguousImageId } = profile;
+  const {
+    providerImageId: _legacyProviderImageId,
+    vcpRuntimeContractDigest: _hostVcpRuntimeContractDigest,
+    vcpRuntimeIdentitySchemaVersion: _hostVcpRuntimeIdentitySchemaVersion,
+    ...profileWithoutHostVcpIdentity
+  } = profile;
   const nextProfile = validateImageProfile({
-    ...profileWithoutAmbiguousImageId,
+    ...profileWithoutHostVcpIdentity,
     schemaVersion: PROFILE_SCHEMA_VERSION,
     runtimeAuthorityMode: 'digest_pinned_read_only_image',
     runtimeImageManifestDigest: authority.acceptedOciManifestDigest,
@@ -1159,6 +1184,9 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
     providerOciManifestDigest: authority.providerOciManifestDigest,
     providerRevision: authority.providerRevision,
     vcpRuntimeBaseline: authority.vcpCommit,
+    vcpRuntimeContractDigest: vcpImageRuntimeAuthorityDigest(authority),
+    vcpRuntimeIdentitySchemaVersion:
+      VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
     vcpRuntimeRepository: IMAGE_VCP_ROOT
   }, authority);
   return Object.freeze({
@@ -1193,6 +1221,8 @@ module.exports = {
   VCP_PROVIDER_RUNTIME_ENVIRONMENT_PATH,
   VCP_PROVIDER_RUNTIME_GID,
   VCP_PROVIDER_RUNTIME_UID,
+  VCP_IMAGE_RUNTIME_AUTHORITY_SCHEMA,
+  VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
   IMAGE_BUILD_MANIFEST_PATH,
   IMAGE_PROFILE_KEYS,
   IMAGE_RUNTIME_ROOT,
@@ -1226,6 +1256,7 @@ module.exports = {
   validateImageInspection,
   validateRuntimeSelfEvidence,
   validateStateMountContract,
+  vcpImageRuntimeAuthorityDigest,
   vcpProviderEnvironmentRuntimeAccess,
   vcpProviderConfigDigest
 };
