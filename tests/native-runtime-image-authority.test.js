@@ -15,6 +15,7 @@ const {
   STATE_MOUNT_SCHEMA,
   authorityRecordDigest,
   buildManifestDigest,
+  canonicalJson,
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
@@ -26,6 +27,7 @@ const {
   validateBuildManifest,
   validateContainerInspection,
   validateEdgeReceipt,
+  validateImageProfile,
   validateProviderReceipt,
   validateImageInspection,
   validateRuntimeSelfEvidence
@@ -50,11 +52,15 @@ const {
   buildProviderReceipt,
   start,
   validateEdgeContainer,
+  validateHostProfileBytes,
   validateImageForHost,
   validateProviderContainer,
   validateStableHostMountSource,
   verifyHostAuthority
 } = require('../deploy/native-runtime/host-launcher');
+const {
+  validateAuthorityProfileBytes
+} = require('../scripts/create-codex-memory-runtime-authority');
 const {
   HISTORICAL_PROVIDER_REVISION,
   historicalProviderInspect
@@ -63,7 +69,6 @@ const {
 const S = value => `sha256:${String(value).repeat(64).slice(0, 64)}`;
 const C = value => String(value).repeat(40).slice(0, 40);
 const I = value => String(value).repeat(64).slice(0, 64);
-const PROFILE_BYTES = Buffer.from('{"schemaVersion":7}\n');
 const ALLOWED_RUNTIME_ENV = Object.freeze([
   'CODEX_MEMORY_CONTAINER_AUTHORITY_PATH', 'CODEX_MEMORY_CONTAINER_SUPERVISOR',
   'CODEX_MEMORY_EDGE_RECEIPT_PATH', 'CODEX_MEMORY_PROVIDER_RECEIPT_PATH',
@@ -224,7 +229,7 @@ function authority(inspect = baseInspect(), overrides = {}) {
     stateRootClass: 'external_primary_r5c'
   };
   const manifest = buildManifest();
-  return {
+  const value = {
     acceptedImageConfigId: S('d'),
     acceptedOciArchiveSha256: S('a'),
     acceptedOciManifestDigest: S('e'),
@@ -257,7 +262,7 @@ function authority(inspect = baseInspect(), overrides = {}) {
     nativeClosureDigest: nativeClosureDigest(nativeClosure()),
     profilePath: SOURCES.profile,
     profileSchemaVersion: 7,
-    profileSha256: sha256Buffer(PROFILE_BYTES),
+    profileSha256: S('0'),
     providerContainerConfigDigest: S('8'),
     providerContainerId: I('8'),
     providerDaemonImageIdentity: PROVIDER_POLICY.daemonImageIdentity,
@@ -274,6 +279,51 @@ function authority(inspect = baseInspect(), overrides = {}) {
     vcpCommit: manifest.vcpCommit,
     ...overrides
   };
+  if (!Object.hasOwn(overrides, 'profileSha256')) {
+    value.profileSha256 = sha256Buffer(profileBytes(value));
+  }
+  return value;
+}
+
+function currentProfile(a) {
+  return {
+    adoptedRepositoryHead: C('1'),
+    controllerSourceManifestDigest: S('1'),
+    controllerSourceManifestVersion: 1,
+    edgeContainer: 'codex-memory-full-stack-001-edge',
+    edgeContainerId: a.edgeContainerId,
+    governanceEnvironment: 'governance/runtime.env',
+    governanceEnvironmentConfigDigest: S('2'),
+    privateRoot: '/srv/codex-memory/r5c',
+    providerContainer: 'new-api-wsl',
+    providerContainerId: a.providerContainerId,
+    providerImageId: a.providerDaemonImageIdentity,
+    providerRevision: a.providerRevision,
+    relayEnvironment: 'relay/runtime.env',
+    relayEnvironmentConfigDigest: S('4'),
+    retainedBinding: 'binding.json',
+    retainedBindingSource: C('4'),
+    runtimeBaseline: C('5'),
+    runtimeRepository: '/repo',
+    schemaVersion: 6,
+    vcpProviderConfigDigest: S('5'),
+    vcpRuntimeBaseline: C('6'),
+    vcpRuntimeContractDigest: S('6'),
+    vcpRuntimeIdentitySchemaVersion: 1,
+    vcpRuntimeRepository: '/vcp',
+    vcpRuntimeScopeDigest: S('7')
+  };
+}
+
+function imageProfile(a) {
+  const current = currentProfile(a);
+  return profileV7MigrationCandidate(current, profileAuthorityComponents(a), {
+    expectedCurrentFingerprint: digest(current)
+  }).nextProfile;
+}
+
+function profileBytes(a) {
+  return Buffer.from(canonicalJson(imageProfile(a)));
 }
 
 function edgeInspect(a = authority(), overrides = {}) {
@@ -494,7 +544,7 @@ function expectCode(fn, code) {
 function selfEvidence(a, overrides = {}) {
   return {
     authority: a, buildManifest: buildManifest(), edgeReceipt: edgeReceipt(a),
-    nativeClosure: nativeClosure(), profileBytes: PROFILE_BYTES,
+    nativeClosure: nativeClosure(), profileBytes: profileBytes(a),
     providerReceipt: providerReceipt(a), runtimeRoot: IMAGE_RUNTIME_ROOT,
     vcpRoot: IMAGE_VCP_ROOT, dockerSocketExists: () => false, ...overrides
   };
@@ -791,7 +841,6 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-host-verify-'));
   t.after(() => fs.rmSync(root, { force: true, recursive: true }));
   const profilePath = path.join(root, 'profile.json');
-  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
   const sources = { ...SOURCES, profile: profilePath };
   const runtime = baseInspect();
   runtime.Mounts.find(m => m.Destination === '/run/codex-memory/profile.json').Source = profilePath;
@@ -818,6 +867,8 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
         'native-image', 'tar-archive.js')
     })
   });
+  const acceptedProfileBytes = profileBytes(accepted);
+  fs.writeFileSync(profilePath, acceptedProfileBytes, { mode: 0o600 });
   const edge = edgeInspect(accepted);
   const provider = providerInspect(accepted);
   const image = {
@@ -841,22 +892,29 @@ test('host verifier binds installed trust, profile, policies, Provider and nativ
     verifyNativeClosureBytes: value => validateNativeClosure(value)
   };
   assert.equal(verifyHostAuthority(accepted, options).runtime.Id, runtime.Id);
-  fs.writeFileSync(profilePath, Buffer.concat([PROFILE_BYTES, Buffer.from(' ')]), { mode: 0o600 });
+  fs.writeFileSync(profilePath, Buffer.concat([
+    acceptedProfileBytes, Buffer.from(' ')
+  ]), { mode: 0o600 });
   expectCode(() => verifyHostAuthority(accepted, options),
     'host_launcher_profile_authority_mismatch');
-  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
+  fs.writeFileSync(profilePath, acceptedProfileBytes, { mode: 0o600 });
   fs.writeFileSync(profilePath, '{"schemaVersion":6}\n', { mode: 0o600 });
   expectCode(() => verifyHostAuthority(accepted, options),
     'host_launcher_profile_authority_mismatch');
-  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
+  const semanticInvalid = Buffer.from('{"schemaVersion":7}\n');
+  fs.writeFileSync(profilePath, semanticInvalid, { mode: 0o600 });
+  expectCode(() => verifyHostAuthority({
+    ...accepted, profileSha256: sha256Buffer(semanticInvalid)
+  }, options), 'host_launcher_profile_authority_mismatch');
+  fs.writeFileSync(profilePath, acceptedProfileBytes, { mode: 0o600 });
   const replacement = path.join(root, 'replacement-profile.json');
-  fs.writeFileSync(replacement, PROFILE_BYTES, { mode: 0o600 });
+  fs.writeFileSync(replacement, acceptedProfileBytes, { mode: 0o600 });
   fs.unlinkSync(profilePath);
   fs.symlinkSync(replacement, profilePath);
   expectCode(() => verifyHostAuthority(accepted, options),
     'runtime_authority_file_unavailable');
   fs.unlinkSync(profilePath);
-  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
+  fs.writeFileSync(profilePath, acceptedProfileBytes, { mode: 0o600 });
   expectCode(() => verifyHostAuthority({
     ...accepted, hostLauncherDigest: S('0')
   }, options), 'host_launcher_trust_bundle_mismatch');
@@ -869,7 +927,6 @@ test('simulated cold boot replaces placeholders with fresh receipts before Runti
   fs.mkdirSync(receiptRoot, { mode: 0o700 });
   const fsModule = coldBootFilesystem(receiptRoot);
   const profilePath = path.join(root, 'profile.json');
-  fs.writeFileSync(profilePath, PROFILE_BYTES, { mode: 0o600 });
   const sources = { ...SOURCES, profile: profilePath };
   const runtime = baseInspect();
   runtime.Mounts.find(m => m.Destination === '/run/codex-memory/profile.json').Source =
@@ -897,6 +954,7 @@ test('simulated cold boot replaces placeholders with fresh receipts before Runti
         'native-image', 'tar-archive.js')
     })
   });
+  fs.writeFileSync(profilePath, profileBytes(accepted), { mode: 0o600 });
   const edge = edgeInspect(accepted);
   const provider = providerInspect(accepted);
   const image = {
@@ -1117,6 +1175,63 @@ test('atomic Edge receipt is non-secret, root-replaceable and runtime-readable',
   assert.deepEqual(JSON.parse(fs.readFileSync(file, 'utf8')), { accepted: true });
 });
 
+test('schema-v7 shared admission rejects incomplete, extended and mutable profiles', () => {
+  const a = authorityWithEdge();
+  const valid = imageProfile(a);
+  assert.deepEqual(validateImageProfile(valid), validateProfile(valid));
+  const missing = { ...valid };
+  delete missing.hostLauncherDigest;
+  const cases = [
+    { schemaVersion: 7 },
+    missing,
+    { ...valid, accepted: true },
+    { ...valid, runtimeAuthorityMode: 'mutable_checkout' },
+    { ...valid, runtimeRepository: '/home/jenn/src/codex-memory' },
+    { ...valid, vcpRuntimeRepository: '/home/jenn/src/VCPToolBox' },
+    { ...valid, profileAuthorityComponentSchemaVersion:
+      'codex-memory-profile-runtime-authority-components/v2' }
+  ];
+  for (const candidate of cases) {
+    expectCode(() => validateImageProfile(candidate), 'runtime_image_profile_invalid');
+    expectCode(() => validateProfile(candidate), 'stack_profile_invalid');
+  }
+});
+
+test('schema-v7 authority binding rejects every governed digest substitution', () => {
+  const a = authorityWithEdge();
+  const valid = imageProfile(a);
+  const components = profileAuthorityComponents(a);
+  for (const field of [
+    'runtimeImageManifestDigest',
+    'runtimeImageConfigId',
+    'runtimeBuildManifestDigest',
+    'hostLauncherDigest',
+    'edgeRuntimeConfigDigest',
+    'providerRuntimeConfigDigest',
+    'stateMountContractDigest'
+  ]) {
+    expectCode(() => validateImageProfile({ ...valid, [field]: S('0') }, components),
+      'runtime_image_profile_authority_mismatch');
+  }
+  expectCode(() => validateImageProfile({
+    ...valid,
+    runtimeImageConfigId: valid.runtimeImageManifestDigest,
+    runtimeImageManifestDigest: valid.runtimeImageConfigId
+  }, components), 'runtime_image_profile_authority_mismatch');
+});
+
+test('authority creation and host admission reject schema-only profile bytes', () => {
+  const invalidBytes = Buffer.from('{"schemaVersion":7}\n');
+  expectCode(() => validateAuthorityProfileBytes(invalidBytes),
+    'runtime_authority_profile_invalid');
+  const a = {
+    ...authorityWithEdge(),
+    profileSha256: sha256Buffer(invalidBytes)
+  };
+  expectCode(() => validateHostProfileBytes(invalidBytes, a),
+    'host_launcher_profile_authority_mismatch');
+});
+
 test('schema-v6 to v7 produces candidate only and preserves state/credential refs', () => {
   const inspect = baseInspect();
   const a = authority(inspect);
@@ -1171,6 +1286,10 @@ test('schema-v6 to v7 produces candidate only and preserves state/credential ref
   assert.equal(result.nextProfile.providerRuntimeConfigDigest,
     a.providerContainerConfigDigest);
   assert.equal(result.nextProfile.edgeRuntimeConfigDigest, a.edgeConfigDigest);
+  assert.deepEqual(validateImageProfile(
+    result.nextProfile, profileAuthorityComponents(a)
+  ), result.nextProfile);
+  assert.deepEqual(validateProfile(result.nextProfile), result.nextProfile);
   assert.equal(containerSupervisorAuthorityMatchesProfile(result.nextProfile, a), true);
   assert.equal(validateProfile(result.nextProfile).schemaVersion, 7);
 });
