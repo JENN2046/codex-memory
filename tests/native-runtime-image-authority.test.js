@@ -21,7 +21,9 @@ const {
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
+  INITIAL_PROFILE_SEED_KEYS,
   profileAuthorityComponents,
+  profileV7InitialBootstrapCandidate,
   profileV7MigrationCandidate,
   readBoundedJson,
   sha256Buffer,
@@ -340,6 +342,24 @@ function imageProfile(a) {
   return profileV7MigrationCandidate(current, profileAuthorityComponents(a), {
     expectedCurrentFingerprint: digest(current)
   }).nextProfile;
+}
+
+function initialProfileSeed(privateRoot = '/srv/codex-memory/r5c') {
+  return {
+    controllerSourceManifestDigest: S('1'),
+    controllerSourceManifestVersion: 1,
+    edgeContainer: 'codex-memory-current-edge',
+    governanceEnvironment: 'governance/runtime.env',
+    governanceEnvironmentConfigDigest: S('2'),
+    privateRoot,
+    providerContainer: 'new-api-wsl',
+    relayEnvironment: 'relay/runtime.env',
+    relayEnvironmentConfigDigest: S('4'),
+    retainedBinding: 'binding.json',
+    retainedBindingSource: C('4'),
+    vcpProviderConfigDigest: S('5'),
+    vcpRuntimeScopeDigest: S('7')
+  };
 }
 
 function profileBytes(a) {
@@ -1433,6 +1453,59 @@ test('schema-v7 private root is canonically bound to its state mount contract', 
     'codex-memory-profile-runtime-authority-components/v3');
   assert.equal(components.profileAuthorityComponentSchemaVersion,
     'codex-memory-profile-runtime-authority-components/v3');
+});
+
+test('initial bootstrap creates deterministic schema-v7 candidate from minimal seed', () => {
+  const a = authorityWithEdge();
+  const result = profileV7InitialBootstrapCandidate(
+    initialProfileSeed(), profileAuthorityComponents(a)
+  );
+  assert.equal(result.candidateOnly, true);
+  assert.equal(result.durableMutationPerformed, false);
+  assert.equal(result.nextProfile.schemaVersion, 7);
+  assert.equal(result.nextProfile.vcpRuntimeIdentitySchemaVersion, 2);
+  assert.equal(result.nextProfile.vcpRuntimeContractDigest,
+    vcpImageRuntimeAuthorityDigest(profileAuthorityComponents(a)));
+  assert.equal(result.nextProfile.runtimeContainerId, a.expectedRuntimeContainerId);
+  assert.deepEqual(validateImageProfile(
+    result.nextProfile, profileAuthorityComponents(a)
+  ), result.nextProfile);
+  const again = profileV7InitialBootstrapCandidate(
+    initialProfileSeed(), profileAuthorityComponents(a)
+  );
+  assert.equal(again.nextProfileFingerprint, result.nextProfileFingerprint);
+  assert.equal(again.nextProfileBytes, result.nextProfileBytes);
+  assert.deepEqual(INITIAL_PROFILE_SEED_KEYS, [
+    'controllerSourceManifestDigest', 'controllerSourceManifestVersion',
+    'edgeContainer', 'governanceEnvironment',
+    'governanceEnvironmentConfigDigest', 'privateRoot', 'providerContainer',
+    'relayEnvironment', 'relayEnvironmentConfigDigest', 'retainedBinding',
+    'retainedBindingSource', 'vcpProviderConfigDigest', 'vcpRuntimeScopeDigest'
+  ]);
+});
+
+test('initial bootstrap rejects authority-owned field injection and legacy VCP identity', () => {
+  const a = authorityWithEdge();
+  const components = profileAuthorityComponents(a);
+  expectCode(() => profileV7InitialBootstrapCandidate({
+    ...initialProfileSeed(), runtimeBuildManifestDigest: S('0')
+  }, components), 'runtime_initial_profile_seed_invalid');
+  expectCode(() => profileV7InitialBootstrapCandidate({
+    ...initialProfileSeed(), vcpRuntimeContractDigest: S('0')
+  }, components), 'runtime_initial_profile_seed_invalid');
+  const candidate = profileV7InitialBootstrapCandidate(
+    initialProfileSeed(), components
+  ).nextProfile;
+  expectCode(() => validateImageProfile({
+    ...candidate, vcpRuntimeIdentitySchemaVersion: 1
+  }, components), 'runtime_image_profile_invalid');
+});
+
+test('initial bootstrap rejects a seed whose private root differs from observed state', () => {
+  const a = authorityWithEdge();
+  expectCode(() => profileV7InitialBootstrapCandidate(
+    initialProfileSeed('/srv/codex-memory/other-r5c'), profileAuthorityComponents(a)
+  ), 'runtime_image_profile_state_mount_mismatch');
 });
 
 test('schema-v7 migration rejects state components for another private root', () => {

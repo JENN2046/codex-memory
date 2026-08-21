@@ -11,6 +11,7 @@ const {
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
+  profileV7InitialBootstrapCandidate,
   profileAuthorityComponents,
   sha256Buffer,
   validateAuthorityRecord,
@@ -132,6 +133,17 @@ function parse(argv) {
   return values;
 }
 
+function readInitialProfileSeed(file) {
+  let bytes;
+  try { bytes = fs.readFileSync(file); } catch { fail('runtime_initial_profile_seed_unavailable'); }
+  if (bytes.length < 2 || bytes.length > 262_144) {
+    fail('runtime_initial_profile_seed_invalid');
+  }
+  try { return JSON.parse(bytes.toString('utf8')); } catch {
+    fail('runtime_initial_profile_seed_invalid');
+  }
+}
+
 function validateExternallyAcceptedImageEvidence(accepted, archiveEvidence, manifest) {
   const actual = {
     archiveSha256: archiveEvidence.archiveSha256,
@@ -200,8 +212,15 @@ function main(argv = process.argv.slice(2)) {
     sourceCommit: args['expected-edge-source-commit']
   }, edgeArchiveEvidence);
   const profileFile = path.resolve(args.profile || '');
-  const profileBytes = fs.readFileSync(profileFile);
-  const profile = validateAuthorityProfileBytes(profileBytes);
+  const initialBootstrap = Boolean(args['initial-profile-seed']);
+  if (!args.profile) fail('runtime_authority_profile_path_required');
+  let profileBytes = initialBootstrap
+    ? null : fs.readFileSync(profileFile);
+  let profile = initialBootstrap
+    ? null : validateAuthorityProfileBytes(profileBytes);
+  const initialProfileSeed = initialBootstrap
+    ? readInitialProfileSeed(path.resolve(args['initial-profile-seed']))
+    : null;
   const nativeClosure = validateNativeClosure(JSON.parse(containerFile(
     runtime.Id, '/opt/codex-memory-runtime/native-closure.json'
   ).toString('utf8')));
@@ -226,9 +245,8 @@ function main(argv = process.argv.slice(2)) {
     providerReceipt: path.resolve(args['provider-receipt'] || ''),
     runtimeDirectory: path.resolve(args['runtime-directory'] || '')
   };
-  validateProviderEnvironmentAuthorityBinding(
-    runtimeMountSources.providerEnvironment,
-    profile
+  if (profile) validateProviderEnvironmentAuthorityBinding(
+    runtimeMountSources.providerEnvironment, profile
   );
   validateRuntimeCandidate(runtime, {
     ...runtimeMountSources,
@@ -270,7 +288,7 @@ function main(argv = process.argv.slice(2)) {
   validateProviderContainerChanges(containerChanges(provider.Id));
   const providerRevision = provider?.Config?.Labels?.['org.opencontainers.image.revision'];
   const edgeRevision = edge?.Config?.Labels?.['org.opencontainers.image.revision'];
-  const candidate = validateAuthorityRecord({
+  let candidate = validateAuthorityRecord({
     acceptedImageConfigId: image.Id,
     acceptedOciArchiveSha256: archiveEvidence.archiveSha256,
     acceptedOciManifestDigest: archiveEvidence.manifestDigest,
@@ -308,7 +326,9 @@ function main(argv = process.argv.slice(2)) {
     nativeClosureDigest: nativeClosureDigest(nativeClosure),
     profilePath: profileFile,
     profileSchemaVersion: 7,
-    profileSha256: sha256Buffer(profileBytes),
+    // Initial bootstrap derives the profile after all observed components are
+    // assembled. This provisional digest is replaced before publication.
+    profileSha256: sha256Buffer(Buffer.from('initial-profile-bootstrap')),
     providerContainerConfigDigest: containerConfigDigest(provider),
     providerContainerId: provider.Id,
     providerDaemonImageIdentity: providerImageEvidence.daemonImageIdentity,
@@ -324,12 +344,28 @@ function main(argv = process.argv.slice(2)) {
     stateMountContractDigest: digest(stateMountContract),
     vcpCommit: manifest.vcpCommit
   });
+  if (initialBootstrap) {
+    const initial = profileV7InitialBootstrapCandidate(
+      initialProfileSeed, profileAuthorityComponents(candidate)
+    ).nextProfile;
+    profile = initial;
+    profileBytes = Buffer.from(canonicalJson(profile));
+    candidate = validateAuthorityRecord({
+      ...candidate,
+      profileSha256: sha256Buffer(profileBytes)
+    });
+    validateProviderEnvironmentAuthorityBinding(
+      runtimeMountSources.providerEnvironment, profile
+    );
+  }
   try {
     validateImageProfile(profile, profileAuthorityComponents(candidate));
   } catch {
     fail('runtime_authority_profile_authority_mismatch');
   }
-  process.stdout.write(canonicalJson(candidate));
+  process.stdout.write(canonicalJson(initialBootstrap
+    ? { authority: candidate, profile, profileSha256: sha256Buffer(profileBytes) }
+    : candidate));
 }
 
 if (require.main === module) {
