@@ -1770,6 +1770,9 @@ test('initial profile seed reader rejects symlinks and mid-read replacement', t 
     'runtime_initial_profile_seed_unavailable');
   const groupWritable = path.join(root, 'seed-group.json');
   fs.writeFileSync(groupWritable, seedBytes, { mode: 0o660 });
+  // writeFileSync mode is masked by the process umask, so force the
+  // group-writable bit to make the permission-rejection deterministic.
+  fs.chmodSync(groupWritable, 0o660);
   expectCode(() => readInitialProfileSeed(groupWritable, { requireRootFiles: false }),
     'runtime_initial_profile_seed_unavailable');
   const changing = path.join(root, 'seed-toctou.json');
