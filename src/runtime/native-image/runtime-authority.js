@@ -15,28 +15,41 @@ const PROVIDER_RECEIPT_SCHEMA = 'codex-memory-provider-runtime-receipt/v2';
 const STATE_MOUNT_SCHEMA = 'codex-memory-primary-state-mount/v1';
 const PROFILE_AUTHORITY_COMPONENT_SCHEMA =
   'codex-memory-profile-runtime-authority-components/v3';
+// Edges point from a prerequisite to the node that depends on / follows it, so
+// `A: [B]` means "A precedes B". The initial bootstrap base case is derived
+// from observed runtime/edge/provider/policy inputs (which precede
+// authorityComponents), then produces the initial profile candidate ahead of
+// the host authority. Receipts remain terminal sinks: they can never precede
+// (and therefore never mint) authority.
 const AUTHORITY_DEPENDENCY_GRAPH = Object.freeze({
-  authorityComponents: Object.freeze([
-    'canonicalPolicies', 'edgeObservation', 'providerObservation',
-    'runtimeContainer', 'runtimeImage'
-  ]),
+  authorityComponents: Object.freeze(['initialProfileCandidate']),
   buildContext: Object.freeze(['runtimeImage']),
-  canonicalPolicies: Object.freeze(['profileCandidate', 'hostAuthority']),
+  canonicalPolicies: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
   edgeBuildContext: Object.freeze(['edgeImageArtifact']),
   edgeImageArtifact: Object.freeze(['edgeObservation']),
-  edgeObservation: Object.freeze(['profileCandidate', 'hostAuthority']),
+  edgeObservation: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
   hostAuthority: Object.freeze(['hostLauncherAdmission']),
   hostLauncherAdmission: Object.freeze(['edgeReceipt', 'providerReceipt', 'runtimeActivation']),
-  initialProfileCandidate: Object.freeze(['authorityComponents']),
-  launcherBundle: Object.freeze(['profileCandidate', 'hostAuthority']),
+  initialProfileCandidate: Object.freeze(['hostAuthority']),
+  launcherBundle: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
   nativeClosure: Object.freeze(['hostAuthority']),
   profileCandidate: Object.freeze(['hostAuthority']),
-  providerObservation: Object.freeze(['profileCandidate', 'hostAuthority']),
+  providerObservation: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
   reviewedSource: Object.freeze([
     'buildContext', 'canonicalPolicies', 'edgeBuildContext', 'launcherBundle'
   ]),
-  runtimeContainer: Object.freeze(['runtimeImage']),
-  runtimeImage: Object.freeze(['nativeClosure'])
+  runtimeContainer: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
+  runtimeImage: Object.freeze(['nativeClosure', 'runtimeContainer'])
 });
 const PROFILE_SCHEMA_VERSION = 7;
 const VCP_IMAGE_RUNTIME_AUTHORITY_SCHEMA =
@@ -178,6 +191,23 @@ function countAuthorityGraphCycles(graph = AUTHORITY_DEPENDENCY_GRAPH) {
   };
   for (const node of Object.keys(graph)) visit(node);
   return cycles;
+}
+
+// Directed reachability over AUTHORITY_DEPENDENCY_GRAPH. Because an edge
+// `A: [B]` encodes "A precedes B", a truthy result means `from` is an ordering
+// prerequisite of `to`. This lets tests assert the real bootstrap ordering
+// instead of only checking acyclicity.
+function authorityGraphPrecedes(from, to, graph = AUTHORITY_DEPENDENCY_GRAPH) {
+  const seen = new Set();
+  const stack = [...(graph[from] || [])];
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (node === to) return true;
+    if (seen.has(node)) continue;
+    seen.add(node);
+    for (const next of graph[node] || []) stack.push(next);
+  }
+  return false;
 }
 
 function canonical(value) {
@@ -1313,6 +1343,7 @@ module.exports = {
   STATE_MOUNT_SCHEMA,
   RuntimeAuthorityError,
   authorityRecordDigest,
+  authorityGraphPrecedes,
   buildManifestDigest,
   canonicalJson,
   countAuthorityGraphCycles,
