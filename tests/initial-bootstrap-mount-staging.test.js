@@ -196,6 +196,160 @@ test('materialize confines root to canonical base and rejects wrong-generation r
     'initial_bootstrap_generation_root_mismatch');
 });
 
+test('stage creates the canonical base on a clean host from a trusted parent', t => {
+  const root = fixtureRoot(t);
+  const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
+  const gid = typeof process.getgid === 'function' ? process.getgid() : 0;
+  const canonicalBase = path.join(root, 'bootstrap');
+  const opts = {
+    generation: GENERATION,
+    canonicalBase,
+    root: path.join(canonicalBase, GENERATION),
+    uid,
+    gid,
+    requireRoot: false,
+    edgeReceiptPath: path.join(root, 'run', 'edge-receipt.json'),
+    providerReceiptPath: path.join(root, 'run', 'provider-receipt.json')
+  };
+  assert.equal(fs.existsSync(canonicalBase), false);
+  const result = stage(opts);
+  assert.equal(result.authoritySource.status, 'created');
+  assert.equal(result.profileSource.status, 'created');
+  const baseStat = fs.lstatSync(canonicalBase);
+  assert.equal(baseStat.isDirectory(), true);
+  assert.equal(baseStat.isSymbolicLink(), false);
+  assert.equal(baseStat.uid, uid);
+  assert.equal(baseStat.gid, gid);
+  assert.equal(baseStat.mode & 0o777, 0o700);
+  assert.equal(fs.lstatSync(path.join(canonicalBase, GENERATION)).mode & 0o777, 0o700);
+});
+
+test('stage rejects unsafe canonical parents without creating the canonical base', t => {
+  const root = fixtureRoot(t);
+  const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
+  const gid = typeof process.getgid === 'function' ? process.getgid() : 0;
+  const optionsFor = parent => ({
+    generation: GENERATION,
+    canonicalBase: path.join(parent, 'bootstrap'),
+    root: path.join(parent, 'bootstrap', GENERATION),
+    uid,
+    gid,
+    requireRoot: false,
+    edgeReceiptPath: path.join(root, 'run', 'edge-receipt.json'),
+    providerReceiptPath: path.join(root, 'run', 'provider-receipt.json')
+  });
+
+  // A symlinked trusted parent must be rejected before any child is created.
+  const realParent = path.join(root, 'real-parent');
+  fs.mkdirSync(realParent, { mode: 0o700 });
+  fs.chmodSync(realParent, 0o700);
+  const symlinkParent = path.join(root, 'symlink-parent');
+  fs.symlinkSync(realParent, symlinkParent);
+  const symlinkOpts = optionsFor(symlinkParent);
+  expectCode(() => stage(symlinkOpts), 'BLOCKED_BOOTSTRAP_CANONICAL_PARENT_UNSAFE');
+  assert.equal(fs.existsSync(symlinkOpts.canonicalBase), false);
+  assert.equal(fs.lstatSync(symlinkParent).isSymbolicLink(), true);
+
+  // A group-writable trusted parent is likewise a hard trust-boundary failure.
+  const insecureParent = path.join(root, 'insecure-parent');
+  fs.mkdirSync(insecureParent, { mode: 0o770 });
+  fs.chmodSync(insecureParent, 0o770);
+  const insecureOpts = optionsFor(insecureParent);
+  expectCode(() => stage(insecureOpts), 'BLOCKED_BOOTSTRAP_CANONICAL_PARENT_UNSAFE');
+  assert.equal(fs.existsSync(insecureOpts.canonicalBase), false);
+  assert.equal(fs.lstatSync(insecureParent).mode & 0o777, 0o770);
+});
+
+test('stage never creates a missing canonical parent recursively', t => {
+  const root = fixtureRoot(t);
+  const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
+  const gid = typeof process.getgid === 'function' ? process.getgid() : 0;
+  const canonicalBase = path.join(root, 'missing-parent', 'bootstrap');
+  const opts = {
+    generation: GENERATION,
+    canonicalBase,
+    root: path.join(canonicalBase, GENERATION),
+    uid,
+    gid,
+    requireRoot: false,
+    edgeReceiptPath: path.join(root, 'run', 'edge-receipt.json'),
+    providerReceiptPath: path.join(root, 'run', 'provider-receipt.json')
+  };
+  expectCode(() => stage(opts), 'BLOCKED_BOOTSTRAP_CANONICAL_PARENT_UNSAFE');
+  assert.equal(fs.existsSync(path.join(root, 'missing-parent')), false);
+});
+
+test('stage revalidates the canonical base after an EEXIST mkdir race', t => {
+  const root = fixtureRoot(t);
+  const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
+  const gid = typeof process.getgid === 'function' ? process.getgid() : 0;
+
+  function racingFilesystemFor(canonicalBase) {
+    let baseLstats = 0;
+    let baseMkdirs = 0;
+    return new Proxy(fs, {
+      get(target, property) {
+        if (property === 'lstatSync') {
+          return file => {
+            if (file === canonicalBase && baseLstats++ === 0) {
+              const error = new Error('simulated clean-host absence');
+              error.code = 'ENOENT';
+              throw error;
+            }
+            return target.lstatSync(file);
+          };
+        }
+        if (property === 'mkdirSync') {
+          return (directory, mkdirOptions) => {
+            if (directory === canonicalBase && baseMkdirs++ === 0) {
+              const error = new Error('simulated concurrent creator');
+              error.code = 'EEXIST';
+              throw error;
+            }
+            return target.mkdirSync(directory, mkdirOptions);
+          };
+        }
+        const value = target[property];
+        return typeof value === 'function' ? value.bind(target) : value;
+      }
+    });
+  }
+
+  // A concurrent trusted creator wins with a safe directory: stage accepts the
+  // resulting directory and completes staging.
+  const safeBase = path.join(root, 'bootstrap');
+  fs.mkdirSync(safeBase, { mode: 0o700 });
+  fs.chmodSync(safeBase, 0o700);
+  const safeOpts = {
+    generation: GENERATION,
+    canonicalBase: safeBase,
+    root: path.join(safeBase, GENERATION),
+    uid,
+    gid,
+    requireRoot: false,
+    fsModule: racingFilesystemFor(safeBase),
+    edgeReceiptPath: path.join(root, 'run', 'edge-receipt.json'),
+    providerReceiptPath: path.join(root, 'run', 'provider-receipt.json')
+  };
+  const safe = stage(safeOpts);
+  assert.equal(safe.authoritySource.status, 'created');
+  assert.equal(safe.profileSource.status, 'created');
+  assert.equal(fs.lstatSync(path.join(safeBase, GENERATION)).isDirectory(), true);
+
+  // A concurrent foreign creator wins with a non-directory: the revalidation
+  // rejects it and never mutates the foreign object.
+  const foreignBase = path.join(root, 'foreign');
+  fs.writeFileSync(foreignBase, 'foreign object', { mode: 0o600 });
+  const foreignOpts = {
+    ...safeOpts,
+    canonicalBase: foreignBase,
+    root: path.join(foreignBase, GENERATION),
+    fsModule: racingFilesystemFor(foreignBase)
+  };
+  expectCode(() => stage(foreignOpts), 'bootstrap_staging_root_unsafe');
+  assert.equal(fs.readFileSync(foreignBase, 'utf8'), 'foreign object');
+});
+
 test('staging placeholders fail production authority/profile validation', t => {
   const root = fixtureRoot(t);
   const opts = options(root);

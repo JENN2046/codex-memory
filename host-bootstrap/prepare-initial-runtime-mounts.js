@@ -93,6 +93,39 @@ function ensureDirectory(directory, options = {}) {
   }
 }
 
+function prepareCanonicalBase(canonicalBase, { fsModule = fs, uid = 0, gid = 0 } = {}) {
+  const parent = path.dirname(canonicalBase);
+  // The trusted parent must already exist. It is never created or repaired by
+  // this tool, so a clean host cannot recursively bootstrap /etc/codex-memory
+  // or any higher directory.
+  try {
+    secureDirectory(parent, { fsModule, uid, gid });
+  } catch {
+    fail('BLOCKED_BOOTSTRAP_CANONICAL_PARENT_UNSAFE');
+  }
+  try {
+    return secureDirectory(canonicalBase, { fsModule, uid, gid });
+  } catch (error) {
+    if (error?.code !== 'bootstrap_staging_root_unavailable') throw error;
+  }
+  // Create exactly one directory level, never recursively. If a concurrent
+  // creator wins with EEXIST, the resulting object is revalidated below; an
+  // existing object is never chmod-repaired.
+  let created = false;
+  try {
+    fsModule.mkdirSync(canonicalBase, { mode: ROOT_MODE });
+    created = true;
+  } catch (error) {
+    if (error?.code !== 'EEXIST') throw error;
+  }
+  if (created) {
+    fsModule.chmodSync(canonicalBase, ROOT_MODE);
+    const descriptor = fsModule.openSync(parent, fs.constants.O_RDONLY);
+    try { fsModule.fsyncSync(descriptor); } finally { fsModule.closeSync(descriptor); }
+  }
+  return secureDirectory(canonicalBase, { fsModule, uid, gid });
+}
+
 function writeExclusive(file, bytes, {
   fsModule = fs,
   uid = 0,
@@ -222,7 +255,7 @@ function stage({ generation, root, fsModule = fs, requireRoot = true,
   if (root !== path.join(canonicalBase, generation)) {
     fail('initial_bootstrap_generation_root_mismatch');
   }
-  ensureDirectory(canonicalBase, { fsModule, uid, gid, create: false });
+  prepareCanonicalBase(canonicalBase, { fsModule, uid, gid });
   ensureDirectory(root, { fsModule, uid, gid, create: true });
   secureDirectory(root, { fsModule, uid, gid, requiredMode: ROOT_MODE });
   const authority = path.join(root, 'runtime-authority.json');
