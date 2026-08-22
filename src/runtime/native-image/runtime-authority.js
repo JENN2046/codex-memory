@@ -15,22 +15,40 @@ const PROVIDER_RECEIPT_SCHEMA = 'codex-memory-provider-runtime-receipt/v2';
 const STATE_MOUNT_SCHEMA = 'codex-memory-primary-state-mount/v1';
 const PROFILE_AUTHORITY_COMPONENT_SCHEMA =
   'codex-memory-profile-runtime-authority-components/v3';
+// Edges point from a prerequisite to the node that depends on / follows it, so
+// `A: [B]` means "A precedes B". The initial bootstrap base case is derived
+// from observed runtime/edge/provider/policy inputs (which precede
+// authorityComponents), then produces the initial profile candidate ahead of
+// the host authority. Receipts remain terminal sinks: they can never precede
+// (and therefore never mint) authority.
 const AUTHORITY_DEPENDENCY_GRAPH = Object.freeze({
+  authorityComponents: Object.freeze(['initialProfileCandidate']),
   buildContext: Object.freeze(['runtimeImage']),
-  canonicalPolicies: Object.freeze(['profileCandidate', 'hostAuthority']),
+  canonicalPolicies: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
   edgeBuildContext: Object.freeze(['edgeImageArtifact']),
   edgeImageArtifact: Object.freeze(['edgeObservation']),
-  edgeObservation: Object.freeze(['profileCandidate', 'hostAuthority']),
+  edgeObservation: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
   hostAuthority: Object.freeze(['hostLauncherAdmission']),
   hostLauncherAdmission: Object.freeze(['edgeReceipt', 'providerReceipt', 'runtimeActivation']),
-  launcherBundle: Object.freeze(['profileCandidate', 'hostAuthority']),
+  initialProfileCandidate: Object.freeze(['hostAuthority']),
+  launcherBundle: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
   nativeClosure: Object.freeze(['hostAuthority']),
   profileCandidate: Object.freeze(['hostAuthority']),
-  providerObservation: Object.freeze(['profileCandidate', 'hostAuthority']),
+  providerObservation: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
   reviewedSource: Object.freeze([
     'buildContext', 'canonicalPolicies', 'edgeBuildContext', 'launcherBundle'
   ]),
-  runtimeContainer: Object.freeze(['profileCandidate', 'hostAuthority']),
+  runtimeContainer: Object.freeze([
+    'authorityComponents', 'hostAuthority', 'profileCandidate'
+  ]),
   runtimeImage: Object.freeze(['nativeClosure', 'runtimeContainer'])
 });
 const PROFILE_SCHEMA_VERSION = 7;
@@ -101,6 +119,21 @@ const IMAGE_PROFILE_KEYS = Object.freeze([
   'vcpRuntimeRepository',
   'vcpRuntimeScopeDigest'
 ]);
+const INITIAL_PROFILE_SEED_KEYS = Object.freeze([
+  'controllerSourceManifestDigest',
+  'controllerSourceManifestVersion',
+  'edgeContainer',
+  'governanceEnvironment',
+  'governanceEnvironmentConfigDigest',
+  'privateRoot',
+  'providerContainer',
+  'relayEnvironment',
+  'relayEnvironmentConfigDigest',
+  'retainedBinding',
+  'retainedBindingSource',
+  'vcpProviderConfigDigest',
+  'vcpRuntimeScopeDigest'
+]);
 const IMAGE_BUILD_MANIFEST_PATH =
   '/opt/codex-memory-runtime/runtime-build-manifest.json';
 const AUTHORITY_RECORD_PATH = '/run/codex-memory/authority.json';
@@ -158,6 +191,23 @@ function countAuthorityGraphCycles(graph = AUTHORITY_DEPENDENCY_GRAPH) {
   };
   for (const node of Object.keys(graph)) visit(node);
   return cycles;
+}
+
+// Directed reachability over AUTHORITY_DEPENDENCY_GRAPH. Because an edge
+// `A: [B]` encodes "A precedes B", a truthy result means `from` is an ordering
+// prerequisite of `to`. This lets tests assert the real bootstrap ordering
+// instead of only checking acyclicity.
+function authorityGraphPrecedes(from, to, graph = AUTHORITY_DEPENDENCY_GRAPH) {
+  const seen = new Set();
+  const stack = [...(graph[from] || [])];
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (node === to) return true;
+    if (seen.has(node)) continue;
+    seen.add(node);
+    for (const next of graph[node] || []) stack.push(next);
+  }
+  return false;
 }
 
 function canonical(value) {
@@ -773,6 +823,108 @@ function profileAuthorityComponents(authority) {
   });
 }
 
+function validateInitialProfileSeed(value) {
+  if (!exactKeys(value, INITIAL_PROFILE_SEED_KEYS) ||
+      value.controllerSourceManifestVersion !== 1 ||
+      typeof value.edgeContainer !== 'string' ||
+      typeof value.providerContainer !== 'string' ||
+      value.providerContainer !== 'new-api-wsl' ||
+      !SHA256.test(value.controllerSourceManifestDigest || '') ||
+      !SHA256.test(value.governanceEnvironmentConfigDigest || '') ||
+      !SHA256.test(value.relayEnvironmentConfigDigest || '') ||
+      !SHA256.test(value.vcpProviderConfigDigest || '') ||
+      !SHA256.test(value.vcpRuntimeScopeDigest || '') ||
+      !SHA1.test(value.retainedBindingSource || '') ||
+      typeof value.privateRoot !== 'string' || !path.isAbsolute(value.privateRoot) ||
+      path.resolve(value.privateRoot) !== value.privateRoot) {
+    reject('runtime_initial_profile_seed_invalid');
+  }
+  validateImageProfileReference(value.governanceEnvironment);
+  validateImageProfileReference(value.relayEnvironment);
+  validateImageProfileReference(value.retainedBinding);
+  if (!SAFE_NAME.test(value.edgeContainer)) reject('runtime_initial_profile_seed_invalid');
+  return Object.freeze({ ...value });
+}
+
+function imageProfileFromAuthoritySeed(seed, imageAuthority) {
+  const authority = validateProfileAuthorityComponents(imageAuthority);
+  const initial = validateInitialProfileSeed(seed);
+  const stateMountContract = {
+    containerPath: initial.privateRoot,
+    readOnly: true,
+    schemaVersion: STATE_MOUNT_SCHEMA,
+    stateRootClass: 'external_primary_r5c'
+  };
+  if (digest(stateMountContract) !== authority.stateMountContractDigest) {
+    reject('runtime_image_profile_state_mount_mismatch');
+  }
+  return validateImageProfile({
+    ...initial,
+    adoptedRepositoryHead: authority.codexMemoryCommit,
+    edgeArtifactSha256: authority.edgeArtifactSha256,
+    edgeBindingDigest: authority.edgeBindingDigest,
+    edgeBindingReference: authority.edgeBindingReference,
+    edgeBuildContextDigest: authority.edgeBuildContextDigest,
+    edgeBuildManifestDigest: authority.edgeBuildManifestDigest,
+    edgeContainerId: authority.edgeContainerId,
+    edgeDaemonImageIdentity: authority.edgeDaemonImageIdentity,
+    edgeHostProjectReference: authority.edgeHostProjectReference,
+    edgeImageConfigDigest: authority.edgeImageConfigDigest,
+    edgeImageStoreIdentityModel: authority.edgeImageStoreIdentityModel,
+    edgeLifecycleAuthority: authority.edgeLifecycleAuthority,
+    edgeLockfileSha256: authority.edgeLockfileSha256,
+    edgeOciManifestDigest: authority.edgeOciManifestDigest,
+    edgeOperatorReference: authority.edgeOperatorReference,
+    edgePolicyDigest: authority.edgePolicyDigest,
+    edgePreviousBindingReference: authority.edgePreviousBindingReference,
+    edgeRuntimeConfigDigest: authority.edgeConfigDigest,
+    edgeSourceCommit: authority.edgeSourceCommit,
+    hostLauncherAuthorityVersion: authority.hostLauncherVersion,
+    hostLauncherDigest: authority.hostLauncherDigest,
+    nativeClosureDigest: authority.nativeClosureDigest,
+    profileAuthorityComponentSchemaVersion:
+      authority.profileAuthorityComponentSchemaVersion,
+    providerContainerId: authority.providerContainerId,
+    providerDaemonImageIdentity: authority.providerDaemonImageIdentity,
+    providerImageConfigDigest: authority.providerImageConfigDigest,
+    providerImageStoreIdentityModel: authority.providerImageStoreIdentityModel,
+    providerOciManifestDigest: authority.providerOciManifestDigest,
+    providerPolicyDigest: authority.providerPolicyDigest,
+    providerRevision: authority.providerRevision,
+    providerRuntimeConfigDigest: authority.providerContainerConfigDigest,
+    retainedBinding: initial.retainedBinding,
+    runtimeAuthorityMode: 'digest_pinned_read_only_image',
+    runtimeBaseline: authority.codexMemoryCommit,
+    runtimeBuildManifestDigest: authority.buildManifestDigest,
+    runtimeContainerId: authority.expectedRuntimeContainerId,
+    runtimeImageConfigId: authority.acceptedImageConfigId,
+    runtimeImageManifestDigest: authority.acceptedOciManifestDigest,
+    runtimeOciArchiveSha256: authority.acceptedOciArchiveSha256,
+    runtimePolicyDigest: authority.runtimePolicyDigest,
+    runtimeRepository: IMAGE_RUNTIME_ROOT,
+    runtimeRootfsChainDigest: authority.rootfsChainDigest,
+    schemaVersion: PROFILE_SCHEMA_VERSION,
+    stateMountContractDigest: digest(stateMountContract),
+    vcpRuntimeBaseline: authority.vcpCommit,
+    vcpRuntimeContractDigest: vcpImageRuntimeAuthorityDigest(authority),
+    vcpRuntimeIdentitySchemaVersion: VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
+    vcpRuntimeRepository: IMAGE_VCP_ROOT
+  }, authority);
+}
+
+function profileV7InitialBootstrapCandidate(seed, imageAuthority) {
+  const nextProfile = imageProfileFromAuthoritySeed(seed, imageAuthority);
+  const nextProfileBytes = canonicalJson(nextProfile);
+  return Object.freeze({
+    candidateOnly: true,
+    nextProfile,
+    nextProfileBytes,
+    nextProfileFingerprint: digest(nextProfile),
+    nextProfileSha256: sha256Buffer(Buffer.from(nextProfileBytes)),
+    durableMutationPerformed: false
+  });
+}
+
 function validateEdgeReceipt(value, authority, {
   now = Date.now(),
   maximumAgeMs = 60_000,
@@ -1132,62 +1284,20 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
     reject('runtime_profile_v7_migration_source_invalid');
   }
   const authority = validateProfileAuthorityComponents(imageAuthority);
-  const {
-    providerImageId: _legacyProviderImageId,
-    vcpRuntimeContractDigest: _hostVcpRuntimeContractDigest,
-    vcpRuntimeIdentitySchemaVersion: _hostVcpRuntimeIdentitySchemaVersion,
-    ...profileWithoutHostVcpIdentity
-  } = profile;
-  const nextProfile = validateImageProfile({
-    ...profileWithoutHostVcpIdentity,
-    schemaVersion: PROFILE_SCHEMA_VERSION,
-    runtimeAuthorityMode: 'digest_pinned_read_only_image',
-    runtimeImageManifestDigest: authority.acceptedOciManifestDigest,
-    runtimeOciArchiveSha256: authority.acceptedOciArchiveSha256,
-    runtimeImageConfigId: authority.acceptedImageConfigId,
-    runtimeRootfsChainDigest: authority.rootfsChainDigest,
-    runtimeBuildManifestDigest: authority.buildManifestDigest,
-    nativeClosureDigest: authority.nativeClosureDigest,
-    runtimePolicyDigest: authority.runtimePolicyDigest,
-    edgePolicyDigest: authority.edgePolicyDigest,
-    edgeRuntimeConfigDigest: authority.edgeConfigDigest,
-    edgeArtifactSha256: authority.edgeArtifactSha256,
-    edgeBindingDigest: authority.edgeBindingDigest,
-    edgeBindingReference: authority.edgeBindingReference,
-    edgeBuildContextDigest: authority.edgeBuildContextDigest,
-    edgeBuildManifestDigest: authority.edgeBuildManifestDigest,
-    edgeDaemonImageIdentity: authority.edgeDaemonImageIdentity,
-    edgeHostProjectReference: authority.edgeHostProjectReference,
-    edgeImageConfigDigest: authority.edgeImageConfigDigest,
-    edgeImageStoreIdentityModel: authority.edgeImageStoreIdentityModel,
-    edgeLockfileSha256: authority.edgeLockfileSha256,
-    edgeOciManifestDigest: authority.edgeOciManifestDigest,
-    edgeOperatorReference: authority.edgeOperatorReference,
-    edgePreviousBindingReference: authority.edgePreviousBindingReference,
-    edgeSourceCommit: authority.edgeSourceCommit,
-    profileAuthorityComponentSchemaVersion: PROFILE_AUTHORITY_COMPONENT_SCHEMA,
-    providerPolicyDigest: authority.providerPolicyDigest,
-    providerRuntimeConfigDigest: authority.providerContainerConfigDigest,
-    runtimeContainerId: authority.expectedRuntimeContainerId,
-    stateMountContractDigest: authority.stateMountContractDigest,
-    hostLauncherAuthorityVersion: authority.hostLauncherVersion,
-    hostLauncherDigest: authority.hostLauncherDigest,
-    edgeLifecycleAuthority: authority.edgeLifecycleAuthority,
-    edgeContainerId: authority.edgeContainerId,
-    runtimeBaseline: authority.codexMemoryCommit,
-    adoptedRepositoryHead: authority.codexMemoryCommit,
-    runtimeRepository: IMAGE_RUNTIME_ROOT,
-    providerContainerId: authority.providerContainerId,
-    providerDaemonImageIdentity: authority.providerDaemonImageIdentity,
-    providerImageConfigDigest: authority.providerImageConfigDigest,
-    providerImageStoreIdentityModel: authority.providerImageStoreIdentityModel,
-    providerOciManifestDigest: authority.providerOciManifestDigest,
-    providerRevision: authority.providerRevision,
-    vcpRuntimeBaseline: authority.vcpCommit,
-    vcpRuntimeContractDigest: vcpImageRuntimeAuthorityDigest(authority),
-    vcpRuntimeIdentitySchemaVersion:
-      VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
-    vcpRuntimeRepository: IMAGE_VCP_ROOT
+  const nextProfile = imageProfileFromAuthoritySeed({
+    controllerSourceManifestDigest: profile.controllerSourceManifestDigest,
+    controllerSourceManifestVersion: profile.controllerSourceManifestVersion,
+    edgeContainer: profile.edgeContainer,
+    governanceEnvironment: profile.governanceEnvironment,
+    governanceEnvironmentConfigDigest: profile.governanceEnvironmentConfigDigest,
+    privateRoot: profile.privateRoot,
+    providerContainer: profile.providerContainer,
+    relayEnvironment: profile.relayEnvironment,
+    relayEnvironmentConfigDigest: profile.relayEnvironmentConfigDigest,
+    retainedBinding: profile.retainedBinding,
+    retainedBindingSource: profile.retainedBindingSource,
+    vcpProviderConfigDigest: profile.vcpProviderConfigDigest,
+    vcpRuntimeScopeDigest: profile.vcpRuntimeScopeDigest
   }, authority);
   return Object.freeze({
     candidateOnly: true,
@@ -1225,6 +1335,7 @@ module.exports = {
   VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
   IMAGE_BUILD_MANIFEST_PATH,
   IMAGE_PROFILE_KEYS,
+  INITIAL_PROFILE_SEED_KEYS,
   IMAGE_RUNTIME_ROOT,
   IMAGE_VCP_ROOT,
   PROFILE_AUTHORITY_COMPONENT_SCHEMA,
@@ -1232,6 +1343,7 @@ module.exports = {
   STATE_MOUNT_SCHEMA,
   RuntimeAuthorityError,
   authorityRecordDigest,
+  authorityGraphPrecedes,
   buildManifestDigest,
   canonicalJson,
   countAuthorityGraphCycles,
@@ -1240,6 +1352,7 @@ module.exports = {
   hostTrustBundleDigest,
   parseVcpProviderEnvironment,
   profileAuthorityComponents,
+  profileV7InitialBootstrapCandidate,
   profileV7MigrationCandidate,
   projectContainerConfig,
   readBoundedJson,

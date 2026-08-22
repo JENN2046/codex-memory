@@ -6,6 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 const {
+  AUTHORITY_DEPENDENCY_GRAPH,
   AUTHORITY_SCHEMA,
   BUILD_MANIFEST_SCHEMA,
   EDGE_RECEIPT_SCHEMA,
@@ -15,13 +16,17 @@ const {
   STATE_MOUNT_SCHEMA,
   VCP_IMAGE_RUNTIME_AUTHORITY_SCHEMA,
   VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
+  authorityGraphPrecedes,
   authorityRecordDigest,
   buildManifestDigest,
   canonicalJson,
   containerConfigDigest,
+  countAuthorityGraphCycles,
   digest,
   hostTrustBundleDigest,
+  INITIAL_PROFILE_SEED_KEYS,
   profileAuthorityComponents,
+  profileV7InitialBootstrapCandidate,
   profileV7MigrationCandidate,
   readBoundedJson,
   sha256Buffer,
@@ -66,6 +71,8 @@ const {
   verifyHostAuthority
 } = require('../deploy/native-runtime/host-launcher');
 const {
+  main: createRuntimeAuthorityMain,
+  readInitialProfileSeed,
   validateAuthorityProfileBytes
 } = require('../scripts/create-codex-memory-runtime-authority');
 const {
@@ -340,6 +347,24 @@ function imageProfile(a) {
   return profileV7MigrationCandidate(current, profileAuthorityComponents(a), {
     expectedCurrentFingerprint: digest(current)
   }).nextProfile;
+}
+
+function initialProfileSeed(privateRoot = '/srv/codex-memory/r5c') {
+  return {
+    controllerSourceManifestDigest: S('1'),
+    controllerSourceManifestVersion: 1,
+    edgeContainer: 'codex-memory-current-edge',
+    governanceEnvironment: 'governance/runtime.env',
+    governanceEnvironmentConfigDigest: S('2'),
+    privateRoot,
+    providerContainer: 'new-api-wsl',
+    relayEnvironment: 'relay/runtime.env',
+    relayEnvironmentConfigDigest: S('4'),
+    retainedBinding: 'binding.json',
+    retainedBindingSource: C('4'),
+    vcpProviderConfigDigest: S('5'),
+    vcpRuntimeScopeDigest: S('7')
+  };
 }
 
 function profileBytes(a) {
@@ -1433,6 +1458,340 @@ test('schema-v7 private root is canonically bound to its state mount contract', 
     'codex-memory-profile-runtime-authority-components/v3');
   assert.equal(components.profileAuthorityComponentSchemaVersion,
     'codex-memory-profile-runtime-authority-components/v3');
+});
+
+test('initial bootstrap creates deterministic schema-v7 candidate from minimal seed', () => {
+  const a = authorityWithEdge();
+  const result = profileV7InitialBootstrapCandidate(
+    initialProfileSeed(), profileAuthorityComponents(a)
+  );
+  assert.equal(result.candidateOnly, true);
+  assert.equal(result.durableMutationPerformed, false);
+  assert.equal(result.nextProfile.schemaVersion, 7);
+  assert.equal(result.nextProfile.vcpRuntimeIdentitySchemaVersion, 2);
+  assert.equal(result.nextProfile.vcpRuntimeContractDigest,
+    vcpImageRuntimeAuthorityDigest(profileAuthorityComponents(a)));
+  assert.equal(result.nextProfile.runtimeContainerId, a.expectedRuntimeContainerId);
+  assert.deepEqual(validateImageProfile(
+    result.nextProfile, profileAuthorityComponents(a)
+  ), result.nextProfile);
+  const again = profileV7InitialBootstrapCandidate(
+    initialProfileSeed(), profileAuthorityComponents(a)
+  );
+  assert.equal(again.nextProfileFingerprint, result.nextProfileFingerprint);
+  assert.equal(again.nextProfileBytes, result.nextProfileBytes);
+  assert.deepEqual(INITIAL_PROFILE_SEED_KEYS, [
+    'controllerSourceManifestDigest', 'controllerSourceManifestVersion',
+    'edgeContainer', 'governanceEnvironment',
+    'governanceEnvironmentConfigDigest', 'privateRoot', 'providerContainer',
+    'relayEnvironment', 'relayEnvironmentConfigDigest', 'retainedBinding',
+    'retainedBindingSource', 'vcpProviderConfigDigest', 'vcpRuntimeScopeDigest'
+  ]);
+});
+
+test('initial bootstrap rejects authority-owned field injection and legacy VCP identity', () => {
+  const a = authorityWithEdge();
+  const components = profileAuthorityComponents(a);
+  expectCode(() => profileV7InitialBootstrapCandidate({
+    ...initialProfileSeed(), runtimeBuildManifestDigest: S('0')
+  }, components), 'runtime_initial_profile_seed_invalid');
+  expectCode(() => profileV7InitialBootstrapCandidate({
+    ...initialProfileSeed(), vcpRuntimeContractDigest: S('0')
+  }, components), 'runtime_initial_profile_seed_invalid');
+  const candidate = profileV7InitialBootstrapCandidate(
+    initialProfileSeed(), components
+  ).nextProfile;
+  expectCode(() => validateImageProfile({
+    ...candidate, vcpRuntimeIdentitySchemaVersion: 1
+  }, components), 'runtime_image_profile_invalid');
+});
+
+test('initial bootstrap rejects a seed whose private root differs from observed state', () => {
+  const a = authorityWithEdge();
+  expectCode(() => profileV7InitialBootstrapCandidate(
+    initialProfileSeed('/srv/codex-memory/other-r5c'), profileAuthorityComponents(a)
+  ), 'runtime_image_profile_state_mount_mismatch');
+});
+
+test('authority dependency graph orders bootstrap and keeps receipts as terminal sinks', () => {
+  assert.equal(countAuthorityGraphCycles(AUTHORITY_DEPENDENCY_GRAPH), 0);
+  const precedes = (from, to) => authorityGraphPrecedes(from, to, AUTHORITY_DEPENDENCY_GRAPH);
+  for (const [from, to] of [
+    ['reviewedSource', 'runtimeImage'],
+    ['runtimeImage', 'runtimeContainer'],
+    ['runtimeContainer', 'authorityComponents'],
+    ['edgeObservation', 'authorityComponents'],
+    ['providerObservation', 'authorityComponents'],
+    ['canonicalPolicies', 'authorityComponents'],
+    ['authorityComponents', 'initialProfileCandidate'],
+    ['initialProfileCandidate', 'hostAuthority'],
+    ['hostAuthority', 'hostLauncherAdmission'],
+    ['hostLauncherAdmission', 'edgeReceipt'],
+    ['hostLauncherAdmission', 'providerReceipt'],
+    ['hostLauncherAdmission', 'runtimeActivation'],
+    ['initialProfileCandidate', 'runtimeActivation']
+  ]) {
+    assert.equal(precedes(from, to), true, `${from} should precede ${to}`);
+  }
+  // Receipts are graph sinks: they must never be able to precede (and thus mint)
+  // authority, the profile, or runtime activation.
+  assert.equal(AUTHORITY_DEPENDENCY_GRAPH.edgeReceipt, undefined);
+  assert.equal(AUTHORITY_DEPENDENCY_GRAPH.providerReceipt, undefined);
+  assert.equal(AUTHORITY_DEPENDENCY_GRAPH.runtimeActivation, undefined);
+  for (const [from, to] of [
+    ['edgeReceipt', 'hostAuthority'],
+    ['providerReceipt', 'authorityComponents'],
+    ['runtimeActivation', 'hostAuthority'],
+    ['hostAuthority', 'authorityComponents'],
+    ['initialProfileCandidate', 'authorityComponents']
+  ]) {
+    assert.equal(precedes(from, to), false, `${from} must not precede ${to}`);
+  }
+});
+
+function authorityCreatorHarness(runtime, extra = {}) {
+  const profilePath = extra.profilePath || SOURCES.profile;
+  const sources = { ...SOURCES, profile: profilePath };
+  runtime.Mounts.find(m => m.Destination === '/run/codex-memory/profile.json').Source =
+    profilePath;
+  const base = authorityWithEdge(runtime);
+  const expected = authority(runtime, {
+    edgeConfigDigest: base.edgeConfigDigest,
+    profilePath,
+    runtimeMountSources: sources,
+    providerContainerConfigDigest: base.providerContainerConfigDigest
+  });
+  const edge = edgeInspect(expected);
+  const provider = providerInspect(expected);
+  const manifest = buildManifest();
+  const image = {
+    Id: expected.acceptedImageConfigId,
+    RootFS: { Layers: [S('4'), S('5')] }
+  };
+  const archiveEvidence = Object.freeze({
+    archiveSha256: expected.acceptedOciArchiveSha256,
+    buildContextDigest: manifest.buildContextFileManifestDigest,
+    buildManifestDigest: buildManifestDigest(manifest),
+    configDigest: expected.acceptedImageConfigId,
+    contextDigest: manifest.buildContextFileManifestDigest,
+    manifestDigest: expected.acceptedOciManifestDigest,
+    rootfsChainDigest: digest([S('4'), S('5')])
+  });
+  const edgeEvidence = Object.freeze({
+    artifactSha256: expected.edgeArtifactSha256,
+    buildContextDigest: expected.edgeBuildContextDigest,
+    buildManifestDigest: expected.edgeBuildManifestDigest,
+    imageConfigDigest: expected.edgeImageConfigDigest,
+    imageStoreIdentityModel: expected.edgeImageStoreIdentityModel,
+    lockfileSha256: expected.edgeLockfileSha256,
+    ociManifestDigest: expected.edgeOciManifestDigest,
+    schemaVersion: 'codex-memory-edge-image-authority/v1',
+    sourceCommit: expected.edgeSourceCommit
+  });
+  const edgeImageInspect = {
+    Architecture: 'amd64',
+    Config: { Labels: {
+      'org.opencontainers.image.revision': expected.edgeSourceCommit
+    } },
+    Descriptor: { digest: expected.edgeOciManifestDigest },
+    Id: expected.edgeOciManifestDigest, Os: 'linux',
+    RepoDigests: [`codex-memory-chatgpt-edge@${expected.edgeOciManifestDigest}`]
+  };
+  const providerImageInspect = providerEvidenceOptions().providerImageInspect();
+  const providerImageEvidence = providerEvidenceOptions().providerImageAdmission();
+  const args = [
+    `--runtime-container-id=${runtime.Id}`,
+    `--edge-container-id=${edge.Id}`,
+    `--provider-container-id=${provider.Id}`,
+    `--image-config-id=${expected.acceptedImageConfigId}`,
+    '--build-manifest=/synthetic/build-manifest.json',
+    '--oci-archive=/synthetic/oci-archive.tar',
+    `--expected-oci-archive-sha256=${archiveEvidence.archiveSha256}`,
+    `--expected-build-manifest-digest=${archiveEvidence.buildManifestDigest}`,
+    `--expected-image-config-id=${archiveEvidence.configDigest}`,
+    `--expected-build-context-digest=${archiveEvidence.contextDigest}`,
+    `--expected-oci-manifest-digest=${archiveEvidence.manifestDigest}`,
+    `--expected-rootfs-chain-digest=${archiveEvidence.rootfsChainDigest}`,
+    '--edge-oci-archive=/synthetic/edge-oci-archive.tar',
+    '--edge-build-manifest=/synthetic/edge-build-manifest.json',
+    `--expected-edge-artifact-sha256=${edgeEvidence.artifactSha256}`,
+    `--expected-edge-build-context-digest=${edgeEvidence.buildContextDigest}`,
+    `--expected-edge-build-manifest-digest=${edgeEvidence.buildManifestDigest}`,
+    `--expected-edge-image-config-digest=${edgeEvidence.imageConfigDigest}`,
+    `--expected-edge-lockfile-sha256=${edgeEvidence.lockfileSha256}`,
+    `--expected-edge-oci-manifest-digest=${edgeEvidence.ociManifestDigest}`,
+    `--expected-edge-source-commit=${edgeEvidence.sourceCommit}`,
+    `--expected-edge-binding-digest=${expected.edgeBindingDigest}`,
+    `--expected-edge-binding-reference=${expected.edgeBindingReference}`,
+    `--expected-edge-host-project-reference=${expected.edgeHostProjectReference}`,
+    `--expected-edge-operator-reference=${expected.edgeOperatorReference}`,
+    `--expected-edge-previous-binding-reference=${expected.edgePreviousBindingReference}`,
+    `--authority-path=${SOURCES.authority}`,
+    `--edge-receipt=${SOURCES.edgeReceipt}`,
+    `--provider-receipt=${SOURCES.providerReceipt}`,
+    `--provider-environment=${SOURCES.providerEnvironment}`,
+    `--state=${SOURCES.primaryState}`,
+    `--runtime-directory=${SOURCES.runtimeDirectory}`,
+    '--state-destination=/srv/codex-memory/r5c',
+    `--profile=${profilePath}`,
+    '--runtime-authority-module=deploy/../src/runtime/native-image/runtime-authority.js',
+    '--edge-image-authority-module=src/runtime/native-image/edge-image-authority.js',
+    '--host-launcher=deploy/native-runtime/host-launcher.js',
+    '--native-closure-module=src/runtime/native-image/native-closure.js',
+    '--container-policy-module=src/runtime/native-image/container-policy.js',
+    '--provider-image-authority-module=src/runtime/native-image/provider-image-authority.js',
+    '--tar-archive-module=src/runtime/native-image/tar-archive.js',
+    ...(extra.seedPath ? [`--initial-profile-seed=${extra.seedPath}`] : [])
+  ];
+  const deps = {
+    inspect(kind, id) {
+      if (kind === 'image') {
+        if (id === expected.acceptedImageConfigId) return image;
+        if (id === edge.Image) return edgeImageInspect;
+        return providerImageInspect;
+      }
+      if (kind === 'volume') {
+        return { Driver: 'local', Name: id, Options: {}, Scope: 'local' };
+      }
+      if (id === runtime.Id) return runtime;
+      if (id === edge.Id) return edge;
+      return provider;
+    },
+    containerFile: (_id, source) => source === PROVIDER_POLICY.executable
+      ? providerElf() : Buffer.from(JSON.stringify(nativeClosure())),
+    containerChanges: () => [],
+    imageArchive: () => Buffer.alloc(0),
+    verifyOciArchive: () => archiveEvidence,
+    verifyEdgeOciArchive: () => edgeEvidence,
+    validateEdgeLocalArchive: () => edgeEvidence,
+    validateProviderImage: () => providerImageEvidence,
+    verifyNativeClosureBytes: () => true,
+    readBuildManifest: () => manifest,
+    providerEnvironmentValidator: () => ({ configDigest: S('5') }),
+    fsModule: edgeSecretFilesystem(),
+    seedReaderOptions: { requireRootFiles: false },
+    writeOutput: () => {}
+  };
+  return { args, deps, expected };
+}
+
+test('authority creator initial bootstrap emits a bound schema-v7 profile end to end', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-initial-bootstrap-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const seedPath = path.join(root, 'seed.json');
+  fs.writeFileSync(seedPath, canonicalJson(initialProfileSeed()), { mode: 0o600 });
+  const runtime = baseInspect();
+  const { args, deps } = authorityCreatorHarness(runtime, { seedPath });
+  const output = JSON.parse(createRuntimeAuthorityMain(args, deps));
+  assert.equal(output.authority.authoritySchemaVersion, AUTHORITY_SCHEMA);
+  assert.equal(output.profile.schemaVersion, 7);
+  assert.equal(output.profile.vcpRuntimeIdentitySchemaVersion,
+    VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION);
+  assert.equal(output.profile.vcpRuntimeContractDigest,
+    vcpImageRuntimeAuthorityDigest(profileAuthorityComponents(output.authority)));
+  assert.equal(output.profile.runtimeContainerId, runtime.Id);
+  // The published digest must be the canonical profile bytes, never the
+  // provisional bootstrap placeholder used while assembling components.
+  const provisional = sha256Buffer(Buffer.from('initial-profile-bootstrap'));
+  assert.notEqual(output.authority.profileSha256, provisional);
+  assert.equal(output.authority.profileSha256,
+    sha256Buffer(Buffer.from(canonicalJson(output.profile))));
+  assert.equal(output.profileSha256, output.authority.profileSha256);
+  assert.deepEqual(
+    validateImageProfile(output.profile, profileAuthorityComponents(output.authority)),
+    output.profile
+  );
+});
+
+test('authority creator normal mode keeps the bare authority-record output contract', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-normal-authority-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const runtime = baseInspect();
+  const profilePath = path.join(root, 'profile.json');
+  // Derive the canonical profile from a bootstrap run so the normal-mode input
+  // matches the exact authority the creator independently computes.
+  const seedPath = path.join(root, 'seed.json');
+  fs.writeFileSync(seedPath, canonicalJson(initialProfileSeed()), { mode: 0o600 });
+  const bootstrap = authorityCreatorHarness(runtime, { seedPath });
+  const bootstrapOutput = JSON.parse(
+    createRuntimeAuthorityMain(bootstrap.args, bootstrap.deps)
+  );
+  const canonicalProfileBytes = Buffer.from(canonicalJson(bootstrapOutput.profile));
+  fs.writeFileSync(profilePath, canonicalProfileBytes, { mode: 0o600 });
+  const { args, deps } = authorityCreatorHarness(runtime, { profilePath });
+  const output = JSON.parse(createRuntimeAuthorityMain(args, deps));
+  assert.equal(output.authority, undefined);
+  assert.equal(output.profile, undefined);
+  assert.equal(output.authoritySchemaVersion, AUTHORITY_SCHEMA);
+  assert.notEqual(output.profileSha256,
+    sha256Buffer(Buffer.from('initial-profile-bootstrap')));
+  assert.equal(output.profileSha256, sha256Buffer(canonicalProfileBytes));
+});
+
+test('authority creator initial bootstrap rejects a seed carrying authority-owned fields', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-initial-inject-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const seedPath = path.join(root, 'seed.json');
+  fs.writeFileSync(seedPath, canonicalJson({
+    ...initialProfileSeed(), runtimeBuildManifestDigest: S('0')
+  }), { mode: 0o600 });
+  const runtime = baseInspect();
+  const { args, deps } = authorityCreatorHarness(runtime, { seedPath });
+  expectCode(() => createRuntimeAuthorityMain(args, deps),
+    'runtime_initial_profile_seed_invalid');
+});
+
+test('authority creator initial bootstrap rejects a seed for a foreign private root', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-initial-foreign-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const seedPath = path.join(root, 'seed.json');
+  fs.writeFileSync(seedPath, canonicalJson(
+    initialProfileSeed('/srv/codex-memory/other-r5c')
+  ), { mode: 0o600 });
+  const runtime = baseInspect();
+  const { args, deps } = authorityCreatorHarness(runtime, { seedPath });
+  expectCode(() => createRuntimeAuthorityMain(args, deps),
+    'runtime_image_profile_state_mount_mismatch');
+});
+
+test('initial profile seed reader rejects symlinks and mid-read replacement', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-seed-read-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const seedFile = path.join(root, 'seed.json');
+  const seedBytes = canonicalJson(initialProfileSeed());
+  fs.writeFileSync(seedFile, seedBytes, { mode: 0o600 });
+  assert.deepEqual(
+    readInitialProfileSeed(seedFile, { requireRootFiles: false }),
+    JSON.parse(seedBytes)
+  );
+  const link = path.join(root, 'seed-link.json');
+  fs.symlinkSync(seedFile, link);
+  expectCode(() => readInitialProfileSeed(link, { requireRootFiles: false }),
+    'runtime_initial_profile_seed_unavailable');
+  const groupWritable = path.join(root, 'seed-group.json');
+  fs.writeFileSync(groupWritable, seedBytes, { mode: 0o660 });
+  // writeFileSync mode is masked by the process umask, so force the
+  // group-writable bit to make the permission-rejection deterministic.
+  fs.chmodSync(groupWritable, 0o660);
+  expectCode(() => readInitialProfileSeed(groupWritable, { requireRootFiles: false }),
+    'runtime_initial_profile_seed_unavailable');
+  const changing = path.join(root, 'seed-toctou.json');
+  fs.writeFileSync(changing, seedBytes, { mode: 0o600 });
+  let statCount = 0;
+  const fsModule = {
+    ...fs,
+    fstatSync(descriptor) {
+      const stat = fs.fstatSync(descriptor);
+      statCount += 1;
+      if (statCount > 1) {
+        return { ...stat, isFile: () => stat.isFile(), size: stat.size + 1 };
+      }
+      return stat;
+    }
+  };
+  expectCode(() => readInitialProfileSeed(changing, {
+    requireRootFiles: false, fsModule
+  }), 'runtime_initial_profile_seed_unavailable');
 });
 
 test('schema-v7 migration rejects state components for another private root', () => {

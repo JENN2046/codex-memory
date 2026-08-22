@@ -11,7 +11,9 @@ const {
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
+  profileV7InitialBootstrapCandidate,
   profileAuthorityComponents,
+  readBoundedBuffer,
   sha256Buffer,
   validateAuthorityRecord,
   validateBuildManifest,
@@ -125,11 +127,38 @@ function imageArchive(id) {
 function parse(argv) {
   const values = {};
   for (const arg of argv) {
-    const match = /^--([a-z-]+)=(.+)$/u.exec(arg);
+    // Accepted flags include digits (e.g. `--expected-oci-archive-sha256`), so
+    // the option name class must allow them; without this the CLI argv path is
+    // uninvocable, which is why no end-to-end coverage previously existed.
+    const match = /^--([a-z0-9-]+)=(.+)$/u.exec(arg);
     if (!match) fail('runtime_authority_argument_invalid');
     values[match[1]] = match[2];
   }
   return values;
+}
+
+// The initial-bootstrap seed is a root-supplied authority input, so it is read
+// through the same hardened primitive used for installed authority records:
+// an O_NOFOLLOW descriptor, a bounded size, a regular-file check, a
+// group/other-writable rejection, an optional root-ownership requirement, and a
+// before/after identity check that rejects TOCTOU replacement mid-read.
+function readInitialProfileSeed(file, {
+  fsModule = fs,
+  requireRootFiles = true,
+  maximumBytes = 262_144
+} = {}) {
+  let bytes;
+  try {
+    bytes = readBoundedBuffer(file, {
+      fsModule,
+      maximumBytes,
+      requireRootOwner: requireRootFiles,
+      requireRootOwnedParent: requireRootFiles
+    });
+  } catch { fail('runtime_initial_profile_seed_unavailable'); }
+  try { return JSON.parse(bytes.toString('utf8')); } catch {
+    fail('runtime_initial_profile_seed_invalid');
+  }
 }
 
 function validateExternallyAcceptedImageEvidence(accepted, archiveEvidence, manifest) {
@@ -163,17 +192,40 @@ function validateExternallyAcceptedEdgeEvidence(accepted, evidence) {
   return Object.freeze({ ...actual });
 }
 
-function main(argv = process.argv.slice(2)) {
+function main(argv = process.argv.slice(2), deps = {}) {
+  // The docker/OCI/native-closure boundary is injectable so the bootstrap and
+  // steady-state paths can be exercised end-to-end against fixtures without a
+  // live host. Defaults preserve the exact production behavior.
+  const inspectContainerOrImage = deps.inspect || inspect;
+  const readContainerFile = deps.containerFile || containerFile;
+  const readContainerChanges = deps.containerChanges || containerChanges;
+  const readImageArchive = deps.imageArchive || imageArchive;
+  const verifyRuntimeOciArchive = deps.verifyOciArchive || verifyOciArchive;
+  const verifyEdgeArchive = deps.verifyEdgeOciArchive || verifyEdgeOciArchive;
+  const verifyNativeClosureContents = deps.verifyNativeClosureBytes ||
+    verifyNativeClosureBytes;
+  const readBuildManifest = deps.readBuildManifest || (file =>
+    JSON.parse(fs.readFileSync(file, 'utf8')));
+  const writeOutput = deps.writeOutput ||
+    (output => process.stdout.write(output));
+  const seedReaderOptions = deps.seedReaderOptions || {};
+  const fsModule = deps.fsModule || fs;
+  const providerEnvironmentValidator = deps.providerEnvironmentValidator;
+  // The OCI archive/image-admission validators require real multi-hundred-MB
+  // tarballs; the host launcher already injects the equivalent evidence, so the
+  // same boundary is injectable here for fixture-driven end-to-end coverage.
+  const validateEdgeLocalArchive = deps.validateEdgeLocalArchive || validateEdgeOciArchive;
+  const validateProviderImage = deps.validateProviderImage || validateProviderImageCandidate;
   const args = parse(argv);
-  const runtime = inspect('container', args['runtime-container-id']);
-  const edge = inspect('container', args['edge-container-id']);
-  const provider = inspect('container', args['provider-container-id']);
-  const providerImage = inspect('image', provider.Image);
-  const image = inspect('image', args['image-config-id']);
-  const manifest = validateBuildManifest(JSON.parse(fs.readFileSync(
-    path.resolve(args['build-manifest']), 'utf8'
-  )));
-  const archiveEvidence = verifyOciArchive(
+  const runtime = inspectContainerOrImage('container', args['runtime-container-id']);
+  const edge = inspectContainerOrImage('container', args['edge-container-id']);
+  const provider = inspectContainerOrImage('container', args['provider-container-id']);
+  const providerImage = inspectContainerOrImage('image', provider.Image);
+  const image = inspectContainerOrImage('image', args['image-config-id']);
+  const manifest = validateBuildManifest(readBuildManifest(
+    path.resolve(args['build-manifest'])
+  ));
+  const archiveEvidence = verifyRuntimeOciArchive(
     path.resolve(args['oci-archive']),
     path.resolve(args['build-manifest'])
   );
@@ -186,7 +238,7 @@ function main(argv = process.argv.slice(2)) {
     rootfsChainDigest: args['expected-rootfs-chain-digest']
   };
   validateExternallyAcceptedImageEvidence(externallyAccepted, archiveEvidence, manifest);
-  const edgeArchiveEvidence = verifyEdgeOciArchive(
+  const edgeArchiveEvidence = verifyEdgeArchive(
     path.resolve(args['edge-oci-archive'] || ''),
     path.resolve(args['edge-build-manifest'] || '')
   );
@@ -200,12 +252,21 @@ function main(argv = process.argv.slice(2)) {
     sourceCommit: args['expected-edge-source-commit']
   }, edgeArchiveEvidence);
   const profileFile = path.resolve(args.profile || '');
-  const profileBytes = fs.readFileSync(profileFile);
-  const profile = validateAuthorityProfileBytes(profileBytes);
-  const nativeClosure = validateNativeClosure(JSON.parse(containerFile(
+  const initialBootstrap = Boolean(args['initial-profile-seed']);
+  if (!args.profile) fail('runtime_authority_profile_path_required');
+  let profileBytes = initialBootstrap
+    ? null : fs.readFileSync(profileFile);
+  let profile = initialBootstrap
+    ? null : validateAuthorityProfileBytes(profileBytes);
+  const initialProfileSeed = initialBootstrap
+    ? readInitialProfileSeed(
+      path.resolve(args['initial-profile-seed']), seedReaderOptions
+    )
+    : null;
+  const nativeClosure = validateNativeClosure(JSON.parse(readContainerFile(
     runtime.Id, '/opt/codex-memory-runtime/native-closure.json'
   ).toString('utf8')));
-  verifyNativeClosureBytes(nativeClosure, source => containerFile(runtime.Id, source));
+  verifyNativeClosureContents(nativeClosure, source => readContainerFile(runtime.Id, source));
   if (![archiveEvidence.manifestDigest, archiveEvidence.configDigest]
     .includes(image.Id) ||
       archiveEvidence.rootfsChainDigest !== digest(image.RootFS.Layers)) {
@@ -226,18 +287,22 @@ function main(argv = process.argv.slice(2)) {
     providerReceipt: path.resolve(args['provider-receipt'] || ''),
     runtimeDirectory: path.resolve(args['runtime-directory'] || '')
   };
-  validateProviderEnvironmentAuthorityBinding(
-    runtimeMountSources.providerEnvironment,
-    profile
+  const providerEnvironmentBindingOptions = {
+    fsModule,
+    ...(providerEnvironmentValidator ? { validator: providerEnvironmentValidator } : {})
+  };
+  if (profile) validateProviderEnvironmentAuthorityBinding(
+    runtimeMountSources.providerEnvironment, profile,
+    providerEnvironmentBindingOptions
   );
   validateRuntimeCandidate(runtime, {
     ...runtimeMountSources,
     primaryStateDestination: stateMountContract.containerPath
   });
   validateEdgeCandidate(edge);
-  validateEdgeSecretMountAuthority(edge);
-  const edgeImage = inspect('image', edge.Image);
-  const edgeLocalArchiveEvidence = validateEdgeOciArchive(imageArchive(edge.Image));
+  validateEdgeSecretMountAuthority(edge, { fsModule });
+  const edgeImage = inspectContainerOrImage('image', edge.Image);
+  const edgeLocalArchiveEvidence = validateEdgeLocalArchive(readImageArchive(edge.Image));
   for (const field of ['imageConfigDigest',
     'imageStoreIdentityModel', 'lockfileSha256', 'ociManifestDigest', 'sourceCommit']) {
     if (edgeLocalArchiveEvidence[field] !== edgeArchiveEvidence[field]) {
@@ -259,18 +324,18 @@ function main(argv = process.argv.slice(2)) {
     edgeSourceCommit: edgeArchiveEvidence.sourceCommit,
     ...edgeSupplyChainReferences
   });
-  const providerImageEvidence = validateProviderImageCandidate(
-    providerImage, imageArchive(provider.Image)
+  const providerImageEvidence = validateProviderImage(
+    providerImage, readImageArchive(provider.Image)
   );
-  const providerVolume = inspect('volume', PROVIDER_POLICY.stateMount.name);
+  const providerVolume = inspectContainerOrImage('volume', PROVIDER_POLICY.stateMount.name);
   validateProviderCandidate(provider, providerImageEvidence, {
     volumeObservation: providerVolume
   });
-  validateProviderExecutableBytes(containerFile(provider.Id, '/new-api'));
-  validateProviderContainerChanges(containerChanges(provider.Id));
+  validateProviderExecutableBytes(readContainerFile(provider.Id, '/new-api'));
+  validateProviderContainerChanges(readContainerChanges(provider.Id));
   const providerRevision = provider?.Config?.Labels?.['org.opencontainers.image.revision'];
   const edgeRevision = edge?.Config?.Labels?.['org.opencontainers.image.revision'];
-  const candidate = validateAuthorityRecord({
+  let candidate = validateAuthorityRecord({
     acceptedImageConfigId: image.Id,
     acceptedOciArchiveSha256: archiveEvidence.archiveSha256,
     acceptedOciManifestDigest: archiveEvidence.manifestDigest,
@@ -308,7 +373,12 @@ function main(argv = process.argv.slice(2)) {
     nativeClosureDigest: nativeClosureDigest(nativeClosure),
     profilePath: profileFile,
     profileSchemaVersion: 7,
-    profileSha256: sha256Buffer(profileBytes),
+    // Normal mode binds the supplied profile bytes directly. Initial bootstrap
+    // has no profile yet, so it uses a provisional digest that is recomputed
+    // from the derived profile bytes below before anything is published.
+    profileSha256: initialBootstrap
+      ? sha256Buffer(Buffer.from('initial-profile-bootstrap'))
+      : sha256Buffer(profileBytes),
     providerContainerConfigDigest: containerConfigDigest(provider),
     providerContainerId: provider.Id,
     providerDaemonImageIdentity: providerImageEvidence.daemonImageIdentity,
@@ -324,12 +394,31 @@ function main(argv = process.argv.slice(2)) {
     stateMountContractDigest: digest(stateMountContract),
     vcpCommit: manifest.vcpCommit
   });
+  if (initialBootstrap) {
+    const initial = profileV7InitialBootstrapCandidate(
+      initialProfileSeed, profileAuthorityComponents(candidate)
+    ).nextProfile;
+    profile = initial;
+    profileBytes = Buffer.from(canonicalJson(profile));
+    candidate = validateAuthorityRecord({
+      ...candidate,
+      profileSha256: sha256Buffer(profileBytes)
+    });
+    validateProviderEnvironmentAuthorityBinding(
+      runtimeMountSources.providerEnvironment, profile,
+      providerEnvironmentBindingOptions
+    );
+  }
   try {
     validateImageProfile(profile, profileAuthorityComponents(candidate));
   } catch {
     fail('runtime_authority_profile_authority_mismatch');
   }
-  process.stdout.write(canonicalJson(candidate));
+  const output = canonicalJson(initialBootstrap
+    ? { authority: candidate, profile, profileSha256: sha256Buffer(profileBytes) }
+    : candidate);
+  writeOutput(output);
+  return output;
 }
 
 if (require.main === module) {
@@ -341,6 +430,7 @@ if (require.main === module) {
 
 module.exports = {
   main,
+  readInitialProfileSeed,
   validateAuthorityProfileBytes,
   validateProviderEnvironmentAuthorityBinding,
   validateExternallyAcceptedEdgeEvidence,
