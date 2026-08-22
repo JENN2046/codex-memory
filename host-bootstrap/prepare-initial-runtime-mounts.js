@@ -21,6 +21,7 @@ const RECEIPT_MAX_BYTES = 64 * 1024;
 const PLACEHOLDER_MODE = 0o644;
 const ROOT_MODE = 0o700;
 const CANDIDATE_MAX_BYTES = 2 * 1024 * 1024;
+const DEFAULT_CANONICAL_BASE = '/etc/codex-memory/bootstrap';
 
 function fail(code) {
   const error = new Error(code);
@@ -67,10 +68,7 @@ function secureDirectory(directory, {
   create = false,
   requiredMode = undefined
 } = {}) {
-  if (create) {
-    fsModule.mkdirSync(directory, { recursive: true, mode: ROOT_MODE });
-    fsModule.chmodSync(directory, ROOT_MODE);
-  }
+  if (create) fsModule.mkdirSync(directory, { recursive: true, mode: ROOT_MODE });
   let stat;
   try { stat = fsModule.lstatSync(directory); } catch { fail('bootstrap_staging_root_unavailable'); }
   if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== uid ||
@@ -193,14 +191,17 @@ function ensureReceipt(file, options = {}) {
   const gid = options.gid === undefined ? 0 : options.gid;
   try {
     regularStat(file, { fsModule, uid, gid, mode: 0o644, maxBytes: RECEIPT_MAX_BYTES });
-    return 'preserved';
+    // A pre-existing safe receipt source is preserved for the launcher to
+    // replace atomically before Runtime start. It is never treated as a fresh
+    // current-generation receipt by this tool.
+    return 'preserved_not_fresh';
   } catch (error) {
     if (error?.code && error.code !== 'bootstrap_staging_source_unavailable') throw error;
   }
   writeExclusive(file, receiptPlaceholderBytes(), {
     fsModule, uid, gid, mode: PLACEHOLDER_MODE
   });
-  return 'created';
+  return 'created_placeholder_not_fresh';
 }
 
 function assertRoot(options = {}) {
@@ -212,12 +213,18 @@ function assertRoot(options = {}) {
 
 function stage({ generation, root, fsModule = fs, requireRoot = true,
   uid = 0, gid = 0, edgeReceiptPath = EDGE_RECEIPT_PATH,
-  providerReceiptPath = PROVIDER_RECEIPT_PATH } = {}) {
+  providerReceiptPath = PROVIDER_RECEIPT_PATH,
+  canonicalBase = DEFAULT_CANONICAL_BASE } = {}) {
   assertRoot({ requireRoot });
   generation = generationName(generation);
-  root = path.resolve(root || '/etc/codex-memory/bootstrap');
-  ensureDirectory(path.dirname(root), { fsModule, uid, gid, create: true });
-  secureDirectory(root, { fsModule, uid, gid, create: true, requiredMode: ROOT_MODE });
+  canonicalBase = path.resolve(canonicalBase);
+  root = path.resolve(root || path.join(canonicalBase, generation));
+  if (root !== path.join(canonicalBase, generation)) {
+    fail('initial_bootstrap_generation_root_mismatch');
+  }
+  ensureDirectory(canonicalBase, { fsModule, uid, gid, create: false });
+  ensureDirectory(root, { fsModule, uid, gid, create: true });
+  secureDirectory(root, { fsModule, uid, gid, requiredMode: ROOT_MODE });
   const authority = path.join(root, 'runtime-authority.json');
   const profile = path.join(root, 'profile-v7.json');
   let materialized = null;
@@ -240,16 +247,19 @@ function stage({ generation, root, fsModule = fs, requireRoot = true,
     }
   } catch {}
   if (materialized) {
-    ensureReceipt(edgeReceiptPath, { fsModule, uid, gid });
-    ensureReceipt(providerReceiptPath, { fsModule, uid, gid });
+    ensureDirectory(path.dirname(edgeReceiptPath), { fsModule, uid, gid, create: true });
+    const edgeStatus = ensureReceipt(edgeReceiptPath, { fsModule, uid, gid });
+    const providerStatus = ensureReceipt(providerReceiptPath, { fsModule, uid, gid });
     return Object.freeze({
       generation,
       authoritySource: { path: authority, status: 'already_materialized' },
       profileSource: { path: profile, status: 'already_materialized' },
-      edgeReceiptSource: { path: edgeReceiptPath, status: 'preserved' },
-      providerReceiptSource: { path: providerReceiptPath, status: 'preserved' },
+      edgeReceiptSource: { path: edgeReceiptPath, status: edgeStatus },
+      providerReceiptSource: { path: providerReceiptPath, status: providerStatus },
       productionAuthorityValid: true,
       productionProfileValid: true,
+      freshEdgeReceipt: false,
+      freshProviderReceipt: false,
       runtimeCreated: false,
       runtimeStarted: false,
       secretValuesReturned: false
@@ -276,6 +286,8 @@ function stage({ generation, root, fsModule = fs, requireRoot = true,
     providerReceiptSource: { path: providerReceiptPath, status: providerResult },
     productionAuthorityValid: false,
     productionProfileValid: false,
+    freshEdgeReceipt: false,
+    freshProviderReceipt: false,
     runtimeCreated: false,
     runtimeStarted: false,
     secretValuesReturned: false
@@ -285,7 +297,8 @@ function stage({ generation, root, fsModule = fs, requireRoot = true,
 function atomicReplace(file, bytes, options = {}) {
   const fsModule = options.fsModule || fs;
   const directory = path.dirname(file);
-  const temporary = path.join(directory, `.${path.basename(file)}.${process.pid}.tmp`);
+  const temporary = path.join(directory,
+    `.${path.basename(file)}.${crypto.randomBytes(12).toString('hex')}.tmp`);
   const expectedPlaceholder = options.expectedPlaceholder;
   if (expectedPlaceholder) {
     const current = regularStat(file, {
@@ -296,41 +309,84 @@ function atomicReplace(file, bytes, options = {}) {
       maxBytes: CANDIDATE_MAX_BYTES
     });
     let parsed;
-    try { parsed = JSON.parse(readExact(file, options).toString('utf8')); } catch {
+    try {
+      parsed = JSON.parse(readExact(file, {
+        fsModule,
+        requireRootOwner: options.requireRootOwner,
+        requireRootOwnedParent: options.requireRootOwnedParent
+      }).toString('utf8'));
+    } catch {
       fail('bootstrap_staging_source_conflict');
     }
-    if (JSON.stringify(parsed) !== JSON.stringify(expectedPlaceholder)) {
+    if (canonicalJson(parsed) !== canonicalJson(expectedPlaceholder)) {
       fail('bootstrap_staging_source_conflict');
     }
     options.expectedIdentity = current;
   }
-  writeExclusive(temporary, bytes, options);
-  if (expectedPlaceholder) {
-    const current = regularStat(file, {
-      fsModule,
-      uid: options.uid === undefined ? 0 : options.uid,
-      gid: options.gid === undefined ? 0 : options.gid,
-      mode: PLACEHOLDER_MODE,
-      maxBytes: CANDIDATE_MAX_BYTES
-    });
-    if (current.dev !== options.expectedIdentity.dev || current.ino !== options.expectedIdentity.ino ||
-        current.size !== options.expectedIdentity.size || current.mtimeMs !== options.expectedIdentity.mtimeMs) {
-      fail('bootstrap_staging_source_changed');
+  // Any failure after the temporary file exists must not leave staging debris
+  // behind, so the temporary path is always removed unless the rename consumed it.
+  let renamed = false;
+  try {
+    writeExclusive(temporary, bytes, options);
+    if (expectedPlaceholder) {
+      const current = regularStat(file, {
+        fsModule,
+        uid: options.uid === undefined ? 0 : options.uid,
+        gid: options.gid === undefined ? 0 : options.gid,
+        mode: PLACEHOLDER_MODE,
+        maxBytes: CANDIDATE_MAX_BYTES
+      });
+      if (current.dev !== options.expectedIdentity.dev ||
+          current.ino !== options.expectedIdentity.ino ||
+          current.size !== options.expectedIdentity.size ||
+          current.mtimeMs !== options.expectedIdentity.mtimeMs) {
+        fail('bootstrap_staging_source_changed');
+      }
+    }
+    fsModule.renameSync(temporary, file);
+    renamed = true;
+    const descriptor = fsModule.openSync(directory, fs.constants.O_RDONLY);
+    try { fsModule.fsyncSync(descriptor); } finally { fsModule.closeSync(descriptor); }
+  } finally {
+    if (!renamed) {
+      try { fsModule.unlinkSync(temporary); } catch {}
     }
   }
-  fsModule.renameSync(temporary, file);
-  const descriptor = fsModule.openSync(directory, fs.constants.O_RDONLY);
-  try { fsModule.fsyncSync(descriptor); } finally { fsModule.closeSync(descriptor); }
+}
+
+function targetState(file, generation, role, options = {}) {
+  const bytes = readExact(file, options);
+  let value;
+  try { value = JSON.parse(bytes.toString('utf8')); } catch {
+    fail('bootstrap_staging_source_conflict');
+  }
+  if (value.placeholder === true) {
+    if (value.generation !== generation || value.role !== role ||
+        value.schemaVersion !== PLACEHOLDER_SCHEMA) {
+      fail('bootstrap_staging_source_conflict');
+    }
+    return { kind: 'placeholder', value };
+  }
+  if (role === 'authority') {
+    return { kind: 'final', value: validateAuthorityRecord(value) };
+  }
+  return { kind: 'final', value: validateImageProfile(value) };
 }
 
 function materialize({ candidate, generation, root, fsModule = fs,
   requireRoot = true, uid = 0, gid = 0,
   edgeReceiptPath = EDGE_RECEIPT_PATH,
-  providerReceiptPath = PROVIDER_RECEIPT_PATH } = {}) {
+  providerReceiptPath = PROVIDER_RECEIPT_PATH,
+  canonicalBase = DEFAULT_CANONICAL_BASE } = {}) {
   assertRoot({ requireRoot });
   generation = generationName(generation);
-  root = path.resolve(root || '/etc/codex-memory/bootstrap');
-  secureDirectory(root, { fsModule, uid, gid });
+  canonicalBase = path.resolve(canonicalBase);
+  root = path.resolve(root || path.join(canonicalBase, generation));
+  if (root !== path.join(canonicalBase, generation)) {
+    fail('initial_bootstrap_generation_root_mismatch');
+  }
+  secureDirectory(canonicalBase, { fsModule, uid, gid });
+  secureDirectory(root, { fsModule, uid, gid, requiredMode: ROOT_MODE });
   const authorityPath = path.join(root, 'runtime-authority.json');
   const profilePath = path.join(root, 'profile-v7.json');
   const input = JSON.parse(readExact(candidate, {
@@ -356,24 +412,47 @@ function materialize({ candidate, generation, root, fsModule = fs,
       authority.runtimeMountSources?.providerReceipt !== providerReceiptPath) {
     fail('blocked_bootstrap_materialization_binding_mismatch');
   }
-  inspectPlaceholder(authorityPath, generation, 'authority', {
+  const targetOptions = {
     fsModule, uid, gid, requireRootOwner: requireRoot, requireRootOwnedParent: requireRoot
-  });
-  inspectPlaceholder(profilePath, generation, 'profile', {
-    fsModule, uid, gid, requireRootOwner: requireRoot, requireRootOwnedParent: requireRoot
-  });
-  atomicReplace(authorityPath, Buffer.from(canonicalJson(authority)), {
-    fsModule, uid, gid, mode: PLACEHOLDER_MODE,
-    expectedPlaceholder: {
-      generation, placeholder: true, role: 'authority', schemaVersion: PLACEHOLDER_SCHEMA
+  };
+  const authorityState = targetState(authorityPath, generation, 'authority', targetOptions);
+  const profileState = targetState(profilePath, generation, 'profile', targetOptions);
+  if (authorityState.kind === 'final' && profileState.kind === 'final') {
+    if (canonicalJson(authorityState.value) !== canonicalJson(authority) ||
+        canonicalJson(profileState.value) !== canonicalJson(profile)) {
+      fail('blocked_bootstrap_materialization_binding_mismatch');
     }
-  });
-  atomicReplace(profilePath, profileBytes, {
-    fsModule, uid, gid, mode: PLACEHOLDER_MODE,
-    expectedPlaceholder: {
-      generation, placeholder: true, role: 'profile', schemaVersion: PLACEHOLDER_SCHEMA
-    }
-  });
+    return Object.freeze({
+      generation, authorityPath, profilePath,
+      authorityDigest: sha256(Buffer.from(canonicalJson(authority))),
+      profileSha256: input.profileSha256,
+      atomic: false, twoFileCommitNotAtomic: false,
+      perFileAtomicReplacement: false, installed: false,
+      alreadyMaterialized: true, runtimeStarted: false, secretValuesReturned: false
+    });
+  }
+  if (authorityState.kind === 'final' &&
+      canonicalJson(authorityState.value) !== canonicalJson(authority)) {
+    fail('blocked_bootstrap_materialization_binding_mismatch');
+  }
+  if (profileState.kind === 'final' &&
+      canonicalJson(profileState.value) !== canonicalJson(profile)) {
+    fail('blocked_bootstrap_materialization_binding_mismatch');
+  }
+  if (authorityState.kind === 'placeholder') {
+    atomicReplace(authorityPath, Buffer.from(canonicalJson(authority)), {
+      fsModule, uid, gid, mode: PLACEHOLDER_MODE,
+      requireRootOwner: requireRoot, requireRootOwnedParent: requireRoot,
+      expectedPlaceholder: authorityState.value
+    });
+  }
+  if (profileState.kind === 'placeholder') {
+    atomicReplace(profilePath, profileBytes, {
+      fsModule, uid, gid, mode: PLACEHOLDER_MODE,
+      requireRootOwner: requireRoot, requireRootOwnedParent: requireRoot,
+      expectedPlaceholder: profileState.value
+    });
+  }
   return Object.freeze({
     generation,
     authorityPath,

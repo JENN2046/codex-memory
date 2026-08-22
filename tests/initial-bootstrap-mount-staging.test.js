@@ -42,6 +42,7 @@ function options(root) {
   fs.chmodSync(authorityParent, 0o700);
   return {
     generation: GENERATION,
+    canonicalBase: path.join(root, 'authority'),
     root: path.join(root, 'authority', GENERATION),
     uid,
     gid,
@@ -62,8 +63,10 @@ test('stage creates secure generation placeholders and canonical receipt placeho
   assert.equal(result.generation, GENERATION);
   assert.equal(result.authoritySource.status, 'created');
   assert.equal(result.profileSource.status, 'created');
-  assert.equal(result.edgeReceiptSource.status, 'created');
-  assert.equal(result.providerReceiptSource.status, 'created');
+  assert.equal(result.edgeReceiptSource.status, 'created_placeholder_not_fresh');
+  assert.equal(result.providerReceiptSource.status, 'created_placeholder_not_fresh');
+  assert.equal(result.freshEdgeReceipt, false);
+  assert.equal(result.freshProviderReceipt, false);
   assert.equal(result.runtimeCreated, false);
   assert.equal(result.runtimeStarted, false);
   assert.equal(result.secretValuesReturned, false);
@@ -101,8 +104,8 @@ test('stage is idempotent for exact placeholders and rejects foreign contents', 
   const second = stage(opts);
   assert.equal(second.authoritySource.status, 'preserved');
   assert.equal(second.profileSource.status, 'preserved');
-  assert.equal(second.edgeReceiptSource.status, 'preserved');
-  assert.equal(second.providerReceiptSource.status, 'preserved');
+  assert.equal(second.edgeReceiptSource.status, 'preserved_not_fresh');
+  assert.equal(second.providerReceiptSource.status, 'preserved_not_fresh');
 
   fs.writeFileSync(first.authoritySource.path, '{"placeholder":true}\n');
   fs.chmodSync(first.authoritySource.path, 0o644);
@@ -118,6 +121,45 @@ test('stage rejects symlinked and insecure pre-existing sources', t => {
   fs.unlinkSync(path.join(opts.root, 'profile-v7.json'));
   fs.symlinkSync(target, path.join(opts.root, 'profile-v7.json'));
   expectCode(() => stage(opts), 'bootstrap_staging_source_unsafe');
+});
+
+test('stage confines root to canonical base and rejects wrong-generation roots', t => {
+  const root = fixtureRoot(t);
+  const opts = options(root);
+  expectCode(() => stage({ ...opts, root: path.join(root, 'other', GENERATION) }),
+    'initial_bootstrap_generation_root_mismatch');
+  const wrong = path.join(root, 'authority', 'other-generation');
+  fs.mkdirSync(wrong, { recursive: true, mode: 0o700 });
+  fs.chmodSync(wrong, 0o700);
+  expectCode(() => stage({ ...opts, root: wrong }),
+    'initial_bootstrap_generation_root_mismatch');
+});
+
+test('stage rejects a pre-existing symlink canonical base and does not chmod repair it', t => {
+  const root = fixtureRoot(t);
+  const real = path.join(root, 'real-authority');
+  fs.mkdirSync(real, { mode: 0o755 });
+  fs.chmodSync(real, 0o755);
+  const base = path.join(root, 'authority');
+  fs.symlinkSync(real, base);
+  const before = fs.lstatSync(base);
+  expectCode(() => stage({ ...options(root), canonicalBase: base,
+    root: path.join(base, GENERATION) }), 'bootstrap_staging_root_unsafe');
+  const after = fs.lstatSync(base);
+  assert.equal(after.isSymbolicLink(), true);
+  assert.equal(after.ino, before.ino);
+});
+
+test('stage rejects an existing unsafe canonical base without changing its mode', t => {
+  const root = fixtureRoot(t);
+  const opts = options(root);
+  const base = path.join(root, 'unsafe-authority');
+  fs.mkdirSync(base, { mode: 0o777 });
+  fs.chmodSync(base, 0o777);
+  expectCode(() => stage({ ...opts, canonicalBase: base,
+    root: path.join(base, GENERATION) }), 'bootstrap_staging_root_unsafe');
+  assert.equal(fs.lstatSync(base).mode & 0o777, 0o777);
+  assert.equal(fs.existsSync(path.join(base, GENERATION)), false);
 });
 
 test('staging placeholders fail production authority/profile validation', t => {
@@ -172,6 +214,39 @@ test('materialize rejects malformed, injected, and non-candidate inputs before w
     generation: GENERATION, placeholder: true, role: 'authority',
     schemaVersion: PLACEHOLDER_SCHEMA
   });
+});
+
+test('materialize rejects mismatched partial final state and preserves staged files', t => {
+  const root = fixtureRoot(t);
+  const opts = options(root);
+  const staged = stage(opts);
+  fs.writeFileSync(staged.authoritySource.path, JSON.stringify({
+    authoritySchemaVersion: 'codex-memory-runtime-authority/v1',
+    codexMemoryCommit: GENERATION
+  }), { mode: 0o644 });
+  fs.chmodSync(staged.authoritySource.path, 0o644);
+  const candidate = path.join(root, 'candidate.json');
+  fs.writeFileSync(candidate, JSON.stringify({ authority: {}, profile: {}, profileSha256: 'x' }), {
+    mode: 0o600
+  });
+  expectCode(() => materialize({ ...opts, candidate }), 'runtime_authority_record_invalid');
+  assert.equal(fs.readFileSync(staged.profileSource.path, 'utf8').includes('placeholder'), true);
+});
+
+test('materialize leaves no temporary staging debris when a commit step fails', t => {
+  const root = fixtureRoot(t);
+  const opts = options(root);
+  const staged = stage(opts);
+  const candidate = path.join(root, 'candidate.json');
+  fs.writeFileSync(candidate, JSON.stringify({
+    authority: { authoritySchemaVersion: 'codex-memory-runtime-authority/v1' },
+    profile: {},
+    profileSha256: 'sha256:' + '0'.repeat(64)
+  }), { mode: 0o600 });
+  expectCode(() => materialize({ ...opts, candidate }), 'runtime_authority_record_invalid');
+  const entries = fs.readdirSync(path.dirname(staged.authoritySource.path));
+  assert.deepEqual(entries.filter(name => name.endsWith('.tmp')), []);
+  assert.deepEqual(entries.sort(), ['profile-v7.json', 'runtime-authority.json']);
 });
 
 test('production stage requires root privilege', t => {
