@@ -1854,6 +1854,16 @@ test('staged mounts carry creator initial-mode output through materialization en
     'runtime_edge_receipt_invalid');
   expectCode(() => validateProviderReceipt(providerReceiptValue, installedAuthority),
     'runtime_provider_receipt_invalid');
+
+  // A stage rerun over a fully materialized pair is recognized as already
+  // materialized and never rewrites or downgrades the installed sources.
+  const stagedRerun = stageInitialMounts(stagingOptions);
+  assert.equal(stagedRerun.authoritySource.status, 'already_materialized');
+  assert.equal(stagedRerun.profileSource.status, 'already_materialized');
+  assert.equal(stagedRerun.productionAuthorityValid, true);
+  assert.equal(stagedRerun.productionProfileValid, true);
+  assert.equal(stagedRerun.freshEdgeReceipt, false);
+  assert.equal(stagedRerun.freshProviderReceipt, false);
 });
 
 test('materialization recovers from a crash that installed only the authority', t => {
@@ -1940,6 +1950,142 @@ test('materialization recovers from a crash that installed only the profile', t 
   assert.equal(canonicalJson(JSON.parse(fs.readFileSync(staged.authoritySource.path, 'utf8'))),
     canonicalJson(output.authority));
   assert.equal(sha256Buffer(fs.readFileSync(staged.profileSource.path)), output.profileSha256);
+});
+
+test('materialization rejects a valid but mismatched partial final and preserves staged files', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-initial-mismatch-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
+  const gid = typeof process.getgid === 'function' ? process.getgid() : 0;
+  const canonicalBase = path.join(root, 'bootstrap');
+  fs.mkdirSync(canonicalBase, { recursive: true, mode: 0o700 });
+  fs.chmodSync(canonicalBase, 0o700);
+  const receipts = path.join(root, 'run');
+  fs.mkdirSync(receipts, { recursive: true, mode: 0o700 });
+  fs.chmodSync(receipts, 0o700);
+  const generation = C('a');
+  const stagingOptions = {
+    generation, canonicalBase, root: path.join(canonicalBase, generation),
+    uid, gid, requireRoot: false,
+    edgeReceiptPath: path.join(receipts, 'edge-receipt.json'),
+    providerReceiptPath: path.join(receipts, 'provider-receipt.json')
+  };
+  const staged = stageInitialMounts(stagingOptions);
+  const runtime = baseInspect();
+  const seedA = path.join(root, 'seed-a.json');
+  fs.writeFileSync(seedA, canonicalJson(initialProfileSeed()), { mode: 0o600 });
+  const { args: argsA, deps: depsA } = authorityCreatorHarness(runtime, {
+    seedPath: seedA,
+    authorityPath: staged.authoritySource.path,
+    profilePath: staged.profileSource.path,
+    edgeReceiptPath: staged.edgeReceiptSource.path,
+    providerReceiptPath: staged.providerReceiptSource.path
+  });
+  const outputA = JSON.parse(createRuntimeAuthorityMain(argsA, depsA));
+  const candidateA = path.join(root, 'candidate-a.json');
+  fs.writeFileSync(candidateA, canonicalJson(outputA), { mode: 0o600 });
+
+  // A second valid creator output for the same generation/bindings but a
+  // different profile is used to build a mismatched partial-final crash state.
+  const seedB = path.join(root, 'seed-b.json');
+  fs.writeFileSync(seedB, canonicalJson({
+    ...initialProfileSeed(), controllerSourceManifestDigest: S('9')
+  }), { mode: 0o600 });
+  const { args: argsB, deps: depsB } = authorityCreatorHarness(runtime, {
+    seedPath: seedB,
+    authorityPath: staged.authoritySource.path,
+    profilePath: staged.profileSource.path,
+    edgeReceiptPath: staged.edgeReceiptSource.path,
+    providerReceiptPath: staged.providerReceiptSource.path
+  });
+  const outputB = JSON.parse(createRuntimeAuthorityMain(argsB, depsB));
+  assert.notEqual(outputA.authority.profileSha256, outputB.authority.profileSha256);
+
+  // Crash state: B's authority is final, the profile is still A's placeholder.
+  fs.writeFileSync(staged.authoritySource.path, canonicalJson(outputB.authority), { mode: 0o644 });
+  fs.chmodSync(staged.authoritySource.path, 0o644);
+  expectCode(() => materializeInitialMounts({ ...stagingOptions, candidate: candidateA }),
+    'blocked_bootstrap_materialization_binding_mismatch');
+  assert.equal(JSON.parse(fs.readFileSync(staged.profileSource.path, 'utf8')).placeholder, true);
+  assert.equal(canonicalJson(JSON.parse(fs.readFileSync(staged.authoritySource.path, 'utf8'))),
+    canonicalJson(outputB.authority));
+});
+
+test('materialize removes its temporary file when a commit rename fails and rerun recovers', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-initial-cleanup-'));
+  t.after(() => fs.rmSync(root, { force: true, recursive: true }));
+  const uid = typeof process.getuid === 'function' ? process.getuid() : 0;
+  const gid = typeof process.getgid === 'function' ? process.getgid() : 0;
+  const canonicalBase = path.join(root, 'bootstrap');
+  fs.mkdirSync(canonicalBase, { recursive: true, mode: 0o700 });
+  fs.chmodSync(canonicalBase, 0o700);
+  const receipts = path.join(root, 'run');
+  fs.mkdirSync(receipts, { recursive: true, mode: 0o700 });
+  fs.chmodSync(receipts, 0o700);
+  const generation = C('a');
+  const stagingOptions = {
+    generation, canonicalBase, root: path.join(canonicalBase, generation),
+    uid, gid, requireRoot: false,
+    edgeReceiptPath: path.join(receipts, 'edge-receipt.json'),
+    providerReceiptPath: path.join(receipts, 'provider-receipt.json')
+  };
+  const staged = stageInitialMounts(stagingOptions);
+  const seedPath = path.join(root, 'seed.json');
+  fs.writeFileSync(seedPath, canonicalJson(initialProfileSeed()), { mode: 0o600 });
+  const runtime = baseInspect();
+  const { args, deps } = authorityCreatorHarness(runtime, {
+    seedPath,
+    authorityPath: staged.authoritySource.path,
+    profilePath: staged.profileSource.path,
+    edgeReceiptPath: staged.edgeReceiptSource.path,
+    providerReceiptPath: staged.providerReceiptSource.path
+  });
+  const output = JSON.parse(createRuntimeAuthorityMain(args, deps));
+  const candidate = path.join(root, 'creator-output.json');
+  fs.writeFileSync(candidate, canonicalJson(output), { mode: 0o600 });
+
+  // Inject a rename failure for the profile commit so materialize stops after
+  // the authority rename, leaving exactly the partial-crash state the
+  // recoverable state machine is required to converge.
+  const cleaned = [];
+  const injectedFs = new Proxy(fs, {
+    get(target, property) {
+      if (property === 'renameSync') {
+        return (from, to) => {
+          if (path.basename(to) === 'profile-v7.json') {
+            const error = new Error('injected rename failure');
+            error.code = 'EIO';
+            throw error;
+          }
+          return target.renameSync(from, to);
+        };
+      }
+      if (property === 'unlinkSync') {
+        return file => {
+          cleaned.push(file);
+          return target.unlinkSync(file);
+        };
+      }
+      const value = target[property];
+      return typeof value === 'function' ? value.bind(target) : value;
+    }
+  });
+  expectCode(() => materializeInitialMounts({ ...stagingOptions, candidate, fsModule: injectedFs }),
+    'EIO');
+  assert.equal(cleaned.length, 1);
+  assert.equal(path.basename(cleaned[0]).startsWith('.profile-v7.json.'), true);
+  assert.deepEqual(fs.readdirSync(stagingOptions.root).filter(name => name.endsWith('.tmp')), []);
+  // The authority commit landed and the profile is still the exact placeholder.
+  assert.equal(canonicalJson(JSON.parse(fs.readFileSync(staged.authoritySource.path, 'utf8'))),
+    canonicalJson(output.authority));
+  assert.equal(JSON.parse(fs.readFileSync(staged.profileSource.path, 'utf8')).placeholder, true);
+
+  // Rerunning materialize with the real filesystem converges the partial pair.
+  const recovered = materializeInitialMounts({ ...stagingOptions, candidate });
+  assert.equal(recovered.installed, true);
+  assert.equal(sha256Buffer(fs.readFileSync(staged.profileSource.path)), output.profileSha256);
+  assert.equal(canonicalJson(JSON.parse(fs.readFileSync(staged.authoritySource.path, 'utf8'))),
+    canonicalJson(output.authority));
 });
 
 test('initial profile seed reader rejects symlinks and mid-read replacement', t => {

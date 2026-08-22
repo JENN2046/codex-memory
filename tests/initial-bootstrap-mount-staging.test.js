@@ -162,6 +162,40 @@ test('stage rejects an existing unsafe canonical base without changing its mode'
   assert.equal(fs.existsSync(path.join(base, GENERATION)), false);
 });
 
+test('stage rejects a symlinked generation root before any mutation', t => {
+  const root = fixtureRoot(t);
+  const opts = options(root);
+  const target = path.join(root, 'staged-target');
+  fs.symlinkSync(target, path.join(opts.canonicalBase, GENERATION));
+  expectCode(() => stage(opts), 'bootstrap_staging_root_unsafe');
+  assert.equal(fs.lstatSync(path.join(opts.canonicalBase, GENERATION)).isSymbolicLink(), true);
+  assert.equal(fs.existsSync(target), false);
+});
+
+test('stage rejects an existing unsafe generation root without changing its mode', t => {
+  const root = fixtureRoot(t);
+  const opts = options(root);
+  fs.mkdirSync(opts.root, { mode: 0o777 });
+  fs.chmodSync(opts.root, 0o777);
+  expectCode(() => stage(opts), 'bootstrap_staging_root_unsafe');
+  assert.equal(fs.lstatSync(opts.root).mode & 0o777, 0o777);
+  assert.equal(fs.existsSync(path.join(opts.root, 'runtime-authority.json')), false);
+});
+
+test('materialize confines root to canonical base and rejects wrong-generation roots', t => {
+  const root = fixtureRoot(t);
+  const opts = options(root);
+  const candidate = path.join(root, 'candidate.json');
+  fs.writeFileSync(candidate, '{}', { mode: 0o600 });
+  expectCode(() => materialize({ ...opts, root: path.join(root, 'other', GENERATION), candidate }),
+    'initial_bootstrap_generation_root_mismatch');
+  const wrong = path.join(root, 'authority', 'other-generation');
+  fs.mkdirSync(wrong, { recursive: true, mode: 0o700 });
+  fs.chmodSync(wrong, 0o700);
+  expectCode(() => materialize({ ...opts, root: wrong, candidate }),
+    'initial_bootstrap_generation_root_mismatch');
+});
+
 test('staging placeholders fail production authority/profile validation', t => {
   const root = fixtureRoot(t);
   const opts = options(root);
