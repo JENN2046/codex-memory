@@ -11,6 +11,7 @@ const {
   containerConfigDigest,
   digest,
   hostTrustBundleDigest,
+  profileV7GenerationRolloverCandidate,
   profileV7InitialBootstrapCandidate,
   profileAuthorityComponents,
   readBoundedBuffer,
@@ -161,6 +162,39 @@ function readInitialProfileSeed(file, {
   }
 }
 
+// The generation-rollover source (current active authority + current accepted
+// schema-v7 profile) is a root-supplied authority input. It is read through the
+// same hardened primitive used for installed authority records: O_NOFOLLOW,
+// bounded size, regular-file, group/other-writable rejection, root-ownership
+// requirement, and a before/after identity check against TOCTOU replacement.
+function readGenerationRolloverSource(authorityFile, profileFile, {
+  fsModule = fs,
+  requireRootFiles = true,
+  maximumBytes = 262_144
+} = {}) {
+  let authorityBytes;
+  let profileBytes;
+  try {
+    authorityBytes = readBoundedBuffer(authorityFile, {
+      fsModule, maximumBytes,
+      requireRootOwner: requireRootFiles,
+      requireRootOwnedParent: requireRootFiles
+    });
+    profileBytes = readBoundedBuffer(profileFile, {
+      fsModule, maximumBytes,
+      requireRootOwner: requireRootFiles,
+      requireRootOwnedParent: requireRootFiles
+    });
+  } catch { fail('runtime_authority_generation_source_unavailable'); }
+  let authority;
+  let profile;
+  try {
+    authority = validateAuthorityRecord(JSON.parse(authorityBytes.toString('utf8')));
+    profile = validateAuthorityProfileBytes(profileBytes);
+  } catch { fail('runtime_authority_generation_source_invalid'); }
+  return Object.freeze({ authority, profile, profileBytes, authorityBytes });
+}
+
 function validateExternallyAcceptedImageEvidence(accepted, archiveEvidence, manifest) {
   const actual = {
     archiveSha256: archiveEvidence.archiveSha256,
@@ -253,16 +287,37 @@ function main(argv = process.argv.slice(2), deps = {}) {
   }, edgeArchiveEvidence);
   const profileFile = path.resolve(args.profile || '');
   const initialBootstrap = Boolean(args['initial-profile-seed']);
+  const generationRollover = Boolean(args['generation-profile-source']);
   if (!args.profile) fail('runtime_authority_profile_path_required');
-  let profileBytes = initialBootstrap
+  if (initialBootstrap && generationRollover) {
+    fail('runtime_authority_mode_conflict');
+  }
+  let profileBytes = (initialBootstrap || generationRollover)
     ? null : fs.readFileSync(profileFile);
-  let profile = initialBootstrap
+  let profile = (initialBootstrap || generationRollover)
     ? null : validateAuthorityProfileBytes(profileBytes);
   const initialProfileSeed = initialBootstrap
     ? readInitialProfileSeed(
       path.resolve(args['initial-profile-seed']), seedReaderOptions
     )
     : null;
+  // Generation rollover: the current accepted schema-v7 profile plus the
+  // current ACTIVE authority are the rollover source. They are admitted here
+  // (read root-hardened) and consumed after the profile-independent NEW
+  // authority components are built, so the source admission never participates
+  // in deriving those components.
+  const generationRolloverSource = generationRollover
+    ? readGenerationRolloverSource(
+      path.resolve(args['current-authority'] || ''),
+      path.resolve(args['generation-profile-source']),
+      { fsModule, ...seedReaderOptions }
+    )
+    : null;
+  if (generationRollover &&
+      (!args['current-authority'] ||
+       !args['expected-current-profile-fingerprint'])) {
+    fail('runtime_authority_generation_rollover_input_missing');
+  }
   const nativeClosure = validateNativeClosure(JSON.parse(readContainerFile(
     runtime.Id, '/opt/codex-memory-runtime/native-closure.json'
   ).toString('utf8')));
@@ -374,10 +429,14 @@ function main(argv = process.argv.slice(2), deps = {}) {
     profilePath: profileFile,
     profileSchemaVersion: 7,
     // Normal mode binds the supplied profile bytes directly. Initial bootstrap
-    // has no profile yet, so it uses a provisional digest that is recomputed
-    // from the derived profile bytes below before anything is published.
-    profileSha256: initialBootstrap
-      ? sha256Buffer(Buffer.from('initial-profile-bootstrap'))
+    // and generation rollover have no new profile yet, so they use a
+    // provisional digest that is recomputed from the derived profile bytes
+    // below before anything is published. The provisional value never enters
+    // the derived profile (profileAuthorityComponents() is independent of
+    // profileSha256), which prevents a profile/authority self-hash cycle.
+    profileSha256: (initialBootstrap || generationRollover)
+      ? sha256Buffer(Buffer.from(
+        initialBootstrap ? 'initial-profile-bootstrap' : 'generation-rollover'))
       : sha256Buffer(profileBytes),
     providerContainerConfigDigest: containerConfigDigest(provider),
     providerContainerId: provider.Id,
@@ -409,6 +468,45 @@ function main(argv = process.argv.slice(2), deps = {}) {
       providerEnvironmentBindingOptions
     );
   }
+  if (generationRollover) {
+    // The observed NEW Runtime must be stopped: it is a candidate for a future
+    // activation, and a running candidate must never be admitted into a new
+    // generation authority by this creator.
+    if (runtime?.State?.Running === true) {
+      fail('runtime_authority_generation_runtime_active');
+    }
+    // Current-profile acceptance is not delegated to the pure producer: the
+    // exact profile bytes must be bound by the ACTIVE authority (profileSha256)
+    // and the profile must validate against the ACTIVE authority components.
+    // Only then is it admitted as the rollover continuity source.
+    const source = generationRolloverSource;
+    if (sha256Buffer(source.profileBytes) !== source.authority.profileSha256) {
+      fail('runtime_authority_generation_source_not_active');
+    }
+    try {
+      validateImageProfile(
+        source.profile,
+        profileAuthorityComponents(source.authority)
+      );
+    } catch {
+      fail('runtime_authority_generation_source_not_active');
+    }
+    const rollover = profileV7GenerationRolloverCandidate(
+      source.profile,
+      profileAuthorityComponents(candidate),
+      { expectedCurrentFingerprint: args['expected-current-profile-fingerprint'] }
+    );
+    profile = rollover.nextProfile;
+    profileBytes = Buffer.from(rollover.nextProfileBytes);
+    candidate = validateAuthorityRecord({
+      ...candidate,
+      profileSha256: sha256Buffer(profileBytes)
+    });
+    validateProviderEnvironmentAuthorityBinding(
+      runtimeMountSources.providerEnvironment, profile,
+      providerEnvironmentBindingOptions
+    );
+  }
   try {
     validateImageProfile(profile, profileAuthorityComponents(candidate));
   } catch {
@@ -416,7 +514,10 @@ function main(argv = process.argv.slice(2), deps = {}) {
   }
   const output = canonicalJson(initialBootstrap
     ? { authority: candidate, profile, profileSha256: sha256Buffer(profileBytes) }
-    : candidate);
+    : generationRollover
+      ? { authority: candidate, profile, profileSha256: sha256Buffer(profileBytes),
+        classification: 'generation_rollover' }
+      : candidate);
   writeOutput(output);
   return output;
 }

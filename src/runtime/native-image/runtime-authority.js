@@ -283,15 +283,15 @@ function vcpProviderEnvironmentRuntimeAccess(stat) {
   });
 }
 
-function sha256File(file) {
+function sha256File(file, { fsModule = fs } = {}) {
   return `sha256:${crypto.createHash('sha256')
-    .update(fs.readFileSync(file)).digest('hex')}`;
+    .update(fsModule.readFileSync(file)).digest('hex')}`;
 }
 
 function hostTrustBundleDigest({ launcherFile, authorityModuleFile,
   policyModuleFile, nativeClosureModuleFile, edgeImageAuthorityModuleFile,
   providerImageAuthorityModuleFile,
-  tarArchiveModuleFile }) {
+  tarArchiveModuleFile, fsModule = fs }) {
   const files = [
     { installPath: 'deploy/native-runtime/host-launcher.js', source: launcherFile },
     { installPath: 'src/runtime/native-image/runtime-authority.js', source: authorityModuleFile },
@@ -304,7 +304,7 @@ function hostTrustBundleDigest({ launcherFile, authorityModuleFile,
     { installPath: 'src/runtime/native-image/tar-archive.js', source: tarArchiveModuleFile }
   ].map(entry => ({
     installPath: entry.installPath,
-    sha256: sha256File(path.resolve(entry.source))
+    sha256: sha256File(path.resolve(entry.source), { fsModule })
   }));
   return digest({
     files,
@@ -1314,6 +1314,60 @@ function profileV7MigrationCandidate(profile, imageAuthority, {
   });
 }
 
+// Steady-state v7 -> v7 generation rollover candidate. Unlike the migration
+// producer (which accepts only schemaVersion === 6), this accepts the current
+// schema-v7 profile as the rollover source. The source must be structurally
+// valid (validateImageProfile without authority binding), carry schemaVersion 7,
+// and match the caller-supplied exact semantic fingerprint. Continuity fields
+// come exclusively from the source profile; generation-bound fields derive
+// exclusively from the profile-independent next authority components through
+// imageProfileFromAuthoritySeed(), which prevents a profile/authority
+// self-hash cycle. The result is candidate-only and performs no durable write.
+//
+// The source's binding to the *active* authority (bytes sha256 ==
+// authority.profileSha256 plus validateImageProfile against the active
+// authority components) is a host-creator admission concern, not part of this
+// pure candidate function.
+function profileV7GenerationRolloverCandidate(profile, imageAuthority, {
+  expectedCurrentFingerprint
+} = {}) {
+  if (profile?.schemaVersion !== PROFILE_SCHEMA_VERSION ||
+      digest(profile) !== expectedCurrentFingerprint) {
+    reject('runtime_profile_v7_generation_rollover_source_invalid');
+  }
+  // Structural validity is required independently of the fingerprint so a
+  // caller cannot mint continuity authority from an arbitrary malformed blob
+  // that happens to match a caller-chosen hash.
+  try {
+    validateImageProfile(profile);
+  } catch {
+    reject('runtime_profile_v7_generation_rollover_source_invalid');
+  }
+  const authority = validateProfileAuthorityComponents(imageAuthority);
+  // Continuity seed is extracted from the CANONICAL seed key list, never from a
+  // second static field list: when INITIAL_PROFILE_SEED_KEYS evolves there is
+  // exactly one source of truth, and validateInitialProfileSeed() still enforces
+  // exact key set + types on whatever the list names.
+  const continuitySeed = Object.fromEntries(
+    INITIAL_PROFILE_SEED_KEYS.map(key => [key, profile[key]])
+  );
+  const nextProfile = imageProfileFromAuthoritySeed(continuitySeed, authority);
+  return Object.freeze({
+    candidateOnly: true,
+    classification: 'generation_rollover',
+    currentProfileFingerprint: expectedCurrentFingerprint,
+    nextProfile,
+    nextProfileBytes: canonicalJson(nextProfile),
+    nextProfileFingerprint: digest(nextProfile),
+    nextProfileSha256: sha256Buffer(Buffer.from(canonicalJson(nextProfile))),
+    durableMutationPerformed: false,
+    stateRootUnchanged: nextProfile.privateRoot === profile.privateRoot,
+    credentialReferencesUnchanged:
+      nextProfile.governanceEnvironment === profile.governanceEnvironment &&
+      nextProfile.relayEnvironment === profile.relayEnvironment
+  });
+}
+
 module.exports = {
   AUTHORITY_DEPENDENCY_GRAPH,
   AUTHORITY_RECORD_PATH,
@@ -1353,6 +1407,7 @@ module.exports = {
   parseVcpProviderEnvironment,
   profileAuthorityComponents,
   profileV7InitialBootstrapCandidate,
+  profileV7GenerationRolloverCandidate,
   profileV7MigrationCandidate,
   projectContainerConfig,
   readBoundedJson,
