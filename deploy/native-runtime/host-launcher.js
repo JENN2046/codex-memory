@@ -59,6 +59,11 @@ const EPHEMERAL_RECEIPT_PLACEHOLDER_SCHEMA =
   'codex-memory-ephemeral-receipt-placeholder/v1';
 const MAXIMUM_RECEIPT_MOUNT_BYTES = 64 * 1024;
 const DEFAULT_LOCK_PATH = '/run/codex-memory/host-lifecycle.lock';
+// Launcher-local re-entry always uses the admitted Node 22 binary. The
+// production caller cannot override this via NODE/PATH/env/CLI (no /usr/bin
+// env node, no PATH lookup) and the systemd /usr/bin/node v18 mismatch stays
+// out of scope for this repair.
+const ADMITTED_NODE = '/opt/nodejs/node-v22.23.1/bin/node';
 const DEFAULT_AUTHORITY_PATH = '/etc/codex-memory/native-runtime-authority.json';
 const DEFAULT_BOOT_ID_PATH = '/proc/sys/kernel/random/boot_id';
 const CONTAINER_ID = /^[a-f0-9]{64}$/u;
@@ -1022,7 +1027,11 @@ function runUnderLifecycleLock(argv, {
   fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
   const result = spawnFile('/bin/bash', [
     '-c',
-    'exec 9>"$1"; /usr/bin/flock --exclusive --nonblock --conflict-exit-code 75 9 || exit $?; export CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD=9; exec /usr/bin/node "$@"',
+    // $1 is the lock path (consumed by `exec 9>"$1"`); shift it away before
+    // exec so the re-entered node runs this launcher script + the original
+    // argv, never the lock file as a script. Re-entry uses the admitted Node
+    // 22 binary (frozen constant, not caller-controllable).
+    `exec 9>"$1"; /usr/bin/flock --exclusive --nonblock --conflict-exit-code 75 9 || exit $?; export CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD=9; shift; exec ${JSON.stringify(ADMITTED_NODE)} "$@"`,
     'codex-memory-lifecycle-lock', lockPath, __filename, ...argv
   ], { stdio: 'inherit', env: process.env });
   if (result.status === 75) fail('host_launcher_lifecycle_lock_busy');
@@ -1049,9 +1058,14 @@ function requireLifecycleLock({
   }
   const stdio = Array.from({ length: Math.max(10, descriptor + 1) }, () => 'ignore');
   stdio[descriptor] = descriptor;
+  // FD-form flock (no trailing command): util-linux operates on the inherited
+  // descriptor itself, so success means THIS OFD currently holds (or has just
+  // acquired) the lifecycle exclusive lock. The FILE form would instead open
+  // and lock a file named "<fd>" in cwd, prove nothing, and leave a garbage
+  // numeric file behind.
   const proof = spawnFile('/usr/bin/flock', [
     '--exclusive', '--nonblock', '--conflict-exit-code', '75',
-    String(descriptor), '/bin/true'
+    String(descriptor)
   ], { stdio });
   if (proof.status !== 0) fail('host_launcher_lifecycle_lock_proof_invalid');
   return true;
@@ -1093,6 +1107,8 @@ if (require.main === module) {
 }
 
 module.exports = {
+  ADMITTED_NODE,
+  DEFAULT_LOCK_PATH,
   EPHEMERAL_RECEIPT_PLACEHOLDER_SCHEMA,
   LAUNCHER_VERSION,
   requireLifecycleLock,
