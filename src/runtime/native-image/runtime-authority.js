@@ -1344,21 +1344,14 @@ function profileV7GenerationRolloverCandidate(profile, imageAuthority, {
     reject('runtime_profile_v7_generation_rollover_source_invalid');
   }
   const authority = validateProfileAuthorityComponents(imageAuthority);
-  const nextProfile = imageProfileFromAuthoritySeed({
-    controllerSourceManifestDigest: profile.controllerSourceManifestDigest,
-    controllerSourceManifestVersion: profile.controllerSourceManifestVersion,
-    edgeContainer: profile.edgeContainer,
-    governanceEnvironment: profile.governanceEnvironment,
-    governanceEnvironmentConfigDigest: profile.governanceEnvironmentConfigDigest,
-    privateRoot: profile.privateRoot,
-    providerContainer: profile.providerContainer,
-    relayEnvironment: profile.relayEnvironment,
-    relayEnvironmentConfigDigest: profile.relayEnvironmentConfigDigest,
-    retainedBinding: profile.retainedBinding,
-    retainedBindingSource: profile.retainedBindingSource,
-    vcpProviderConfigDigest: profile.vcpProviderConfigDigest,
-    vcpRuntimeScopeDigest: profile.vcpRuntimeScopeDigest
-  }, authority);
+  // Continuity seed is extracted from the CANONICAL seed key list, never from a
+  // second static field list: when INITIAL_PROFILE_SEED_KEYS evolves there is
+  // exactly one source of truth, and validateInitialProfileSeed() still enforces
+  // exact key set + types on whatever the list names.
+  const continuitySeed = Object.fromEntries(
+    INITIAL_PROFILE_SEED_KEYS.map(key => [key, profile[key]])
+  );
+  const nextProfile = imageProfileFromAuthoritySeed(continuitySeed, authority);
   return Object.freeze({
     candidateOnly: true,
     classification: 'generation_rollover',

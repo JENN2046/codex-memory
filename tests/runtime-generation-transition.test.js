@@ -863,10 +863,60 @@ test('transition recovery: corrupted OLD authority backup fails closed', t => {
   );
   expectCode(
     () => T.executeTransition(options),
-    'generation_transition_recovery_state_invalid'
+    'generation_transition_old_authority_backup_invalid'
   );
   // The control authority must remain untouched (still NEW) because recovery
   // fails before any restore write.
   const state = pairState(world);
   assert.ok(state.bundleOld && state.authorityNew, 'no partial authority restore');
+});
+
+test('transition recovery: corrupted OLD bundle backup fails closed', t => {
+  const { world, options } = executeWorld(t);
+  withInterruptedState(world, { bundle: 'new', journalState: 'BUNDLE_PUBLISHED' });
+  // Corrupt one preserved OLD bundle file so the backup no longer matches the
+  // OLD bundle digest.
+  fs.writeFileSync(
+    path.join(world.journalRoot, FIXTURE_TID, 'old-bundle',
+      T.BUNDLE_FILES[0]),
+    '// corrupted preserved bundle\nmodule.exports = {};\n',
+    { mode: 0o644 }
+  );
+  expectCode(
+    () => T.executeTransition(options),
+    'generation_transition_old_bundle_backup_invalid'
+  );
+  // No restore may have happened: the installed bundle stays NEW.
+  const state = pairState(world);
+  assert.ok(state.bundleNew && state.authorityOld, 'no partial bundle restore');
+});
+
+test('transition rollback: corrupted OLD authority backup fails closed before partial restore', t => {
+  const { world, options } = executeWorld(t, { verifyShouldFail: true });
+  // Corrupt the preserved OLD authority backup the moment backupOldPair writes
+  // it (before activation), so rollback must reject it before touching either
+  // installed object.
+  const backupAuthorityPath = path.join(
+    world.journalRoot, 'aaaaaaaaaaaaaaaaaaaaaaaa', 'old-authority.json'
+  );
+  const realRename = world.sandbox.renameSync.bind(world.sandbox);
+  world.sandbox.renameSync = (from, to, ...rest) => {
+    const result = realRename(from, to, ...rest);
+    if (path.resolve(to) === path.resolve(backupAuthorityPath)) {
+      fs.writeFileSync(
+        backupAuthorityPath,
+        canonicalJson({ ...world.oldAuthority, codexMemoryCommit: C('ee') }),
+        { mode: 0o600 }
+      );
+    }
+    return result;
+  };
+  expectCode(
+    () => T.executeTransition(options),
+    'generation_transition_old_authority_backup_invalid'
+  );
+  // Both backups are validated up front: the pair must remain NEW+NEW with no
+  // partial bundle restore.
+  const state = pairState(world);
+  assert.ok(state.bundleNew && state.authorityNew, 'no partial restore on corrupt backup');
 });

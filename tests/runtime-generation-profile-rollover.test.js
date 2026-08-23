@@ -19,6 +19,7 @@ const {
   canonicalJson,
   digest,
   hostTrustBundleDigest,
+  INITIAL_PROFILE_SEED_KEYS,
   profileAuthorityComponents,
   profileV7GenerationRolloverCandidate,
   profileV7InitialBootstrapCandidate,
@@ -253,7 +254,16 @@ test('profileV7GenerationRolloverCandidate: continuity fields preserved exactly'
     profileAuthorityComponents(validateAuthorityRecord(next)),
     { expectedCurrentFingerprint: digest(current) }
   );
-  for (const key of CONTINUITY_KEYS) {
+  // The test fixture continuity list must never drift from the canonical
+  // INITIAL_PROFILE_SEED_KEYS: if the canonical seed evolves, this assertion
+  // fails loudly and the fixture is updated deliberately (single source of
+  // truth, no second static list).
+  assert.deepEqual(
+    [...CONTINUITY_KEYS].sort(),
+    [...INITIAL_PROFILE_SEED_KEYS].sort(),
+    'continuity fixture must mirror INITIAL_PROFILE_SEED_KEYS'
+  );
+  for (const key of INITIAL_PROFILE_SEED_KEYS) {
     assert.equal(result.nextProfile[key], current[key], `continuity field ${key}`);
   }
 });

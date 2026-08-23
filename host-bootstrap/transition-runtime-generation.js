@@ -439,9 +439,47 @@ function backupOldPair(authority, transactionId, {
   }
 }
 
-function restoreOldBundle(transactionId, {
+// Verify the preserved OLD authority backup (exact byte digest) before any
+// restore write. A corrupted/missing backup must fail closed without touching
+// the control authority.
+function verifyOldAuthorityBackup(transactionId, expectedDigest, {
   fsModule = fs, journalRoot = JOURNAL_ROOT
 } = {}) {
+  const backupRoot = path.join(journalRoot, transactionId);
+  let oldBytes;
+  try {
+    oldBytes = readRootFile(path.join(backupRoot, 'old-authority.json'), { fsModule });
+  } catch { fail('generation_transition_old_authority_backup_invalid'); }
+  let restored;
+  try { restored = JSON.parse(oldBytes.toString('utf8')); } catch {
+    fail('generation_transition_old_authority_backup_invalid');
+  }
+  if (digest(restored) !== expectedDigest) {
+    fail('generation_transition_old_authority_backup_invalid');
+  }
+}
+
+// Verify the preserved OLD bundle backup (exact 7-file topology + digest)
+// before any restore write.
+function verifyOldBundleBackup(transactionId, expectedDigest, {
+  fsModule = fs, journalRoot = JOURNAL_ROOT
+} = {}) {
+  const backupRoot = path.join(journalRoot, transactionId, 'old-bundle');
+  let backupDigest;
+  try {
+    backupDigest = stagedBundleDigest(backupRoot, { fsModule });
+  } catch { fail('generation_transition_old_bundle_backup_invalid'); }
+  if (backupDigest !== expectedDigest) {
+    fail('generation_transition_old_bundle_backup_invalid');
+  }
+}
+
+function restoreOldBundle(transactionId, {
+  fsModule = fs, journalRoot = JOURNAL_ROOT, expectedDigest
+} = {}) {
+  if (expectedDigest !== undefined) {
+    verifyOldBundleBackup(transactionId, expectedDigest, { fsModule, journalRoot });
+  }
   const backupRoot = path.join(journalRoot, transactionId, 'old-bundle');
   for (const relative of BUNDLE_FILES) {
     copyFileAtomic(
@@ -529,7 +567,8 @@ function recoverInterrupted({
     if (!journal || journal.transactionId === undefined) {
       fail(RECOVERY_UNKNOWN);
     }
-    restoreOldBundle(journal.transactionId, { fsModule, journalRoot });
+    verifyOldBundleBackup(journal.transactionId, oldBundleDigest, { fsModule, journalRoot });
+    restoreOldBundle(journal.transactionId, { fsModule, journalRoot, expectedDigest: oldBundleDigest });
     writeJournal(journal.transactionId, 'ROLLED_BACK', {
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
     }, { fsModule, journalRoot });
@@ -554,9 +593,9 @@ function recoverInterrupted({
     // Never write preserved bytes that no longer match the OLD authority
     // digest: fail closed on a corrupted backup before touching the control
     // authority.
-    let restored;
-    try { restored = JSON.parse(oldBytes.toString('utf8')); } catch { fail(RECOVERY_UNKNOWN); }
-    if (digest(restored) !== oldAuthorityDigest) fail(RECOVERY_UNKNOWN);
+    verifyOldAuthorityBackup(journal.transactionId, oldAuthorityDigest, {
+      fsModule, journalRoot
+    });
     atomicRootWrite(CONTROL_AUTHORITY, oldBytes.toString('utf8'), {
       fsModule, uid: 0, gid: 0, mode: 0o644
     });
@@ -572,8 +611,11 @@ function recoverInterrupted({
 // Execute transaction.
 // ---------------------------------------------------------------------------
 function restoreOldAuthority(transactionId, {
-  fsModule = fs, journalRoot = JOURNAL_ROOT
+  fsModule = fs, journalRoot = JOURNAL_ROOT, expectedDigest
 } = {}) {
+  if (expectedDigest !== undefined) {
+    verifyOldAuthorityBackup(transactionId, expectedDigest, { fsModule, journalRoot });
+  }
   const backupRoot = path.join(journalRoot, transactionId);
   const oldBytes = readRootFile(path.join(backupRoot, 'old-authority.json'), { fsModule });
   atomicRootWrite(CONTROL_AUTHORITY, oldBytes.toString('utf8'), {
@@ -623,16 +665,24 @@ function rollbackToCoherentPair({
         return 'COMMITTED';
       }
     } catch { /* fall through to pair rollback */ }
-    // Case B: the new pair cannot verify. Restore OLD bundle first, then OLD
-    // authority, so every intermediate pair remains restorable.
-    restoreOldBundle(transactionId, { fsModule, journalRoot });
-    restoreOldAuthority(transactionId, { fsModule, journalRoot });
+    // Case B: the new pair cannot verify. Validate BOTH preserved backups
+    // before any restore so a corrupt journal can never produce a partial
+    // cross-generation restore, then restore OLD bundle first and OLD
+    // authority second.
+    verifyOldAuthorityBackup(transactionId, oldAuthorityDigest, { fsModule, journalRoot });
+    verifyOldBundleBackup(transactionId, oldBundleDigest, { fsModule, journalRoot });
+    restoreOldBundle(transactionId, { fsModule, journalRoot, expectedDigest: oldBundleDigest });
+    restoreOldAuthority(transactionId, { fsModule, journalRoot, expectedDigest: oldAuthorityDigest });
   } else if (newBundleOldAuthority) {
-    // Incomplete: NEW bundle + OLD authority -> restore OLD bundle.
-    restoreOldBundle(transactionId, { fsModule, journalRoot });
+    // Incomplete: NEW bundle + OLD authority -> verify backup, restore OLD
+    // bundle.
+    verifyOldBundleBackup(transactionId, oldBundleDigest, { fsModule, journalRoot });
+    restoreOldBundle(transactionId, { fsModule, journalRoot, expectedDigest: oldBundleDigest });
   } else if (oldBundleNewAuthority) {
-    // Incomplete: OLD bundle + NEW authority -> restore OLD authority.
-    restoreOldAuthority(transactionId, { fsModule, journalRoot });
+    // Incomplete: OLD bundle + NEW authority -> verify backup, restore OLD
+    // authority.
+    verifyOldAuthorityBackup(transactionId, oldAuthorityDigest, { fsModule, journalRoot });
+    restoreOldAuthority(transactionId, { fsModule, journalRoot, expectedDigest: oldAuthorityDigest });
   } else if (!oldPair) {
     fail(RECOVERY_UNKNOWN);
   }
