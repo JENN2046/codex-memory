@@ -508,10 +508,29 @@ function invokeInstalledLauncher(command, authorityFile, {
 } = {}) {
   let result;
   try {
+    const childEnv = { ...process.env, ...env };
+    let stdio = ['ignore', 'pipe', 'pipe'];
+    const lockFdValue = childEnv.CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD;
+    if (lockFdValue !== undefined) {
+      if (!/^\d+$/u.test(lockFdValue)) {
+        fail('generation_transition_lifecycle_fd_invalid');
+      }
+      const lockFd = Number(lockFdValue);
+      if (!Number.isSafeInteger(lockFd) || lockFd < 3) {
+        fail('generation_transition_lifecycle_fd_invalid');
+      }
+      try { fs.fstatSync(lockFd); } catch {
+        fail('generation_transition_lifecycle_fd_invalid');
+      }
+      stdio = Array.from({ length: lockFd + 1 }, () => 'ignore');
+      stdio[1] = 'pipe';
+      stdio[2] = 'pipe';
+      stdio[lockFd] = lockFd;
+    }
     result = execFile(node, [launcher, command, `--authority=${authorityFile}`], {
       encoding: 'utf8',
-      env: { ...process.env, ...env },
-      stdio: ['ignore', 'pipe', 'pipe']
+      env: childEnv,
+      stdio
     });
   } catch {
     // A failing/absent launcher process is a "not accepted" result, never a
