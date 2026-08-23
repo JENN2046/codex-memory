@@ -340,8 +340,9 @@ function setupWorld(t, {
     [EDGE_ID]: { Id: EDGE_ID, State: { Running: true, Health: { Status: 'healthy' } } },
     [PROVIDER_ID]: { Id: PROVIDER_ID, State: { Running: true } }
   };
-  const dockerInspect = (kind, id) => {
-    if (kind !== 'container') throw new Error('no image');
+  // Canonical host-launcher dockerInspect(id) signature (transition only
+  // observes containers).
+  const dockerInspect = id => {
     if (!containers[id]) throw new Error('missing');
     return containers[id];
   };
@@ -919,4 +920,61 @@ test('transition rollback: corrupted OLD authority backup fails closed before pa
   // partial bundle restore.
   const state = pairState(world);
   assert.ok(state.bundleNew && state.authorityNew, 'no partial restore on corrupt backup');
+});
+
+// ===========================================================================
+// Production CLI wiring (no-DI docker observer) + DI support + injection
+// ===========================================================================
+test('transition main without DI provides canonical docker observer (no docker_unavailable)', t => {
+  // Production main() runs with deps = {}: common.dockerInspect must fall back
+  // to the canonical host-launcher observer, so the docker_unavailable failure
+  // is unreachable. Use an empty root sandbox: the first failure happens in
+  // verifyOldPair (authority read) BEFORE any docker invocation, proving the
+  // observer check already passed.
+  const backing = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-cli-wiring-'));
+  const sandbox = rootSandbox(backing);
+  t.after(() => fs.rmSync(backing, { force: true, recursive: true }));
+  const args = [
+    '--old-authority-digest=' + S('a'), '--old-bundle-digest=' + S('b'),
+    '--new-authority-candidate=/x', '--new-authority-digest=' + S('c'),
+    '--new-bundle-root=/y', '--new-bundle-digest=' + S('d')
+  ];
+  // If the production wiring regressed, this would fail with
+  // generation_transition_docker_unavailable; with the canonical observer
+  // wired it proceeds into verifyOldPair and fails on the missing authority.
+  expectCode(
+    () => T.main(args, { getuid: () => 0, fsModule: sandbox, lockPath: '/tmp/unused.lock' }),
+    'generation_transition_root_file_unavailable'
+  );
+});
+
+test('transition main with custom dockerInspect DI still supported', t => {
+  const world = setupWorld(t);
+  const args = [
+    '--old-authority-digest=' + world.oldAuthorityDigest,
+    '--old-bundle-digest=' + world.oldBundleDigest,
+    '--new-authority-candidate=' + world.newCandidatePath,
+    '--new-authority-digest=' + world.newAuthorityDigest,
+    '--new-bundle-root=' + world.stagedRoot,
+    '--new-bundle-digest=' + world.newBundleDigest
+  ];
+  const result = T.main(args, {
+    getuid: () => 0,
+    fsModule: world.sandbox,
+    dockerInspect: world.dockerInspect,
+    journalRoot: world.journalRoot
+  });
+  assert.equal(result.accepted, true);
+  assert.equal(result.action, 'generation_transition_candidate');
+  assert.equal(result.mutation, false);
+});
+
+test('transition CLI rejects caller docker-path injection', () => {
+  const args = [
+    '--old-authority-digest=' + S('a'), '--old-bundle-digest=' + S('b'),
+    '--new-authority-candidate=/x', '--new-authority-digest=' + S('c'),
+    '--new-bundle-root=/y', '--new-bundle-digest=' + S('d'),
+    '--docker=/evil/docker'
+  ];
+  expectCode(() => T.parseArguments(args), 'generation_transition_target_injection_rejected');
 });
