@@ -28,6 +28,21 @@ jobs:
           node-version: '22'
           cache: npm
 
+      - name: Provision admitted Node 22 at production path
+        # The lifecycle-lock re-entry and host-launcher CLI tests exec the
+        # frozen production node path (/opt/nodejs/node-v22.23.1/bin/node)
+        # through a real bash + flock + exec boundary. GitHub runners do not
+        # ship that path, so materialize the exact admitted Node 22.23.1
+        # distribution there before running the suite.
+        run: |
+          set -euo pipefail
+          sudo mkdir -p /opt/nodejs
+          curl -fsSL --retry 3 https://nodejs.org/dist/v22.23.1/node-v22.23.1-linux-x64.tar.xz \
+            -o /tmp/node-v22.23.1-linux-x64.tar.xz
+          sudo tar -xJf /tmp/node-v22.23.1-linux-x64.tar.xz -C /opt/nodejs
+          sudo mv /opt/nodejs/node-v22.23.1-linux-x64 /opt/nodejs/node-v22.23.1
+          /opt/nodejs/node-v22.23.1/bin/node --version
+
       - name: Install dependencies
         run: npm ci
 
