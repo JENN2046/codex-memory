@@ -236,6 +236,7 @@ function runtimeInspect() {
     'CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH=/opt/codex-memory-runtime/runtime-build-manifest.json',
     'CODEX_MEMORY_STACK_PROFILE_PATH=/run/codex-memory/profile.json',
     'CODEX_MEMORY_STACK_RUNTIME_DIR=/run/codex-memory-runtime-data',
+    'XDG_RUNTIME_DIR=/run/codex-memory-runtime-data',
     'NODE_ENV=production', 'VCP_ROOT=/opt/vcptoolbox', 'VCPTOOLBOX_ROOT=/opt/vcptoolbox'
   ];
   const destinations = [

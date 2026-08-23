@@ -190,6 +190,14 @@ test('container plan has no Docker socket or application code bind mount', () =>
   assert.equal(joined.includes('dst=/opt/vcptoolbox'), false);
 });
 
+test('container plan emits XDG_RUNTIME_DIR exactly once with the canonical value', () => {
+  const args = createPlan();
+  const xdg = args.filter(value =>
+    value === 'XDG_RUNTIME_DIR=/run/codex-memory-runtime-data');
+  assert.equal(xdg.length, 1);
+  assert.equal(args[args.indexOf(xdg[0]) - 1], '--env');
+});
+
 test('container plan rejects a non-canonical Provider environment source', () => {
   const options = {
     authoritySource: '/synthetic/authority.json',

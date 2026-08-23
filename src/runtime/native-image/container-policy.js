@@ -211,6 +211,7 @@ function validateRuntimeCandidate(inspect, expected) {
       '/opt/codex-memory-runtime/runtime-build-manifest.json',
     CODEX_MEMORY_STACK_PROFILE_PATH: PROFILE_PATH,
     CODEX_MEMORY_STACK_RUNTIME_DIR: RUNTIME_DATA_PATH,
+    XDG_RUNTIME_DIR: RUNTIME_DATA_PATH,
     VCP_ROOT: '/opt/vcptoolbox',
     VCPTOOLBOX_ROOT: '/opt/vcptoolbox'
   };
