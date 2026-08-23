@@ -79,6 +79,7 @@ function buildDockerCreateArguments({
     '--env', `CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH=${IMAGE_BUILD_MANIFEST_PATH}`,
     '--env', 'CODEX_MEMORY_STACK_PROFILE_PATH=/run/codex-memory/profile.json',
     '--env', 'CODEX_MEMORY_STACK_RUNTIME_DIR=/run/codex-memory-runtime-data',
+    '--env', 'XDG_RUNTIME_DIR=/run/codex-memory-runtime-data',
     '--env', 'CODEX_MEMORY_CONTAINER_SUPERVISOR=1',
     '--env', 'VCP_ROOT=/opt/vcptoolbox',
     '--env', 'VCPTOOLBOX_ROOT=/opt/vcptoolbox',

@@ -91,7 +91,7 @@ const ALLOWED_RUNTIME_ENV = Object.freeze([
   'CODEX_MEMORY_CONTAINER_AUTHORITY_PATH', 'CODEX_MEMORY_CONTAINER_SUPERVISOR',
   'CODEX_MEMORY_EDGE_RECEIPT_PATH', 'CODEX_MEMORY_PROVIDER_RECEIPT_PATH',
   'CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH', 'CODEX_MEMORY_STACK_PROFILE_PATH',
-  'CODEX_MEMORY_STACK_RUNTIME_DIR', 'NODE_ENV', 'VCP_ROOT', 'VCPTOOLBOX_ROOT'
+  'CODEX_MEMORY_STACK_RUNTIME_DIR', 'XDG_RUNTIME_DIR', 'NODE_ENV', 'VCP_ROOT', 'VCPTOOLBOX_ROOT'
 ]);
 const SOURCES = Object.freeze({
   authority: '/etc/codex-memory/authority.json',
@@ -202,6 +202,7 @@ function baseInspect(overrides = {}) {
         'CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_PATH=/opt/codex-memory-runtime/runtime-build-manifest.json',
         'CODEX_MEMORY_STACK_PROFILE_PATH=/run/codex-memory/profile.json',
         'CODEX_MEMORY_STACK_RUNTIME_DIR=/run/codex-memory-runtime-data',
+        'XDG_RUNTIME_DIR=/run/codex-memory-runtime-data',
         'NODE_ENV=production', 'VCP_ROOT=/opt/vcptoolbox',
         'VCPTOOLBOX_ROOT=/opt/vcptoolbox'
       ],
@@ -826,6 +827,23 @@ test('T unexpected secret environment is rejected', () => {
   const a = authority(inspect);
   expectCode(() => validateContainerInspection(inspect, a, {
     allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  }), 'runtime_container_environment_unapproved');
+});
+
+test('XDG_RUNTIME_DIR env is admitted by host inspection allowlist', () => {
+  const inspect = baseInspect(); // baseInspect carries the canonical XDG_RUNTIME_DIR binding
+  const a = authority(inspect);
+  validateContainerInspection(inspect, a, {
+    allowedEnvironmentNames: ALLOWED_RUNTIME_ENV
+  });
+});
+
+test('XDG_RUNTIME_DIR env is rejected when the host inspection allowlist omits the name', () => {
+  const inspect = baseInspect();
+  const a = authority(inspect);
+  const withoutXdg = ALLOWED_RUNTIME_ENV.filter(name => name !== 'XDG_RUNTIME_DIR');
+  expectCode(() => validateContainerInspection(inspect, a, {
+    allowedEnvironmentNames: withoutXdg
   }), 'runtime_container_environment_unapproved');
 });
 
