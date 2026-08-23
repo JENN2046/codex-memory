@@ -458,6 +458,65 @@ function runCli(preload, args, { cwd, extraEnv = {} } = {}) {
   return result;
 }
 
+test('invokeInstalledLauncher inherits the held lifecycle FD across a real child boundary', t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-lock-fd-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const lockPath = path.join(root, 'lifecycle.lock');
+  const runner = path.join(root, 'runner.js');
+  const launcherProbe = path.join(root, 'launcher-probe.js');
+  fs.writeFileSync(launcherProbe, `
+    const { requireLifecycleLock } = require(${JSON.stringify(
+      path.join(__dirname, '..', 'deploy/native-runtime/host-launcher.js')
+    )});
+    try {
+      requireLifecycleLock({ lockPath: process.env.REPRO_LOCK });
+      process.stdout.write(JSON.stringify({ accepted: true, fd: Number(
+        process.env.CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD
+      ) }));
+    } catch (error) {
+      process.stderr.write(error.code || error.message);
+      process.exitCode = 17;
+    }
+  `, { mode: 0o600 });
+  fs.writeFileSync(runner, `
+    const fs = require('node:fs');
+    const T = require(${JSON.stringify(path.join(__dirname, '..', 'host-bootstrap/transition-runtime-generation.js'))});
+    const result = T.invokeInstalledLauncher('activate', '/dev/null', {
+      node: process.execPath,
+      launcher: ${JSON.stringify(launcherProbe)},
+      env: {
+        CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD: '9',
+        REPRO_LOCK: process.env.REPRO_LOCK
+      }
+    });
+    process.stdout.write(JSON.stringify({
+      parentFdOpen: (() => { try { fs.fstatSync(9); return true; } catch { return false; } })(),
+      result
+    }));
+  `, { mode: 0o600 });
+  const child = spawnSync('/bin/bash', [
+    '-c',
+    'exec 9>"$1"; /usr/bin/flock --exclusive --nonblock 9 || exit $?; export REPRO_LOCK="$1"; exec "$2" "$3"',
+    'codex-memory-lock-fd-reproducer', lockPath, NODE, runner
+  ], { encoding: 'utf8' });
+  assert.equal(child.status, 0, child.stderr);
+  const observed = JSON.parse(child.stdout);
+  assert.equal(observed.parentFdOpen, true);
+  assert.deepEqual(observed.result, { accepted: true, fd: 9 });
+});
+
+test('invokeInstalledLauncher rejects invalid and closed lifecycle FDs before spawning', () => {
+  for (const value of ['not-a-fd', '2', '999']) {
+    let spawned = false;
+    const result = T.invokeInstalledLauncher('activate', '/dev/null', {
+      env: { CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD: value },
+      execFile: () => { spawned = true; return '{}'; }
+    });
+    assert.equal(result, null, value);
+    assert.equal(spawned, false, value);
+  }
+});
+
 test('production CLI: candidate mode real entrypoint without DI', t => {
   const world = buildWorld(t);
   const preload = writePreload(world.backing, world.dockerRecords);
