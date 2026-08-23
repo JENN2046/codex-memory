@@ -248,6 +248,78 @@ container the execution authority and classifies Edge lifecycle ownership as
 only, preserves primary state and credential references, and performs no
 durable write. There is no automatic v6-to-v7 acceptance.
 
+## Steady-state v7 generation rollover
+
+Schema v7 is also the steady-state rollover contract: an accepted schema-v7
+profile is carried forward to a deterministic schema-v7 next-generation
+candidate, never downgraded and never re-bootstrapped.
+
+`profileV7GenerationRolloverCandidate(currentProfile, nextAuthorityComponents,
+{ expectedCurrentFingerprint })` requires the current profile schema to be
+exactly 7 and its semantic fingerprint to equal the caller-supplied
+`expectedCurrentFingerprint` (derived from the active authority's profile
+binding). The 13 continuity fields are projected from the current profile via
+`imageProfileFromAuthoritySeed()`; all generation fields come exclusively from
+the next authority components and cannot be injected by callers. The candidate
+is in-memory only, performs no durable write, and avoids the
+profile/authority self-hash cycle by deriving exact candidate bytes before a
+final authority binding.
+
+The creator (`scripts/create-codex-memory-runtime-authority.js`) gains a
+generation-rollover mode (`--generation-profile-source` +
+`--current-authority` + `--expected-current-profile-fingerprint`): it reads the
+OLD authority + OLD profile from the root sandbox, verifies
+`sha256(profileBytes) === activeAuthority.profileSha256`, validates the profile
+against the active authority, derives the next profile from the observed NEW
+stopped container/image evidence, and only then binds the final authority. The
+NEW Runtime must be stopped; a running NEW Runtime is rejected. The final
+profile SHA-256 is recomputed from the derived bytes, eliminating the
+self-hash cycle.
+
+## Host generation transition primitive
+
+`host-bootstrap/transition-runtime-generation.js` is a root administrative
+primitive that moves a host from OLD bundle + OLD authority to NEW bundle + NEW
+authority as a single orchestrated transaction:
+
+1. ensure a root-owned journal root (`/var/lib/codex-memory/
+   generation-transition`);
+2. recover any interrupted prior transaction (journal + actual pair);
+3. verify the OLD pair and the NEW candidate pair (exact 7-file bundle
+   topology, root-owned files, no extra entries, no symlinks, no group/other
+   writable bits);
+4. verify lifecycle containers (OLD/NEW Runtime stopped, Edge healthy,
+   Provider running);
+5. write a durable `PREPARED` journal, preserve OLD authority bytes and OLD
+   bundle bytes;
+6. publish the NEW bundle atomically per file;
+7. stage the NEW authority inside the journal only, then invoke the NEW
+   installed launcher's `activate` (the only authority write path) followed by
+   its `verify`;
+8. write the durable `COMMITTED` journal.
+
+Fixed production targets (install root, authority path, lifecycle lock, Node
+executable, 7-file list) are hard-coded and never caller-settable. The control
+authority is only ever written by the installed launcher's activation path.
+A `flock`-based host lifecycle lock serializes transitions.
+
+Crash model (documented, not overstated):
+
+```yaml
+concurrent_mutation_safe: true        # flock lifecycle lock
+handled_process_error_rollback: true  # deterministic pair judgement
+interrupted_process_recoverable: true # journal + actual pair
+pair_power_loss_atomic: false         # two filesystem objects
+```
+
+On any handled failure the primitive judges the actual bundle/authority pair:
+verified NEW+NEW is committed (`generation_transition_committed_after_failure`),
+and every incomplete pair (NEW+OLD, OLD+NEW) is restored to OLD+OLD before
+re-throwing the original failure. Interrupted recovery restores OLD bundle or
+OLD authority from the journal backup and fails closed on unknown states. The
+primitive never starts, stops, creates, or deletes containers and never
+touches Edge or Provider sources.
+
 ## R1 disposition
 
 - Reuse: Git/npm dependency discovery, contract evidence, source/Vexus
