@@ -47,7 +47,10 @@ const {
   validateImageProfile,
   profileAuthorityComponents
 } = require('../src/runtime/native-image/runtime-authority');
-const { requireLifecycleLock } = require('../deploy/native-runtime/host-launcher');
+const {
+  dockerInspect: hostDockerInspect,
+  requireLifecycleLock
+} = require('../deploy/native-runtime/host-launcher');
 
 // ---------------------------------------------------------------------------
 // Fixed production targets (caller cannot override these via CLI).
@@ -261,7 +264,11 @@ function stagedBundleDigest(root, { fsModule = fs } = {}) {
 function containerRunning(dockerInspect, id) {
   if (!id) return false;
   let inspect;
-  try { inspect = dockerInspect('container', id); } catch { return false; }
+  // Canonical host-launcher dockerInspect(id) signature: the transition only
+  // ever observes containers, so the observer is called with the container id
+  // directly. All container-ID validation, /usr/bin/docker invocation, inspect
+  // parsing and failure semantics come from the one canonical implementation.
+  try { inspect = dockerInspect(id); } catch { return false; }
   return inspect?.State?.Running === true;
 }
 
@@ -339,8 +346,8 @@ function verifyLifecycle({
   let edge;
   let provider;
   try {
-    edge = dockerInspect('container', edgeContainerId);
-    provider = dockerInspect('container', providerContainerId);
+    edge = dockerInspect(edgeContainerId);
+    provider = dockerInspect(providerContainerId);
   } catch { fail('generation_transition_lifecycle_identity_invalid'); }
   if (!edge || !provider || edge?.Id !== edgeContainerId ||
       provider?.Id !== providerContainerId) {
@@ -954,7 +961,7 @@ function main(argv = process.argv.slice(2), deps = {}) {
   const common = {
     fsModule: deps.fsModule || fs,
     journalRoot: deps.journalRoot || JOURNAL_ROOT,
-    dockerInspect: deps.dockerInspect,
+    dockerInspect: deps.dockerInspect || hostDockerInspect,
     oldAuthorityDigest: args['old-authority-digest'],
     oldBundleDigest: args['old-bundle-digest'],
     newAuthorityCandidate: path.resolve(args['new-authority-candidate']),
@@ -995,7 +1002,10 @@ function runUnderLifecycleLock(argv, deps = {}) {
   fsModule.mkdirSync(directory, { recursive: true, mode: 0o700 });
   const result = spawnFile('/bin/bash', [
     '-c',
-    `exec 9>"$1"; /usr/bin/flock --exclusive --nonblock --conflict-exit-code 75 9 || exit $?; export CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD=9; exec ${JSON.stringify(node)} "$@"`,
+    // $1 is the lock path (used by `exec 9>"$1"`); shift it away before exec so
+    // "$@" resumes at the real script + argv and the re-entered node runs the
+    // transition CLI, not the lock file.
+    `exec 9>"$1"; /usr/bin/flock --exclusive --nonblock --conflict-exit-code 75 9 || exit $?; export CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD=9; shift; exec ${JSON.stringify(node)} "$@"`,
     'codex-memory-generation-transition-lock', lockPath, __filename, ...argv
   ], { stdio: 'inherit', env: process.env });
   if (result.status === 75) fail('generation_transition_lifecycle_lock_busy');
