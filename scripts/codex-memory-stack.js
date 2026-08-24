@@ -488,6 +488,51 @@ function controllerIdentityReceiptMatches(receipt, profile) {
   return false;
 }
 
+function validateControllerIdentityReceipt(value, failureCode) {
+  if (value?.schemaVersion === 1 &&
+      SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '')) {
+    return Object.freeze({
+      keys: Object.freeze(['controllerSourceCommit']),
+      projection: Object.freeze({
+        controllerSourceCommit: value.controllerSourceCommit
+      })
+    });
+  }
+  if (value?.schemaVersion === 2 &&
+      value.controllerSourceManifestVersion === MANIFEST_SCHEMA_VERSION &&
+      SAFE_SHA256_DIGEST.test(
+        value.controllerSourceManifestDigest || ''
+      )) {
+    return Object.freeze({
+      keys: Object.freeze([
+        'controllerSourceManifestDigest',
+        'controllerSourceManifestVersion'
+      ]),
+      projection: Object.freeze({
+        controllerSourceManifestDigest:
+          value.controllerSourceManifestDigest,
+        controllerSourceManifestVersion:
+          value.controllerSourceManifestVersion
+      })
+    });
+  }
+  if (value?.schemaVersion === 3 &&
+      SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '') &&
+      SAFE_SHA256_DIGEST.test(value.runtimeBuildManifestDigest || '')) {
+    return Object.freeze({
+      keys: Object.freeze([
+        'controllerSourceCommit',
+        'runtimeBuildManifestDigest'
+      ]),
+      projection: Object.freeze({
+        controllerSourceCommit: value.controllerSourceCommit,
+        runtimeBuildManifestDigest: value.runtimeBuildManifestDigest
+      })
+    });
+  }
+  throw codedError(failureCode);
+}
+
 function currentUid() {
   if (typeof process.getuid !== 'function') throw codedError('stack_owner_uid_unavailable');
   return process.getuid();
@@ -971,31 +1016,17 @@ function readRuntimeVcpProviderEnvironmentSnapshot(file, options = {}) {
 }
 
 function validateProviderConfigIdentityReceipt(value) {
+  const controller = validateControllerIdentityReceipt(
+    value, 'stack_provider_config_receipt_invalid'
+  );
   const shimPid = parsePid(value?.shimPid);
-  const controllerKeys = value?.schemaVersion === 2
-    ? [
-        'controllerSourceManifestDigest',
-        'controllerSourceManifestVersion'
-      ]
-    : ['controllerSourceCommit'];
   if (!exactKeys(value, [
-    ...controllerKeys,
+    ...controller.keys,
     'providerConfigIdentity',
     'schemaVersion',
     'shimPid',
     'shimProcessStartTicks'
   ]) ||
-      ![1, 2].includes(value.schemaVersion) ||
-      (value.schemaVersion === 1 &&
-        !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '')) ||
-      (value.schemaVersion === 2 &&
-        (
-          value.controllerSourceManifestVersion !==
-            MANIFEST_SCHEMA_VERSION ||
-          !SAFE_SHA256_DIGEST.test(
-            value.controllerSourceManifestDigest || ''
-          )
-        )) ||
       shimPid === null ||
       value.shimPid !== shimPid ||
       !/^[1-9][0-9]{0,39}$/u.test(
@@ -1015,14 +1046,7 @@ function validateProviderConfigIdentityReceipt(value) {
     throw codedError('stack_provider_config_receipt_invalid');
   }
   return Object.freeze({
-    ...(value.schemaVersion === 1
-      ? { controllerSourceCommit: value.controllerSourceCommit }
-      : {
-          controllerSourceManifestDigest:
-            value.controllerSourceManifestDigest,
-          controllerSourceManifestVersion:
-            value.controllerSourceManifestVersion
-        }),
+    ...controller.projection,
     providerConfigIdentity: Object.freeze({
       ...value.providerConfigIdentity
     }),
@@ -1241,31 +1265,17 @@ function fileIdentitySetMatches(
 }
 
 function validateGovernancePrivateIdentityReceipt(value) {
+  const controller = validateControllerIdentityReceipt(
+    value, 'stack_governance_private_receipt_invalid'
+  );
   const governancePid = parsePid(value?.governancePid);
-  const controllerKeys = value?.schemaVersion === 2
-    ? [
-        'controllerSourceManifestDigest',
-        'controllerSourceManifestVersion'
-      ]
-    : ['controllerSourceCommit'];
   if (!exactKeys(value, [
-    ...controllerKeys,
+    ...controller.keys,
     'governancePid',
     'governanceProcessStartTicks',
     'privateFileIdentities',
     'schemaVersion'
   ]) ||
-      ![1, 2].includes(value.schemaVersion) ||
-      (value.schemaVersion === 1 &&
-        !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '')) ||
-      (value.schemaVersion === 2 &&
-        (
-          value.controllerSourceManifestVersion !==
-            MANIFEST_SCHEMA_VERSION ||
-          !SAFE_SHA256_DIGEST.test(
-            value.controllerSourceManifestDigest || ''
-          )
-        )) ||
       governancePid === null ||
       value.governancePid !== governancePid ||
       !/^[1-9][0-9]{0,39}$/u.test(
@@ -1279,14 +1289,7 @@ function validateGovernancePrivateIdentityReceipt(value) {
     throw codedError('stack_governance_private_receipt_invalid');
   }
   return Object.freeze({
-    ...(value.schemaVersion === 1
-      ? { controllerSourceCommit: value.controllerSourceCommit }
-      : {
-          controllerSourceManifestDigest:
-            value.controllerSourceManifestDigest,
-          controllerSourceManifestVersion:
-            value.controllerSourceManifestVersion
-        }),
+    ...controller.projection,
     governancePid,
     governanceProcessStartTicks: value.governanceProcessStartTicks,
     privateFileIdentities: Object.freeze(Object.fromEntries(
@@ -1362,31 +1365,17 @@ function governanceCredentialFreshnessMatches({
 }
 
 function validateRelaySecretIdentityReceipt(value) {
+  const controller = validateControllerIdentityReceipt(
+    value, 'stack_relay_secret_receipt_invalid'
+  );
   const relayPid = parsePid(value?.relayPid);
-  const controllerKeys = value?.schemaVersion === 2
-    ? [
-        'controllerSourceManifestDigest',
-        'controllerSourceManifestVersion'
-      ]
-    : ['controllerSourceCommit'];
   if (!exactKeys(value, [
-    ...controllerKeys,
+    ...controller.keys,
     'relayPid',
     'relayProcessStartTicks',
     'schemaVersion',
     'secretFileIdentities'
   ]) ||
-      ![1, 2].includes(value.schemaVersion) ||
-      (value.schemaVersion === 1 &&
-        !SAFE_GIT_OBJECT.test(value.controllerSourceCommit || '')) ||
-      (value.schemaVersion === 2 &&
-        (
-          value.controllerSourceManifestVersion !==
-            MANIFEST_SCHEMA_VERSION ||
-          !SAFE_SHA256_DIGEST.test(
-            value.controllerSourceManifestDigest || ''
-          )
-        )) ||
       relayPid === null ||
       value.relayPid !== relayPid ||
       !/^[1-9][0-9]{0,39}$/u.test(
@@ -1399,14 +1388,7 @@ function validateRelaySecretIdentityReceipt(value) {
     throw codedError('stack_relay_secret_receipt_invalid');
   }
   return Object.freeze({
-    ...(value.schemaVersion === 1
-      ? { controllerSourceCommit: value.controllerSourceCommit }
-      : {
-          controllerSourceManifestDigest:
-            value.controllerSourceManifestDigest,
-          controllerSourceManifestVersion:
-            value.controllerSourceManifestVersion
-        }),
+    ...controller.projection,
     relayPid,
     relayProcessStartTicks: value.relayProcessStartTicks,
     schemaVersion: value.schemaVersion,
@@ -6502,12 +6484,21 @@ function childControllerProfileFields() {
   const adoptedRepositoryHead = schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
     ? process.env.CODEX_MEMORY_STACK_ADOPTED_REPOSITORY_HEAD
     : null;
+  const runtimeBaseline = schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+    ? process.env.CODEX_MEMORY_STACK_RUNTIME_BASELINE
+    : null;
+  const runtimeBuildManifestDigest =
+    schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+      ? process.env.CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_DIGEST
+      : null;
   if (![PROFILE_SCHEMA_VERSION, IMAGE_PROFILE_SCHEMA_VERSION]
       .includes(schemaVersion) ||
       controllerSourceManifestVersion !== MANIFEST_SCHEMA_VERSION ||
       !SAFE_SHA256_DIGEST.test(controllerSourceManifestDigest || '') ||
       (schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION &&
-        !SAFE_GIT_OBJECT.test(adoptedRepositoryHead || ''))) {
+        (!SAFE_GIT_OBJECT.test(adoptedRepositoryHead || '') ||
+          !SAFE_GIT_OBJECT.test(runtimeBaseline || '') ||
+          !SAFE_SHA256_DIGEST.test(runtimeBuildManifestDigest || '')))) {
     throw codedError('stack_child_controller_identity_invalid');
   }
   return Object.freeze({
@@ -6516,6 +6507,9 @@ function childControllerProfileFields() {
       : gitText(['rev-parse', 'HEAD^{commit}']),
     controllerSourceManifestDigest,
     controllerSourceManifestVersion,
+    ...(schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+      ? { runtimeBaseline, runtimeBuildManifestDigest }
+      : {}),
     schemaVersion
   });
 }
@@ -7368,6 +7362,7 @@ module.exports = {
   prepareStaleOwnerSocket,
   privateReferencePath,
   processEnvironmentExactlyMatches,
+  profileControllerIdentityReceipt,
   processOwnsLoopbackTcpListener,
   processOwnsUnixListener,
   profileHttpEndpoint,
