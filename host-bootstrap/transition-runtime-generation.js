@@ -11,6 +11,7 @@
 //
 //   verify OLD pair
 //   -> verify NEW candidate pair
+//   -> prepare missing ephemeral receipt mount placeholders
 //   -> durable PREPARED journal
 //   -> preserve OLD authority bytes + OLD bundle bytes
 //   -> publish NEW bundle (exact 7-file topology, atomically per file)
@@ -49,6 +50,7 @@ const {
 } = require('../src/runtime/native-image/runtime-authority');
 const {
   dockerInspect: hostDockerInspect,
+  prepareEphemeralReceiptMountSources,
   requireLifecycleLock
 } = require('../deploy/native-runtime/host-launcher');
 
@@ -829,6 +831,7 @@ function executeTransition({
   journalRoot = JOURNAL_ROOT,
   dockerInspect,
   execFile,
+  prepareReceiptMountSources = prepareEphemeralReceiptMountSources,
   node = ADMITTED_NODE,
   launcher = INSTALLED_LAUNCHER,
   randomBytes = crypto.randomBytes,
@@ -893,6 +896,16 @@ function executeTransition({
     edgeContainerId: newPair.candidate.edgeContainerId,
     providerContainerId: newPair.candidate.providerContainerId
   });
+
+  // Receipt mount sources live under /run and may be absent after a fresh
+  // host boot. Bootstrap them only in execute mode, after every read-only
+  // generation/lifecycle precheck and while the CLI holds the lifecycle lock.
+  // Candidate mode never reaches this function. The canonical helper is
+  // idempotent, preserves existing receipt files byte/inode-exactly, rejects
+  // unsafe paths and refuses to create a missing source for an active Runtime.
+  // This is an ephemeral prerequisite, so it deliberately precedes PREPARED:
+  // a partial bootstrap cannot imply that generation mutation began.
+  prepareReceiptMountSources(newPair.candidate, { fsModule });
 
   // 3) Durable PREPARED journal + backups.
   const id = transactionId(randomBytes);
@@ -1078,6 +1091,7 @@ function main(argv = process.argv.slice(2), deps = {}) {
     execFile: deps.execFile,
     node: deps.node || ADMITTED_NODE,
     launcher: deps.launcher || INSTALLED_LAUNCHER,
+    prepareReceiptMountSources: deps.prepareReceiptMountSources,
     randomBytes: deps.randomBytes,
     verifyAfter: deps.verifyAfter !== false
   });

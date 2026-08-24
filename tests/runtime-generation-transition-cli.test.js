@@ -46,6 +46,9 @@ const {
   nativeClosureDigest
 } = require('../src/runtime/native-image/native-closure');
 const T = require('../host-bootstrap/transition-runtime-generation');
+const {
+  EPHEMERAL_RECEIPT_PLACEHOLDER_SCHEMA
+} = require('../deploy/native-runtime/host-launcher');
 
 const S = value => `sha256:${String(value).repeat(64).slice(0, 64)}`;
 const C = value => String(value).repeat(40).slice(0, 40);
@@ -534,6 +537,12 @@ test('production CLI: candidate mode real entrypoint without DI', t => {
   assert.equal(parsed.accepted, true);
   assert.equal(parsed.action, 'generation_transition_candidate');
   assert.equal(parsed.mutation, false);
+  assert.equal(fs.existsSync(path.join(
+    world.backing, 'run/codex-memory/edge-receipt.json'
+  )), false);
+  assert.equal(fs.existsSync(path.join(
+    world.backing, 'run/codex-memory/provider-receipt.json'
+  )), false);
 });
 
 test('production CLI: execute mode real entrypoint without DI survives lifecycle-lock re-entry', t => {
@@ -559,6 +568,15 @@ test('production CLI: execute mode real entrypoint without DI survives lifecycle
     .find(entry => entry && entry.action === 'generation_transition_committed');
   assert.ok(committed, `no committed result in stdout: ${result.stdout}`);
   assert.equal(committed.accepted, true);
+  for (const name of ['edge-receipt.json', 'provider-receipt.json']) {
+    const receipt = JSON.parse(fs.readFileSync(path.join(
+      world.backing, 'run/codex-memory', name
+    ), 'utf8'));
+    assert.deepEqual(receipt, {
+      placeholder: true,
+      schemaVersion: EPHEMERAL_RECEIPT_PLACEHOLDER_SCHEMA
+    });
+  }
 });
 
 test('production CLI: docker path injection rejected through real entrypoint', t => {
