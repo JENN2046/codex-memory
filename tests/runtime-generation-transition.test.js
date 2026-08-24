@@ -296,6 +296,7 @@ function setupWorld(t, {
   const stagedRoot = path.join(backing, 'staged-bundle');
   writeBundle(stagedRoot, newBundleContent);
   const newBundleDigest = T.stagedBundleDigest(stagedRoot, { fsModule: sandbox });
+  const newCandidatePath = '/etc/codex-memory/bootstrap/new/runtime-authority.json';
   const newRuntime = runtimeInspect(NEW_RUNTIME_ID, NEW_IMAGE_ID,
     newRuntimeRunning ? { State: { Running: true } } : {});
   const next = {
@@ -314,6 +315,7 @@ function setupWorld(t, {
       vcpCommit: C('dd'),
       runtimeMountSources: {
         ...authorityBase().runtimeMountSources,
+        authority: newCandidatePath,
         profile: '/etc/codex-memory/bootstrap/new/profile-v7.json',
         runtimeDirectory: '/var/lib/codex-memory/runtime-new'
       }
@@ -326,9 +328,9 @@ function setupWorld(t, {
     { expectedCurrentFingerprint: digest(oldProfile) }
   ).nextProfile;
   next.profileSha256 = sha256Buffer(Buffer.from(canonicalJson(newProfile)));
-  const newCandidatePath = path.join(backing, 'etc/codex-memory/bootstrap/new/candidate.json');
-  fs.mkdirSync(path.dirname(newCandidatePath), { recursive: true, mode: 0o700 });
-  fs.writeFileSync(newCandidatePath, canonicalJson(next), { mode: 0o600 });
+  const newCandidateBackingPath = path.join(backing, newCandidatePath.replace(/^\//, ''));
+  fs.mkdirSync(path.dirname(newCandidateBackingPath), { recursive: true, mode: 0o700 });
+  fs.writeFileSync(newCandidateBackingPath, canonicalJson(next), { mode: 0o600 });
   const newProfilePath = path.join(backing, next.profilePath.replace(/^\//, ''));
   fs.mkdirSync(path.dirname(newProfilePath), { recursive: true, mode: 0o700 });
   fs.writeFileSync(newProfilePath, canonicalJson(newProfile), { mode: 0o644 });
@@ -377,6 +379,8 @@ function makeFakeExecFile(world, {
     const command = argv[1];
     const authorityFile = argv[2].split('=')[1];
     if (command === 'activate') {
+      assert.equal(authorityFile, world.newCandidatePath,
+        'forward activation must use the admitted materialized /etc authority');
       if (activateShouldFail) throw new Error('activation failure injected');
       const candidate = JSON.parse(sandbox.readFileSync(authorityFile, 'utf8'));
       if (T.installedBundleDigest({ fsModule: sandbox }) !== candidate.hostLauncherDigest) {
@@ -387,7 +391,8 @@ function makeFakeExecFile(world, {
           sandbox.readFileSync(authorityFile), { mode: 0o644 });
       }
       return JSON.stringify({ accepted: true, action: 'authority_activated',
-        authorityDigest: digest(validateAuthorityRecord(candidate)) });
+        authorityDigest: digest(validateAuthorityRecord(candidate)),
+        runtimeContainerId: candidate.expectedRuntimeContainerId });
     }
     if (command === 'verify') {
       verifyCalls += 1;
@@ -442,6 +447,20 @@ test('transition candidate mode accepts a coherent OLD->NEW pair with zero mutat
   assert.equal(digest(authority), world.oldAuthorityDigest);
   assert.equal(T.installedBundleDigest({ fsModule: world.sandbox }), world.oldBundleDigest);
   assert.equal(fs.existsSync(path.join(world.journalRoot)), false);
+});
+
+test('transition rejects an activation candidate outside the authority-bound /etc path', t => {
+  const world = setupWorld(t);
+  const journalCandidate = '/var/lib/codex-memory/generation-transition/new-authority.json';
+  world.sandbox.mkdirSync(path.dirname(journalCandidate), { recursive: true, mode: 0o700 });
+  world.sandbox.writeFileSync(journalCandidate,
+    world.sandbox.readFileSync(world.newCandidatePath), { mode: 0o600 });
+  expectCode(
+    () => T.candidateTransition(transitionOptions(world, {
+      newAuthorityCandidate: journalCandidate
+    })),
+    'generation_transition_new_authority_activation_path_invalid'
+  );
 });
 
 test('execute precheck failure cannot bootstrap receipt mount sources', t => {
@@ -743,6 +762,73 @@ test('transition execute commits NEW+NEW and leaves a COMMITTED journal', t => {
   const journal = journalFor(world, result.transactionId);
   assert.equal(journal.state, 'COMMITTED');
   assert.equal(journal.transactionId, result.transactionId);
+  const journalCandidate = path.join(
+    world.journalRoot, result.transactionId, 'new-authority.json'
+  );
+  assert.deepEqual(
+    world.sandbox.readFileSync(journalCandidate),
+    world.sandbox.readFileSync(world.newCandidatePath),
+    'journal evidence must preserve the exact admitted authority bytes'
+  );
+});
+
+test('transition detects materialized authority drift before launcher activation', t => {
+  const world = setupWorld(t);
+  let activationCalled = false;
+  const prepareReceiptMountSources = authority => {
+    world.sandbox.writeFileSync(world.newCandidatePath,
+      canonicalJson({ ...authority, codexMemoryCommit: C('ef') }), { mode: 0o600 });
+    return { created: [], preserved: [] };
+  };
+  const launcher = makeFakeExecFile(world);
+  const options = transitionOptions(world, {
+    execFile: (...args) => {
+      if (args[1][1] === 'activate') activationCalled = true;
+      return launcher(...args);
+    },
+    prepareReceiptMountSources,
+    randomBytes: () => Buffer.from('aaaaaaaaaaaaaaaaaaaaaaaa', 'hex')
+  });
+  expectCode(
+    () => T.executeTransition(options),
+    'generation_transition_new_authority_activation_source_drift'
+  );
+  assert.equal(activationCalled, false);
+  assertCoherentPair(world);
+  assert.equal(journalFor(world, 'aaaaaaaaaaaaaaaaaaaaaaaa').state, 'ROLLED_BACK');
+});
+
+test('transition rejects authority substituted after parent byte comparison', t => {
+  const { world, options } = executeWorld(t);
+  const launcher = options.execFile;
+  let substituted = false;
+  options.execFile = (...args) => {
+    if (!substituted && args[1][1] === 'activate') {
+      substituted = true;
+      world.sandbox.writeFileSync(world.newCandidatePath, canonicalJson({
+        ...world.next,
+        codexMemoryCommit: C('ef')
+      }), { mode: 0o600 });
+    }
+    return launcher(...args);
+  };
+  expectCode(
+    () => T.executeTransition(options),
+    'generation_transition_authority_activation_result_mismatch'
+  );
+  assert.equal(substituted, true);
+  assertCoherentPair(world);
+  assert.equal(journalFor(world, 'aaaaaaaaaaaaaaaaaaaaaaaa').state, 'ROLLED_BACK');
+});
+
+test('transition proves the installed control authority before COMMITTED', t => {
+  const { world, options } = executeWorld(t, { activateShouldSkipWrite: true });
+  expectCode(
+    () => T.executeTransition({ ...options, verifyAfter: false }),
+    'generation_transition_active_authority_result_mismatch'
+  );
+  assertCoherentPair(world);
+  assert.equal(journalFor(world, 'aaaaaaaaaaaaaaaaaaaaaaaa').state, 'ROLLED_BACK');
 });
 
 test('partial receipt bootstrap failure is cleaned before an idempotent retry', t => {

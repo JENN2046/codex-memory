@@ -15,7 +15,7 @@
 //   -> durable PREPARED journal
 //   -> preserve OLD authority bytes + OLD bundle bytes
 //   -> publish NEW bundle (exact 7-file topology, atomically per file)
-//   -> invoke NEW INSTALLED launcher activate NEW authority
+//   -> invoke NEW INSTALLED launcher with the verified materialized NEW authority
 //   -> NEW installed launcher verifies NEW active authority
 //   -> durable COMMITTED journal
 //
@@ -397,6 +397,18 @@ function verifyNewCandidate({
   if (digest(candidate) !== newAuthorityDigest) {
     fail('generation_transition_new_authority_digest_mismatch');
   }
+  // Activation is deliberately narrower than general candidate-file input:
+  // the installed launcher accepts authority material only from its fixed
+  // /etc/codex-memory/ trust surface. Require the admitted candidate path to
+  // be that authority's own exact mount-source binding, not a journal copy or
+  // another byte-equivalent file chosen by the transition caller.
+  const activationAuthorityPath = candidate?.runtimeMountSources?.authority;
+  if (typeof activationAuthorityPath !== 'string' ||
+      path.resolve(activationAuthorityPath) !== activationAuthorityPath ||
+      !activationAuthorityPath.startsWith('/etc/codex-memory/') ||
+      path.resolve(newAuthorityCandidate) !== activationAuthorityPath) {
+    fail('generation_transition_new_authority_activation_path_invalid');
+  }
   const candidateBundleDigest = stagedBundleDigest(newBundleRoot, { fsModule });
   if (candidateBundleDigest !== newBundleDigest) {
     fail('generation_transition_new_bundle_digest_mismatch');
@@ -422,7 +434,7 @@ function verifyNewCandidate({
     validateImageProfile(profile, profileAuthorityComponents(candidate));
   } catch { fail('generation_transition_new_profile_authority_mismatch'); }
   return Object.freeze({ candidate, candidateBytes: bytes,
-    candidateBundleDigest });
+    candidateBundleDigest, activationAuthorityPath });
 }
 
 function verifyLifecycle({
@@ -826,7 +838,8 @@ function rollbackToCoherentPair({
   journalRoot = JOURNAL_ROOT,
   execFile,
   node = ADMITTED_NODE,
-  launcher = INSTALLED_LAUNCHER
+  launcher = INSTALLED_LAUNCHER,
+  forceOldPairRollback = false
 } = {}) {
   const pair = actualPairState({ fsModule });
   const newPair = pair.bundleDigest === newBundleDigest &&
@@ -838,7 +851,18 @@ function rollbackToCoherentPair({
   const oldPair = pair.bundleDigest === oldBundleDigest &&
     pair.authorityDigest === oldAuthorityDigest;
 
-  if (newPair) {
+  if (forceOldPairRollback) {
+    // An activation identity mismatch means the child may have installed
+    // bytes other than the admitted candidate. Do not treat even an observed
+    // NEW+NEW pair as committed on this path. Restoration is authorized only
+    // while the installed bundle is still the exact bundle published by this
+    // transaction; every other unknown bundle state remains fail-closed.
+    if (pair.bundleDigest !== newBundleDigest) fail(RECOVERY_UNKNOWN);
+    verifyOldAuthorityBackup(transactionId, oldAuthorityDigest, { fsModule, journalRoot });
+    verifyOldBundleBackup(transactionId, oldBundleDigest, { fsModule, journalRoot });
+    restoreOldBundle(transactionId, { fsModule, journalRoot, expectedDigest: oldBundleDigest });
+    restoreOldAuthority(transactionId, { fsModule, journalRoot, expectedDigest: oldAuthorityDigest });
+  } else if (newPair) {
     // Case A / Case B: NEW+NEW. Verify reality; if it verifies, the transaction
     // already committed and must not be destroyed by a late journal write.
     try {
@@ -1010,7 +1034,8 @@ function executeTransition({
   }, { fsModule, journalRoot });
   backupOldPair(oldPair.authority, id, { fsModule, journalRoot });
 
-  // 4) Publish NEW bundle, stage candidate, activate, verify, commit.
+  // 4) Publish NEW bundle, preserve a journal copy, revalidate the exact
+  // materialized /etc authority bytes, activate, verify, commit.
   try {
     publishNewBundle(newBundleRoot, { fsModule });
     writeJournal(id, 'BUNDLE_PUBLISHED', {
@@ -1022,12 +1047,24 @@ function executeTransition({
       fsModule, uid: 0, gid: 0, mode: 0o600
     });
 
-    const activated = invokeInstalledLauncher('activate', stagedAuthority, {
+    // The journal copy is recovery evidence, not an activation input. Re-read
+    // the admitted materialized authority immediately before launcher handoff
+    // and fail closed if its bytes moved after candidate verification.
+    const activationBytes = readRootFile(newPair.activationAuthorityPath, { fsModule });
+    if (!activationBytes.equals(newPair.candidateBytes)) {
+      fail('generation_transition_new_authority_activation_source_drift');
+    }
+    const activated = invokeInstalledLauncher('activate', newPair.activationAuthorityPath, {
       execFile, node, launcher,
       env: { CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD: process.env.CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD }
     });
     if (!activated || activated.accepted !== true) {
       fail('generation_transition_authority_activation_failed');
+    }
+    if (activated.action !== 'authority_activated' ||
+        activated.authorityDigest !== newAuthorityDigest ||
+        activated.runtimeContainerId !== newPair.candidate.expectedRuntimeContainerId) {
+      fail('generation_transition_authority_activation_result_mismatch');
     }
     writeJournal(id, 'AUTHORITY_ACTIVATED', {
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
@@ -1041,6 +1078,17 @@ function executeTransition({
         fail('generation_transition_final_verify_failed');
       }
     }
+    // The launcher reopens the materialized path in its own process. Bind the
+    // final transaction state to what was actually installed, not only to the
+    // pre-spawn bytes or the child response. This check is deliberately the
+    // last operation before COMMITTED so later verification cannot create an
+    // unobserved authority drift window.
+    const activeAuthority = readAuthority(CONTROL_AUTHORITY, { fsModule });
+    if (digest(activeAuthority) !== newAuthorityDigest ||
+        activeAuthority.expectedRuntimeContainerId !==
+          newPair.candidate.expectedRuntimeContainerId) {
+      fail('generation_transition_active_authority_result_mismatch');
+    }
     writeJournal(id, 'COMMITTED', {
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
     }, { fsModule, journalRoot });
@@ -1048,7 +1096,10 @@ function executeTransition({
     const outcome = rollbackToCoherentPair({
       transactionId: id,
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest,
-      fsModule, journalRoot, execFile, node, launcher
+      fsModule, journalRoot, execFile, node, launcher,
+      forceOldPairRollback: error?.code ===
+          'generation_transition_authority_activation_result_mismatch' ||
+        error?.code === 'generation_transition_active_authority_result_mismatch'
     });
     if (outcome === 'COMMITTED') {
       return Object.freeze({
