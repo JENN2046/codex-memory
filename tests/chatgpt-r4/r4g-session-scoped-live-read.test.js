@@ -867,7 +867,7 @@ test('R4-G runtime authority binds operator/control references and starts defaul
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4g-authority-'));
   fs.chmodSync(root, 0o700);
   const stateRoot = path.join(root, 'state');
-  const socketRoot = path.join(root, 'run');
+  const socketRoot = path.join(path.dirname(root), `${path.basename(root)}-run`);
   fs.mkdirSync(stateRoot, { mode: 0o700 });
   fs.mkdirSync(socketRoot, { mode: 0o700 });
   const edge = identity('r4g-authority-edge');
@@ -925,7 +925,8 @@ test('R4-G runtime authority binds operator/control references and starts defaul
   environment.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST =
     computeGovernanceRuntimeBindingDigest(environment);
   const runtime = await loadGovernanceRuntimeFromEnvironment(environment, {
-    privateRoot: root
+    privateRoot: root,
+    runtimeSocketRoot: socketRoot
   });
   await runtime.start();
   t.after(async () => {
@@ -966,10 +967,12 @@ test('R4-G runtime authority binds operator/control references and starts defaul
   invalidEnvironment.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST =
     computeGovernanceRuntimeBindingDigest(invalidEnvironment);
   await assert.rejects(loadGovernanceRuntimeFromEnvironment(invalidEnvironment, {
-    privateRoot: root
+    privateRoot: root,
+    runtimeSocketRoot: socketRoot
   }), { code: 'r4_governance_control_socket_path_invalid' });
   assert.equal(DATA_TOOL_NAMES.includes('activate_live_read'), false);
   assert.equal(DATA_TOOL_NAMES.includes('kill_live_read'), false);
+  fs.rmSync(socketRoot, { recursive: true, force: true });
 });
 
 test('R5-A observer records only bounded low-disclosure session outcomes', async () => {

@@ -6,6 +6,7 @@ const net = require('node:net');
 const {
   CONTEXT_VISIBILITIES,
   digestObject,
+  R4ContractError,
   reject
 } = require('../../../packages/chatgpt-r4-contracts');
 const {
@@ -190,7 +191,7 @@ function createSessionActivationControlServer({
       await new Promise((resolve, rejectStart) => {
         const onError = error => {
           server.off('listening', onListening);
-          rejectStart(error);
+          rejectStart(new R4ContractError('r4_governance_control_socket_start_failed'));
         };
         const onListening = () => {
           server.off('error', onError);

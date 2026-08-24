@@ -77,6 +77,7 @@ const {
   processOwnsUnixListener,
   profileControllerIdentityReceipt,
   profileHttpEndpoint,
+  runtimeSocketPaths,
   profileEdgeIdentityMatches,
   profileEdgeLifecycleIdentityMatches,
   profileManagedEnvironmentConfigMatches,
@@ -1691,6 +1692,18 @@ test('controller child environment binds v6 manifest and historical v5 identitie
   );
   assert.equal(imageChild.VCP_ROOT, '/opt/vcptoolbox');
   assert.equal(imageChild.VCPTOOLBOX_ROOT, '/opt/vcptoolbox');
+  const imageSockets = runtimeSocketPaths(environment);
+  assert.equal(imageChild.CODEX_MEMORY_R4_RELAY_UDS_PATH, imageSockets.data);
+  assert.equal(
+    imageChild.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH,
+    imageSockets.control
+  );
+  assert.notEqual(imageSockets.data, imageSockets.control);
+  assert.equal(
+    path.relative(environment.XDG_RUNTIME_DIR, imageSockets.data)
+      .startsWith('..'),
+    false
+  );
   const relayChild = buildControllerChildEnvironment(environmentFile, {
     profile: boundProfile,
     environment,

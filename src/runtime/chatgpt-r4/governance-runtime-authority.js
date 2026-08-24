@@ -222,27 +222,32 @@ function validateLoopbackEndpoint(value) {
   return parsed.href;
 }
 
-function validateOwnedDirectoryWithinRoot(value, root, { statSync = fs.statSync, realpathSync = fs.realpathSync } = {}) {
+function validateOwnedDirectoryWithinRoot(value, root, {
+  statSync = fs.statSync,
+  realpathSync = fs.realpathSync,
+  failureCode = 'r4_governance_state_root'
+} = {}) {
   let resolved;
   let stat;
   try {
     resolved = realpathSync(value);
     stat = statSync(resolved);
   } catch {
-    reject('r4_governance_state_root_unavailable');
+    reject(`${failureCode}_unavailable`);
   }
   const relative = path.relative(root, resolved);
   const currentUid = typeof process.getuid === 'function' ? process.getuid() : null;
   if ((!relative && resolved !== root) || relative.startsWith('..') || path.isAbsolute(relative) ||
       !stat.isDirectory() || (stat.mode & 0o077) !== 0 ||
       (currentUid !== null && stat.uid !== currentUid)) {
-    reject('r4_governance_state_root_security_invalid');
+    reject(`${failureCode}_security_invalid`);
   }
   return resolved;
 }
 
 async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
   privateRoot = environment.CODEX_MEMORY_R4_GOVERNANCE_PRIVATE_ROOT || DEFAULT_PRIVATE_ROOT,
+  runtimeSocketRoot = privateRoot,
   readFileSync = fs.readFileSync,
   statSync = fs.statSync,
   realpathSync = fs.realpathSync,
@@ -254,6 +259,10 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
     reject('r4_governance_live_read_disabled');
   }
   const resolvedPrivateRoot = validatePrivateRoot(privateRoot, { statSync, realpathSync });
+  const resolvedRuntimeSocketRoot = validatePrivateRoot(runtimeSocketRoot, {
+    statSync,
+    realpathSync
+  });
   const readReference = name => readPrivateReference(getEnvironment(environment, name), {
     privateRoot: resolvedPrivateRoot,
     readFileSync,
@@ -321,8 +330,12 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
   const socketPath = getEnvironment(environment, 'CODEX_MEMORY_R4_RELAY_UDS_PATH');
   const socketParent = validateOwnedDirectoryWithinRoot(
     path.dirname(socketPath),
-    resolvedPrivateRoot,
-    { statSync, realpathSync }
+    resolvedRuntimeSocketRoot,
+    {
+      statSync,
+      realpathSync,
+      failureCode: 'r4_governance_socket_path'
+    }
   );
   if (path.dirname(socketPath) !== socketParent) reject('r4_governance_socket_path_invalid');
   let activationController = null;
@@ -351,8 +364,12 @@ async function loadGovernanceRuntimeFromEnvironment(environment = process.env, {
     );
     const controlSocketParent = validateOwnedDirectoryWithinRoot(
       path.dirname(controlSocketPath),
-      resolvedPrivateRoot,
-      { statSync, realpathSync }
+      resolvedRuntimeSocketRoot,
+      {
+        statSync,
+        realpathSync,
+        failureCode: 'r4_governance_control_socket_path'
+      }
     );
     if (path.dirname(controlSocketPath) !== controlSocketParent || controlSocketPath === socketPath) {
       reject('r4_governance_control_socket_path_invalid');
