@@ -391,7 +391,8 @@ function makeFakeExecFile(world, {
           sandbox.readFileSync(authorityFile), { mode: 0o644 });
       }
       return JSON.stringify({ accepted: true, action: 'authority_activated',
-        authorityDigest: digest(validateAuthorityRecord(candidate)) });
+        authorityDigest: digest(validateAuthorityRecord(candidate)),
+        runtimeContainerId: candidate.expectedRuntimeContainerId });
     }
     if (command === 'verify') {
       verifyCalls += 1;
@@ -793,6 +794,39 @@ test('transition detects materialized authority drift before launcher activation
     'generation_transition_new_authority_activation_source_drift'
   );
   assert.equal(activationCalled, false);
+  assertCoherentPair(world);
+  assert.equal(journalFor(world, 'aaaaaaaaaaaaaaaaaaaaaaaa').state, 'ROLLED_BACK');
+});
+
+test('transition rejects authority substituted after parent byte comparison', t => {
+  const { world, options } = executeWorld(t);
+  const launcher = options.execFile;
+  let substituted = false;
+  options.execFile = (...args) => {
+    if (!substituted && args[1][1] === 'activate') {
+      substituted = true;
+      world.sandbox.writeFileSync(world.newCandidatePath, canonicalJson({
+        ...world.next,
+        codexMemoryCommit: C('ef')
+      }), { mode: 0o600 });
+    }
+    return launcher(...args);
+  };
+  expectCode(
+    () => T.executeTransition(options),
+    'generation_transition_authority_activation_result_mismatch'
+  );
+  assert.equal(substituted, true);
+  assertCoherentPair(world);
+  assert.equal(journalFor(world, 'aaaaaaaaaaaaaaaaaaaaaaaa').state, 'ROLLED_BACK');
+});
+
+test('transition proves the installed control authority before COMMITTED', t => {
+  const { world, options } = executeWorld(t, { activateShouldSkipWrite: true });
+  expectCode(
+    () => T.executeTransition({ ...options, verifyAfter: false }),
+    'generation_transition_active_authority_result_mismatch'
+  );
   assertCoherentPair(world);
   assert.equal(journalFor(world, 'aaaaaaaaaaaaaaaaaaaaaaaa').state, 'ROLLED_BACK');
 });

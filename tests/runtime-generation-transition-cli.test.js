@@ -332,7 +332,7 @@ function buildWorld(t) {
 
 // Test-only preload: fakes root, redirects fixed production paths into the
 // backing sandbox, and fakes /usr/bin/docker + the installed launcher.
-function writePreload(backing, dockerRecords) {
+function writePreload(backing, dockerRecords, newAuthorityDigest) {
   const file = path.join(backing, 'cli-preload.js');
   const source = `'use strict';
 const realFs = require('node:fs');
@@ -342,6 +342,9 @@ const BACKING = ${JSON.stringify(backing)};
 const DOCKER_RECORDS = ${JSON.stringify(dockerRecords)};
 const ADMITTED_NODE = ${JSON.stringify(T.ADMITTED_NODE)};
 const LAUNCHER = ${JSON.stringify(T.INSTALLED_LAUNCHER)};
+const CONTROL_AUTHORITY = ${JSON.stringify(T.CONTROL_AUTHORITY)};
+const NEW_AUTHORITY_DIGEST = ${JSON.stringify(newAuthorityDigest)};
+const NEW_RUNTIME_ID = ${JSON.stringify(NEW_RUNTIME_ID)};
 process.getuid = () => 0;
 const FIXED_ROOTS = ['/etc/codex-memory', '/usr/local/lib/codex-memory-native-runtime', '/var/lib/codex-memory', '/run/codex-memory'];
 function translate(target) {
@@ -442,8 +445,16 @@ childProcess.execFileSync = function (file, args, options) {
         '--authority=/etc/codex-memory/bootstrap/new/runtime-authority.json') {
       throw new Error('unexpected activation authority path: ' + argv[2]);
     }
+    if (argv[1] === 'activate') {
+      const authorityFile = argv[2].split('=')[1];
+      origWriteFileSync(
+        translate(CONTROL_AUTHORITY), origReadFileSync(translate(authorityFile)),
+        { mode: 0o644 }
+      );
+    }
     return JSON.stringify(argv[1] === 'activate'
-      ? { accepted: true, action: 'authority_activated', authorityDigest: 'sha256:' + '0'.repeat(64) }
+      ? { accepted: true, action: 'authority_activated',
+          authorityDigest: NEW_AUTHORITY_DIGEST, runtimeContainerId: NEW_RUNTIME_ID }
       : { accepted: true, action: 'verified' });
   }
   return realExecFileSync.apply(this, arguments);
@@ -528,7 +539,9 @@ test('invokeInstalledLauncher rejects invalid and closed lifecycle FDs before sp
 
 test('production CLI: candidate mode real entrypoint without DI', t => {
   const world = buildWorld(t);
-  const preload = writePreload(world.backing, world.dockerRecords);
+  const preload = writePreload(
+    world.backing, world.dockerRecords, world.newAuthorityDigest
+  );
   const args = [
     '--old-authority-digest=' + world.oldAuthorityDigest,
     '--old-bundle-digest=' + world.oldBundleDigest,
@@ -553,7 +566,9 @@ test('production CLI: candidate mode real entrypoint without DI', t => {
 
 test('production CLI: execute mode real entrypoint without DI survives lifecycle-lock re-entry', t => {
   const world = buildWorld(t);
-  const preload = writePreload(world.backing, world.dockerRecords);
+  const preload = writePreload(
+    world.backing, world.dockerRecords, world.newAuthorityDigest
+  );
   const args = [
     '--old-authority-digest=' + world.oldAuthorityDigest,
     '--old-bundle-digest=' + world.oldBundleDigest,
@@ -587,7 +602,9 @@ test('production CLI: execute mode real entrypoint without DI survives lifecycle
 
 test('production CLI: docker path injection rejected through real entrypoint', t => {
   const world = buildWorld(t);
-  const preload = writePreload(world.backing, world.dockerRecords);
+  const preload = writePreload(
+    world.backing, world.dockerRecords, world.newAuthorityDigest
+  );
   const args = [
     '--old-authority-digest=' + world.oldAuthorityDigest,
     '--old-bundle-digest=' + world.oldBundleDigest,

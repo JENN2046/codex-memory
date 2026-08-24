@@ -300,7 +300,9 @@ authority as a single orchestrated transaction:
    evidence, re-read and byte-compare the authority's own admitted,
    root-owned `/etc/codex-memory/...` mount-source path, then pass that exact
    materialized path to the NEW installed launcher's `activate` (the only
-   control-authority write path), followed by its `verify`;
+   control-authority write path), require the returned authority digest and
+   Runtime ID to match the admitted generation, follow with `verify`, and
+   re-read the installed control authority immediately before commit;
 9. write the durable `COMMITTED` journal.
 
 Fixed production targets (install root, authority path, lifecycle lock, Node
