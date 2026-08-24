@@ -131,7 +131,7 @@ function cleanupFailedReceiptBootstrap(files, fsModule) {
       fail('generation_transition_receipt_bootstrap_cleanup_failed');
     }
     if (!pathStat.isFile() || pathStat.isSymbolicLink() ||
-        pathStat.uid !== 0 || pathStat.gid !== 0 || (pathStat.mode & 0o022) !== 0) {
+        pathStat.uid !== 0 || (pathStat.mode & 0o022) !== 0) {
       fail('generation_transition_receipt_bootstrap_cleanup_failed');
     }
     let descriptor;
@@ -146,8 +146,8 @@ function cleanupFailedReceiptBootstrap(files, fsModule) {
     } finally {
       if (descriptor !== undefined) fsModule.closeSync(descriptor);
     }
-    if (!opened.isFile() || opened.uid !== 0 || opened.gid !== 0 ||
-        (opened.mode & 0o022) !== 0 || opened.dev !== pathStat.dev ||
+    if (!opened.isFile() || opened.uid !== 0 || (opened.mode & 0o022) !== 0 ||
+        opened.dev !== pathStat.dev ||
         opened.ino !== pathStat.ino) {
       fail('generation_transition_receipt_bootstrap_cleanup_failed');
     }

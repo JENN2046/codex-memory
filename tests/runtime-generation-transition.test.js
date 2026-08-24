@@ -212,6 +212,8 @@ function derivedProfile(authority) {
 // reports root ownership. Mutation never touches real /etc, /usr/local/lib, or
 // /var/lib.
 function rootSandbox(backingRoot) {
+  let reportedUid = 0;
+  let reportedGid = 0;
   const translate = target => {
     if (target === '/') return backingRoot;
     const absolute = path.resolve(target);
@@ -223,7 +225,7 @@ function rootSandbox(backingRoot) {
     return path.join(backingRoot, absolute.replace(/^\//, ''));
   };
   const owned = stat => ({
-    ...stat, uid: 0, gid: 0,
+    ...stat, uid: reportedUid, gid: reportedGid,
     isFile: stat.isFile.bind(stat),
     isDirectory: stat.isDirectory.bind(stat),
     isSymbolicLink: stat.isSymbolicLink.bind(stat)
@@ -247,6 +249,7 @@ function rootSandbox(backingRoot) {
     realpathSync(target, ...args) { return target; },
     openSync(target, ...args) { return fs.openSync(translate(target), ...args); },
     unlinkSync(target) { return fs.unlinkSync(translate(target)); },
+    setReportedOwnership(uid, gid) { reportedUid = uid; reportedGid = gid; },
     // Root ownership is simulated via stat reporting; the real fchown to uid 0
     // requires privileges this test does not have.
     fchownSync() {}
@@ -808,6 +811,9 @@ test('post-create receipt bootstrap failure removes the verified incomplete inod
       const descriptor = fsModule.openSync(edgeReceipt,
         fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_WRONLY, 0o644);
       fsModule.closeSync(descriptor);
+      // Creation may fail before fchown(0, 0) while UID 0 has a nonzero
+      // effective GID. Cleanup must still identify the exact created inode.
+      fsModule.setReportedOwnership(0, 1000);
       const error = new Error('host_launcher_receipt_bootstrap_create_failed');
       error.code = 'host_launcher_receipt_bootstrap_create_failed';
       throw error;
@@ -828,6 +834,7 @@ test('post-create receipt bootstrap failure removes the verified incomplete inod
 
   expectCode(() => T.executeTransition(options),
     'host_launcher_receipt_bootstrap_create_failed');
+  world.sandbox.setReportedOwnership(0, 0);
   assert.equal(world.sandbox.existsSync(edgeReceipt), false,
     'failed post-create placeholder must be removed before returning');
   assert.equal(T.readJournalEntries({
