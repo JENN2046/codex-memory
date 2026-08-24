@@ -741,7 +741,8 @@ function recoverInterrupted({
       recovered: true,
       state: 'NEW_PAIR',
       action: selection.action,
-      journal
+      journal,
+      authority: pair.authority
     };
   }
   if (newBundleOldAuthority) {
@@ -755,7 +756,8 @@ function recoverInterrupted({
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
     }, { fsModule, journalRoot });
     return {
-      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_bundle', journal
+      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_bundle', journal,
+      authority: pair.authority
     };
   }
   if (oldBundleNewAuthority) {
@@ -787,7 +789,8 @@ function recoverInterrupted({
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
     }, { fsModule, journalRoot });
     return {
-      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_authority', journal
+      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_authority', journal,
+      authority: readAuthority(CONTROL_AUTHORITY, { fsModule })
     };
   }
   fail(RECOVERY_UNKNOWN);
@@ -932,6 +935,9 @@ function executeTransition({
     fsModule, journalRoot
   });
   if (recovery.state === 'NEW_PAIR') {
+    prepareReceiptMountSourcesForTransition(recovery.authority, {
+      fsModule, prepareReceiptMountSources
+    });
     // Already NEW+NEW: verify; if it fails, roll back to OLD+OLD.
     try {
       const verified = invokeInstalledLauncher('verify', CONTROL_AUTHORITY, {
@@ -956,6 +962,9 @@ function executeTransition({
     fail('generation_transition_recovery_new_pair_unverifiable');
   }
   if (recovery.state === 'ROLLED_BACK') {
+    prepareReceiptMountSourcesForTransition(recovery.authority, {
+      fsModule, prepareReceiptMountSources
+    });
     const verified = invokeInstalledLauncher('verify', CONTROL_AUTHORITY, {
       execFile, node, launcher
     });

@@ -331,6 +331,10 @@ sources are never cleanup candidates, missing sources are completed, and an
 active Runtime or unsafe source path fails closed. Candidate-only mode never
 performs this bootstrap. The primitive never starts, stops, creates, or deletes
 containers and never mutates Edge or Provider container state.
+Recovery performs the same execute-only bootstrap before installed-launcher
+verification of a coherent NEW pair or a restored OLD pair, so loss of `/run`
+across a reboot does not force rollback or make an interrupted transaction
+unrecoverable.
 
 ## R1 disposition
 

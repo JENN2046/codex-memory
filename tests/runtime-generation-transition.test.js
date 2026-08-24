@@ -471,7 +471,9 @@ test('production source orders execute-only receipt bootstrap after lifecycle pr
     source.indexOf('function candidateTransition(')
   );
   const lifecycle = executeSource.indexOf('verifyLifecycle({');
-  const bootstrap = executeSource.indexOf('prepareReceiptMountSourcesForTransition(');
+  const bootstrap = executeSource.indexOf(
+    'prepareReceiptMountSourcesForTransition(', lifecycle
+  );
   const prepared = executeSource.indexOf("writeJournal(id, 'PREPARED'");
   assert.equal([lifecycle, bootstrap, prepared].every(index => index !== -1), true);
   assert.equal(lifecycle < bootstrap && bootstrap < prepared, true);
@@ -1140,9 +1142,16 @@ test('transition recovery: two terminal ROLLED_BACK journals remain immutable du
 });
 
 test('transition recovery: NEW+OLD BUNDLE_PUBLISHED restores OLD bundle', t => {
-  const { world, options } = executeWorld(t);
+  let bootstrapCalls = 0;
+  const { world, options } = executeWorld(t, {
+    prepareReceiptMountSources(authority) {
+      bootstrapCalls += 1;
+      assert.equal(authority.expectedRuntimeContainerId, OLD_RUNTIME_ID);
+    }
+  });
   withInterruptedState(world, { bundle: 'new', journalState: 'BUNDLE_PUBLISHED' });
   const result = T.executeTransition(options);
+  assert.equal(bootstrapCalls, 1);
   assert.equal(result.accepted, true);
   assert.equal(result.action, 'rolled_back_before_transaction');
   const state = pairState(world);
@@ -1153,11 +1162,18 @@ test('transition recovery: NEW+OLD BUNDLE_PUBLISHED restores OLD bundle', t => {
 });
 
 test('transition recovery: NEW+NEW BUNDLE_PUBLISHED verifies and commits NEW', t => {
-  const { world, options } = executeWorld(t);
+  let bootstrapCalls = 0;
+  const { world, options } = executeWorld(t, {
+    prepareReceiptMountSources(authority) {
+      bootstrapCalls += 1;
+      assert.equal(authority.expectedRuntimeContainerId, NEW_RUNTIME_ID);
+    }
+  });
   withInterruptedState(world, {
     bundle: 'new', authority: 'new', journalState: 'BUNDLE_PUBLISHED'
   });
   const result = T.executeTransition(options);
+  assert.equal(bootstrapCalls, 1);
   assert.equal(result.accepted, true);
   assert.equal(result.action, 'generation_transition_committed_after_recovery');
   const state = pairState(world);
