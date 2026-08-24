@@ -16,6 +16,7 @@ const {
   EDGE_CONTRACT_STATUS,
   EXACT_HEAD_PROFILE_SCHEMA_VERSION,
   GOVERNED_READ_SHIM_PORT,
+  IMAGE_PROFILE_SCHEMA_VERSION,
   LEGACY_ROLLBACK_MCP_ENDPOINT,
   PROFILE_KEYS,
   PROFILE_SCHEMA_VERSION,
@@ -74,6 +75,7 @@ const {
   processEnvironmentExactlyMatches,
   processOwnsLoopbackTcpListener,
   processOwnsUnixListener,
+  profileControllerIdentityReceipt,
   profileHttpEndpoint,
   profileEdgeIdentityMatches,
   profileEdgeLifecycleIdentityMatches,
@@ -231,6 +233,22 @@ function v5Profile(overrides = {}) {
     ...v5,
     schemaVersion: EXACT_HEAD_PROFILE_SCHEMA_VERSION,
     controllerSourceCommit: V5_CONTROLLER_SOURCE_COMMIT,
+    ...overrides
+  };
+}
+
+function imageProfile(overrides = {}) {
+  return {
+    ...profile(),
+    adoptedRepositoryHead: CONTROLLER_SOURCE_COMMIT,
+    runtimeBaseline: CONTROLLER_SOURCE_COMMIT,
+    runtimeBuildManifestDigest: `sha256:${'91'.repeat(32)}`,
+    schemaVersion: IMAGE_PROFILE_SCHEMA_VERSION,
+    vcpRuntimeBaseline: '9'.repeat(40),
+    vcpRuntimeContractDigest: `sha256:${'92'.repeat(32)}`,
+    vcpRuntimeIdentitySchemaVersion:
+      VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
+    vcpRuntimeRepository: '/opt/vcptoolbox',
     ...overrides
   };
 }
@@ -1645,26 +1663,28 @@ test('controller child environment binds v6 manifest and historical v5 identitie
     child.CODEX_MEMORY_STACK_VCP_RUNTIME_SCOPE_DIGEST,
     boundProfile.vcpRuntimeScopeDigest
   );
-  const imageProfile = {
-    ...boundProfile,
-    adoptedRepositoryHead: CONTROLLER_SOURCE_COMMIT,
-    runtimeBaseline: CONTROLLER_SOURCE_COMMIT,
-    runtimeBuildManifestDigest: `sha256:${'91'.repeat(32)}`,
-    schemaVersion: 7,
-    vcpRuntimeBaseline: '9'.repeat(40),
-    vcpRuntimeContractDigest: `sha256:${'92'.repeat(32)}`,
-    vcpRuntimeIdentitySchemaVersion:
-      VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION,
-    vcpRuntimeRepository: '/opt/vcptoolbox'
-  };
+  const imageBoundProfile = imageProfile({
+    governanceEnvironment: boundProfile.governanceEnvironment,
+    privateRoot: boundProfile.privateRoot,
+    relayEnvironment: boundProfile.relayEnvironment,
+    retainedBinding: boundProfile.retainedBinding
+  });
   const imageChild = buildControllerChildEnvironment(environmentFile, {
-    profile: imageProfile,
+    profile: imageBoundProfile,
     environment
   });
   assert.equal(imageChild.CODEX_MEMORY_CONTAINER_SUPERVISOR, '1');
   assert.equal(imageChild.CODEX_MEMORY_STACK_PROFILE_SCHEMA_VERSION, '7');
+  assert.equal(
+    imageChild.CODEX_MEMORY_STACK_RUNTIME_BASELINE,
+    imageBoundProfile.runtimeBaseline
+  );
+  assert.equal(
+    imageChild.CODEX_MEMORY_RUNTIME_BUILD_MANIFEST_DIGEST,
+    imageBoundProfile.runtimeBuildManifestDigest
+  );
   assert.equal(imageChild.CODEX_MEMORY_STACK_VCP_RUNTIME_CONTRACT_DIGEST,
-    imageProfile.vcpRuntimeContractDigest);
+    imageBoundProfile.vcpRuntimeContractDigest);
   assert.equal(
     imageChild.CODEX_MEMORY_STACK_VCP_RUNTIME_IDENTITY_SCHEMA_VERSION,
     String(VCP_IMAGE_RUNTIME_IDENTITY_SCHEMA_VERSION)
@@ -3307,7 +3327,7 @@ test('VCP provider binding pins model and dimension without pinning the API key'
   );
 });
 
-test('provider key rotation invalidates the running shim without persisting key material', t => {
+test('provider schema-v3 receipt binds image identity and rejects key rotation without disclosure', t => {
   const root = fs.mkdtempSync(path.join(
     os.tmpdir(),
     'codex-memory-stack-provider-freshness-'
@@ -3356,6 +3376,82 @@ test('provider key rotation invalidates the running shim without persisting key 
     }),
     true
   );
+
+  const boundImageProfile = imageProfile();
+  const imageControllerIdentity = profileControllerIdentityReceipt(
+    boundImageProfile
+  );
+  assert.deepEqual(imageControllerIdentity, {
+    controllerSourceCommit: boundImageProfile.runtimeBaseline,
+    runtimeBuildManifestDigest:
+      boundImageProfile.runtimeBuildManifestDigest,
+    schemaVersion: 3
+  });
+  writeProviderConfigIdentityReceipt({
+    ...imageControllerIdentity,
+    providerConfigIdentity: snapshot.fileIdentity,
+    shimPid: process.pid,
+    shimProcessStartTicks: readLinuxProcessStartTicks(process.pid)
+  }, runtimeRoot);
+  const imageReceiptText = fs.readFileSync(
+    path.join(pidDirectory, 'vcp-provider-config.identity.json'),
+    'utf8'
+  );
+  assert.equal(imageReceiptText.includes('synthetic-provider-key-a'), false);
+  assert.equal(imageReceiptText.includes('API_Key'), false);
+  assert.equal(
+    imageReceiptText.includes(boundImageProfile.runtimeBuildManifestDigest),
+    true
+  );
+  assert.equal(
+    providerCredentialFreshnessMatches({
+      profile: boundImageProfile,
+      providerConfigFile,
+      runtimeRoot,
+      shimPid: process.pid
+    }),
+    true
+  );
+  assert.equal(
+    providerCredentialFreshnessMatches({
+      profile: imageProfile({
+        runtimeBuildManifestDigest: `sha256:${'93'.repeat(32)}`
+      }),
+      providerConfigFile,
+      runtimeRoot,
+      shimPid: process.pid
+    }),
+    false
+  );
+  for (const invalidControllerIdentity of [
+    {
+      controllerSourceCommit: boundImageProfile.runtimeBaseline,
+      schemaVersion: 3
+    },
+    {
+      ...imageControllerIdentity,
+      controllerSourceCommit: 'not-a-commit'
+    },
+    {
+      ...imageControllerIdentity,
+      runtimeBuildManifestDigest: 'sha256:not-a-digest'
+    },
+    {
+      ...imageControllerIdentity,
+      controllerSourceManifestDigest: CONTROLLER_SOURCE_MANIFEST_DIGEST
+    },
+    {
+      ...imageControllerIdentity,
+      schemaVersion: 4
+    }
+  ]) {
+    assert.throws(() => writeProviderConfigIdentityReceipt({
+      ...invalidControllerIdentity,
+      providerConfigIdentity: snapshot.fileIdentity,
+      shimPid: process.pid,
+      shimProcessStartTicks: readLinuxProcessStartTicks(process.pid)
+    }, runtimeRoot), { code: 'stack_provider_config_receipt_invalid' });
+  }
 
   writeProviderConfigIdentityReceipt({
     controllerSourceCommit: V5_CONTROLLER_SOURCE_COMMIT,
@@ -3417,7 +3513,7 @@ test('provider key rotation invalidates the running shim without persisting key 
   );
 });
 
-test('Governance private-file rotation invalidates the running process without private disclosure', t => {
+test('Governance schema-v3 receipt binds image identity and rejects private-file rotation', t => {
   const root = fs.mkdtempSync(path.join(
     os.tmpdir(),
     'codex-memory-stack-governance-freshness-'
@@ -3497,6 +3593,55 @@ test('Governance private-file rotation invalidates the running process without p
     true
   );
 
+  const boundImageProfile = imageProfile({ privateRoot });
+  const imageControllerIdentity = profileControllerIdentityReceipt(
+    boundImageProfile
+  );
+  writeGovernancePrivateIdentityReceipt({
+    ...imageControllerIdentity,
+    governancePid: process.pid,
+    governanceProcessStartTicks: readLinuxProcessStartTicks(process.pid),
+    privateFileIdentities: identities
+  }, runtimeRoot);
+  const imageReceiptText = fs.readFileSync(
+    path.join(pidDirectory, 'governance-private-files.identity.json'),
+    'utf8'
+  );
+  assert.equal(imageReceiptText.includes('synthetic-'), false);
+  assert.equal(imageReceiptText.includes(privateRoot), false);
+  assert.equal(
+    imageReceiptText.includes(boundImageProfile.runtimeBuildManifestDigest),
+    true
+  );
+  assert.equal(
+    governanceCredentialFreshnessMatches({
+      governanceEnvironmentFile,
+      governancePid: process.pid,
+      profile: boundImageProfile,
+      runtimeRoot
+    }),
+    true
+  );
+  assert.equal(
+    governanceCredentialFreshnessMatches({
+      governanceEnvironmentFile,
+      governancePid: process.pid,
+      profile: imageProfile({
+        privateRoot,
+        runtimeBuildManifestDigest: `sha256:${'93'.repeat(32)}`
+      }),
+      runtimeRoot
+    }),
+    false
+  );
+  assert.throws(() => writeGovernancePrivateIdentityReceipt({
+    controllerSourceCommit: boundImageProfile.runtimeBaseline,
+    governancePid: process.pid,
+    governanceProcessStartTicks: readLinuxProcessStartTicks(process.pid),
+    privateFileIdentities: identities,
+    schemaVersion: 3
+  }, runtimeRoot), { code: 'stack_governance_private_receipt_invalid' });
+
   fs.writeFileSync(
     files.operatorSubjectFingerprint,
     'rotated-synthetic-operator-fingerprint-material-longer\n',
@@ -3506,14 +3651,14 @@ test('Governance private-file rotation invalidates the running process without p
     governanceCredentialFreshnessMatches({
       governanceEnvironmentFile,
       governancePid: process.pid,
-      profile: boundProfile,
+      profile: boundImageProfile,
       runtimeRoot
     }),
     false
   );
 });
 
-test('Relay secret-file rotation invalidates the running process without secret disclosure', t => {
+test('Relay schema-v3 receipt binds image identity and rejects secret-file rotation', t => {
   const root = fs.mkdtempSync(path.join(
     os.tmpdir(),
     'codex-memory-stack-relay-freshness-'
@@ -3577,6 +3722,55 @@ test('Relay secret-file rotation invalidates the running process without secret 
     true
   );
 
+  const boundImageProfile = imageProfile({ privateRoot });
+  const imageControllerIdentity = profileControllerIdentityReceipt(
+    boundImageProfile
+  );
+  writeRelaySecretIdentityReceipt({
+    ...imageControllerIdentity,
+    relayPid: process.pid,
+    relayProcessStartTicks: readLinuxProcessStartTicks(process.pid),
+    secretFileIdentities: identities
+  }, runtimeRoot);
+  const imageReceiptText = fs.readFileSync(
+    path.join(pidDirectory, 'relay-secret-files.identity.json'),
+    'utf8'
+  );
+  assert.equal(imageReceiptText.includes('synthetic-'), false);
+  assert.equal(imageReceiptText.includes(privateRoot), false);
+  assert.equal(
+    imageReceiptText.includes(boundImageProfile.runtimeBuildManifestDigest),
+    true
+  );
+  assert.equal(
+    relayCredentialFreshnessMatches({
+      profile: boundImageProfile,
+      relayEnvironmentFile,
+      relayPid: process.pid,
+      runtimeRoot
+    }),
+    true
+  );
+  assert.equal(
+    relayCredentialFreshnessMatches({
+      profile: imageProfile({
+        privateRoot,
+        runtimeBuildManifestDigest: `sha256:${'93'.repeat(32)}`
+      }),
+      relayEnvironmentFile,
+      relayPid: process.pid,
+      runtimeRoot
+    }),
+    false
+  );
+  assert.throws(() => writeRelaySecretIdentityReceipt({
+    controllerSourceCommit: boundImageProfile.runtimeBaseline,
+    relayPid: process.pid,
+    relayProcessStartTicks: readLinuxProcessStartTicks(process.pid),
+    schemaVersion: 3,
+    secretFileIdentities: identities
+  }, runtimeRoot), { code: 'stack_relay_secret_receipt_invalid' });
+
   fs.writeFileSync(
     files.relayAuthToken,
     'rotated-synthetic-relay-token-material-longer\n',
@@ -3584,7 +3778,7 @@ test('Relay secret-file rotation invalidates the running process without secret 
   );
   assert.equal(
     relayCredentialFreshnessMatches({
-      profile: boundProfile,
+      profile: boundImageProfile,
       relayEnvironmentFile,
       relayPid: process.pid,
       runtimeRoot
