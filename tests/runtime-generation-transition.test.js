@@ -246,6 +246,7 @@ function rootSandbox(backingRoot) {
     readdirSync(target, ...args) { return fs.readdirSync(translate(target), ...args); },
     realpathSync(target, ...args) { return target; },
     openSync(target, ...args) { return fs.openSync(translate(target), ...args); },
+    unlinkSync(target) { return fs.unlinkSync(translate(target)); },
     // Root ownership is simulated via stat reporting; the real fchown to uid 0
     // requires privileges this test does not have.
     fchownSync() {}
@@ -467,7 +468,7 @@ test('production source orders execute-only receipt bootstrap after lifecycle pr
     source.indexOf('function candidateTransition(')
   );
   const lifecycle = executeSource.indexOf('verifyLifecycle({');
-  const bootstrap = executeSource.indexOf('prepareReceiptMountSources(');
+  const bootstrap = executeSource.indexOf('prepareReceiptMountSourcesForTransition(');
   const prepared = executeSource.indexOf("writeJournal(id, 'PREPARED'");
   assert.equal([lifecycle, bootstrap, prepared].every(index => index !== -1), true);
   assert.equal(lifecycle < bootstrap && bootstrap < prepared, true);
@@ -739,7 +740,7 @@ test('transition execute commits NEW+NEW and leaves a COMMITTED journal', t => {
   assert.equal(journal.transactionId, result.transactionId);
 });
 
-test('partial receipt bootstrap failure creates no generation journal and permits an idempotent retry', t => {
+test('partial receipt bootstrap failure is cleaned before an idempotent retry', t => {
   const world = setupWorld(t);
   const edgeReceipt = world.next.runtimeMountSources.edgeReceipt;
   const providerReceipt = world.next.runtimeMountSources.providerReceipt;
@@ -780,7 +781,7 @@ test('partial receipt bootstrap failure creates no generation journal and permit
 
   expectCode(() => T.executeTransition(options),
     'host_launcher_receipt_bootstrap_create_failed');
-  assert.equal(world.sandbox.existsSync(edgeReceipt), true);
+  assert.equal(world.sandbox.existsSync(edgeReceipt), false);
   assert.equal(world.sandbox.existsSync(providerReceipt), false);
   assert.equal(T.readJournalEntries({
     fsModule: world.sandbox, journalRoot: world.journalRoot
@@ -794,6 +795,48 @@ test('partial receipt bootstrap failure creates no generation journal and permit
   assert.equal(world.sandbox.existsSync(edgeReceipt), true);
   assert.equal(world.sandbox.existsSync(providerReceipt), true);
   assert.equal(journalFor(world, result.transactionId).state, 'COMMITTED');
+});
+
+test('post-create receipt bootstrap failure removes the verified incomplete inode', t => {
+  const world = setupWorld(t);
+  const edgeReceipt = world.next.runtimeMountSources.edgeReceipt;
+  let calls = 0;
+  const prepareReceiptMountSources = (_authority, { fsModule }) => {
+    calls += 1;
+    if (calls === 1) {
+      fsModule.mkdirSync(path.dirname(edgeReceipt), { recursive: true, mode: 0o700 });
+      const descriptor = fsModule.openSync(edgeReceipt,
+        fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_WRONLY, 0o644);
+      fsModule.closeSync(descriptor);
+      const error = new Error('host_launcher_receipt_bootstrap_create_failed');
+      error.code = 'host_launcher_receipt_bootstrap_create_failed';
+      throw error;
+    }
+    for (const file of [edgeReceipt, world.next.runtimeMountSources.providerReceipt]) {
+      fsModule.writeFileSync(file, canonicalJson({
+        placeholder: true,
+        schemaVersion: 'codex-memory-ephemeral-receipt-placeholder/v1'
+      }), { flag: 'wx', mode: 0o644 });
+    }
+    return { created: ['edge', 'provider'], preserved: [] };
+  };
+  const options = transitionOptions(world, {
+    execFile: makeFakeExecFile(world),
+    prepareReceiptMountSources,
+    randomBytes: () => Buffer.from('aaaaaaaaaaaaaaaaaaaaaaaa', 'hex')
+  });
+
+  expectCode(() => T.executeTransition(options),
+    'host_launcher_receipt_bootstrap_create_failed');
+  assert.equal(world.sandbox.existsSync(edgeReceipt), false,
+    'failed post-create placeholder must be removed before returning');
+  assert.equal(T.readJournalEntries({
+    fsModule: world.sandbox, journalRoot: world.journalRoot
+  }).length, 0);
+
+  const result = T.executeTransition(options);
+  assert.equal(result.action, 'generation_transition_committed');
+  assert.equal(world.sandbox.existsSync(edgeReceipt), true);
 });
 
 test('transition failure injection: transient final verify failure commits NEW+NEW', t => {

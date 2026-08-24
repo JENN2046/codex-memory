@@ -105,6 +105,91 @@ function parseBoolean(value) {
   return value === 'true';
 }
 
+function missingReceiptMountSources(authority, fsModule) {
+  const sources = authority?.runtimeMountSources;
+  const paths = [sources?.edgeReceipt, sources?.providerReceipt];
+  if (paths.some(file => typeof file !== 'string' || path.dirname(file) !== '/run/codex-memory')) {
+    fail('generation_transition_receipt_bootstrap_path_invalid');
+  }
+  return paths.filter(file => {
+    try {
+      fsModule.lstatSync(file);
+      return false;
+    } catch (error) {
+      if (error?.code === 'ENOENT') return true;
+      fail('generation_transition_receipt_bootstrap_observe_failed');
+    }
+  });
+}
+
+function cleanupFailedReceiptBootstrap(files, fsModule) {
+  const directories = new Set();
+  for (const file of files) {
+    let pathStat;
+    try { pathStat = fsModule.lstatSync(file); } catch (error) {
+      if (error?.code === 'ENOENT') continue;
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    if (!pathStat.isFile() || pathStat.isSymbolicLink() ||
+        pathStat.uid !== 0 || pathStat.gid !== 0 || (pathStat.mode & 0o022) !== 0) {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    let descriptor;
+    let opened;
+    try {
+      descriptor = fsModule.openSync(
+        file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0)
+      );
+      opened = fsModule.fstatSync(descriptor);
+    } catch {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    } finally {
+      if (descriptor !== undefined) fsModule.closeSync(descriptor);
+    }
+    if (!opened.isFile() || opened.uid !== 0 || opened.gid !== 0 ||
+        (opened.mode & 0o022) !== 0 || opened.dev !== pathStat.dev ||
+        opened.ino !== pathStat.ino) {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    let current;
+    try { current = fsModule.lstatSync(file); } catch {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    if (!current.isFile() || current.isSymbolicLink() ||
+        current.dev !== opened.dev || current.ino !== opened.ino) {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    try { fsModule.unlinkSync(file); } catch {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    directories.add(path.dirname(file));
+  }
+  for (const directory of directories) {
+    let descriptor;
+    try {
+      descriptor = fsModule.openSync(directory, fs.constants.O_RDONLY);
+      fsModule.fsyncSync(descriptor);
+    } catch {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    } finally {
+      if (descriptor !== undefined) fsModule.closeSync(descriptor);
+    }
+  }
+}
+
+function prepareReceiptMountSourcesForTransition(authority, {
+  fsModule = fs,
+  prepareReceiptMountSources = prepareEphemeralReceiptMountSources
+} = {}) {
+  const missingBefore = missingReceiptMountSources(authority, fsModule);
+  try {
+    return prepareReceiptMountSources(authority, { fsModule });
+  } catch (error) {
+    cleanupFailedReceiptBootstrap(missingBefore, fsModule);
+    throw error;
+  }
+}
+
 function regularStat(file, {
   fsModule = fs, uid = 0, gid = 0, mode = undefined, maxBytes = undefined
 } = {}) {
@@ -905,7 +990,9 @@ function executeTransition({
   // unsafe paths and refuses to create a missing source for an active Runtime.
   // This is an ephemeral prerequisite, so it deliberately precedes PREPARED:
   // a partial bootstrap cannot imply that generation mutation began.
-  prepareReceiptMountSources(newPair.candidate, { fsModule });
+  prepareReceiptMountSourcesForTransition(newPair.candidate, {
+    fsModule, prepareReceiptMountSources
+  });
 
   // 3) Durable PREPARED journal + backups.
   const id = transactionId(randomBytes);

@@ -323,11 +323,14 @@ OLD authority from the journal backup and fails closed on unknown states. The
 receipt bootstrap deliberately precedes `PREPARED`: it may create one or both
 root-owned placeholder files even when no generation journal is created. A
 partial bootstrap therefore means ephemeral prerequisite mutation only, not
-that bundle/authority mutation began. Retrying is safe: existing valid receipt
-sources are preserved byte- and inode-exactly, missing sources are completed,
-and an active Runtime or unsafe source path fails closed. Candidate-only mode
-never performs this bootstrap. The primitive never starts, stops, creates, or
-deletes containers and never mutates Edge or Provider container state.
+that bundle/authority mutation began. On a handled helper failure, the
+controller removes only files that were absent before this attempt and still
+match a root-owned, no-follow-opened regular-file inode, then fsyncs the parent;
+an unverifiable cleanup fails closed. Retrying is safe: existing receipt
+sources are never cleanup candidates, missing sources are completed, and an
+active Runtime or unsafe source path fails closed. Candidate-only mode never
+performs this bootstrap. The primitive never starts, stops, creates, or deletes
+containers and never mutates Edge or Provider container state.
 
 ## R1 disposition
 
