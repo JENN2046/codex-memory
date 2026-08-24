@@ -863,6 +863,27 @@ test('R4-G owner-only control UDS supports bounded activate/status/kill and repl
   inflightController.completeRead({ useToken: inflightRead.use_token });
 });
 
+test('R4-G control UDS projects native listen failures to a safe contract code', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4g-uds-error-'));
+  fs.chmodSync(root, 0o700);
+  const socketPath = path.join(root, 'control.sock');
+  fs.writeFileSync(socketPath, 'occupied\n', { mode: 0o600 });
+  const controller = createSessionReadActivationController({
+    expectedPrincipalFingerprint: sha256('r4g-uds-error-owner'),
+    selectedProjectAlias: 'project-alpha'
+  });
+  const server = createSessionActivationControlServer({
+    socketPath,
+    activationController: controller
+  });
+  await assert.rejects(
+    server.start(),
+    { code: 'r4_governance_control_socket_start_failed' }
+  );
+  assert.equal(server.snapshot().started, false);
+  fs.rmSync(root, { recursive: true, force: true });
+});
+
 test('R4-G runtime authority binds operator/control references and starts default-closed', async t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4g-authority-'));
   fs.chmodSync(root, 0o700);

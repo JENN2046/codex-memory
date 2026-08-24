@@ -6476,6 +6476,15 @@ function childPrivateRoot() {
   return assertOwnerOnlyDirectory(process.env.CODEX_MEMORY_STACK_PRIVATE_ROOT || '');
 }
 
+function governanceSocketRootForSchema(schemaVersion, {
+  privateRoot,
+  runtimeRoot
+} = {}) {
+  return schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+    ? runtimeRoot
+    : privateRoot;
+}
+
 function assertChildMode() {
   if (process.env.CODEX_MEMORY_STACK_CHILD !== '1') {
     throw codedError('stack_child_mode_not_authorized');
@@ -6753,6 +6762,10 @@ async function runGovernanceChild() {
   const {
     loadGovernanceRuntimeFromEnvironment
   } = require('../src/runtime/chatgpt-r4/governance-runtime-authority');
+  const runtimeSocketRoot = governanceSocketRootForSchema(
+    childProfileSchemaVersion(process.env),
+    { privateRoot, runtimeRoot }
+  );
   const prepared = await preparePrivateRuntimeEnvironment({
     baseEnvironment: process.env,
     isolatedShimTarget: {
@@ -6783,7 +6796,7 @@ async function runGovernanceChild() {
   }
   const runtime = await loadGovernanceRuntimeFromEnvironment(
     prepared.private_environment,
-    { privateRoot, runtimeSocketRoot: runtimeRoot }
+    { privateRoot, runtimeSocketRoot }
   );
   const privateFileIdentitiesAfter = governancePrivateFileIdentities(
     prepared.private_environment,
@@ -6994,8 +7007,16 @@ async function probeRelayChild() {
 
 async function prepareGovernanceSocketsChild() {
   assertChildMode();
-  const socketRoot = process.env.CODEX_MEMORY_STACK_RUNTIME_DIR ||
-    runtimeDirectory(process.env);
+  const privateRoot = childPrivateRoot();
+  const schemaVersion = childProfileSchemaVersion(process.env);
+  const socketRoot = governanceSocketRootForSchema(schemaVersion, {
+    privateRoot,
+    runtimeRoot: schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+      ? assertOwnerOnlyDirectory(
+        process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
+      )
+      : null
+  });
   const dataSocket = process.env.CODEX_MEMORY_R4_RELAY_UDS_PATH;
   const controlSocket = process.env.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH;
   if (dataSocket === controlSocket) {
@@ -7337,6 +7358,7 @@ module.exports = {
   childBaseEnvironment,
   childHttpEndpoint,
   childProfileSchemaVersion,
+  governanceSocketRootForSchema,
   classifyManagedCommandShape,
   commandMatchesComponent,
   computeRuntimeAccepted,
