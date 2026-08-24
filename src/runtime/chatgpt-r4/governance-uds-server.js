@@ -11,6 +11,7 @@ const {
   contextResolutionDeadlineBudgetMs,
   governedReadAttemptDeadlineBudgetMs,
   validateGovernedContextResolutionWorkingSet,
+  R4ContractError,
   reject
 } = require('../../../packages/chatgpt-r4-contracts');
 
@@ -224,7 +225,7 @@ function createGovernanceUdsServer({
       await new Promise((resolve, rejectStart) => {
         const onError = error => {
           server.off('listening', onListening);
-          rejectStart(error);
+          rejectStart(new R4ContractError('r4_governance_uds_start_failed'));
         };
         const onListening = () => {
           server.off('error', onError);

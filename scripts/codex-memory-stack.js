@@ -621,6 +621,14 @@ function runtimeDirectory(environment = process.env) {
   return path.resolve(root, RUNTIME_DIRECTORY_NAME);
 }
 
+function runtimeSocketPaths(environment = process.env) {
+  const root = runtimeDirectory(environment);
+  return Object.freeze({
+    data: path.join(root, 'governance-data.sock'),
+    control: path.join(root, 'governance-control.sock')
+  });
+}
+
 function assertOwnerOnlyDirectory(directory, {
   create = false,
   fsModule = fs
@@ -4500,6 +4508,9 @@ function buildControllerChildEnvironment(environmentFile, {
         profile.runtimeBaseline;
       childEnvironment.VCP_ROOT = IMAGE_VCP_ROOT;
       childEnvironment.VCPTOOLBOX_ROOT = IMAGE_VCP_ROOT;
+      const sockets = runtimeSocketPaths(environment);
+      childEnvironment.CODEX_MEMORY_R4_RELAY_UDS_PATH = sockets.data;
+      childEnvironment.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH = sockets.control;
     }
   } else if (profile.schemaVersion === EXACT_HEAD_PROFILE_SCHEMA_VERSION) {
     childEnvironment.CODEX_MEMORY_STACK_CONTROLLER_SOURCE_COMMIT =
@@ -6465,6 +6476,15 @@ function childPrivateRoot() {
   return assertOwnerOnlyDirectory(process.env.CODEX_MEMORY_STACK_PRIVATE_ROOT || '');
 }
 
+function governanceSocketRootForSchema(schemaVersion, {
+  privateRoot,
+  runtimeRoot
+} = {}) {
+  return schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+    ? runtimeRoot
+    : privateRoot;
+}
+
 function assertChildMode() {
   if (process.env.CODEX_MEMORY_STACK_CHILD !== '1') {
     throw codedError('stack_child_mode_not_authorized');
@@ -6742,6 +6762,10 @@ async function runGovernanceChild() {
   const {
     loadGovernanceRuntimeFromEnvironment
   } = require('../src/runtime/chatgpt-r4/governance-runtime-authority');
+  const runtimeSocketRoot = governanceSocketRootForSchema(
+    childProfileSchemaVersion(process.env),
+    { privateRoot, runtimeRoot }
+  );
   const prepared = await preparePrivateRuntimeEnvironment({
     baseEnvironment: process.env,
     isolatedShimTarget: {
@@ -6772,7 +6796,7 @@ async function runGovernanceChild() {
   }
   const runtime = await loadGovernanceRuntimeFromEnvironment(
     prepared.private_environment,
-    { privateRoot }
+    { privateRoot, runtimeSocketRoot }
   );
   const privateFileIdentitiesAfter = governancePrivateFileIdentities(
     prepared.private_environment,
@@ -6984,13 +7008,22 @@ async function probeRelayChild() {
 async function prepareGovernanceSocketsChild() {
   assertChildMode();
   const privateRoot = childPrivateRoot();
+  const schemaVersion = childProfileSchemaVersion(process.env);
+  const socketRoot = governanceSocketRootForSchema(schemaVersion, {
+    privateRoot,
+    runtimeRoot: schemaVersion === IMAGE_PROFILE_SCHEMA_VERSION
+      ? assertOwnerOnlyDirectory(
+        process.env.CODEX_MEMORY_STACK_RUNTIME_DIR || ''
+      )
+      : null
+  });
   const dataSocket = process.env.CODEX_MEMORY_R4_RELAY_UDS_PATH;
   const controlSocket = process.env.CODEX_MEMORY_R4_SESSION_CONTROL_UDS_PATH;
   if (dataSocket === controlSocket) {
     throw codedError('stack_governance_socket_paths_reused');
   }
-  const controlCleaned = await prepareStaleOwnerSocket(controlSocket, privateRoot);
-  const dataCleaned = await prepareStaleOwnerSocket(dataSocket, privateRoot);
+  const controlCleaned = await prepareStaleOwnerSocket(controlSocket, socketRoot);
+  const dataCleaned = await prepareStaleOwnerSocket(dataSocket, socketRoot);
   process.stdout.write(`${JSON.stringify({
     accepted: true,
     staleControlSocketRemoved: controlCleaned,
@@ -7325,6 +7358,7 @@ module.exports = {
   childBaseEnvironment,
   childHttpEndpoint,
   childProfileSchemaVersion,
+  governanceSocketRootForSchema,
   classifyManagedCommandShape,
   commandMatchesComponent,
   computeRuntimeAccepted,
@@ -7366,6 +7400,7 @@ module.exports = {
   processOwnsLoopbackTcpListener,
   processOwnsUnixListener,
   profileHttpEndpoint,
+  runtimeSocketPaths,
   profileEdgeIdentityMatches,
   profileEdgeLifecycleIdentityMatches,
   profileManagedEnvironmentConfigMatches,

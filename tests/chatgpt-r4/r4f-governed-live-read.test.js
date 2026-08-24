@@ -1016,11 +1016,28 @@ test('R4-F UDS closes a bound listener when owner-only chmod fails', async () =>
   fs.rmSync(root, { recursive: true, force: true });
 });
 
+test('R4-F UDS projects native listen failures to a safe contract code', async () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4f-uds-error-'));
+  fs.chmodSync(root, 0o700);
+  const socketPath = path.join(root, 'governance.sock');
+  fs.writeFileSync(socketPath, 'occupied\n', { mode: 0o600 });
+  const server = createGovernanceUdsServer({
+    socketPath,
+    governanceRuntime: { async handle() { return { accepted: true }; } }
+  });
+  await assert.rejects(
+    server.start(),
+    { code: 'r4_governance_uds_start_failed' }
+  );
+  assert.equal(server.snapshot().started, false);
+  fs.rmSync(root, { recursive: true, force: true });
+});
+
 test('R4-F runtime authority is default-off and loads only owner-only exact bindings', async t => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'codex-memory-r4f-authority-'));
   fs.chmodSync(root, 0o700);
   const stateRoot = path.join(root, 'state');
-  const socketRoot = path.join(root, 'run');
+  const socketRoot = path.join(path.dirname(root), `${path.basename(root)}-run`);
   fs.mkdirSync(stateRoot, { mode: 0o700 });
   fs.mkdirSync(socketRoot, { mode: 0o700 });
   const edge = identity('r4f-authority-edge');
@@ -1074,20 +1091,25 @@ test('R4-F runtime authority is default-off and loads only owner-only exact bind
   await assert.rejects(loadGovernanceRuntimeFromEnvironment({
     ...environment,
     CODEX_MEMORY_R4_GOVERNANCE_LIVE_READ_ENABLED: 'false'
-  }, { privateRoot: root }), { code: 'r4_governance_live_read_disabled' });
+  }, { privateRoot: root, runtimeSocketRoot: socketRoot }), { code: 'r4_governance_live_read_disabled' });
 
   await assert.rejects(loadGovernanceRuntimeFromEnvironment({
     ...environment,
     CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST: sha256('mismatched-r4f-binding')
-  }, { privateRoot: root }), { code: 'r4_governance_binding_digest_mismatch' });
+  }, { privateRoot: root, runtimeSocketRoot: socketRoot }), { code: 'r4_governance_binding_digest_mismatch' });
 
   await assert.rejects(loadGovernanceRuntimeFromEnvironment({
     ...environment,
     CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST: sha256('mismatched-r4f-mapping')
-  }, { privateRoot: root }), { code: 'r4_governance_expected_binding_mismatch' });
+  }, { privateRoot: root, runtimeSocketRoot: socketRoot }), { code: 'r4_governance_expected_binding_mismatch' });
+
+  await assert.rejects(loadGovernanceRuntimeFromEnvironment(environment, {
+    privateRoot: root
+  }), { code: 'r4_governance_socket_path_security_invalid' });
 
   const runtime = await loadGovernanceRuntimeFromEnvironment(environment, {
-    privateRoot: root
+    privateRoot: root,
+    runtimeSocketRoot: socketRoot
   });
   await runtime.start();
   assert.equal(runtime.snapshot().mode, COUNTER_MODES.governedLiveReadV1);
@@ -1107,9 +1129,11 @@ test('R4-F runtime authority is default-off and loads only owner-only exact bind
   ipv6Environment.CODEX_MEMORY_R4_GOVERNANCE_BINDING_DIGEST =
     computeGovernanceRuntimeBindingDigest(ipv6Environment);
   const ipv6Runtime = await loadGovernanceRuntimeFromEnvironment(ipv6Environment, {
-    privateRoot: root
+    privateRoot: root,
+    runtimeSocketRoot: socketRoot
   });
   await ipv6Runtime.start();
   await ipv6Runtime.stop();
   fs.rmSync(root, { recursive: true, force: true });
+  fs.rmSync(socketRoot, { recursive: true, force: true });
 });
