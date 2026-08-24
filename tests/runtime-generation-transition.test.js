@@ -655,6 +655,12 @@ function assertCoherentPair(world) {
   );
 }
 
+function journalFor(world, transactionId) {
+  return T.readJournalEntries({
+    fsModule: world.sandbox, journalRoot: world.journalRoot
+  }).find(journal => journal.transactionId === transactionId);
+}
+
 test('transition execute commits NEW+NEW and leaves a COMMITTED journal', t => {
   const { world, options } = executeWorld(t);
   const result = T.executeTransition(options);
@@ -663,7 +669,7 @@ test('transition execute commits NEW+NEW and leaves a COMMITTED journal', t => {
   assert.equal(result.transactionId, 'aaaaaaaaaaaaaaaaaaaaaaaa');
   const state = pairState(world);
   assert.ok(state.bundleNew && state.authorityNew);
-  const journal = T.readLatestJournal({ fsModule: world.sandbox, journalRoot: world.journalRoot });
+  const journal = journalFor(world, result.transactionId);
   assert.equal(journal.state, 'COMMITTED');
   assert.equal(journal.transactionId, result.transactionId);
 });
@@ -677,7 +683,7 @@ test('transition failure injection: transient final verify failure commits NEW+N
   const state = pairState(world);
   assert.ok(state.bundleNew && state.authorityNew, 'verified NEW+NEW must commit after failure');
   assertCoherentPair(world);
-  const journal = T.readLatestJournal({ fsModule: world.sandbox, journalRoot: world.journalRoot });
+  const journal = journalFor(world, result.transactionId);
   assert.equal(journal.state, 'COMMITTED');
 });
 
@@ -690,7 +696,7 @@ test('transition failure injection: persistent final verify failure rolls back t
   const state = pairState(world);
   assert.ok(state.bundleOld && state.authorityOld, 'unverifiable NEW+NEW must roll back to OLD+OLD');
   assertCoherentPair(world);
-  const journal = T.readLatestJournal({ fsModule: world.sandbox, journalRoot: world.journalRoot });
+  const journal = journalFor(world, 'aaaaaaaaaaaaaaaaaaaaaaaa');
   assert.equal(journal.state, 'ROLLED_BACK');
 });
 
@@ -719,7 +725,7 @@ test('transition failure injection: COMMITTED journal write failure keeps NEW+NE
   const state = pairState(world);
   assert.ok(state.bundleNew && state.authorityNew);
   assertCoherentPair(world);
-  const journal = T.readLatestJournal({ fsModule: world.sandbox, journalRoot: world.journalRoot });
+  const journal = journalFor(world, 'aaaaaaaaaaaaaaaaaaaaaaaa');
   assert.equal(journal.state, 'COMMITTED');
 });
 
@@ -731,24 +737,25 @@ test('transition failure injection: activation failure rolls back to OLD+OLD', t
   );
   assert.equal(T.installedBundleDigest({ fsModule: world.sandbox }), world.oldBundleDigest);
   assertCoherentPair(world);
-  const journal = T.readLatestJournal({ fsModule: world.sandbox, journalRoot: world.journalRoot });
+  const journal = journalFor(world, 'aaaaaaaaaaaaaaaaaaaaaaaa');
   assert.equal(journal.state, 'ROLLED_BACK');
 });
 
 // ===========================================================================
 // Interrupted-state recovery matrix (fixture-constructed, no real kill)
 // ===========================================================================
-// Fixture transaction ids use '0'*24 so the real transaction ('a'*24 from the
-// injected randomBytes) sorts later and wins readLatestJournal after a commit.
+// Fixture transaction ids are intentionally independent of the real
+// transaction id; recovery selection must use transition digests, not ID order.
 const FIXTURE_TID = '0'.repeat(24);
 
 function withInterruptedState(world, {
   bundle = 'old',
   authority = 'old',
-  journalState = 'PREPARED'
+  journalState = 'PREPARED',
+  transactionId = FIXTURE_TID
 } = {}) {
   const journalRoot = world.journalRoot;
-  const backupRoot = path.join(journalRoot, FIXTURE_TID);
+  const backupRoot = path.join(journalRoot, transactionId);
   const oldRoot = path.join(world.backing, T.INSTALLED_BUNDLE_ROOT.replace(/^\//, ''));
   fs.mkdirSync(path.join(backupRoot, 'old-bundle'), { recursive: true, mode: 0o700 });
   for (const rel of T.BUNDLE_FILES) {
@@ -761,7 +768,7 @@ function withInterruptedState(world, {
     canonicalJson(world.oldAuthority), { mode: 0o600 });
   const journal = {
     schemaVersion: T.JOURNAL_SCHEMA,
-    transactionId: FIXTURE_TID,
+    transactionId,
     state: journalState,
     updatedAt: new Date().toISOString(),
     oldAuthorityDigest: world.oldAuthorityDigest,
@@ -769,7 +776,7 @@ function withInterruptedState(world, {
     newAuthorityDigest: world.newAuthorityDigest,
     newBundleDigest: world.newBundleDigest
   };
-  fs.writeFileSync(path.join(journalRoot, `${FIXTURE_TID}.json`),
+  fs.writeFileSync(path.join(journalRoot, `${transactionId}.json`),
     canonicalJson(journal), { mode: 0o600 });
 
   const installedRoot = path.join(world.backing, T.INSTALLED_BUNDLE_ROOT.replace(/^\//, ''));
@@ -787,17 +794,154 @@ function withInterruptedState(world, {
   }
 }
 
-test('transition recovery: OLD+OLD PREPARED needs no restore and commits NEW+NEW', t => {
+function writeSelectionJournal(world, transactionId, state, overrides = {}) {
+  fs.mkdirSync(world.journalRoot, { recursive: true, mode: 0o700 });
+  fs.writeFileSync(path.join(world.journalRoot, `${transactionId}.json`), canonicalJson({
+    schemaVersion: T.JOURNAL_SCHEMA,
+    transactionId,
+    state,
+    updatedAt: new Date().toISOString(),
+    oldAuthorityDigest: world.oldAuthorityDigest,
+    oldBundleDigest: world.oldBundleDigest,
+    newAuthorityDigest: world.newAuthorityDigest,
+    newBundleDigest: world.newBundleDigest,
+    ...overrides
+  }), { mode: 0o600 });
+}
+
+function selectFixture(world, pair, records) {
+  for (const record of records) {
+    writeSelectionJournal(world, record.transactionId, record.state, record.overrides);
+  }
+  return T.selectRecoveryJournal({
+    oldAuthorityDigest: world.oldAuthorityDigest,
+    oldBundleDigest: world.oldBundleDigest,
+    newAuthorityDigest: world.newAuthorityDigest,
+    newBundleDigest: world.newBundleDigest,
+    pair,
+    fsModule: world.sandbox,
+    journalRoot: world.journalRoot
+  });
+}
+
+test('recovery journal selection is digest- and actual-pair-aware across multiple journals', t => {
+  const cases = [
+    {
+      name: 'larger rolled back does not beat smaller mixed bundle publication',
+      pair: world => ({ bundleDigest: world.newBundleDigest, authorityDigest: world.oldAuthorityDigest }),
+      records: [
+        { transactionId: 'f'.repeat(24), state: 'ROLLED_BACK' },
+        { transactionId: '0'.repeat(24), state: 'BUNDLE_PUBLISHED' }
+      ],
+      expected: { state: 'MIXED_PAIR', action: 'rollback', transactionId: '0'.repeat(24) }
+    },
+    {
+      name: 'larger rolled back does not beat smaller mixed authority activation',
+      pair: world => ({ bundleDigest: world.oldBundleDigest, authorityDigest: world.newAuthorityDigest }),
+      records: [
+        { transactionId: 'f'.repeat(24), state: 'ROLLED_BACK' },
+        { transactionId: '0'.repeat(24), state: 'AUTHORITY_ACTIVATED' }
+      ],
+      expected: { state: 'MIXED_PAIR', action: 'rollback', transactionId: '0'.repeat(24) }
+    },
+    {
+      name: 'larger rolled back does not beat smaller NEW pair journal',
+      pair: world => ({ bundleDigest: world.newBundleDigest, authorityDigest: world.newAuthorityDigest }),
+      records: [
+        { transactionId: 'f'.repeat(24), state: 'ROLLED_BACK' },
+        { transactionId: '0'.repeat(24), state: 'AUTHORITY_ACTIVATED' }
+      ],
+      expected: { state: 'NEW_PAIR', action: 'verify_or_commit', transactionId: '0'.repeat(24) }
+    },
+    {
+      name: 'unrelated terminal journal cannot shadow matching current journal',
+      pair: world => ({ bundleDigest: world.newBundleDigest, authorityDigest: world.oldAuthorityDigest }),
+      records: [
+        { transactionId: 'f'.repeat(24), state: 'COMMITTED', overrides: {
+          newBundleDigest: 'sha256:' + '9'.repeat(64)
+        } },
+        { transactionId: '0'.repeat(24), state: 'BUNDLE_PUBLISHED' }
+      ],
+      expected: { state: 'MIXED_PAIR', action: 'rollback', transactionId: '0'.repeat(24) }
+    },
+    {
+      name: 'OLD pair ignores terminal history and permits clean retry',
+      pair: world => ({ bundleDigest: world.oldBundleDigest, authorityDigest: world.oldAuthorityDigest }),
+      records: [{ transactionId: 'f'.repeat(24), state: 'ROLLED_BACK' }],
+      expected: { state: 'OLD_PAIR', action: 'none', transactionId: null }
+    },
+    {
+      name: 'matching committed journal is recognized without rewrite',
+      pair: world => ({ bundleDigest: world.newBundleDigest, authorityDigest: world.newAuthorityDigest }),
+      records: [{ transactionId: '0'.repeat(24), state: 'COMMITTED' }],
+      expected: { state: 'NEW_PAIR', action: 'already_committed', transactionId: '0'.repeat(24) }
+    }
+  ];
+
+  for (const scenario of cases) {
+    const world = setupWorld(t);
+    const selection = selectFixture(world, scenario.pair(world), scenario.records);
+    assert.equal(selection.state, scenario.expected.state, scenario.name);
+    assert.equal(selection.action, scenario.expected.action, scenario.name);
+    assert.equal(selection.journal?.transactionId ?? null, scenario.expected.transactionId, scenario.name);
+  }
+
+  {
+    const world = setupWorld(t);
+    writeSelectionJournal(world, '0'.repeat(24), 'BUNDLE_PUBLISHED');
+    writeSelectionJournal(world, '1'.repeat(24), 'AUTHORITY_ACTIVATED');
+    expectCode(() => T.selectRecoveryJournal({
+      oldAuthorityDigest: world.oldAuthorityDigest,
+      oldBundleDigest: world.oldBundleDigest,
+      newAuthorityDigest: world.newAuthorityDigest,
+      newBundleDigest: world.newBundleDigest,
+      pair: { bundleDigest: world.newBundleDigest, authorityDigest: world.oldAuthorityDigest },
+      fsModule: world.sandbox, journalRoot: world.journalRoot
+    }), 'generation_transition_recovery_journal_ambiguous');
+  }
+
+  {
+    const world = setupWorld(t);
+    writeSelectionJournal(world, '0'.repeat(24), 'BUNDLE_PUBLISHED', {
+      newBundleDigest: 'sha256:' + '9'.repeat(64)
+    });
+    expectCode(() => T.selectRecoveryJournal({
+      oldAuthorityDigest: world.oldAuthorityDigest,
+      oldBundleDigest: world.oldBundleDigest,
+      newAuthorityDigest: world.newAuthorityDigest,
+      newBundleDigest: world.newBundleDigest,
+      pair: { bundleDigest: world.newBundleDigest, authorityDigest: world.oldAuthorityDigest },
+      fsModule: world.sandbox, journalRoot: world.journalRoot
+    }), 'generation_transition_recovery_state_invalid');
+  }
+
+  {
+    const world = setupWorld(t);
+    fs.mkdirSync(world.journalRoot, { recursive: true, mode: 0o700 });
+    fs.writeFileSync(path.join(world.journalRoot, `${'0'.repeat(24)}.json`), '{broken');
+    expectCode(() => T.selectRecoveryJournal({
+      oldAuthorityDigest: world.oldAuthorityDigest,
+      oldBundleDigest: world.oldBundleDigest,
+      newAuthorityDigest: world.newAuthorityDigest,
+      newBundleDigest: world.newBundleDigest,
+      pair: { bundleDigest: world.newBundleDigest, authorityDigest: world.oldAuthorityDigest },
+      fsModule: world.sandbox, journalRoot: world.journalRoot
+    }), 'generation_transition_journal_invalid');
+  }
+});
+
+test('transition recovery: OLD+OLD terminal history permits a clean NEW+NEW retry', t => {
   const { world, options } = executeWorld(t);
-  withInterruptedState(world, { journalState: 'PREPARED' });
+  withInterruptedState(world, { journalState: 'ROLLED_BACK' });
   const result = T.executeTransition(options);
   assert.equal(result.accepted, true);
   assert.equal(result.action, 'generation_transition_committed');
   const state = pairState(world);
   assert.ok(state.bundleNew && state.authorityNew);
   assertCoherentPair(world);
-  const journal = T.readLatestJournal({ fsModule: world.sandbox, journalRoot: world.journalRoot });
-  assert.equal(journal.state, 'COMMITTED');
+  const historicalJournal = journalFor(world, FIXTURE_TID);
+  assert.equal(historicalJournal.state, 'ROLLED_BACK');
+  assert.equal(journalFor(world, result.transactionId).state, 'COMMITTED');
 });
 
 test('transition recovery: NEW+OLD BUNDLE_PUBLISHED restores OLD bundle', t => {
@@ -809,7 +953,7 @@ test('transition recovery: NEW+OLD BUNDLE_PUBLISHED restores OLD bundle', t => {
   const state = pairState(world);
   assert.ok(state.bundleOld && state.authorityOld, 'interrupted NEW+OLD must restore OLD+OLD');
   assertCoherentPair(world);
-  const journal = T.readLatestJournal({ fsModule: world.sandbox, journalRoot: world.journalRoot });
+  const journal = journalFor(world, FIXTURE_TID);
   assert.equal(journal.state, 'ROLLED_BACK');
 });
 
@@ -824,7 +968,7 @@ test('transition recovery: NEW+NEW BUNDLE_PUBLISHED verifies and commits NEW', t
   const state = pairState(world);
   assert.ok(state.bundleNew && state.authorityNew);
   assertCoherentPair(world);
-  const journal = T.readLatestJournal({ fsModule: world.sandbox, journalRoot: world.journalRoot });
+  const journal = journalFor(world, FIXTURE_TID);
   assert.equal(journal.state, 'COMMITTED');
 });
 
@@ -837,7 +981,7 @@ test('transition recovery: OLD+NEW AUTHORITY_ACTIVATED restores OLD authority', 
   const state = pairState(world);
   assert.ok(state.bundleOld && state.authorityOld, 'interrupted OLD+NEW must restore OLD+OLD');
   assertCoherentPair(world);
-  const journal = T.readLatestJournal({ fsModule: world.sandbox, journalRoot: world.journalRoot });
+  const journal = journalFor(world, FIXTURE_TID);
   assert.equal(journal.state, 'ROLLED_BACK');
 });
 

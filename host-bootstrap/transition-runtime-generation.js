@@ -384,27 +384,87 @@ function writeJournal(transactionId, state, fields, {
   return value;
 }
 
-function readLatestJournal({ fsModule = fs, journalRoot = JOURNAL_ROOT } = {}) {
+function readJournalEntries({ fsModule = fs, journalRoot = JOURNAL_ROOT } = {}) {
   let entries;
   try {
     entries = fsModule.readdirSync(journalRoot, { withFileTypes: true });
   } catch { return null; }
-  const journals = entries
+  const journalFiles = entries
     .filter(entry => entry.isFile() && /^[a-f0-9]{24}\.json$/u.test(entry.name))
-    .map(entry => entry.name)
-    .sort();
-  if (journals.length === 0) return null;
-  const latest = journals[journals.length - 1];
-  try {
-    const value = JSON.parse(fsModule.readFileSync(
-      path.join(journalRoot, latest), 'utf8'
-    ));
+    .map(entry => entry.name);
+  const journals = [];
+  for (const file of journalFiles) {
+    let value;
+    try {
+      value = JSON.parse(fsModule.readFileSync(path.join(journalRoot, file), 'utf8'));
+    } catch { fail('generation_transition_journal_invalid'); }
+    const transactionId = path.basename(file, '.json');
     if (value?.schemaVersion !== JOURNAL_SCHEMA ||
-        !JOURNAL_STATES.includes(value?.state)) {
+        value?.transactionId !== transactionId ||
+        !JOURNAL_STATES.includes(value?.state) ||
+        !isSha256(value?.oldAuthorityDigest) ||
+        !isSha256(value?.oldBundleDigest) ||
+        !isSha256(value?.newAuthorityDigest) ||
+        !isSha256(value?.newBundleDigest) ||
+        typeof value?.updatedAt !== 'string') {
       fail('generation_transition_journal_invalid');
     }
-    return value;
-  } catch { fail('generation_transition_journal_invalid'); }
+    journals.push(value);
+  }
+  return journals;
+}
+
+function selectRecoveryJournal({
+  oldAuthorityDigest,
+  oldBundleDigest,
+  newAuthorityDigest,
+  newBundleDigest,
+  pair,
+  fsModule = fs,
+  journalRoot = JOURNAL_ROOT
+} = {}) {
+  const journals = readJournalEntries({ fsModule, journalRoot }) || [];
+  const oldPair = pair.bundleDigest === oldBundleDigest &&
+    pair.authorityDigest === oldAuthorityDigest;
+  const newBundleOldAuthority = pair.bundleDigest === newBundleDigest &&
+    pair.authorityDigest === oldAuthorityDigest;
+  const newPair = pair.bundleDigest === newBundleDigest &&
+    pair.authorityDigest === newAuthorityDigest;
+  const oldBundleNewAuthority = pair.bundleDigest === oldBundleDigest &&
+    pair.authorityDigest === newAuthorityDigest;
+
+  if (oldPair) return { state: 'OLD_PAIR', action: 'none', journal: null };
+
+  const matching = journals.filter(journal =>
+    journal.oldAuthorityDigest === oldAuthorityDigest &&
+    journal.oldBundleDigest === oldBundleDigest &&
+    journal.newAuthorityDigest === newAuthorityDigest &&
+    journal.newBundleDigest === newBundleDigest
+  );
+  const nonTerminal = matching.filter(journal => journal.state !== 'COMMITTED' &&
+    journal.state !== 'ROLLED_BACK');
+  const committed = matching.filter(journal => journal.state === 'COMMITTED');
+
+  if (newBundleOldAuthority || oldBundleNewAuthority) {
+    if (nonTerminal.length > 1) {
+      fail('generation_transition_recovery_journal_ambiguous');
+    }
+    if (nonTerminal.length === 0) fail(RECOVERY_UNKNOWN);
+    return { state: 'MIXED_PAIR', action: 'rollback', journal: nonTerminal[0] };
+  }
+  if (newPair) {
+    if (nonTerminal.length > 1 || committed.length > 1) {
+      fail('generation_transition_recovery_journal_ambiguous');
+    }
+    if (nonTerminal.length === 1) {
+      return { state: 'NEW_PAIR', action: 'verify_or_commit', journal: nonTerminal[0] };
+    }
+    if (committed.length === 1) {
+      return { state: 'NEW_PAIR', action: 'already_committed', journal: committed[0] };
+    }
+    fail(RECOVERY_UNKNOWN);
+  }
+  fail(RECOVERY_UNKNOWN);
 }
 
 // ---------------------------------------------------------------------------
@@ -568,8 +628,12 @@ function recoverInterrupted({
   fsModule = fs,
   journalRoot = JOURNAL_ROOT
 } = {}) {
-  const journal = readLatestJournal({ fsModule, journalRoot });
   const pair = actualPairState({ fsModule });
+  const selection = selectRecoveryJournal({
+    oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest,
+    pair, fsModule, journalRoot
+  });
+  const journal = selection.journal;
   const oldPair = pair.bundleDigest === oldBundleDigest &&
     pair.authorityDigest === oldAuthorityDigest;
   const newBundleOldAuthority = pair.bundleDigest === newBundleDigest &&
@@ -586,7 +650,12 @@ function recoverInterrupted({
   }
   if (newPair) {
     // NEW+NEW: verify below; if verification fails, caller rolls back.
-    return { recovered: true, state: 'NEW_PAIR', action: 'verify_or_rollback' };
+    return {
+      recovered: true,
+      state: 'NEW_PAIR',
+      action: selection.action,
+      journal
+    };
   }
   if (newBundleOldAuthority) {
     // Incomplete: restore OLD bundle -> OLD+OLD.
@@ -598,7 +667,9 @@ function recoverInterrupted({
     writeJournal(journal.transactionId, 'ROLLED_BACK', {
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
     }, { fsModule, journalRoot });
-    return { recovered: true, state: 'ROLLED_BACK', action: 'restored_old_bundle' };
+    return {
+      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_bundle', journal
+    };
   }
   if (oldBundleNewAuthority) {
     // Incomplete: authority switched but bundle restored already -> restore
@@ -628,7 +699,9 @@ function recoverInterrupted({
     writeJournal(journal.transactionId, 'ROLLED_BACK', {
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
     }, { fsModule, journalRoot });
-    return { recovered: true, state: 'ROLLED_BACK', action: 'restored_old_authority' };
+    return {
+      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_authority', journal
+    };
   }
   fail(RECOVERY_UNKNOWN);
 }
@@ -777,9 +850,8 @@ function executeTransition({
         execFile, node, launcher
       });
       if (verified?.accepted === true) {
-        const journal = readLatestJournal({ fsModule, journalRoot });
-        if (journal && journal.state !== 'COMMITTED') {
-          writeJournal(journal.transactionId, 'COMMITTED', {
+        if (recovery.action !== 'already_committed') {
+          writeJournal(recovery.journal.transactionId, 'COMMITTED', {
             oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
           }, { fsModule, journalRoot });
         }
@@ -788,9 +860,8 @@ function executeTransition({
           oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest });
       }
     } catch { /* fall through to rollback */ }
-    const journal = readLatestJournal({ fsModule, journalRoot });
     rollbackToCoherentPair({
-      transactionId: journal?.transactionId,
+      transactionId: recovery.journal?.transactionId,
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest,
       fsModule, journalRoot, execFile, node, launcher
     });
@@ -1062,7 +1133,8 @@ module.exports = {
   parseArguments,
   publishNewBundle,
   readAuthority,
-  readLatestJournal,
+  readJournalEntries,
+  selectRecoveryJournal,
   recoverInterrupted,
   restoreOldAuthority,
   restoreOldBundle,
