@@ -212,6 +212,8 @@ function derivedProfile(authority) {
 // reports root ownership. Mutation never touches real /etc, /usr/local/lib, or
 // /var/lib.
 function rootSandbox(backingRoot) {
+  let reportedUid = 0;
+  let reportedGid = 0;
   const translate = target => {
     if (target === '/') return backingRoot;
     const absolute = path.resolve(target);
@@ -223,7 +225,7 @@ function rootSandbox(backingRoot) {
     return path.join(backingRoot, absolute.replace(/^\//, ''));
   };
   const owned = stat => ({
-    ...stat, uid: 0, gid: 0,
+    ...stat, uid: reportedUid, gid: reportedGid,
     isFile: stat.isFile.bind(stat),
     isDirectory: stat.isDirectory.bind(stat),
     isSymbolicLink: stat.isSymbolicLink.bind(stat)
@@ -246,6 +248,8 @@ function rootSandbox(backingRoot) {
     readdirSync(target, ...args) { return fs.readdirSync(translate(target), ...args); },
     realpathSync(target, ...args) { return target; },
     openSync(target, ...args) { return fs.openSync(translate(target), ...args); },
+    unlinkSync(target) { return fs.unlinkSync(translate(target)); },
+    setReportedOwnership(uid, gid) { reportedUid = uid; reportedGid = gid; },
     // Root ownership is simulated via stat reporting; the real fchown to uid 0
     // requires privileges this test does not have.
     fchownSync() {}
@@ -420,7 +424,10 @@ function transitionOptions(world, extra = {}) {
 // ===========================================================================
 test('transition candidate mode accepts a coherent OLD->NEW pair with zero mutation', t => {
   const world = setupWorld(t);
-  const result = T.candidateTransition(transitionOptions(world));
+  let receiptBootstrapCalls = 0;
+  const result = T.candidateTransition(transitionOptions(world, {
+    prepareReceiptMountSources: () => { receiptBootstrapCalls += 1; }
+  }));
   assert.equal(result.accepted, true);
   assert.equal(result.mutation, false);
   assert.equal(result.plannedTransition.oldAuthorityDigest, world.oldAuthorityDigest);
@@ -428,11 +435,54 @@ test('transition candidate mode accepts a coherent OLD->NEW pair with zero mutat
   assert.equal(result.plannedTransition.newAuthorityDigest, world.newAuthorityDigest);
   assert.equal(result.plannedTransition.newBundleDigest, world.newBundleDigest);
   assert.equal(result.plannedTransition.newRuntimeContainerId, NEW_RUNTIME_ID);
+  assert.equal(receiptBootstrapCalls, 0,
+    'candidate mode must never bootstrap receipt mount sources');
   // zero mutation: control authority + installed bundle unchanged.
   const authority = JSON.parse(world.sandbox.readFileSync(T.CONTROL_AUTHORITY, 'utf8'));
   assert.equal(digest(authority), world.oldAuthorityDigest);
   assert.equal(T.installedBundleDigest({ fsModule: world.sandbox }), world.oldBundleDigest);
   assert.equal(fs.existsSync(path.join(world.journalRoot)), false);
+});
+
+test('execute precheck failure cannot bootstrap receipt mount sources', t => {
+  const world = setupWorld(t, { newRuntimeRunning: true });
+  let receiptBootstrapCalls = 0;
+  expectCode(() => T.executeTransition(transitionOptions(world, {
+    prepareReceiptMountSources: () => { receiptBootstrapCalls += 1; }
+  })), 'generation_transition_new_runtime_active');
+  assert.equal(receiptBootstrapCalls, 0);
+  assert.equal(T.readJournalEntries({
+    fsModule: world.sandbox, journalRoot: world.journalRoot
+  }).length, 0);
+});
+
+test('production source orders execute-only receipt bootstrap after lifecycle proof and before PREPARED', () => {
+  const source = fs.readFileSync(require.resolve(
+    '../host-bootstrap/transition-runtime-generation'
+  ), 'utf8');
+  const mainSource = source.slice(source.indexOf('function main('));
+  const lockProof = mainSource.indexOf('requireLifecycleLock(');
+  const transitionDispatch = mainSource.indexOf('return transition({');
+  assert.equal([lockProof, transitionDispatch].every(index => index !== -1), true);
+  assert.equal(lockProof < transitionDispatch, true);
+
+  const executeSource = source.slice(
+    source.indexOf('function executeTransition('),
+    source.indexOf('function candidateTransition(')
+  );
+  const lifecycle = executeSource.indexOf('verifyLifecycle({');
+  const bootstrap = executeSource.indexOf(
+    'prepareReceiptMountSourcesForTransition(', lifecycle
+  );
+  const prepared = executeSource.indexOf("writeJournal(id, 'PREPARED'");
+  assert.equal([lifecycle, bootstrap, prepared].every(index => index !== -1), true);
+  assert.equal(lifecycle < bootstrap && bootstrap < prepared, true);
+
+  const candidateSource = source.slice(
+    source.indexOf('function candidateTransition('),
+    source.indexOf('// ---------------------------------------------------------------------------\n// CLI.')
+  );
+  assert.equal(candidateSource.includes('prepareReceiptMountSources('), false);
 });
 
 // ===========================================================================
@@ -627,8 +677,15 @@ test('transition main rejects lifecycle lock wrong inode', () => {
 // ===========================================================================
 function executeWorld(t, launcherOverrides = {}) {
   const world = setupWorld(t);
+  const {
+    prepareReceiptMountSources = () => Object.freeze({
+      created: Object.freeze([]), preserved: Object.freeze(['edge', 'provider'])
+    }),
+    ...launcherOptions
+  } = launcherOverrides;
   const options = transitionOptions(world, {
-    execFile: makeFakeExecFile(world, launcherOverrides),
+    execFile: makeFakeExecFile(world, launcherOptions),
+    prepareReceiptMountSources,
     randomBytes: () => Buffer.from('aaaaaaaaaaaaaaaaaaaaaaaa', 'hex')
   });
   return { world, options };
@@ -662,8 +719,22 @@ function journalFor(world, transactionId) {
 }
 
 test('transition execute commits NEW+NEW and leaves a COMMITTED journal', t => {
-  const { world, options } = executeWorld(t);
+  let bootstrapCalls = 0;
+  const { world, options } = executeWorld(t, {
+    prepareReceiptMountSources(authority) {
+      bootstrapCalls += 1;
+      assert.equal(authority.expectedRuntimeContainerId, NEW_RUNTIME_ID);
+      assert.equal(T.readJournalEntries({
+        fsModule: world.sandbox, journalRoot: world.journalRoot
+      }).length, 0, 'receipt bootstrap must precede PREPARED');
+      assert.deepEqual(pairState(world), {
+        bundleNew: false, bundleOld: true, authorityNew: false, authorityOld: true
+      });
+      return { created: ['edge', 'provider'], preserved: [] };
+    }
+  });
   const result = T.executeTransition(options);
+  assert.equal(bootstrapCalls, 1);
   assert.equal(result.accepted, true);
   assert.equal(result.action, 'generation_transition_committed');
   assert.equal(result.transactionId, 'aaaaaaaaaaaaaaaaaaaaaaaa');
@@ -672,6 +743,109 @@ test('transition execute commits NEW+NEW and leaves a COMMITTED journal', t => {
   const journal = journalFor(world, result.transactionId);
   assert.equal(journal.state, 'COMMITTED');
   assert.equal(journal.transactionId, result.transactionId);
+});
+
+test('partial receipt bootstrap failure is cleaned before an idempotent retry', t => {
+  const world = setupWorld(t);
+  const edgeReceipt = world.next.runtimeMountSources.edgeReceipt;
+  const providerReceipt = world.next.runtimeMountSources.providerReceipt;
+  let failProviderCreation = true;
+  const prepareReceiptMountSources = (_authority, { fsModule }) => {
+    fsModule.mkdirSync(path.dirname(edgeReceipt), { recursive: true, mode: 0o700 });
+    const created = [];
+    const preserved = [];
+    if (fsModule.existsSync(edgeReceipt)) preserved.push('edge');
+    else {
+      fsModule.writeFileSync(edgeReceipt, canonicalJson({
+        placeholder: true,
+        schemaVersion: 'codex-memory-ephemeral-receipt-placeholder/v1'
+      }), { mode: 0o644 });
+      created.push('edge');
+    }
+    if (failProviderCreation) {
+      failProviderCreation = false;
+      const error = new Error('host_launcher_receipt_bootstrap_create_failed');
+      error.code = 'host_launcher_receipt_bootstrap_create_failed';
+      throw error;
+    }
+    if (fsModule.existsSync(providerReceipt)) preserved.push('provider');
+    else {
+      fsModule.writeFileSync(providerReceipt, canonicalJson({
+        placeholder: true,
+        schemaVersion: 'codex-memory-ephemeral-receipt-placeholder/v1'
+      }), { mode: 0o644 });
+      created.push('provider');
+    }
+    return { created, preserved };
+  };
+  const options = transitionOptions(world, {
+    execFile: makeFakeExecFile(world),
+    prepareReceiptMountSources,
+    randomBytes: () => Buffer.from('aaaaaaaaaaaaaaaaaaaaaaaa', 'hex')
+  });
+
+  expectCode(() => T.executeTransition(options),
+    'host_launcher_receipt_bootstrap_create_failed');
+  assert.equal(world.sandbox.existsSync(edgeReceipt), false);
+  assert.equal(world.sandbox.existsSync(providerReceipt), false);
+  assert.equal(T.readJournalEntries({
+    fsModule: world.sandbox, journalRoot: world.journalRoot
+  }).length, 0);
+  assert.deepEqual(pairState(world), {
+    bundleNew: false, bundleOld: true, authorityNew: false, authorityOld: true
+  });
+
+  const result = T.executeTransition(options);
+  assert.equal(result.action, 'generation_transition_committed');
+  assert.equal(world.sandbox.existsSync(edgeReceipt), true);
+  assert.equal(world.sandbox.existsSync(providerReceipt), true);
+  assert.equal(journalFor(world, result.transactionId).state, 'COMMITTED');
+});
+
+test('post-create receipt bootstrap failure removes the verified incomplete inode', t => {
+  const world = setupWorld(t);
+  const edgeReceipt = world.next.runtimeMountSources.edgeReceipt;
+  let calls = 0;
+  const prepareReceiptMountSources = (_authority, { fsModule }) => {
+    calls += 1;
+    if (calls === 1) {
+      fsModule.mkdirSync(path.dirname(edgeReceipt), { recursive: true, mode: 0o700 });
+      const descriptor = fsModule.openSync(edgeReceipt,
+        fs.constants.O_CREAT | fs.constants.O_EXCL | fs.constants.O_WRONLY, 0o644);
+      fsModule.closeSync(descriptor);
+      // Creation may fail before fchown(0, 0) while UID 0 has a nonzero
+      // effective GID. Cleanup must still identify the exact created inode.
+      fsModule.setReportedOwnership(0, 1000);
+      const error = new Error('host_launcher_receipt_bootstrap_create_failed');
+      error.code = 'host_launcher_receipt_bootstrap_create_failed';
+      throw error;
+    }
+    for (const file of [edgeReceipt, world.next.runtimeMountSources.providerReceipt]) {
+      fsModule.writeFileSync(file, canonicalJson({
+        placeholder: true,
+        schemaVersion: 'codex-memory-ephemeral-receipt-placeholder/v1'
+      }), { flag: 'wx', mode: 0o644 });
+    }
+    return { created: ['edge', 'provider'], preserved: [] };
+  };
+  const options = transitionOptions(world, {
+    execFile: makeFakeExecFile(world),
+    prepareReceiptMountSources,
+    randomBytes: () => Buffer.from('aaaaaaaaaaaaaaaaaaaaaaaa', 'hex')
+  });
+
+  expectCode(() => T.executeTransition(options),
+    'host_launcher_receipt_bootstrap_create_failed');
+  world.sandbox.setReportedOwnership(0, 0);
+  assert.equal(world.sandbox.existsSync(edgeReceipt), false,
+    'failed post-create placeholder must be removed before returning');
+  assert.equal(T.readJournalEntries({
+    fsModule: world.sandbox, journalRoot: world.journalRoot
+  }).length, 0);
+
+  const result = T.executeTransition(options);
+  assert.equal(result.action, 'generation_transition_committed');
+  assert.equal(world.sandbox.existsSync(edgeReceipt), true);
 });
 
 test('transition failure injection: transient final verify failure commits NEW+NEW', t => {
@@ -944,10 +1118,40 @@ test('transition recovery: OLD+OLD terminal history permits a clean NEW+NEW retr
   assert.equal(journalFor(world, result.transactionId).state, 'COMMITTED');
 });
 
-test('transition recovery: NEW+OLD BUNDLE_PUBLISHED restores OLD bundle', t => {
+test('transition recovery: two terminal ROLLED_BACK journals remain immutable during a clean retry', t => {
   const { world, options } = executeWorld(t);
+  const firstId = 'e'.repeat(24);
+  const secondId = 'f'.repeat(24);
+  writeSelectionJournal(world, firstId, 'ROLLED_BACK');
+  writeSelectionJournal(world, secondId, 'ROLLED_BACK');
+  const journalPath = id => path.join(world.journalRoot, `${id}.json`);
+  const before = new Map([firstId, secondId].map(id => [
+    id, world.sandbox.readFileSync(journalPath(id)).toString('hex')
+  ]));
+
+  const result = T.executeTransition(options);
+
+  assert.equal(result.action, 'generation_transition_committed');
+  assert.notEqual(result.transactionId, firstId);
+  assert.notEqual(result.transactionId, secondId);
+  assert.equal(journalFor(world, result.transactionId).state, 'COMMITTED');
+  for (const id of [firstId, secondId]) {
+    assert.equal(journalFor(world, id).state, 'ROLLED_BACK');
+    assert.equal(world.sandbox.readFileSync(journalPath(id)).toString('hex'), before.get(id));
+  }
+});
+
+test('transition recovery: NEW+OLD BUNDLE_PUBLISHED restores OLD bundle', t => {
+  let bootstrapCalls = 0;
+  const { world, options } = executeWorld(t, {
+    prepareReceiptMountSources(authority) {
+      bootstrapCalls += 1;
+      assert.equal(authority.expectedRuntimeContainerId, OLD_RUNTIME_ID);
+    }
+  });
   withInterruptedState(world, { bundle: 'new', journalState: 'BUNDLE_PUBLISHED' });
   const result = T.executeTransition(options);
+  assert.equal(bootstrapCalls, 1);
   assert.equal(result.accepted, true);
   assert.equal(result.action, 'rolled_back_before_transaction');
   const state = pairState(world);
@@ -958,11 +1162,18 @@ test('transition recovery: NEW+OLD BUNDLE_PUBLISHED restores OLD bundle', t => {
 });
 
 test('transition recovery: NEW+NEW BUNDLE_PUBLISHED verifies and commits NEW', t => {
-  const { world, options } = executeWorld(t);
+  let bootstrapCalls = 0;
+  const { world, options } = executeWorld(t, {
+    prepareReceiptMountSources(authority) {
+      bootstrapCalls += 1;
+      assert.equal(authority.expectedRuntimeContainerId, NEW_RUNTIME_ID);
+    }
+  });
   withInterruptedState(world, {
     bundle: 'new', authority: 'new', journalState: 'BUNDLE_PUBLISHED'
   });
   const result = T.executeTransition(options);
+  assert.equal(bootstrapCalls, 1);
   assert.equal(result.accepted, true);
   assert.equal(result.action, 'generation_transition_committed_after_recovery');
   const state = pairState(world);

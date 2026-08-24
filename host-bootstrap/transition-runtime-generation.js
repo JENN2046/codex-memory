@@ -11,6 +11,7 @@
 //
 //   verify OLD pair
 //   -> verify NEW candidate pair
+//   -> prepare missing ephemeral receipt mount placeholders
 //   -> durable PREPARED journal
 //   -> preserve OLD authority bytes + OLD bundle bytes
 //   -> publish NEW bundle (exact 7-file topology, atomically per file)
@@ -49,6 +50,7 @@ const {
 } = require('../src/runtime/native-image/runtime-authority');
 const {
   dockerInspect: hostDockerInspect,
+  prepareEphemeralReceiptMountSources,
   requireLifecycleLock
 } = require('../deploy/native-runtime/host-launcher');
 
@@ -101,6 +103,91 @@ function transactionId(randomBytes = crypto.randomBytes) {
 
 function parseBoolean(value) {
   return value === 'true';
+}
+
+function missingReceiptMountSources(authority, fsModule) {
+  const sources = authority?.runtimeMountSources;
+  const paths = [sources?.edgeReceipt, sources?.providerReceipt];
+  if (paths.some(file => typeof file !== 'string' || path.dirname(file) !== '/run/codex-memory')) {
+    fail('generation_transition_receipt_bootstrap_path_invalid');
+  }
+  return paths.filter(file => {
+    try {
+      fsModule.lstatSync(file);
+      return false;
+    } catch (error) {
+      if (error?.code === 'ENOENT') return true;
+      fail('generation_transition_receipt_bootstrap_observe_failed');
+    }
+  });
+}
+
+function cleanupFailedReceiptBootstrap(files, fsModule) {
+  const directories = new Set();
+  for (const file of files) {
+    let pathStat;
+    try { pathStat = fsModule.lstatSync(file); } catch (error) {
+      if (error?.code === 'ENOENT') continue;
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    if (!pathStat.isFile() || pathStat.isSymbolicLink() ||
+        pathStat.uid !== 0 || (pathStat.mode & 0o022) !== 0) {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    let descriptor;
+    let opened;
+    try {
+      descriptor = fsModule.openSync(
+        file, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0)
+      );
+      opened = fsModule.fstatSync(descriptor);
+    } catch {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    } finally {
+      if (descriptor !== undefined) fsModule.closeSync(descriptor);
+    }
+    if (!opened.isFile() || opened.uid !== 0 || (opened.mode & 0o022) !== 0 ||
+        opened.dev !== pathStat.dev ||
+        opened.ino !== pathStat.ino) {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    let current;
+    try { current = fsModule.lstatSync(file); } catch {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    if (!current.isFile() || current.isSymbolicLink() ||
+        current.dev !== opened.dev || current.ino !== opened.ino) {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    try { fsModule.unlinkSync(file); } catch {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    }
+    directories.add(path.dirname(file));
+  }
+  for (const directory of directories) {
+    let descriptor;
+    try {
+      descriptor = fsModule.openSync(directory, fs.constants.O_RDONLY);
+      fsModule.fsyncSync(descriptor);
+    } catch {
+      fail('generation_transition_receipt_bootstrap_cleanup_failed');
+    } finally {
+      if (descriptor !== undefined) fsModule.closeSync(descriptor);
+    }
+  }
+}
+
+function prepareReceiptMountSourcesForTransition(authority, {
+  fsModule = fs,
+  prepareReceiptMountSources = prepareEphemeralReceiptMountSources
+} = {}) {
+  const missingBefore = missingReceiptMountSources(authority, fsModule);
+  try {
+    return prepareReceiptMountSources(authority, { fsModule });
+  } catch (error) {
+    cleanupFailedReceiptBootstrap(missingBefore, fsModule);
+    throw error;
+  }
 }
 
 function regularStat(file, {
@@ -654,7 +741,8 @@ function recoverInterrupted({
       recovered: true,
       state: 'NEW_PAIR',
       action: selection.action,
-      journal
+      journal,
+      authority: pair.authority
     };
   }
   if (newBundleOldAuthority) {
@@ -668,7 +756,8 @@ function recoverInterrupted({
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
     }, { fsModule, journalRoot });
     return {
-      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_bundle', journal
+      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_bundle', journal,
+      authority: pair.authority
     };
   }
   if (oldBundleNewAuthority) {
@@ -700,7 +789,8 @@ function recoverInterrupted({
       oldAuthorityDigest, oldBundleDigest, newAuthorityDigest, newBundleDigest
     }, { fsModule, journalRoot });
     return {
-      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_authority', journal
+      recovered: true, state: 'ROLLED_BACK', action: 'restored_old_authority', journal,
+      authority: readAuthority(CONTROL_AUTHORITY, { fsModule })
     };
   }
   fail(RECOVERY_UNKNOWN);
@@ -829,6 +919,7 @@ function executeTransition({
   journalRoot = JOURNAL_ROOT,
   dockerInspect,
   execFile,
+  prepareReceiptMountSources = prepareEphemeralReceiptMountSources,
   node = ADMITTED_NODE,
   launcher = INSTALLED_LAUNCHER,
   randomBytes = crypto.randomBytes,
@@ -844,6 +935,9 @@ function executeTransition({
     fsModule, journalRoot
   });
   if (recovery.state === 'NEW_PAIR') {
+    prepareReceiptMountSourcesForTransition(recovery.authority, {
+      fsModule, prepareReceiptMountSources
+    });
     // Already NEW+NEW: verify; if it fails, roll back to OLD+OLD.
     try {
       const verified = invokeInstalledLauncher('verify', CONTROL_AUTHORITY, {
@@ -868,6 +962,9 @@ function executeTransition({
     fail('generation_transition_recovery_new_pair_unverifiable');
   }
   if (recovery.state === 'ROLLED_BACK') {
+    prepareReceiptMountSourcesForTransition(recovery.authority, {
+      fsModule, prepareReceiptMountSources
+    });
     const verified = invokeInstalledLauncher('verify', CONTROL_AUTHORITY, {
       execFile, node, launcher
     });
@@ -892,6 +989,18 @@ function executeTransition({
     dockerInspect,
     edgeContainerId: newPair.candidate.edgeContainerId,
     providerContainerId: newPair.candidate.providerContainerId
+  });
+
+  // Receipt mount sources live under /run and may be absent after a fresh
+  // host boot. Bootstrap them only in execute mode, after every read-only
+  // generation/lifecycle precheck and while the CLI holds the lifecycle lock.
+  // Candidate mode never reaches this function. The canonical helper is
+  // idempotent, preserves existing receipt files byte/inode-exactly, rejects
+  // unsafe paths and refuses to create a missing source for an active Runtime.
+  // This is an ephemeral prerequisite, so it deliberately precedes PREPARED:
+  // a partial bootstrap cannot imply that generation mutation began.
+  prepareReceiptMountSourcesForTransition(newPair.candidate, {
+    fsModule, prepareReceiptMountSources
   });
 
   // 3) Durable PREPARED journal + backups.
@@ -1078,6 +1187,7 @@ function main(argv = process.argv.slice(2), deps = {}) {
     execFile: deps.execFile,
     node: deps.node || ADMITTED_NODE,
     launcher: deps.launcher || INSTALLED_LAUNCHER,
+    prepareReceiptMountSources: deps.prepareReceiptMountSources,
     randomBytes: deps.randomBytes,
     verifyAfter: deps.verifyAfter !== false
   });

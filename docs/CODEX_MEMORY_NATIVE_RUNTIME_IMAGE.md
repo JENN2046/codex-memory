@@ -290,13 +290,16 @@ authority as a single orchestrated transaction:
    writable bits);
 4. verify lifecycle containers (OLD/NEW Runtime stopped, Edge healthy,
    Provider running);
-5. write a durable `PREPARED` journal, preserve OLD authority bytes and OLD
+5. prepare any missing ephemeral Edge/Provider receipt mount-source
+   placeholders below `/run/codex-memory` with the installed launcher's
+   canonical, idempotent bootstrap primitive;
+6. write a durable `PREPARED` journal, preserve OLD authority bytes and OLD
    bundle bytes;
-6. publish the NEW bundle atomically per file;
-7. stage the NEW authority inside the journal only, then invoke the NEW
+7. publish the NEW bundle atomically per file;
+8. stage the NEW authority inside the journal only, then invoke the NEW
    installed launcher's `activate` (the only authority write path) followed by
    its `verify`;
-8. write the durable `COMMITTED` journal.
+9. write the durable `COMMITTED` journal.
 
 Fixed production targets (install root, authority path, lifecycle lock, Node
 executable, 7-file list) are hard-coded and never caller-settable. The control
@@ -317,8 +320,21 @@ verified NEW+NEW is committed (`generation_transition_committed_after_failure`),
 and every incomplete pair (NEW+OLD, OLD+NEW) is restored to OLD+OLD before
 re-throwing the original failure. Interrupted recovery restores OLD bundle or
 OLD authority from the journal backup and fails closed on unknown states. The
-primitive never starts, stops, creates, or deletes containers and never
-touches Edge or Provider sources.
+receipt bootstrap deliberately precedes `PREPARED`: it may create one or both
+root-owned placeholder files even when no generation journal is created. A
+partial bootstrap therefore means ephemeral prerequisite mutation only, not
+that bundle/authority mutation began. On a handled helper failure, the
+controller removes only files that were absent before this attempt and still
+match a root-owned, no-follow-opened regular-file inode, then fsyncs the parent;
+an unverifiable cleanup fails closed. Retrying is safe: existing receipt
+sources are never cleanup candidates, missing sources are completed, and an
+active Runtime or unsafe source path fails closed. Candidate-only mode never
+performs this bootstrap. The primitive never starts, stops, creates, or deletes
+containers and never mutates Edge or Provider container state.
+Recovery performs the same execute-only bootstrap before installed-launcher
+verification of a coherent NEW pair or a restored OLD pair, so loss of `/run`
+across a reboot does not force rollback or make an interrupted transaction
+unrecoverable.
 
 ## R1 disposition
 
