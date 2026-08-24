@@ -15,7 +15,7 @@
 //   -> durable PREPARED journal
 //   -> preserve OLD authority bytes + OLD bundle bytes
 //   -> publish NEW bundle (exact 7-file topology, atomically per file)
-//   -> invoke NEW INSTALLED launcher activate NEW authority
+//   -> invoke NEW INSTALLED launcher with the verified materialized NEW authority
 //   -> NEW installed launcher verifies NEW active authority
 //   -> durable COMMITTED journal
 //
@@ -397,6 +397,18 @@ function verifyNewCandidate({
   if (digest(candidate) !== newAuthorityDigest) {
     fail('generation_transition_new_authority_digest_mismatch');
   }
+  // Activation is deliberately narrower than general candidate-file input:
+  // the installed launcher accepts authority material only from its fixed
+  // /etc/codex-memory/ trust surface. Require the admitted candidate path to
+  // be that authority's own exact mount-source binding, not a journal copy or
+  // another byte-equivalent file chosen by the transition caller.
+  const activationAuthorityPath = candidate?.runtimeMountSources?.authority;
+  if (typeof activationAuthorityPath !== 'string' ||
+      path.resolve(activationAuthorityPath) !== activationAuthorityPath ||
+      !activationAuthorityPath.startsWith('/etc/codex-memory/') ||
+      path.resolve(newAuthorityCandidate) !== activationAuthorityPath) {
+    fail('generation_transition_new_authority_activation_path_invalid');
+  }
   const candidateBundleDigest = stagedBundleDigest(newBundleRoot, { fsModule });
   if (candidateBundleDigest !== newBundleDigest) {
     fail('generation_transition_new_bundle_digest_mismatch');
@@ -422,7 +434,7 @@ function verifyNewCandidate({
     validateImageProfile(profile, profileAuthorityComponents(candidate));
   } catch { fail('generation_transition_new_profile_authority_mismatch'); }
   return Object.freeze({ candidate, candidateBytes: bytes,
-    candidateBundleDigest });
+    candidateBundleDigest, activationAuthorityPath });
 }
 
 function verifyLifecycle({
@@ -1010,7 +1022,8 @@ function executeTransition({
   }, { fsModule, journalRoot });
   backupOldPair(oldPair.authority, id, { fsModule, journalRoot });
 
-  // 4) Publish NEW bundle, stage candidate, activate, verify, commit.
+  // 4) Publish NEW bundle, preserve a journal copy, revalidate the exact
+  // materialized /etc authority bytes, activate, verify, commit.
   try {
     publishNewBundle(newBundleRoot, { fsModule });
     writeJournal(id, 'BUNDLE_PUBLISHED', {
@@ -1022,7 +1035,14 @@ function executeTransition({
       fsModule, uid: 0, gid: 0, mode: 0o600
     });
 
-    const activated = invokeInstalledLauncher('activate', stagedAuthority, {
+    // The journal copy is recovery evidence, not an activation input. Re-read
+    // the admitted materialized authority immediately before launcher handoff
+    // and fail closed if its bytes moved after candidate verification.
+    const activationBytes = readRootFile(newPair.activationAuthorityPath, { fsModule });
+    if (!activationBytes.equals(newPair.candidateBytes)) {
+      fail('generation_transition_new_authority_activation_source_drift');
+    }
+    const activated = invokeInstalledLauncher('activate', newPair.activationAuthorityPath, {
       execFile, node, launcher,
       env: { CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD: process.env.CODEX_MEMORY_HOST_LIFECYCLE_LOCK_FD }
     });

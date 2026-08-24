@@ -274,6 +274,7 @@ function buildWorld(t) {
   const stagedRoot = path.join(backing, 'staged-bundle');
   writeBundle(stagedRoot, NEW_BUNDLE_CONTENT);
   const newBundleDigest = hostBundleDigest(stagedRoot);
+  const newCandidatePath = '/etc/codex-memory/bootstrap/new/runtime-authority.json';
   const newRuntime = runtimeInspect(NEW_RUNTIME_ID, NEW_IMAGE_ID);
   const next = {
     ...authorityBase({
@@ -291,6 +292,7 @@ function buildWorld(t) {
       vcpCommit: C('dd'),
       runtimeMountSources: {
         ...authorityBase().runtimeMountSources,
+        authority: newCandidatePath,
         profile: '/etc/codex-memory/bootstrap/new/profile-v7.json',
         runtimeDirectory: '/var/lib/codex-memory/runtime-new'
       }
@@ -302,9 +304,9 @@ function buildWorld(t) {
     { expectedCurrentFingerprint: digest(oldProfile) }
   ).nextProfile;
   next.profileSha256 = sha256Buffer(Buffer.from(canonicalJson(newProfile)));
-  const newCandidatePath = path.join(backing, 'etc/codex-memory/bootstrap/new/candidate.json');
-  fs.mkdirSync(path.dirname(newCandidatePath), { recursive: true, mode: 0o700 });
-  fs.writeFileSync(newCandidatePath, canonicalJson(next), { mode: 0o600 });
+  const newCandidateBackingPath = path.join(backing, newCandidatePath.replace(/^\//, ''));
+  fs.mkdirSync(path.dirname(newCandidateBackingPath), { recursive: true, mode: 0o700 });
+  fs.writeFileSync(newCandidateBackingPath, canonicalJson(next), { mode: 0o600 });
   const newProfilePath = path.join(backing, 'etc/codex-memory/bootstrap/new/profile-v7.json');
   fs.mkdirSync(path.dirname(newProfilePath), { recursive: true, mode: 0o700 });
   fs.writeFileSync(newProfilePath, canonicalJson(newProfile), { mode: 0o644 });
@@ -436,6 +438,10 @@ childProcess.execFileSync = function (file, args, options) {
   }
   if (file === ADMITTED_NODE && argv[0] === LAUNCHER &&
       (argv[1] === 'activate' || argv[1] === 'verify')) {
+    if (argv[1] === 'activate' && argv[2] !==
+        '--authority=/etc/codex-memory/bootstrap/new/runtime-authority.json') {
+      throw new Error('unexpected activation authority path: ' + argv[2]);
+    }
     return JSON.stringify(argv[1] === 'activate'
       ? { accepted: true, action: 'authority_activated', authorityDigest: 'sha256:' + '0'.repeat(64) }
       : { accepted: true, action: 'verified' });

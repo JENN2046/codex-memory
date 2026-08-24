@@ -296,9 +296,11 @@ authority as a single orchestrated transaction:
 6. write a durable `PREPARED` journal, preserve OLD authority bytes and OLD
    bundle bytes;
 7. publish the NEW bundle atomically per file;
-8. stage the NEW authority inside the journal only, then invoke the NEW
-   installed launcher's `activate` (the only authority write path) followed by
-   its `verify`;
+8. preserve an exact NEW-authority copy inside the journal as recovery
+   evidence, re-read and byte-compare the authority's own admitted,
+   root-owned `/etc/codex-memory/...` mount-source path, then pass that exact
+   materialized path to the NEW installed launcher's `activate` (the only
+   control-authority write path), followed by its `verify`;
 9. write the durable `COMMITTED` journal.
 
 Fixed production targets (install root, authority path, lifecycle lock, Node
