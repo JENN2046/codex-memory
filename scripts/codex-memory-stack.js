@@ -7175,9 +7175,12 @@ async function stopContainerManaged(profile, environment) {
 
 async function superviseContainedRuntime(evidence, {
   environment = process.env,
-  waitIntervalMs = 1_000
+  waitIntervalMs = 1_000,
+  startStack = startStackWithProfile,
+  inspectProcess = inspectManagedProcess,
+  stopStack = stopContainerManaged
 } = {}) {
-  const startRecord = await startStackWithProfile(evidence.profile, {
+  const startRecord = await startStack(evidence.profile, {
     containerEvidence: evidence,
     environment
   });
@@ -7199,7 +7202,7 @@ async function superviseContainedRuntime(evidence, {
   const monitor = setInterval(() => {
     if (stopping) return;
     const healthy = Object.keys(COMPONENTS).every(name => {
-      const state = inspectManagedProcess(name, {
+      const state = inspectProcess(name, {
         environment,
         profile: evidence.profile
       });
@@ -7210,10 +7213,14 @@ async function superviseContainedRuntime(evidence, {
       resolveStop('child_exit');
     }
   }, waitIntervalMs);
-  monitor.unref();
+  // The managed children are deliberately detached and unreferenced. This
+  // monitor is therefore the supervisor's liveness anchor and must remain
+  // referenced; a pending Promise alone does not keep the Node event loop
+  // alive. Unref'ing it makes the container entrypoint exit 0 immediately
+  // after admission even though all managed children were just started.
   const reason = await stopRequested;
   clearInterval(monitor);
-  const stopped = await stopContainerManaged(evidence.profile, environment);
+  const stopped = await stopStack(evidence.profile, environment);
   if (reason !== 'signal') throw codedError('stack_container_child_exited');
   return Object.freeze({
     accepted: true,

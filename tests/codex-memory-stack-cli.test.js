@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('node:assert/strict');
-const { spawnSync } = require('node:child_process');
+const { spawn, spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const http = require('node:http');
 const net = require('node:net');
@@ -4591,4 +4591,64 @@ test('error projection never returns arbitrary runtime text', () => {
   assert.equal(safeCode(new Error('token=not-for-output')), 'codex_memory_stack_failed');
   assert.equal(exactKeys({ a: 1 }, ['a']), true);
   assert.equal(exactKeys({ a: 1, b: 2 }, ['a']), false);
+});
+
+test('container supervisor remains alive after detached children start', async () => {
+  const stackModule = path.join(__dirname, '..', 'scripts', 'codex-memory-stack.js');
+  const program = `
+    const { superviseContainedRuntime } = require(${JSON.stringify(stackModule)});
+    let announced = false;
+    superviseContainedRuntime({ profile: {} }, {
+      environment: {},
+      waitIntervalMs: 10,
+      startStack: async () => ({
+        outcome: { accepted: true, runtimeAccepted: true }
+      }),
+      inspectProcess: () => {
+        if (!announced) {
+          announced = true;
+          process.stdout.write('READY\\n');
+        }
+        return { running: true, controllerManaged: true };
+      },
+      stopStack: async () => []
+    }).then(result => {
+      process.stdout.write('RESULT ' + JSON.stringify(result) + '\\n');
+    }).catch(error => {
+      process.stderr.write(String(error && (error.code || error.message)) + '\\n');
+      process.exitCode = 1;
+    });
+  `;
+  const child = spawn(process.execPath, ['-e', program], {
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+  let stdout = '';
+  let stderr = '';
+  let stopSent = false;
+  child.stdout.on('data', chunk => {
+    stdout += chunk;
+    if (!stopSent && stdout.includes('READY\n')) {
+      stopSent = true;
+      assert.equal(child.exitCode, null);
+      child.kill('SIGTERM');
+    }
+  });
+  child.stderr.on('data', chunk => { stderr += chunk; });
+  const exitCode = await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      child.kill('SIGKILL');
+      reject(new Error('container supervisor liveness test timed out'));
+    }, 2_000);
+    child.once('error', error => {
+      clearTimeout(timeout);
+      reject(error);
+    });
+    child.once('close', code => {
+      clearTimeout(timeout);
+      resolve(code);
+    });
+  });
+  assert.equal(stopSent, true, `child exited before liveness observation: ${stderr}`);
+  assert.equal(exitCode, 0, stderr);
+  assert.match(stdout, /RESULT .*"action":"stopped"/u);
 });
