@@ -43,6 +43,13 @@ const {
   VCP_RUNTIME_SECURITY_ROOTS
 } = require('../src/core/VcpRuntimeContract');
 const {
+  canonicalGovernedNativeClient,
+  canonicalMemoryVisibility
+} = require('../src/core/MemoryAccessContract');
+const {
+  isSafeReferenceName
+} = require('../src/core/VcpToolBoxSafeReference');
+const {
   AUTHORITY_RECORD_PATH,
   IMAGE_BUILD_MANIFEST_PATH,
   IMAGE_PROFILE_KEYS,
@@ -223,6 +230,20 @@ const SAFE_MANAGED_ENVIRONMENT_NAME =
   /^CODEX_MEMORY_R(?:4|5)_[A-Z0-9_]{1,96}$/u;
 const SENSITIVE_MANAGED_ENVIRONMENT_NAME =
   /(?:^|_)(?:PASSWORD|PRIVATE_KEY|SECRET|TOKEN)(?:_|$)/u;
+const HTTP_TRUSTED_SCOPE_MANAGED_ENVIRONMENT_NAMES = Object.freeze({
+  projectId: 'CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID',
+  workspaceId: 'CODEX_MEMORY_R5_TRUSTED_SCOPE_WORKSPACE_ID',
+  scopeId: 'CODEX_MEMORY_R5_TRUSTED_SCOPE_SCOPE_ID',
+  clientId: 'CODEX_MEMORY_R5_TRUSTED_SCOPE_CLIENT_ID',
+  visibility: 'CODEX_MEMORY_R5_TRUSTED_SCOPE_VISIBILITY'
+});
+const HTTP_TRUSTED_SCOPE_CHILD_ENVIRONMENT_NAMES = Object.freeze({
+  projectId: 'CODEX_MEMORY_PROJECT_ID',
+  workspaceId: 'CODEX_MEMORY_WORKSPACE_ID',
+  scopeId: 'CODEX_MEMORY_SCOPE_ID',
+  clientId: 'CODEX_MEMORY_CLIENT_ID',
+  visibility: 'CODEX_MEMORY_VISIBILITY'
+});
 const PROVIDER_CONFIG_IDENTITY_FILENAME =
   'vcp-provider-config.identity.json';
 const GOVERNANCE_SECRET_IDENTITY_FILENAME =
@@ -6388,6 +6409,52 @@ function buildShimChildEnvironment(environment, {
   };
 }
 
+function validateManagedHttpTrustedScope(environment) {
+  const trustedScope = Object.fromEntries(
+    Object.entries(HTTP_TRUSTED_SCOPE_MANAGED_ENVIRONMENT_NAMES).map(
+      ([fieldName, environmentName]) => [
+        fieldName,
+        typeof environment?.[environmentName] === 'string'
+          ? environment[environmentName].trim()
+          : ''
+      ]
+    )
+  );
+  const identifierFields = ['projectId', 'workspaceId', 'scopeId'];
+  if (!identifierFields.some(fieldName => trustedScope[fieldName])) {
+    throw codedError('stack_http_trusted_scope_identifier_missing');
+  }
+  for (const fieldName of identifierFields) {
+    if (trustedScope[fieldName] && !isSafeReferenceName(trustedScope[fieldName])) {
+      throw codedError('stack_http_trusted_scope_reference_invalid');
+    }
+  }
+  if (!isSafeReferenceName(trustedScope.clientId) ||
+      canonicalGovernedNativeClient(trustedScope.clientId) === null) {
+    throw codedError('stack_http_trusted_scope_client_invalid');
+  }
+  const visibility = canonicalMemoryVisibility(trustedScope.visibility);
+  if (visibility === null) {
+    throw codedError('stack_http_trusted_scope_visibility_invalid');
+  }
+  return Object.freeze({
+    ...trustedScope,
+    visibility
+  });
+}
+
+function projectManagedHttpTrustedScope(environment) {
+  const trustedScope = validateManagedHttpTrustedScope(environment);
+  return Object.freeze(Object.fromEntries(
+    Object.entries(HTTP_TRUSTED_SCOPE_CHILD_ENVIRONMENT_NAMES)
+      .filter(([fieldName]) => trustedScope[fieldName])
+      .map(([fieldName, environmentName]) => [
+        environmentName,
+        trustedScope[fieldName]
+      ])
+  ));
+}
+
 function buildHttpChildEnvironment(environment, {
   token,
   runtimeRoot,
@@ -6399,6 +6466,7 @@ function buildHttpChildEnvironment(environment, {
   const isolatedDiaryRoot = path.join(runtimeRoot, 'data', 'no-primary-memory');
   return {
     ...childBaseEnvironment(environment),
+    ...projectManagedHttpTrustedScope(environment),
     CODEX_MEMORY_HTTP_HOST: httpEndpoint.host,
     CODEX_MEMORY_HTTP_PORT: String(httpEndpoint.port),
     CODEX_MEMORY_HTTP_PATH: httpEndpoint.path,
@@ -7415,6 +7483,7 @@ module.exports = {
   profileVcpProviderConfigMatches,
   profileWithControllerManifestBinding,
   profileWithSourceManifestRebinding,
+  projectManagedHttpTrustedScope,
   profileVcpRuntimeIdentityMode,
   profileVcpRuntimeIdentityMatches,
   containerSupervisorAuthorityMatchesProfile,
@@ -7438,6 +7507,7 @@ module.exports = {
   safeCode,
   sourceManifestRebindEligible,
   validateExpectedMappingEnvironment,
+  validateManagedHttpTrustedScope,
   validateRetainedBindingPayload,
   validateProfile,
   vcpProviderConfigDigest,
