@@ -88,6 +88,7 @@ const {
   profileWithSourceManifestRebinding,
   profileVcpRuntimeIdentityMode,
   profileVcpRuntimeIdentityMatches,
+  projectManagedHttpTrustedScope,
   providerCredentialFreshnessMatches,
   projectHttpHealthPayload,
   relayCredentialFreshnessMatches,
@@ -97,6 +98,7 @@ const {
   safeCode,
   sourceManifestRebindEligible,
   validateExpectedMappingEnvironment,
+  validateManagedHttpTrustedScope,
   validateRetainedBindingPayload,
   validateProfile,
   vcpProviderConfigDigest,
@@ -111,6 +113,9 @@ const {
 const {
   getPublicToolDefinitions
 } = require('../src/adapters/codex-mcp/server');
+const {
+  buildRecordMemoryTrustedExecutionContext
+} = require('../src/core/RecordMemoryTrustedExecutionContext');
 const {
   canonicalProfileFingerprint,
   commitOwnerProfileTransaction
@@ -1828,6 +1833,16 @@ test('managed child environments neutralize caller write, root, provider, and pu
     CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE: 'full',
     CODEX_MEMORY_EXPOSE_WRITE_TOOLS: 'true',
     CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER: 'true',
+    CODEX_MEMORY_PROJECT_ID: 'parent-injected-project',
+    CODEX_MEMORY_WORKSPACE_ID: 'parent-injected-workspace',
+    CODEX_MEMORY_SCOPE_ID: 'parent-injected-scope',
+    CODEX_MEMORY_CLIENT_ID: 'Claude',
+    CODEX_MEMORY_VISIBILITY: 'shared',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID: 'codex-memory',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_WORKSPACE_ID: 'workspace-alpha',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_SCOPE_ID: 'project-scope',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_CLIENT_ID: 'codex',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_VISIBILITY: 'project',
     CODEX_MEMORY_R4_EXPECTED_MAPPING_REFERENCE: 'jenn-vcp-diary-scope-v1',
     CODEX_MEMORY_R4_EXPECTED_MAPPING_DIGEST: digest
   };
@@ -1903,6 +1918,11 @@ test('managed child environments neutralize caller write, root, provider, and pu
   assert.equal(http.CODEX_MEMORY_HTTP_PORT, '7625');
   assert.equal(http.CODEX_MEMORY_HTTP_PATH, '/mcp/codex-memory');
   assert.equal(http.CODEX_MEMORY_HTTP_TOKEN, 'synthetic-token');
+  assert.equal(http.CODEX_MEMORY_PROJECT_ID, 'codex-memory');
+  assert.equal(http.CODEX_MEMORY_WORKSPACE_ID, 'workspace-alpha');
+  assert.equal(http.CODEX_MEMORY_SCOPE_ID, 'project-scope');
+  assert.equal(http.CODEX_MEMORY_CLIENT_ID, 'codex');
+  assert.equal(http.CODEX_MEMORY_VISIBILITY, 'project');
   assert.equal(http.CODEX_MEMORY_SECURITY_PROFILE, 'hardened');
   assert.equal(http.CODEX_MEMORY_ALLOW_EXTERNAL_PROVIDER, 'false');
   assert.equal(http.CODEX_MEMORY_ENABLE_SOFT_READ_POLICY, 'true');
@@ -1962,6 +1982,94 @@ test('managed child environments neutralize caller write, root, provider, and pu
   );
   assert.equal(http.CODEX_MEMORY_EXPECTED_DIARY_SCOPE_MAPPING_DIGEST, digest);
   assert.equal(Object.hasOwn(http, 'API_Key'), false);
+});
+
+test('HTTP child validates the dedicated managed trusted-scope source fail closed', () => {
+  const valid = {
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID: 'codex-memory',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_WORKSPACE_ID: 'workspace-alpha',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_SCOPE_ID: 'project-scope',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_CLIENT_ID: 'codex',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_VISIBILITY: 'project'
+  };
+
+  assert.deepEqual(validateManagedHttpTrustedScope(valid), {
+    projectId: 'codex-memory',
+    workspaceId: 'workspace-alpha',
+    scopeId: 'project-scope',
+    clientId: 'codex',
+    visibility: 'project'
+  });
+  assert.deepEqual(projectManagedHttpTrustedScope({
+    ...valid,
+    CODEX_MEMORY_PROJECT_ID: 'parent-injected-project',
+    CODEX_MEMORY_CLIENT_ID: 'Claude',
+    CODEX_MEMORY_VISIBILITY: 'shared'
+  }), {
+    CODEX_MEMORY_PROJECT_ID: 'codex-memory',
+    CODEX_MEMORY_WORKSPACE_ID: 'workspace-alpha',
+    CODEX_MEMORY_SCOPE_ID: 'project-scope',
+    CODEX_MEMORY_CLIENT_ID: 'codex',
+    CODEX_MEMORY_VISIBILITY: 'project'
+  });
+
+  const executionContext = buildRecordMemoryTrustedExecutionContext({
+    config: {
+      allowedAgentAlias: 'Codex',
+      defaultAgentId: 'codex-desktop',
+      defaultRequestSource: 'codex-memory-mcp'
+    },
+    env: projectManagedHttpTrustedScope(valid)
+  });
+  assert.deepEqual(executionContext, {
+    agentAlias: 'Codex',
+    agentId: 'codex-desktop',
+    requestSource: 'codex-memory-mcp',
+    projectId: 'codex-memory',
+    workspaceId: 'workspace-alpha',
+    scopeId: 'project-scope',
+    clientId: 'codex',
+    visibility: 'project'
+  });
+
+  assert.throws(
+    () => validateManagedHttpTrustedScope({
+      ...valid,
+      CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID: '',
+      CODEX_MEMORY_R5_TRUSTED_SCOPE_WORKSPACE_ID: '',
+      CODEX_MEMORY_R5_TRUSTED_SCOPE_SCOPE_ID: ''
+    }),
+    { code: 'stack_http_trusted_scope_identifier_missing' }
+  );
+  assert.throws(
+    () => validateManagedHttpTrustedScope({
+      ...valid,
+      CODEX_MEMORY_R5_TRUSTED_SCOPE_VISIBILITY: 'public'
+    }),
+    { code: 'stack_http_trusted_scope_visibility_invalid' }
+  );
+  assert.throws(
+    () => validateManagedHttpTrustedScope({
+      ...valid,
+      CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID: 'file:/private/scope'
+    }),
+    { code: 'stack_http_trusted_scope_reference_invalid' }
+  );
+  assert.throws(
+    () => validateManagedHttpTrustedScope({
+      ...valid,
+      CODEX_MEMORY_R5_TRUSTED_SCOPE_CLIENT_ID: 'manual'
+    }),
+    { code: 'stack_http_trusted_scope_client_invalid' }
+  );
+  assert.throws(
+    () => projectManagedHttpTrustedScope({
+      CODEX_MEMORY_PROJECT_ID: 'parent-injected-project',
+      CODEX_MEMORY_CLIENT_ID: 'codex',
+      CODEX_MEMORY_VISIBILITY: 'project'
+    }),
+    { code: 'stack_http_trusted_scope_identifier_missing' }
+  );
 });
 
 test('native shim exposes an in-process listener entry for the managed PID', () => {

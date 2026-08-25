@@ -16,6 +16,9 @@ const {
 const {
   validateGovernedMcpToolsListCoversCurrentProductGoal
 } = require('../src/core/CurrentProductGoalContract');
+const {
+  buildHttpChildEnvironment
+} = require('../scripts/codex-memory-stack');
 
 const NO_TOKEN_OVERVIEW_KEYS = [
   'access',
@@ -111,7 +114,9 @@ const RECORD_MEMORY_STRICT_AUTH_ENV_KEYS = [
   'CODEX_MEMORY_REQUEST_SOURCE',
   'CODEX_MEMORY_PROJECT_ID',
   'CODEX_MEMORY_WORKSPACE_ID',
+  'CODEX_MEMORY_SCOPE_ID',
   'CODEX_MEMORY_CLIENT_ID',
+  'CODEX_MEMORY_VISIBILITY',
   'CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE',
   'CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_ALIAS',
   'CODEX_MEMORY_RECORD_MEMORY_ALLOWED_AGENT_IDS',
@@ -333,6 +338,137 @@ test('HTTP MCP should initialize and return a session header', async () => {
       payload.result._meta.codexMemoryGovernedBridge.disclosure.serverHandshakeLowDisclosure,
       true
     );
+  });
+});
+
+test('HTTP MCP projects managed trusted scope through strict gate to native read boundary', async () => {
+  const childEnvironment = buildHttpChildEnvironment({
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID: 'codex-memory',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_WORKSPACE_ID: 'workspace-alpha',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_SCOPE_ID: 'project-scope',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_CLIENT_ID: 'codex',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_VISIBILITY: 'project'
+  }, {
+    token: 'test-token',
+    runtimeRoot: '/runtime/isolated'
+  });
+  const trustedScopeEnvironment = Object.fromEntries([
+    'CODEX_MEMORY_PROJECT_ID',
+    'CODEX_MEMORY_WORKSPACE_ID',
+    'CODEX_MEMORY_SCOPE_ID',
+    'CODEX_MEMORY_CLIENT_ID',
+    'CODEX_MEMORY_VISIBILITY'
+  ].map(name => [name, childEnvironment[name]]));
+  let nativeReadCall = null;
+  const nativeReadCaller = async payload => {
+    nativeReadCall = payload;
+    return { results: [] };
+  };
+
+  await withRecordMemoryStrictAuthEnv(trustedScopeEnvironment, async () => {
+    await withHttpServer(async ({ address }) => {
+      const initResponse = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token'
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'initialize',
+          params: {}
+        })
+      });
+      const sessionId = initResponse.headers.get(SESSION_HEADER);
+      assert.equal(initResponse.status, 200);
+      assert.ok(sessionId);
+
+      const toolsResponse = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token',
+          [SESSION_HEADER]: sessionId
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 2,
+          method: 'tools/list',
+          params: {}
+        })
+      });
+      const toolsPayload = await toolsResponse.json();
+      const toolNames = toolsPayload.result.tools.map(tool => tool.name);
+      assert.equal(toolsResponse.status, 200);
+      assert.equal(toolNames.includes('search_memory'), true);
+      assert.equal(toolNames.includes('record_memory'), false);
+
+      const searchResponse = await fetch(address.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer test-token',
+          [SESSION_HEADER]: sessionId
+        },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: 3,
+          method: 'tools/call',
+          params: {
+            name: 'search_memory',
+            arguments: {
+              query: 'managed trusted scope boundary fixture',
+              target: 'both',
+              limit: 3,
+              include_content: false
+            }
+          }
+        })
+      });
+      const searchPayload = await searchResponse.json();
+      const searchResult = searchPayload.result.structuredContent;
+
+      assert.equal(searchResponse.status, 200);
+      assert.equal(searchResult.status, 'GOVERNED_MCP_VCP_NATIVE_READ_DELEGATED');
+      assert.ok(nativeReadCall);
+      assert.deepEqual(nativeReadCall.arguments.scope, {
+        project_id: 'codex-memory',
+        scope_id: 'project-scope',
+        workspace_id: 'workspace-alpha',
+        client_id: 'Codex',
+        visibility: 'project'
+      });
+      assert.equal(
+        nativeReadCall.arguments.governed_bridge.trusted_execution_context_supplied,
+        true
+      );
+      assert.equal(
+        nativeReadCall.arguments.governed_bridge.trusted_execution_context_accepted,
+        true
+      );
+      assert.equal(
+        nativeReadCall.arguments.governed_bridge.trusted_execution_context_scope_matched,
+        true
+      );
+      assert.equal(nativeReadCall.arguments.governed_bridge.write_allowed, false);
+    }, {
+      bearerToken: 'test-token'
+    }, {
+      mcpPublicToolSurface: childEnvironment.CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE,
+      exposeWriteMcpTools: false,
+      governedMcpVcpNativeBridgeGateMode:
+        childEnvironment.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE,
+      governedMcpVcpNativeReadDelegationMode:
+        childEnvironment.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE,
+      governedMcpVcpNativeWriteDelegationMode:
+        childEnvironment.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE,
+      governedMcpVcpNativeRuntimeTarget: {
+        targetReferenceName: 'operator-vcp-toolbox-service-ref',
+        targetKind: 'mcp_server'
+      },
+      governedMcpVcpNativeReadDelegationToolCaller: nativeReadCaller
+    });
   });
 });
 
