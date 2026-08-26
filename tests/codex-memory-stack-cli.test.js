@@ -63,6 +63,7 @@ const {
   governanceSocketRootForSchema,
   governanceCredentialFreshnessMatches,
   governancePrivateFileIdentities,
+  hasManagedHttpTrustedScopeMigration,
   loadManagedEnvironmentFile,
   managedEnvironmentConfigDigest,
   managedShimArguments,
@@ -2012,6 +2013,15 @@ test('HTTP child validates the dedicated managed trusted-scope source fail close
     CODEX_MEMORY_CLIENT_ID: 'codex',
     CODEX_MEMORY_VISIBILITY: 'project'
   });
+  assert.deepEqual(projectManagedHttpTrustedScope({
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID: 'codex-memory',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_CLIENT_ID: 'codex',
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_VISIBILITY: 'project'
+  }), {
+    CODEX_MEMORY_PROJECT_ID: 'codex-memory',
+    CODEX_MEMORY_CLIENT_ID: 'codex',
+    CODEX_MEMORY_VISIBILITY: 'project'
+  });
 
   const executionContext = buildRecordMemoryTrustedExecutionContext({
     config: {
@@ -2062,13 +2072,106 @@ test('HTTP child validates the dedicated managed trusted-scope source fail close
     }),
     { code: 'stack_http_trusted_scope_client_invalid' }
   );
-  assert.throws(
-    () => projectManagedHttpTrustedScope({
+  assert.deepEqual(
+    projectManagedHttpTrustedScope({
       CODEX_MEMORY_PROJECT_ID: 'parent-injected-project',
       CODEX_MEMORY_CLIENT_ID: 'codex',
       CODEX_MEMORY_VISIBILITY: 'project'
     }),
+    {}
+  );
+});
+
+test('HTTP child treats dedicated R5 key presence as an explicit migration envelope', () => {
+  const ordinaryParentScope = {
+    CODEX_MEMORY_PROJECT_ID: 'parent-injected-project',
+    CODEX_MEMORY_WORKSPACE_ID: 'parent-injected-workspace',
+    CODEX_MEMORY_SCOPE_ID: 'parent-injected-scope',
+    CODEX_MEMORY_CLIENT_ID: 'Claude',
+    CODEX_MEMORY_VISIBILITY: 'shared'
+  };
+  const childScopeNames = [
+    'CODEX_MEMORY_PROJECT_ID',
+    'CODEX_MEMORY_WORKSPACE_ID',
+    'CODEX_MEMORY_SCOPE_ID',
+    'CODEX_MEMORY_CLIENT_ID',
+    'CODEX_MEMORY_VISIBILITY'
+  ];
+
+  assert.equal(hasManagedHttpTrustedScopeMigration({}), false);
+  assert.equal(
+    hasManagedHttpTrustedScopeMigration(ordinaryParentScope),
+    false
+  );
+  assert.deepEqual(projectManagedHttpTrustedScope(ordinaryParentScope), {});
+  assert.throws(
+    () => validateManagedHttpTrustedScope({}),
     { code: 'stack_http_trusted_scope_identifier_missing' }
+  );
+
+  for (const [schemaVersion, expectedPort] of [
+    [4, '7605'],
+    [EXACT_HEAD_PROFILE_SCHEMA_VERSION, '7605'],
+    [PROFILE_SCHEMA_VERSION, '7625'],
+    [IMAGE_PROFILE_SCHEMA_VERSION, '7625']
+  ]) {
+    const child = buildHttpChildEnvironment(ordinaryParentScope, {
+      token: 'synthetic-token',
+      runtimeRoot: '/runtime/isolated',
+      profileSchemaVersion: schemaVersion
+    });
+    assert.equal(child.CODEX_MEMORY_HTTP_PORT, expectedPort, schemaVersion);
+    for (const name of childScopeNames) {
+      assert.equal(Object.hasOwn(child, name), false, `${schemaVersion}:${name}`);
+    }
+    assert.equal(
+      child.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE,
+      'strict'
+    );
+    assert.equal(
+      child.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE,
+      'primary'
+    );
+    assert.equal(
+      child.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE,
+      'off'
+    );
+    assert.equal(child.CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE, 'read_only');
+    assert.equal(child.CODEX_MEMORY_RECORD_MEMORY_AUTH_MODE, 'off');
+  }
+
+  const unmigratedExecutionContext = buildRecordMemoryTrustedExecutionContext({
+    config: {
+      allowedAgentAlias: 'Codex',
+      defaultAgentId: 'codex-desktop',
+      defaultRequestSource: 'codex-memory-mcp'
+    },
+    env: buildHttpChildEnvironment(ordinaryParentScope, {
+      token: 'synthetic-token',
+      runtimeRoot: '/runtime/isolated',
+      profileSchemaVersion: PROFILE_SCHEMA_VERSION
+    })
+  });
+  assert.deepEqual(unmigratedExecutionContext, {
+    agentAlias: 'Codex',
+    agentId: 'codex-desktop',
+    requestSource: 'codex-memory-mcp'
+  });
+
+  assert.equal(hasManagedHttpTrustedScopeMigration({
+    CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID: ''
+  }), true);
+  assert.throws(
+    () => projectManagedHttpTrustedScope({
+      CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID: ''
+    }),
+    { code: 'stack_http_trusted_scope_identifier_missing' }
+  );
+  assert.throws(
+    () => projectManagedHttpTrustedScope({
+      CODEX_MEMORY_R5_TRUSTED_SCOPE_PROJECT_ID: 'codex-memory'
+    }),
+    { code: 'stack_http_trusted_scope_client_invalid' }
   );
 });
 
