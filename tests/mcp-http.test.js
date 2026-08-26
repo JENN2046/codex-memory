@@ -472,6 +472,132 @@ test('HTTP MCP projects managed trusted scope through strict gate to native read
   });
 });
 
+test('HTTP MCP starts unmigrated legacy and current children without granting native scope', async () => {
+  const ordinaryParentScope = {
+    CODEX_MEMORY_PROJECT_ID: 'parent-injected-project',
+    CODEX_MEMORY_WORKSPACE_ID: 'parent-injected-workspace',
+    CODEX_MEMORY_SCOPE_ID: 'parent-injected-scope',
+    CODEX_MEMORY_CLIENT_ID: 'Claude',
+    CODEX_MEMORY_VISIBILITY: 'shared'
+  };
+  const trustedScopeNames = [
+    'CODEX_MEMORY_PROJECT_ID',
+    'CODEX_MEMORY_WORKSPACE_ID',
+    'CODEX_MEMORY_SCOPE_ID',
+    'CODEX_MEMORY_CLIENT_ID',
+    'CODEX_MEMORY_VISIBILITY'
+  ];
+
+  await withRecordMemoryStrictAuthEnv({}, async () => {
+    for (const [schemaVersion, expectedPort] of [[5, '7605'], [6, '7625']]) {
+      const childEnvironment = buildHttpChildEnvironment(ordinaryParentScope, {
+        token: 'test-token',
+        runtimeRoot: '/runtime/isolated',
+        profileSchemaVersion: schemaVersion
+      });
+      assert.equal(childEnvironment.CODEX_MEMORY_HTTP_PORT, expectedPort);
+      for (const name of trustedScopeNames) {
+        assert.equal(Object.hasOwn(childEnvironment, name), false, name);
+      }
+
+      let nativeReads = 0;
+      await withHttpServer(async ({ address }) => {
+        const initResponse = await fetch(address.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer test-token'
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'initialize',
+            params: {}
+          })
+        });
+        const sessionId = initResponse.headers.get(SESSION_HEADER);
+        assert.equal(initResponse.status, 200);
+        assert.ok(sessionId);
+
+        const toolsResponse = await fetch(address.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer test-token',
+            [SESSION_HEADER]: sessionId
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 2,
+            method: 'tools/list',
+            params: {}
+          })
+        });
+        const toolsPayload = await toolsResponse.json();
+        const toolNames = toolsPayload.result.tools.map(tool => tool.name);
+        assert.equal(toolsResponse.status, 200);
+        assert.equal(toolNames.includes('search_memory'), true);
+        assert.equal(toolNames.includes('record_memory'), false);
+
+        const searchResponse = await fetch(address.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer test-token',
+            [SESSION_HEADER]: sessionId
+          },
+          body: JSON.stringify({
+            jsonrpc: '2.0',
+            id: 3,
+            method: 'tools/call',
+            params: {
+              name: 'search_memory',
+              arguments: {
+                query: 'unmigrated startup compatibility fixture',
+                target: 'both',
+                limit: 3,
+                include_content: false
+              }
+            }
+          })
+        });
+        const searchPayload = await searchResponse.json();
+        const searchResult = searchPayload.result.structuredContent;
+
+        assert.equal(searchResponse.status, 200);
+        assert.equal(searchPayload.result.isError, true);
+        assert.equal(searchResult.decision, 'rejected');
+        assert.equal(
+          searchResult.reasonCode,
+          'governed_mcp_vcp_native_bridge_gate_rejected'
+        );
+        assert.equal(searchResult.access.runtimeCalled, false);
+        assert.equal(searchResult.access.memoryReadPerformed, false);
+        assert.equal(nativeReads, 0);
+      }, {
+        bearerToken: 'test-token'
+      }, {
+        mcpPublicToolSurface: childEnvironment.CODEX_MEMORY_MCP_PUBLIC_TOOL_SURFACE,
+        exposeWriteMcpTools: false,
+        governedMcpVcpNativeBridgeGateMode:
+          childEnvironment.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_BRIDGE_GATE_MODE,
+        governedMcpVcpNativeReadDelegationMode:
+          childEnvironment.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_READ_DELEGATION_MODE,
+        governedMcpVcpNativeWriteDelegationMode:
+          childEnvironment.CODEX_MEMORY_GOVERNED_MCP_VCP_NATIVE_WRITE_DELEGATION_MODE,
+        governedMcpVcpNativeRuntimeTarget: {
+          targetReferenceName: 'operator-vcp-toolbox-service-ref',
+          targetKind: 'mcp_server'
+        },
+        governedMcpVcpNativeReadDelegationToolCaller: async () => {
+          nativeReads += 1;
+          return { results: [] };
+        }
+      });
+    }
+  });
+});
+
 test('HTTP MCP should expose health and tools/list', async () => {
   await withHttpServer(async ({ app, address }) => {
     assert.equal(app.services.memoryWriteReconcileWorker.isRunning(), false);

@@ -6443,7 +6443,17 @@ function validateManagedHttpTrustedScope(environment) {
   });
 }
 
+function hasManagedHttpTrustedScopeMigration(environment) {
+  return Object.values(HTTP_TRUSTED_SCOPE_MANAGED_ENVIRONMENT_NAMES)
+    .some(environmentName =>
+      Object.prototype.hasOwnProperty.call(environment || {}, environmentName)
+    );
+}
+
 function projectManagedHttpTrustedScope(environment) {
+  if (!hasManagedHttpTrustedScopeMigration(environment)) {
+    return Object.freeze({});
+  }
   const trustedScope = validateManagedHttpTrustedScope(environment);
   return Object.freeze(Object.fromEntries(
     Object.entries(HTTP_TRUSTED_SCOPE_CHILD_ENVIRONMENT_NAMES)
@@ -7460,6 +7470,7 @@ module.exports = {
   isPidRunning,
   legacyVcpRuntimeBootstrapMatches,
   getJsonHealth,
+  hasManagedHttpTrustedScopeMigration,
   loadManagedEnvironmentFile,
   managedStopWaitOptions,
   managedShimArguments,
